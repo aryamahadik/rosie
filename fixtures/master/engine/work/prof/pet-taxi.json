@@ -1,0 +1,5501 @@
+{
+ "id": "pet-taxi",
+ "name": "Pet taxi",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "dog-walker",
+ "plugin": {
+  "pf.license": {
+   "need": "A business registration. Some states or cities also ask for a pet transport license or a commercial pet carrier permit, and commercial vehicle insurance. Drivers need a valid driver's license. The state's or city's form says which.",
+   "ask": "The business registration number, and the pet transport license number where the form asks for one.",
+   "who_holds": "The business holds the pet transport license. Each driver needs a valid driver's license: the business's own check.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "insurance_bond": "Commercial vehicle insurance and pet-care liability insurance are shown as given by the business, not checked by Rosie.",
+   "background_checks": "Drivers: the business's own check of the driver's license and record, or as the state's rules require.",
+   "not_this_work": "Emergency vet transport, pet relocation by air or across states, boarding, grooming and dog walking are other kinds of work, with their own plug-ins."
+  },
+  "pf.services": {
+   "pattern": "Set service: a driver picks the pet up at the customer's door and takes it to the vet, groomer, daycare or another address, then back. Depot runs start and end at the business's own depot.",
+   "list": [
+    {
+     "name": "Local trip, one way",
+     "price_kind": "one price",
+     "example": "$45 for up to 10 miles, one pet (the example business's own price)",
+     "length": "about 30 minutes",
+     "where": "door to door; an adult hands the pet over",
+     "money": "card saved at booking; charged at DONE, when the pet is handed over at the destination"
+    },
+    {
+     "name": "Vet round trip",
+     "price_kind": "one price",
+     "example": "$85 for up to 10 miles each way, with up to 30 minutes of waiting at the clinic",
+     "where": "door to door; the pet comes home with the driver",
+     "money": "paid in full when booked"
+    },
+    {
+     "name": "Long trip, 10 to 30 miles one way",
+     "price_kind": "one price",
+     "example": "$95",
+     "where": "door to door",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Long-distance trip, 30 to 60 miles one way",
+     "price_kind": "one price",
+     "example": "$140: a $40 deposit when booked, and the $100 rest charged to the saved card at DONE",
+     "where": "door to door",
+     "money": "a deposit when booked; the rest at DONE"
+    },
+    {
+     "name": "Extra pet, same trip",
+     "price_kind": "one price, added to a trip",
+     "example": "$12 a trip, up to 3 pets in all"
+    },
+    {
+     "name": "After-hours trip",
+     "price_kind": "added to a trip before 7am or after 8pm",
+     "example": "$15 more, shown before the yes"
+    },
+    {
+     "name": "Extra wait time",
+     "price_kind": "per 15 minutes past the 30 minutes",
+     "example": "$10 per 15 minutes, only if the customer says yes by text at the time"
+    },
+    {
+     "name": "Crate fit check",
+     "price_kind": "free",
+     "length": "15 minutes",
+     "where": "at the depot, with the customer there",
+     "money": "nothing taken",
+     "note": "The driver checks that the crate or carrier fits the pet and the van."
+    },
+    {
+     "name": "Late cancel or no-show",
+     "price_kind": "a fee, never more than what was paid",
+     "example": "up to $25, only if the owner confirms it",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Depot run, round trip (Lee Pet Express, the second company)",
+     "price_kind": "one price each",
+     "example": "daycare or groomer run $35; hospital run, with a vet appointment, $55; short run, up to 5 miles, $25; extra pet $20; long run, up to 60 miles, $140",
+     "where": "the pet is dropped off and picked up at the business's depot by the customer, the same day",
+     "money": "a daycare run saves a card and is charged at pick-up; a hospital run is paid in full when booked"
+    }
+   ],
+   "capacity": "Door to door: up to 3 pets of one household per trip, each in its own crate or carrier, or clipped into a safety harness. Depot runs: up to 6 crates a van.",
+   "nobody_home": "No. An adult hands the pet over at the door and takes it back. A pet is never taken from an empty home, and never from a child alone.",
+   "online": "No.",
+   "not_offered": "Emergency vet transport (call the vet or an emergency service), flights and moves across states, rides over 60 miles, pets over 100 lb, wildlife, livestock, venomous pets and puppies under 8 weeks. A pet that has bitten a person rides only if the owner OKs it, crated and muzzled.",
+   "drop_off_slots": "Depot runs are booked as drop-off slots that name no driver: the pet is dropped off at the depot and picked up there with the check-in code."
+  },
+  "pf.questions": {
+   "before_times": [
+    "What kind of pet, its weight, and how many pets",
+    "Has the pet ever bitten or snapped at a person or another animal? (a yes sends the request to the owner first)",
+    "The pick-up address and where it goes: a vet, groomer, daycare or another address",
+    "One way or a round trip, and how long the stop is",
+    "Does the pet ride in a crate or carrier, or in a safety harness?",
+    "Does the pet get carsick, or panic in cars?"
+   ],
+   "after_a_time": [
+    "The destination's name and the appointment time",
+    "Who meets the pet at the destination",
+    "Where the crate or carrier is kept, and the harness and leash",
+    "A blanket or toy going with the pet",
+    "Parking, and how to reach the door"
+   ],
+   "secure_page_only": [
+    "The gate, door or building code",
+    "The vaccine record (rabies at least)",
+    "The vet's name and phone, an emergency contact, and the vet-care OK with a spending limit",
+    "Health conditions and medicines"
+   ],
+   "who_may_book": "An adult (18 or older) who owns the pet or may decide for it, and who hands the pet over. A teen at home can't hand a pet over. The person at the destination is an adult named on the booking."
+  },
+  "pf.safety": {
+   "words": [
+    "a pet that is hurt, very sick, struggling to breathe, overheating or ate something toxic, right now",
+    "a person bitten and hurt",
+    "a pet that got out at a stop and is lost right now",
+    "signs of a catching illness, like kennel cough, for a depot run in a shared van"
+   ],
+   "what_happens": [
+    "A pet hurt, very sick, overheating or poisoned now: a pet taxi is not an emergency ride, and Rosie can't judge how sick a pet is. It says to call the vet, or the nearest 24-hour emergency vet, now. No booking until the pet is safe.",
+    "A person bitten and hurt: call 911 first.",
+    "A pet lost right now: Rosie gives the business's number to call, and tells the owner at once.",
+    "Signs of a catching illness: no depot run until a vet clears the pet. A door-to-door trip to the vet can still be booked, and the customer tells the clinic."
+   ],
+   "booking_goes_on": "No, for an emergency now. Yes, after the owner's OK, for a pet that has bitten. Door-to-door only, for a pet not cleared for the shared van."
+  },
+  "pf.first_steps": {
+   "pet_profile": "No meeting is needed. Before a first ride, on the secure page: the pet's rabies record, how it rides (crate, carrier or harness), the vet's name and an emergency contact. The first ride starts with the driver checking the crate or harness fits.",
+   "forms": "On the secure page, before the first ride: the vaccine record, an emergency contact, and a vet-care OK with a spending limit the customer sets (the example: up to $500). The business's ride agreement, with the crate or harness rule, the skip and weather terms, is signed there too.",
+   "plan": "A weekly plan, like daycare runs every Monday and Wednesday, gets its own yes, apart from the booking, and its terms are texted back. If the first ride shows the pet can't ride safely, the plan ends with nothing charged.",
+   "prep_for_reminder": [
+    "Have the pet in its crate or carrier, or in its harness",
+    "Walk the pet first, and skip a big meal before the ride",
+    "Put the gate or building code on the secure page, never in a text",
+    "Tell us about any change in the pet's health"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "At the door: the customer gives the check-in code to the driver, who takes the crate or carrier. At the depot: the code is given at drop-off, and again at pick-up. DONE with a photo of the pet at the destination confirms the ride.",
+   "entry_codes": "Gate or building codes are shown only to the driver on the job, on the ride day. Each use is logged. Deleted 72 hours after the plan ends.",
+   "handover": "The pet goes to an adult named on the booking, at both ends. Someone else is asked for the code first. A child alone doesn't hand a pet over.",
+   "ride_report": "Pick-up time, drop-off time, the crate or harness checked, any notes, and a photo at the destination.",
+   "changes_at_visit": "An extra stop, an extra pet or more wait time only when the customer says yes by text first, priced from the list. It is paid with the ride.",
+   "proof_done": "DONE with the drop-off time and a photo at the destination.",
+   "weather": "Heat over the owner's limit, ice, deep snow or a storm: the ride moves to a safer time, no fee, or the customer cancels free. A pet is never left alone in a parked vehicle."
+  },
+  "pf.money": {
+   "start": "Door to door: a card saved at booking, and the ride charged to it at DONE. A vet round trip, or any ride booked around a vet appointment, is paid in full when booked. A long-distance trip takes a $40 deposit when booked, and the rest is charged to the saved card at DONE. Sam can send a bill after the ride instead. Depot runs: a daycare run saves a card and is charged at pick-up; a hospital run is paid in full when booked. The crate fit check is free.",
+   "deposits": "A deposit only for a long-distance trip (the example: $40), taken when booked, with the rest charged at DONE. Nothing is held.",
+   "fees": "A late cancel (the example: inside 2 hours before pick-up; at the depot, inside 24 hours) or a no-show: up to $25 (depot: $20), never more than what was paid, and only if the owner confirms. No answer, no fee. At the door, the driver waits 15 minutes for an adult, then leaves. A change the business makes never costs the customer.",
+   "plans": "Each plan ride is charged at its own DONE, or billed after by text. Rosfield's $2 counts once a month for a plan.",
+   "tips": "Optional, all to the driver. A tip line only if the owner turns it on.",
+   "tax": "A sales tax line only where the state taxes pet transport, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking, once a month for a plan."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate, door, garage and building codes",
+    "The pet's health conditions, medicines and vet records",
+    "The vet's phone number and the vet-care spending limit"
+   ],
+   "photos": "Ride photos go only to the customer and the business. They show the pet and the crate, never people or the house number. They are shown to others only with the customer's yes.",
+   "urgent": "A pet that gets out, is hurt or falls ill on a ride: the owner and the customer are told at once, at any hour. Rosie then steps back, and never admits fault or offers money.",
+   "languages": "English and Spanish.",
+   "minors": "Nobody under 18 books. A teen at home isn't the booking's adult and can't hand a pet over."
+  },
+  "pf.staff": {
+   "skills": [
+    "Door-to-door rides, crate and harness handling",
+    "Nervous or carsick pets, and large dogs",
+    "Long-distance trips (30 to 60 miles)",
+    "Depot runs in the shared van, up to 6 crates"
+   ],
+   "licenses": "A valid driver's license for every driver (the business's own check). No other license per person unless the state's form says so.",
+   "new_person_ok": "A driver the customer hasn't met takes the pet only after the customer's OK by reply, or after the owner calls them. No answer: the owner calls first, or the ride is skipped with no charge.",
+   "ratio": "One driver per van. The depot van takes up to 6 crates, each pet in its own crate.",
+   "who_oks": "The owner OKs a pet with a bite history, every fee and every refund. The office manager may OK prices over the limit; the owner's answer wins."
+  },
+  "pf.rules": {
+   "plans": [
+    "The plan's terms show before any card is asked: the days and pick-up time, the price a ride, when it's charged, skip and weather terms, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking, and the terms are texted back.",
+    "One reply ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask.",
+    "Once a year, the terms and how to end the plan are texted again (the business's own rule), plus any reminder the state's rules require."
+   ],
+   "agreement": "A signed ride agreement and vet-care OK before the first ride: crate or harness for every pet, no loose pets, and the skip and weather terms (the business's own rule).",
+   "local_rules": "Vehicle, carrier and animal transport rules, as the state's or city's form sets them.",
+   "records": "3 years, with ride reports and anything that happened on a ride (the business's own rule)."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "A pet gets loose at a stop: the owner and the customer are told at once. The business handles it; Rosie never admits fault or offers money.",
+    "A pet is unwell on the ride: the driver pulls over, texts, and takes the pet to the nearest emergency vet under the vet-care OK the customer signed. The owner calls the customer.",
+    "Nobody to hand the pet over: the driver waits 15 minutes, then leaves; the owner decides any fee. A child alone never hands a pet over.",
+    "A driver is out: someone the customer hasn't met takes the pet only after the customer's OK. No reply: the owner calls first, or a free skip.",
+    "Weather day: heat, ice, deep snow or a storm moves the ride to a safer time, or a free cancel.",
+    "The vet runs long: extra wait time is added only after the customer's yes by text, priced from the list.",
+    "Skip, pause or end a plan. A skip after the cutoff may be charged, only if the owner confirms.",
+    "A pet not picked up at the depot on time: the owner calls the customer, then the emergency contact. A pet is never left overnight.",
+    "A vaccine record runs out: depot runs stop until a new one is on file."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "animals",
+   "plans",
+   "forms",
+   "dropoff",
+   "extrawork"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Perry and Lane (depot drivers)",
+   "cust": "Alex M. (customer, with Nugget) · other customers"
+  },
+  "B": {
+   "staff": "Skye and Marlo (pet taxi drivers)",
+   "cust": "Alex M. (customer, with Pretzel) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Perry"
+  },
+  "B": {
+   "staff": "Skye"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books Nugget, a pug, on a daycare run with Lee Pet Express: drop-off Sat Oct 24 at 11:00am at the depot, 20 Mill St, in his crate, and pick-up at the depot that afternoon. The money depends on the choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Pet Taxi for Pretzel, a corgi, at 9 Willow Ct: a local trip to Eastgate Animal Hospital, picked up Thu Oct 22 at 8:00am by Skye, in his crate, with Alex there to hand him over. The money depends on the choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $35 daycare run for Nugget, round trip from the depot. A card is saved for the depot's $20 late-cancel and no-show fee, and charged $35 when Perry texts DONE at pick-up.",
+    "list|full|none": "A $55 hospital run, round trip, around a vet appointment, paid in full when booking. Nothing more is owed at pick-up."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Daycare run, round trip"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Daycare run, round trip"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$20",
+     "name": "Hospital run, round trip"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|full|none",
+    "list|deposit|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $45 local trip for Pretzel to the vet. A card is saved for the $25 late-cancel and no-show fee, and charged $45 when Skye texts DONE at the clinic.",
+    "list|none|bill": "A $45 local trip. Nothing is taken. Rosie texts the bill after the ride.",
+    "list|full|none": "A $85 vet round trip, with up to 30 minutes of waiting at the clinic, paid in full when booking.",
+    "list|deposit|card": "A $140 long-distance trip, 30 to 60 miles one way. A $40 deposit when booking, and the $100 rest charged to the saved card at DONE."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$25",
+     "name": "Local trip, one way"
+    },
+    "list|*|*": {
+     "price": "$45",
+     "name": "Local trip, one way"
+    },
+    "list|full|*": {
+     "price": "$85",
+     "paid": "$85",
+     "fee": "$25",
+     "name": "Vet round trip"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Long-distance trip"
+    }
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Pet transport needs a company license where the state's form asks; drivers hold only a driver's license."
+   ],
+   [
+    "please come with dry hair",
+    "please bring Nugget's crate"
+   ],
+   [
+    "a $20 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "Style consult",
+    "Crate fit check"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Drop-off at the depot gate · parking by the side door"
+   ],
+   [
+    "a step-free chair",
+    "a step-free ramp"
+   ],
+   [
+    "already in the chair",
+    "already at the counter"
+   ],
+   [
+    "The chairs",
+    "The vans"
+   ],
+   [
+    "A chair, ready",
+    "A crate, ready"
+   ],
+   [
+    "Shop's side",
+    "Depot's side"
+   ],
+   [
+    "At your shop",
+    "At your depot"
+   ],
+   [
+    "each shop",
+    "each depot"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Someone in the shop is threatening people.",
+    "Someone at the depot is threatening people."
+   ],
+   [
+    "someone in the shop was threatening people",
+    "someone at the depot was threatening people"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about the run wasn't right, reply here."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "A special run's price comes to you first. Listed prices never need one"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A run's example: 'A new pet needs a quick crate fit check first. Had one at Lee Pet Express in the last 3 months?'"
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some jobs take several visits, like a daycare run on set days each week."
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Short run, up to 5 miles"
+   ],
+   [
+    "barbershops",
+    "pet transport companies"
+   ],
+   [
+    "Kids cut",
+    "Short run"
+   ],
+   [
+    "Color correction",
+    "Special run"
+   ],
+   [
+    "color correction",
+    "special run"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Depot runs to the vet, the groomer and daycare, from our depot on Mill St."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for pet grooming, which isn't on the depot's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Pet Express doesn't do grooming."
+   ],
+   [
+    "NEW massage",
+    "NEW airport transfers"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Airport transfers for Lee Pet Express: is it the same company?"
+   ],
+   [
+    "Ben T. books a skin fade",
+    "Ben T. books a groomer run"
+   ],
+   [
+    "skin fades",
+    "groomer runs"
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Rosie finds one run with room for both, and adds the prices: $35 and $20."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Depot run times name no driver. A time shows only if its run has room."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A family books a daycare run for its two pets on one morning."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds two crate spots on one run, so the pets ride together."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like a pet that's hurt or sick right now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A run is rated, so the depot takes the first branch."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's run got back two hours late."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a ride gets the soonest open time."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May Lee Pet Express show photos of your pet? Yes / No"
+   ],
+   [
+    "your hair",
+    "your pet"
+   ],
+   [
+    "the hair",
+    "the pet"
+   ],
+   [
+    "dry hair",
+    "a dry pet"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. the Sat Oct 24 3:00pm drop-off?"
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says Nugget's carrier latch came back bent"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's for my friend's cat, as a gift. Can I pay for it?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can Nugget ride with a blanket?"
+   ],
+   [
+    "Lee's Barbershop will fix it for free.",
+    "Lee Pet Express will make it up with a free run."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Nugget's carrier latch came back bent."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds airport transfers to Lee Pet Express."
+   ],
+   [
+    "Adds a second shop, with its own team",
+    "Adds a second depot, with its own team"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a depot run or a ride from home"
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. daycare run Sat 11am"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a pet taxi or a pet groomer"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning depot run"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a daycare run every Monday and Wednesday."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Hospital run"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's pets together"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up, if Sam says so"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Saturday's run got back two hours late."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was Nugget's run with Perry?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a same-day request"
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Pet Express · drop-off"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens on the run?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a run every Monday and Wednesday"
+   ],
+   [
+    "like a skin-test result",
+    "like a vet's note"
+   ],
+   [
+    "plumbing and electrical",
+    "pet rides and airport transfers"
+   ],
+   [
+    "Signature cut and shave",
+    "Hospital run"
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "the $90 color quote",
+    "the $90 special run quote"
+   ],
+   [
+    "Alex asks for a fix",
+    "Alex asks for a make-up"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Pet Express'"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pet Taxi's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pet Taxi"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pet Express"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Groom's package",
+    "Long run"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "2:00pm · Avery",
+    "2:00pm drop-off"
+   ],
+   [
+    "1 color quote",
+    "1 special run quote"
+   ],
+   [
+    "every 4 weeks",
+    "every Monday and Wednesday"
+   ],
+   [
+    "color and cut",
+    "large pet run"
+   ],
+   [
+    "Color and cut",
+    "Large pet run"
+   ],
+   [
+    "signature cut",
+    "hospital run"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Rides"
+   ],
+   [
+    "Lee Electric",
+    "Lee Airport Rides"
+   ],
+   [
+    "1200 Main St",
+    "14 Birch Rd"
+   ],
+   [
+    "at the chair",
+    "at the depot"
+   ],
+   [
+    "At the chair",
+    "At the depot"
+   ],
+   [
+    "house calls",
+    "door-to-door rides"
+   ],
+   [
+    "House calls",
+    "Door-to-door rides"
+   ],
+   [
+    "patch test",
+    "crate fit check"
+   ],
+   [
+    "Electrical",
+    "Airport transfers"
+   ],
+   [
+    "electrical",
+    "airport transfers"
+   ],
+   [
+    "Barbershop",
+    "Pet express depot"
+   ],
+   [
+    "barbershop",
+    "pet express depot"
+   ],
+   [
+    "Beard trim",
+    "Extra pet"
+   ],
+   [
+    "beard trim",
+    "extra pet"
+   ],
+   [
+    "house call",
+    "door-to-door ride"
+   ],
+   [
+    "The shop's",
+    "Lee Pet Express'"
+   ],
+   [
+    "the shop's",
+    "Lee Pet Express'"
+   ],
+   [
+    "Shop front",
+    "The depot front"
+   ],
+   [
+    "kids cuts",
+    "short runs"
+   ],
+   [
+    "Skin fade",
+    "Groomer run"
+   ],
+   [
+    "skin fade",
+    "groomer run"
+   ],
+   [
+    "88 Elm St",
+    "20 Mill St"
+   ],
+   [
+    "on Elm St",
+    "on Mill St"
+   ],
+   [
+    "kids cut",
+    "short run"
+   ],
+   [
+    "Plumbing",
+    "Pet ride"
+   ],
+   [
+    "plumbing",
+    "pet ride"
+   ],
+   [
+    "Haircuts",
+    "Daycare runs"
+   ],
+   [
+    "haircuts",
+    "daycare runs"
+   ],
+   [
+    "The shop",
+    "The depot"
+   ],
+   [
+    "the shop",
+    "the depot"
+   ],
+   [
+    "25 miles",
+    "30 miles"
+   ],
+   [
+    "the cut",
+    "the run"
+   ],
+   [
+    "Plumber",
+    "Driver"
+   ],
+   [
+    "plumber",
+    "driver"
+   ],
+   [
+    "barbers",
+    "depot drivers"
+   ],
+   [
+    "Haircut",
+    "Depot run"
+   ],
+   [
+    "haircut",
+    "depot run"
+   ],
+   [
+    "Jordan",
+    "Skye"
+   ],
+   [
+    "Barber",
+    "Depot driver"
+   ],
+   [
+    "barber",
+    "depot driver"
+   ],
+   [
+    "a cut",
+    "a run"
+   ],
+   [
+    "Casey",
+    "Marlo"
+   ],
+   [
+    "Riley",
+    "Perry"
+   ],
+   [
+    "Avery",
+    "Lane"
+   ],
+   [
+    "$89",
+    "$25"
+   ]
+  ],
+  "B": [
+   [
+    "The $110 rest after",
+    "The $45 rest at DONE"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "the sewer camera inspection",
+    "the long-distance trip"
+   ],
+   [
+    "sewer camera report",
+    "ride report"
+   ],
+   [
+    "$89, credited to the repair",
+    "up to $25, only if you OK it"
+   ],
+   [
+    "service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Priced at the visit",
+    "$15 more"
+   ],
+   [
+    "Set at the visit",
+    "$15 more"
+   ],
+   [
+    "Priced from photos",
+    "$140"
+   ],
+   [
+    "From photos",
+    "$140"
+   ],
+   [
+    "$120 an hour",
+    "$10 per 15 minutes"
+   ],
+   [
+    "$199",
+    "$12 a trip"
+   ],
+   [
+    "Labor",
+    "Extra wait time"
+   ],
+   [
+    "Water pressure check",
+    "Crate fit check"
+   ],
+   [
+    "E 25% deposit after the quote",
+    "E $40 deposit when they book"
+   ],
+   [
+    "25% deposit",
+    "$40 deposit"
+   ],
+   [
+    "The rest after",
+    "The rest at DONE"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every ride is booked ahead"
+   ],
+   [
+    "Free until 7am on the visit day",
+    "Free until 2 hours before pick-up"
+   ],
+   [
+    "After that, or nobody home: up to the",
+    "After that, or nobody there to hand the pet over: up to the"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Mon–Sat 7am–7pm"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "Cards only · a tip line if you turn it on"
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Does your pet get carsick?'"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $45 trip needs none."
+   ],
+   [
+    "Someone in the shop is threatening people.",
+    "Someone at the door is threatening people."
+   ],
+   [
+    "someone in the shop was threatening people",
+    "someone at the door was threatening people"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about the ride wasn't right, reply here."
+   ],
+   [
+    "Leak repair",
+    "After-hours trip"
+   ],
+   [
+    "Water heater replacement",
+    "Long-distance trip"
+   ],
+   [
+    "Sewer camera inspection",
+    "Extra pet, same trip"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Pet rides in Springfield: door to door to the vet, the groomer and daycare, within 30 miles."
+   ],
+   [
+    "A water heater job",
+    "A long-distance trip"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for a daycare ride every Monday and Wednesday. Lee Pet Taxi offers that as a plan, so the AI shows its terms. Each ride is booked and paid like a single one."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one ride, like a pet that goes to the vet and comes home the next day."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Skye take Pretzel to daycare every Monday and Wednesday, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Pet Taxi has a daycare ride plan, $45 a ride. Each ride is booked and paid like a single one. Want it every Monday and Wednesday?"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the long-distance path, only Skye's times show: Skye does the long trips."
+   ],
+   [
+    "Water heater fix",
+    "After-hours add-on"
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the long-distance trip before booking."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks to take a second pet. Both go in one booking, with one pick-up time and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Skye also take my second dog?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A second pet is $12 from the list. Both ride in the same trip."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a ride to the vet, today,"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "The ride is $45. Accept it?"
+   ],
+   [
+    "accept the leak repair for today,",
+    "accept the ride for today,"
+   ],
+   [
+    "Accepted: the leak repair today,",
+    "Accepted: the ride today,"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Skye also take my cat Miso along?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a ride to the vet for my dog. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'A ride for my dog to the vet and back' fits a vet round trip."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the pet in its crate by the door."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found the crate latch bent when I got Pretzel back."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a driver take my dog to the vet this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa vet trip Thu 8:30 Marlo"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Pet Taxi can take your pet:"
+   ],
+   [
+    "Yard drain",
+    "Vet round trip"
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A ride ran two hours late. Sam OKs a free make-up ride at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Thursday's ride ran two hours late."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "'s ride on Thu Oct 22 ran two hours late."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. The make-up ride is free."
+   ],
+   [
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Ivy C. books a ride for Mon Nov 9 in the morning."
+   ],
+   [
+    "drain clearings",
+    "rides"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like taking a neighbor's dog without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a second pet? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Pet Taxi asks: what kind of pet and how big? And is it going to a vet, a groomer or daycare, and how far?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "A corgi, 28 lb, in a crate. To the vet, one way."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $140 long-distance price is good for 7 days."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Long-distance trip · $140"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the long-distance trip for $140."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds airport transfers to Lee Pet Taxi."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW airport transfers"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Airport transfers for Lee Pet Taxi: is it the same company?"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Pet Taxi doesn't do, like flying a pet to another state."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A ride starts only at the customer's door, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a daycare ride every Monday and Wednesday for two dogs."
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "A ride priced at the door promises only the late-cancel fee now."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A local trip with Lee Pet Taxi is $45, not $40."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a local trip at $40, an old price."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Skye's next times for a local trip."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a ride gets the soonest open time."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Skye do the ride next week?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip Monday's ride? Pretzel is home sick."
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a ride from home or a depot run"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Skye left the crate door unlatched."
+   ],
+   [
+    "How was your visit with Jordan?",
+    "How was the ride with Skye?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a same-day request"
+   ],
+   [
+    "2 Someone else meets the pro",
+    "2 Someone else hands the pet over"
+   ],
+   [
+    "Jordan came late and rushed.",
+    "Skye came an hour late."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise local trips to 49"
+   ],
+   [
+    "Jordan was late and rushed.",
+    "Skye was an hour late."
+   ],
+   [
+    "1 Yes, Alex will be there",
+    "1 Yes, Alex will hand the pet over"
+   ],
+   [
+    "plumbing license MP045210",
+    "pet transport license PT-1042"
+   ],
+   [
+    "plumbing and electrical",
+    "pet rides and airport transfers"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Pet ride"
+   ],
+   [
+    "leehomeservices.com",
+    "leepettaxi.com"
+   ],
+   [
+    "Water heater flush",
+    "Vet round trip"
+   ],
+   [
+    "water heater flush",
+    "vet round trip"
+   ],
+   [
+    "water heater replacement",
+    "long-distance trip"
+   ],
+   [
+    "your water heater",
+    "your pet"
+   ],
+   [
+    "the water heater",
+    "the pet"
+   ],
+   [
+    "water heater",
+    "pet"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pet Taxi's"
+   ],
+   [
+    "the kitchen drain",
+    "the ride"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pet Taxi"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pet Express"
+   ],
+   [
+    "Plumbing license",
+    "Pet transport license"
+   ],
+   [
+    "Drain clearings",
+    "Rides"
+   ],
+   [
+    "Drain clearing",
+    "Ride"
+   ],
+   [
+    "drain clearing",
+    "ride"
+   ],
+   [
+    "Kitchen drain",
+    "Pet ride"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "today's work",
+    "today's ride"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Rides"
+   ],
+   [
+    "Lee Electric",
+    "Lee Airport Rides"
+   ],
+   [
+    "1200 Main St",
+    "14 Birch Rd"
+   ],
+   [
+    "at the chair",
+    "at the depot"
+   ],
+   [
+    "house calls",
+    "depot runs"
+   ],
+   [
+    "House calls",
+    "Depot runs"
+   ],
+   [
+    "Electrical",
+    "Airport transfers"
+   ],
+   [
+    "electrical",
+    "airport transfers"
+   ],
+   [
+    "Barbershop",
+    "Pet express depot"
+   ],
+   [
+    "barbershop",
+    "pet express depot"
+   ],
+   [
+    "beard trim",
+    "extra pet"
+   ],
+   [
+    "The shop's",
+    "Lee Pet Taxi's"
+   ],
+   [
+    "the shop's",
+    "Lee Pet Taxi's"
+   ],
+   [
+    "Shop front",
+    "The van"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "88 Elm St",
+    "20 Mill St"
+   ],
+   [
+    "Plumbing",
+    "Pet ride"
+   ],
+   [
+    "plumbing",
+    "pet ride"
+   ],
+   [
+    "The shop",
+    "The company"
+   ],
+   [
+    "the shop",
+    "the company"
+   ],
+   [
+    "25 miles",
+    "30 miles"
+   ],
+   [
+    "40 miles",
+    "60 miles"
+   ],
+   [
+    "7am Thu",
+    "6am Thu"
+   ],
+   [
+    "Fri 8am",
+    "Fri 9am"
+   ],
+   [
+    "Plumber",
+    "Driver"
+   ],
+   [
+    "plumber",
+    "driver"
+   ],
+   [
+    "barbers",
+    "drivers"
+   ],
+   [
+    "Haircut",
+    "Pet ride"
+   ],
+   [
+    "haircut",
+    "pet ride"
+   ],
+   [
+    "25-mile",
+    "30-mile"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "Jordan",
+    "Skye"
+   ],
+   [
+    "Barber",
+    "Driver"
+   ],
+   [
+    "barber",
+    "driver"
+   ],
+   [
+    "Casey",
+    "Marlo"
+   ],
+   [
+    "Riley",
+    "Perry"
+   ],
+   [
+    "Avery",
+    "Lane"
+   ],
+   [
+    "$179",
+    "$45"
+   ],
+   [
+    "$150",
+    "$85"
+   ],
+   [
+    "$89",
+    "$25"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pet taxi plug-in adds no agreement for the business to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Drivers are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: rides and depot runs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Drivers need no license of their own unless the state's form says so (the plug-in): a driver's license is the business's own check."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A ride is never sent now: a ride needed soon gets the soonest open time, and an emergency goes to a vet (the plug-in)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your services and prices for Lee Pet Express. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Depot run prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Depot price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Daycare run, round trip",
+          "$35"
+         ],
+         [
+          "Groomer run, round trip",
+          "$40"
+         ],
+         [
+          "Short run, up to 5 miles",
+          "$25"
+         ],
+         [
+          "Extra pet, same run",
+          "$20"
+         ],
+         [
+          "Hospital run, round trip",
+          "$55"
+         ],
+         [
+          "Long run, up to 60 miles",
+          "$140"
+         ],
+         [
+          "Crate fit check",
+          "Free · 15 min"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Pet rides next: its own company, Lee Pet Taxi. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The van"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Pet Taxi is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Where you work, the state asks for a pet transport license for the company. What's the license number Lee Pet Taxi works under?"
+     ],
+     [
+      "owner",
+      "san",
+      "PT-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Ride price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most pet taxis start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Pet Taxi, to start",
+        "lines": [
+         "Every door-to-door ride",
+         "At the customer's door, an adult hands the pet over",
+         "When they book: a card saved for a $25 fee you OK",
+         "After the ride: the saved card is charged at DONE"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules pet taxis often set. Your call: keep them, or change any. They become the company's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Pet Taxi, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price, pack, membership and intro-offer services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Pet Taxi will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Pet rides in Springfield: door to door to the vet, the groomer and daycare, within 30 miles."
+        ]
+       },
+       "photos": [
+        "The van",
+        "A pet in its crate"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Pet Taxi the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Pet Taxi · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Depot runs",
+          "Once it's set up and a depot driver joins. Stripe still to connect"
+         ],
+         [
+          "Pet rides",
+          "Once you say yes"
+         ],
+         [
+          "Airport transfers",
+          "Once your driver joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "The business gives its pet transport license number. Drivers give none: their driver's license is checked by the business."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state asks for a pet transport license for the company. What's the license number Lee Pet Express works under?"
+     ],
+     [
+      "owner",
+      "san",
+      "PT-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Book Nugget on the Saturday daycare run from the Lee Pet Express depot."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero reservar un viaje para mi perro el sábado.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like to book a trip for my dog on Saturday.",
+       "as": "Lucía"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Pet Express. Esta llamada se graba y se transcribe. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Pet Express. This call is recorded and transcribed. How can I help?",
+       "as": "Lucía"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent.",
+    "more": [
+     "A pet taxi example: a pet with a cough gets 'no depot run until a vet clears it'.",
+     "Then only dates after the vet's OK are offered."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If your pet is hurt or very sick, call your vet or the nearest emergency vet now. A pet taxi is not an emergency ride. If a person is in danger, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the depot drivers themselves. They can go over it at drop-off. For anything sooner, call Lee Pet Express at (555) 010-0177. If your pet seems sick, call your vet."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "A walk-in pet is checked in at the depot now, if a run has a spot. The pet needs a vaccine record on file.",
+    "more": [
+     "The price, and the owner's OK, come before the run.",
+     "READY is texted when the van is back, with the pick-up time.",
+     "The depot van takes up to 6 crates."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-03",
+    "more": [
+     "Its questions: what kind of pet, its weight, any bite history, and how it rides.",
+     "Its danger words: a pet that's hurt, very sick or poisoned right now, or a person bitten.",
+     "Its forms: the vaccine record, an emergency contact, a vet-care OK and the ride agreement.",
+     "Who can stand in for whom, and how a depot run is checked in: the code at drop-off.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Pet Express asks: what kind of pet, and how big? And has the pet ever bitten or snapped at a person or another animal?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Nugget, a pug, 18 lb. Nugget has never bitten anyone."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in's form goes on the secure page: the vaccine record, an emergency contact, a vet-care OK and the ride agreement. It's due before the first run."
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "does": "Alex adds a second pet. Rosie finds one run with room for both, and adds the prices: $35 and $20."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "san",
+      "cust",
+      "A few questions before you book.",
+      {
+       "form": [
+        "Does the pet get carsick? (optional)",
+        "Anything the driver should know about Nugget?",
+        "May Lee Pet Express show photos of your pet? Yes / No"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "does": "Sam says yes, with a change, like another time. Rosie reads it back, then asks Alex. Here, Sam offers the 3:00pm drop-off instead.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "What time can you offer?"
+     ],
+     [
+      "owner",
+      "san",
+      "Sat 3pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer {{alex.staff}} the Sat Oct 24 3:00pm drop-off?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Nugget bring a blanket on the run?"
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff:Alex M.}} asks: Can Nugget bring a blanket on the run?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Perry says yes, as long as it fits in the crate."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say Nugget starts coughing before the run. The plug-in's danger words are checked first. A cough can be catching in a shared van, so Nugget can't ride until a vet clears Nugget.",
+    "more": [
+     "A sign of danger gets the safety message first, like 'call your vet now'.",
+     "Health details stay on the secure page, never in a text to staff.",
+     "The plug-in asks for the move, so there's no fee."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Nugget started coughing today. Can Nugget still ride Saturday?"
+     ],
+     [
+      "san",
+      "cust",
+      "A cough can be catching, so Nugget can't ride in the shared van until a vet clears Nugget. Move the run with no fee:",
+      {
+       "times": [
+        "Sat Oct 31 · 11:00am drop-off",
+        "Sun Nov 1 · 10:00am drop-off"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M.'s Nugget, Sat 11:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "Nugget is checked in with Perry. Thanks, Alex! Pick-up is at the depot, with the same code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "At Lee Pet Express, the code is given when the pet is left at the depot. It confirms the visit, like any check-in.",
+    "more": [
+     "The driver checks the crate latch and the pet before it goes in the van.",
+     "Next come the before notes and the run. READY and the pick-up come after it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Before the run: Nugget calm, harness clipped, crate latch works. Old scrape on the left front paw.",
+      {
+       "photos": [
+        "Nugget in the crate, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "Nugget scrapes a paw pad climbing out of the van at the daycare. Perry cleans and wraps it, and tells Sam and Alex at once.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Nugget scraped a paw pad climbing out of the van. Cleaned and wrapped."
+     ],
+     [
+      "san",
+      "owner",
+      "Perry says Nugget (Alex M.) scraped a paw pad at the daycare. It's cleaned and wrapped. Call Alex."
+     ],
+     [
+      "san",
+      "cust",
+      "From Lee Pet Express: Nugget scraped a paw pad at the daycare. Perry cleaned and wrapped it. Sam is calling you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Perry drives the run: pets ride in crates to the daycare, groomer or clinic, then back to the depot.",
+    "more": [
+     "Perry texts an update with a photo, midway.",
+     "At a drop-off, READY and the pick-up come next."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-11",
+    "t": "Sat Oct 24, 12:40pm",
+    "more": [
+     "The plug-in sets the status words: an update, LATE and READY.",
+     "A moved pick-up time is always sent, with the new time.",
+     "A reply from the customer goes to staff, like any question.",
+     "Nothing extra is done until the customer says yes."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE Nugget is at the daycare, all good",
+      {
+       "photos": [
+        "Nugget at the daycare"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "An update from Nugget's run: Nugget is at the daycare, all good.",
+      {
+       "photos": [
+        "Nugget at the daycare"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "t": "Sat Oct 24, 3:20pm",
+    "does": "The van is back at the depot. Perry texts READY with a photo, and Alex hears Nugget is ready for pick-up.",
+    "more": [
+     "Only Alex, or someone Alex named, can pick Nugget up.",
+     "Alex can reply within 24 hours if something's wrong, and Sam is told."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "READY Alex M.",
+      {
+       "photos": [
+        "Nugget, back at the depot"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Nugget is back at the depot and ready for pick-up.",
+      {
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "Lee Pet Express · 20 Mill St",
+         "Pick-up by 4:30pm",
+         "Bring the code you used to drop Nugget off",
+         "Something wrong? Reply within 24 hours"
+        ],
+        "button": "See the photos",
+        "link": "rosfield.com/r/s7"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "t": "Sat Oct 24, 3:35pm",
+    "does": "Alex gives the drop-off code at pick-up, or the person Alex named shows an ID. Nugget goes home only with them.",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: Nugget stays with Perry.",
+     "Not picked up 30 minutes after the end: Sam calls Alex, then the emergency contact. A pet is never left overnight."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Hand Nugget over."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "At pick-up, Perry tells Alex how the run went: the pet's paws, water, and how Nugget did in the van.",
+    "more": [
+     "A sore paw or a scrape is shown to Alex at pick-up.",
+     "Anything new needs Alex's yes and its price first.",
+     "Work with no hand-back, like a class, skips this."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Nugget: calm in the crate, drools a little after 20 minutes. A blanket helps."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Perry finds the crate latch cracked at drop-off. The plug-in says to stop: the run doesn't go, and nothing is charged for the part not done.",
+    "more": [
+     "The note says what was found, what wasn't done, and why.",
+     "It names the kind of fix, like another crate, never a named company.",
+     "Health details stay on the secure page, never in a text."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Stopped Nugget's run: crate latch is cracked. Back with Alex. Note and photo on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Perry left you a note about Nugget's run today.",
+      {
+       "card": {
+        "title": "A note from Lee Pet Express",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Perry stopped {{alex.staff:Alex M.}}'s run. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for visiting Lee Pet Express! How was Nugget's run?",
+      {
+       "card": {
+        "title": "Rate the run",
+        "lines": [
+         "Sat Oct 24",
+         "1 to 5 stars, one tap on the page"
+        ],
+        "button": "Rate it",
+        "link": "rosfield.com/r/a2"
+       },
+       "stars": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-42",
+    "say": [
+     [
+      "san",
+      "cust",
+      "After the run, from Lee Pet Express.",
+      {
+       "card": {
+        "title": "After the run",
+        "lines": [
+         "Fresh water and a rest",
+         "Check the crate and carrier for wear"
+        ],
+        "button": "Read it",
+        "link": "rosfield.com/a/a14"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Pet Express",
+          "6 pets on 2 runs · Perry 3, Lane 3"
+         ],
+         [
+          "Lee Pet Taxi",
+          "9 rides · Skye 5, Marlo 4"
+         ],
+         [
+          "Waiting on you",
+          "Dee W.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-11",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your special run quote is with Lee Pet Express' owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-40",
+    "more": [
+     "Here: lightning, a loose dog in the depot that attacks, or smoke. All pets stay in their crates, and the van goes back to the depot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam drives too, so Sam is on the pet taxi team.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Skye Price and Marlo Moore drive the pet taxi. Skye does the long-distance trips too. Perry Chen and Lane Diaz run the depot and the depot vans."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Skye Price: door-to-door rides and long-distance trips",
+         "Marlo Moore: door-to-door rides",
+         "Perry Chen: depot runs",
+         "Lane Diaz: depot runs"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Marlo gets the same invite. Perry and Lane get theirs from Lee Pet Express.",
+     "Pat gets one too, to OK prices for Lee Pet Taxi.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Sam Lee added you to the team for pet rides. Reply YES to join and get your rides here by text.",
+      {
+       "stop": "first",
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Sam Lee added you to the team for pet rides. Reply YES to join and get your rides here by text.",
+      {
+       "stop": "first",
+       "as": "Marlo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Express. Sam Lee added you to the depot's team. Reply YES to join and get your runs here by text.",
+      {
+       "stop": "first",
+       "as": "Perry"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Express. Sam Lee added you to the depot's team. Reply YES to join and get your runs here by text.",
+      {
+       "stop": "first",
+       "as": "Lane"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Sam Lee added you to OK its prices. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Skye replies YES, then checks what Sam set. One reply covers every kind of work Skye does.",
+    "more": [
+     "No license number is asked: a driver's license is the business's own check.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Marlo, Perry and Lane join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Pet Taxi! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time",
+         "An emergency contact, since you drive alone"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t01"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time",
+        "Emergency contact"
+       ],
+       "as": "Skye"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 7am",
+      {
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Skye Price · Lee Pet Taxi",
+        "lines": [
+         "Every door-to-door ride, and long-distance trips",
+         "Hours: Mon–Sat 7am–7pm",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Skye"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Skye"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Pet Taxi",
+       "At the customer's door",
+       "The company's pet transport license PT-1042",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Skye Price",
+       "Lee Pet Taxi",
+       "At the customer's door",
+       "Driver's license, on file with the business",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Marlo Moore",
+       "Lee Pet Taxi",
+       "At the customer's door",
+       "Driver's license, on file with the business",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Pet Taxi",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Perry Chen",
+       "Lee Pet Express",
+       "At the depot, and depot runs",
+       "Driver's license, on file with the business",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Lane Diaz",
+       "Lee Pet Express",
+       "At the depot, and depot runs",
+       "Driver's license, on file with the business",
+       "Once Sam says yes",
+       "Yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Drivers need no license number here, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Skye: door-to-door rides and long-distance trips",
+         "Marlo: door-to-door rides",
+         "Perry: depot runs",
+         "Lane: depot runs"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, airport transfers and Lee Pet Express now show to AI assistants too. Each person hears they can be booked for their own work: Marlo for rides, Lane at the depot.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pet Taxi can book you for pet rides from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pet Express can book you from now on, for depot runs. Your day list comes at 7:30am, the time you picked.",
+      {
+       "as": "Perry"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pet Express can book you from now on, for depot runs. Your day list comes at the time you picked.",
+      {
+       "as": "Lane"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Airport transfers and Lee Pet Express now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone else work in Lee Pet Taxi? Driving alone? Add one emergency contact on this page. Without one, no safety timer runs while you drive.",
+      {
+       "card": {
+        "title": "Your emergency contact",
+        "lines": [
+         "Called only for your safety",
+         "Told only where you're driving, if you miss a safety check",
+         "Not now: no safety timer"
+        ],
+        "button": "Add a contact",
+        "link": "rosfield.com/v/e01"
+       },
+       "form": [
+        "Name",
+        "Mobile",
+        "They agreed to a call or text from Rosie"
+       ],
+       "buttons": [
+        "Just me, for now",
+        "People to add"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Marlo Moore"
+     ],
+     [
+      "Company",
+      "Lee Pet Taxi"
+     ],
+     [
+      "Kinds of work",
+      "Pet rides"
+     ],
+     [
+      "Jobs",
+      "Local trips, vet round trips, long trips"
+     ],
+     [
+      "Hours",
+      "Mon–Sat 7am–7pm"
+     ],
+     [
+      "Marlo agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Pet Taxi. Reese gets one invite, and replies YES. Reese's driver's license is the business's own check.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": "first",
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no license; the owner says when one lapses. Here, Sam says it is lapsed, so new rides pause at once.",
+    "more": [
+     "Every 30 days by default, and again before each end date.",
+     "Expired, suspended or revoked all pause new bookings.",
+     "Rosie's team reviews the rides already booked within 1 business day.",
+     "Customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Pet Taxi's pet transport license is lapsed.",
+      {
+       "card": {
+        "title": "Pet rides · new bookings paused",
+        "lines": [
+         "Rides already booked: reviewed within 1 business day",
+         "Send the renewal on the secure page"
+        ],
+        "button": "Send it",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Rosie checks the pet transport license on the state's own lookup. While it's down, nobody new is offered for rides until it's checked. Those already checked stay on.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's license lookup is down, so the pet transport license isn't re-checked yet. Rides already booked stay booked. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "does": "One number booked several rides under different names, and each time there was nobody to hand the pet over. New requests from it now wait for Sam's OK.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 rides at Lee Pet Taxi this week under different names. Each time, nobody was there to hand the pet over. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A pet is booked by its adult owner, never for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A depot run books a crate spot on a run (A4-67), never a seat."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A depot run books a crate spot on a run (A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A depot run is a day trip, never a stay: a pet is never kept overnight."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Depot run slots name no driver. A wish for one goes in the notes."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The pet is left with the depot driver: READY and the pick-up follow the run."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the depot."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A run is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A run has no result that comes later: READY is the result (A8-50)."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "Runs are booked from the list; nothing is proposed after one."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "A pet not picked up is a same-day matter: Sam calls Alex, then the emergency contact (A8-54). There's never a storage fee."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A run is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a run."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every pet signs the vaccine record, emergency contact, vet-care OK and ride agreement first."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pet taxi plug-in adds no agreement for the business to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Drivers are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: rides and depot runs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Drivers need no license of their own unless the state's form says so (the plug-in): a driver's license is the business's own check."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A ride is never sent now: a ride needed soon gets the soonest open time, and an emergency goes to a vet (the plug-in)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your ride services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Ride prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Ride price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Local trip, one way",
+          "$45 · up to 10 miles"
+         ],
+         [
+          "Vet round trip",
+          "$85 · up to 30 min of waiting"
+         ],
+         [
+          "Long trip, 10 to 30 miles",
+          "$95"
+         ],
+         [
+          "Long-distance trip, 30 to 60 miles",
+          "$140 · $40 deposit"
+         ],
+         [
+          "Extra pet, same trip",
+          "$12"
+         ],
+         [
+          "After-hours trip",
+          "$15 more"
+         ],
+         [
+          "Extra wait time",
+          "$10 per 15 min"
+         ],
+         [
+          "Crate fit check",
+          "Free · 15 min"
+         ],
+         [
+          "Late cancel or no-show",
+          "Up to $25, if you OK it"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Airport transfers next: same company, so only what's new. It needs no state license where you work. Send your airport transfers prices."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Airport transfers price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like rides. Send only what's different.",
+      {
+       "card": {
+        "title": "Airport transfers, set like rides",
+        "lines": [
+         "At the customer's home",
+         "A card saved when they book, charged after each visit"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee Pet Express is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The depot front"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the depot is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Where you work, the state asks for a pet transport license for the company. What's the license number Lee Pet Express works under?"
+     ],
+     [
+      "owner",
+      "san",
+      "PT-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Depot price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most depot runs start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Pet Express, to start",
+        "lines": [
+         "Every depot run",
+         "Dropped off and picked up at your depot",
+         "When they book: a card saved, for a $20 fee you OK",
+         "At pick-up: the saved card is charged at DONE"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules depot runs often set. Your call: keep them, or change any. They become the depot's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Pet Express, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price, pack, membership and intro-offer services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Pet Express will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Depot runs to the vet, the groomer and daycare, from our depot on Mill St."
+        ]
+       },
+       "photos": [
+        "The depot front",
+        "The van"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Pet Express the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Pet Express · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Pet rides",
+          "Now, once it's set up"
+         ],
+         [
+          "Airport transfers",
+          "Once your driver joins and you say yes"
+         ],
+         [
+          "Lee Pet Express",
+          "Once it's set up and a depot driver joins. Stripe still to connect"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "The business gives its pet transport license number. Drivers give none: their driver's license is checked by the business."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state asks for a pet transport license for the company. What's the license number Lee Pet Taxi works under?"
+     ],
+     [
+      "owner",
+      "san",
+      "PT-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam drives too, so Sam is on the pet taxi team.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Skye Price and Marlo Moore drive the pet taxi. Skye does the long-distance trips too. Perry Chen and Lane Diaz run the depot and the depot vans."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Skye Price: door-to-door rides and long-distance trips",
+         "Marlo Moore: door-to-door rides",
+         "Perry Chen: depot runs",
+         "Lane Diaz: depot runs"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Marlo gets the same invite. Perry and Lane get theirs from Lee Pet Express.",
+     "Pat gets one too, to OK prices for Lee Pet Taxi.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Sam Lee added you to the team for pet rides. Reply YES to join and get your rides here by text.",
+      {
+       "stop": "first",
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Sam Lee added you to the team for pet rides. Reply YES to join and get your rides here by text.",
+      {
+       "stop": "first",
+       "as": "Marlo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Express. Sam Lee added you to the depot's team. Reply YES to join and get your runs here by text.",
+      {
+       "stop": "first",
+       "as": "Perry"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Express. Sam Lee added you to the depot's team. Reply YES to join and get your runs here by text.",
+      {
+       "stop": "first",
+       "as": "Lane"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Sam Lee added you to OK its prices. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Skye replies YES, then checks what Sam set. One reply covers every kind of work Skye does.",
+    "more": [
+     "No license number is asked: a driver's license is the business's own check.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Marlo, Perry and Lane join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Pet Taxi! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time",
+         "An emergency contact, since you drive alone"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t01"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time",
+        "Emergency contact"
+       ],
+       "as": "Skye"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 7am",
+      {
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Skye Price · Lee Pet Taxi",
+        "lines": [
+         "Every door-to-door ride, and long-distance trips",
+         "Hours: Mon–Sat 7am–7pm",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Skye"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Skye"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Pet Taxi",
+       "At the customer's door",
+       "The company's pet transport license PT-1042",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Skye Price",
+       "Lee Pet Taxi",
+       "At the customer's door",
+       "Driver's license, on file with the business",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Marlo Moore",
+       "Lee Pet Taxi",
+       "At the customer's door",
+       "Driver's license, on file with the business",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Pet Taxi",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Perry Chen",
+       "Lee Pet Express",
+       "At the depot, and depot runs",
+       "Driver's license, on file with the business",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Lane Diaz",
+       "Lee Pet Express",
+       "At the depot, and depot runs",
+       "Driver's license, on file with the business",
+       "Once Sam says yes",
+       "Yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Drivers need no license number here, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Skye: door-to-door rides and long-distance trips",
+         "Marlo: door-to-door rides",
+         "Perry: depot runs",
+         "Lane: depot runs"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, airport transfers and Lee Pet Express now show to AI assistants too. Each person hears they can be booked for their own work: Marlo for rides, Lane at the depot.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pet Taxi can book you for pet rides from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pet Express can book you from now on, for depot runs. Your day list comes at 7:30am, the time you picked.",
+      {
+       "as": "Perry"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pet Express can book you from now on, for depot runs. Your day list comes at the time you picked.",
+      {
+       "as": "Lane"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Airport transfers and Lee Pet Express now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone else work in Lee Pet Taxi? Driving alone? Add one emergency contact on this page. Without one, no safety timer runs while you drive.",
+      {
+       "card": {
+        "title": "Your emergency contact",
+        "lines": [
+         "Called only for your safety",
+         "Told only where you're driving, if you miss a safety check",
+         "Not now: no safety timer"
+        ],
+        "button": "Add a contact",
+        "link": "rosfield.com/v/e01"
+       },
+       "form": [
+        "Name",
+        "Mobile",
+        "They agreed to a call or text from Rosie"
+       ],
+       "buttons": [
+        "Just me, for now",
+        "People to add"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Marlo Moore"
+     ],
+     [
+      "Company",
+      "Lee Pet Taxi"
+     ],
+     [
+      "Kinds of work",
+      "Pet rides"
+     ],
+     [
+      "Jobs",
+      "Local trips, vet round trips, long trips"
+     ],
+     [
+      "Hours",
+      "Mon–Sat 7am–7pm"
+     ],
+     [
+      "Marlo agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Pet Taxi. Reese gets one invite, and replies YES. Reese's driver's license is the business's own check.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": "first",
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no license; the owner says when one lapses. Here, Sam says it is lapsed, so new rides pause at once.",
+    "more": [
+     "Every 30 days by default, and again before each end date.",
+     "Expired, suspended or revoked all pause new bookings.",
+     "Rosie's team reviews the rides already booked within 1 business day.",
+     "Customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Pet Taxi's pet transport license is lapsed.",
+      {
+       "card": {
+        "title": "Pet rides · new bookings paused",
+        "lines": [
+         "Rides already booked: reviewed within 1 business day",
+         "Send the renewal on the secure page"
+        ],
+        "button": "Send it",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Rosie checks the pet transport license on the state's own lookup. While it's down, nobody new is offered for rides until it's checked. Those already checked stay on.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's license lookup is down, so the pet transport license isn't re-checked yet. Rides already booked stay booked. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "does": "One number booked several rides under different names, and each time there was nobody to hand the pet over. New requests from it now wait for Sam's OK.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 rides at Lee Pet Taxi this week under different names. Each time, nobody was there to hand the pet over. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "The ride report comes at DONE, with the photo (B8-41)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Rides are booked from the list; nothing is proposed after one."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Rides are booked with a set pick-up time (the second branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A ride is a trip, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A ride books a driver's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Door-to-door rides start at the customer's door. Depot runs are the other flow."
+   },
+   {
+    "op": "off",
+    "at": "B4-26",
+    "label": "3 Nobody will be home",
+    "why": "An adult hands the pet over at the door: a pet is never taken from an empty home."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "An adult hands the pet over at the door."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "A ride has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A driver never looks after a child."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "Rides are priced from the list; nothing is quoted at the door."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a ride."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "A ride is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "The ride agreement is the plug-in's form on the secure page (B4-38), signed with the booking."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "A ride is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "A ride is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "A ride is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A ride is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a ride."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam keeps cards only: rides are small bills (S1-57)."
+   },
+   {
+    "op": "off",
+    "at": "B9-03",
+    "label": "Yes: one pay link",
+    "why": "Extra wait time is added only after the customer's yes by text, and is paid with the ride (B8-23)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at the door (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at the door (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Next visit booked at checkout",
+    "why": "A plan books the next rides."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each ride is rated."
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can someone take my dog Pretzel to the vet on Thursday morning and bring Pretzel home? I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Necesito llevar a mi perro al veterinario.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I need to get my dog to the vet.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Pet Taxi. Esta llamada se graba y se transcribe. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Pet Taxi. This call is recorded and transcribed. How can I help?",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, and a bite history sends it to Sam first. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A pet taxi example: a dog that nearly bit someone gets 'is anyone hurt?' first.",
+     "Rosa's dog snapped at a vet tech last month. Nobody was hurt, so the call goes on. Sam reads her answers first."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay alguien herido, una persona o un perro?",
+      {
+       "lang": "es",
+       "en": "First: is anyone hurt, a person or a dog?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Mi perro le gruñó a un técnico del veterinario el mes pasado, pero nadie se lastimó.",
+      {
+       "lang": "es",
+       "en": "No. My dog growled at a vet tech last month, but nobody got hurt.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Gracias. Si una persona mordida está herida, llame al 911. Sam revisa su pedido antes de reservar.",
+      {
+       "lang": "es",
+       "en": "Thanks. If a person who was bitten is hurt, call 911. Sam checks your request before it's booked.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. A pet that's hurt, very sick or poisoned right now stops the booking. A pet taxi is no emergency ride.",
+    "more": [
+     "The message is the plug-in's: Rosie can't judge how sick a pet is, so it says to call the vet now.",
+     "A person who was bitten and is hurt gets 911 first.",
+     "On a call, the caller hears it, and Sam gets the call summary."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency for your pet. A pet taxi is not an emergency ride, and Rosie can't judge how sick a pet is. Call your vet, or the nearest 24-hour emergency vet, now. If a person was bitten and is hurt, call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their dog can't breathe well and asked for a ride. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A dog struggling to breathe",
+         "Told to call the vet or an emergency vet now"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Pretzel has been scratching at the ears a lot. Is that something a driver can look at?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't judge a pet's health. Ask your vet about the scratching. To ask about rides, call Lee Pet Taxi at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa called at 7:12am, in Spanish. Rosa wants a ride to the vet. Her dog growled at a vet tech last month; nobody was hurt. Safety steps given, and a booking link sent.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "A growl last month · nobody hurt · safety steps given",
+         "Booking link sent · comes to you first"
+        ],
+        "button": "Hear the call",
+        "link": "rosfield.com/k/a1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Pet Taxi · Pet rides",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Pet Taxi. We got your voicemail about a ride for your pet. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Pet Taxi · Local trip, one way",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about a ride for a pet. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants a ride to the groomer next week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Booked, with no texts to Tessa. Please tell Tessa the details yourself.",
+      {
+       "card": {
+        "title": "Tessa · Local trip, one way",
+        "lines": [
+         "Thu Oct 22 · 8:00am · Marlo",
+         "Add the address on the Today page"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/b8"
+       },
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Pet Taxi drives pets locally, but doesn't fly them to other states. Nothing was saved. You can look for a pet relocation service."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: the kind of pet and its weight, any bite history, the two addresses, and how the pet rides.",
+     "Its danger words: a pet that's hurt, very sick or poisoned right now, or a person bitten.",
+     "Its forms: the vaccine record, an emergency contact and a vet-care OK.",
+     "Who can stand in for whom, and how a ride is checked in: the code at the door.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Pet Taxi asks: what kind of pet, and how big? Has the pet ever bitten or snapped at a person? And where is it going?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Pretzel, a corgi, 28 lb, in a crate. Pretzel has never bitten anyone. To Eastgate Animal Hospital, one way."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "does": "Alex adds how Skye reaches the door and what Skye should know. A gate or building code shows to Skye only on the ride day.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Does Pretzel get carsick? And where are the crate and harness?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Pretzel drools a little. The crate and harness are by the front door."
+     ]
+    ],
+    "form": [
+     [
+      "Parking",
+      "In the driveway"
+     ],
+     [
+      "The pet",
+      "Pretzel, corgi, 28 lb · in the crate"
+     ],
+     [
+      "Gate or building code",
+      "Typed here only"
+     ],
+     [
+      "Crate and harness",
+      "By the front door"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-26",
+    "does": "Who meets the driver comes from the plug-in: an adult hands the pet over at the door. The page asks who that is.",
+    "form": [
+     [
+      "An adult (18+) will hand the pet over {{day:Thu Oct 22}}, {{window:8–10am|when the driver arrives}}",
+      "I will"
+     ],
+     [
+      "Or",
+      "Someone else will"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "does": "Who may book comes from the plug-in. The person booking confirms they're 18 or older and own the pet or may decide for it.",
+    "form": [
+     [
+      "I'm 18 or older",
+      "Yes"
+     ],
+     [
+      "Pretzel is my dog, or I may decide for Pretzel",
+      "Yes"
+     ],
+     [
+      "An adult (18+) will hand Pretzel over",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "The plug-in needs a form before the first ride. It covers the vaccine record, an emergency contact, a vet-care OK and the ride terms.",
+    "form": [
+     [
+      "Form",
+      "Ride agreement: crate or harness for every pet, no loose pets, skip and weather terms"
+     ],
+     [
+      "Due",
+      "Before the first ride"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "more": [
+     "Examples: a written estimate for work over a set amount, or the right to cancel a sale made at home.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date. Sam is reminded before it's late.",
+     "Rides need no notice at booking here. The crate and weather terms are on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "form": [
+     [
+      "How often",
+      "Every Monday and Wednesday"
+     ],
+     [
+      "Price a ride",
+      "$45"
+     ],
+     [
+      "When it's charged",
+      "Each ride, like a single booking"
+     ],
+     [
+      "Skip, pause or end",
+      "Any time, by text"
+     ],
+     [
+      "I agree to the plan's terms",
+      "Yes"
+     ]
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Daycare ride plan",
+        "lines": [
+         "Every Monday and Wednesday · pick-up 8:00am",
+         "Each ride: $45",
+         "Each ride is booked and paid like this one",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this ride"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Fri 9am"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. a first ride Fri Oct 23, 9:00am, with Skye?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-15",
+    "say": [
+     [
+      "cust",
+      "san",
+      "STOP"
+     ],
+     [
+      "san",
+      "cust",
+      "You won't get more texts from Rosie for Lee Pet Taxi. Your rides stay booked."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. opted out of texts. The rides stay. Text DONE as usual; the report goes to Alex's secure page."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. opted out of texts. The rides stand, every Monday and Wednesday. For any change, call Alex."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Pretzel bring a blanket in the crate?"
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff}} asks: Can Pretzel bring a blanket in the crate?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ],
+       "as": "Skye"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Skye says yes, as long as the crate door still latches."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that the vet moved the appointment earlier. Rosie runs the plug-in's danger check again: nothing in it, so it asks the driver. Marlo can come sooner, so that's offered.",
+    "more": [
+     "Real danger, like a pet that is hurt or struggling to breathe, gets the safety steps first: call the vet now.",
+     "An earlier time shows its price first. No reply: the ride stays as booked.",
+     "If Alex picks the earlier time, Skye and Marlo are told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The vet moved Pretzel's appointment to 7:30am. Can you come sooner?"
+     ],
+     [
+      "san",
+      "cust",
+      "Marlo can come sooner, at the same price. If your pet is hurt or very sick, call your vet now.",
+      {
+       "times": [
+        "Thu Oct 22 · 7:00am · Marlo"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep 8:00am"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 7:40am",
+    "does": "Back to Alex: it's Thursday, and Skye heads to Alex's door for Pretzel. An adult hands the pet over, so the text carries the check-in code.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Skye from Lee Pet Taxi is on the way to pick up Pretzel, about 15 minutes. When Skye arrives, give your check-in code and hand over Pretzel in the crate. We'll text you as soon as it's entered. If someone else comes, don't hand Pretzel over.",
+      {
+       "photos": [
+        "Skye, from Lee Pet Taxi"
+       ],
+       "photoLink": "rosfield.com/m/r4",
+       "code": "3906",
+       "buttons": [
+        [
+         "2",
+         "It isn't Skye"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 8:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before the ride, Skye checks the crate or harness and the van's tie-down, and notes the pet's condition: calm, panting, any scrape. The notes stay with the ride.",
+    "more": [
+     "The plug-in names the checks: the crate latch, the harness clip, and the van's temperature.",
+     "Alex can see them on the secure page.",
+     "A claim later is checked against them."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE crate latch works, harness clipped, Pretzel calm. Van at 68 degrees.",
+      {
+       "photos": [
+        "Pretzel in the crate, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with {{alex.staff}}'s ride.",
+      {
+       "as": "Skye"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-19",
+    "does": "Rides have their price before the ride, from Sam's list. Nothing is priced at the door."
+   },
+   {
+    "op": "words",
+    "at": "B8-22",
+    "does": "Back to Pretzel's ride on Thursday. Each branch is one thing that can happen on a ride. Most rejoin before DONE."
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A pet gets loose at a stop",
+     "end": "end",
+     "endText": "Sam and Skye search, with Alex on the phone. Rosie logged the time and the place.",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.20"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:35am",
+       "title": "A pet is loose: Sam and Alex told at once",
+       "does": "Pretzel slips the harness in the clinic's lot. Skye texts PET LOOSE with the place. Rosie tells Sam and Alex at once, at any hour, then steps back.",
+       "more": [
+        "Sam and Skye run the search, with Alex on the phone. The clinic is called too.",
+        "Rosie never admits fault or offers money. Sam decides the rest.",
+        "The time and the place stay on the ride record."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "PET LOOSE Pretzel slipped the harness in the Eastgate Animal Hospital lot"
+        ],
+        [
+         "san",
+         "owner",
+         "URGENT: Pretzel (Alex M.) got loose at the Eastgate Animal Hospital lot at 8:35am. Skye is searching. Call Alex now."
+        ],
+        [
+         "san",
+         "cust",
+         "Urgent from Lee Pet Taxi: Pretzel got loose near Eastgate Animal Hospital at 8:35am. Skye is searching now, and Sam is calling you."
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A pet is unwell on the ride",
+     "end": "end",
+     "endText": "Skye takes the pet to the nearest emergency vet. Sam calls Alex.",
+     "steps": [
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.20"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:20am",
+       "title": "A pet is unwell: the driver pulls over",
+       "does": "Pretzel pants hard and drools on the ride. Skye pulls over and texts PET UNWELL. Rosie tells Sam and Alex at once. Skye drives to the nearest emergency vet, under the vet-care OK Alex signed.",
+       "more": [
+        "A pet taxi is not an emergency ride, so this is the one case where it goes to a vet.",
+        "The vet-care OK is on the secure page; its limit never goes in a text.",
+        "Sam calls Alex. Any charge for the part of the ride not given is Sam's call, never Rosie's.",
+        "Health details stay on the secure page."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "PET UNWELL Pretzel is panting hard and drooling, pulled over. Going to the nearest emergency vet"
+        ],
+        [
+         "san",
+         "owner",
+         "URGENT: Pretzel (Alex M.) is unwell on the ride. Skye is taking Pretzel to the nearest emergency vet. Call Alex now."
+        ],
+        [
+         "san",
+         "cust",
+         "Urgent from Lee Pet Taxi: Pretzel isn't feeling well on the ride. Skye is taking Pretzel to the nearest emergency vet, as you allowed. Sam is calling you."
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "t": "Thu Oct 22, 8:36am",
+    "does": "The vet runs late, so the wait goes past 30 minutes. Extra wait time is on the list: $10 per 15 minutes. Alex hears the price and says yes first.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "EXTRA 10 vet running late, waiting another 15 minutes"
+     ],
+     [
+      "san",
+      "staff",
+      "Extra for {{alex.staff}}: 15 more minutes of waiting, $10. Sent to Alex.",
+      {
+       "as": "Skye"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "The vet is running late. Skye can wait 15 more minutes. Add it?",
+      {
+       "card": {
+        "title": "Extra wait time · $10 per 15 minutes",
+        "lines": [
+         "Skye waits with Pretzel",
+         "Paid with the rest of your ride"
+        ]
+       },
+       "buttons": [
+        "Yes, wait",
+        "No, head home now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Skye finds the crate's door is cracked, so it won't latch safely. The plug-in says a driver stops that part of the ride, so Alex gets a written note and the photo.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD crate door is cracked and won't latch, ride stopped",
+      {
+       "photos": [
+        "Cracked crate door"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Skye found Pretzel's crate door cracked and didn't take the ride.",
+      {
+       "card": {
+        "title": "Safety note · your pet's ride",
+        "lines": [
+         "Found: the crate door is cracked",
+         "Not done: the ride",
+         "Use another crate, or Lee Pet Taxi can rebook"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "does": "Skye needs extra time because of traffic. Alex is told in the business's name, inside text hours, with the new arrival time.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE traffic on Route 9, arriving at the clinic by 8:50"
+     ],
+     [
+      "san",
+      "cust",
+      "Skye is stuck in traffic and will reach the clinic about 8:50am. Pretzel is calm."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-35",
+    "does": "Say Skye bumps the van into the clinic's sign post and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DAMAGE scraped the clinic's sign post with the van",
+      {
+       "photos": [
+        "Scraped sign post"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Skye scraped a sign post at Eastgate Animal Hospital. The before photo shows it clean.",
+      {
+       "photos": [
+        "Before",
+        "After"
+       ],
+       "buttons": [
+        "Pay for it",
+        "Take money off",
+        "I'll call the clinic"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Skye hands Pretzel to an adult at the clinic and gets the clinic's yes. A photo of Pretzel at the destination is the check.",
+    "more": [
+     "The plug-in names what's checked: the pet is handed to the adult named on the booking, in its crate.",
+     "On a round trip, the same check happens at home."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 8:40am",
+    "does": "The pet is delivered: Pretzel is handed to the clinic at 8:38am. Skye texts DONE with the drop-off time. Alex gets the report and a photo.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 45 local trip. Pretzel handed to the clinic at 8:38, crate checked",
+      {
+       "photos": [
+        "Pretzel at the clinic"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Done: Alex M., Thu 8:00am. The report is sent to Alex."
+     ],
+     [
+      "san",
+      "cust",
+      "Pretzel is at Eastgate Animal Hospital: handed over at 8:38am, in the crate, calm.",
+      {
+       "photos": [
+        "Pretzel at the clinic"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Pretzel drools a little after 15 minutes. A blanket in the crate helps."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to {{alex.staff}}'s private record.",
+      {
+       "as": "Skye"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-34",
+    "does": "Skye slips on the clinic's wet steps and texts HURT. Rosie tells Sam at once, by phone and by text.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT slipped on the clinic steps, hurt my wrist, need to stop"
+     ],
+     [
+      "san",
+      "owner",
+      "Urgent: call Skye now about the ride at 9 Willow Ct. Details on the secure page.",
+      {
+       "buttons": [
+        "Offer Marlo",
+        "New time for Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam is told. If you need care, call 911.",
+      {
+       "as": "Skye"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 6:00pm"
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "A ride sells no extra work at the door, so there's nothing here to cancel. The booked rides can't be cancelled this way."
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Pet Express",
+          "6 pets on 2 runs · Perry 3, Lane 3"
+         ],
+         [
+          "Lee Pet Taxi",
+          "9 rides · Skye 5, Marlo 4"
+         ],
+         [
+          "Waiting on you",
+          "Nora S.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes. Alex has them in writing, and can end the plan with one reply.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "Yes: Monday and Wednesday",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to the daycare ride plan on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: the days, the pick-up time, the price a ride and when it's charged. Skip and weather terms. It runs until Alex ends it.",
+           "Ending it takes one reply. Rides already done stay paid.",
+           "Once a year, the terms and how to end the plan come again, by the business's own rule."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your ride plan with Lee Pet Taxi is set.",
+            {
+             "card": {
+              "title": "Daycare rides Mon and Wed · $45 a ride",
+              "lines": [
+               "From Thu Oct 22 · pick-up 8:00am · Skye",
+               "Your saved card is charged after each ride",
+               "Skip free until 2 hours before pick-up",
+               "Runs until you end it"
+              ]
+             },
+             "buttons": [
+              [
+               "3",
+               "End the plan"
+              ]
+             ]
+            }
+           ]
+          ],
+          "vary": {
+           "after:bill": {
+            "say": [
+             [
+              "san",
+              "cust",
+              "Your ride plan with Lee Pet Taxi is set.",
+              {
+               "card": {
+                "title": "Daycare rides Mon and Wed · $45 a ride",
+                "lines": [
+                 "From Thu Oct 22 · pick-up 8:00am · Skye",
+                 "We text you the bill after each ride",
+                 "Skip free until 2 hours before pick-up",
+                 "Runs until you end it"
+                ]
+               },
+               "buttons": [
+                [
+                 "3",
+                 "End the plan"
+                ]
+               ]
+              }
+             ]
+            ]
+           }
+          },
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "Visit fee",
+  "color"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60"
+  ]
+ },
+ "notes": "Built Tue Oct 27 2026 from the refitted dog-walker (from: dog-walker); the plug-in, rename pairs, money and every own step were rewritten for pet transport. No sample or test-drive plug-in existed, so it is built from the trade's norm and says so here.\nWork: a driver picks a pet up and takes it to a vet, groomer, daycare or another address. Flow B (the usual side) is Lee Pet Taxi, door to door: Alex books Pretzel, a corgi in a crate, a local trip to Eastgate Animal Hospital, picked up Thu Oct 22 at 8:00am by Skye, with Alex handing him over. Flow A (the less usual side, from the dog-walker's drop-off flow) is Lee Pet Express, Sam's second company: depot runs. Alex drops Nugget, a pug, at the depot, 20 Mill St, Sat Oct 24 at 11:00am for a daycare run, and picks Nugget up at the depot that afternoon with the same code.\nPrices (the example business's own): local trip one way up to 10 miles $45, vet round trip with up to 30 minutes of waiting $85, long trip 10 to 30 miles $95, long-distance trip 30 to 60 miles $140 ($40 deposit, $100 rest to the saved card at DONE), extra pet $12, after-hours $15 more, extra wait time $10 per 15 minutes (only after the customer's yes by text), crate fit check free, late cancel or no-show up to $25 (never more than what was paid). Lee Pet Express: daycare run $35, groomer run $40, short run $25, extra pet $20, hospital run $55 paid in full, long run $140, crate fit check free; late-cancel fee $20.\nMoney paths. B: list|card|card (main: card saved for the $25 fee, charged $45 at DONE), list|none|bill ($45, nothing taken, Rosie texts the bill), list|full|none (vet round trip $85 paid in full, fee $25), list|deposit|card (long-distance $140: $40 deposit, $100 rest to the saved card at DONE, fee $40). A: list|card|card (main: depot run $35, card saved for the $20 fee, charged at pick-up), list|full|none (hospital run $55 paid in full, fee $20). No hold, no rest on a set day. Extra pet, extra wait and after-hours are paid with the ride.\nLicenses: S1-60 keeps both branches (the example state asks for a pet transport license for the business: PT-1042, an obviously fake format; where the form asks for none, the registration is enough). Drivers give no license number (S2-28 off): a valid driver's license is the business's own check. Insurance is the other date that comes due.\nSafety: a pet hurt, very sick, overheating or poisoned now (a pet taxi is not an emergency ride: call the vet, no booking); a person bitten (911); a pet lost right now; signs of a catching illness (no depot run). A pet with a bite history goes to the owner first, crated and muzzled. An adult hands the pet over at both ends; a child alone never does (B8-03 'Only a child answers' and 'Nobody home' stay on; the nobody-home way in is off).\nOwn steps: B6-x01 and B6-x02 (the plan's terms texted back); branches of B8-22: B8-x01 (a pet gets loose at a stop) and B8-x02 (a pet is unwell on the ride: the driver pulls over and takes the pet to the nearest emergency vet under the vet-care OK the customer signed, Sam calls Alex). Extra wait time uses B8-23 (price and a yes first).\nSettings: arrive A and B a set start (pick-up 8:00am), cutoff A 24 hours before, B 2 hours before pick-up. Booking choices limited: nothing is sent now, so S2-30's yes branch and every sent-now branch are off, and S1-21's 'Jobs sent now' row says every ride is booked ahead.\nNames: Skye Price and Marlo Moore (pet taxi drivers), Perry Chen and Lane Diaz (depot drivers); Pretzel (B) and Nugget (A). Second kind of work: airport transfers (S1-04, S1-50, S2-24). Kept word: 'leak' (S12-29), 'visit fee', 'color' (S13-40).\nOff, as pet taxi never uses them: children, crews, estimates at the door, contracts, deliveries, rentals, stays, classes, seats, proposals, results later, insurance or plan pays, bank transfer, stage billing, nobody-home entry, groups.\nNot sure (verifier): the S1-13 / S1-14 sign-up money cards are the master's example rows with this trade's names and amounts put in by pairs; a few owner-reply lines for paths the work never uses still show the master's wording (MASTER 2 of batch D1); cards such as B6-13 and A6-14 name the main service on every path (MASTER); S1-13's 'Depot run at their home $75' read-back is the master's both-places example.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "please come with dry hair",
+    "a $20 fee ($40 for the Groom's package)",
+    "Style consult",
+    "Step-free door on Elm St · parking in the back",
+    "a step-free chair",
+    "already in the chair",
+    "The chairs",
+    "A chair, ready",
+    "Shop's side",
+    "At your shop",
+    "each shop",
+    "shop-added",
+    "Someone in the shop is threatening people.",
+    "someone in the shop was threatening people",
+    "Color quotes come to you first. Board prices never need one",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Kids cut (12 and under)",
+    "barbershops",
+    "Kids cut",
+    "Color correction",
+    "color correction",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Ben T. books a skin fade",
+    "skin fades",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "May the shop show photos of your hair? Yes / No",
+    "your hair",
+    "the hair",
+    "dry hair",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "says the cape clip ripped a shirt collar today",
+    "It's a gift for my brother. Can I pay for it?",
+    "Can my son wait in the shop during my cut?",
+    "Lee's Barbershop will fix it for free.",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Adds a second shop, with its own team",
+    "like a haircut at the shop or at home",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "could mean a salon or a barbershop",
+    "Wants Saturday morning, with Riley",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "Books a free fix, if Sam says so",
+    "The cut is uneven on one side.",
+    "How was your visit with Riley?",
+    "like a burst pipe or a lockout",
+    "Lee's Barbershop · with Riley",
+    "What happens at the chair?",
+    "Books a cut every 4 weeks",
+    "like a skin-test result",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "Today · 3:00pm · Avery",
+    "the $90 color quote",
+    "Alex asks for a fix",
+    "Lee's Barbershop's",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "11:00am · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Groom's package",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "2:00pm · Avery",
+    "1 color quote",
+    "every 4 weeks",
+    "color and cut",
+    "Color and cut",
+    "signature cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "house calls",
+    "House calls",
+    "patch test",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "The shop's",
+    "the shop's",
+    "Shop front",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "88 Elm St",
+    "on Elm St",
+    "kids cut",
+    "Plumbing",
+    "plumbing",
+    "Haircuts",
+    "haircuts",
+    "The shop",
+    "the shop",
+    "25 miles",
+    "the cut",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "a cut",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$89"
+   ],
+   "B": [
+    "The $110 rest after",
+    "shop-added",
+    "the sewer camera inspection",
+    "sewer camera report",
+    "$89, credited to the repair",
+    "service-call fee",
+    "Priced at the visit",
+    "Set at the visit",
+    "Priced from photos",
+    "From photos",
+    "$120 an hour",
+    "$199",
+    "Labor",
+    "Water pressure check",
+    "E 25% deposit after the quote",
+    "25% deposit",
+    "The rest after",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Free until 7am on the visit day",
+    "After that, or nobody home: up to the",
+    "Mon–Fri 7:30am–5:30pm",
+    "A tip line · bank transfer over $500",
+    "like 'Is the sink still full of water?'",
+    "The $179 drain needs none.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Leak repair",
+    "Water heater replacement",
+    "Sewer camera inspection",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Water heater fix",
+    "would like to talk about the water heater quote before booking.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "It's a leak under the sink, today,",
+    "The service call is $89. Accept it?",
+    "accept the leak repair for today,",
+    "Accepted: the leak repair today,",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Lee Home Services can clear the drain:",
+    "Yard drain",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "drain clearings",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Replace both shutoff valves · $160",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A job quoted at the visit promises only the service call now.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Can I skip next week's drain cleaning?",
+    "like a haircut at the shop or at home",
+    "Jordan left a mess under the sink.",
+    "How was your visit with Jordan?",
+    "like a burst pipe or a lockout",
+    "2 Someone else meets the pro",
+    "Jordan came late and rushed.",
+    "raise drain clearing to 199",
+    "Jordan was late and rushed.",
+    "1 Yes, Alex will be there",
+    "plumbing license MP045210",
+    "plumbing and electrical",
+    "Kitchen drain clearing",
+    "leehomeservices.com",
+    "Water heater flush",
+    "water heater flush",
+    "water heater replacement",
+    "your water heater",
+    "the water heater",
+    "water heater",
+    "Lee Home Services'",
+    "the kitchen drain",
+    "Lee Home Services",
+    "service call fee",
+    "Service call fee",
+    "Lee's Barbershop",
+    "Plumbing license",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "service call",
+    "Service call",
+    "today's work",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "house calls",
+    "House calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "beard trim",
+    "The shop's",
+    "the shop's",
+    "Shop front",
+    "42 Oak St",
+    "88 Elm St",
+    "Plumbing",
+    "plumbing",
+    "The shop",
+    "the shop",
+    "25 miles",
+    "40 miles",
+    "Fri 8am",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "25-mile",
+    "8–10am",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$179",
+    "$150",
+    "$89"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "41b86c1e72",
+   "S1-38": "b50b0bd4e8",
+   "S1-50": "3167049ceb",
+   "S1-60": "235c90a3c3",
+   "S1-23": "39941a5377",
+   "A3-02": "223044a79d",
+   "A3-07": "6b005cf195",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A3-26": "9e3630dc0b",
+   "A3-20": "b8251d2535",
+   "A4-03": "c24298dc38",
+   "A4-50": "6f43775326",
+   "A4-43": "c17d56f766",
+   "A4-34": "9f322d96aa",
+   "A4-65": "fa7ec0389d",
+   "A6-04": "fe10e3d360",
+   "A7-12": "05f64179a4",
+   "A7-13": "e41528a397",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-23": "e3a35f7f9e",
+   "A8-38": "5e48b74f3a",
+   "A8-43": "7b0f73c701",
+   "A8-11": "d5522790d9",
+   "A8-50": "0f26abfc87",
+   "A8-54": "bc2f9467fd",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A8-35": "a67e890a5b",
+   "A10-02": "c9223be948",
+   "A10-42": "4f28189298",
+   "S11-02": "d0b2cf9f6c",
+   "A4-11": "2983f72b69",
+   "A8-40": "8ce1ecdbe5",
+   "S2-02": "b2094081ee",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S1-70": "3961b1f903",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S12-19": "07db0515b2",
+   "S12-24": "329bff1093",
+   "A4-24": "0a292df05b",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A9-15": "bd2a17c3c5"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "0bea92643b",
+   "S1-38": "6301c86637",
+   "S1-50": "daa9091585",
+   "S1-60": "235c90a3c3",
+   "S1-23": "5b2324d920",
+   "S2-02": "b2094081ee",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "S1-70": "34e952eac5",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S12-19": "176d3d2beb",
+   "S12-24": "7514a15e65",
+   "B10-38": "867fe1ab7c",
+   "B4-83": "a7473a80ea",
+   "B4-01": "15f683e6cb",
+   "B4-26": "912686f788",
+   "B8-03": "ac9d404766",
+   "B7-90": "a5b8b2fe42",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B9-03": "df9548d13f",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B3-21": "ad48326ac5",
+   "B3-22": "19f64ba1ba",
+   "B3-25": "4413e58bcb",
+   "B3-04": "31447caa31",
+   "B3-24": "a31b436ff1",
+   "B4-03": "1126d68737",
+   "B4-04": "df3ea4b2f5",
+   "B4-05": "fb3a9061c8",
+   "B4-34": "74ff52d83d",
+   "B4-32": "fcfe092e37",
+   "B4-38": "9539521dc7",
+   "B4-28": "506d267aaf",
+   "B5-21": "925b7342ed",
+   "B6-06": "1d676278da",
+   "B7-15": "a00f0c64fb",
+   "B7-16": "3177c3701b",
+   "B7-17": "ac1fd212f3",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-18": "530038d2b8",
+   "B8-19": "11e79a26d8",
+   "B8-22": "50d78f1af0",
+   "B8-23": "dd780a2ec8",
+   "B8-30": "a1ef4983e4",
+   "B8-32": "1cfd4f7afa",
+   "B8-35": "93207824c7",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B8-34": "643812e26f",
+   "B10-02": "eaf53a5e74",
+   "S11-02": "b5be5f9aa7",
+   "B6-13": "ed1f412f7d"
+  }
+ }
+}

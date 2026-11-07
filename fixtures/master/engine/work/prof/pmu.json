@@ -1,0 +1,7050 @@
+{
+ "id": "pmu",
+ "name": "Permanent makeup / microblading",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "hair",
+ "plugin": {
+  "pf.license": {
+   "need": "always: permanent makeup is tattooing on the face, licensed where the state's rules require it (a tattoo, body art or permanent cosmetics license, as the state names it)",
+   "who": "both: the studio holds an establishment license where the state issues one, and each artist holds their own",
+   "ask": "the studio's license number; each artist's number in their invite reply (or the owner sends it)",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "services": "which services each license covers, from the state form: where a state lets only some license holders work on the face, those services are listed only for them",
+   "away": "guest days only at another licensed salon or studio, and only where the state's rules allow it; a guest or temporary permit for each host place where the state asks (a switch from the state form)",
+   "training": "bloodborne pathogens training and any health permit, where the state's rules require them",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance where the state's form asks for it; a host salon may ask for proof"
+  },
+  "pf.services": {
+   "shape": "set services with a chosen artist; a first session includes one touch-up 6 to 8 weeks later",
+   "examples": "the example businesses' own prices (Lee Brow Studio and Lee Traveling PMU), not a standard",
+   "list": [
+    {
+     "name": "Consult and patch test",
+     "price": "free",
+     "kind": "a first step",
+     "length": "30 min",
+     "where": "at the studio",
+     "before": "nothing",
+     "after": "nothing more",
+     "note": "new clients; at least 48 hours before the first session"
+    },
+    {
+     "name": "Microblading (brows)",
+     "price": "$550",
+     "kind": "one price",
+     "length": "2½ hours",
+     "where": "at the studio, or on a guest day at a host salon",
+     "before": "a $100 deposit, toward the price",
+     "after": "the rest at the desk (studio); Rosie texts the bill (guest day)",
+     "note": "one touch-up included, 6 to 8 weeks later"
+    },
+    {
+     "name": "Powder or combo brows",
+     "price": "$650",
+     "kind": "one price",
+     "length": "2½ hours",
+     "where": "at the studio, or on a guest day",
+     "before": "a $100 deposit",
+     "after": "as for microblading",
+     "note": "one touch-up included"
+    },
+    {
+     "name": "Lip blush",
+     "price": "$600",
+     "kind": "one price",
+     "length": "2½ hours",
+     "where": "at the studio",
+     "before": "a $100 deposit",
+     "after": "the rest at the desk",
+     "note": "one touch-up included; Hannah only"
+    },
+    {
+     "name": "Eyeliner",
+     "price": "$400",
+     "kind": "one price",
+     "length": "2 hours",
+     "where": "at the studio",
+     "before": "a $100 deposit",
+     "after": "the rest at the desk",
+     "note": "one touch-up included; Hannah only"
+    },
+    {
+     "name": "Included touch-up",
+     "price": "$0",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "where the first session was",
+     "before": "nothing",
+     "after": "nothing to pay",
+     "note": "6 to 8 weeks after the first session; its own booking and check-in code"
+    },
+    {
+     "name": "Yearly color refresh",
+     "price": "$200",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the studio, or on a guest day",
+     "before": "a $50 deposit",
+     "after": "the rest at the desk, or on the bill"
+    },
+    {
+     "name": "Brow lamination or lash lift, with tint",
+     "price": "$95 each, $170 together",
+     "kind": "one price",
+     "length": "60 min (90 min together)",
+     "where": "on a guest day",
+     "before": "a $25 deposit, toward the price",
+     "after": "Rosie texts the bill",
+     "note": "Lee Traveling PMU's second kind of work (brow lamination); waits for its licensed esthetician"
+    }
+   ],
+   "capacity": "one artist and one client per booking; lip blush and eyeliner also use the studio's one private room (the example studio)",
+   "skills": "microblading, powder and combo brows, lip blush, eyeliner; lips and eyeliner offer only the artists who do them",
+   "online": "no: permanent makeup is done in person, and so is the consult",
+   "nobodyHome": "never: the client is always there"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "is it for you, and are you 18 or older (asked first)",
+    "which area: brows, lips or eyeliner",
+    "new or returning, and any permanent makeup on that area before",
+    "for a touch-up: the date of the first session, so it falls 6 to 8 weeks after"
+   ],
+   "afterTime": [
+    "the look you want, like soft and natural",
+    "anything the artist should know"
+   ],
+   "securePage": [
+    "18 or older, with a photo ID to bring",
+    "pregnant or breastfeeding",
+    "isotretinoin (Accutane) in the last 12 months",
+    "blood thinners",
+    "keloids or raised scars",
+    "Botox or fillers near the area in the last 2 weeks",
+    "a past reaction to tattoo ink or numbing cream",
+    "a photo of the area now"
+   ],
+   "flags": "any yes goes to the artist, who decides; Rosie only sorts the answers",
+   "whoMayBook": "the client, for herself, 18 or older (the example's rule); a state's minimum age and any parent's OK come from the state form"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a reaction happening now: face, lips or throat swelling, or trouble breathing",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "signs of infection after a session: spreading redness, pus or a fever",
+     "say": "See a doctor today. The studio is told at once.",
+     "booking": "no new session until the artist OKs it"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "the patch-test spot red, itchy or swollen",
+     "what": "the client tells the studio on the secure page; the artist decides, and a reaction calls the session off with a full refund"
+    },
+    {
+     "words": "pregnant, breastfeeding, or on isotretinoin or blood thinners",
+     "what": "only on the secure page; the artist decides, and may move the session to a later date"
+    },
+    {
+     "words": "a cold sore, a rash or broken skin on the area",
+     "what": "the artist decides at check-in; the session moves with no fee"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Consult and patch test (a small dab of the pigment on the skin, watched 48 hours for a reaction)",
+     "when": "at least 48 hours before the first session",
+     "who": "where the artist asks for one: the example studio asks every new client; on guest days, only when the secure-page answers show a past reaction",
+     "result": "the client tells the studio only if the spot reacts; the artist checks it at check-in; a reaction calls the session off with a full refund",
+     "goodFor": "6 months with the same pigment (the example studio's rule)"
+    },
+    {
+     "name": "Consent form, with aftercare advice and a note that a new tattoo can delay giving blood",
+     "when": "signed on the secure page before the session, or on the studio's tablet at check-in",
+     "who": "every session, touch-ups too"
+    },
+    {
+     "name": "The shape drawn and agreed",
+     "when": "at the consult, and again before any work at the session",
+     "result": "nothing is tattooed until the client OKs the shape in the mirror"
+    }
+   ],
+   "reaction": "a past reaction to tattoo ink or numbing cream: book only the consult and patch test, with the artist's OK",
+   "prep": "for the reminder: bring a photo ID; no alcohol for 24 hours before; sign the consent form if it isn't done"
+  },
+  "pf.visit": {
+   "checkIn": "the check-in code at the front desk (on a guest day, at the host salon's desk); a photo ID showing 18 or older at every visit, touch-ups too; the consent signed",
+   "beforeWork": "the artist checks the patch-test spot, draws the shape and the client OKs it in the mirror; numbing cream goes on before any strokes",
+   "stops": "no photo ID showing 18 or older, or signs of alcohol or drugs: no session that day, and the owner decides about the deposit",
+   "changes": "a change of shape or color is agreed before any work; another service or price needs the client's OK first",
+   "done": "the check-in code, or DONE from the artist; the brow map, the pigment and the before-and-after photos go in the client's private record"
+  },
+  "pf.money": {
+   "before": "a $100 deposit toward a first session, and $50 for a color refresh (the example's amounts); the consult and the included touch-up take nothing",
+   "caps": "deposit cap: from the state form",
+   "cancel": "free to cancel until 24 hours before (the owner's setting; some studios pick 48 hours)",
+   "fees": "a late cancel or a no-show: the deposit may be kept, never more; the owner confirms each time",
+   "refunds": "a full refund if the patch test or the artist's health review rules the session out, or the business changes the plan",
+   "after": "at the studio, the rest at the desk, the studio's own way; on a guest day, Rosie texts the bill",
+   "tips": "on: at the desk, or a tip line on the bill Rosie texts; tips go to the artist",
+   "tax": "a tax line for aftercare balm sold, where the state's rules require it",
+   "fee2": "Rosfield's $2 applies to each confirmed booking; a touch-up the artist books at checkout is added by the business, so it carries no $2 (the master's rule)"
+  },
+  "pf.messages": {
+   "never": "health answers, test-spot reports, face photos and healing questions never go in a text or through the AI: only the secure page and the client's record",
+   "photos": "before-and-after photos stay in the record; showing them anywhere needs the client's own yes",
+   "languages": "English and Spanish",
+   "minors": "no bookings for minors at the example businesses; where a state allows a minor with a parent's OK, the texts go to the parent"
+  },
+  "pf.staff": {
+   "licenses": "each artist's license per state; lash and brow work has its own license where the state's rules require it",
+   "skills": "microblading, powder and combo brows, lip blush, eyeliner; only Hannah does lips and eyeliner at the studio",
+   "supervision": "an apprentice works only under a licensed artist on site, where the state's rules allow it; where only a physician, or staff a physician supervises on site, may work on the face, those times show only when the supervisor is there (a switch from the state form)",
+   "oks": "the artist doing the work reads any health yes and decides; Sam OKs a stand-in",
+   "standIn": "brows are personal: the client chooses another licensed artist at the same time and price, or her own artist's next date; the stand-in gets the brow map, the pigment and the patch-test result",
+   "away": "only artists cleared for guest days, with any guest permit, are offered there"
+  },
+  "pf.rules": {
+   "minimumAge": "the minimum age and any parent's OK: from the state form (the example businesses book 18 and older only)",
+   "consent": "a consent form with aftercare advice and the blood-donation note before the work, where the state's rules require it (the example asks for it always)",
+   "idCheck": "a photo ID checked before starting, where the state's rules require it (the example checks at every visit)",
+   "impaired": "no work on anyone impaired by alcohol or drugs",
+   "faceWork": "where a state lets only some license holders work on the face, those services are listed only for them",
+   "showLicense": "the license posted at the studio, and shown at a host salon, where the state asks",
+   "guestPermit": "a guest or temporary permit for each host place, where the state's rules require it",
+   "records": "consent forms, health answers, pigments and patch-test results kept 7 years, or longer where the state asks"
+  },
+  "pf.edges": {
+   "lateArrival": "15 minutes' grace for a 2½-hour session; later, the artist may move it, and the owner decides about the deposit as for a late cancel",
+   "standIn": "an artist out: the client picks another licensed artist, her own artist's next date, or a full refund; no answer in a day: someone calls her",
+   "patchTest": "a reaction at the test spot: the session is called off with a full refund",
+   "healthReview": "a health yes the artist hasn't read in 24 hours: declined politely, with nothing kept",
+   "stop": "STOP after booking: the consent form can't be texted, so it's signed on the tablet at check-in",
+   "healing": "a healing question or photo goes to the artist on the secure page; danger signs get the safety message first",
+   "touchUp": "the included touch-up stays open on the record until 8 weeks after the session; no sales texts about it",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "forms",
+   "tips",
+   "aftercare"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Hannah and Grace (PMU artists)",
+   "cust": "Alex M. (client) · other clients"
+  },
+  "B": {
+   "staff": "Paige and Leah (PMU artists on guest days)",
+   "cust": "Alex M. (client) · other clients",
+   "other": "Others (a host salon, a bank, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Hannah"
+  },
+  "B": {
+   "staff": "Paige"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: 9:00am, Riley"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero hacerme microblading el sábado."
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the studio's list"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the session?"
+   ],
+   [
+    "Priced from your photos",
+    "Made just for you"
+   ],
+   [
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Nia K.'s refund was due yesterday."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book my touch-up at Lee's Barbershop on Saturday."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The studio's plug-in adds one: a reaction happening now, like a swelling face, lips or throat."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Another kind of work's example: a gas smell gets 'leave now, then call 911'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's message has none, so nothing is sent here."
+   ],
+   [
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Sam set this line at sign-up: the number clients call for what only an artist should answer."
+   ],
+   [
+    "Riley can go over it at your visit.",
+    "Riley can go over it at your consult."
+   ],
+   [
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "Rosie is the studio's booking software. Its only outside links are the artists' phone calendars and Stripe."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Brows could mean permanent makeup or brow lamination."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some work takes several visits, like a first session and its touch-up 6 to 8 weeks later."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books brows and eyeliner together"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A studio books an artist's time."
+   ],
+   [
+    "A barbershop has none.",
+    "The studio has none."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the studio show photos of your brows?"
+   ],
+   [
+    "A barbershop's services need none.",
+    "The studio's services need none: the consent form is its own step."
+   ],
+   [
+    "Book this haircut?",
+    "Book this touch-up?"
+   ],
+   [
+    "Color always stays with Riley.",
+    "The session stays with the artist who did the consult."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s session."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Riley stopped Alex M.'s session."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Pigment got on my white shirt collar."
+   ],
+   [
+    "the cape clip ripped a shirt collar today",
+    "pigment stained a shirt collar today"
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping: the brow map, the pigment and the patch-test result."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A session is rated, so the studio takes the first branch."
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like the included touch-up."
+   ],
+   [
+    "Skin fade · $40",
+    "Consult and patch test · Free"
+   ],
+   [
+    "Lee's Barbershop · Skin fade",
+    "Lee's Barbershop · Consult and patch test"
+   ],
+   [
+    "Color and cut · $90",
+    "Brows and eyeliner · $900"
+   ],
+   [
+    "1 color quote",
+    "1 price to OK"
+   ],
+   [
+    "raise haircut to 40",
+    "raise color refresh to 220"
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "It's a brow touch-up today at 2:00pm with Avery, for a returning client. It's included, at $0. Accept it?"
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery.",
+    "Reading it back: accept the brow touch-up today at 2:00pm with Avery."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $900 price."
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2.",
+    "Sam raises the color refresh to $220 for visits from Mon Nov 2."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Refreshes already booked keep $200, even after Nov 2."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for a color refresh at $180, an old price. Rosie answers with the real price, $200."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A color refresh at Lee's Barbershop is $200, not $180. Here are the open times at $200."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: each state's form says where tattooing, permanent makeup included, may be done."
+   ],
+   [
+    "EC22871",
+    "ES22871"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Sam Lee added you to the team for guest days and brow lamination."
+   ],
+   [
+    "Barber license",
+    "Permanent makeup license"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, lips and eyeliner"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Paige: guest days and brow lamination"
+   ],
+   [
+    "Casey: plumbing",
+    "Leah: guest days"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: brows, lips and eyeliner"
+   ],
+   [
+    "Avery: barber",
+    "Avery: brows"
+   ],
+   [
+    "Each person hears they can be booked for their own work: Avery at the shop, Casey for plumbing.",
+    "Each person hears they can be booked for their own work: Avery at the studio, Casey on guest days."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee's Barbershop can book you from now on, at the studio, for brows, lips and eyeliner."
+   ],
+   [
+    "Lee Home Services can book you for plumbing and electrical from now on.",
+    "Lee Home Services can book you for guest days and brow lamination from now on."
+   ],
+   [
+    "a barber",
+    "an artist"
+   ],
+   [
+    "A barber",
+    "An artist"
+   ],
+   [
+    "Haircut · $35",
+    "Touch-up · $0, included"
+   ],
+   [
+    "Groom's package ·",
+    "Microblading ·"
+   ],
+   [
+    "The Groom's package",
+    "Microblading"
+   ],
+   [
+    "the Groom's package",
+    "microblading"
+   ],
+   [
+    "Groom's package",
+    "microblading"
+   ],
+   [
+    "Haircuts",
+    "Touch-ups"
+   ],
+   [
+    "haircuts",
+    "touch-ups"
+   ],
+   [
+    "Haircut",
+    "Touch-up"
+   ],
+   [
+    "haircut",
+    "touch-up"
+   ],
+   [
+    "$100",
+    "$450"
+   ],
+   [
+    "$140",
+    "$550"
+   ],
+   [
+    "$40",
+    "$100"
+   ],
+   [
+    "on the shop's board",
+    "on the studio's list"
+   ],
+   [
+    "Riley Chen",
+    "Hannah Park"
+   ],
+   [
+    "Riley",
+    "Hannah"
+   ],
+   [
+    "Avery Diaz",
+    "Grace Liu"
+   ],
+   [
+    "Avery",
+    "Grace"
+   ],
+   [
+    "Jordan Price",
+    "Paige Ross"
+   ],
+   [
+    "Jordan",
+    "Paige"
+   ],
+   [
+    "Casey Moore",
+    "Leah Ortiz"
+   ],
+   [
+    "Casey",
+    "Leah"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Brow Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Brow Studio"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Traveling PMU's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Traveling PMU"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Guest Brows"
+   ],
+   [
+    "Lee Electric",
+    "Lee Brow Bar"
+   ],
+   [
+    "88 Elm St",
+    "88 Linden St"
+   ],
+   [
+    "Elm St",
+    "Linden St"
+   ],
+   [
+    "1200 Main St",
+    "1200 Cherry St"
+   ],
+   [
+    "Oak St",
+    "Cedar St"
+   ],
+   [
+    "MP045210",
+    "PM045210"
+   ],
+   [
+    "JP031552",
+    "PM031552"
+   ],
+   [
+    "BS20981",
+    "BA20981"
+   ],
+   [
+    "plumbing and electrical",
+    "permanent makeup and brow lamination"
+   ],
+   [
+    "Electrical",
+    "Brow lamination"
+   ],
+   [
+    "electrical",
+    "brow lamination"
+   ],
+   [
+    "Plumbing",
+    "Permanent makeup"
+   ],
+   [
+    "plumbing",
+    "permanent makeup"
+   ],
+   [
+    "plumber",
+    "artist"
+   ],
+   [
+    "Plumber",
+    "Artist"
+   ],
+   [
+    "Barbershop",
+    "Studio"
+   ],
+   [
+    "barbershops",
+    "studios"
+   ],
+   [
+    "barbershop",
+    "studio"
+   ],
+   [
+    "barbers",
+    "artists"
+   ],
+   [
+    "Barber",
+    "Artist"
+   ],
+   [
+    "barber",
+    "artist"
+   ],
+   [
+    "Barbering",
+    "Permanent makeup"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Visit fee",
+    "Late-cancel fee"
+   ],
+   [
+    "visit fee",
+    "late-cancel fee"
+   ],
+   [
+    "skin fades",
+    "brow touch-ups"
+   ],
+   [
+    "skin fade",
+    "brow lamination"
+   ],
+   [
+    "Beard trim",
+    "Lash lift"
+   ],
+   [
+    "Kids cut",
+    "Brow touch-up"
+   ],
+   [
+    "Color correction",
+    "Color refresh"
+   ],
+   [
+    "Color and cut",
+    "Color refresh"
+   ],
+   [
+    "color and cut",
+    "color refresh"
+   ],
+   [
+    "color correction",
+    "color refresh"
+   ],
+   [
+    "Signature cut and shave",
+    "Signature microblading"
+   ],
+   [
+    "Classic cuts, fades and",
+    "Microblading and"
+   ],
+   [
+    "hot towel shaves",
+    "brow tints"
+   ],
+   [
+    "Service call",
+    "Touch-up"
+   ],
+   [
+    "A water heater job",
+    "A brow lamination job"
+   ],
+   [
+    "water heaters",
+    "lash lifts"
+   ],
+   [
+    "water heater",
+    "lash lift"
+   ],
+   [
+    "kids cut",
+    "brow touch-up"
+   ],
+   [
+    "shave",
+    "tint"
+   ],
+   [
+    "heater",
+    "tint"
+   ],
+   [
+    "Skin fade",
+    "Brow lamination"
+   ],
+   [
+    "beard trim",
+    "lash lift"
+   ],
+   [
+    "'A trim' or 'a fade' fits a touch-up.",
+    "'A brow tint' or 'a lash lift' fits a touch-up."
+   ],
+   [
+    "a fade",
+    "a lash lift"
+   ]
+  ],
+  "B": [
+   [
+    "MOVE Alex to Thu 12pm",
+    "MOVE Alex to Thu 12:30pm"
+   ],
+   [
+    "first tomorrow: 10:00am",
+    "first tomorrow: 9:00am"
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every guest-day session, and brow lamination"
+   ],
+   [
+    "Hours: Mon–Fri 7:30am–5:30pm",
+    "Hours: guest days, Thu and Fri, 9am–5pm"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Permanent makeup PM031552 · esthetics ES30417"
+   ],
+   [
+    "Casey for plumbing, Avery at the shop",
+    "Casey on guest days, Avery at the studio"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My event is Friday. Can someone do my brows tonight?"
+   ],
+   [
+    "Alex M. asks: Can I run the dishwasher before you come?",
+    "Alex M. asks: Can I wear makeup to the session?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I wear makeup to the session?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE: shape drawn and OK'd by Alex in the mirror."
+   ],
+   [
+    "Under the sink, before",
+    "Brows, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Shape drawn"
+   ],
+   [
+    "The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "The main story: Alex asks an AI for microblading on Mon Oct 19, 6:40pm."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Can I get microblading Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'd like microblading on Thursday."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can Lee Home Services do powder brows this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa touch-up Thu 12:30 Casey"
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Touch-up"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Another kind of work's example: a gas smell gets 'leave now, then call 911'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now if her face, lips or throat swell."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If your face, lips or throat swell, or it's hard to breathe, call 911 now."
+   ],
+   [
+    "A gas smell at the home",
+    "A swelling face after a session"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "I'm on blood thinners. Is it safe to get microblading?"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like tattoo removal."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services does permanent makeup and brow lamination, not tattoo removal. Nothing was saved. You can look for a removal clinic near you."
+   ],
+   [
+    "Say another customer's AI asks for a job in Riverton, 40 miles away.",
+    "Say another client's AI asks for a guest day in Riverton, 40 miles away."
+   ],
+   [
+    "Each service got a price kind at sign-up. A custom job gets its price before anyone says yes. Sam OKs any price over $500 made for one customer.",
+    "Each service got a price kind at sign-up. A price made for one client gets its price before anyone says yes. Sam OKs any such price over $500."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a lash lift. Both go in one booking, with one start time and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also do a lash lift?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A lash lift is $95, and both fit before lunch."
+   ],
+   [
+    "Wed morning is full.",
+    "Thursday morning is full."
+   ],
+   [
+    "Sorry, no plumber on call can come tonight, so nothing was booked.",
+    "Sorry, no artist on call can come tonight, so nothing was booked."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Alex picked Jordan, so only Jordan's next times show."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swelling face, lips or throat, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "I have a rash near my eyebrows."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Thanks for telling us. Jordan suggests moving your session until it clears, with no fee."
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be 30 minutes late, sorry!"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do a lash lift on Thursday?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Lash lift and tint · $95"
+   ],
+   [
+    "Jordan texts OMW (on my way)",
+    "Jordan texts that she's set up"
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code at the desk"
+   ],
+   [
+    "Nobody home",
+    "Alex doesn't come"
+   ],
+   [
+    "Jordan couldn't enter your code. If the person at your door isn't Jordan, don't let them in.",
+    "Jordan couldn't enter your code. If the artist greeting you isn't Jordan, don't start the session."
+   ],
+   [
+    "Alex was told to keep the door closed",
+    "Alex was told not to start"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "3: Alex is home",
+    "3: Alex is here"
+   ],
+   [
+    "Alex says they're home. Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "Alex says she's here. Jordan finds her at the desk and checks in with the code, so it's a normal visit."
+   ],
+   [
+    "Thanks. We've told Jordan you're home.",
+    "Thanks. We've told Jordan you're here."
+   ],
+   [
+    "Alex M. says they're home. Try the door again, and check in with the code.",
+    "Alex M. says she's here. Find her at the desk, and check in with the code."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most sessions have a price before the visit, from the list. Here, microblading is $550."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 95 lash lift and tint"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: lash lift and tint, $95. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Lash lift and tint · $95"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $95 lash lift price is good for 7 days."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 9:52am on Jordan's phone, you said yes to a lash lift for $95."
+   ],
+   [
+    "UNSAFE leaving 42 Oak St",
+    "UNSAFE leaving Aster Salon"
+   ],
+   [
+    "Jordan left Alex M.'s visit at 42 Oak St for safety. Please call Jordan now.",
+    "Jordan left Alex M.'s session at Aster Salon for safety. Please call Jordan now."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds broken skin on one brow. The plug-in says an artist stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD broken skin on the left brow, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Broken skin, left brow"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found broken skin on your left brow and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: broken skin on the left brow"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the left brow"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See a doctor if it doesn't heal in a week"
+   ],
+   [
+    "The note says what was found, what wasn't done and why, and which kind of business to call.",
+    "The note says what was found, what wasn't done and why, and when to see a doctor."
+   ],
+   [
+    "Answers, photos and gate codes",
+    "Answers, photos and consent forms"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE pigment on Alex's white collar"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Pigment on a white collar"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Pigment stained Alex M.'s white collar. The before photo shows it clean."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE soft hair strokes, pigment Warm Brown. Touch-up on a guest day in 6 to 8 weeks."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 650 powder brows"
+   ],
+   [
+    "the kitchen drain",
+    "the session"
+   ],
+   [
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "Lee Home Services: $800 for your bill. Pay by card, or by bank transfer."
+   ],
+   [
+    "stage 2 of your repipe",
+    "your bill"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what the included touch-up covers."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "One brow looks lighter than the other."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M. says one brow looks lighter, 2 weeks after Thu Oct 22. Her touch-up is included."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. Jordan will even it out for free on a guest day, once it's healed:"
+   ],
+   [
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Alex M. isn't happy with the Thu Oct 22 session: \"I waited 25 minutes past my start time.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "I waited 25 minutes past my start time."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan do my sister's brows on a guest day next month?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. She books for herself, with her own health questions. Here are Jordan's next guest-day times."
+   ],
+   [
+    "Water heater replacement · $640",
+    "Powder brows and lash lift · $640"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise powder brows to 700"
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the price before booking."
+   ],
+   [
+    "Sam adds a plumber",
+    "Sam adds an artist"
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises powder brows to $700 for visits from Mon Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Powder brows already booked keep $179, even after Nov 2."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Ivy's AI asks for powder brows at $600, an old price. Rosie answers with the real price, $179."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Powder brows with Lee Home Services are $179, not $600. Here are the open times at $179."
+   ],
+   [
+    "Fri 8am",
+    "Fri 9am"
+   ],
+   [
+    "Add the address on the Today page",
+    "Add her details on the Today page"
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Paige asks for a patch test first, on an earlier guest day. So the first open times are next week."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Please come with no makeup on your brows."
+   ],
+   [
+    "so your Mon Nov 30 booking is cancelled.",
+    "so your Thu Dec 3 booking is cancelled."
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Nora can ask to be next for that time."
+   ],
+   [
+    "and nobody was home for any of them.",
+    "and nobody came to any of them."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: each state's form says where tattooing, permanent makeup included, may be done."
+   ],
+   [
+    "EC22871",
+    "ES22871"
+   ],
+   [
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Sam Lee added you to the team for guest days and brow lamination."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Paige: guest days and brow lamination"
+   ],
+   [
+    "Casey: plumbing",
+    "Leah: guest days"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: brows, lips and eyeliner"
+   ],
+   [
+    "Avery: barber",
+    "Avery: brows"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee's Barbershop can book you from now on, at the studio, for brows, lips and eyeliner."
+   ],
+   [
+    "Lee Home Services can book you for plumbing and electrical from now on.",
+    "Lee Home Services can book you for guest days and brow lamination from now on."
+   ],
+   [
+    "a barber",
+    "an artist"
+   ],
+   [
+    "· arriving 8–10am",
+    "· starts at 9:00am"
+   ],
+   [
+    "arriving 8–10am",
+    "starting at 9:00am"
+   ],
+   [
+    "· arriving 12–2pm",
+    "· starts at 12:30pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "starting at 12:30pm"
+   ],
+   [
+    "8–10am",
+    "9:00am"
+   ],
+   [
+    "12–2pm",
+    "12:30pm"
+   ],
+   [
+    "at the door",
+    "at the desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Powder brows"
+   ],
+   [
+    "Drain clearings",
+    "Powder brows"
+   ],
+   [
+    "Drain clearing",
+    "Powder brows"
+   ],
+   [
+    "drain clearing",
+    "powder brows"
+   ],
+   [
+    "Kitchen drain",
+    "Powder brows"
+   ],
+   [
+    "Yard drain",
+    "Touch-up"
+   ],
+   [
+    "yard drain",
+    "touch-up"
+   ],
+   [
+    "Water heater flush",
+    "Microblading"
+   ],
+   [
+    "water heater flush",
+    "microblading"
+   ],
+   [
+    "Water heater replacement",
+    "Brow correction"
+   ],
+   [
+    "water heater replacement",
+    "brow correction"
+   ],
+   [
+    "Leak repair",
+    "Brow check"
+   ],
+   [
+    "leak repair",
+    "brow check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Color refresh"
+   ],
+   [
+    "sewer camera inspection",
+    "color refresh"
+   ],
+   [
+    "Service call fee",
+    "No-show fee"
+   ],
+   [
+    "service call fee",
+    "no-show fee"
+   ],
+   [
+    "service call",
+    "consult fee"
+   ],
+   [
+    "$179",
+    "$650"
+   ],
+   [
+    "$150",
+    "$550"
+   ],
+   [
+    "$110",
+    "$450"
+   ],
+   [
+    "$89",
+    "$100"
+   ],
+   [
+    "$40",
+    "$100"
+   ],
+   [
+    "$199",
+    "$200"
+   ],
+   [
+    "Riley Chen",
+    "Hannah Park"
+   ],
+   [
+    "Riley",
+    "Hannah"
+   ],
+   [
+    "Avery Diaz",
+    "Grace Liu"
+   ],
+   [
+    "Avery",
+    "Grace"
+   ],
+   [
+    "Jordan Price",
+    "Paige Ross"
+   ],
+   [
+    "Jordan",
+    "Paige"
+   ],
+   [
+    "Casey Moore",
+    "Leah Ortiz"
+   ],
+   [
+    "Casey",
+    "Leah"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Brow Studio"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Traveling PMU LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Traveling PMU's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Traveling PMU"
+   ],
+   [
+    "leehomeservices.com",
+    "leetravelingpmu.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Guest Brows"
+   ],
+   [
+    "Lee Electric",
+    "Lee Brow Bar"
+   ],
+   [
+    "88 Elm St",
+    "88 Linden St"
+   ],
+   [
+    "Elm St",
+    "Linden St"
+   ],
+   [
+    "1200 Main St",
+    "1200 Cherry St"
+   ],
+   [
+    "42 Oak St",
+    "42 Cedar St"
+   ],
+   [
+    "MP045210",
+    "PM045210"
+   ],
+   [
+    "BS20981",
+    "BA20981"
+   ],
+   [
+    "plumbing and electrical",
+    "permanent makeup and brow lamination"
+   ],
+   [
+    "Electrical",
+    "Brow lamination"
+   ],
+   [
+    "electrical",
+    "brow lamination"
+   ],
+   [
+    "Plumbing",
+    "Permanent makeup"
+   ],
+   [
+    "plumbing",
+    "permanent makeup"
+   ],
+   [
+    "plumber",
+    "artist"
+   ],
+   [
+    "Plumber",
+    "Artist"
+   ],
+   [
+    "Barbershop",
+    "Studio"
+   ],
+   [
+    "barbershops",
+    "studios"
+   ],
+   [
+    "barbershop",
+    "studio"
+   ],
+   [
+    "barbers",
+    "artists"
+   ],
+   [
+    "Barber",
+    "Artist"
+   ],
+   [
+    "barber",
+    "artist"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "a haircut",
+    "a brow appointment"
+   ],
+   [
+    "haircut",
+    "brow appointment"
+   ],
+   [
+    "Service call",
+    "Touch-up"
+   ],
+   [
+    "service call",
+    "touch-up"
+   ],
+   [
+    "water heater",
+    "lash lift"
+   ],
+   [
+    "heater",
+    "tint"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "a sore brow after my visit"
+   ],
+   [
+    "the cabinet under the sink",
+    "the counter by the chair"
+   ],
+   [
+    "under the sink",
+    "by the chair"
+   ],
+   [
+    "my sink won't drain",
+    "my tint won't set"
+   ],
+   [
+    "won't drain",
+    "won't set"
+   ],
+   [
+    "drain clearings",
+    "touch-ups"
+   ],
+   [
+    "drain clearing",
+    "touch-up"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "tinting a neighbor's brows without asking"
+   ],
+   [
+    "overflowing",
+    "watery"
+   ],
+   [
+    "clog",
+    "clump"
+   ],
+   [
+    "Shutoff valve",
+    "Pigment bottle"
+   ],
+   [
+    "valve",
+    "bottle"
+   ],
+   [
+    "shutoff",
+    "pigment"
+   ],
+   [
+    "cabinet",
+    "counter"
+   ],
+   [
+    "sink",
+    "chair"
+   ],
+   [
+    "pipe",
+    "hose"
+   ],
+   [
+    "water heaters",
+    "lash lifts"
+   ],
+   [
+    "pigment valves",
+    "pigment bottles"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Lash lift, touch-up"
+   ],
+   [
+    "watery drain",
+    "watery brow"
+   ],
+   [
+    "drain cleaning",
+    "tint touch-up"
+   ],
+   [
+    "drain cleanings",
+    "tint touch-ups"
+   ],
+   [
+    "clogged",
+    "stuck"
+   ],
+   [
+    "drain clogs again",
+    "brow tint fades again"
+   ]
+  ]
+ },
+ "keep": [
+  "makeup",
+  "salon",
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books microblading with Hannah at Lee Brow Studio, Sat Oct 24 at 11:00am, after a free consult and patch test Thu Oct 22. A $100 deposit now, the rest at the desk, and one touch-up 6 to 8 weeks later. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books microblading with Paige on Lee Traveling PMU's guest day at Aster Salon, 42 Cedar St, Thu Oct 22 at 9:00am. A $100 deposit now, and Rosie texts the rest after."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: $550 microblading with Hannah, a free consult and patch test first. A $100 deposit now, $450 at the desk.",
+    "list|none|counter": "The touch-up included with Alex's August microblading, 8 weeks later. $0: nothing taken, and nothing to pay at the desk."
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "$550",
+     "name": "Microblading"
+    },
+    "list|none|*": {
+     "price": "$0",
+     "name": "Included touch-up"
+    },
+    "list|deposit|*": {
+     "deposit": "$100",
+     "rest": "$450",
+     "fee": "$100"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Brow lamination with tint",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$95"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|bill",
+   "combos": [
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|deposit|bill": "The main story: $550 microblading on a guest day at Aster Salon. A $100 deposit now, and Rosie texts the $450 bill after."
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "$550",
+     "name": "Microblading"
+    },
+    "list|deposit|*": {
+     "deposit": "$100",
+     "rest": "$450",
+     "fee": "$100"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Brow lamination with tint",
+     "price": "list",
+     "before": "deposit",
+     "after": "bill",
+     "amounts": {
+      "price": "$95",
+      "deposit": "$25",
+      "rest": "$70",
+      "fee": "$25"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Permanent makeup is licensed: the company and each artist."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Permanent makeup pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Permanent makeup adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Permanent makeup books artists, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each artist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Permanent makeup is never sent now: every session has a set start."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "Permanent makeup is never done at a client's home: tattooing needs a licensed place."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Permanent makeup is done in person, and so is the consult."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The studio sells no repeat plans: a touch-up and a yearly refresh are booked one at a time."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Each session is one client with one artist."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for cosmetic permanent makeup at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Permanent makeup is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "Another adult",
+    "why": "The health questions and the consent are the client's own, so she books for herself."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "An adult the booker acts for",
+    "why": "Permanent makeup needs the client's own consent, so a guardian doesn't book it."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The studio sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The studio sells no packs or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The studio sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A session needs a consent form (A4-72), not a contract."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A session has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The studio sells no plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The studio sells no plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The studio sells no plans."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The studio runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off: the client is in the chair."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio: the client is in the chair."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A session is paid once, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each session is paid on its own day."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for cosmetic permanent makeup."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A session is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Nothing is sold under a contract at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The studio sends no proposals: the touch-up is booked at checkout."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A session has no results to send later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "Every service here is one price. Each first session includes one touch-up, on the list at $0."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your permanent makeup services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Permanent makeup prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      {
+       "photos": [
+        "Permanent makeup price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Microblading",
+          "$550 · 2½ hours"
+         ],
+         [
+          "Powder brows",
+          "$650 · 2½ hours"
+         ],
+         [
+          "Touch-up, 6 to 8 weeks after",
+          "$0 · 90 min, included"
+         ],
+         [
+          "Yearly color refresh",
+          "$200 · 90 min"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "Sam can change each rule now, by text later, or in the portal.",
+     "The portal is the business's website for Rosie, where owners change prices, hours and rules.",
+     "A booking keeps the rules it was made with, even if Sam changes them later.",
+     "Each guest-day session has a set start time, as the plug-in suggests.",
+     "Permanent makeup is never sent now, so there's no same-day job to keep time for."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are my suggested starting rules for permanent makeup. You can change any of them.",
+      {
+       "list": {
+        "head": [
+         "Rule",
+         "Suggested"
+        ],
+        "rows": [
+         [
+          "Open",
+          "Guest days, set with each host salon"
+         ],
+         [
+          "Start",
+          "A set start time"
+         ],
+         [
+          "Notice",
+          "At least 24 hours"
+         ],
+         [
+          "Books ahead",
+          "Up to 60 days"
+         ],
+         [
+          "Same-day bookings",
+          "Ask you first"
+         ],
+         [
+          "Free to cancel",
+          "Until 24 hours before"
+         ],
+         [
+          "After that, or a no-show",
+          "Up to the deposit, only if you say so"
+         ],
+         [
+          "Travel area",
+          "25 miles from 1200 Cherry St"
+         ],
+         [
+          "If your artist can't come",
+          "Offer another licensed artist, same time and price, or a new date"
+         ]
+        ]
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Want to keep some times for one kind of booking? Other bookings can't take them.",
+      {
+       "buttons": [
+        "No",
+        "Keep some times"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The brow lamination plug-in loads the same way, with its own services and license form.",
+     "AI assistants find Lee Traveling PMU under permanent makeup and under brow lamination."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Brow lamination next. Send a photo of your brow lamination prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Brow lamination prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      {
+       "photos": [
+        "Brow lamination price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Brow lamination and tint",
+          "$95 · 60 min"
+         ],
+         [
+          "Lash lift and tint",
+          "$95 · 60 min"
+         ],
+         [
+          "Both together",
+          "$170 · 90 min"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like permanent makeup. Send only what's different.",
+      {
+       "card": {
+        "title": "Brow lamination, set like permanent makeup",
+        "lines": [
+         "On guest days at host salons",
+         "A $25 deposit, toward the price",
+         "The rest after, on the bill",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "New clients book a free consult and patch test first, at least 48 hours before.",
+     "The long services show how much time they take, so the artist's time is saved for all of it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the studio's price list."
+     ],
+     [
+      "owner",
+      "san",
+      {
+       "photos": [
+        "Price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Consult and patch test",
+          "Free · 30 min"
+         ],
+         [
+          "Microblading",
+          "$550 · 2½ hours"
+         ],
+         [
+          "Powder or combo brows",
+          "$650 · 2½ hours"
+         ],
+         [
+          "Lip blush",
+          "$600 · 2½ hours"
+         ],
+         [
+          "Eyeliner",
+          "$400 · 2 hours"
+         ],
+         [
+          "Touch-up, 6 to 8 weeks after",
+          "$0 · 90 min, included"
+         ],
+         [
+          "Yearly color refresh",
+          "$200 · 90 min"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "Where the state's rules don't allow it, Rosie won't set permanent makeup away from the studio. It stays at the studio.",
+    "more": [
+     "If a client asks for a session somewhere else, Rosie offers a time at the studio instead."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where your studio is, the state's rules allow permanent makeup only in a licensed studio. So every service stays at the studio.",
+      {
+       "card": {
+        "title": "Permanent makeup · at the studio only",
+        "lines": [
+         "Guest days elsewhere stay off"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "Every price on the list books without an OK. A price Hannah makes for one client, like two areas together, comes to Sam first.",
+    "more": [
+     "Sam keeps Rosie's suggested rules with one tap.",
+     "The deposit is kept only after Sam says yes.",
+     "Pat OKs only Lee Traveling PMU prices over $500. At the studio, only Sam OKs prices."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Prices on the list never need your OK. Should a price made for one client come to you first?",
+      {
+       "buttons": [
+        "Yes, every time",
+        "Send them",
+        "Over an amount"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "These are the booking rules I suggest:",
+      {
+       "card": {
+        "title": "Lee Brow Studio · booking rules",
+        "lines": [
+         "Hours: from your Google listing",
+         "New clients: a free consult and patch test, 48 hours before",
+         "Free to cancel until 24 hours before",
+         "A no-show is marked 15 minutes after the start",
+         "Late cancel or no-show: the deposit, if you confirm",
+         "Same-day bookings ask you first"
+        ]
+       },
+       "buttons": [
+        "Keep these",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "Big bills can also be paid by bank transfer, through the company's own Stripe. Sessions are paid by card, so Sam keeps cards only.",
+    "more": [
+     "With it on, the pay link offers a bank transfer next to the card.",
+     "A bill paid this way counts as paid only once the transfer clears, in a few business days.",
+     "Each company sets it for itself. Sam leaves it off for both, and can turn it on later in the portal."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Big bills can also be paid by bank transfer, through your Stripe. Want that for bills over an amount?",
+      {
+       "buttons": [
+        "Yes, over an amount",
+        "No, cards only"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Set: cards only. You can turn on bank transfer later, in the portal."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Leah Ortiz"
+     ],
+     [
+      "Company",
+      "Lee Traveling PMU"
+     ],
+     [
+      "Kinds of work",
+      "Permanent makeup"
+     ],
+     [
+      "Jobs",
+      "Microblading, powder brows, touch-ups"
+     ],
+     [
+      "Hours",
+      "Guest days, 9am–5pm"
+     ],
+     [
+      "Leah agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Sam says one price is different: microblading costs more when Sam does it himself.",
+    "more": [
+     "At the studio, prices are the same whichever artist does the work.",
+     "A person can have their own price list, their own hourly rate, or a different price for one service."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Are your guest-day prices the same, whoever does the session?",
+      {
+       "buttons": [
+        "Yes, the same",
+        "Some charge differently"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 Microblading is 650 if I do it myself"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Microblading is $650 when Sam does it, and $550 with anyone else.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Clients see the price of whoever does it, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who does it",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Microblading",
+          "You",
+          "$650"
+         ],
+         [
+          "Microblading",
+          "Anyone else",
+          "$550"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Traveling PMU",
+       "Guest days at host salons",
+       "Permanent makeup PM045210",
+       "Yes"
+      ],
+      [
+       "Paige Ross",
+       "Lee Traveling PMU",
+       "Guest days at host salons",
+       "Permanent makeup PM031552 · esthetics ES30417",
+       "Once Sam says yes"
+      ],
+      [
+       "Leah Ortiz",
+       "Lee Traveling PMU",
+       "Guest days at host salons",
+       "Permanent makeup, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Traveling PMU",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Hannah Park",
+       "Lee Brow Studio",
+       "At the studio",
+       "Permanent makeup, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Grace Liu",
+       "Lee Brow Studio",
+       "At the studio",
+       "Permanent makeup, as given, not checked",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "A reaction happening now, like a swelling face, lips or throat, gets the plug-in's words too: call 911 now."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-01",
+    "does": "No danger, so the booking goes on. Each service is set at sign-up: at the studio, at the client's place, or both. The touch-up is done only at the studio.",
+    "more": [
+     "At the studio, no address or travel check is needed. The studio's address goes in the confirmation.",
+     "Permanent makeup is never booked at a client's home: the plug-in books it only at a licensed studio or salon.",
+     "Guest days at a host salon are the other company's, in the other flow."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "The touch-up is done only at the studio: 88 Linden St, Springfield."
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "does": "No danger, so the booking goes on. Each service is set at sign-up: at the studio, at the client's place, or both. Microblading is done only at the studio.",
+      "more": [
+       "At the studio, no address or travel check is needed. The studio's address goes in the confirmation.",
+       "Permanent makeup is never booked at a client's home: the plug-in books it only at a licensed studio or salon.",
+       "Guest days at a host salon are the other company's, in the other flow."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "does": "New clients need a free consult and patch test first, so Rosie learns new or returning before any times. Then only the times that fit are shown.",
+    "more": [
+     "It comes from the client's words, or one question.",
+     "A new client gets times for the session at least 48 hours after a consult.",
+     "A touch-up is for a returning client, 6 to 8 weeks after her first session.",
+     "It's checked again when the mobile is found. If they disagree, the times are offered again.",
+     "A later move offers only times of the same length."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Have you had permanent makeup at Lee Brow Studio before?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Yes. This is the touch-up for my microblading on Aug 29."
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Have you had permanent makeup at Lee Brow Studio before?"
+       ],
+       [
+        "cust",
+        "agent",
+        "No, it's my first time."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: which area, and any permanent makeup there before.",
+     "A touch-up must fall 6 to 8 weeks after the first session.",
+     "Questions that only add detail come later, once a time is saved.",
+     "Clients are 18 or older, so no child's service is picked here."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Is this the touch-up included with that session?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Yes, the included one."
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Which area: brows, lips or eyeliner? Any permanent makeup there before?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Brows. Never had any."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "does": "Alex adds eyeliner. Rosie finds one time long enough for both, with Hannah, and adds the prices: $550 and $400.",
+    "more": [
+     "It's one booking, with one code.",
+     "Only Hannah does eyeliner, so only her times show.",
+     "Both areas go on the same health questions and consent form."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-85",
+    "does": "Alex asks for tattoo removal, which the studio doesn't do. Rosie says so plainly, and the AI can look for another business.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Brow Studio doesn't do tattoo removal. Other businesses nearby may."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-06",
+    "does": "The touch-up is $0 on the studio's list: it's included with the first session. The price shows before anyone says yes.",
+    "vary": {
+     "before:deposit": {
+      "does": "Microblading is $550 on the studio's list, with one touch-up included. The price shows before anyone says yes, and it never needs Sam's OK."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "vary": {
+     "price:list+before:none+after:counter": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Your touch-up at Lee Brow Studio is included: $0, and nothing is taken to book. Open times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am · Hannah",
+          "Sat Oct 24 · 12:30pm · Grace",
+          "Sat Oct 24 · 2:00pm · Hannah"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:counter": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Microblading at Lee Brow Studio is $550, with one touch-up included. A $100 deposit now, and the $450 rest at the desk. Open times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am · Hannah",
+          "Sat Oct 24 · 12:30pm · Grace",
+          "Sat Oct 24 · 2:00pm · Hannah"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Anything Hannah should know?"
+     ],
+     [
+      "cust",
+      "agent",
+      "The left brow healed a little lighter."
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What look would you like? Anything Hannah should know?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Soft and natural, please."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-23",
+    "does": "The AI sends Rosie only Alex's name and mobile. From the mobile, Rosie finds Alex as a returning client, with her August session on file.",
+    "vary": {
+     "before:deposit": {
+      "does": "The AI sends Rosie only Alex's name and mobile. Rosie finds no record for that mobile, so Alex is added as a new client."
+     }
+    }
+   },
+   {
+    "op": "more",
+    "at": "A4-24",
+    "more": [
+     "Here, a client books for herself, 18 or older. A teen asking for herself gets the same kind no as a child."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "more": [
+     "A patch test is a small dab of the pigment on the skin, watched 48 hours for a reaction.",
+     "Lee Brow Studio asks every new client for a free consult and patch test, at least 48 hours before.",
+     "Every session, touch-ups too, has a consent form on the secure page."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "A patch test is a small dab of the pigment on the skin, watched 48 hours for a reaction.",
+       "Lee Brow Studio asks every new client for a free consult and patch test, at least 48 hours before.",
+       "Every session, touch-ups too, has a consent form on the secure page."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "Alex is new, so the plug-in's first step comes first: a free consult and patch test with Hannah. The AI offers two times, at least 48 hours before.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Before your first session, Lee Brow Studio needs a free 30-minute consult and patch test, at least 2 days before. Pick a time:",
+      {
+       "times": [
+        "Thu Oct 22 · 9:30am · Hannah",
+        "Thu Oct 22 · 10:30am · Hannah"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "The consult and patch test are saved with the session, on the same secure link. At booking, the consult gets its own check-in code."
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Neither consult time works. The AI offers later sessions, each with room for a consult 2 days before. Alex picks again.",
+    "more": [
+     "The new pick is saved for 10 minutes instead.",
+     "Hannah stays the artist: the consult and the session are with the same artist."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "No problem. Here are later sessions, each with a consult and patch test 2 days before:",
+      {
+       "times": [
+        "Tue Oct 27 · 11:00am · Hannah",
+        "Wed Oct 28 · 2:00pm · Hannah"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "more": [
+     "Here: the consent form, with aftercare advice and a note that a new tattoo can delay giving blood.",
+     "It goes on the secure link Alex gets next. It's due before the session.",
+     "Not signed by then: Alex signs it on the studio's tablet at check-in.",
+     "It's signed again for each session, touch-ups too.",
+     "Its answers stay on the page, never in a text."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-65",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "line": [
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex answers the health questions",
+      "does": "On the same secure page, Alex answers the plug-in's health questions and adds a photo of her brows now. Rosie only sorts the answers.",
+      "more": [
+       "The answers never go in a text, or through the AI.",
+       "All no, like Alex's: the booking goes on.",
+       "A yes, like pregnant or on blood thinners: Hannah reads it before anything is booked, and the money stays held.",
+       "Hannah decides, never Rosie or the AI."
+      ],
+      "form": [
+       [
+        "I'm 18 or older, and I'll bring a photo ID",
+        "Yes"
+       ],
+       [
+        "Pregnant or breastfeeding",
+        "No"
+       ],
+       [
+        "Isotretinoin (Accutane) in the last 12 months",
+        "No"
+       ],
+       [
+        "Blood thinners",
+        "No"
+       ],
+       [
+        "Keloids or raised scars",
+        "No"
+       ],
+       [
+        "Botox or fillers near the brows in the last 2 weeks",
+        "No"
+       ],
+       [
+        "A past reaction to tattoo ink or numbing cream",
+        "No"
+       ],
+       [
+        "Photo of your brows now",
+        "Uploaded"
+       ]
+      ],
+      "needs": [
+       "contact",
+       "pf.questions",
+       "pf.messages"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-30",
+    "vary": {
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Book this for Alex M., a new client? I'll text Alex a link to finish.",
+        {
+         "card": {
+          "title": "Microblading · $550",
+          "lines": [
+           "Sat Oct 24 · 11:00am · Hannah",
+           "Consult and patch test first",
+           "Alex M. · mobile given"
+          ]
+         },
+         "buttons": [
+          "Book it",
+          "Change it"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-42",
+    "vary": {
+     "price:list+before:deposit+after:counter": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Lee Brow Studio. Tap to finish your booking and see the terms.",
+        {
+         "card": {
+          "title": "Lee Brow Studio · Microblading",
+          "lines": [
+           "Sat Oct 24 · 11:00am · Hannah",
+           "Consult and patch test first: Thu Oct 22 · 9:30am",
+           "$100 deposit now · $450 at the desk",
+           "Free to cancel until Fri 11am. After that, the $100 may be kept"
+          ],
+          "button": "Book and pay $100",
+          "link": "rosfield.com/c/r2"
+         },
+         "stop": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A6-01",
+    "more": [
+     "Rosie checked this before the secure page too.",
+     "Here it books right away: Alex's health answers were all no, and it isn't for today.",
+     "A health yes waits for the artist first, as in 'An expert reads the answers'.",
+     "Pat, the office manager, gets the same requests. Sam's answer wins."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-02",
+    "does": "A what-if: Alex answers yes to a health question, like blood thinners. The answers go to Hannah on a secure page, and she decides.",
+    "more": [
+     "It's her own decision, like Sam's OK, in her text hours.",
+     "Alex is told at once that the answers are being read.",
+     "Money stays held, not taken, until Hannah says OK.",
+     "The plug-in gives her 24 hours. No answer by then: declined politely, with nothing kept."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-15",
+    "say": [
+     [
+      "san",
+      "staff",
+      "New booking for you, Hannah.",
+      {
+       "card": {
+        "title": "Alex M. · Touch-up",
+        "lines": [
+         "Sat Oct 24 · 11:00am · 90 min",
+         "Note: The left brow healed a little lighter.",
+         "$0: included with her August session"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x02",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Does a first step come before the session?",
+      "q": "A first step before Saturday?",
+      "does": "A new client's consult and patch test come before the session, booked with it. A touch-up skips it: the test is on file.",
+      "needs": [
+       "pf.first_steps"
+      ],
+      "branches": [
+       {
+        "label": "A new client: the consult first",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A7-x01",
+          "line": [
+           "7.16"
+          ],
+          "who": "cust",
+          "to": "staff",
+          "via": "visit",
+          "t": "Thu Oct 22, 9:30am",
+          "title": "Alex comes in for her consult",
+          "does": "Alex gives the consult's code at the desk, and Hannah checks her photo ID. Hannah draws the brow shape, Alex OKs it in the mirror, and they pick the pigment.",
+          "more": [
+           "A small dab of that pigment goes on the skin behind the ear: the patch test.",
+           "Alex watches the spot for 48 hours. She tells the studio only if it reacts, on the secure page.",
+           "A swelling face, lips or throat gets the safety message first: call 911.",
+           "The brow map and the pigment go in Alex's private record, for Saturday."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "7342"
+           ],
+           [
+            "san",
+            "cust",
+            "You're checked in for your consult with Hannah. Thanks, Alex!"
+           ],
+           [
+            "staff",
+            "san",
+            "Alex M.'s consult is done: shape and pigment agreed, test spot placed. Notes are on the page."
+           ]
+          ],
+          "needs": [
+           "pf.first_steps",
+           "pf.visit"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "On file already, like a touch-up",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my friend wait in the studio during my session?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can my friend wait in the studio during my session?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Hannah says yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say Alex gets a rash near her brows before the session. The plug-in's danger words are checked first. Then Hannah is asked if the session can go ahead.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "I have a rash near my eyebrows. Can I still come in?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. (Sat 11:00am) sent an update before the session. It's on the secure page. Can it go ahead?",
+      {
+       "card": {
+        "title": "Alex M.'s update",
+        "lines": [
+         "On the secure page"
+        ]
+       },
+       "buttons": [
+        "Yes, come in",
+        "Better to move it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Hannah suggests moving your session until it clears, with no fee. Pick a new time:",
+      {
+       "times": [
+        "Sat Oct 31 · 11:00am · Hannah",
+        "Tue Nov 3 · 11:00am · Hannah"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-15",
+    "more": [
+     "With no reply by 10:50am, Rosie asks Grace to come in early, and offers Alex that.",
+     "The plug-in says who may take each booking. Grace does every studio service but lips and eyeliner.",
+     "Grace works Saturday afternoons, and comes in to stand in when asked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-18",
+    "more": [
+     "Grace gets Hannah's consult notes: the brow map, the pigment and the patch-test result, by link."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-21",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't picked a new time for the eyeliner Hannah can't do Saturday. Please call Alex. The number is on the booking."
+     ]
+    ],
+    "vary": {
+     "price:list": {
+      "does": "Say Alex's session were eyeliner, which only Hannah does at the studio. With no new time picked by 6pm, Sam is asked to call."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A7-70",
+    "does": "The plug-in gives 15 minutes' grace for a 2½-hour session. Say Ruth P. is past it: Ruth picks the next open time, today or the next day.",
+    "more": [
+     "Any deposit may be kept, as for a late cancel. Sam decides, and confirms first.",
+     "No reply in 30 minutes: the first time offered is kept, and Ruth is told."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry, it's past the 15 minutes we can wait for a 2½-hour session. Pick the next open time:",
+      {
+       "as": "Ruth",
+       "times": [
+        "Today · 3:30pm",
+        "Tomorrow · 9:00am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-31",
+    "does": "Rosie checks that Hannah has the time, then shows the new price first. Hannah is told.",
+    "more": [
+     "A switch to another service works the same way, with its own price.",
+     "If the new service costs less, money paid ahead is lowered to match.",
+     "Any deposit counts toward the new price. The rest is paid the way this service is paid."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I switch to powder brows on Saturday?"
+     ],
+     [
+      "san",
+      "cust",
+      "Hannah has time for it. Switch your Sat 11:00am session to powder brows?",
+      {
+       "card": {
+        "title": "Powder brows · $650",
+        "lines": [
+         "Sat Oct 24 · 11:00am · Hannah",
+         "Any deposit paid counts toward it"
+        ]
+       },
+       "buttons": [
+        "Switch it",
+        "No thanks"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "staff",
+      "Change: Alex M. switched the Sat 11:00am to powder brows."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "Say another client, Dana R., booked lip blush for Sat Oct 31 with Hannah. Her consult and patch test aren't done in time, so it can't go ahead as booked.",
+    "more": [
+     "Rosie offers later times that keep the plug-in's 48 hours.",
+     "A cancel follows the rules Dana agreed to when booking.",
+     "Sam is told.",
+     "No reply by 24 hours before: Sat stays as a consult and patch test only, at no charge.",
+     "Any deposit moves to the new date. Dana and Hannah are told."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your Sat Oct 31 lip blush needs a patch test at least 48 hours before, and it isn't done yet. Pick a later time, or keep Sat for the consult only.",
+      {
+       "as": "Dana",
+       "times": [
+        "Tue Nov 3 · 2:00pm · Hannah",
+        "Thu Nov 5 · 4:00pm · Hannah"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Consult only, Sat Oct 31"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "48 hours after the consult, the test spot is read. Alex reports only a reaction, on the secure page, and none came. So Hannah texts the result, kept on Alex's record for 6 months.",
+    "more": [
+     "The plug-in says how long a result stays good: here, 6 months with the same pigment.",
+     "Health details stay on the secure page, never in a text.",
+     "Here it passed: the spot stayed clear, and the session stands."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Alex M.'s patch test passed: no reaction in 48 hours. Notes are on the page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-31",
+    "does": "The consult changes the plan, like powder brows instead of microblading for oily skin. Alex says yes, or cancels for free.",
+    "more": [
+     "No reply in 24 hours: Sam calls Alex.",
+     "A change the first step caused never costs a fee. A cancel refunds anything paid."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "After your consult, Hannah suggests powder brows instead, for your skin. See it, with its price, before you say yes.",
+      {
+       "card": {
+        "title": "Your new plan · powder brows · $650",
+        "lines": [
+         "Sat Oct 24 · 11:00am · Hannah",
+         "Any deposit paid counts toward it"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/c/a6"
+       },
+       "buttons": [
+        "Yes, change it",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "Say the test spot turns red and itchy, and Alex tells the studio on the secure page. Hannah reads it and calls the session off. Alex owes nothing.",
+    "more": [
+     "Alex gets the safety words first: a swelling face, lips or throat means call 911.",
+     "The reason stays on the secure page, never in a text.",
+     "Anything paid is refunded in full. Sam is told.",
+     "No visit, so Rosfield's $2 doesn't count. If it came out with a payment, it goes back to the studio."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "After your patch test, Lee Brow Studio can't go ahead with your Sat Oct 24 session. It's cancelled, with no fee. Anything you paid is refunded in full."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-23",
+    "does": "Say another client, Tess L., has lip blush this Sat at 2:00pm. The studio's lip machine breaks, so each booking that needs it is offered a change, with no fee.",
+    "more": [
+     "The plug-in says what each service needs, like a room, a tool or a crew.",
+     "No reply in 24 hours: Sam is asked to call.",
+     "Money paid ahead moves with the new time, or comes back in full.",
+     "Bookings that don't need it aren't touched, like Alex's brows."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "Lip machine broken until Mon"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Tess. The machine for your Sat 2:00pm lip blush is out until Monday. Pick a new time, or cancel, with no fee. Any deposit moves with you or comes back.",
+      {
+       "as": "Tess",
+       "buttons": [
+        "A new time",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Sat Oct 24 at Lee Brow Studio:",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Client",
+         "Service"
+        ],
+        "rows": [
+         [
+          "9:00am",
+          "Ben T.",
+          "Eyeliner touch-up"
+         ],
+         [
+          "11:00am",
+          "Alex M.",
+          "Touch-up, 90 min"
+         ],
+         [
+          "12:30pm",
+          "Dana R.",
+          "Consult and patch test"
+         ],
+         [
+          "2:00pm",
+          "Tess L.",
+          "Lip blush"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open them",
+        "link": "rosfield.com/d/r24"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex arrives at the studio. The plug-in asks for a photo ID showing 18 or older, and the consent form signed. Hannah checks first.",
+    "more": [
+     "Signs of alcohol or drugs stop the session too, whatever was ticked online.",
+     "The consent was signed on the secure page. Not signed yet: Alex signs it on the studio's tablet now.",
+     "The reminder already said what to bring.",
+     "The code is taken only once nothing required is missing."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-51",
+    "more": [
+     "Alex's side: no photo ID showing 18 or older, or signs of alcohol or drugs.",
+     "The studio's side: a conflict found, or the client isn't eligible for the service.",
+     "No code was taken, so the visit doesn't count for Rosfield's $2. If it came out of a payment, it goes back to the studio.",
+     "The plug-in says what's required, and what counts as a conflict."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M. No photo ID showing 18 or older."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex at the desk, Sat 11:00am. Hannah checks the test spot, then draws the shape on Alex's brows. Alex OKs it in the mirror before any work.",
+    "more": [
+     "Numbing cream goes on before any strokes.",
+     "Nothing is tattooed until Alex says yes to the shape.",
+     "The before photos stay with the booking. Alex can see them on the secure page.",
+     "A damage claim or a later complaint is checked against the before record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Before: test spot clear. Shape drawn and OK'd by Alex in the mirror.",
+      {
+       "photos": [
+        "Brows, before",
+        "Shape drawn"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the before record."
+     ]
+    ],
+    "vary": {
+     "before:none": {
+      "does": "Back to Alex at the desk, Sat 11:00am. Hannah looks at the healed brows and draws in what the touch-up fills. Alex OKs it in the mirror before any work.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "Before: healed well, left tail a little light. Fill drawn and OK'd by Alex.",
+        {
+         "photos": [
+          "Healed brows, before",
+          "Fill drawn"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s visit as the before record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-33",
+    "does": "Alex asks Hannah about lip blush. Only if Alex wants it does Hannah text NEXT. Then Alex gets its price and times. Today's session stays as booked.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. wants lip blush. Own session."
+     ],
+     [
+      "san",
+      "cust",
+      "You asked Hannah about lip blush. It's its own session, with its own health questions and consent.",
+      {
+       "card": {
+        "title": "Lip blush · $600",
+        "lines": [
+         "Its own session · a $100 deposit",
+         "A patch test with the lip pigment first"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/b/a9"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 15"
+     ],
+     [
+      "san",
+      "cust",
+      "Hannah is running about 15 minutes behind. Your 12:30pm consult will start about 12:45pm.",
+      {
+       "as": "Dana",
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit+after:counter": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "LATE 15"
+       ],
+       [
+        "san",
+        "cust",
+        "Hannah is running about 15 minutes behind. Your 1:30pm consult will start about 1:45pm.",
+        {
+         "as": "Dana",
+         "buttons": [
+          "That's fine",
+          "Move my visit"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: touch-up done, left tail filled, same pigment. Next: a yearly refresh."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ],
+    "vary": {
+     "before:deposit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE Alex M.: soft hair strokes, pigment Warm Brown. Touch-up due Dec 5 to 19."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private notes."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A9-03",
+    "vary": {
+     "price:list+before:none+after:counter": {
+      "does": "There's nothing to pay at the desk: the touch-up was included in the $550 Alex paid for her August session. Rosie doesn't text a bill.",
+      "more": [
+       "Nothing was taken or saved when booking.",
+       "A tip goes the studio's own way."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A10-07",
+    "vary": {
+     "price:list+before:deposit+after:counter": {
+      "does": "Alex books her included touch-up before leaving. Hannah texts it in, and Alex gets the confirmation with a new code.",
+      "more": [
+       "It's 7 weeks after today: inside the 6 to 8 weeks.",
+       "Its own reminder, consent and photo ID check come with it.",
+       "Booked by the studio at checkout, so it carries no $2.",
+       "A new visit always gets a new code."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "Book Alex M.'s touch-up Sat Dec 12, 11am"
+       ],
+       [
+        "san",
+        "cust",
+        "You're booked for your touch-up, included in today's price. Give this code at the desk when you arrive.",
+        {
+         "card": {
+          "title": "Lee Brow Studio · Touch-up with Hannah",
+          "lines": [
+           "Sat Dec 12 · 11:00am · 90 min",
+           "Included · nothing to pay",
+           "No fee to cancel · tell us by Fri Dec 11, 11am"
+          ]
+         },
+         "code": "2847",
+         "buttons": [
+          "Change the time",
+          "Cancel the visit"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:none+after:counter": {
+      "does": "A what-if: Alex asks to book her yearly color refresh at checkout, about a year out. It's past the 60 days the studio books ahead, so Rosie saves it as a reminder.",
+      "more": [
+       "Nothing is booked or taken now.",
+       "The reminder is the one Alex asked for, never a sales text."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: yearly color refresh, about 12 months"
+       ],
+       [
+        "san",
+        "cust",
+        "Saved: Lee Brow Studio will text you next September to book your yearly color refresh. Nothing is booked or taken now."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A10-08",
+    "does": "Alex says the work needs a fix. Sam decides, and a free fix is booked at $0, once the brows have healed.",
+    "more": [
+     "The included touch-up comes first: it evens out what healed lighter.",
+     "Rosie never argues and never offers money on its own."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "One brow looks lighter than the other."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says one brow looks lighter than the other.",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Brow Studio will even it out for free, once it's healed. Pick a time:",
+      {
+       "times": [
+        "Sat Dec 5 · 11:00am · Hannah",
+        "Sat Dec 12 · 11:00am · Hannah"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-20",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Do you do lip blush too?"
+     ],
+     [
+      "san",
+      "cust",
+      "Yes: lip blush is $600, with a $100 deposit. A patch test with the lip pigment comes first. Pick a consult time:",
+      {
+       "times": [
+        "Tue Nov 10 · 5:00pm · Hannah",
+        "Wed Nov 11 · 5:00pm · Hannah"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-42",
+    "more": [
+     "Healing questions and photos go to Hannah on the secure page, never in a text.",
+     "Danger signs get the safety message, like 'call 911'.",
+     "Anything else goes to Sam and Hannah privately."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Aftercare for today's session, from Lee Brow Studio.",
+      {
+       "card": {
+        "title": "Aftercare",
+        "lines": [
+         "How to care for your brows while they heal",
+         "Questions or photos: send them on the page"
+        ],
+        "button": "Read it",
+        "link": "rosfield.com/a/a14"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-10",
+    "say": [
+     [
+      "owner",
+      "san",
+      "850"
+     ],
+     [
+      "san",
+      "owner",
+      "Send Nia K. $850 for brows and eyeliner?",
+      {
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee Brow Studio",
+      "88 Linden St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Microblading $550 · Color refresh $200 ($220 from Nov 2) · Touch-up $0, included"
+     ],
+     [
+      "To book",
+      "A $100 deposit for a first session, toward the price"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Traveling PMU",
+      "Guest days at host salons within 25 miles of 1200 Cherry St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "does": "Sam adds brow lamination to Lee Brow Studio. It brings its own plug-in, and only what's new is asked.",
+    "more": [
+     "What's new: the prices, the license, and who does the work.",
+     "People already on the team get one text to confirm, never a second invite.",
+     "It goes live on its own once it's set up. Brow sessions never pause.",
+     "Left unanswered, it's saved. Sam texts MORE to finish it."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW brow lamination"
+     ],
+     [
+      "san",
+      "owner",
+      "Brow lamination for Lee Brow Studio: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like your brow sessions?",
+      {
+       "card": {
+        "title": "Brow sessions work like this",
+        "lines": [
+         "Clients come to you",
+         "A deposit for a first session, nothing for a touch-up",
+         "The rest at the desk"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:list+before:none": {
+      "say": [
+       [
+        "owner",
+        "san",
+        "NEW brow lamination"
+       ],
+       [
+        "san",
+        "owner",
+        "Brow lamination for Lee Brow Studio: is it the same company?",
+        {
+         "buttons": [
+          "Yes, same company",
+          "Its own company"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "owner",
+        "Does it work like your brow sessions?",
+        {
+         "card": {
+          "title": "Brow sessions work like this",
+          "lines": [
+           "Clients come to you",
+           "A deposit for a first session, nothing for a touch-up",
+           "The rest at the desk"
+          ]
+         },
+         "buttons": [
+          "Same",
+          "Something's different"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where permanent makeup outside a studio is allowed, and who may go. It's a switch from each state's form.",
+    "more": [
+     "Some states allow it only for some services.",
+     "Some allow it only with a guest permit for each place.",
+     "Times at the customer's place offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "Someone is hurt, sick or lost during the visit. Hannah helps first, and calls 911 in an emergency. Sam is told at once.",
+    "more": [
+     "A record is kept on the secure page, never in a text to the customer.",
+     "Lost means a client's belongings left in the studio.",
+     "The plug-in says what staff must do for this work."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Alex M. needs a break in the session. Sitting down, with water."
+     ],
+     [
+      "san",
+      "owner",
+      "Hannah paused Alex M.'s session to help. Hannah is with Alex, and the details are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-40",
+    "vary": {
+     "price:list+before:none+after:counter": {
+      "does": "Hannah stops the visit if the studio isn't safe, from a person, smoke or a gas smell. Safety comes first, then Sam is told.",
+      "more": [
+       "Call 911 first if anyone is in danger.",
+       "Sam follows up with the customer by phone, and decides any money.",
+       "Nothing was taken for the touch-up, so there's no money to decide."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "Stopped the visit. Someone in the studio is threatening people."
+       ],
+       [
+        "san",
+        "owner",
+        "Hannah stopped a visit for safety: someone in the studio was threatening people. Call 911 if anyone is in danger."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-16",
+    "does": "Alex says they're here. Hannah checks Alex in with the code, so it's a normal visit.",
+    "more": [
+     "If they still can't find each other, a person at Rosie reviews it, and the no-show mark is flagged. No fee is asked.",
+     "Alex's word counts as the visit, so Rosfield's $2 stands."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Lee Brow Studio you're here."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. says they're here for the 11:00am. Check Alex in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "Sam decides. Keep: the form is signed at the desk, on the secure page, before the work starts. Move: Lena gets new times. Cancel: no fee.",
+    "more": [
+     "Cancel: anything paid comes back in full.",
+     "No answer by 8pm: the visit stays, and the form is signed at the desk first.",
+     "Lena is told what Sam picked, by 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lena V. hasn't signed the form for Fri Oct 30 at 10:00am, after one reminder.",
+      {
+       "buttons": [
+        "Keep it",
+        "Move it",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-61",
+    "does": "Say it's on the studio's side instead, like a conflict found, or Alex isn't eligible for the service. Nothing is charged, and Alex and Sam are told.",
+    "more": [
+     "Alex can book another service, or come back once it's sorted.",
+     "Anything paid is refunded in full."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M. Not eligible for this service, as the plug-in's rules say."
+     ],
+     [
+      "san",
+      "cust",
+      "Hannah couldn't start today's visit. It's on our side, so nothing is charged. You can book another service here.",
+      {
+       "card": {
+        "title": "Nothing charged",
+        "lines": [
+         "The card was saved only for fees. No fee for this."
+        ],
+        "button": "Book again",
+        "link": "rosfield.com/b/a5"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Hannah couldn't start Alex M.'s 11:00am: Alex isn't eligible for the service. It's on the studio's side, so nothing was charged."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-01",
+    "vary": {
+     "before:none+after:counter": {
+      "does": "The touch-up was included, so there was nothing to pay at the desk. Nothing was saved, so Rosie sends no receipt text.",
+      "more": [
+       "Any warranty the plug-in or Sam sets is on the receipt.",
+       "The aftercare link still goes out, as in 'Aftercare and reactions' below.",
+       "Alex can ask for a copy later, like any record.",
+       "Where the plug-in keeps service names private, the text says only the business, date, time and place. The rest is on the secure page."
+      ],
+      "say": []
+     }
+    },
+    "does": "Alex paid at the desk, so the studio gave its own receipt. Rosie sends one short text: the card saved for fees is now removed.",
+    "more": [
+     "Any warranty the plug-in or Sam sets is on the receipt.",
+     "The aftercare link goes out after every session, as in 'Aftercare and reactions' below.",
+     "Alex can ask for a copy later, like any record.",
+     "A card that a plan or an open fee still needs stays saved, and the text says so.",
+     "Where the plug-in keeps service names private, the text says only the business, date, time and place. The rest is on the secure page."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your visit is paid. The card you saved for it is now removed: nothing else needs it."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "The plug-in's switch, from the state form, gives a session at the studio no cancel period. Only a contract or extra work the state's rules cover gets one.",
+    "more": [],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "A10-10",
+    "vary": {
+     "price:list+before:none+after:counter": {
+      "does": "Nothing was paid for the included touch-up, so there's nothing to refund for it. A refund of the first session is Sam's, at the studio's desk.",
+      "more": [
+       "A confirmed visit keeps Rosfield's $2."
+      ],
+      "say": []
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "does": "A charge went through twice for the same thing. Rosfield refunds the second one at once, and tells the customer and Sam.",
+    "more": [
+     "Where the plug-in keeps service names private, the text gives only the business, the date, the time and the place."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Brow Studio: your card was charged twice for the same payment. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $100",
+        "lines": [
+         "Microblading deposit · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Ben T."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Ben T.'s $100 deposit for microblading was charged twice. The second charge is refunded, and Ben is told."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "no child is left in a permanent makeup booking"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Permanent makeup is licensed: the company and each artist."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Permanent makeup pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Permanent makeup adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Permanent makeup books artists, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each artist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Permanent makeup is never sent now: every session has a set start."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Lee Traveling PMU has no studio of its own: every booking is on a guest day."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Permanent makeup is done in person."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "Guest days sell no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "Each session is one client with one artist."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan pays for cosmetic permanent makeup."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A guest day gives a set start time, not an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Permanent makeup is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Guest days sell no seats in a session."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Permanent makeup is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-26",
+    "label": "2 Someone else meets the pro",
+    "why": "The client is always the one there: the work is on her own face."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "An adult the booker acts for",
+    "why": "Permanent makeup needs the client's own consent, so a guardian doesn't book it."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A session needs a consent form (B4-86), not a contract."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "Guest days sell no plans."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Permanent makeup is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Permanent makeup is never sent now: every session has a set start."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "Guest days sell no plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "Guest days sell no plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "Guest days sell no plans."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Permanent makeup is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Only a child answers",
+    "why": "The client is an adult at a host salon, so no child answers."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "The client is always there: the work is on her own face."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "The client is always there, and a host salon has no gate code."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Alex is in the chair the whole time."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Nobody else pays the business for a session."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A session is paid once, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each session is billed on its own day."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for cosmetic permanent makeup."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "Nothing is sold at a home: a guest day is at a host salon."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Nothing is sold at a home: a guest day is at a host salon."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Guest days send no proposals: the touch-up is booked at checkout."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A session has no report to send later."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "Every service here is one price. Each first session includes one touch-up, on the list at $0."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your permanent makeup services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Permanent makeup prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      {
+       "photos": [
+        "Permanent makeup price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Microblading",
+          "$550 · 2½ hours"
+         ],
+         [
+          "Powder brows",
+          "$650 · 2½ hours"
+         ],
+         [
+          "Touch-up, 6 to 8 weeks after",
+          "$0 · 90 min, included"
+         ],
+         [
+          "Yearly color refresh",
+          "$200 · 90 min"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "Sam can change each rule now, by text later, or in the portal.",
+     "The portal is the business's website for Rosie, where owners change prices, hours and rules.",
+     "A booking keeps the rules it was made with, even if Sam changes them later.",
+     "Each guest-day session has a set start time, as the plug-in suggests.",
+     "Permanent makeup is never sent now, so there's no same-day job to keep time for."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are my suggested starting rules for permanent makeup. You can change any of them.",
+      {
+       "list": {
+        "head": [
+         "Rule",
+         "Suggested"
+        ],
+        "rows": [
+         [
+          "Open",
+          "Guest days, set with each host salon"
+         ],
+         [
+          "Start",
+          "A set start time"
+         ],
+         [
+          "Notice",
+          "At least 24 hours"
+         ],
+         [
+          "Books ahead",
+          "Up to 60 days"
+         ],
+         [
+          "Same-day bookings",
+          "Ask you first"
+         ],
+         [
+          "Free to cancel",
+          "Until 24 hours before"
+         ],
+         [
+          "After that, or a no-show",
+          "Up to the deposit, only if you say so"
+         ],
+         [
+          "Travel area",
+          "25 miles from 1200 Cherry St"
+         ],
+         [
+          "If your artist can't come",
+          "Offer another licensed artist, same time and price, or a new date"
+         ]
+        ]
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Want to keep some times for one kind of booking? Other bookings can't take them.",
+      {
+       "buttons": [
+        "No",
+        "Keep some times"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The brow lamination plug-in loads the same way, with its own services and license form.",
+     "AI assistants find Lee Traveling PMU under permanent makeup and under brow lamination."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Brow lamination next. Send a photo of your brow lamination prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Brow lamination prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      {
+       "photos": [
+        "Brow lamination price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Brow lamination and tint",
+          "$95 · 60 min"
+         ],
+         [
+          "Lash lift and tint",
+          "$95 · 60 min"
+         ],
+         [
+          "Both together",
+          "$170 · 90 min"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like permanent makeup. Send only what's different.",
+      {
+       "card": {
+        "title": "Brow lamination, set like permanent makeup",
+        "lines": [
+         "On guest days at host salons",
+         "A $25 deposit, toward the price",
+         "The rest after, on the bill",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "New clients book a free consult and patch test first, at least 48 hours before.",
+     "The long services show how much time they take, so the artist's time is saved for all of it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the studio's price list."
+     ],
+     [
+      "owner",
+      "san",
+      {
+       "photos": [
+        "Price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Consult and patch test",
+          "Free · 30 min"
+         ],
+         [
+          "Microblading",
+          "$550 · 2½ hours"
+         ],
+         [
+          "Powder or combo brows",
+          "$650 · 2½ hours"
+         ],
+         [
+          "Lip blush",
+          "$600 · 2½ hours"
+         ],
+         [
+          "Eyeliner",
+          "$400 · 2 hours"
+         ],
+         [
+          "Touch-up, 6 to 8 weeks after",
+          "$0 · 90 min, included"
+         ],
+         [
+          "Yearly color refresh",
+          "$200 · 90 min"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "Where the state's rules don't allow it, Rosie won't set permanent makeup away from the studio. It stays at the studio.",
+    "more": [
+     "If a client asks for a session somewhere else, Rosie offers a time at the studio instead."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where your studio is, the state's rules allow permanent makeup only in a licensed studio. So every service stays at the studio.",
+      {
+       "card": {
+        "title": "Permanent makeup · at the studio only",
+        "lines": [
+         "Guest days elsewhere stay off"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Every price on the list books without an OK. A price Hannah makes for one client, like two areas together, comes to Sam first.",
+    "more": [
+     "Sam keeps Rosie's suggested rules with one tap.",
+     "The deposit is kept only after Sam says yes.",
+     "Pat OKs only Lee Traveling PMU prices over $500. At the studio, only Sam OKs prices."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Prices on the list never need your OK. Should a price made for one client come to you first?",
+      {
+       "buttons": [
+        "Yes, every time",
+        "Send them",
+        "Over an amount"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "These are the booking rules I suggest:",
+      {
+       "card": {
+        "title": "Lee Brow Studio · booking rules",
+        "lines": [
+         "Hours: from your Google listing",
+         "New clients: a free consult and patch test, 48 hours before",
+         "Free to cancel until 24 hours before",
+         "A no-show is marked 15 minutes after the start",
+         "Late cancel or no-show: the deposit, if you confirm",
+         "Same-day bookings ask you first"
+        ]
+       },
+       "buttons": [
+        "Keep these",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "Big bills can also be paid by bank transfer, through the company's own Stripe. Sessions are paid by card, so Sam keeps cards only.",
+    "more": [
+     "With it on, the pay link offers a bank transfer next to the card.",
+     "A bill paid this way counts as paid only once the transfer clears, in a few business days.",
+     "Each company sets it for itself. Sam leaves it off for both, and can turn it on later in the portal."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Big bills can also be paid by bank transfer, through your Stripe. Want that for bills over an amount?",
+      {
+       "buttons": [
+        "Yes, over an amount",
+        "No, cards only"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Set: cards only. You can turn on bank transfer later, in the portal."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Leah Ortiz"
+     ],
+     [
+      "Company",
+      "Lee Traveling PMU"
+     ],
+     [
+      "Kinds of work",
+      "Permanent makeup"
+     ],
+     [
+      "Jobs",
+      "Microblading, powder brows, touch-ups"
+     ],
+     [
+      "Hours",
+      "Guest days, 9am–5pm"
+     ],
+     [
+      "Leah agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Sam says one price is different: microblading costs more when Sam does it himself.",
+    "more": [
+     "At the studio, prices are the same whichever artist does the work.",
+     "A person can have their own price list, their own hourly rate, or a different price for one service."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Are your guest-day prices the same, whoever does the session?",
+      {
+       "buttons": [
+        "Yes, the same",
+        "Some charge differently"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 Microblading is 650 if I do it myself"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Microblading is $650 when Sam does it, and $550 with anyone else.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Clients see the price of whoever does it, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who does it",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Microblading",
+          "You",
+          "$650"
+         ],
+         [
+          "Microblading",
+          "Anyone else",
+          "$550"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Traveling PMU",
+       "Guest days at host salons",
+       "Permanent makeup PM045210",
+       "Yes"
+      ],
+      [
+       "Paige Ross",
+       "Lee Traveling PMU",
+       "Guest days at host salons",
+       "Permanent makeup PM031552 · esthetics ES30417",
+       "Once Sam says yes"
+      ],
+      [
+       "Leah Ortiz",
+       "Lee Traveling PMU",
+       "Guest days at host salons",
+       "Permanent makeup, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Traveling PMU",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Hannah Park",
+       "Lee Brow Studio",
+       "At the studio",
+       "Permanent makeup, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Grace Liu",
+       "Lee Brow Studio",
+       "At the studio",
+       "Permanent makeup, as given, not checked",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-30",
+    "label": "Outside after all",
+    "why": "A guest day's place is the host salon, checked when Sam set the guest days, so no street address can fall outside."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam keeps cards only (sign-up), so no bill offers a bank transfer."
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "vary": {
+     "before:deposit": {
+      "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the service, the area and the day, with no name or address yet. With a deposit, the example is $550 microblading on a guest day.",
+      "say": [
+       [
+        "cust",
+        "agent",
+        "Can I get microblading Thursday morning? I'm in Springfield."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero hacerme microblading el jueves.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like microblading on Thursday.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Traveling PMU. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Traveling PMU. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "more": [
+     "Another kind of work's example: a gas smell gets 'leave now, then call 911'.",
+     "Rosa has a rash near her brows. She's told to call 911 if her face, lips or throat swell, and Paige checks the skin at check-in."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿se le hincha la cara, los labios o la garganta?",
+      {
+       "lang": "es",
+       "en": "First: are your face, lips or throat swelling?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Solo tengo un sarpullido cerca de las cejas.",
+      {
+       "lang": "es",
+       "en": "No. I just have a rash near my brows.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "No se rasque. Si se le hincha la cara, los labios o la garganta, llame al 911. La artista revisa la piel al llegar.",
+      {
+       "lang": "es",
+       "en": "Don't scratch it. If your face, lips or throat swell, call 911. The artist checks the skin when you arrive.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If your face, lips or throat are swelling, or it's hard to breathe, call 911 now."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said her face is swelling after a session. She got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A swelling face after a session",
+         "Told to call 911 now"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-01",
+    "does": "Back to Alex's chat, Mon 6:40pm: Rosie matches the request to one of the business's services. Each one was set up at sign-up: at the business, at the client's place, or both.",
+    "more": [
+     "Lee Traveling PMU has no studio of its own. Every session is on a guest day at a host salon, so nothing is asked.",
+     "Permanent makeup is never booked at a client's home: the plug-in books it only at a licensed studio or salon.",
+     "A host salon counts as the client's place here: the business goes to it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "does": "A plug-in holds what one kind of work needs. The steps around it stay the same. Here, Rosie uses the permanent makeup plug-in's booking parts.",
+    "more": [
+     "Its questions: the area, new or returning, and any permanent makeup there before.",
+     "Its danger words: a reaction happening now, like a swelling face, lips or throat.",
+     "Its first steps: a consent form always, and a patch test where the artist asks for one.",
+     "Who can stand in for whom, and how the visit is checked in: the code at the host salon's desk.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-77",
+    "does": "Guest days are set for places, so the AI asks the town or ZIP first. The host salon's address comes with the times.",
+    "more": [
+     "The plug-in names the kinds of place: here, another licensed salon or studio, never a home.",
+     "Lee Traveling PMU works guest days within 25 miles of 1200 Cherry St. Aster Salon in Springfield is inside it.",
+     "The kind of place decides what's asked later, like the host's rules.",
+     "If Sam set a travel fee for farther towns, the price shows with it."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Traveling PMU works guest days at salons near Springfield. Which town are you in?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "more": [
+     "Each answer is checked for danger too.",
+     "New or returning is asked, since a touch-up is only for a returning client.",
+     "A later move offers only times of the same length."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Traveling PMU asks: which area, and any permanent makeup there before?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Brows. Never had any."
+     ]
+    ],
+    "vary": {
+     "before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Lee Traveling PMU asks: which area, and any permanent makeup there before?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Brows. Never had any."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-07",
+    "does": "Microblading is $550, straight from Sam's list, with one touch-up included. List prices never need Sam's OK.",
+    "vary": {
+     "before:deposit": {
+      "does": "Microblading is $550, straight from Sam's list, with one touch-up included. With a deposit, $100 of it is taken when Alex books.",
+      "more": [
+       "List prices never need Sam's OK.",
+       "The touch-up 6 to 8 weeks later is on the list at $0."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-43",
+    "more": [
+     "Answers that only add detail come later, once a time is saved.",
+     "More than one can apply, like a second area and a first step. The AI asks each one that fits, in this order.",
+     "Here, Alex's booking is on a guest day at a host salon (below)."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-84",
+    "does": "A guest day books a set start, so the times read 'starts at 9:00am', not a window. Three choices, soonest first.",
+    "more": [
+     "The confirmation, the reminder and the day's texts say the same start.",
+     "Only people free, skilled and licensed for the place are shown, with any guest permit.",
+     "Microblading takes 2½ hours, so the next start is after lunch.",
+     "A fee-free client sees 'No fee to cancel or miss', and no card is saved for fees."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Traveling PMU can do microblading at Aster Salon for $550, with a $100 deposit when you book. Times:",
+      {
+       "times": [
+        "Thu Oct 22 · starts at 9:00am · Paige",
+        "Thu Oct 22 · starts at 12:30pm · Leah",
+        "Fri Oct 23 · starts at 9:00am · Paige"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "more": [
+     "Private answers, like health questions, go only on the secure page."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "What look would you like? Anything Paige should know?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Soft and natural, please."
+     ]
+    ],
+    "vary": {
+     "before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What look would you like? Anything Paige should know?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Soft and natural, please."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-26",
+    "does": "The visit texts and the code go to whoever meets the pro. For permanent makeup, that's always the client: the work is on her own face.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Will you be there to meet Paige at Aster Salon?",
+      {
+       "buttons": [
+        "Yes, I'll be there"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "more": [
+     "On guest days, a consent form always goes on the secure page.",
+     "A patch test only where the artist asks: here, when the secure page shows a past reaction to ink or numbing cream.",
+     "Then the session moves to the next guest day, at least 48 hours after the test."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "On guest days, a consent form always goes on the secure page.",
+       "A patch test only where the artist asks: here, when the secure page shows a past reaction to ink or numbing cream.",
+       "Then the session moves to the next guest day, at least 48 hours after the test."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "does": "Say Alex had a reaction to tattoo ink before. Paige asks for a patch test first, at the Oct 22 guest day, and the session moves to Nov 12.",
+    "more": [
+     "Alex has 30 minutes to pick. The main time stays saved meanwhile.",
+     "The test is at least 48 hours before the session, as the plug-in says."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Before your session, Lee Traveling PMU needs a quick patch test. Pick a time:",
+      {
+       "times": [
+        "Thu Oct 22 · 9:00am · Paige",
+        "Thu Oct 22 · 12:30pm · Paige"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "The plug-in needs a consent form before every session. Alex signs it on the secure page that comes next, by the day before.",
+    "more": [
+     "It has aftercare advice, and a note that a new tattoo can delay giving blood.",
+     "It's signed again for each session, touch-ups too.",
+     "Not done by its due date: one reminder, then Sam decides to keep it, move it, or cancel with no fee.",
+     "Kept: Alex signs it on a tablet at the host salon, before any work."
+    ],
+    "form": [
+     [
+      "Form",
+      "Consent for permanent makeup, with aftercare and the blood-donation note"
+     ],
+     [
+      "Due",
+      "By the day before"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "more": [
+     "Examples: a written estimate for work over a set amount, or the right to cancel a sale made at home.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date. Sam is reminded before it's late.",
+     "Microblading on a guest day needs no notice here. Its consent form is its own step."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-29",
+    "more": [
+     "The page asks only what this booking needs: the health questions, the consent form, any card or money, and the terms.",
+     "The time stays saved for 10 minutes while Alex fills it in.",
+     "Where the plug-in keeps service names private, this text carries only the business, the date, the time and the place."
+    ],
+    "vary": {
+     "before:deposit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Lee Traveling PMU. Tap to finish your booking and see the terms.",
+        {
+         "card": {
+          "title": "Lee Traveling PMU · Microblading",
+          "lines": [
+           "Thu Oct 22 · starts at 9:00am · Paige",
+           "Aster Salon, 42 Cedar St, Springfield",
+           "$550 · a $100 deposit now"
+          ],
+          "button": "Answer and pay",
+          "link": "rosfield.com/c/r4"
+         },
+         "stop": true
+        }
+       ]
+      ]
+     },
+     "booking:shop": {
+      "more": [
+       "The page asks only what this booking needs: the health questions, the consent form, any card or money, and the terms.",
+       "The time stays saved for 10 minutes while Alex fills it in.",
+       "Where the plug-in keeps service names private, this text carries only the business, the date, the time and the place."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-30",
+    "does": "On a guest day, the place is the host salon, so Alex types no street address. The page shows Aster Salon's address and its rules.",
+    "more": [
+     "The host's address decides which state's rules apply.",
+     "An address an AI puts in a message is never saved."
+    ],
+    "form": [
+     [
+      "What the AI sent",
+      "Microblading, Thu Oct 22, 9:00am, with Paige"
+     ],
+     [
+      "Wrong? Fix it here",
+      "Change service · Change time"
+     ],
+     [
+      "Where",
+      "Aster Salon, 42 Cedar St, Springfield"
+     ],
+     [
+      "The host's rules",
+      "Check in at the front desk"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "does": "Who may book comes from the plug-in. Here, the client books for herself and confirms she's 18 or older, with a photo ID to bring.",
+    "more": [
+     "The state's rules can set other ages for some work. The plug-in carries them."
+    ],
+    "form": [
+     [
+      "I'm 18 or older, and I'll bring a photo ID",
+      "Yes"
+     ],
+     [
+      "I'll be at Aster Salon Thu at 9:00am",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B4-32",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "line": [
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex answers the health questions",
+      "does": "On the same secure page, Alex answers the plug-in's health questions and adds a photo of her brows now. Rosie only sorts the answers.",
+      "more": [
+       "The answers never go in a text, or through the AI.",
+       "All no, like Alex's: the booking goes on.",
+       "A yes, like pregnant or on blood thinners: Paige reads it before anything is booked, and the money stays held.",
+       "A past reaction to ink or numbing cream: Paige asks for a patch test first."
+      ],
+      "form": [
+       [
+        "Pregnant or breastfeeding",
+        "No"
+       ],
+       [
+        "Isotretinoin (Accutane) in the last 12 months",
+        "No"
+       ],
+       [
+        "Blood thinners",
+        "No"
+       ],
+       [
+        "Keloids or raised scars",
+        "No"
+       ],
+       [
+        "Botox or fillers near the brows in the last 2 weeks",
+        "No"
+       ],
+       [
+        "A past reaction to tattoo ink or numbing cream",
+        "No"
+       ],
+       [
+        "Photo of your brows now",
+        "Uploaded"
+       ]
+      ],
+      "needs": [
+       "pf.questions",
+       "pf.messages"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "does": "Alex sees how to get in at Aster Salon, from the host's own details, and adds anything Paige should know.",
+    "more": [
+     "The host's rules came with its OK when Sam set the guest days.",
+     "The plug-in adds its own questions. Here it has none."
+    ],
+    "form": [
+     [
+      "Parking",
+      "Behind the salon"
+     ],
+     [
+      "Check in",
+      "At the front desk"
+     ],
+     [
+      "Anything Paige should know",
+      "Soft and natural, please"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-34",
+    "does": "Where the plug-in or Sam needs a written contract, it's signed before any money is taken. A session needs none: its consent form is its own step.",
+    "more": [
+     "Sam can also ask for a contract on any service, at sign-up or in the portal."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "more": [
+     "Here it books right away: it isn't for today, and the price is from the list.",
+     "Permanent makeup is never sent now, so every booking comes through this step.",
+     "A health yes goes to the artist first, as in 'An expert reads answers first'."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-13",
+    "more": [
+     "The AI gets the same details and a booking number, but not the code.",
+     "The code comes again in Paige's text on the day.",
+     "Paid before, then a late cancel or a no-show: only what this says may be kept. Sam confirms first. No answer in 24 hours: a full refund.",
+     "A fee-free client sees 'No fee to cancel or miss' instead.",
+     "The pro's name stays in it, for the check at the desk."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-14",
+    "does": "Paige gets the session, the time, the host salon, the notes and how it's paid. The code comes from Alex at the visit.",
+    "more": [
+     "Health answers stay on the secure page. The text only says there are answers to read.",
+     "The client's language shows too, so Sam can send someone who speaks it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-55",
+    "does": "Nothing is asked again here: this follows the booking. Permanent makeup is never sent now, so Alex's microblading has a set start, and the reminder comes first."
+   },
+   {
+    "op": "words",
+    "at": "B7-01",
+    "t": "Tue Oct 20, 10:00am",
+    "does": "Free cancel ends 24 hours before, at 9am Wed. So Alex's reminder goes Tue at 10am, with the plug-in's way to get ready.",
+    "more": [
+     "No reminder goes for a cancelled booking, or after Alex texts STOP.",
+     "The plug-in's way to get ready: a photo ID, no alcohol for 24 hours before, and the consent form signed.",
+     "The code comes again in Paige's text on the day.",
+     "Where the plug-in keeps service names private, the text names only the business, date, time and place. The rest is on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "more": [
+     "Real danger, like a swelling face, lips or throat, gets the safety steps first.",
+     "If anyone is at risk, the text says to call 911.",
+     "A rash or broken skin on the area: the artist decides, and the move has no fee.",
+     "No reply: the session stays as booked, and Paige checks the skin at check-in."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-27",
+    "more": [
+     "Paige is told.",
+     "Past 15 minutes' grace, Paige may move the session. Sam decides about the deposit, as for a late cancel.",
+     "With no reply, nothing moves until Paige decides."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "I'll be 30 minutes late, sorry!"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks, Paige knows. A 2½-hour session has 15 minutes' grace, so Paige may need to move it.",
+      {
+       "buttons": [
+        "Start later if Paige can",
+        "Another time"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Before Paige starts, please read and sign the notice the state's rules require for this work.",
+      {
+       "card": {
+        "title": "Permanent makeup notice",
+        "lines": [
+         "The state's notice on risks and aftercare",
+         "Read it, then sign on the page"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/n/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-31",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your patch test went well, and Paige says powder brows suit your skin better. OK the change to go ahead.",
+      {
+       "card": {
+        "title": "Powder brows · now $650",
+        "lines": [
+         "Was $550: powder brows add $100",
+         "Thu Oct 22 · starts at 9:00am · Paige"
+        ],
+        "button": "See and OK it",
+        "link": "rosfield.com/k/r3"
+       },
+       "buttons": [
+        "Cancel, full refund"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. OK'd the change to powder brows, $650.",
+      {
+       "card": {
+        "title": "Changed plan · $650",
+        "lines": [
+         "Powder brows",
+         "OK'd by Alex M."
+        ],
+        "button": "See it",
+        "link": "rosfield.com/k/r3"
+       }
+      }
+     ]
+    ],
+    "does": "Powder brows are $650 on Sam's list, so no price OK is needed. Alex OKs the changed plan, or cancels for free with a full refund."
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "does": "At 7am, the day-list time set when Paige joined, Rosie texts the day's sessions at Aster Salon. The link opens only on Paige's and Sam's signed-in phones.",
+    "more": [
+     "Each session shows what to bring, from the plug-in: the pigments picked, and the consent forms on file.",
+     "The host's notes show too, like where to park.",
+     "No text from Paige by 8:45: she's nudged, then Sam."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 8:40am",
+    "does": "Back to Alex: it's Thursday morning, and Paige is setting up at Aster Salon. Alex sees Paige's photo and the code. Until check-in, 2 means only 'that isn't Paige'.",
+    "more": [
+     "The photo link is where a plain text finds the photo.",
+     "If Alex texted STOP, Paige calls instead.",
+     "The time reads 'starts at 9:00am', as booked."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Paige from Lee Traveling PMU is setting up at Aster Salon for your 9:00am session. Give your check-in code at the front desk. If someone else greets you as Paige, tell us.",
+      {
+       "photos": [
+        "Paige, from Lee Traveling PMU"
+       ],
+       "photoLink": "rosfield.com/m/r4",
+       "code": "3906",
+       "buttons": [
+        [
+         "2",
+         "It isn't Paige"
+        ]
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "At the desk, ask Alex M. for her check-in code and text it here."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 9:00am",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3906"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M., 9:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "Paige from Lee Traveling PMU has checked you in for your 9:00am session."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "t": "Thu Oct 22, 9:00am",
+    "does": "Back to Aster Salon, 9:00am. Paige checks what the plug-in asked Alex to bring: a photo ID showing 18 or older, and the consent form signed. Both are there, so the work can start.",
+    "more": [
+     "Signs of alcohol or drugs stop the session too, whatever was ticked online.",
+     "The consent not signed yet: Alex signs it on Paige's tablet now, and the work starts.",
+     "No photo ID: it goes as 'Can't go ahead'."
+    ],
+    "vary": {
+     "before:deposit": {
+      "does": "Back to Aster Salon, 9:00am. Paige checks what the plug-in asked Alex to bring: a photo ID showing 18 or older, and the consent form signed. Both are there, so the work can start."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before any work, Paige draws the shape on Alex's brows. Alex OKs it in the mirror, and the before photos stay with the booking.",
+    "more": [
+     "Numbing cream goes on before any strokes.",
+     "Nothing is tattooed until Alex says yes to the shape.",
+     "Alex can see the photos on the secure page.",
+     "A damage claim later is checked against them."
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "BEFORE: shape drawn and OK'd by Alex in the mirror.",
+        {
+         "photos": [
+          "Brows, before",
+          "Shape drawn"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s booking."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-24",
+    "does": "Whether extra work gets a written right to cancel is the plug-in's switch, from the state form. For work at a host salon it gives none here, so the extra line goes on the bill.",
+    "more": [
+     "Where a state's form turns it on even at a salon, the cancel notice goes out, as for work at a home.",
+     "Paige also tells Alex the price out loud."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Added to today's session: lash lift and tint, $95. It goes on the bill Rosie texts after.",
+      {
+       "card": {
+        "title": "Lash lift and tint · $95",
+        "lines": [
+         "Done today, with your yes",
+         "On today's bill, with the rest"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "vary": {
+     "price:list+before:deposit": {
+      "does": "Before DONE, Paige shows Alex the brows in the mirror. Anything Alex wants changed is done before Paige texts DONE.",
+      "more": [
+       "The plug-in names what's checked. Here: the shape matches what Alex OK'd, and both brows match.",
+       "After photos are taken from the same angles as the before photos, kept only with Alex's yes."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 11:30am",
+    "vary": {
+     "price:list+before:deposit+after:bill": {
+      "does": "The session is done, 2½ hours after the start. Paige texts DONE with the total, so Rosie can text the bill.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 550 microblading"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "vary": {
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE soft hair strokes, pigment Warm Brown. Touch-up on the Dec 10 guest day."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 11:32am"
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 11:35am",
+    "does": "Back to Alex, Thu 11:35am: the money is in. The receipt goes out by text and email, with the included touch-up on it.",
+    "vary": {
+     "before:deposit+after:bill": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid: $450 to Lee Traveling PMU. Your touch-up is included, on a guest day 6 to 8 weeks from today. Paige sets the date with you.",
+        {
+         "card": {
+          "title": "Receipt · $550",
+          "lines": [
+           "Microblading · $550",
+           "$100 deposit + $450 today",
+           "Thu Oct 22 · Paige · Aster Salon",
+           "Your saved card is now removed"
+          ]
+         }
+        }
+       ]
+      ],
+      "does": "Back to Alex, Thu 11:35am: the money is in. The receipt goes out by text and email, with the included touch-up on it.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "Extra work shows its own cancel line.",
+       "Any fact the state's rules require, like a license number, is on it.",
+       "A rest that was declined and is still owed: the receipt shows only what was paid.",
+       "Where the plug-in keeps service names private, the text names only the business, date, time and place. The rest is on the secure page.",
+       "A card that a plan or an open fee still needs stays saved, and the receipt says so."
+      ],
+      "t": "Thu Oct 22, 11:35am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 1:30pm"
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "vary": {
+     "price:list+before:deposit": {
+      "does": "Two weeks later, one brow looks lighter as it heals. The included touch-up evens it out, so Sam OKs an early, free check.",
+      "more": [
+       "A free fix is booked at $0, with its own check-in code.",
+       "The plug-in says what the included touch-up covers."
+      ],
+      "say": [
+       [
+        "cust",
+        "san",
+        "One brow looks lighter than the other."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. says one brow looks lighter, 2 weeks after Thu Oct 22. Her touch-up is included.",
+        {
+         "buttons": [
+          "Book a free fix",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. Paige will even it out for free on a guest day, once it's healed:",
+        {
+         "times": [
+          "Thu Nov 19 · starts at 9:00am · Paige",
+          "Thu Dec 10 · starts at 9:00am · Paige"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Paige to book her included touch-up on the Dec 10 guest day. Paige texts NEXT, and it's booked at $0, with its own code.",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the client asks.",
+     "Dec 10 is 7 weeks after the session: inside the 6 to 8 weeks.",
+     "Booked by the business, so it carries no $2. Its own reminder, consent and photo ID check come with it."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M.: included touch-up, Thu Dec 10 guest day, 9:00am"
+     ],
+     [
+      "san",
+      "cust",
+      "You're booked for your touch-up, included in today's price.",
+      {
+       "card": {
+        "title": "Lee Traveling PMU · Touch-up with Paige",
+        "lines": [
+         "Thu Dec 10 · starts at 9:00am · Aster Salon",
+         "Included · nothing to pay",
+         "Free to cancel until 9am Wed Dec 9"
+        ]
+       },
+       "code": "4417",
+       "buttons": [
+        "Change the time",
+        "Cancel the visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-35",
+    "does": "After DONE, Alex gets the plug-in's aftercare tips for the days ahead. A healing question or photo goes to Paige on the secure page.",
+    "more": [
+     "The plug-in writes the tips.",
+     "Health details never go in a text.",
+     "Danger signs get the safety message first, like 'call 911'."
+    ],
+    "vary": {
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Aftercare for your new brows, from Lee Traveling PMU. Questions or photos while they heal: send them on the page.",
+        {
+         "card": {
+          "title": "Aftercare",
+          "lines": [
+           "How to care for your brows while they heal"
+          ],
+          "button": "Read it",
+          "link": "rosfield.com/a/b14"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "2pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Nora S. today, starting at 2:00pm?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Traveling PMU. It can't do 1:00pm today, but it offered another time:",
+      {
+       "card": {
+        "title": "Powder brows · $650",
+        "lines": [
+         "Today · starts at 2:00pm · Leah",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ],
+       "stop": true,
+       "as": "Nora S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee Traveling PMU",
+      "Guest days at host salons within 25 miles of 1200 Cherry St, Springfield · (555) 010-0142"
+     ],
+     [
+      "Prices",
+      "Microblading $550 · Powder brows $650 ($700 from Nov 2) · Touch-up $0, included"
+     ],
+     [
+      "To book",
+      "A $100 deposit for a first session, toward the price; the rest on the bill after"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Brow Studio",
+      "88 Linden St, Springfield · Microblading $550"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "does": "Sam adds lash extensions to Lee Traveling PMU. It brings its own plug-in, and only what's new is asked.",
+    "more": [
+     "What's new: the prices, the license, and who does the work.",
+     "People already on the team get one text to confirm, never a second invite.",
+     "It goes live on its own once it's set up. Permanent makeup never pauses.",
+     "Left unanswered, it's saved. Sam texts MORE to finish it."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW lash extensions"
+     ],
+     [
+      "san",
+      "owner",
+      "Lash extensions for Lee Traveling PMU: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like permanent makeup?",
+      {
+       "card": {
+        "title": "Permanent makeup works like this",
+        "lines": [
+         "You go to host salons on guest days",
+         "A deposit when they book",
+         "Rosie texts the bill"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where permanent makeup outside a studio is allowed, and who may go. It's a switch from each state's form.",
+    "more": [
+     "Some states allow it only for some services.",
+     "Some allow it only with a guest permit for each place.",
+     "Times at the customer's place offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "B5-11",
+    "does": "A $100 deposit on the $550 microblading, taken when the booking is written. The $450 rest is on the bill after the job.",
+    "more": [
+     "The card is saved too, in the business's own Stripe.",
+     "The deposit is within the plug-in's money limits, and the state's limits win.",
+     "If Sam must OK the booking first, it stays held until Sam accepts.",
+     "The page says where the deposit goes: the business's Stripe, or a kept-apart account where the state's rules require it."
+    ],
+    "say": [],
+    "form": [
+     [
+      "Your visit",
+      "Microblading · Thu Oct 22, 9:00am · Paige · $550"
+     ],
+     [
+      "Deposit now",
+      "$100, toward the price"
+     ],
+     [
+      "Card",
+      "•••• 4242"
+     ],
+     [
+      "I agree",
+      "Free to cancel until 9am Wed for a full refund. After that, the deposit may be kept"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "A what-if: say Alex had a patch test on an earlier guest day. Paige texts what it found. The session goes ahead, changes, or is called off.",
+    "more": [
+     "The result stays on Alex's record. It counts for later bookings until it runs out."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Alex M.: patch test fine. Powder brows suit her skin better. New price 650. Photo on the page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "Extra work sold at a home can be cancelled in the cancel period the state's rules set. The plug-in's switch gives none for work at a host salon, so nothing waits here.",
+    "more": [
+     "Alex can cancel on the page, by text, or in writing.",
+     "A cancel is refunded in the time the rules set."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Paige finds broken skin on one brow, which the plug-in says stops the work there. She stops that part, and Alex gets a written note on the secure page.",
+    "more": [
+     "The note says what was found, what wasn't done and why, and the kind of pro to see, like a doctor.",
+     "It never names a company.",
+     "Health details and photos stay on the secure page, never in a text.",
+     "Only the work done is charged.",
+     "Sam is told, and the note stays with the job.",
+     "Alex can text when it's healed, and the rest of the work is booked then."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD stopped the left brow. Note and photo on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Paige stopped part of today's work and left you a note.",
+      {
+       "card": {
+        "title": "A note from Lee Traveling PMU",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/b6"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-54",
+    "does": "A what-if: something the plug-in requires is missing, or a conflict is found. The work doesn't start. Whether a fee may apply depends on whose side it's on.",
+    "more": [
+     "The customer's side: an ID, proof of the right to the work, or a paper Alex was to have ready.",
+     "The business's side: a conflict, Alex isn't eligible, or a permit the business needed."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CANT START no photo ID showing 18 or older"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-12",
+    "does": "Alex says she's here. Paige finds her at the desk and checks in with the code, so it's a normal visit.",
+    "more": [
+     "If they still can't meet, no fee is asked. Rosfield's $2 stands, and a person at Rosie reviews it.",
+     "Money paid before moves to a new time, or is refunded, as Sam picks."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Paige you're here."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. says she's here. Find her at the desk, and check in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-18",
+    "does": "Marked 'confirmed by the customer'. The visit counts, and what's paid after goes ahead.",
+    "more": [
+     "Rosfield's $2 counts once: from a payment through Rosie, or else on the monthly bill.",
+     "The bill or the saved-card charge waits for Paige's DONE with the total. Sam is asked to have Paige send it."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "B4-10",
+    "does": "Any price made for one customer over Sam's $500 limit comes to him first. Here, it's Paige's $700 price for Morgan P.'s powder brows and lash lift together.",
+    "more": [
+     "Prices straight from the list never need an OK.",
+     "Pat can OK it too. Sam's answer wins.",
+     "Before it reaches Sam, the price is checked against any job limit on the license."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Paige's quote is over your $500 limit.",
+      {
+       "card": {
+        "title": "Powder brows and lash lift · $700",
+        "lines": [
+         "For Morgan P. · made just for her",
+         "Lee Traveling PMU"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-13",
+    "does": "With times to pick, all with Paige, since only Paige does lash lifts here. The deposit is paid when Morgan books.",
+    "more": [
+     "No reply in 24 hours: nothing is booked. The price stays good for 7 days.",
+     "Where the plug-in keeps service names private, the text gives only the business, the date, the time and the place."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Traveling PMU can do your powder brows and lash lift together for $700.",
+      {
+       "card": {
+        "title": "Powder brows and lash lift · $700",
+        "lines": [
+         "A deposit when you book: $100",
+         "The rest after the job"
+        ],
+        "button": "Pick a time, pay $100",
+        "link": "rosfield.com/q/mp"
+       },
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-11",
+    "does": "Rosie reads it back before it goes out.",
+    "more": [],
+    "say": [
+     [
+      "owner",
+      "san",
+      "680"
+     ],
+     [
+      "san",
+      "owner",
+      "Send Morgan P. $680 for powder brows and a lash lift?",
+      {
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-40",
+    "does": "Morgan P. asked to talk about the $700 price. Sam taps Call, and the call goes out from the business's number.",
+    "more": [
+     "After a STOP, only a person calls. This is how Sam does it.",
+     "Sam adds a one-line note after the call. It stays with the booking, so Pat and the team see it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Morgan P. would like to talk about the price before booking.",
+      {
+       "buttons": [
+        "Call Morgan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "does": "Sam raises powder brows to $700 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "more": [
+     "Powder brows already booked keep $650, even after Nov 2.",
+     "A time being saved right now keeps the price on the customer's screen.",
+     "Guest days sell no plans, so no plan notice goes out.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: powder brows $700 for visits from Mon Nov 2. Those already booked keep $650."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-70",
+    "does": "Say a state's form gave Morgan P. a cancel period for extra work, and she cancelled inside it. The refund then has a date. Sam was reminded each day, and the date passed.",
+    "more": [
+     "Morgan was told the date when she cancelled.",
+     "A person on Rosie's team calls Sam the same day."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Morgan P.'s refund for the cancelled extra work was due yesterday. A person from Rosie's team will call you today.",
+      {
+       "buttons": [
+        "It's done",
+        "Call me now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "permanent makeup work is never named-only: a rating is asked for every job"
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "From: hair. Permanent makeup runs like the hair salon: booked with one artist by name, a consult and a patch test first, and a deposit. The dentist pilot was the other choice (health questions before the first visit), but the master's own secure page, its expert-read branch and its form-on-the-page branch carry those, so the chair pilot fits better.\nNames: Sam Lee's main company is Lee Traveling PMU LLC (guest days at host salons, with lash and brow as its second kind of work); his second company is Lee Brow Studio LLC (the studio). The master's shape is kept: flow A's story is at the second company (the studio), flow B's at the main one.\nArtists: Hannah and Grace at the studio (the master's Riley and Avery); Paige and Leah on guest days (Jordan and Casey). Addresses: the studio 88 Linden St, the main company 1200 Cherry St, the host salon Aster Salon, 42 Cedar St.\nFlow B is the less usual side: the old flowchart shows only the studio, so flow B is a guest artist's day at another licensed salon, set at sign-up with the host's OK (S1-58, S1-59). Permanent makeup at a client's home isn't offered: the plug-in books it only at a licensed studio or salon, where the state's rules require one. The guest days are every Thursday and Friday, 9am to 5pm, so every later time in flow B lands on one.\nPrices are the old flowchart's example studio's: microblading $550 with a $100 deposit off the price, one touch-up included 6 to 8 weeks later, a $200 yearly color refresh with a $50 deposit. The master's $140, $40 and $100 become $550, $100 and $450 on the listed paths.\nMoney paths: flow A lists the first session (a deposit, the rest at the desk) and the included touch-up booked on its own (nothing taken, nothing to pay). The yearly refresh takes a deposit, so it runs on the first path. Flow B lists the guest-day session (a deposit, then the bill Rosie texts). A guest-day touch-up is booked at checkout for the next guest day at $0, so it needs no bill and no path of its own.\nTimes: the master's clock is kept. Booked Wed Oct 21, consult and patch test Thu Oct 22 at 9:30am, the session Sat Oct 24 at 11:00am (49½ hours later), the touch-up Sat Dec 12 (7 weeks). On the touch-up path, the first session was Sat Aug 29, so Sat Oct 24 is 8 weeks later. Flow B: booked Mon Oct 19, the guest day Thu Oct 22 from 9:00 to 11:30am, the touch-up on the guest day Thu Dec 10.\nCancel window: the master's 24 hours before is kept (the owner's setting; the old flowchart's studio used 48 hours, which the owner can set). Flow B's guest day moves the master's 7am cutoff to 9am Wed, 24 hours before.\nAge: 18 or older is the example businesses' rule; each state's minimum age and any parent's OK is a switch from the state form. So kids and teens are off (A4-70 Adults only), and a guardian for an adult is off: permanent makeup needs the client's own consent.\nHealth questions sit only on the secure page (A4-x01, B4-x01): any yes goes to the artist through the master's expert-read branch (A6-16, B6-15). The consent form is the master's form on the secure page (A4-72, B4-86).\nPatch test: where the artist asks for one. The studio asks every new client, at a free consult at least 48 hours before; the client reports the spot on the secure page (A7-x01). On guest days it's asked only when the answers show a past reaction.\nOff: plans, insurance and memberships (no plan pays for cosmetic work), rushes, groups, crews, classes, spaces, stays, drop-offs, rentals, items held, deliveries, permits, damage holds, contracts, a date that can't move, a minimum to run, weather, parts and orders, sent-now work, and the home's owner or landlord.\nKeep: 'makeup' (permanent makeup is this work's own name) and 'salon' (a guest day happens at a host salon).\nReview (Oct 23): open for Jay, logged as the gap 'Included return visit counts no new $2': a $0 touch-up the client books on her own counts as its own confirmed booking under today's rule, so A9-21 counts a $2 on the touch-up path. The flow follows today's rule and says nothing else about it.\nReview (Oct 23): the series branch (A4-28, B4-43) is off: the touch-up is never booked as a series with the first session. Flow B has no money path for a $0 touch-up booked on its own (the master's flow B has no 'nothing before, nothing after' choice), so the guest-day touch-up is set by Paige at checkout (B10-18) and the receipt says so.\nRefit Q06 (Oct 27, 2026): money A list|deposit|counter (main), list|none|counter; B list|deposit|bill. Amounts: $550 microblading, $100 deposit, $450 rest, fee $100 (the deposit may be kept, never more); $0 included touch-up. Added services: brow lamination $95 at the counter (A); $95 with $25 deposit and $70 bill (B). Facts firststeps, forms, tips, aftercare; settings setstart and 24 hours before; sensitive switch left off (see log). Sign-up money ops removed; the card-hold sentence in B5-11 replaced.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "first tomorrow: 10:00am, Riley",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Takes the price from the shop's board",
+    "What happens at the chair?",
+    "Priced from your photos",
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Riley can go over it at your visit.",
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "A haircut could mean a salon or a barbershop.",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Books a haircut and a beard trim",
+    "A barbershop books a person's time.",
+    "A barbershop has none.",
+    "May the shop show photos of your hair?",
+    "A barbershop's services need none.",
+    "Book this haircut?",
+    "Color always stays with Riley.",
+    "Stopped Alex M.'s cut.",
+    "Riley stopped Alex M.'s cut.",
+    "The cape clip ripped my shirt collar.",
+    "the cape clip ripped a shirt collar today",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Skin fade · $40",
+    "Lee's Barbershop · Skin fade",
+    "Color and cut · $90",
+    "1 color quote",
+    "raise haircut to 40",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2.",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "EC22871",
+    "JE30417",
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Barber license",
+    "Every shop service, color and house calls",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Each person hears they can be booked for their own work: Avery at the shop, Casey for plumbing.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Lee Home Services can book you for plumbing and electrical from now on.",
+    "a barber",
+    "A barber",
+    "Haircut · $35",
+    "Groom's package ·",
+    "The Groom's package",
+    "the Groom's package",
+    "Groom's package",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "$100",
+    "$140",
+    "$40",
+    "on the shop's board",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Oak St",
+    "MP045210",
+    "JP031552",
+    "BS20981",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "Barbering",
+    "shops",
+    "Shop",
+    "shop",
+    "at the chair",
+    "At the chair",
+    "visit fee",
+    "skin fades",
+    "skin fade",
+    "Beard trim",
+    "Kids cut",
+    "Color correction",
+    "Color and cut",
+    "color and cut",
+    "color correction",
+    "Signature cut and shave",
+    "Classic cuts, fades and",
+    "hot towel shaves",
+    "A water heater job",
+    "water heaters",
+    "water heater",
+    "kids cut",
+    "shave",
+    "heater",
+    "Skin fade",
+    "beard trim",
+    "a fade"
+   ],
+   "B": [
+    "MOVE Alex to Thu 12pm",
+    "first tomorrow: 10:00am",
+    "Every plumbing job, and electrical jobs",
+    "Hours: Mon–Fri 7:30am–5:30pm",
+    "Plumbing JP031552 · electrical JE30417",
+    "Casey for plumbing, Avery at the shop",
+    "It's overflowing. Can someone come tonight?",
+    "Alex M. asks: Can I run the dishwasher before you come?",
+    "Can I run the dishwasher before you come?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Tessa · Drain clearing",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "A gas smell at the home",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Say another customer's AI asks for a job in Riverton, 40 miles away.",
+    "Each service got a price kind at sign-up. A custom job gets its price before anyone says yes. Sam OKs any price over $500 made for one customer.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Wed morning is full.",
+    "Sorry, no plumber on call can come tonight, so nothing was booked.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "I'll be home 30 minutes late, sorry!",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Jordan texts OMW (on my way)",
+    "Alex gives the code at the door",
+    "Nobody home",
+    "Jordan couldn't enter your code. If the person at your door isn't Jordan, don't let them in.",
+    "Alex was told to keep the door closed",
+    "I'm home",
+    "3: Alex is home",
+    "Alex says they're home. Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "Thanks. We've told Jordan you're home.",
+    "Alex M. says they're home. Try the door again, and check in with the code.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves · $160",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "UNSAFE leaving 42 Oak St",
+    "Jordan left Alex M.'s visit at 42 Oak St for safety. Please call Jordan now.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "The note says what was found, what wasn't done and why, and which kind of business to call.",
+    "Answers, photos and gate codes",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "DONE 179 drain",
+    "the kitchen drain",
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "stage 2 of your repipe",
+    "The plug-in says how long the warranty lasts.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Water heater replacement · $640",
+    "raise drain clearing to 199",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Sam adds a plumber",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Fri 8am",
+    "Add the address on the Today page",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Jordan says no. Please wait until the job is done.",
+    "so your Mon Nov 30 booking is cancelled.",
+    "Nora can ask to be next for that window.",
+    "and nobody was home for any of them.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "EC22871",
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Lee Home Services can book you for plumbing and electrical from now on.",
+    "a barber",
+    "· arriving 8–10am",
+    "arriving 8–10am",
+    "· arriving 12–2pm",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "at the door",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "Yard drain",
+    "yard drain",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call fee",
+    "service call fee",
+    "service call",
+    "$179",
+    "$150",
+    "$110",
+    "$89",
+    "$40",
+    "$199",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "MP045210",
+    "BS20981",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "Shop",
+    "shop",
+    "at the chair",
+    "visit fee",
+    "a haircut",
+    "haircut",
+    "Service call",
+    "service call",
+    "water heater",
+    "heater",
+    "a leaking pipe under my sink",
+    "the cabinet under the sink",
+    "under the sink",
+    "won't drain",
+    "drain clearings",
+    "drain clearing",
+    "tapping a neighbor's water line without asking",
+    "overflowing",
+    "clog",
+    "Shutoff valve",
+    "valve",
+    "shutoff",
+    "cabinet",
+    "sink",
+    "pipe",
+    "water heaters",
+    "Overflowing kitchen drain",
+    "drain cleaning",
+    "clogged",
+    "drain clogs again"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-03": "7accda6f86",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "S1-12": "41b86c1e72",
+   "S1-21": "913a9558f4",
+   "S1-38": "b50b0bd4e8",
+   "S1-43": "e16d5048f3",
+   "S11-48": "03f824b27b",
+   "S2-15": "4a64408afc",
+   "S2-21": "bf6617b6d3",
+   "A3-24": "78e61fd50f",
+   "A4-50": "6f43775326",
+   "A4-34": "9f322d96aa",
+   "A4-85": "f164e7b264",
+   "A4-06": "e9e9bb848b",
+   "A4-14": "95c7ffcfab",
+   "A4-65": "fa7ec0389d",
+   "A4-23": "9f76d7b6f5",
+   "A4-43": "c17d56f766",
+   "A4-15": "db5792db95",
+   "A3-30": "b53a513069",
+   "A4-42": "7f259bddbf",
+   "A6-01": "df3c5778ea",
+   "A6-02": "d7d5a3ecf5",
+   "A6-15": "1e6395c2f5",
+   "A7-01": "afb51b5e1b",
+   "A7-12": "05f64179a4",
+   "A7-13": "e41528a397",
+   "A7-15": "7ca3e4c467",
+   "A7-18": "b98d7c1744",
+   "A7-21": "996ff87f58",
+   "A7-70": "da4cede3e2",
+   "A7-31": "65a8abd6c4",
+   "A7-74": "b3ec278ce4",
+   "A7-23": "90bc4b1137",
+   "A8-01": "750bd94ee4",
+   "A8-02": "15f418fec4",
+   "A8-51": "71142aa1fa",
+   "A8-23": "e3a35f7f9e",
+   "A8-33": "561bc291a5",
+   "A7-14": "6a57738a17",
+   "A8-45": "6589a6b4d4",
+   "A9-03": "219c966588",
+   "A10-07": "bc852cf77d",
+   "A10-08": "b60e30f285",
+   "A10-20": "f082cec9f8",
+   "A10-42": "4f28189298",
+   "A4-10": "d3655b97dd",
+   "S11-57": "a3996ae84e",
+   "S11-58": "87f7492a91",
+   "A8-38": "5e48b74f3a",
+   "A8-40": "8ce1ecdbe5",
+   "A8-16": "90a6202deb",
+   "A8-61": "7c0489caf3",
+   "A10-01": "77ff9c7550",
+   "A10-10": "e890d0a884",
+   "S12-26": "7b7e6af034",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B4-26": "912686f788",
+   "B4-32": "fcfe092e37",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-22": "50d78f1af0",
+   "B9-06": "f091432f2d",
+   "B9-19": "b97bfbf0d2",
+   "B10-05": "a326ea3c0b",
+   "B10-38": "867fe1ab7c",
+   "S1-12": "0bea92643b",
+   "S1-21": "334e0a791c",
+   "S1-38": "6301c86637",
+   "S1-43": "dd3ae2a1a9",
+   "S11-48": "6fd1c7b7b9",
+   "S2-15": "4a64408afc",
+   "S2-21": "bf6617b6d3",
+   "B4-30": "26ca477d69",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B4-04": "df3ea4b2f5",
+   "B4-77": "67ff953065",
+   "B4-05": "fb3a9061c8",
+   "B4-07": "9d0dbc90ad",
+   "B4-84": "549b5c1a9d",
+   "B4-34": "74ff52d83d",
+   "B4-38": "9539521dc7",
+   "B4-15": "f13240b9c6",
+   "B4-28": "506d267aaf",
+   "B4-29": "9234c5ed40",
+   "B6-13": "ed1f412f7d",
+   "B6-14": "dfd03ee673",
+   "B7-01": "f7a5523875",
+   "B7-17": "ac1fd212f3",
+   "B7-27": "0f5f9883ff",
+   "B7-61": "342b55fd9b",
+   "B7-31": "1b4da1dea9",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B8-24": "bd5fb0ef0b",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B10-08": "01bac94fd8",
+   "B10-18": "3d7ba16539",
+   "B10-35": "5ed99b23b3",
+   "B6-06": "1d676278da",
+   "S11-57": "2f34f23d8a",
+   "S11-58": "3461928783",
+   "B5-11": "bda80de20e",
+   "B8-30": "a1ef4983e4",
+   "B8-54": "0f180048ca",
+   "B8-12": "7e627afb46",
+   "B9-18": "9126ad2c72",
+   "B4-10": "c21b3d3450",
+   "B4-13": "ecedd7f044",
+   "B4-11": "982f2084f8",
+   "S11-40": "af544c4b0a",
+   "S11-54": "f2d479cd60",
+   "S11-70": "e3cd4d5dcd",
+   "B10-32": "7713bff255"
+  }
+ }
+}

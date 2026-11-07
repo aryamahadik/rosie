@@ -1,0 +1,2612 @@
+{
+ "id": "surf-school",
+ "name": "Surf and paddle school",
+ "style": "Class",
+ "pattern": "class",
+ "from": "swim",
+ "cast": {
+  "A": {
+   "staff": "Kai and Pono (instructors) and the beach stand",
+   "cust": "Alex M. (a first-timer) · other surfers · a parent booking for a child"
+  },
+  "B": {
+   "staff": "Sol and Ines (instructors who go to a customer's place)",
+   "cust": "Alex M. (books for a group) · the group",
+   "other": "Others (a rental house, a hotel, a school)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Kai"
+  },
+  "B": {
+   "staff": "Sol"
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "none from the state for surf lessons in most places; each instructor holds a current lifeguard or first-aid card the business says is current; where a city or park permits commercial lessons on its beach, the permit is the business's own word, shown only once the owner says it is on file",
+   "who": "the business, for its registration and any beach permit; each instructor, for their own lifeguard or first-aid card",
+   "ask": "the business registration; any beach permit, with the beaches and dates it covers; each instructor's card and its end date",
+   "check": "Rosie checks no card, license or permit: each one is the business's own word, shown as that, never as a state license or as checked",
+   "scope": "an instructor is offered only for the beaches and lesson types the owner says they may teach",
+   "blocks": "goes live on identity and the business's registration; an instructor is offered once the owner says yes",
+   "renewals": "cards reminded 30 and 7 days before; a card the owner reports lapsed takes that instructor off new lessons",
+   "insurance": "liability insurance: the business's own word, shown once it is sent",
+   "background": "background checks for instructors who teach children, where the rules ask: the business's own word"
+  },
+  "pf.services": {
+   "shape": "class: seats in a scheduled lesson on the beach, each surfer with their own spot and their own code; a private lesson books one instructor for one person or a family; at a customer's place (flow B) the instructor goes to the beach the group picks",
+   "examples": "the example school's own prices (Lee Surf School and Lee Surf Lessons), not a standard",
+   "list": [
+    {
+     "name": "Group beginner lesson (90 min, board and wetsuit lent)",
+     "price": "$85 a person",
+     "kind": "one price per person",
+     "length": "90 minutes",
+     "where": "at the beach stand (flow A)",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "8 surfers per instructor; runs with 3"
+    },
+    {
+     "name": "Private lesson (60 min, one instructor)",
+     "price": "$140",
+     "kind": "one price",
+     "length": "60 minutes",
+     "where": "at the beach stand (flow A)",
+     "before": "a card saved for the $40 fee, paid at the beach stand",
+     "after": "at the stand, the rest is paid",
+     "capacity": "one or two people, one instructor"
+    },
+    {
+     "name": "Kids group lesson (ages 8 to 12, a parent on the sand)",
+     "price": "$70 a child",
+     "kind": "one price per child",
+     "length": "60 minutes",
+     "where": "at the beach stand (flow A)",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "a parent or guardian books and signs; children under 8 need a parent on the sand"
+    },
+    {
+     "name": "Paddle board session (90 min)",
+     "price": "$60",
+     "kind": "one price",
+     "length": "90 minutes",
+     "where": "at the beach stand (flow A)",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Private lesson at a rental house or hotel (up to 4 people)",
+     "price": "$160",
+     "kind": "one price per group",
+     "length": "90 minutes",
+     "where": "at the customer's place, then the beach they pick (flow B)",
+     "before": "a card saved for the $40 fee",
+     "after": "the saved card charged when the instructor texts DONE"
+    },
+    {
+     "name": "Beach party lesson (up to 6 people)",
+     "price": "$420",
+     "kind": "one price per group",
+     "length": "90 minutes",
+     "where": "at a beach the customer picks, where the city allows lessons (flow B)",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "the beach permit where it asks for one, booked ahead; big surf: a new time or a full refund"
+    }
+   ],
+   "intro": "the free beach look: nothing is taken; it's an instructor's talk on the sand before any lesson, booked by text",
+   "capacity": "spots per lesson set by the instructor's limit (8 surfers per instructor); a second instructor adds spots",
+   "minimum": "a group lesson runs with 3, counted 24 hours before; too few: Sam runs it or cancels, and each surfer gets a full refund or another time",
+   "waitlist": "a full lesson keeps a waitlist; a freed spot goes by text to one person at a time",
+   "skills": "surf and paddle lessons, kids' lessons, private lessons, beach permits by beach",
+   "online": "no",
+   "nobodyHome": "never: the surfer must be there"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which lesson, and the date",
+    "how many surfers, and their ages (children's lessons are for ages 8 to 12)",
+    "has the surfer tried surfing or paddling before (sets the level and the group)",
+    "for a lesson at a customer's place: the address, the beach they want and the area"
+   ],
+   "afterTime": [
+    "board and wetsuit sizes, to lend",
+    "anything the instructor should know: a fear of the water, a health need, a language"
+   ],
+   "securePage": [
+    "each surfer's name, age and a waiver, read and signed",
+    "health notes: heart, asthma, a seizure or a recent surgery, and any medicine they carry",
+    "a swimming level the instructor should know",
+    "an emergency contact",
+    "for a child: the parent or guardian's OK and who may pick them up"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for a child under 18 (children 8 to 12 in group lessons; teens 13 to 17 with a guardian's OK); children under 8 are booked with a parent on the sand",
+   "told": "the beach, the meeting point, the length, that surf conditions decide the day, and what to bring"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone not breathing or unresponsive in the water right now, or a child who can't get a breath",
+     "say": "Call 911 now. Start rescue breathing or CPR, and call for the lifeguard.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a heart condition, asthma, a recent surgery, or pregnancy",
+     "what": "the booking goes on; the answer stays on the secure page, and the instructor reads it before the lesson; Rosie gives no health advice"
+    },
+    {
+     "words": "a surfer afraid of the water",
+     "what": "the booking goes on; the instructor starts on the sand, and nobody is pushed into the water"
+    }
+   ],
+   "inWater": "a surfer swallows water or is in trouble: the instructor lifts them out and checks breathing; 911 for trouble breathing; the instructor's first-aid steps follow; Sam is told",
+   "always": "the generic screen, always on"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Waiver on the secure page",
+     "when": "while booking",
+     "who": "every surfer; a parent or guardian signs for a child",
+     "result": "not signed in 10 minutes: nothing is booked"
+    },
+    {
+     "name": "Health questions on the secure page",
+     "when": "before the first lesson",
+     "who": "every surfer",
+     "result": "the booking goes on; any yes is read by the instructor before the lesson, on the secure page"
+    },
+    {
+     "name": "Surf conditions check",
+     "when": "by 7am the day of the lesson",
+     "who": "the instructor, then Sam",
+     "result": "unsafe surf: the lesson is called off, and the customer picks a new time or a full refund"
+    }
+   ],
+   "prep": "a swimsuit, sunscreen, water and a rash guard; arrive 15 minutes early for the board and wetsuit; a photo ID for the first lesson"
+  },
+  "pf.visit": {
+   "checkIn": "the instructor ticks each surfer at the beach stand, or takes each surfer's own code",
+   "lateEntry": "a late surfer joins until 10 minutes after the start; after that the spot may go to someone waiting, and the lesson ends on time",
+   "changes": "an extra hour or a private add-on is priced first, and the surfer says yes; nothing is added to a group lesson",
+   "leaveEarly": "a surfer who leaves early pays the full price: the spot was theirs",
+   "done": "the instructor texts DONE at the end of the lesson"
+  },
+  "pf.money": {
+   "before": "a group lesson, a kids' lesson and a paddle session paid in full when booking; a private lesson at the beach: a card saved for the $40 fee, paid at the beach stand; a lesson at a customer's place: a card saved for the $40 fee, charged when the instructor texts DONE; a beach party paid in full",
+   "after": "everything is settled before, or at DONE on the saved card; nothing is billed later",
+   "cancel": "free to cancel or move up to 24 hours before (the school's setting); later, or a no-show, the price may be kept only with the owner's yes",
+   "fees": "late cancel or no-show: the $40 fee on a private lesson, the price on a group; the owner confirms each fee; no answer in 24 hours means no fee",
+   "makeups": "when the school calls a lesson off for surf or weather: a full refund or another time, never a fee",
+   "caps": "deposits within the state's limits where they apply",
+   "tips": "no tips line",
+   "tax": "any sales tax the state requires, in the price before the yes",
+   "fee2": "Rosfield's $2 per confirmed booking applies: one $2 per booking, however many surfers"
+  },
+  "pf.messages": {
+   "never": "health notes, injuries, a child's name and age in texts to anyone but the parent: only on the secure page",
+   "staffTexts": "the instructor's day list shows the lesson and the number of surfers; names open on the secure page",
+   "languages": "English and Spanish",
+   "minors": "texts go to the parent or guardian who booked"
+  },
+  "pf.staff": {
+   "licenses": "each instructor's lifeguard or first-aid card, the business's own word, never checked by Rosie",
+   "skills": "surf and paddle lessons, kids' lessons, private lessons; the beaches each instructor knows; children's lessons only with instructors the owner says may teach children",
+   "ratio": "up to 8 surfers per instructor; children's lessons at 4 per instructor",
+   "standIn": "another instructor who knows the beach and the lesson; a private customer who named an instructor is asked first, and nobody moves on silence",
+   "oks": "Sam OKs beach parties, private add-ons and refunds"
+  },
+  "pf.rules": {
+   "showFacts": "the beach, the meeting point, the length, that surf decides the day, and the cancel terms before the yes; any beach permit the city asks for",
+   "cancelRight": "no cancel period for a lesson already given",
+   "waiver": "what a waiver may say, where the state limits it; the state form sets the words",
+   "minors": "children with a parent or guardian on the booking; a child is never left with staff without the parent's OK on file",
+   "records": "waivers and health notes kept with the booking for 7 years, or longer where the state asks",
+   "reviews": "a rating once after the lesson"
+  },
+  "pf.edges": {
+   "surf": "high surf, a red-flag day or lightning: the instructor or Sam calls the lesson off by 7am the day of, or at the beach; a full refund or another time, the customer picks",
+   "tooFew": "too few by 24 hours before: Sam runs it or cancels; each surfer gets a full refund or another time",
+   "late": "a late surfer joins until 10 minutes after the start; after that the spot goes to someone waiting",
+   "instructorOut": "another certified instructor covers the same lesson at the same time",
+   "childLeaves": "a child leaves the group: the instructor keeps the rest together, calls the parent at once, and only a listed adult takes the child",
+   "unwell": "a surfer looks unwell: the instructor stops the lesson, gives first aid, calls 911 if it's serious, and Sam is told; nothing about it goes in a text",
+   "minors": "a child is picked up by a listed adult; a teen (13 to 17) may leave only when the guardian's OK says so",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "classes",
+   "groups",
+   "children",
+   "waitlist",
+   "forms"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "With Sam's yes, electrical and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Casey for plumbing, Avery at the shop.",
+    "With Sam's yes, the surf lessons now show to AI assistants too. Each instructor hears what they can teach: Ines for private lessons, Kai for group lessons."
+   ],
+   [
+    "An organization books the same way, like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "An organization books the same way, like a day camp: 'We'd like a group lesson for 6 campers on Saturday.'"
+   ],
+   [
+    "Lee Surf School can teach a lesson at the beach for $85, or Lee Surf Lessons can come to your place for $160.",
+    "Lee Surf School: $85 at the beach. Lee Surf Lessons: $160 at your place."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A surf school's example: 'A new surfer starts with a beginner lesson. Had one at Lee's in the last 3 months?'"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Mika can join when you get here. The lesson still ends at 11:30am, at the same price."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M. says the lesson ended early. It's under the 1-year lesson promise."
+   ],
+   [
+    "Tonight 6-9pm: 12 booked. How many more tables can you take? Reply a number.",
+    "Tonight's 6pm lesson: 12 booked. How many more surfers can you take? Reply a number."
+   ],
+   [
+    "Extra for {{alex.staff}}: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for {{alex.staff}}: one more surfer, $85. Sent to Alex."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a kids' lesson for a son, so the times fit it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A beach company's example: cloudy water gets 'keep everyone out of the beach'."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At the beach, a parent stays on the sand for a beach group lesson, so nothing more happens."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the lesson's address, after a missed check."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery teach surfing; Riley also teaches at family beaches."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A lesson for Alex and a beach group lesson for a child work the same way."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley shows what Mika learned, like floating on the back."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: a seat in the shade, and a short lesson to start"
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Group lesson $85 ($40 from Nov 2) · Private lesson $420 · Beginner lesson $40"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the board leash snapped today."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to one more surfer for $85."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Sol's board cracks the floor, and Sol texts a photo."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for scuba lessons, which aren't on the shop's list."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Paddle guiding for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "The beginner lesson, $40, is paid in full when booked."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A lesson is rated, so the school takes the first branch."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Private lessons at family beaches, within 25 miles."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's surf work takes no jobs sent now, at the school or away."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Sol also add one more surfer?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 85 one more surfer"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Sol's board cracked the tile floor at Alex M.'s house."
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter lesson."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I watch from the sand during the lesson?"
+   ],
+   [
+    "The note and photo are on the secure page.",
+    "The note is on the secure page."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Group and private surf lessons for all ages."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every school lesson, private lessons and home beaches"
+   ],
+   [
+    "sent you a proposal: Riley's color plan.",
+    "sent you a proposal: Kai's lesson plan."
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The lookup shows Sol's lifeguard certificate as expired."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a space for the boards."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: Beach group 1 is for ages 3 to 5, $420 a month."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A sand chair ripped my jacket."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds paddle guiding to Lee's Barbershop."
+   ],
+   [
+    "I put a note and a photo on the page.",
+    "I put a note on the page."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Sol's group asks for one more surfer."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: surf instructor, private lessons and home beaches"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A first lesson' or 'a try-out' fits a beginner lesson."
+   ],
+   [
+    "like Alex's employer for a staff cut",
+    "like a grandparent who pays for lessons"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A surf school books a spot in a group lesson, or an instructor's time for a private lesson."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't teach scuba."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a lesson every Saturday."
+   ],
+   [
+    "Riley's color plan after a consult",
+    "Kai's lesson plan after a check"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more surfer · $85"
+   ],
+   [
+    "Please wait until the job is done.",
+    "Please wait on the sand until the lesson is done."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: surf instructor, private lessons, home beaches"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Beginner lesson"
+   ],
+   [
+    "Barbershop, plumbing, electrical",
+    "Surf school, lifeguards"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books lessons for two children"
+   ],
+   [
+    "Books the groom's party together",
+    "Books two children together"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Host beach quotes come to you first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Private lessons always stay with Riley."
+   ],
+   [
+    "My employer pays for this cut.",
+    "Mika's grandparent pays for this lesson."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Mika got little time in the water."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "A barbershop runs no classes.",
+    "A surf school runs no classes; a surf school does."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a surf lesson for my child on Saturday."
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more surfer"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una clase de natación para mi hijo el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a lesson every Saturday"
+   ],
+   [
+    "plumbing and electrical",
+    "surf lessons and paddle guiding"
+   ],
+   [
+    "Signature cut and shave",
+    "Beginner lesson"
+   ],
+   [
+    "'Adding a faucet check?",
+    "'Adding one more surfer?"
+   ],
+   [
+    "The $89 late-cancel fee",
+    "The late-cancel fee"
+   ],
+   [
+    "the $89 late-cancel fee",
+    "the late-cancel fee"
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration SR41907"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, but at 9:00am'"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Lesson plan"
+   ],
+   [
+    "Do you do kids cuts?",
+    "Do you teach preschoolers?"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Surf School LLC"
+   ],
+   [
+    "$89 service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "priced at the chair",
+    "priced at the lesson"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the lesson"
+   ],
+   [
+    "$89 late-cancel fee",
+    "late-cancel fee"
+   ],
+   [
+    "never more than $89",
+    "never more than the lesson price"
+   ],
+   [
+    "$20 late-cancel fee",
+    "late-cancel fee"
+   ],
+   [
+    "A water heater job",
+    "A beach party lifeguard"
+   ],
+   [
+    "Barbering workshop",
+    "Beach group 1"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Surf Lessons'"
+   ],
+   [
+    "a color correction",
+    "a lesson for extra needs"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Surf Lessons"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Surf School"
+   ],
+   [
+    "Color correction",
+    "Lesson for extra needs"
+   ],
+   [
+    "color correction",
+    "lesson for extra needs"
+   ],
+   [
+    "Skin fade · $40",
+    "Group lesson · $85"
+   ],
+   [
+    "Just this visit",
+    "Just this lesson"
+   ],
+   [
+    "Groom's package",
+    "Beach party lifeguard"
+   ],
+   [
+    "Book a free fix",
+    "Book a free redo"
+   ],
+   [
+    "Color touch-up",
+    "Make-up lesson"
+   ],
+   [
+    "color touch-up",
+    "make-up lesson"
+   ],
+   [
+    "single lessons",
+    "group lessons"
+   ],
+   [
+    "Color and cut",
+    "Private lesson"
+   ],
+   [
+    "color and cut",
+    "private lesson"
+   ],
+   [
+    "kitchen drain",
+    "beach set-up"
+   ],
+   [
+    "Kitchen drain",
+    "Beach set-up"
+   ],
+   [
+    "single lesson",
+    "group lesson"
+   ],
+   [
+    "Single lesson",
+    "Group lesson"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Surf at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Beach Lifeguards"
+   ],
+   [
+    "Jordan Price",
+    "Sol Price"
+   ],
+   [
+    "1200 Main St",
+    "18 Pier Rd"
+   ],
+   [
+    "A beard trim",
+    "A surf diaper"
+   ],
+   [
+    "a beard trim",
+    "a surf diaper"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "water heater",
+    "board rack"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "starting fee",
+    "booking fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "Starting fee",
+    "Booking fee"
+   ],
+   [
+    "NEW massage",
+    "NEW paddle guiding"
+   ],
+   [
+    "Casey Moore",
+    "Ines Moore"
+   ],
+   [
+    "color quote",
+    "special request"
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "the $89 fee",
+    "the late-cancel fee"
+   ],
+   [
+    "the $20 fee",
+    "the late-cancel fee"
+   ],
+   [
+    "barbershops",
+    "surf schools"
+   ],
+   [
+    "Barbershops",
+    "Surf schools"
+   ],
+   [
+    "Electrical",
+    "Paddle guiding"
+   ],
+   [
+    "electrical",
+    "paddle guiding"
+   ],
+   [
+    "Riley Chen",
+    "Kai Brooks"
+   ],
+   [
+    "Avery Diaz",
+    "Pono Diaz"
+   ],
+   [
+    "Beard trim",
+    "Surf diaper"
+   ],
+   [
+    "beard trim",
+    "surf diaper"
+   ],
+   [
+    "house call",
+    "beach visit"
+   ],
+   [
+    "barbershop",
+    "surf school"
+   ],
+   [
+    "skin fades",
+    "group lessons"
+   ],
+   [
+    "House call",
+    "Beach visit"
+   ],
+   [
+    "Barbershop",
+    "Surf school"
+   ],
+   [
+    "88 Elm St",
+    "22 Shore Rd"
+   ],
+   [
+    "Skin fade",
+    "Group lesson"
+   ],
+   [
+    "skin fade",
+    "group lesson"
+   ],
+   [
+    "Plumbing",
+    "Surf lessons"
+   ],
+   [
+    "plumbing",
+    "surf lessons"
+   ],
+   [
+    "Kids cut",
+    "Beach group lesson"
+   ],
+   [
+    "kids cut",
+    "beach group lesson"
+   ],
+   [
+    "Haircuts",
+    "Surf lessons"
+   ],
+   [
+    "haircuts",
+    "surf lessons"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "consult",
+    "surf check"
+   ],
+   [
+    "Haircut",
+    "Beginner lesson"
+   ],
+   [
+    "haircut",
+    "beginner lesson"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "BS20981",
+    "SR41907"
+   ],
+   [
+    "teacher",
+    "instructor"
+   ],
+   [
+    "$89 fee",
+    "late-cancel fee"
+   ],
+   [
+    "shutoff",
+    "lift"
+   ],
+   [
+    "cabinet",
+    "rack"
+   ],
+   [
+    "Jordan",
+    "Sol"
+   ],
+   [
+    "Elm St",
+    "Harbor Rd"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "heater",
+    "rack"
+   ],
+   [
+    "valves",
+    "gear"
+   ],
+   [
+    "Riley",
+    "Kai"
+   ],
+   [
+    "Avery",
+    "Pono"
+   ],
+   [
+    "Casey",
+    "Ines"
+   ],
+   [
+    "shops",
+    "schools"
+   ],
+   [
+    "valve",
+    "gear"
+   ],
+   [
+    "drain",
+    "session"
+   ],
+   [
+    "beard",
+    "wetsuit"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "Rosa",
+    "Dana"
+   ],
+   [
+    "$150",
+    "$420"
+   ],
+   [
+    "$112",
+    "$140"
+   ],
+   [
+    "$100",
+    "$120"
+   ],
+   [
+    "$110",
+    "$120"
+   ],
+   [
+    "$125",
+    "$120"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "cape",
+    "board"
+   ],
+   [
+    "$55",
+    "$140"
+   ],
+   [
+    "$35",
+    "$85"
+   ],
+   [
+    "$90",
+    "$140"
+   ],
+   [
+    "$89",
+    "$160"
+   ],
+   [
+    "$75",
+    "$160"
+   ],
+   [
+    "$65",
+    "$140"
+   ],
+   [
+    "$28",
+    "$85"
+   ],
+   [
+    "$25",
+    "$70"
+   ],
+   [
+    "$20",
+    "$40"
+   ]
+  ],
+  "B": [
+   [
+    "With Sam's yes, electrical and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Casey for plumbing, Avery at the shop.",
+    "With Sam's yes, the surf lessons now show to AI assistants too. Each instructor hears what they can teach: Ines for private lessons, Kai for group lessons."
+   ],
+   [
+    "Lee Surf School can teach a lesson at the beach for $85, or Lee Surf Lessons can come to your place for $160.",
+    "Lee Surf School: $85 at the beach. Lee Surf Lessons: $160 at your place."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Pono is told to keep everyone out of the beach, and to call 911 if anyone is hurt."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the surfer's age, comfort in the water, and the beach's depth."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M. says the lesson ended early. It's under the 1-year lesson promise."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Que nadie entre a la piscina. Si alguien se lastima, llame al 911."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 4:52pm on Jordan's phone, you said yes to 15 more minutes for $25."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep everyone out of the beach until 30 minutes after the last thunder."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some lessons come as a weekly plan, one lesson at a time."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep everyone out of the beach. If anyone gets hurt, call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like beach cleaning."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found the beach gate won't latch and stopped the lesson."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 summer surf camp is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can teach at the school for $420, or at your beach for $160."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Say Morgan has a repeat plan: a weekly lesson at home for two children."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A surf assessment is priced at the visit: only the $160 visit was promised."
+   ],
+   [
+    "Tonight 6-9pm: 12 booked. How many more tables can you take? Reply a number.",
+    "Tonight's 6pm lesson: 12 booked. How many more surfers can you take? Reply a number."
+   ],
+   [
+    "Extra for {{alex.staff}}: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for {{alex.staff}}: one more surfer, $85. Sent to Alex."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A surf school's example: a child who went under and is coughing gets 'call 911 now'."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a kids' lesson for a son, so the times fit it."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like the beach party lifeguard."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how deep is the beach, and is it fenced?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Paddle guiding for Lee Home Services: is it the same company?"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the lesson's address, after a missed check."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery teach surfing; Riley also teaches at family beaches."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: a seat in the shade, and a short lesson to start"
+   ],
+   [
+    "Drive time from the jobs before and after is checked again.",
+    "Drive time from the lessons before and after is checked again."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Home Services has a weekly lesson plan, $160 a lesson."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the board leash snapped today."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to one more surfer for $85."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Sol's board cracks the floor, and Sol texts a photo."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most surf schools start."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a lesson in a neighbor's beach."
+   ],
+   [
+    "can start the sewer camera inspection at a set time.",
+    "can start the beach party lifeguard at a set time."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "A make-up lesson is free when a lesson was cut short."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Each lesson has a set start time, as Sam set at sign-up."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Private lessons at family beaches, within 25 miles."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a private lesson."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds paddle guiding to Lee Home Services."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's surf work takes no jobs sent now, at the school or away."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack in the beach step this morning."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "A younger child's lesson is its own booking."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Sol also add one more surfer?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a surf instructor teach at a family's beach this Thursday?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 85 one more surfer"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Milo have a lesson every week, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come back next week?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Sol's board cracked the tile floor at Alex M.'s house."
+   ],
+   [
+    "Each rejoins: the job stays on Alex's record.",
+    "Each rejoins: the lesson stays on Alex's record."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a private surf lesson at our beach."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Lessons at our beach' fits a private lesson at home."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a storm is coming in."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a lesson for a younger child."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "There's thunder now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE beach gate latch already loose"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also teach my 4-year-old?"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules surf schools often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Group and private surf lessons for all ages."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I add chlorine before you come?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD beach gate won't latch, stopped"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "Our beach's water looks cloudy."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a space for the boards."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $25 extra time offer is good for 7 days."
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Dee can ask to be next for that time."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Our beach fence broke in the storm."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is the beach fenced?'"
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds the beach gate won't latch."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's lesson?"
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Bring the small kickboard next time."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Certificates on file"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Sol's group asks for one more surfer."
+   ],
+   [
+    "Texts the report link on the new date",
+    "Texts the plan link on the new date"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: surf instructor, private lessons and home beaches"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Alex asks about the lesson 2 weeks later."
+   ],
+   [
+    "The report is ready on the new date.",
+    "The plan is ready on the new date."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Milo still won't put her face in."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more surfer · $85"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the lesson"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left wet towels on the sand."
+   ],
+   [
+    "Please wait until the job is done.",
+    "Please wait on the sand until the lesson is done."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: surf instructor, private lessons, home beaches"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a fence repair company first"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the beach fenced?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the beach gate won't latch"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE broke a potted plant"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa private lesson Thu 4:30pm Casey"
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code at the beach gate"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Surf lessons book a set start time."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is hurt."
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Second child's lesson · $160"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My 6-year-old is nervous in the water."
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the practice plan ready on time?"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the practice plan link"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more surfer"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The private lesson needs none."
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE added for Milo on the secure page."
+   ],
+   [
+    "Mold behind the sink wall",
+    "Beach gate won't latch"
+   ],
+   [
+    "Books one job for a group",
+    "Books one lesson for a group"
+   ],
+   [
+    "Water heater replacement",
+    "Camp water safety lessons"
+   ],
+   [
+    "water heater replacement",
+    "camp water safety lessons"
+   ],
+   [
+    "Sewer camera inspection",
+    "Private lesson"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW paddle guiding"
+   ],
+   [
+    "plumbing and electrical",
+    "surf lessons and paddle guiding"
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or benefit pays"
+   ],
+   [
+    "'Adding a faucet check?",
+    "'Adding one more surfer?"
+   ],
+   [
+    "The $89 late-cancel fee",
+    "The late-cancel fee"
+   ],
+   [
+    "the $89 late-cancel fee",
+    "the late-cancel fee"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Private lesson at home"
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a sibling's lesson?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Four feet at the shallow end, and yes."
+   ],
+   [
+    "Under the sink, before",
+    "Beach gate, before"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration SR418220"
+   ],
+   [
+    "replaces water heaters",
+    "teaches camps"
+   ],
+   [
+    "Cabinet floor, before",
+    "Beach sand, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken potted plant"
+   ],
+   [
+    "The door stayed shut.",
+    "The gate stayed shut."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Surf Lessons LLC"
+   ],
+   [
+    "a water heater flush",
+    "a private lesson at home"
+   ],
+   [
+    "$89 service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está herido."
+   ],
+   [
+    "can clear the drain",
+    "can teach at your beach"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, with a locked gate"
+   ],
+   [
+    "leehomeservices.com",
+    "leeswimlessons.com"
+   ],
+   [
+    "$89 late-cancel fee",
+    "late-cancel fee"
+   ],
+   [
+    "never more than $89",
+    "never more than the lesson price"
+   ],
+   [
+    "$20 late-cancel fee",
+    "late-cancel fee"
+   ],
+   [
+    "A water heater job",
+    "A beach party lifeguard"
+   ],
+   [
+    "Water heater flush",
+    "Private lesson at home"
+   ],
+   [
+    "water heater flush",
+    "private lesson at home"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Surf Lessons'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Surf Lessons"
+   ],
+   [
+    "Service call fee",
+    "Starting fee"
+   ],
+   [
+    "service call fee",
+    "booking fee"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Surf School"
+   ],
+   [
+    "Arrival windows",
+    "Time held per visit"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 4:30pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 5:30pm"
+   ],
+   [
+    "Drain clearings",
+    "Private lessons"
+   ],
+   [
+    "Book a free fix",
+    "Book a free redo"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 75 lesson"
+   ],
+   [
+    "Drain clearing",
+    "Private lesson at home"
+   ],
+   [
+    "drain clearing",
+    "private lesson at home"
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "single lessons",
+    "group lessons"
+   ],
+   [
+    "Kitchen drain",
+    "Beach set-up"
+   ],
+   [
+    "after the job",
+    "after the lesson"
+   ],
+   [
+    "kitchen drain",
+    "beach set-up"
+   ],
+   [
+    "single lesson",
+    "group lesson"
+   ],
+   [
+    "Single lesson",
+    "Group lesson"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Surf at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Beach Lifeguards"
+   ],
+   [
+    "Jordan Price",
+    "Sol Price"
+   ],
+   [
+    "1200 Main St",
+    "18 Pier Rd"
+   ],
+   [
+    "water heater",
+    "board rack"
+   ],
+   [
+    "starting fee",
+    "booking fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "Starting fee",
+    "Booking fee"
+   ],
+   [
+    "Casey Moore",
+    "Ines Moore"
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "the $89 fee",
+    "the late-cancel fee"
+   ],
+   [
+    "the $20 fee",
+    "the late-cancel fee"
+   ],
+   [
+    "barbershops",
+    "surf schools"
+   ],
+   [
+    "Barbershops",
+    "Surf schools"
+   ],
+   [
+    "Yard drain",
+    "Sibling lesson"
+   ],
+   [
+    "Electrical",
+    "Paddle guiding"
+   ],
+   [
+    "electrical",
+    "paddle guiding"
+   ],
+   [
+    "Riley Chen",
+    "Kai Brooks"
+   ],
+   [
+    "Avery Diaz",
+    "Pono Diaz"
+   ],
+   [
+    "barbershop",
+    "surf school"
+   ],
+   [
+    "house call",
+    "beach visit"
+   ],
+   [
+    "House call",
+    "Beach visit"
+   ],
+   [
+    "Barbershop",
+    "Surf school"
+   ],
+   [
+    "88 Elm St",
+    "22 Shore Rd"
+   ],
+   [
+    "42 Oak St",
+    "14 Birch Ct"
+   ],
+   [
+    "Plumbing",
+    "Surf lessons"
+   ],
+   [
+    "plumbing",
+    "surf lessons"
+   ],
+   [
+    "Nora S.",
+    "Dee W."
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "haircut",
+    "private lesson"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "BS20981",
+    "SR41907"
+   ],
+   [
+    "teacher",
+    "instructor"
+   ],
+   [
+    "$89 fee",
+    "late-cancel fee"
+   ],
+   [
+    "shutoff",
+    "lift"
+   ],
+   [
+    "cabinet",
+    "rack"
+   ],
+   [
+    "Jordan",
+    "Sol"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "8–10am",
+    "4:30pm"
+   ],
+   [
+    "heater",
+    "rack"
+   ],
+   [
+    "valves",
+    "gear"
+   ],
+   [
+    "Riley",
+    "Kai"
+   ],
+   [
+    "Avery",
+    "Pono"
+   ],
+   [
+    "Casey",
+    "Ines"
+   ],
+   [
+    "valve",
+    "gear"
+   ],
+   [
+    "drain",
+    "session"
+   ],
+   [
+    "beard",
+    "wetsuit"
+   ],
+   [
+    "Nora",
+    "Dee"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "$150",
+    "$420"
+   ],
+   [
+    "$179",
+    "$160"
+   ],
+   [
+    "Rosa",
+    "Dana"
+   ],
+   [
+    "$112",
+    "$140"
+   ],
+   [
+    "$100",
+    "$120"
+   ],
+   [
+    "$110",
+    "$120"
+   ],
+   [
+    "$125",
+    "$120"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "cape",
+    "board"
+   ],
+   [
+    "$90",
+    "$140"
+   ],
+   [
+    "$89",
+    "$160"
+   ],
+   [
+    "$75",
+    "$160"
+   ],
+   [
+    "$55",
+    "$140"
+   ],
+   [
+    "$65",
+    "$140"
+   ],
+   [
+    "$35",
+    "$85"
+   ],
+   [
+    "$28",
+    "$85"
+   ],
+   [
+    "$25",
+    "$70"
+   ],
+   [
+    "$20",
+    "$40"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ]
+  ]
+ },
+ "keep": [
+  "grace",
+  "Grace",
+  "instructor",
+  "Instructor",
+  "private lesson",
+  "Private lesson",
+  "leak",
+  "color",
+  "photo ID",
+  "group lesson",
+  "Group lesson"
+ ],
+ "story": {
+  "A": "Alex books a group beginner lesson at the beach stand for Saturday at 9am, $85, paid in full. Kai ticks the names, checks the surf by 7am, and hands out boards and wetsuits. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a private lesson for a family of 4 at a rental house: Sol comes Thu Oct 22 at 8:00am with boards for the beach they pick. A card is saved for the $40 fee, and the $160 is charged when Sol texts DONE. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: Alex's group beginner lesson at the beach stand, $85 a person, paid in full when booking. A kids' lesson and a paddle session are paid this way too. A late cancel or a no-show: the price may be kept only with the owner's yes.",
+    "list|card|counter": "A private lesson at the beach: a card is saved for the $40 fee, and the lesson is paid at the stand. A late cancel or no-show: the $40 fee, only with the owner's yes."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$85",
+     "name": "Group beginner lesson"
+    },
+    "list|full|*": {
+     "price": "$85",
+     "paid": "$85",
+     "fee": "$85",
+     "name": "Group beginner lesson"
+    },
+    "list|card|*": {
+     "price": "$140",
+     "fee": "$40",
+     "name": "Private lesson"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: a private lesson for a family of 4 at a rental house, $160, with a card saved for the $40 fee; the $160 is charged when the instructor texts DONE. A late cancel or nobody there: the $40, only with the owner's OK.",
+    "list|full|none": "A beach party lesson for up to 6 people, $420, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "price": "$160",
+     "fee": "$40",
+     "name": "Private lesson at your place"
+    },
+    "list|full|none": {
+     "price": "$420",
+     "paid": "$420",
+     "fee": "$420",
+     "name": "Beach party lesson"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Teaching swimming needs no state license, so the company gives only its registration (S1-61). Where the state's form names one, this branch comes back."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Swim lessons, lifeguarding and the school all pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Swim lessons book spots in a lesson and instructors' time, never lanes on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The school runs group lessons on a timetable (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No swim instructor or lifeguard holds a state license. Lifesaving and CPR certificates, and a background check where it's on, are asked instead (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No swim lesson is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A swim school bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The school books spots in a lesson and instructors' time, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A lesson is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A swim diaper is sold at the front desk and the waiver is signed while booking, so nothing missing stops a lesson."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "A swimmer hurt or unwell is 'Someone is hurt or feels sick' (A8-38)."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the school."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A swim school bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Trial lessons, group lessons and private lessons are rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "After a trial, a child's next lesson comes with starting a monthly session (A10-x02). An adult books the next private lesson like any booking."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The school sends no proposals: the session's terms are on the note page, and starting one is the parent's own choice."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the school for work."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Every swim lesson is in the water, so none is ever by video or phone."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Teaching swimming needs no state license, so the company gives only its registration (S1-61). Where the state's form names one, this branch comes back."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Swim lessons, lifeguarding and the school all pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Swim lessons book spots in a lesson and instructors' time, never lanes on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The school runs group lessons on a timetable (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No swim instructor or lifeguard holds a state license. Lifesaving and CPR certificates, and a background check where it's on, are asked instead (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No swim lesson is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A lesson is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A group lesson at a host pool is booked for the group, not spot by spot."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Swim lessons take no jobs sent now (S2-31), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A lesson needs no contract: the waiver is the form signed on the secure page (B4-86)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for swim lessons (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No swim lesson is sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No swim lesson is sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A lesson always needs the swimmer there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A lesson always needs the swimmer there."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left alone with the instructor at home: a parent or guardian stays home the whole lesson (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A lesson is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A lesson needs no proposal: the next lesson is booked like any other (B10-18)."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Every swim lesson is in the water, so none is ever by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "The second lesson was given that day, and work already given has no cancel period (B8-24); only something sold at the home and not given yet can have one."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Swim lessons ask one rating, like the school's flow A."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-66",
+   "A7-15",
+   "A8-67",
+   "A4-43"
+  ],
+  "B": []
+ },
+ "notes": "Built Oct 27 2026 (new profession, batch L2) from sibling swim (refit R13, class pattern). No base plug-in or test-drive exists for surf-school.\nD96: no state license; Rosie checks no lifeguard or first-aid card, permit or insurance (pf.license).\nD97: one $2 per booking, no no2 switch.\nMoney: A list|full|none (group beginner lesson $85 paid in full; fee = price, kept only with the owner's OK), A list|card|counter (private lesson $140: card saved for the $40 fee, paid at the stand), B list|card|card (private lesson at a customer's place $160: card saved for the $40 fee, charged at DONE), B list|full|none (beach party lesson $420 for up to 6, paid in full). Never a card hold, never a charge on a set day.\nNames: Lee Surf School (flow A) and Lee Surf Lessons (flow B), both of Sam Lee; instructors Kai and Pono (A), Sol and Ines (B); the example surfer Alex M., children Mika (A) and Milo (B).\nFacts: classes, groups, children, waitlist, forms. No switches. Settings: set start times; free cancel until 24 hours before.\nSurf conditions: the instructor or Sam decides by 7am the day of (pf.first_steps, pf.edges); no weather fact (cut from the live set).\nNot used: plans, packs, memberships, intro offers, online, drop-off, insurance, holds, results, sent-now work, on-call, stays.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "An organization books the same way, like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Tonight 6-9pm: 12 booked. How many more tables can you take? Reply a number.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "We'd share only where they're working, only after a missed check.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "The signature cut, $55, is paid in full when booked.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "The note and photo are on the secure page.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Every shop service, color and house calls",
+    "sent you a proposal: Riley's color plan.",
+    "The lookup shows the license as expired.",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "I put a note and a photo on the page.",
+    "Riley: barber, color and house calls",
+    "'A trim' or 'a fade' fits a haircut.",
+    "like Alex's employer for a staff cut",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop doesn't do perms.",
+    "Alex asks for a cut every 4 weeks.",
+    "Riley's color plan after a consult",
+    "Riley: barber, color, house calls",
+    "Signature cut and hot towel shave",
+    "Barbershop, plumbing, electrical",
+    "Books a haircut and a beard trim",
+    "Books the groom's party together",
+    "Color quotes come to you first.",
+    "Color always stays with Riley.",
+    "My employer pays for this cut.",
+    "The cut is uneven on one side.",
+    "like a burst pipe or a lockout",
+    "A barbershop runs no classes.",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "Registration 2020-1187",
+    "'Yes, make it a fade'",
+    "Proposal · Color plan",
+    "Do you do kids cuts?",
+    "Lee's Barbershop LLC",
+    "$89 service-call fee",
+    "priced at the chair",
+    "Priced at the chair",
+    "A water heater job",
+    "Barbering workshop",
+    "Lee Home Services'",
+    "a color correction",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Skin fade · $40",
+    "Just this visit",
+    "Groom's package",
+    "Book a free fix",
+    "Color touch-up",
+    "color touch-up",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "A beard trim",
+    "a beard trim",
+    "at the chair",
+    "At the chair",
+    "water heater",
+    "NEW massage",
+    "Casey Moore",
+    "color quote",
+    "house calls",
+    "price board",
+    "the $20 fee",
+    "barbershops",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "barbershop",
+    "skin fades",
+    "House call",
+    "Barbershop",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "plumber",
+    "consult",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "BS20981",
+    "teacher",
+    "Jordan",
+    "Elm St",
+    "Barber",
+    "barber",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "valve",
+    "beard",
+    "Shop",
+    "shop",
+    "Rosa",
+    "$100",
+    "$110",
+    "$125",
+    "cape",
+    "$55",
+    "$35",
+    "$90",
+    "$89",
+    "$75",
+    "$25",
+    "$20"
+   ],
+   "B": [
+    "With Sam's yes, electrical and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Casey for plumbing, Avery at the shop.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Tonight 6-9pm: 12 booked. How many more tables can you take? Reply a number.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "We'd share only where they're working, only after a missed check.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Drive time from the jobs before and after is checked again.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Its money card is set the way most barbershops start.",
+    "Like tapping a neighbor's water line without asking.",
+    "can start the sewer camera inspection at a set time.",
+    "Your drain is under warranty, so this visit is free.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "I found water damage under the sink this morning.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Each rejoins: the job stays on Alex's record.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Alex texts that the sink is now overflowing.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Water is coming out of the water heater.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "The $160 valve quote is good for 7 days.",
+    "Nora can ask to be next for that window.",
+    "My gas water heater got wet in a flood.",
+    "like 'Is the sink still full of water?'",
+    "Jordan finds mold behind the sink wall.",
+    "Can I skip next week's drain cleaning?",
+    "Old pipes: bring the camera next time.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Jordan finds corroded shutoff valves.",
+    "Texts the report link on the new date",
+    "Riley: barber, color and house calls",
+    "The drain clogs again 2 weeks later.",
+    "The report is ready on the new date.",
+    "The kitchen drain is clogged again.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Please wait until the job is done.",
+    "Riley: barber, color, house calls",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Alex gives the code at the door",
+    "Plumbing books a 2-hour window.",
+    "No. It doesn't smell like gas.",
+    "Sewer camera inspection · $199",
+    "like a burst pipe or a lockout",
+    "My kitchen drain is clogged.",
+    "Is the report ready on time?",
+    "Texts the camera report link",
+    "Replace both shutoff valves",
+    "The $179 drain needs none.",
+    "NOTE grease clog 12 ft in.",
+    "Mold behind the sink wall",
+    "Books one job for a group",
+    "Water heater replacement",
+    "water heater replacement",
+    "Sewer camera inspection",
+    "NEW heating and cooling",
+    "plumbing and electrical",
+    "A plan or warranty pays",
+    "'Adding a faucet check?",
+    "Kitchen drain clearing",
+    "Adding a faucet check?",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Registration 2019-0451",
+    "replaces water heaters",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "The door stayed shut.",
+    "Lee Home Services LLC",
+    "a water heater flush",
+    "$89 service-call fee",
+    "No. No huele a gas.",
+    "can clear the drain",
+    "Yes, it won't drain",
+    "leehomeservices.com",
+    "never more than $89",
+    "A water heater job",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Service call fee",
+    "service call fee",
+    "Lee's Barbershop",
+    "Arrival windows",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "Drain clearings",
+    "Book a free fix",
+    "DONE 179 drain",
+    "Drain clearing",
+    "drain clearing",
+    "Arrival times:",
+    "Kitchen drain",
+    "after the job",
+    "kitchen drain",
+    "service call",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "water heater",
+    "Service call",
+    "Casey Moore",
+    "house calls",
+    "the $89 fee",
+    "barbershops",
+    "Yard drain",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "barbershop",
+    "house call",
+    "House call",
+    "Barbershop",
+    "88 Elm St",
+    "42 Oak St",
+    "Plumbing",
+    "plumbing",
+    "Nora S.",
+    "plumber",
+    "haircut",
+    "barbers",
+    "BS20981",
+    "teacher",
+    "$89 fee",
+    "shutoff",
+    "cabinet",
+    "Jordan",
+    "barber",
+    "8–10am",
+    "heater",
+    "valves",
+    "Riley",
+    "Avery",
+    "Casey",
+    "valve",
+    "drain",
+    "beard",
+    "Nora",
+    "Shop",
+    "shop",
+    "$150",
+    "$179",
+    "Rosa",
+    "$100",
+    "$110",
+    "sink",
+    "$90",
+    "$89",
+    "$75",
+    "$35",
+    "$20",
+    "Barber"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A8-02": "15f418fec4",
+   "A8-86": "c989a99e52",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A4-01": "7e7a61082c"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B4-01": "15f683e6cb",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255"
+  }
+ }
+}

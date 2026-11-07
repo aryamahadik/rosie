@@ -1,0 +1,3129 @@
+{
+ "id": "dog-trainer",
+ "name": "Dog trainer",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "hair",
+ "plugin": {
+  "pf.license": {
+   "need": "if: training a dog needs no state license of its own; a place where dogs are kept, boarded or trained for pay may need a kennel or facility license where the state's rules require it (a switch from the state form)",
+   "who": "the business: the center gives its kennel or facility license where the state asks; the in-home company gives its business registration; no trainer or walker holds a state license",
+   "ask": "the center's license number, or the business registration number; nothing from each trainer",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "the center goes live once it's set up, where one is required; in-home training goes live on its registration",
+   "certificates": "a trainer's certificate (like CPDT-KA) is the trainer's own claim: shown as 'certified' only as the trainer states it, not checked by Rosie, and taken off when it lapses",
+   "renewals": "the center's license and the business's insurance: reminded 30 days and 7 days before; a lapsed facility license pauses the center's new bookings",
+   "insurance": "liability insurance shown as 'insured' only once the owner sends the certificate",
+   "away": "training at the owner's home is allowed by trainers the owner clears for it",
+   "renter": "a trainer who rents the floor for their own classes is their own business: their own prices, terms and Stripe"
+  },
+  "pf.services": {
+   "shape": "set lessons with a chosen trainer, and group classes booked by the spot; the dog is booked under its owner",
+   "examples": "the example businesses' own prices (Lee Dog Training and Lee Pet Services), not a standard",
+   "list": [
+    {
+     "name": "Private lesson",
+     "price": "$120",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the center",
+     "before": "a card saved for the $60 fee",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Reactive dog lesson, with a helper dog",
+     "price": "$135",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the center",
+     "before": "a card saved for the $60 fee",
+     "after": "at the front desk",
+     "note": "uses the quiet yard and the helper dog"
+    },
+    {
+     "name": "Extra 30 minutes",
+     "price": "$60",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the center",
+     "before": "with the lesson",
+     "after": "at the front desk",
+     "note": "added to a lesson"
+    },
+    {
+     "name": "Junior handler lesson (ages 10 to 17)",
+     "price": "$70",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the center",
+     "before": "a card saved",
+     "after": "at the front desk",
+     "note": "a parent books and stays"
+    },
+    {
+     "name": "Behavior evaluation",
+     "price": "$180",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the center",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "Lauren only; first for a dog that has bitten, when Sam says so"
+    },
+    {
+     "name": "6-week Manners class",
+     "price": "$210",
+     "kind": "one price, for all 6 weeks",
+     "length": "60 min a week, up to 6 dogs",
+     "where": "at the center",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "DHPP and Bordetella proof; a dog that reacts to other dogs starts with a private lesson"
+    },
+    {
+     "name": "6-week Puppy class (under 6 months)",
+     "price": "$180",
+     "kind": "one price, for all 6 weeks",
+     "length": "45 to 60 min a week, up to 6 puppies",
+     "where": "at the center",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "4-lesson package (the center's)",
+     "price": "$440",
+     "kind": "one price, a pack of 4 private lessons",
+     "length": "4 lessons",
+     "where": "at the center",
+     "before": "sold at the front desk, the center's own way",
+     "after": "nothing more; each lesson uses a credit",
+     "note": "never offered in a booking text"
+    },
+    {
+     "name": "Private lesson at home (the center's)",
+     "price": "$150",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the customer's home",
+     "before": "a card saved for the $60 fee",
+     "after": "the saved card charged when it's done"
+    },
+    {
+     "name": "In-home private lesson",
+     "price": "$179",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the customer's home",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill (or the saved card charged at DONE, as Sam sets)"
+    },
+    {
+     "name": "Puppy start-up visit (under 6 months)",
+     "price": "$150",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the customer's home",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Behavior evaluation at home",
+     "price": "$199 ($249 with Sam)",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the customer's home",
+     "before": "a card saved for the $89 fee",
+     "after": "after the lesson",
+     "note": "Marcus or Sam ($249 with Sam); always first after any bite"
+    },
+    {
+     "name": "4-lesson package",
+     "price": "$640",
+     "kind": "one price, a pack of 4 lessons",
+     "length": "4 visits",
+     "where": "at the customer's home",
+     "before": "paid in full when bought",
+     "after": "nothing more; each lesson uses a credit"
+    },
+    {
+     "name": "Extra time at home",
+     "price": "$60 a half hour ($70 with Marcus)",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the customer's home",
+     "before": "with the lesson",
+     "after": "with the lesson"
+    },
+    {
+     "name": "Second dog, same lesson",
+     "price": "+$40",
+     "kind": "an add-on",
+     "where": "at the customer's home",
+     "before": "with the lesson",
+     "after": "with the lesson"
+    },
+    {
+     "name": "Dog walking: 30 or 60 minutes, or a 20-minute puppy potty visit",
+     "price": "$25, $40 or $20; +$10 an extra dog",
+     "kind": "one price",
+     "where": "at the customer's home",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE",
+     "note": "the in-home company's second kind of work; a free meet-and-greet first"
+    }
+   ],
+   "capacity": "one trainer and one dog (and its owner) per lesson; a class has up to 6 dogs, each with its own code; a second dog in the same home is an add-on",
+   "skills": "private lessons, reactive dogs, puppies, classes, behavior evaluations (Lauren at the center; Marcus or Sam at home), home lessons (trainers cleared for it)",
+   "online": "no: the example trains in person (a video lesson is a switch the owner can turn on)",
+   "nobodyHome": "never: the dog's owner is there for every lesson and class",
+   "notOffered": "boarding, grooming and board-and-train stays in the example; vet care and medicine never"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "the dog's name and age, and one dog or two",
+    "does the dog bark or lunge at other dogs? (then the reactive dog lesson, or a private lesson before any class)",
+    "a puppy under 6 months? (the puppy class or the puppy start-up visit)",
+    "who will handle the dog (a junior handler lesson needs a parent there)"
+   ],
+   "afterTime": [
+    "the dog's breed and weight",
+    "what to work on: leash walking, manners, jumping, reactivity, puppy basics, other",
+    "anything the trainer should know, like where the dog jumps or what sets it off",
+    "for a home lesson: parking, and any other pets in the home"
+   ],
+   "securePage": [
+    "18 or older, and the dog's owner (or an adult who handles it)",
+    "has the dog ever bitten or nipped a person or a dog, and when",
+    "vaccine proof uploaded: rabies for any visit; DHPP and Bordetella for a group class",
+    "the waiver, signed by an adult (a parent or guardian signs for a handler under 18)",
+    "the dog's vet, by name, for an emergency"
+   ],
+   "whoMayBook": "the dog's owner, an adult; a parent or guardian books a junior handler's lesson and stays; every dog is booked under its owner"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a bite or a dog fight happening now; someone badly hurt by a dog",
+     "say": "Call 911 if anyone is badly hurt. Keep the dogs apart from people and other pets.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a dog that is very sick or hurt now (like after eating something)",
+     "say": "Call your vet now. Rosie gives no health advice.",
+     "booking": "no booking; the lesson can move with no fee"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a bite earlier, with nobody badly hurt now",
+     "what": "the safety steps first (keep the dog apart; see a doctor for the bite), then the booking goes on and waits for the owner's OK"
+    },
+    {
+     "words": "a dog that growls, snaps or guards things",
+     "what": "noted for the trainer on the secure page; a bite in its history sends the booking to the owner for an OK"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking; crisis words get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Vaccine proof",
+     "when": "on the secure page before the first visit",
+     "who": "every dog: rabies for any visit; DHPP and Bordetella for a group class (the example business's rule)",
+     "goodFor": "until each certificate's own end date",
+     "result": "missing or run out at the visit: the lesson can't start, and it's handled as the customer's side"
+    },
+    {
+     "name": "Waiver",
+     "when": "signed on the secure page while booking",
+     "who": "every new customer; a parent or guardian signs for a handler under 18",
+     "goodFor": "1 year in the example, or until the words change"
+    },
+    {
+     "name": "A private lesson before a group class",
+     "when": "before the first class",
+     "who": "a dog that barks or lunges at other dogs",
+     "result": "the trainer clears the dog for the class, suggests more lessons, or says a class isn't right yet (a full refund)"
+    },
+    {
+     "name": "Behavior evaluation",
+     "when": "at the center: before any lesson or class, where the owner asks for it; at home: always first after any bite",
+     "who": "a dog that has bitten a person or a dog",
+     "result": "the trainer's written plan comes after; the owner OKs the booking, and may ask for a vet visit first"
+    }
+   ],
+   "biteHistory": "a bite in the dog's history: the booking waits for the owner's OK; the owner can OK it, offer the behavior evaluation first, or ask for a vet visit first; the reason never goes in a text",
+   "prep": "for the reminder: bring the dog a little hungry, with soft treats and a 6-foot leash; at home, have the dog on its leash"
+  },
+  "pf.visit": {
+   "checkIn": "at the center: the check-in code at the front desk; a dog that reacts to other dogs waits in the car, the owner replies 1 from the lot, and the trainer comes out; a class: each dog's own code, or names ticked on the roster; at home: the code at the door, from the owner",
+   "ownerPresent": "the owner, or an adult who handles the dog, is there for every lesson and class; no dog is dropped off or left alone with the trainer",
+   "beforeWork": "the trainer notes how the dog is (a limp, a sore spot, fear signs) before the lesson",
+   "changes": "extra time or a second dog is priced and OK'd before it's done; a lesson stops early if the dog is too stressed, and only the part done is charged",
+   "incident": "a bite or snap during a lesson: the trainer ends it, writes an incident note, and makes any bite report the state's rules require; the dog's next booking waits for the owner's OK",
+   "done": "the check-in code, or DONE from the trainer; then the homework goes to the owner",
+   "homework": "the trainer's homework after every lesson: what to practice and how often, on the secure page, with a short text"
+  },
+  "pf.money": {
+   "before": "a card saved for the late-cancel or no-show fee on lessons; paid in full when booking for evaluations at the center, 6-week classes, puppy start-up visits and packages",
+   "after": "at the center: at the front desk, the center's own way, or the bill Rosie texts on Saturday mornings, when Lauren works alone (the old flowchart's pay link); at home: Rosie texts the bill (with a tip line), or the saved card is charged at DONE, as Sam sets",
+   "caps": "deposit and prepay caps: from the state form",
+   "cancel": "free to cancel until 24 hours before at the center; until 7am the day of a home lesson (the owners' settings)",
+   "fees": "late cancel or no-show: $60 at the center, $89 at home (the example's amounts); the owner confirms each fee; no answer: no fee",
+   "packages": "a 4-lesson package at home ($640) is paid in full when bought; the center's ($440) is sold at the front desk; each lesson uses a credit; a late cancel may use a credit only with the owner's yes",
+   "refunds": "a full refund when the business changes the plan, a class is cancelled for too few sign-ups, or a first lesson says a class isn't right yet",
+   "tips": "on: at the front desk, or a tip line on the bills Rosie texts",
+   "tax": "a tax line for goods sold, like a long line, where the state's rules require it",
+   "fee2": "Rosfield's $2 applies"
+  },
+  "pf.messages": {
+   "never": "bite history, health notes and incident notes never go in a text or through the AI: only the secure page and the dog's record",
+   "languages": "English and Spanish",
+   "minors": "a junior handler's texts go to the parent or guardian",
+   "homework": "the homework text is short; the exercises sit on the secure page"
+  },
+  "pf.staff": {
+   "licenses": "none for trainers or walkers; a certificate shows only once checked",
+   "skills": "private lessons, reactive dogs, puppies, classes; behavior evaluations only by Lauren at the center, and by Marcus or Sam at home; home lessons only by trainers cleared for them",
+   "supervision": "none set in the example; an assistant trainer works only beside a trainer, where the owner sets it",
+   "oks": "Sam OKs every booking for a dog that has bitten, same-day bookings and new customers at the center",
+   "standIn": "a stand-in gets the dog's notes, its triggers and the homework so far; an evaluation has no stand-in",
+   "away": "only trainers cleared for home lessons are offered for them"
+  },
+  "pf.rules": {
+   "facility": "a kennel or facility license for the center where the state's rules require one (a switch from the state form)",
+   "bites": "a bite report where the state's rules require one, made by the trainer or the owner, never by Rosie",
+   "advice": "no diagnosis and no medicine advice: health questions go to the dog's vet, as the state's rules on vet practice require",
+   "vaccines": "proof of rabies vaccination where the state's or the town's rules require it; the business's own rule for classes",
+   "contracts": "a written package agreement or a cancel right for a package sold at the center or at the home, where the state's rules require it",
+   "dogLicense": "the town's dog license number on the secure page, where the town's rules require one",
+   "records": "the dog's record, waivers, incident notes and homework kept 7 years, or longer where the state asks"
+  },
+  "pf.edges": {
+   "biteHistory": "a bite in the dog's history: the owner's OK first, an evaluation or a vet visit first, or a no",
+   "reactive": "a dog that reacts to other dogs: a private lesson first; a group class only once the trainer clears it",
+   "vaccinesMissing": "vaccine proof missing or run out at the visit: the lesson doesn't start; any agreed fee is the owner's call",
+   "stressed": "a dog too stressed to go on: the trainer stops early, suggests a vet check where pain may play a part, and charges only the part done",
+   "incident": "a bite during a lesson: the lesson ends, an incident note, any report the state's rules require, and the owner's OK for the next booking",
+   "lateArrival": "the lesson still ends on time, at the full price; very late counts as a no-show (the owner's setting)",
+   "classMinimum": "a class with too few sign-ups by its cutoff: the owner runs it or cancels with full refunds; no answer: it runs",
+   "standIn": "a trainer out: another trainer who does that service, new times, or a free cancel; an evaluation waits for its trainer",
+   "secondDog": "a second dog in the same home: an add-on to the lesson, priced first",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "animals",
+   "classes",
+   "packs",
+   "firststeps",
+   "forms",
+   "children",
+   "aftercare",
+   "tips",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Lauren and Dev (trainers at the center)",
+   "cust": "Alex M. (customer, with Juno) · other customers"
+  },
+  "B": {
+   "staff": "Marcus and Darius (trainers who go to homes)",
+   "cust": "Alex M. (customer, with Milo) · other customers",
+   "other": "Others (a bank, a partner, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Lauren"
+  },
+  "B": {
+   "staff": "Marcus"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Private lessons, classes and behavior evaluations."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "In-home lessons and dog walking, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A behavior evaluation at home"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: many barbers, salons and groomers are licensed to their place of work."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or on a video call."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a junior lesson for a son, so the times fit it."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for dog boarding, which isn't on the center's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Dog Training doesn't board dogs."
+   ],
+   [
+    "the color and cut takes",
+    "a behavior program takes"
+   ],
+   [
+    "the color and cut is paid",
+    "a behavior program is paid"
+   ],
+   [
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "One request waits for Lee's Barbershop. It's a private lesson today at 2:00pm with Avery, for a new customer. It's $120. Accept it?"
+   ],
+   [
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Accepted: the private lesson today at 2:00pm with Avery."
+   ],
+   [
+    "BS20981",
+    "KN20981"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: trainer, evaluations and home lessons"
+   ],
+   [
+    "barber, color and house calls",
+    "trainer, evaluations and home lessons"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every center service, evaluations and home lessons"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No dog training or walk is sent now, at home or at the center."
+   ],
+   [
+    "$140 an hour",
+    "$70 a half hour"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee's Barbershop can book you from now on, at the center and for home lessons. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "Some work runs classes on a timetable, like yoga or a cooking class. Customers book a seat in a session, not a person's free time.",
+    "Some work runs classes on a timetable, like yoga or a dog training class. Customers book a spot in a session, not a person's free time."
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Reading it back: accept the private lesson today at 2:00pm with Avery. Say yes to go ahead."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about her dog's bite history before booking. Sam taps Call, and the call goes out from the center's number."
+   ],
+   [
+    "1 color quote",
+    "1 bite case to OK"
+   ],
+   [
+    "raise haircut to 40",
+    "raise private lesson to 135"
+   ],
+   [
+    "License renewal",
+    "Certificate renewal"
+   ],
+   [
+    "A deposit is taken when the customer books, and comes off the price.",
+    "The new way shows on the page before the next customer books."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds dog grooming to Lee's Barbershop. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "NEW massage",
+    "NEW grooming"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Grooming for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Nia K.'s refund for the cancelled membership was due yesterday. A person from Rosie's team will call you today.",
+    "Nia K.'s refund for the cancelled lesson package was due yesterday. A person from Rosie's team will call you today."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Private lesson $120 ($135 from Nov 2) · Reactive dog lesson $135 · Extra 30 minutes $60"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Work that's never sent now sets nobody on call."
+   ],
+   [
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet. Nobody new is offered until it is. I'll tell you if it takes more than 1 business day.",
+    "The state's license lookup is down, so the center's kennel license renewal isn't checked yet. Bookings go on as before. I'll tell you if it takes more than 1 business day."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una clase privada para mi perra el sábado."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a private lesson for my dog on Saturday."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book a private lesson for my dog, Juno, at Lee's Barbershop on Saturday."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The dog training plug-in adds a bite or a dog fight happening now."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Here: a bite earlier today, with nobody badly hurt, gets 'keep your dog apart, and see a doctor for the bite'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Then the booking goes on, and the bite goes to Sam for an OK."
+   ],
+   [
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. Training could mean a dog trainer or a personal trainer. Why: each kind asks its own questions, and nothing is guessed."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a lesson every week"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for a lesson every week. The center offers a plan, so Rosie books the first lesson and saves the next ones on the same day and time."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some bookings take several visits, like a 6-week class. Where the plug-in says so, all the times are picked now."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a lesson and 30 extra minutes"
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds 30 extra minutes. Rosie finds one time long enough for both, with one trainer, and adds the prices: $120 and $60."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the center show photos of Juno? Yes / No"
+   ],
+   [
+    "A barbershop sells its packages only at the shop.",
+    "The center sells its lesson packages only at the center."
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Private lesson every week · Lauren"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Lesson plan · every week"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks. What would you like?",
+    "Your private lesson is part of a plan with Lauren, every week. What would you like?"
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Lauren, so Lauren's next times show. Evaluations always stay with Lauren."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son come and watch Juno's lesson?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "Juno has been limping since yesterday. Can we still come in?"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Lauren can do a shorter lesson in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can we make Saturday's lesson 30 minutes longer?"
+   ],
+   [
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "Lauren has time for it. Add 30 minutes to your Sat 11:00am visit?"
+   ],
+   [
+    "Change: Alex M. added a beard trim to the Sat 11:00am.",
+    "Change: Alex M. added 30 minutes to the Sat 11:00am."
+   ],
+   [
+    "Beard trim · $20",
+    "Extra 30 minutes · $60"
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex arrives at the center with Juno. If the plug-in asks for something to bring, the desk checks it first. Juno's rabies proof is on file."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. Juno's rabies proof has run out."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "The center takes no drop-offs: the owner stays for every lesson. A tailor or a groomer does."
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex adds 30 minutes"
+   ],
+   [
+    "extra 20 beard trim Alex M.",
+    "extra 60 for 30 more minutes, Alex M."
+   ],
+   [
+    "Add a beard trim today?",
+    "Add 30 more minutes today?"
+   ],
+   [
+    "Color correction",
+    "Behavior evaluation"
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped Alex M.'s lesson: Juno was too stressed. I put a note on the page."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Lauren stopped Alex M.'s lesson early. The note is on the secure page."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Juno's harness strap tore on the center's gate."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says Juno's harness strap tore on the center's gate today."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: Juno walks 20 steps on a loose leash. Next: sit at the door for guests."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A lesson is rated, so the center takes the first branch."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next lesson at the desk"
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter. It goes on the secure page, to sign or decline.",
+    "Say a visit leads to more work, like Lauren's training plan after an evaluation, or a lawyer's engagement letter. It goes on the secure page, to sign or decline."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan. Read it, then sign or decline on the secure page.",
+    "Lee's Barbershop sent you a proposal: Lauren's training plan for Juno. Read it, then sign or decline on the secure page."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Training plan"
+   ],
+   [
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Signed, thanks! Pick a time for the plan's first lesson:"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Can my son learn to handle Juno too? My son is 12."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a junior handler lesson (ages 10 to 17) is $70, with a parent there. Want a time?"
+   ],
+   [
+    "Form to sign",
+    "Vaccine proof to upload"
+   ],
+   [
+    "Sign the form",
+    "Upload it"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "The center's group classes check in this way, one code per dog."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens at the lesson?"
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the dog's triggers and what it learned."
+   ],
+   [
+    "LATE Rosa F. Fri Oct 30",
+    "LATE Rosa F. plan, Fri Oct 30"
+   ],
+   [
+    "every 4 weeks",
+    "every week"
+   ],
+   [
+    "a beard trim",
+    "30 extra minutes"
+   ],
+   [
+    "Beard trim",
+    "Extra 30 minutes"
+   ],
+   [
+    "beard trim",
+    "30 extra minutes"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Behavior evaluation"
+   ],
+   [
+    "Signature cut and shave",
+    "Behavior evaluation"
+   ],
+   [
+    "Signature cut",
+    "Behavior evaluation"
+   ],
+   [
+    "signature cut",
+    "behavior evaluation"
+   ],
+   [
+    "Groom's package",
+    "6-week Manners class"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Junior handler lesson (ages 10 to 17)"
+   ],
+   [
+    "kids cuts",
+    "junior handler lessons"
+   ],
+   [
+    "Kids cut",
+    "Junior handler lesson"
+   ],
+   [
+    "kids cut",
+    "junior handler lesson"
+   ],
+   [
+    "Skin fade",
+    "Reactive dog lesson"
+   ],
+   [
+    "skin fade",
+    "reactive dog lesson"
+   ],
+   [
+    "Haircuts",
+    "Private lessons"
+   ],
+   [
+    "haircuts",
+    "private lessons"
+   ],
+   [
+    "Haircut",
+    "Private lesson"
+   ],
+   [
+    "haircut",
+    "private lesson"
+   ],
+   [
+    "Water heater flush",
+    "Puppy start-up visit"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Dog Training LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Dog Training"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pet Services"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee In-Home Training"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dog Walking"
+   ],
+   [
+    "Electrical",
+    "Dog walking"
+   ],
+   [
+    "electrical",
+    "dog walking"
+   ],
+   [
+    "Plumbing",
+    "In-home training"
+   ],
+   [
+    "plumbing",
+    "in-home training"
+   ],
+   [
+    "plumber",
+    "trainer"
+   ],
+   [
+    "Plumber",
+    "Trainer"
+   ],
+   [
+    "barbershops",
+    "training centers"
+   ],
+   [
+    "Barbershop",
+    "Training center"
+   ],
+   [
+    "barbershop",
+    "training center"
+   ],
+   [
+    "Barbering",
+    "Training at the center"
+   ],
+   [
+    "Barbers",
+    "Trainers"
+   ],
+   [
+    "barbers",
+    "trainers"
+   ],
+   [
+    "Barber",
+    "Trainer"
+   ],
+   [
+    "barber",
+    "trainer"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "shops",
+    "centers"
+   ],
+   [
+    "Shop",
+    "Center"
+   ],
+   [
+    "shop",
+    "center"
+   ],
+   [
+    "Riley Chen",
+    "Lauren Pierce"
+   ],
+   [
+    "Riley",
+    "Lauren"
+   ],
+   [
+    "Avery Diaz",
+    "Dev Sharma"
+   ],
+   [
+    "Avery",
+    "Dev"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Bell"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey Moore",
+    "Darius Cole"
+   ],
+   [
+    "Casey",
+    "Darius"
+   ],
+   [
+    "88 Elm St",
+    "60 Mill St"
+   ],
+   [
+    "1200 Main St",
+    "215 River Rd"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "Oak St",
+    "Cedar Ct"
+   ],
+   [
+    "$35",
+    "$120"
+   ],
+   [
+    "$20",
+    "$60"
+   ],
+   [
+    "$55",
+    "$180"
+   ],
+   [
+    "$40",
+    "$135"
+   ],
+   [
+    "$25",
+    "$70"
+   ],
+   [
+    "$75",
+    "$150"
+   ],
+   [
+    "$140",
+    "$210"
+   ],
+   [
+    "skin fades",
+    "private lessons"
+   ],
+   [
+    "skin fade",
+    "private lesson"
+   ],
+   [
+    "A trim",
+    "A puppy class"
+   ],
+   [
+    "a fade",
+    "a board and train"
+   ]
+  ],
+  "B": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Private lessons, classes and behavior evaluations."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "In-home lessons and dog walking, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A behavior evaluation at home"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: many barbers, salons and groomers are licensed to their place of work."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or on a video call."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a lesson for my puppy. A text back is fine."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a trainer come for a lesson this Thursday?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lesson could mean a dog trainer or a riding school."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My puppy jumps on guests' fits an in-home lesson."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a lesson in a neighbor's yard."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a second dog? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Pet Services asks: is it at your home? And how old is your dog, and has it ever bitten?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Milo is 5 months, no bites."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Where does Milo jump most?'"
+   ],
+   [
+    "Yes, it won't drain",
+    "At the door"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 lesson needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have Milo's leash and treats ready."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Say Morgan has a repeat plan: a lesson for two dogs every 2 weeks."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that Milo nipped a guest's hand."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Milo just nipped a guest's hand."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Keep Milo apart from guests, and wash the bite with soap and water. Call 911 if anyone is badly hurt."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks Jordan for 30 more minutes."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 30 more minutes"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "30 more minutes · $60"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Milo chews Jordan's long line during the lesson, and Jordan texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE chewed rug corner"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Chewed rug corner"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an in-home lesson, today,"
+   ],
+   [
+    "accept the leak repair for today",
+    "accept the in-home lesson for today"
+   ],
+   [
+    "Accepted: the leak repair today",
+    "Accepted: the in-home lesson today"
+   ],
+   [
+    "The service call is $89.",
+    "The late-cancel and no-show fee is $89."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a chewed rug corner this morning."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's at my home."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A lesson needs nothing first, unless the dog has bitten: then an evaluation comes first. So the first open times are this week."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Lesson notes are on your secure page."
+   ],
+   [
+    "a drain clearing",
+    "an in-home lesson"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "BS20981",
+    "KN20981"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: trainer, evaluations and home lessons"
+   ],
+   [
+    "barber, color and house calls",
+    "trainer, evaluations and home lessons"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No dog training or walk is sent now, at home or at the center."
+   ],
+   [
+    "$140 an hour",
+    "$70 a half hour"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee's Barbershop can book you from now on, at the center and for home lessons. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "Some work runs classes on a timetable, like yoga or a cooking class. Customers book a seat in a session, not a person's free time.",
+    "Some work runs classes on a timetable, like yoga or a dog training class. Customers book a spot in a session, not a person's free time."
+   ],
+   [
+    "License renewal",
+    "Certificate renewal"
+   ],
+   [
+    "A deposit is taken when the customer books, and comes off the price.",
+    "The new way shows on the page before the next customer books."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Work that's never sent now sets nobody on call."
+   ],
+   [
+    "Every way in reaches the same booking desk, with the same rules. The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "Every way in reaches the same booking desk, with the same rules. The main story: Alex asks an AI for a trainer on Mon Oct 19, 6:40pm."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My puppy Milo jumps on guests and pulls on the leash. Can a trainer come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa lesson Thu 1pm Casey"
+   ],
+   [
+    "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, and Sam OKs it. Here it's Rosa's call, in Spanish, with the English under each line."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in's example: a bite earlier today, with nobody badly hurt, gets 'keep the dog apart, and see a doctor'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep her dog apart from people and pets, and to see a doctor for the bite."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido de gravedad ahora?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone badly hurt right now?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Mi perro mordió a mi vecino esta mañana, pero fue leve."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantenga a su perro lejos de personas y otras mascotas. Su vecino debe ver a un médico por la mordida."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My dog ate a sock this morning. Is it safe to wait for the lesson?"
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. A lesson at the center is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can teach a private lesson at the center for $120, or at your home for $150. Where would you like it?"
+   ],
+   [
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "One of the center's trainers does home lessons. Sam set each place's price and money at sign-up."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee's Barbershop for a private lesson instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Booked at the shop: the other flow goes on from here.",
+    "Booked at the center: the other flow goes on from here."
+   ],
+   [
+    "2 At the shop",
+    "2 At the center"
+   ],
+   [
+    "At the shop",
+    "At the center"
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services does dog training and dog walking, not boarding. Nothing was saved. You can look for a boarding kennel near you."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just Milo. He's 5 months old."
+   ],
+   [
+    "Lee Electric.",
+    "Lee Dog Walking."
+   ],
+   [
+    "Electric.",
+    "Milo is 5 months old."
+   ],
+   [
+    "Say the work starts at a set time, like a private class at home or an event. The times read 'starts at 8:00am', not a window.",
+    "The lesson starts at a set time, with the owner and the dog home. The times read 'starts at 8:00am', not a window."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam sets it for every in-home lesson and puppy visit."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Where does Milo jump most: at the door, or on the couch?"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a bite that needs care, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Milo nipped my friend's hand tonight. It's a small scratch."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Keep Milo apart from guests for now, and wash the scratch with soap and water. Casey can come sooner, at the same price."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for a lesson every week. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one."
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Home Services has a weekly lesson plan, $179 a lesson. Each lesson is booked and paid like a single one. Want it every week?"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Weekly lesson plan"
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every week?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every week"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come back next week for loose-leash walking?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for an in-home lesson."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can our older dog, Rosie, join Thursday's lesson?"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can our older dog, Rosie, join the lesson too?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE Milo is calm and walks fine. Healed scrape on the nose."
+   ],
+   [
+    "Under the sink, before",
+    "Milo, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "The yard gate, before"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 40 second dog, Rosie"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: a second dog, Rosie, $40. Sent to Alex."
+   ],
+   [
+    "Jordan found more work.",
+    "Jordan can add Rosie to today's lesson."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Second dog, Rosie · $40"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. Adding Rosie stays open for 7 days."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 9:20am on Jordan's phone, you said yes to adding Rosie for $40."
+   ],
+   [
+    "Lee Home Services: $160 for today's extra work.",
+    "Lee Home Services: $40 for adding Rosie today."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds the yard gate doesn't latch. The plug-in says outdoor work stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD yard gate doesn't latch, stopped the outdoor part"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Yard gate that doesn't latch"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found your yard gate doesn't latch and stopped the outdoor part of the lesson."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the yard gate doesn't latch"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: off-leash recall in the yard"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Fix the latch first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE walking Milo, back 9:45"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan is out walking Milo and will be back about 9:45am. The lesson ends by 10:00am."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT Milo nipped my hand, need to stop"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE knocked over a lamp"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken lamp"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan's long line knocked over a lamp at Alex M.'s. It broke."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 lesson"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE Milo sits for guests 3 of 5 times. Next: loose leash past the neighbor's dog."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds the yard gate doesn't latch."
+   ],
+   [
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left treats all over the rug.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left treats all over the rug."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: refresher lesson, late January"
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Home Services books up to 60 days ahead. In late November, we'll text you times for the refresher lesson you asked Jordan about."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Home Services sent you a proposal for a 4-lesson package, from Jordan's notes."
+   ],
+   [
+    "Sewer camera report",
+    "Milo's training plan"
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep your dog away from people and other pets. Your neighbor should see a doctor for the bite."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the dog's age, how many dogs, and any bite history."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Jordan come every week, too?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about Rosie, the family's second dog. Both go in one booking, with one start time and one code."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A second dog is $40 more, and both fit in the same lesson."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Home evaluations show only Jordan's times: he's the one who does them."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I feed Milo before you come?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip Bella's next lesson?"
+   ],
+   [
+    "Yard drain",
+    "Walk lesson"
+   ],
+   [
+    "the shutoff valves",
+    "adding Rosie"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Second dog, Rosie"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · 4-lesson package"
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "In-home lessons already booked keep $179, even after Nov 2."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds pet sitting to Lee Home Services. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW pet sitting"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Pet sitting for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito ayuda con mi perro."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need help with my dog."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If someone is badly hurt, call 911 now. Keep the dogs apart from people."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said a dog fight is happening now. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "A dog fight at the home"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 if anyone is badly hurt"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "An in-home lesson happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "A job quoted at the visit promises only its starting fee now."
+   ],
+   [
+    "Entry statement: I live here, or may let the pro in",
+    "Waiver, and Milo's rabies proof"
+   ],
+   [
+    "A dog, kept inside",
+    "Milo, and Rosie, an older dog"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no: a hungry puppy works harder for treats."
+   ],
+   [
+    "MOVE Alex to Thu 12pm",
+    "MOVE Alex to Thu 1pm"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START Milo's rabies proof has run out"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. Dog training prices every lesson from the list."
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Bella · Tue Oct 20 · $179"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Max · Wed Oct 21 · $179"
+   ],
+   [
+    "Rental 1",
+    "Bella"
+   ],
+   [
+    "Rental 2",
+    "Max"
+   ],
+   [
+    "Book a free fix",
+    "Offer a free lesson"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the training plan link"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE training plan Mon Oct 26"
+   ],
+   [
+    "Every 12 months",
+    "Every week"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Second dog, Rosie · $40"
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote. Sam taps Call, and the call goes out from the business's number.",
+    "Morgan P. asked to talk about her dog's bite history before booking. Sam taps Call, and the call goes out from the business's number."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about her dog's bite history before booking."
+   ],
+   [
+    "1 quote",
+    "1 bite case to OK"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 1:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "1:00pm"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 8:40am"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 10:00am"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Behavior evaluation"
+   ],
+   [
+    "Signature cut",
+    "Behavior evaluation"
+   ],
+   [
+    "Haircut",
+    "Private lesson"
+   ],
+   [
+    "haircut",
+    "private lesson"
+   ],
+   [
+    "Kitchen drain clearing",
+    "In-home private lesson"
+   ],
+   [
+    "Water heater flush",
+    "Puppy start-up visit"
+   ],
+   [
+    "water heater flush",
+    "puppy start-up visit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Behavior evaluation at home"
+   ],
+   [
+    "sewer camera inspection",
+    "behavior evaluation at home"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Dog Training"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Pet Services LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pet Services"
+   ],
+   [
+    "leehomeservices.com",
+    "leepetservices.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee In-Home Training"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dog Walking"
+   ],
+   [
+    "Electrical",
+    "Dog walking"
+   ],
+   [
+    "electrical",
+    "dog walking"
+   ],
+   [
+    "Plumbing",
+    "In-home training"
+   ],
+   [
+    "plumbing",
+    "in-home training"
+   ],
+   [
+    "plumber",
+    "trainer"
+   ],
+   [
+    "Plumber",
+    "Trainer"
+   ],
+   [
+    "barbershops",
+    "training centers"
+   ],
+   [
+    "Barbershop",
+    "Training center"
+   ],
+   [
+    "barbershop",
+    "training center"
+   ],
+   [
+    "Barbers",
+    "Trainers"
+   ],
+   [
+    "barbers",
+    "trainers"
+   ],
+   [
+    "Barber",
+    "Trainer"
+   ],
+   [
+    "barber",
+    "trainer"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "shops",
+    "centers"
+   ],
+   [
+    "Shop",
+    "Center"
+   ],
+   [
+    "shop",
+    "center"
+   ],
+   [
+    "Riley Chen",
+    "Lauren Pierce"
+   ],
+   [
+    "Riley",
+    "Lauren"
+   ],
+   [
+    "Avery Diaz",
+    "Dev Sharma"
+   ],
+   [
+    "Avery",
+    "Dev"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Bell"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey Moore",
+    "Darius Cole"
+   ],
+   [
+    "Casey",
+    "Darius"
+   ],
+   [
+    "88 Elm St",
+    "60 Mill St"
+   ],
+   [
+    "1200 Main St",
+    "215 River Rd"
+   ],
+   [
+    "42 Oak St",
+    "9 Cedar Ct"
+   ],
+   [
+    "Elm St",
+    "Mill St"
+   ],
+   [
+    "Oak St",
+    "Cedar Ct"
+   ],
+   [
+    "Water heater replacement",
+    "Behavior program"
+   ],
+   [
+    "water heater replacement",
+    "behavior program"
+   ],
+   [
+    "Water heater",
+    "Behavior program"
+   ],
+   [
+    "water heater",
+    "behavior program"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "Leak repair",
+    "In-home private lesson"
+   ],
+   [
+    "leak repair",
+    "in-home lesson"
+   ],
+   [
+    "after the job",
+    "after the lesson"
+   ],
+   [
+    "A drain clearing",
+    "An in-home lesson"
+   ],
+   [
+    "Drain clearings",
+    "In-home lessons"
+   ],
+   [
+    "drain clearings",
+    "in-home lessons"
+   ],
+   [
+    "Drain clearing",
+    "In-home lesson"
+   ],
+   [
+    "drain clearing",
+    "in-home lesson"
+   ],
+   [
+    "Kitchen drain",
+    "In-home lesson"
+   ],
+   [
+    "kitchen drain",
+    "in-home lesson"
+   ],
+   [
+    "the drain",
+    "the lesson"
+   ],
+   [
+    "$20 fee",
+    "$60 fee"
+   ]
+  ]
+ },
+ "keep": [
+  "visit fee",
+  "Visit fee",
+  "leak",
+  "salon"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a private lesson for Juno, a 1-year-old shepherd mix who pulls on the leash, with Lauren at Lee Dog Training, Sat Oct 24 at 11:00am. A card is saved for the $60 fee, Alex pays $120 at the front desk, and Lauren's homework comes after. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Pet Services at home, 9 Cedar Ct, for Milo, a 5-month-old puppy who jumps on guests: Marcus comes Thu Oct 22 at 8:00am for a $179 lesson, with Alex there. The money choice at the top picks the bill, the saved card, or a $150 puppy visit paid in full."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|full|none",
+    "list|card|bill"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $120 private lesson for Juno with Lauren. A card is saved for the center's $60 late-cancel and no-show fee. Alex pays at the front desk, and Lauren's homework comes after.",
+    "list|full|none": "A $180 behavior evaluation with Lauren (90 minutes), paid in full when booking. A 6-week Manners class ($210) is paid the same way.",
+    "list|card|bill": "A $120 private lesson on a Saturday morning, when Lauren works alone: a card is saved for the $60 fee, and Rosie texts the bill after, with a tip line."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$60",
+     "name": "Private lesson"
+    },
+    "list|*|*": {
+     "price": "$120",
+     "name": "Private lesson"
+    },
+    "list|full|*": {
+     "price": "$180",
+     "paid": "$180",
+     "fee": "$60",
+     "name": "Behavior evaluation"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra 30 minutes",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$60",
+      "fee": "$60"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "6-week Manners class",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$210",
+      "paid": "$210",
+      "fee": "$60"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Private lesson (package)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|card|card",
+    "list|full|none"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|card|bill": "The main story: a $179 in-home lesson for Milo with Marcus. A card is saved for the $89 late-cancel and no-show fee. Marcus texts DONE, and Rosie texts the bill, with a tip line.",
+    "list|card|card": "The same $179 lesson, with the saved card charged when Marcus texts DONE.",
+    "list|full|none": "A $150 puppy start-up visit at home, paid in full when booking. A 4-lesson package ($640) is paid the same way."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "In-home lesson"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "In-home lesson"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$89",
+     "name": "Puppy start-up visit"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Second dog, same lesson",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$40",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Puppy start-up visit",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "In-home lesson (package)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Dog training pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Dog training adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Dog training books trainers and class spots, never rooms on their own."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No trainer or walker needs a state license of their own. A certificate is a claim, shown only once it's checked."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No dog training or walk is sent now, so nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "The example center trains in person only."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The center books a trainer's time or a class spot."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The example center offers no board-and-train stays."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Training isn't billed to a pet plan here."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Each dog is its own booking, with its own owner there."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "No dog is dropped off: the owner stays for every session."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A junior handler's parent stays, as the plug-in's who-may-book says."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Each lesson is paid on its own, and a 6-week class is paid when booking."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "Training isn't billed to a pet plan here."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Training promises no result, so there's no free fix. A question about homework goes to the trainer."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "No dog or item is left at the center."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Lessons and classes are rated."
+   },
+   {
+    "op": "more",
+    "at": "A4-65",
+    "more": [
+     "The center asks about the dog: name, breed, age and weight, what to work on, and who will handle the dog.",
+     "Bite history is asked on the secure page, never through the AI."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-24",
+    "more": [
+     "Dog training books every dog under its owner: Alex books, pays and gets the texts. Juno's profile, with its history, sits in Alex's record."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-38",
+    "more": [
+     "A bite during a lesson: the trainer ends it, writes an incident note, and makes any bite report the state's rules require.",
+     "Juno's next booking then waits for Sam's OK."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-53",
+    "more": [
+     "Dog training: the owner stays for every lesson and class, so the dog never waits alone."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-03",
+    "more": [
+     "A dog that reacts to other dogs can wait in the car. Alex replies 1 from the lot, and the trainer comes out.",
+     "Then the dog meets no other dog at the door. The code is given at the car, the same way."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "The center takes no drop-offs: the owner stays with the dog for every lesson and class.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "more",
+    "at": "A6-05",
+    "more": [
+     "After a bite, Sam may ask for a vet visit first. Rosie passes on Sam's own words, never advice of its own."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-04",
+    "more": [
+     "For a dog that has bitten, the change can be the behavior evaluation first. It's paid in full when Alex takes it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "The center asks for a rating after a lesson."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Dog training needs no state license: registration only."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every new customer signs the waiver on the secure page."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most dog training centers set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your center, paid at the front desk, your own way",
+         "When they book: a card saved, for a $60 fee you OK"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Private lesson",
+          "$120"
+         ],
+         [
+          "Reactive dog lesson",
+          "$135"
+         ],
+         [
+          "Extra 30 minutes",
+          "$60"
+         ],
+         [
+          "Junior handler lesson",
+          "$70"
+         ],
+         [
+          "Behavior evaluation",
+          "$180"
+         ],
+         [
+          "6-week Manners class",
+          "$210"
+         ],
+         [
+          "6-week Puppy class",
+          "$180"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "E, F and G paid in full when they book"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. The evaluation and the classes are paid when they book. The rest stays as on the card.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Behavior evaluation",
+          "$180",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "6-week Manners class",
+          "$210",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "6-week Puppy class",
+          "$180",
+          "Paid in full",
+          "Nothing more"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:counter": {
+      "addSay": []
+     },
+     "before:full": {
+      "addSay": []
+     },
+     "after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Saturday mornings Lauren works alone: send the bill then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Saturday mornings, any lesson: the bill I send, with a tip line. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, Saturday mornings are paid by the bill Rosie sends."
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Dog training and dog walking need no state license, so the company gives its registration (S1-61). A trainer's certificate is shown only once it's checked."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Dog training pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Dog training adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Dog training books trainers and class spots, never rooms on their own."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No trainer or walker needs a state license of their own. A certificate is a claim, shown only once it's checked."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No dog training or walk is sent now, so nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "The example trains in person only."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "Each dog is its own booking, with its owner there."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Training isn't billed to a pet plan here."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "An in-home lesson starts at a set time, with the owner home (B4-84)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "No board-and-train stays in the example."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "The in-home company runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Training is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "In-home lessons need only the waiver on the secure page, not a contract."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Training is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Training is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Training is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the trainer's care: the owner is there for every lesson."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "The owner is there for every lesson."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Each lesson is paid on its own."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam left bank transfer off: lessons are small bills (S1-57)."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "A lesson at home is never paid by a landlord."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Training isn't billed to a pet plan here."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Training promises no result, so there's no warranty claim."
+   },
+   {
+    "op": "more",
+    "at": "B4-26",
+    "more": [
+     "For dog training, the owner is home with the dog for every lesson. Another adult who handles the dog can stand in, on Alex's word."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-25",
+    "more": [
+     "Dog training books every dog under its owner: Alex books, pays and gets the texts. Milo's profile, with its history, sits in Alex's record."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Dog training asks for the waiver and the rabies proof on the secure page. After a bite, a home evaluation comes first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-34",
+    "more": [
+     "A bite during a lesson: the trainer ends it, writes an incident note, and makes any bite report the state's rules require.",
+     "Milo's next booking then waits for Sam's OK."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-03",
+    "more": [
+     "A dog with a bite in its history always asks Sam first. Sam can OK it, change it, or ask for a vet visit first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Lee Pet Services asks for a rating after a lesson."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most in-home trainers set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service at home, to start",
+        "lines": [
+         "Where: at the customer's place",
+         "When they book: a card saved for the $89 late-cancel and no-show fee you OK",
+         "After the lesson: Rosie sends the bill"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "In-home lesson",
+          "$179"
+         ],
+         [
+          "Puppy start-up visit",
+          "$150"
+         ],
+         [
+          "Behavior evaluation at home",
+          "$199"
+         ],
+         [
+          "4-lesson package",
+          "$640"
+         ],
+         [
+          "Second dog, same lesson",
+          "$40"
+         ],
+         [
+          "Extra time",
+          "$60 a half hour"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "B and D paid in full when they book"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Here's what changed. The rest stays as on the card.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Puppy start-up visit",
+          "$150",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "4-lesson package",
+          "$640",
+          "Paid in full",
+          "Each lesson uses a credit"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "addSay": []
+     },
+     "before:full": {
+      "addSay": []
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "After the lesson: charge the saved card at DONE"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Lessons paid after: the saved card at DONE. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, every lesson paid after is charged to the saved card at DONE."
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "notes": "Pilot: hair (from: hair). Dog training runs like a chair: a private lesson with a chosen trainer, booked by name, with the owner there, card saved for the late-cancel fee and paid at the front desk. The old flowchart's story is exactly that (a private lesson first for a dog that barks at other dogs). Group classes are the less usual part, so they use the master's own class branches (S2-32's timetable, A4-66's seat in a session, A7-67's minimum) instead of starting from yoga.\nUsual side: flow A, the training center (the old flowchart's center, with private lessons and Saturday classes). Flow B is a trainer at the owner's home (the old flowchart's home lesson within 10 miles).\nNames: Sam's main company is Lee Pet Services LLC (in-home training, with dog walking as its second kind of work; 215 River Rd); the second company is Lee Dog Training LLC (60 Mill St). Trade names: Lee In-Home Training and Lee Dog Walking. Trainers: Lauren and Dev at the center (the master's Riley and Avery); Marcus and Darius go to homes (Jordan and Casey, both 'he'). Dogs: Juno (A, 1-year-old shepherd mix) and Milo (B, 5-month-old puppy), each booked under its owner, Alex M. Alex's home: 9 Cedar Ct.\nPrices at the center are changed from the master's barbershop numbers to dog training's own, with every sum kept: $35 to $120 (private lesson, 60 min), $20 to $60 (the fee, and 30 extra minutes), $55 to $180 (behavior evaluation, 90 min; 180 - 60 = 120 still holds), $40 to $135 (reactive dog lesson, and the raised lesson price), $25 to $70 (junior handler lesson), $75 to $150 (the center's lesson at home), $140 to $210 (the 6-week Manners class). They are the example's own prices, not a standard.\nPrices at home keep the master's numbers: $179 in-home lesson, $89 late-cancel or no-show fee, $150 puppy start-up visit ($150 - $89 = $61 still holds), $199 home evaluation ($249 with Sam), $640 4-lesson package, $40 second dog.\nMoney paths: A lists list|card|counter (lessons) and list|full|none (evaluations and 6-week classes, paid up front). B lists list|card|bill (main: the bill with a tip line, as the old flowchart's pay link with a tip), list|card|card (the saved card at DONE) and list|full|none (puppy visits and packages). No holds, deposits, photo quotes or prices set at the visit: dog training prices every lesson from the list.\nPackages and 6-week courses: the old flowchart sold them outside Rosie (an old single-sessions-only answer); the master now sells packs and series, so a 4-lesson package is bought paid in full and each lesson uses a credit (A5-03, A5-22, B5-01), and a 6-week class books all its weeks at once (A4-31, A8-41).\nSign-up: S1-12 to S1-17, S1-38, S1-39, S1-41, S1-42, S1-45 (paid in full), S1-47 and S1-57 have words ops with dog training's real money: card saved for the fee, paid at the front desk at the center; the bill at home; evaluations, classes, puppy visits and packages paid in full. No holds or deposits. Sam leaves bank transfer off (small bills).\nLicenses: no state license for training or walking (S1-60 and S2-28 take the no-license branches); the center gives a kennel or facility license where the state's rules require one (S1-63, KN20981). A trainer's certificate (CPDT-KA) is a claim shown only once checked; S11-50 reminds about its renewal; S11-42's lapsed-license re-check is off.\nFlow B starts at a set time (B4-84, 9:00am), never an arrival window; every window in the master's words becomes a start time, and the visit's clock runs OMW 8:40am, check-in 9:00am, DONE 10:00am, bill 10:02am, receipt 10:05am, homework 10:10am. Flow A's lesson runs 11:00am to 12:00pm (90 minutes for an evaluation), so the next booking and 'running late' times move to 12:00pm (12:30pm).\nOwn steps: A10-x01 and B10-x01 send the trainer's homework right after the receipt, on the main path. Also listed as a gap: tutors, coaches, music teachers and therapists send session notes too.\nBite history: A4-43's 'A reaction last time' branch becomes 'A bite in the dog's history' (A4-49): the booking waits for Sam's OK, who can OK it, offer the evaluation first, or ask for a vet visit first. A bite during a lesson (A8-38, B8-34): the lesson ends, an incident note, any report the state's rules require, and the next booking waits for Sam's OK.\nVaccines: rabies proof for any visit, DHPP and Bordetella for a group class (the example business's rule), uploaded on the secure page with the waiver (A4-72, B4-86), on file until each end date (A4-44). Missing at the visit: A8-02's 'Something required is missing' branch is kept (A8-51, B8-54).\nOwner present: A8-53 and A8-67 keep the owner with the dog; B8-67, B8-69 and B8-70 keep 'Someone must be home'. Reactive dogs can check in from the car (A8-03 more), from the old flowchart's parking-lot check-in; listed as a gap too.\nOff, as never used in dog training: holds and the day-before hold (A7-02), plan and insurance branches (A4-28, A4-54, A7-02, A9-15; B4-43, B4-63, B7-05, B9-19), items not picked up and rented items (A10-06, B10-07), a free fix and warranty claims (training promises no result), stays, drop-offs and spaces, sent now and live lines, a crew, dates that can't move, a damage hold, contracts, permits, notices, parts, deliveries, items to the shop, landlords, bank transfer, the color-quote OK (S11-08) and the emergency price checks (S12-20's higher-price branches: no quotes).\nShared what-ifs renamed to dog training: S11-56 switches a lesson from a card saved to paid in full (no hold or deposit), S11-58 adds grooming (center) and pet sitting (in-home), S11-40 is a talk about a dog's bite history, Morgan's plan is a monthly lesson for each of her two dogs, and Nora's and Lin's examples save a card instead of holding $89.\nsplitsKept: A: S2-32 (the center runs classes, the in-home company doesn't), A7-59, S11-87, S11-90 (lessons by name, classes not), A7-61 (an evaluation has no stand-in), A7-67 (classes have a minimum, lessons don't), A8-02 (vaccine proof can be missing). B: S2-32, S11-87, S11-90.\nOld outside software (Square Appointments, Gingr, Square's own texts and reminders) is outdated: Rosie is the business's software. Old one-state facts (Connecticut's facility license, Iowa, a California code section) become switches in pf.license and pf.rules.\nNot sure: the 24-hour and 7am cancel windows and the $60 and $89 fees are the example's settings; real trainers vary. Board-and-train stays are left out of the example (A4-66's stay branch is off); a trainer who offers them would turn the stay branch on.\nReviewer (Oct 23): flow A also lists list|card|bill, the old flowchart's pay link at checkout (Saturday mornings, when Lauren works alone, Rosie texts the bill with a tip line). The center sells its own 4-lesson package ($440) at the front desk, never in a booking text. Home evaluations are Marcus's or Sam's. Texts to Sam and staff carry no bite or incident details: only 'an incident' and 'the note is on the secure page'. Licenses show as none needed on every team screen.",
+ "splitsKept": {
+  "A": [
+   "S1-82",
+   "A7-59",
+   "A7-15",
+   "A7-68",
+   "A8-02",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-82",
+   "S11-87",
+   "S11-90"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "the color and cut takes",
+    "the color and cut is paid",
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "BS20981",
+    "Riley: barber, color and house calls",
+    "barber, color and house calls",
+    "Every shop service, color and house calls",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "$140 an hour",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "Some work runs classes on a timetable, like yoga or a cooking class. Customers book a seat in a session, not a person's free time.",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "1 color quote",
+    "raise haircut to 40",
+    "License renewal",
+    "A deposit is taken when the customer books, and comes off the price.",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Nia K.'s refund for the cancelled membership was due yesterday. A person from Rosie's team will call you today.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet. Nobody new is offered until it is. I'll tell you if it takes more than 1 business day.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Books a haircut and a beard trim",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "May the shop show photos of your hair? Yes / No",
+    "A barbershop sells its packages only at the shop.",
+    "Haircut every 4 weeks · Riley",
+    "Haircut plan · every 4 weeks",
+    "Your haircut is part of a plan with Riley, every 4 weeks. What would you like?",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Can I add a beard trim on Saturday?",
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "Change: Alex M. added a beard trim to the Sat 11:00am.",
+    "Beard trim · $20",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Alex adds a beard trim",
+    "extra 20 beard trim Alex M.",
+    "Add a beard trim today?",
+    "Color correction",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Books the next visit at the chair",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter. It goes on the secure page, to sign or decline.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan. Read it, then sign or decline on the secure page.",
+    "Proposal · Color plan",
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Form to sign",
+    "Sign the form",
+    "Next: Sat Nov 28 · 10:00am",
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "What happens at the chair?",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "LATE Rosa F. Fri Oct 30",
+    "every 4 weeks",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "Groom's package",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "barbershops",
+    "Barbershop",
+    "barbershop",
+    "Barbering",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "at the chair",
+    "At the chair",
+    "shops",
+    "Shop",
+    "shop",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "$35",
+    "$20",
+    "$55",
+    "$40",
+    "$25",
+    "$75",
+    "$140",
+    "skin fades",
+    "skin fade",
+    "A trim",
+    "a fade"
+   ],
+   "B": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "like 'Is the sink still full of water?'",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves · $160",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today",
+    "Accepted: the leak repair today",
+    "The service call is $89.",
+    "I found water damage under the sink this morning.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "a drain clearing",
+    "Plumbing license",
+    "BS20981",
+    "Riley: barber, color and house calls",
+    "barber, color and house calls",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "$140 an hour",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "Some work runs classes on a timetable, like yoga or a cooking class. Customers book a seat in a session, not a person's free time.",
+    "License renewal",
+    "A deposit is taken when the customer books, and comes off the price.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Every way in reaches the same booking desk, with the same rules. The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Booked at the shop: the other flow goes on from here.",
+    "2 At the shop",
+    "At the shop",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Just the kitchen sink.",
+    "Lee Electric.",
+    "Electric.",
+    "Say the work starts at a set time, like a private class at home or an event. The times read 'starts at 8:00am', not a window.",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Is the sink still full of water?",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yearly water heater flush plan",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also look at a dripping faucet?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Jordan found more work.",
+    "Replace both shutoff valves · $160",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Lee Home Services: $160 for today's extra work.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "HURT cut my hand, need to stop",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan finds mold behind the sink wall.",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Sewer camera report",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Can you flush my water heater every year, too?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Can I run the dishwasher before you come?",
+    "Can I skip next week's drain cleaning?",
+    "Yard drain",
+    "the shutoff valves",
+    "Replace both shutoff valves",
+    "Proposal · Replace the old pipes",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A job quoted at the visit promises only the service call now.",
+    "Entry statement: I live here, or may let the pro in",
+    "A dog, kept inside",
+    "Jordan says no. Please wait until the job is done.",
+    "MOVE Alex to Thu 12pm",
+    "CANT START no proof Alex may have this work done",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "Rental 1",
+    "Rental 2",
+    "Book a free fix",
+    "Texts the camera report link",
+    "LATE camera report Mon Oct 26",
+    "Every 12 months",
+    "Sewer camera inspection · $199",
+    "Morgan P. asked to talk about the $640 quote. Sam taps Call, and the call goes out from the business's number.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "1 quote",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 9:10am",
+    "Haircut",
+    "haircut",
+    "Kitchen drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "barbershops",
+    "Barbershop",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "at the chair",
+    "shops",
+    "Shop",
+    "shop",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater",
+    "water heater",
+    "Service call fee",
+    "service call fee",
+    "Service call",
+    "service call",
+    "Leak repair",
+    "leak repair",
+    "after the job",
+    "A drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "kitchen drain",
+    "the drain",
+    "$20 fee"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-28": "c8e677520c",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A4-65": "fa7ec0389d",
+   "A4-24": "0a292df05b",
+   "A8-38": "5e48b74f3a",
+   "A8-03": "7accda6f86",
+   "A6-05": "0e69163f75",
+   "A6-04": "fe10e3d360",
+   "S1-60": "235c90a3c3",
+   "A4-43": "c17d56f766",
+   "S1-13": "eca22651fd"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B4-26": "912686f788",
+   "B4-25": "004f66a272",
+   "B4-38": "9539521dc7",
+   "B8-34": "643812e26f",
+   "B10-32": "7713bff255",
+   "S1-13": "6964bfbe60"
+  }
+ }
+}

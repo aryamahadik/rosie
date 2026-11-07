@@ -1,0 +1,3470 @@
+{
+ "id": "senior-move",
+ "name": "Senior move manager",
+ "style": "Project",
+ "pattern": "project",
+ "from": "movers",
+ "plugin": {
+  "pf.license": {
+   "need": "no state license to plan, sort, pack or set up a home in most places, only a business registration; a household goods mover's license (and the state's mover rules) only where the business itself carries belongings in its own truck for pay; otherwise the move is done by a licensed moving company the family hires",
+   "who": "the business",
+   "ask": [
+    "The business registration",
+    "A mover's license, only if the business itself moves goods",
+    "General liability insurance, and a bond or crime coverage for staff working in clients' homes"
+   ],
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "credentials": "A senior move manager association membership and certificates are the business's own word, shown that way, never as a license",
+   "blocks": [
+    "Planning, sorting, packing and unpacking go live on identity and registration",
+    "Moving goods in the business's own truck goes live only with the mover's license, where the state's rules require one"
+   ],
+   "background": "A criminal background check for every person who works in a client's home (the business's own rule, shown to the customer as checked)",
+   "renewals": "Insurance and any mover's license reminded 30 days before they lapse; a lapse pauses that part of the work"
+  },
+  "pf.services": {
+   "shape": "Project: a free in-home assessment with the older adult and the family, then a written plan and estimate, then a series of sessions (sorting, packing, move day, unpacking) over weeks, billed by the hour every Friday",
+   "examples": "the example business's own prices, not a standard",
+   "B": [
+    {
+     "name": "In-home assessment",
+     "price": "free (example)",
+     "length": "about 90 minutes",
+     "where": "at the older adult's home; the older adult is there and takes part, and family may join in person or by phone",
+     "before": "nothing taken",
+     "after": "nothing owed; the written plan and estimate follow within 3 business days"
+    },
+    {
+     "name": "Full senior move (plan, sort, pack, move day, unpack)",
+     "price": "$85 an hour per person, estimated 40 to 60 person-hours (example): $3,400 to $5,100; the rate and range are set in the signed agreement",
+     "length": "3 to 8 weeks of sessions",
+     "where": "at the old home and the new home",
+     "before": "nothing taken at the assessment; a $500 retainer when the agreement is signed (example), taken off the last bill",
+     "after": "billed every Friday for the hours worked that week, with each session's start and end times",
+     "note": "the moving company is hired separately by the family and paid its own way; the business books and supervises the date"
+    },
+    {
+     "name": "Downsizing and sorting session",
+     "price": "$85 an hour per person, 3-hour minimum: $255 (example)",
+     "length": "3 to 4 hours",
+     "where": "at the older adult's home",
+     "before": "nothing taken",
+     "after": "billed after the session",
+     "note": "for an older adult staying put who wants less in the home"
+    },
+    {
+     "name": "Home setup visit (unpacking and setting up the new home)",
+     "price": "$85 an hour per person, 2-hour minimum: $170 (example)",
+     "length": "1 to 2 days",
+     "where": "at the new home (an apartment, assisted living or a family member's home)",
+     "before": "nothing taken",
+     "after": "billed after",
+     "note": "the bed made, clothes put away, pictures hung, the kitchen set up the way it was"
+    },
+    {
+     "name": "Floor plan visit",
+     "price": "$275: measured at the new home, a drawn plan after (example)",
+     "length": "about 2 hours",
+     "where": "at the new home",
+     "before": "nothing taken",
+     "after": "billed after"
+    },
+    {
+     "name": "Room-by-room plan from photos",
+     "price": "priced from the family's photos (example)",
+     "where": "by photos; for families who live far away"
+    },
+    {
+     "name": "Phone check-in",
+     "price": "free: 10 minutes by phone with the lead before the assessment",
+     "where": "by phone"
+    },
+    {
+     "name": "Labor",
+     "price": "$85 an hour per person; billed by the hour, each session's times listed",
+     "where": "added to a session, never booked alone"
+    },
+    {
+     "name": "Change order",
+     "price": "priced, written and signed by the payer before the changed work"
+    }
+   ],
+   "A": [
+    {
+     "name": "Family planning call",
+     "price": "free (example)",
+     "length": "30 minutes",
+     "where": "by phone or video; for family who live far away",
+     "before": "nothing taken",
+     "after": "nothing owed"
+    },
+    {
+     "name": "Planning session",
+     "price": "$35, 45 minutes",
+     "where": "by video",
+     "before": "a card saved for the $20 missed-session fee",
+     "after": "nothing more"
+    },
+    {
+     "name": "Evening planning session",
+     "price": "$40, 45 minutes",
+     "where": "by video"
+    },
+    {
+     "name": "Extra floor plan sheet",
+     "price": "$20, an add-on",
+     "where": "by video or email"
+    },
+    {
+     "name": "Mover quote review",
+     "price": "$25, 15 minutes: the planner reads the moving company's quote with the family",
+     "where": "by phone or video"
+    },
+    {
+     "name": "Remote move plan and floor plan",
+     "price": "$150 (example)",
+     "length": "90 minutes by video, then a floor plan of the new home",
+     "where": "by video",
+     "before": "paid in full when booking",
+     "after": "nothing more; a late cancel may keep $20 of it, only with the owner's yes"
+    },
+    {
+     "name": "Planning package (plan, floor plan sheet, mover quote review)",
+     "price": "$250 (example)",
+     "where": "by video"
+    },
+    {
+     "name": "Plan from photos",
+     "price": "priced from the family's photos of the home (example: $90); Sam OKs each one",
+     "where": "by photos"
+    },
+    {
+     "name": "Care-move planning call",
+     "price": "set on the call",
+     "where": "by phone or video"
+    }
+   ],
+   "capacity": "Two people for packing and move days; one for sorting sessions; the same lead for the whole move where possible",
+   "online": "Planning calls and the remote move plan by phone or video; no hands-on work online",
+   "nobody_home": "Unpacking at the new home before the older adult arrives, and packing days the family OKs, may be done with nobody home (a start photo and DONE with photos); the assessment and sorting sessions need the older adult there"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Who is moving, and who is asking (the older adult, a family member, a care manager)?",
+    "Where from and where to: the town or ZIP of each (a house, an apartment, assisted living, a family member's home)",
+    "Any date the move must happen by: a move-in date set by the community, a closing or a lease end",
+    "What help is needed: the whole move, sorting only, or setting up the new home"
+   ],
+   "after_time": [
+    "Who will be at the assessment, and who decides what goes and what stays?",
+    "Anything that helps the visit go well: hearing, sight, walking, the best time of day",
+    "Pets, and who will care for them on move day",
+    "The new home's rules: move-in hours, an elevator to book, an insurance certificate"
+   ],
+   "secure_page_only": [
+    "Both street addresses and how to get in",
+    "The older adult's own contact, and how they like to be reached (text, a call to a landline, or only through the family)",
+    "Who has a power of attorney or guardianship, if anyone, and who signs and pays",
+    "Health or memory details that change how sessions run (only on this page, only for the lead)"
+   ],
+   "who_may_book": "An adult. The older adult agrees to the move and to the sessions themself whenever they can. A family member may book and pay for them. Where the older adult can't decide, an agent under a power of attorney or a guardian signs the agreement. The business never books a move the older adult says they don't want.",
+   "planning": [
+    "Who is moving, and who is asking?",
+    "The new home's floor plan or its size, if the family has it"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "the older adult has fallen and can't get up, is suddenly confused, has chest pain or trouble breathing",
+     "says": "Call 911 now.",
+     "booking": "no booking in that chat"
+    },
+    {
+     "words": "a fire, smoke or a gas smell",
+     "says": "Leave the home now, and call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "dementia, memory loss or confusion",
+     "says": "Sessions are short and at the best time of day, the same person comes each time, and a family member is on call.",
+     "booking": "goes on; the details stay on the secure page"
+    },
+    {
+     "words": "the older adult is being pressured, neglected or has money taken by someone",
+     "says": "A hotline is given. The owner is told privately the same day; the business follows its own reporting steps where the state's rules require them. Rosie gives no advice.",
+     "booking": "goes on"
+    },
+    {
+     "words": "oxygen in the home, a fall risk, a walker or wheelchair",
+     "says": "Paths are kept clear during sessions. Oxygen tanks are never packed in a moving truck.",
+     "booking": "goes on"
+    },
+    {
+     "words": "hoarding, pests or a home that isn't safe to work in",
+     "says": "The assessment notes it. A cleanup company may be needed first (no company named).",
+     "booking": "goes on"
+    },
+    {
+     "words": "medicines in the home",
+     "says": "Staff never handle or give medicine. The family packs them in a labeled bag that travels with the older adult.",
+     "booking": "goes on"
+    },
+    {
+     "words": "firearms in the home",
+     "says": "Staff never touch them. The family removes them before sorting.",
+     "booking": "goes on"
+    }
+   ],
+   "business_line": "Questions about money, medicines, or what a doctor or a lawyer should decide go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_agreement": "The in-home assessment with the older adult and the family; a written plan and estimate within 3 business days",
+   "after_agreement": [
+    {
+     "name": "Signed agreement",
+     "when": "before the first session",
+     "who": "the older adult when they can decide, or their agent or guardian; and the person who pays",
+     "result": "the rate, the estimate range, the sessions, who decides about belongings, the weekly bill, the retainer, the cancel terms"
+    },
+    {
+     "name": "Floor plan of the new home",
+     "when": "before sorting starts",
+     "who": "the business, from the new home's plan or a measuring visit",
+     "result": "what furniture fits; the rest is sorted"
+    },
+    {
+     "name": "Moving company booked",
+     "when": "at least 3 weeks before move day",
+     "who": "the family hires it; the business helps choose and confirms the date",
+     "result": "the mover's date and arrival window"
+    },
+    {
+     "name": "The new home's move-in OK",
+     "when": "before move day",
+     "who": "the family; the business sends its insurance certificate if asked",
+     "result": "the move-in date, the elevator and the hours"
+    }
+   ],
+   "prep": "Before the assessment: have whoever decides there or on the phone, and don't throw things away yet. Before sorting: set aside papers, medicines and valuables. Before move day: pack a bag with medicines, glasses, hearing aids and chargers that travels with the older adult.",
+   "planning_prep": "Before a planning call: the new home's floor plan or its size, and the move-in date, if known"
+  },
+  "pf.visit": {
+   "check_in": "The check-in code from whoever meets the lead at the door (the older adult or a family member). An older adult without a mobile: the family member gets the code, or the lead texts DONE at the end. Unpacking with nobody home: a start photo and DONE with photos. Planning calls: the code is said at the start of the call.",
+   "at_the_visit": "The lead meets the older adult, walks the home, measures key furniture, and sends a written plan and estimate on the secure page within 3 business days",
+   "changes": "Hours over the estimate's top need the payer's yes first. Added services (an estate sale, a cleanout) go to partner businesses the family picks and pays.",
+   "done": "Each session ends with DONE and its hours; the move ends when the new home is set up and the older adult has walked through it",
+   "items": "Each item's fate (move, family, donate, sell, discard) is decided by the older adult or the named decision maker, never by staff; donation receipts go to the family with the last bill",
+   "found_items": "Cash, jewelry, papers and keepsakes found while sorting are shown to the older adult or the named decision maker, logged with a photo, and never thrown away or taken by staff",
+   "nobody_answers": "Nobody answers the door at a session: the lead calls the older adult, then the family contact, before anything else; no fee words until they are found safe"
+  },
+  "pf.money": {
+   "assessment": "free; nothing taken and nothing owed",
+   "hourly": "Per hour per person, billed weekly (every Friday) for the hours worked, each session's times listed",
+   "retainer": "A $500 retainer when the agreement is signed (example), taken off the last bill; the deposit cap comes from the state's form",
+   "over_estimate": "Hours past the estimate's top need the payer's yes first",
+   "who_pays": "The older adult, a family member or an agent under a power of attorney; the bill goes to whoever the agreement names",
+   "movers": "The moving company bills the family its own way; the business takes no fee on it and no referral fee unless it tells the family in writing",
+   "cancel": "A session cancelled less than 48 hours ahead may be billed 1 hour ($85, example), only if the owner confirms; never for a hospital stay or a death",
+   "remote_plan": "The $150 remote move plan is paid in full when booked; a late cancel may keep $20 of it, only with the owner's yes (example)",
+   "tips": "None",
+   "fee2": "Rosfield's $2 applies: one per confirmed booking; a whole move from one agreement is one job, so one $2",
+   "big_bills": "Bank transfer through the company's own Stripe for weekly bills over the owner's amount; paid once it clears. A check from an agent under a power of attorney also works: the lead texts 'paid check'."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Health, memory or care details, and money details",
+    "Door codes and lockbox codes",
+    "Why someone is moving: owner and staff texts never say it",
+    "Contract papers and lab or medical papers (secure page only, with a copy by email)"
+   ],
+   "older_adult": "Texts go to the older adult only if they have a mobile and said yes; otherwise reminders go to the family contact, or by phone call where the older adult asked for calls",
+   "tone": "Plain and patient; no rushing; the older adult is spoken to directly, never about as if absent",
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor"
+  },
+  "pf.staff": {
+   "roles": "Move leads (Marta, Joel) run each move; move assistants help on packing and move days. Planners (Joan, Priya) take the planning calls and the remote plans.",
+   "licenses": "No person license; a background check for everyone in clients' homes",
+   "who_oks": "The owner OKs every agreement and any estimate change",
+   "stand_in": "The older adult keeps the same lead wherever possible; a new person is offered only with the older adult's or the family's OK first, never on silence",
+   "two_people": "Packing and move days need two people; sorting sessions can be one",
+   "never": "Staff never accept gifts or buy items from a client, never handle money or medicines, and never sign anything for the client"
+  },
+  "pf.rules": {
+   "agreement": "A written agreement before the first session, with the rate, the estimate range and the cancel terms; a written cancel period where the state's rules give one",
+   "decisions": "The older adult decides about their belongings whenever they can. When they can't, the person named in the agreement decides.",
+   "authority": "A power of attorney ends when the person dies; from then on, only the executor may decide about the belongings",
+   "partners": "Estate sale, donation, cleanout and moving companies are separate businesses the family picks and pays",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "move_date_fixed": "A move-in date the community set can't move: the family decides, and no new person comes without their OK",
+   "hospital_stay": "Sessions pause with no fee while the older adult is in the hospital or rehab",
+   "death_during_move": "Every text to the older adult stops; sessions pause; the work goes on only once the executor confirms",
+   "older_adult_changes_mind": "The session stops and the people the older adult named are told; nothing is packed or thrown away against the older adult's wishes",
+   "family_disagrees": "Work on the disputed items waits for the named decision maker",
+   "nobody_answers": "Nobody answers the door at a session: the lead calls the older adult, then the family contact, before anything else; a fee is never asked until they're found safe",
+   "landline_only": "An older adult with only a landline gets reminder calls, or reminders go to the family contact",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "multiday",
+   "extrawork",
+   "photos",
+   "video",
+   "monthlybill"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   },
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Style consult",
+    "Family planning call"
+   ],
+   [
+    "style consult",
+    "family planning call"
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code at the start of your call."
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at the start of your call."
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Join by video from any device"
+   ],
+   [
+    "88 Elm St, Springfield",
+    "By video, link on your page"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither senior moves nor planning calls are sent now."
+   ],
+   [
+    "The chairs",
+    "A planner at work"
+   ],
+   [
+    "A chair, ready",
+    "A floor plan, ready"
+   ],
+   [
+    "like a chair renter",
+    "like an independent planner"
+   ],
+   [
+    "A chair renter",
+    "An independent planner"
+   ],
+   [
+    "a step-free chair",
+    "a step-free entrance"
+   ],
+   [
+    "A step-free door on Elm St, and parking in the back.",
+    "Join by video from any device, or by phone."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a planning call on Saturday."
+   ],
+   [
+    "a staff cut",
+    "a staff session"
+   ],
+   [
+    "the shorter cut",
+    "the shorter session"
+   ],
+   [
+    "come with dry hair on Saturday",
+    "bring your floor plan on Saturday"
+   ],
+   [
+    "come with dry hair",
+    "bring your floor plan"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s session"
+   ],
+   [
+    "the cut in the mirror",
+    "the plan on the screen"
+   ],
+   [
+    "A cut is rated",
+    "A session is rated"
+   ],
+   [
+    "At the shop, and house calls",
+    "By video, and home visits"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this session."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Marta and Joel lead moves; Marta does estate help too, at $85 an hour. Joan and Priya plan moves; Joan also draws floor plans and visits homes. Pat is my office manager, for prices over $500. Jules works independently, with their own customers."
+   ],
+   [
+    "A neighborhood barbershop on Elm St.",
+    "A remote planning office for families moving an older parent."
+   ],
+   [
+    "Riley's color plan",
+    "Joan's move plan"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Move plan"
+   ],
+   [
+    "color plan visit",
+    "move plan session"
+   ],
+   [
+    "a beard trim",
+    "an extra sheet"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer's move date changes before the session, and they ask if the session can still go ahead."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most move managers set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Planning calls, planning sessions and remote move plans."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a cleanout dumpster, which isn't on the office's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Move Planning doesn't rent dumpsters."
+   ],
+   [
+    "like a roofer",
+    "like a dumpster company"
+   ],
+   [
+    "skin fades",
+    "planning sessions"
+   ],
+   [
+    "color plan after a consult",
+    "move plan after a call"
+   ],
+   [
+    "Only the consult;",
+    "Only the call;"
+   ],
+   [
+    "does the consult,",
+    "does the call,"
+   ],
+   [
+    "does the consult only",
+    "does the call only"
+   ],
+   [
+    "Consult only",
+    "Call only"
+   ],
+   [
+    "the consult only",
+    "the call only"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds estate sales to Lee Move Planning."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Estate sales for Lee Move Planning: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW estate sales"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A move manager has none of its own, so nothing is sent here."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A move manager's plug-in adds words for a fall, sudden confusion and an older adult being pressured."
+   ],
+   [
+    "like a color correction done in two steps",
+    "like a floor plan drawn in two steps"
+   ],
+   [
+    "$25 consult",
+    "$25 mover quote review"
+   ],
+   [
+    "at the shop and for house calls",
+    "by video and by phone"
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The new home's floor plan isn't here."
+   ],
+   [
+    "a color correction",
+    "a custom floor plan"
+   ],
+   [
+    "A color correction",
+    "A custom floor plan"
+   ],
+   [
+    "no cut of",
+    "no fee on"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a mover quote review is $25"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una llamada de planificación el sábado."
+   ],
+   [
+    "Gloss to finish",
+    "Extra floor plan sheet"
+   ],
+   [
+    "gloss",
+    "extra floor plan sheet"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "An evening planning session at Lee Move Planning is $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for an evening planning session at $35"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the floor plan sheet was sent to the wrong email today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The floor plan sheet went to the wrong email."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Joan sees the floor plan"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Join by video from any device"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you review mover quotes? I have one from a company."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A planning session could mean a move planner or a care manager."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "does color",
+    "draws floor plans"
+   ],
+   [
+    "rents a chair",
+    "works independently"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's calls together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Three siblings book planning calls on one morning. Rosie finds times side by side with Joan and Priya."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A planning session and a mover quote review work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of the home"
+   ],
+   [
+    "patch test",
+    "floor plan"
+   ],
+   [
+    "skin-test result",
+    "floor plan check"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my mother join the video call during my session?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The move-in date changed. Can we still talk on Saturday?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: move-in Dec 7, elevator booked, floor plan sent, bed and recliner fit"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the guest room."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the guest room"
+   ],
+   [
+    "2 Not today",
+    "2 Not now"
+   ],
+   [
+    "Haircut at their home",
+    "Home assessment"
+   ],
+   [
+    "Haircut at home · $75",
+    "Home assessment · free"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout or a tow"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Senior Moves'"
+   ],
+   [
+    "a shorter cut",
+    "a shorter session"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A move manager's example: a fall or sudden confusion gets '911 now', and the booking waits."
+   ],
+   [
+    "MP045210",
+    "EX-2210"
+   ],
+   [
+    "EC22871",
+    "EX-3871"
+   ],
+   [
+    "BS20981",
+    "EX-4981"
+   ],
+   [
+    "Panel upgrade",
+    "Home setup visit"
+   ],
+   [
+    "Drain clearing",
+    "Downsizing session"
+   ],
+   [
+    "water heaters",
+    "move plans"
+   ],
+   [
+    "water heater",
+    "move plan"
+   ],
+   [
+    "an estimate visit",
+    "an assessment"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Senior Moves"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Move Planning LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Move Planning"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Senior Moves"
+   ],
+   [
+    "Lee Electric",
+    "Lee Estate Help"
+   ],
+   [
+    "1200 Main St",
+    "15 Harbor St, Suite 2"
+   ],
+   [
+    "88 Elm St",
+    "15 Harbor St, Suite 2"
+   ],
+   [
+    "Riley",
+    "Joan"
+   ],
+   [
+    "Avery",
+    "Priya"
+   ],
+   [
+    "Jordan",
+    "Marta"
+   ],
+   [
+    "Casey",
+    "Joel"
+   ],
+   [
+    "plumbing and electrical",
+    "move management and estate help"
+   ],
+   [
+    "Plumbing and electrical",
+    "Move management and estate help"
+   ],
+   [
+    "electrical",
+    "estate help"
+   ],
+   [
+    "Electrical",
+    "Estate help"
+   ],
+   [
+    "plumber",
+    "move lead"
+   ],
+   [
+    "plumbing",
+    "move management"
+   ],
+   [
+    "Plumbing",
+    "Move management"
+   ],
+   [
+    "barbershop",
+    "planning office"
+   ],
+   [
+    "Barbershop",
+    "Planning office"
+   ],
+   [
+    "barbers",
+    "planners"
+   ],
+   [
+    "barber",
+    "planner"
+   ],
+   [
+    "Barber",
+    "Planner"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Remote move plan"
+   ],
+   [
+    "Signature cut and shave",
+    "Remote move plan"
+   ],
+   [
+    "signature cut",
+    "remote move plan"
+   ],
+   [
+    "The Groom's package",
+    "The Planning package"
+   ],
+   [
+    "the Groom's package",
+    "the planning package"
+   ],
+   [
+    "Groom's package",
+    "Planning package"
+   ],
+   [
+    "Color and cut",
+    "Plan from photos"
+   ],
+   [
+    "color and cut",
+    "plan from photos"
+   ],
+   [
+    "Color correction",
+    "Care-move planning call"
+   ],
+   [
+    "color correction",
+    "care-move planning call"
+   ],
+   [
+    "color quote",
+    "plan quote"
+   ],
+   [
+    "color",
+    "floor plan"
+   ],
+   [
+    "Color",
+    "Floor plan"
+   ],
+   [
+    "Kids cut",
+    "Mover quote review"
+   ],
+   [
+    "kids cut",
+    "mover quote review"
+   ],
+   [
+    "Skin fade",
+    "Evening planning session"
+   ],
+   [
+    "skin fade",
+    "evening planning session"
+   ],
+   [
+    "Beard trim",
+    "Extra floor plan sheet"
+   ],
+   [
+    "beard trim",
+    "extra sheet"
+   ],
+   [
+    "Haircuts",
+    "Planning sessions"
+   ],
+   [
+    "haircuts",
+    "planning sessions"
+   ],
+   [
+    "Haircut",
+    "Planning session"
+   ],
+   [
+    "haircut",
+    "planning session"
+   ],
+   [
+    "paid at the chair",
+    "paid when booked"
+   ],
+   [
+    "Paid at the chair",
+    "Paid when booked"
+   ],
+   [
+    "pays at the chair",
+    "pays when booking"
+   ],
+   [
+    "at the chair",
+    "at the call"
+   ],
+   [
+    "the chair",
+    "the call"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "$55",
+    "$150"
+   ],
+   [
+    "$140 an hour",
+    "$85 an hour"
+   ]
+  ],
+  "B": [
+   [
+    "$89, credited to the repair",
+    "Free; the move is quoted after it"
+   ],
+   [
+    "a card saved for the $89 service-call fee you OK",
+    "nothing taken; a late-cancel hour only if you OK it"
+   ],
+   [
+    "Water pressure check",
+    "Phone check-in"
+   ],
+   [
+    "up to the $89 service call",
+    "up to one hour's pay ($85)"
+   ],
+   [
+    "11:59pm Tue Oct 27",
+    "11:59pm Mon Nov 2"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And who is moving, and is there a move-in date?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, December 7."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither senior moves nor planning calls are sent now."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most move managers start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules move managers often set."
+   ],
+   [
+    "The shop front",
+    "The truck and crew"
+   ],
+   [
+    "The chairs",
+    "A sorted room"
+   ],
+   [
+    "A chair, ready",
+    "A set-up bedroom"
+   ],
+   [
+    "like a chair renter",
+    "like an independent planner"
+   ],
+   [
+    "a camera inspection",
+    "a floor plan visit"
+   ],
+   [
+    "At the shop, and house calls",
+    "By video, and home visits"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Marta and Joel lead moves; Marta does estate help too, at $85 an hour. Joan and Priya plan moves; Joan also draws floor plans and visits homes. Pat is my office manager, for prices over $500. Jules works independently, with their own customers."
+   ],
+   [
+    "A neighborhood barbershop on Elm St.",
+    "A senior move manager for families in Springfield."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Planning, sorting, packing and setting up for older adults."
+   ],
+   [
+    "Only the {{fee}} service call is promised now.",
+    "Only the free assessment is promised now."
+   ],
+   [
+    "The {{fee}} counts toward the work's price.",
+    "The assessment is free."
+   ],
+   [
+    "the {{fee}} service call is owed, even after a no to the price",
+    "the assessment costs nothing, even after a no to the price"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched table leg"
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Senior Moves · Senior move"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · Senior move"
+   ],
+   [
+    "Book this drain clearing?",
+    "Book this visit?"
+   ],
+   [
+    "can clear the drain",
+    "can help with this move"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about moving out of my house into an apartment next month."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I need help sorting my house' fits a downsizing session."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please keep the walkways clear of rugs and boxes."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a box of old photos this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's help with sorting, next week,"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like moving a neighbor's things without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding the garage? Say so.'"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Marta finished the assessment. Here's your written plan and estimate."
+   ],
+   [
+    "like a $620 repair",
+    "like a $4,250 move"
+   ],
+   [
+    "leak repair is $620",
+    "the senior move estimate is $4,250"
+   ],
+   [
+    "Leak repair · $620",
+    "Senior move · about $4,250"
+   ],
+   [
+    "Leak repair · $245",
+    "Senior move · about $4,250"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Sorting and packing, about 34 hours · $2,890"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Sorting and packing, about 34 hours · $2,890"
+   ],
+   [
+    "Supply line · $80",
+    "Move day and unpacking, about 16 hours · $1,360"
+   ],
+   [
+    "The $89 service call is included",
+    "The assessment was free"
+   ],
+   [
+    "cracks the cabinet floor",
+    "scratches a table leg"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · senior move"
+   ],
+   [
+    "Harper gets the notice",
+    "Alex gets the notice"
+   ],
+   [
+    "Harper's first cancel message",
+    "Alex's first cancel message"
+   ],
+   [
+    "only in Harper's own words",
+    "only in Alex's own words"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds estate sales to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Estate sales for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW estate sales"
+   ],
+   [
+    "at the shop and for house calls",
+    "by video and in the home"
+   ],
+   [
+    "no cut of",
+    "no fee on"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A planning session could mean a move planner or a care manager."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works independently"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The planning calls are in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Move Planning can do your planning session by video for $35, or Lee Senior Moves can assess your home for free."
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Downsizing session"
+   ],
+   [
+    "asks an AI for a plumber",
+    "asks an AI for a move manager"
+   ],
+   [
+    "Then the booking goes on, marked urgent. Here it's Rosa's call",
+    "Then the booking goes on. Here it's Rosa's call"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about sorting the garage."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Marta also look at the garage?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The garage goes in the same plan and estimate. Marta looks at it at the same assessment."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you help me sort my storage unit every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Home Services has a yearly sorting plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a sorting session every year."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly sorting plan"
+   ],
+   [
+    "Cancel your plumbing visit (Thu 8–10am)? It's free.",
+    "Cancel your assessment (Thu 9am)? It's free."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I throw anything away before the assessment?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Marta says no. Please don't throw anything away until the plan is made."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a fall or a gas smell, gets the safety steps first."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the company's planners also does home assessments."
+   ],
+   [
+    "Contract · Water heater replacement",
+    "Agreement · Senior move"
+   ],
+   [
+    "water heater contract",
+    "senior move agreement"
+   ],
+   [
+    "replaces water heaters",
+    "plans senior moves"
+   ],
+   [
+    "Jordan texts the quote",
+    "Marta sends the plan"
+   ],
+   [
+    "Signed: the deposit, then the work days",
+    "Signed: the retainer, then the sessions"
+   ],
+   [
+    "2 Not today",
+    "2 Not now"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Marta twists a knee on a stair and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT twisted my knee on the stairs, need to stop"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Marta needs more boxes from the supply store."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting more boxes, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Marta went to get more boxes and will be back about 9:30am. Sorting goes on meanwhile."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched a table leg"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Marta's crew scratched a table leg at Alex M.'s. The before photo shows no scratch."
+   ],
+   [
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish. Each day has its own check-in code.",
+    "Your move takes two days: packing today, and Fri Oct 23, starting at 9am, to finish. Each day has its own check-in code."
+   ],
+   [
+    "Set at the visit",
+    "After a free assessment"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no elevator booking at the new building"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout or a tow"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Can someone come sort my closet tonight?"
+   ],
+   [
+    "LATE camera report",
+    "LATE floor plan"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A downsizing session happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "A drain clearing",
+    "A downsizing session"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a legal question."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services does move management and estate help, not legal advice. Nothing was saved. You can look for an elder law office near you."
+   ],
+   [
+    "a drain clearing",
+    "a downsizing session"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Senior Moves'"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who is moving, from where to where, the move-in date, and what help is needed."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a fall, sudden confusion, chest pain, a fire or a gas smell."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE hallway rug curled, a loose stair rail"
+   ],
+   [
+    "Under the sink, before",
+    "Hallway, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Stair rail, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A senior move is quoted after the assessment: only the free assessment was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Marta finds the basement has mold on the boxes. The plug-in says the crew doesn't touch them, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold on the basement boxes"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold on the basement boxes"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Marta found mold on the boxes in your basement, so the crew won't touch them."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the basement boxes"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left packing paper in the hallway.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left packing paper in the hallway."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marta also look at my sister's house next month?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Marta's next times for an assessment."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the assessment for today"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi mamá se confunde a veces y vive sola."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mother gets confused sometimes and lives alone."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A move manager's example: confusion that comes and goes gets '911 if it turns sudden', and the booking goes on."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if there is a fall, sudden confusion or chest pain. The booking goes on, with the same person each time."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido o en peligro ahora?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt or in danger right now?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Ahora no, pero se confunde a veces."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Not right now, but my mother gets confused sometimes."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Gracias. Si se cae, se confunde de repente o le duele el pecho, llame al 911. Mientras tanto, la reserva sigue: vendrá la misma persona cada vez, y alguien de la familia estará disponible."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Thank you. If your mother falls, is suddenly confused or has chest pain, call 911. Meanwhile the booking goes on: the same person comes each time, and a family member is on call."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Should my mother sign the agreement herself, or should I?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone sort my mother's garage this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Garage sorting"
+   ],
+   [
+    "yard drain",
+    "garage sorting"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa sorting Thu 12-3 Joel"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a sorting session at two homes every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's sorting session?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I need help moving out of my house next month. Can someone come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "A 3-bedroom house, mostly books and furniture."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a move-in date set?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the move-in date is now two weeks sooner."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The move-in date is two weeks sooner now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Marta's crew can add sessions to fit the new date."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 255 downsizing, 3 hours"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE bedroom done. The books are boxed and labeled. Bring tape and the recliner cover next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A box label peels off 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A box label peeled off and a box is lost."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s books, boxed Thu Oct 22, have a box with no label."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your boxes are covered by the setup promise"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Marta finds a second storage closet to sort."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 255 sort the second closet, 3 hours"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Sort the second closet"
+   ],
+   [
+    "replace both shutoff valves",
+    "sort the second closet"
+   ],
+   [
+    "both shutoff valves",
+    "the second closet"
+   ],
+   [
+    "the shutoff valves",
+    "the second closet"
+   ],
+   [
+    "The $160 valve quote",
+    "The $255 closet quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $255 closet work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Marta also draw a floor plan of my new apartment?"
+   ],
+   [
+    "Sewer camera report",
+    "Floor plan"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the floor plan link"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Marta's notes"
+   ],
+   [
+    "sewer camera report",
+    "floor plan"
+   ],
+   [
+    "Harper J.",
+    "Alex M."
+   ],
+   [
+    "Harper",
+    "Alex"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 garage cleanout"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your garage cleanout"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like sorting the garage Marta noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to sort the garage too, from Marta's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Sort the garage too"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the agreement"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the agreement; Sam signs too"
+   ],
+   [
+    "leehomeservices.com",
+    "leeseniormoves.com"
+   ],
+   [
+    "MP045210",
+    "EX-2210"
+   ],
+   [
+    "EC22871",
+    "EX-3871"
+   ],
+   [
+    "BS20981",
+    "EX-4981"
+   ],
+   [
+    "Panel upgrade",
+    "Home setup visit"
+   ],
+   [
+    "credited to the repair",
+    "for the senior move"
+   ],
+   [
+    "Water heater replacement",
+    "Room-by-room plan from photos"
+   ],
+   [
+    "water heater replacement",
+    "room-by-room plan from photos"
+   ],
+   [
+    "Leak repair",
+    "Senior move"
+   ],
+   [
+    "leak repair",
+    "senior move"
+   ],
+   [
+    "Sewer camera inspection",
+    "Floor plan visit"
+   ],
+   [
+    "sewer camera inspection",
+    "floor plan visit"
+   ],
+   [
+    "$179 drain",
+    "$255 downsizing session"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Downsizing session"
+   ],
+   [
+    "Drain clearings",
+    "Downsizing sessions"
+   ],
+   [
+    "drain clearings",
+    "downsizing sessions"
+   ],
+   [
+    "Drain clearing",
+    "Downsizing session"
+   ],
+   [
+    "drain clearing",
+    "downsizing session"
+   ],
+   [
+    "the kitchen drain",
+    "the downsizing session"
+   ],
+   [
+    "Kitchen drain",
+    "Downsizing session"
+   ],
+   [
+    "kitchen drain",
+    "downsizing session"
+   ],
+   [
+    "1-year labor warranty",
+    "Questions about the move"
+   ],
+   [
+    "Water heater flush",
+    "Home setup visit"
+   ],
+   [
+    "water heater flush",
+    "home setup visit"
+   ],
+   [
+    "water heaters",
+    "room plans"
+   ],
+   [
+    "Water heater",
+    "Room plan"
+   ],
+   [
+    "water heater",
+    "room plan"
+   ],
+   [
+    "service call fee",
+    "late-cancel hour"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel hour"
+   ],
+   [
+    "an estimate visit",
+    "an assessment"
+   ],
+   [
+    "estimate visit",
+    "assessment"
+   ],
+   [
+    "Estimate visit",
+    "Assessment"
+   ],
+   [
+    "service call",
+    "assessment"
+   ],
+   [
+    "Service call",
+    "Assessment"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Senior Moves LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Senior Moves"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Move Planning"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Senior Moves"
+   ],
+   [
+    "Lee Electric",
+    "Lee Estate Help"
+   ],
+   [
+    "1200 Main St",
+    "15 Harbor St"
+   ],
+   [
+    "88 Elm St",
+    "15 Harbor St, Suite 2"
+   ],
+   [
+    "42 Oak St",
+    "48 Linden Ave"
+   ],
+   [
+    "Riley",
+    "Joan"
+   ],
+   [
+    "Avery",
+    "Priya"
+   ],
+   [
+    "Jordan",
+    "Marta"
+   ],
+   [
+    "Casey",
+    "Joel"
+   ],
+   [
+    "plumbing and electrical",
+    "move management and estate help"
+   ],
+   [
+    "Plumbing and electrical",
+    "Move management and estate help"
+   ],
+   [
+    "electrical",
+    "estate help"
+   ],
+   [
+    "Electrical",
+    "Estate help"
+   ],
+   [
+    "plumber",
+    "move lead"
+   ],
+   [
+    "plumbing",
+    "move management"
+   ],
+   [
+    "Plumbing",
+    "Move management"
+   ],
+   [
+    "barbershop",
+    "planning office"
+   ],
+   [
+    "barber",
+    "planner"
+   ],
+   [
+    "Barber",
+    "Planner"
+   ],
+   [
+    "color",
+    "floor plan"
+   ],
+   [
+    "hot towel",
+    "setup"
+   ],
+   [
+    "haircut",
+    "planning session"
+   ],
+   [
+    "paid at the chair",
+    "paid when booked"
+   ],
+   [
+    "at the chair",
+    "at the call"
+   ],
+   [
+    "$120 an hour",
+    "$85 an hour, per person"
+   ],
+   [
+    "$179",
+    "$255"
+   ],
+   [
+    "$199",
+    "$275"
+   ],
+   [
+    "$150",
+    "$170"
+   ],
+   [
+    "$89",
+    "$85"
+   ],
+   [
+    "$140 an hour",
+    "$85 an hour"
+   ]
+  ]
+ },
+ "keep": [
+  "moving",
+  "Moving",
+  "estate",
+  "leak",
+  "house call"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a planning session with Joan at Lee Move Planning, Sam's remote planning company, by video on Sat Oct 24 at 11:00am. The session depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Senior Moves for a free in-home assessment before moving from the family home at 48 Linden Ave to an apartment at 300 Maple Ct. Marta comes Thu Oct 22 at 9am, sends a written plan and estimate, and runs sorting, packing, move day and setting up over six weeks, billed every Friday by the hour. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|none",
+   "combos": [
+    "list|none|none",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|none|none": "A free 30-minute family planning call by phone. Nothing is taken and nothing is owed.",
+    "list|full|none": "The $150 remote move plan by video, paid in full when booking, with a floor plan after."
+   },
+   "labels": {
+    "price": {
+     "photos": "Priced from photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Family planning call"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Family planning call"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Remote move plan",
+     "fee": "$20"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "list|none|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "The main story: a free assessment; an agreement at $85 an hour per person, estimated 40 to 60 hours, with a $500 retainer; a bill every Friday for that week's hours; the retainer comes off the last bill.",
+    "visit|none|own": "The same move billed the business's own way, like a check from the older adult's agent under a power of attorney. Rosie sends no bills.",
+    "list|none|bill": "A 3-hour downsizing session for someone staying put, at $85 an hour ($255 minimum); billed after."
+   },
+   "labels": {
+    "price": {
+     "visit": "Quoted after a free assessment"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$85",
+     "name": "Downsizing session"
+    },
+    "list|*|*": {
+     "price": "$255",
+     "name": "Downsizing session"
+    },
+    "visit|*|*": {
+     "fee": "free",
+     "name": "Senior move"
+    }
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "setstart"
+    ]
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60"
+  ],
+  "B": [
+   "S1-60"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the free assessment at home",
+      "does": "Joan saves Alex's floor plan notes. If the family wants hands-on help, Joan books Marta's free in-home assessment with Lee Senior Moves.",
+      "more": [
+       "That visit belongs to Lee Senior Moves, Sam's other company. It runs in the other flow.",
+       "The floor plan notes go with it, so Marta starts from them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: free in-home assessment. Floor plan notes saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Joan saved your floor plan notes. Want Lee Senior Moves to come see the home, free?",
+        {
+         "buttons": [
+          "Book the assessment",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "Adults only: a child never books or is served."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A planner's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A planner's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A planner's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "No first step for a call or a plan session."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with the business."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Children are never left."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The customer pays; no plan or insurance bills."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The customer pays; no plan or insurance bills."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "Nothing is required for a call or a plan session."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A senior move manager pays Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The senior move plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People are booked, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license: a background check for everyone in clients' homes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A senior move is never sent now."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "B5-03",
+    "form": [
+     [
+      "Your visit",
+      "Lee Senior Moves · Thu Oct 22 · starts at 8:00am · Marta"
+     ],
+     [
+      "Price",
+      "As shown above"
+     ],
+     [
+      "Card",
+      "None needed"
+     ],
+     [
+      "I agree",
+      "No fee can be charged. Please cancel before 8am Tue"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "The lead is told how Alex likes to be reached and who joins the visit. Health and memory notes stay on the job page.",
+     "Marta keeps the same lead for the whole move where possible."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-03",
+    "more": [
+     "The assessment needs Alex there. Family may join in person or by phone.",
+     "Nobody answers at a session: Marta calls Alex, then the family contact, before anything else (welfare check)."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "does": "Marta walked the home with Alex, and Alex's daughter joined by phone. On Fri Oct 23, the written plan and estimate reach Alex's secure page, once Sam OKs it.",
+    "more": [
+     "It's over Sam's $500, so Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+     "The estimate is a range: 40 to 60 person-hours at $85 an hour. The agreement sets the rate and the range.",
+     "Hours past the top of the range need the payer's yes first.",
+     "The moving company is hired by the family and bills its own way. The business takes no fee on it.",
+     "The plan and estimate are good for 30 days. The assessment was free, so nothing is billed if Alex doesn't sign."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 4250 senior move, about 50 hours. Plan on the page"
+     ],
+     [
+      "san",
+      "owner",
+      "Marta's plan for Alex M. is about $4,250 (40 to 60 hours at $85). It's over your $500 limit.",
+      {
+       "card": {
+        "title": "Senior move · about $4,250",
+        "lines": [
+         "Sorting and packing, about 34 hours",
+         "Move day and unpacking, about 16 hours"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Here's your written plan and estimate from Lee Senior Moves. It's good until Sun Nov 22.",
+      {
+       "card": {
+        "title": "Senior move · about $4,250",
+        "lines": [
+         "Sorting and packing, about 34 hours · $2,890",
+         "Move day and unpacking, about 16 hours · $1,360",
+         "$85 an hour per person; 40 to 60 hours in all",
+         "$500 retainer once the agreement is signed",
+         "Billed every Friday for that week's hours",
+         "The moving company bills you its own way"
+        ],
+        "button": "Read the plan",
+        "link": "rosfield.com/q/s8"
+       },
+       "buttons": [
+        "Sign the agreement",
+        "Not now"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 4250 senior move, about 50 hours. Plan on the page"
+       ],
+       [
+        "san",
+        "owner",
+        "Marta's plan for Alex M. is about $4,250 (40 to 60 hours at $85). It's over your $500 limit.",
+        {
+         "card": {
+          "title": "Senior move · about $4,250",
+          "lines": [
+           "Sorting and packing, about 34 hours",
+           "Move day and unpacking, about 16 hours"
+          ]
+         },
+         "buttons": [
+          "Send it",
+          "Change it"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's your written plan and estimate from Lee Senior Moves. It's good until Sun Nov 22.",
+        {
+         "card": {
+          "title": "Senior move · about $4,250",
+          "lines": [
+           "Sorting and packing, about 34 hours · $2,890",
+           "Move day and unpacking, about 16 hours · $1,360",
+           "$85 an hour per person; 40 to 60 hours in all",
+           "$500 retainer once the agreement is signed",
+           "Billed every Friday for that week's hours",
+           "Billed by Lee Senior Moves, its own way"
+          ],
+          "button": "Read the plan",
+          "link": "rosfield.com/q/s8"
+         },
+         "buttons": [
+          "Sign the agreement",
+          "Not now"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "does": "Alex doesn't sign now. The assessment was free, so nothing is owed. The plan stays good until Sun Nov 22.",
+    "more": [
+     "Marta texts DONE for the assessment. No bill goes out.",
+     "Alex can sign later from the same page, until the plan's date.",
+     "Alex can ask for a call first. Marta or Sam calls, and the plan stays open."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your plan stays good until Sun Nov 22. The assessment was free, so nothing is owed.",
+      {
+       "card": {
+        "title": "Senior move · about $4,250",
+        "lines": [
+         "Good until Sun Nov 22"
+        ],
+        "button": "Sign it later",
+        "link": "rosfield.com/q/s8"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "does": "Alex hasn't answered the plan in 5 days. Rosie sends one reminder. Still no answer 2 days later: Sam picks to call Alex, or let the plan run to its date.",
+    "more": [
+     "Nothing starts without the signed agreement.",
+     "Let it run: nothing is owed, the same as Not now.",
+     "Alex can still sign from the page until Sun Nov 22.",
+     "Rosie sends no more texts about it.",
+     "No answer from Sam in 2 days: the plan runs to its date, as with Let it run."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "A reminder: your senior move plan from Lee Senior Moves is good until Sun Nov 22.",
+      {
+       "card": {
+        "title": "Senior move · about $4,250",
+        "lines": [
+         "Good until Sun Nov 22"
+        ],
+        "button": "Read the plan",
+        "link": "rosfield.com/q/s8"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered Marta's plan in 7 days. It's good until Sun Nov 22.",
+      {
+       "buttons": [
+        "I'll call Alex",
+        "Let it run"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Wed Oct 28, 10:00am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-62",
+    "does": "Alex taps Sign the agreement on the plan's page. Rosie builds it from the plan and the parts the state's rules require. Alex signs, then Sam does.",
+    "more": [
+     "Alex signs for themself when they can decide. Where they can't, the agent or guardian named in the papers signs.",
+     "The person who pays is named in it, and the bills go to them. A payer or agent signs on a link Alex forwards.",
+     "Sam signs within 24 hours. Each one gets a copy by text and email.",
+     "Nothing is taken before everyone has signed.",
+     "Not signed by Sun Nov 22: one reminder 3 days before, then the plan lapses. Nothing is owed.",
+     "The agreement shows the rate, the range, the weekly bill, the retainer and the cancel terms."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. signed the senior move agreement. Please sign it too. Nothing is charged until you do.",
+      {
+       "card": {
+        "title": "Agreement · Senior move · about $4,250",
+        "lines": [
+         "Signed by Alex M. · Mon 7:40pm",
+         "The payer is named in it"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/s8"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Senior Moves signed your agreement. Your copy is on the page and in your email.",
+      {
+       "card": {
+        "title": "Agreement signed by both",
+        "lines": [
+         "Senior move · about $4,250",
+         "Alex M. · Mon Oct 26",
+         "Sam Lee · Tue Oct 27"
+        ],
+        "button": "See your copy",
+        "link": "rosfield.com/k/s8"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Mon Oct 26, 7:40pm"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-63",
+    "does": "With both signatures in, Alex pays the $500 retainer on the secure page, into Lee Senior Moves' own Stripe. The agreement set it. Then Alex picks the first session.",
+    "more": [
+     "It comes off the last bill. The retainer cap comes from the state's form.",
+     "Where the state's rules say money paid before the work is kept apart, it goes to the account Sam named at sign-up.",
+     "Not paid in 2 days: one reminder. A day later, Sam is asked to call Alex or cancel under the agreement.",
+     "No session starts until the cancel window ends."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your agreement is signed. The next step is the retainer.",
+      {
+       "pay": {
+        "amount": "$500",
+        "what": "your retainer",
+        "link": "rosfield.com/p/s8d"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Paid: your $500 retainer to Lee Senior Moves. It comes off your last bill. Pick your first session:",
+      {
+       "times": [
+        "Tue Nov 3 · 9:00am · Marta",
+        "Thu Nov 5 · 9:00am · Marta"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Tue Oct 27, 8:20am"
+     },
+     "price:visit+after:own": {
+      "t": "Tue Oct 27, 8:20am",
+      "does": "With both signatures in, Sam bills the $500 retainer outside Rosie, as the agreement set. Rosie sends nothing about money. Alex picks the first session.",
+      "more": [
+       "Rosfield's $2 for this booking goes on the monthly bill.",
+       "Sam bills the weekly hours outside Rosie too.",
+       "No session starts until the cancel window ends."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your agreement is signed. Lee Senior Moves bills the retainer its own way. Pick your first session:",
+        {
+         "times": [
+          "Tue Nov 3 · 9:00am · Marta",
+          "Thu Nov 5 · 9:00am · Marta"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-78",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Oct 27, 8:40am"
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B8-78",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "msg",
+      "t": "Tue Nov 3, 8:30am",
+      "title": "Marta checks the floor plan and the mover",
+      "does": "The cancel window has ended. Marta has the new apartment's floor plan. The family books the moving company for Sat Dec 5, at least 3 weeks ahead.",
+      "more": [
+       "Marta checks the company's date and arrival window, and sends the building's insurance certificate if asked.",
+       "The moving company is the family's own business, paid its own way. Lee Senior Moves takes no fee on it.",
+       "The building's move-in OK (elevator, hours) is the family's to get before move day."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "PLAN new floor plan measured. Bed and recliner fit"
+       ],
+       [
+        "san",
+        "cust",
+        "Marta has your new apartment's floor plan. Please book your moving company for Sat Dec 5, at least 3 weeks ahead.",
+        {
+         "card": {
+          "title": "Move day checklist",
+          "lines": [
+           "Your moving company booked",
+           "The building's move-in OK and elevator",
+           "A bag for what you need each day"
+          ],
+          "button": "See the list",
+          "link": "rosfield.com/s/s8m"
+         },
+         "buttons": [
+          "It's booked",
+          "Call me"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Nov 3, 8:45am",
+      "does": "The floor plan is done. Alex gets the work plan. Sorting is Tue and Thu. Packing starts Mon Nov 30, move day is Sat Dec 5, and setting up is Mon Dec 7 and Tue Dec 8.",
+      "more": [
+       "Sessions are short and at Alex's best time of day. Alex is there for every sorting session.",
+       "Marta decides nothing about belongings. Alex decides what goes, stays, is donated or sold.",
+       "Packing and move days use two people. Each day has its own code and DONE with its hours.",
+       "Marta texts DONE after each session with its start and end times. The hours add up for the weekly bill.",
+       "If a day moves, only that day moves, and Alex is told. A new person comes only with Alex's OK first.",
+       "A cancel after the window goes to Sam to settle with Alex. Rosie moves no money on its own."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your sessions start today. Here's the plan.",
+        {
+         "card": {
+          "title": "Work plan · 48 Linden Ave",
+          "lines": [
+           "Tue and Thu · sorting, 3 weeks",
+           "Mon Nov 30 to Wed Dec 2 · packing",
+           "Sat Dec 5 · move day",
+           "Mon Dec 7 and Tue Dec 8 · setting up the new home"
+          ],
+          "button": "See the plan",
+          "link": "rosfield.com/s/s8"
+         }
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "IN session 1: study, desk drawers",
+        {
+         "photos": [
+          "Study, start of session 1"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Marta started session 1. You'll get an update after each session."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Alex says stop",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.8",
+        "8.9"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Nov 12, 11:20am",
+       "title": "Marta stops: Alex changes their mind",
+       "does": "Alex says to stop packing the study. Marta stops at once. Nothing is packed or thrown away against Alex's wishes.",
+       "more": [
+        "The people Alex named are told only that the session stopped, never why.",
+        "Sam calls Alex. Alex decides about the rest, or the agent named in the papers where Alex can't.",
+        "Only the hours worked so far are billed. Stopping has no fee.",
+        "A person the family names can't overrule Alex while Alex can decide."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "STOP Alex M. asked to stop. Study not packed"
+        ],
+        [
+         "san",
+         "owner",
+         "Marta stopped Alex M.'s session at 11:20am. Alex asked to stop. Please call Alex.",
+         {
+          "buttons": [
+           "I'll call Alex"
+          ]
+         }
+        ]
+       ],
+       "tells": [
+        "owner"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "vary": {
+     "price:visit+after:bill": {
+      "t": "Tue Dec 8, 4:00pm",
+      "does": "The new home is set up and Alex has walked through it. Marta texts DONE with that session's hours. Each Friday's bill adds up the week.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 5 hours unpacking, kitchen and bedroom"
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Tue Dec 8, 4:00pm",
+      "does": "The new home is set up and Alex has walked through it. Marta texts DONE. Sam bills the hours outside Rosie.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE"
+       ],
+       [
+        "san",
+        "staff",
+        "Done: Alex M., senior move."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE new apartment set up. Bed made, kitchen like the old one. Spare keys with the daughter"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-22",
+    "vary": {
+     "price:visit": {
+      "t": "Fri Dec 11, 4:00pm",
+      "does": "Say Alex's move is billed every Friday. Each bill lists that week's sessions with their start and end times. This last one also takes off the $500 retainer.",
+      "more": [
+       "Each session still gets its own code and DONE, and each line shows its date and hours.",
+       "A running total of the hours shows against the estimate's range, so the payer can see it.",
+       "Before a session would pass the top of the range, the payer's own yes comes first.",
+       "Only the hours worked are billed. The retainer comes off the last bill, and nothing else is added.",
+       "After a bill, the same rules as any bill: card or link, a decline, unpaid after 4 days."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Senior Moves: your last week and your last bill. Think this is wrong? Reply here, and it goes to Sam.",
+        {
+         "pay": {
+          "amount": "$350",
+          "what": "your last bill",
+          "link": "rosfield.com/p/s8"
+         }
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Week 6 · Mon Dec 7 and Tue Dec 8 · 10 hours · $850. Less your $500 retainer: $350. Hours in all: 50 of about 50.",
+        {
+         "card": {
+          "title": "Last bill · $350",
+          "lines": [
+           "Mon Dec 7 · 9:00am to 2:00pm · 5 hours",
+           "Tue Dec 8 · 9:00am to 2:00pm · 5 hours",
+           "Week 6 · $850 less $500 retainer",
+           "Hours in all: 50 (range 40 to 60)"
+          ],
+          "button": "See the hours",
+          "link": "rosfield.com/p/s8"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "vary": {
+     "price:visit": {
+      "t": "Fri Dec 11, 4:30pm",
+      "does": "The receipt goes out once the last bill is paid, by text and email. It carries the move summary and any donation receipts.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "Donation receipts go to the family with it.",
+       "The move summary lists each session's hours.",
+       "Any fact the state's rules require, like a registration number, is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your senior move. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $4,250",
+          "lines": [
+           "50 hours at $85 an hour",
+           "$500 retainer + weekly bills + $350 last bill",
+           "Move summary and donation receipts",
+           "Questions about the move: reply here any time"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/s8"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Fri Dec 11, 4:30pm",
+      "does": "Lee Senior Moves sends its own receipt. Rosie sends the move summary.",
+      "more": [
+       "Rosie sends no receipt here. The business's own receipt carries any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Senior Moves. Your move summary is on the page. If anything looks wrong, reply here."
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "t": "Fri Dec 11, 4:30pm",
+      "does": "The receipt goes out once the last bill is paid, by text and email. It carries the move summary and any donation receipts.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "Donation receipts go to the family with it.",
+       "The move summary lists each session's hours.",
+       "Any fact the state's rules require, like a registration number, is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your senior move. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $4,250",
+          "lines": [
+           "50 hours at $85 an hour",
+           "$500 retainer + weekly bills + $350 last bill",
+           "Move summary and donation receipts",
+           "Questions about the move: reply here any time"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/s8"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "t": "Fri Dec 11, 4:30pm",
+      "does": "Lee Senior Moves sends its own receipt. Rosie sends the move summary.",
+      "more": [
+       "Rosie sends no receipt here. The business's own receipt carries any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Senior Moves. Your move summary is on the page. If anything looks wrong, reply here."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "vary": {
+     "price:visit": {
+      "t": "Sat Dec 12, 10:00am",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Senior Moves! How was working with Marta and the crew?",
+        {
+         "card": {
+          "title": "Rate your move",
+          "lines": [
+           "Marta · Lee Senior Moves"
+          ],
+          "button": "Rate it",
+          "link": "rosfield.com/r/s8"
+         },
+         "stars": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "A senior move is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "A senior move is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "A senior move is never sent now; every session has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "A senior move is never sent now; every session has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Sessions start at a set time with a named lead."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Sessions start at a set time with a named lead."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Sessions start at a set time with a named lead."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An assessment has no form to sign first; the agreement is signed with the plan (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A senior move never starts at the assessment: Alex signs a written agreement first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "The agreement is signed whole. A change is a new written plan from Marta, after a call."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A senior move manager pays Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The senior move plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People are booked, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license: a background check for everyone in clients' homes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A senior move is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "The customer pays; no plan or insurance bills."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "The customer pays; no plan or insurance bills."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked once, after the move."
+   }
+  ]
+ },
+ "notes": "New profession (P3 pass, Tue Oct 27 2026, batch P6), started from the refitted movers (from: movers), merged with the verified Oct 24 test-drive plug-in (work/testdrive/senior-move.md, 12 findings, all general). The movers' truck, weigh-ticket and bill-of-lading move-day chain, vault storage and crate prices were not carried; every pf key, rename pair and own step was rewritten for a senior move manager.\nStyle Project: a free in-home assessment, a written plan and estimate, a signed agreement with a retainer, a cancel window, then sessions over weeks (sorting, packing, move day, unpacking) billed by the hour every Friday. The moving company is a separate business the family hires and pays; the business books and supervises the date and takes no fee on it.\nFlow B main path visit|none|bill: Alex (the older adult, with their daughter on the phone) at 48 Linden Ave moving to 300 Maple Ct. Free assessment Thu Oct 22, 9am (set start, Marta); the plan and estimate Fri Oct 23 after Sam's OK: about 50 person-hours at $85 = $4,250 (sorting and packing about 34 hours $2,890 + move day and unpacking about 16 hours $1,360); the range is 40 to 60 person-hours ($3,400 to $5,100). Agreement Mon Oct 26 (Alex) and Tue Oct 27 (Sam); $500 retainer Tue Oct 27 (taken off the last bill; the cap comes from the state's form); cancel window to 11:59pm Mon Nov 2 (switch cancelright, flow B only). Sessions Tue Nov 3 to Tue Dec 8; weekly bills $680, $680, $680, $510, $850 and a last bill of $350 (week 6 $850 less the $500 retainer): 50 hours, $4,250 in all, the receipt adds up.\nHours past the top of the range need the payer's own yes first (master B9-22 line); a session cancelled less than 48 hours ahead may be billed 1 hour ($85, example) only if the owner confirms, never for a hospital stay or a death. The assessment and the family planning call are free, so a no costs nothing.\nFlow B money paths: visit|none|bill (main), visit|none|own (an agent's check under a power of attorney; Rosie sends nothing about money), list|none|bill (a downsizing session, $85 an hour, 3-hour minimum = $255, billed after). Other list services in pf.services (home setup visit $170, floor plan visit $275, room plan from photos) have no path of their own: they are priced and billed the same way as the downsizing session.\nFlow A is Sam's second company Lee Move Planning (remote planning by phone or video, no walk-ins; planners Joan and Priya). Paths: list|none|none (main: a free 30-minute family planning call) and list|full|none (the $150 remote move plan, paid in full; a late cancel may keep $20 of it, only with the owner's yes). A8-x01 offers the free in-home assessment, which runs in flow B. Cards name 'a planning session' on every A path (the master hard-codes one service name per flow, MASTER line in the log).\nOwn steps (dated forward): B8-x01 Tue Nov 3 floor plan + the family books the moving company 3 weeks ahead (nothing named that is private); B8-x02 (a branch of B8-22) Thu Nov 12 Alex changes their mind: the session stops, nothing is packed or thrown away against their wishes, the people they named are told only that it stopped. The work plan B8-37 (Tue Nov 3), the weekly bill B9-22 (Fri Dec 11), the receipt B10-01 and the rating B10-02 are the master's steps with this work's words.\nSafety: stop = a fall and can't get up, sudden confusion, chest pain or trouble breathing; a fire, smoke or gas smell. Steps then go on = dementia or confusion that comes and goes (the same lead each time, short sessions, a family member on call), pressure or money taken from the older adult (hotline; the owner told privately the same day), oxygen and fall risks, hoarding or a home not safe to work in (a cleanup company first, none named), medicines (staff never handle them), firearms (staff never touch them). B3-11 and B3-18 are one Spanish conversation about confusion that comes and goes: booking goes on.\nWho may book and decide: an adult; the older adult agrees to the move whenever they can; family may book and pay; where they can't decide, an agent under a power of attorney or a guardian signs; never a move the older adult says they don't want. A named lead is never replaced on silence. Never in texts: health, memory, care or money details, door codes, why someone is moving. Texts go to the older adult only with a mobile and a yes, else to the family contact or by phone call.\nSwitches: cancelright (B), welfare (B: nobody answers the door = a safety check before any no-show words). Not set: sensitive, standin, fixeddate. Settings: set start times in both flows; cutoff 24 hours (A) and 2 days (B). Facts: firststeps, documents, multiday, extrawork, photos, video, monthlybill.\nSplits: S1-60 kept both (no license in most places; a mover's license only where the business carries goods itself), S1-62 the $2 applies, S2-28 no person license, S2-30 never sent now, B4-83 set start only, B8-67 an adult must be there, B10-32 a rating is asked, A4-66 a person's time, A8-02 nothing required.\nThe old test-drive gaps are all closed by the REDESIGN 2 master (see the log): S13-31 three roles, S13-19 contact, S13-56 nobody moves on silence, B3-31 harm to an older adult, B4-77 two addresses, B7-73 a death, B8-80 a stop partway, B9-22 hours against the range, the free path. Example license numbers use EX-2210 style. keep: moving, Moving, estate, leak, house call.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Style consult",
+    "style consult",
+    "Give this code at the chair when you arrive.",
+    "Give this code at the chair.",
+    "Step-free door on Elm St · parking in the back",
+    "88 Elm St, Springfield",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter",
+    "A chair renter",
+    "a step-free chair",
+    "A step-free door on Elm St, and parking in the back.",
+    "I'd like a cut on Saturday.",
+    "a staff cut",
+    "the shorter cut",
+    "come with dry hair on Saturday",
+    "come with dry hair",
+    "Alex M.'s cut",
+    "the cut in the mirror",
+    "A cut is rated",
+    "At the shop, and house calls",
+    "My employer pays for this cut.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "A neighborhood barbershop on Elm St.",
+    "Riley's color plan",
+    "Proposal · Color plan",
+    "color plan visit",
+    "a beard trim",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "like a roofer",
+    "skin fades",
+    "color plan after a consult",
+    "Only the consult;",
+    "does the consult,",
+    "does the consult only",
+    "Consult only",
+    "the consult only",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "A barbershop has none, so nothing is sent here.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "like a color correction done in two steps",
+    "$25 consult",
+    "at the shop and for house calls",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "a color correction",
+    "A color correction",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "a Kids cut (12 and under) is $25",
+    "Quiero un corte el sábado.",
+    "Gloss to finish",
+    "gloss",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "once Riley sees the hair",
+    "Step-free door on Elm St",
+    "Do you do kids cuts? My son is 8.",
+    "A haircut could mean a salon or a barbershop.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "does color",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "2 Not today",
+    "Haircut at their home",
+    "Haircut at home · $75",
+    "takes jobs sent now, like a burst pipe",
+    "A repair shop, a tailor or a groomer does.",
+    "Lee Home Services'",
+    "a shorter cut",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Panel upgrade",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "an estimate visit",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "The Groom's package",
+    "the Groom's package",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color",
+    "Color",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "at the chair",
+    "the chair",
+    "shops",
+    "shop",
+    "Shop",
+    "$55",
+    "$140 an hour"
+   ],
+   "B": [
+    "$89, credited to the repair",
+    "a card saved for the $89 service-call fee you OK",
+    "Water pressure check",
+    "up to the $89 service call",
+    "11:59pm Tue Oct 27",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Yes, it won't drain",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "The shop front",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter",
+    "a camera inspection",
+    "At the shop, and house calls",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "A neighborhood barbershop on Elm St.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Only the {{fee}} service call is promised now.",
+    "The {{fee}} counts toward the work's price.",
+    "the {{fee}} service call is owed, even after a no to the price",
+    "Cracked cabinet floor",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Book this drain clearing?",
+    "can clear the drain",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "like a $620 repair",
+    "leak repair is $620",
+    "Leak repair · $620",
+    "Leak repair · $245",
+    "Shutoff valve and wall pipe · $540",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "The $89 service call is included",
+    "cracks the cabinet floor",
+    "Right to cancel · repipe",
+    "Harper gets the notice",
+    "Harper's first cancel message",
+    "only in Harper's own words",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "at the shop and for house calls",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "A haircut could mean a salon or a barbershop.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Tessa · Drain clearing",
+    "asks an AI for a plumber",
+    "Then the booking goes on, marked urgent. Here it's Rosa's call",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "One of the shop's barbers does house calls.",
+    "Contract · Water heater replacement",
+    "water heater contract",
+    "replaces water heaters",
+    "Jordan texts the quote",
+    "Signed: the deposit, then the work days",
+    "2 Not today",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "Jordan needs a part from the supply house.",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "DAMAGE cracked the cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Set at the visit",
+    "CANT START no proof Alex may have this work done",
+    "takes jobs sent now, like a burst pipe",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A drain clearing",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "a drain clearing",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "Harper J.",
+    "Harper",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "leehomeservices.com",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Panel upgrade",
+    "credited to the repair",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "$179 drain",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "the kitchen drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "1-year labor warranty",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "service call fee",
+    "Service call fee",
+    "an estimate visit",
+    "estimate visit",
+    "Estimate visit",
+    "service call",
+    "Service call",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "barber",
+    "Barber",
+    "color",
+    "hot towel",
+    "haircut",
+    "paid at the chair",
+    "at the chair",
+    "$120 an hour",
+    "$179",
+    "$199",
+    "$150",
+    "$89",
+    "$140 an hour"
+   ]
+  },
+  "A": {
+   "A8-44": "4410a4860c",
+   "A4-24": "0a292df05b",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-02": "15f418fec4",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3"
+  },
+  "B": {
+   "B5-03": "7c7d43f508",
+   "B6-14": "dfd03ee673",
+   "B8-03": "ac9d404766",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-49": "4fcfdeb80b",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "B8-78": "628ca6843e",
+   "B8-37": "3ce85cf051",
+   "B8-22": "50d78f1af0",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B9-22": "f691bde396",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255"
+  }
+ }
+}

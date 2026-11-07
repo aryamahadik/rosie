@@ -1,0 +1,3144 @@
+{
+ "id": "camp",
+ "name": "Summer camp",
+ "style": "Class",
+ "pattern": "class",
+ "from": "swim",
+ "plugin": {
+  "pf.license": {
+   "need": "from the state form: a youth camp license or permit for the camp's own grounds where the state's rules require one (a switch), renewed on the state's schedule; health inspections of the grounds, kitchen, water, cabins and swim area where the state's or county's rules require them (a switch); a backyard camp at a family's home may need none, or the host site's own OK (a switch)",
+   "who": "the business, for the camp license, its inspections and its registration; the camp nurse, for a nursing license; each counselor, for first aid and CPR certificates; waterfront staff, for their own water safety certificates",
+   "ask": "the camp license number and its end date where the state's form asks (shown in an obviously made-up example as EX-1042); the date of the last health inspection; the business registration; the camp nurse's license number; each person's first aid and CPR certificates; any accreditation the camp holds, only as the camp gives it",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "background": "a background check for every staff member and regular volunteer before they start, and again on the state's schedule, where the state's rules require it (a switch from the state's form, on by default for anyone who works with children): who ran it and when, kept on file, shown to families only as the camp's own dated statement",
+   "blocks": "camp sessions go live only once the camp license is on file where the switch is on; a person is offered for camp work only once their background check (where on) and certificates are on file; a lapsed license takes the sessions offline until it's renewed, and Sam tells the families booked",
+   "renewals": "reminded 30 days and 7 days before the camp license, an inspection, a background check, a certificate or the insurance comes due",
+   "insurance": "liability insurance where the state's form asks for it, or where a host site (a school, a park, a community center) asks for proof",
+   "accreditation": "a voluntary accreditation shows only as the camp gives it, labeled voluntary, never as a license"
+  },
+  "pf.services": {
+   "shape": "class: a place in a set session (a day camp week or an overnight week) by age group, with a cap for each cabin or group and a free waitlist; each camper is one booking with their own check-in code, checked in at drop-off and handed back only to an approved adult at pick-up. A backyard camp week books two counselors for a group of children at the host family's home. A free camp tour books the director's time.",
+   "examples": "the example camps' own prices (Lee Lakeside Camp and Lee Backyard Camps), not a standard",
+   "list": [
+    {
+     "name": "Overnight week (Sun 2:00pm to Sat noon), ages 9 to 14",
+     "price": "$1,150",
+     "kind": "one price",
+     "length": "7 days",
+     "where": "at the camp",
+     "before": "a $250 deposit when registering, with the $900 rest charged to the saved card when the session is done",
+     "after": "nothing more",
+     "capacity": "cabins of 8 campers by grade and gender, 2 counselors each",
+     "note": "a parent or guardian registers; the health form, shot record and medicine form go on the secure page by May 15"
+    },
+    {
+     "name": "Two-week overnight session, ages 11 to 15",
+     "price": "$2,150",
+     "kind": "one price",
+     "length": "14 days",
+     "where": "at the camp",
+     "before": "a $400 deposit when registering, with the rest charged to the saved card when the session is done",
+     "after": "nothing more",
+     "capacity": "cabins of 8 campers, 2 counselors each"
+    },
+    {
+     "name": "Day camp week (Mon to Fri, 9:00am to 3:30pm), ages 5 to 8",
+     "price": "$325",
+     "kind": "one price",
+     "length": "5 days",
+     "where": "at the camp",
+     "before": "a $75 deposit when registering, with the $250 rest charged to the saved card when the session is done",
+     "after": "nothing more",
+     "capacity": "groups of 10 campers, 2 counselors each",
+     "note": "signed in and out each day by an adult on the pick-up list"
+    },
+    {
+     "name": "Extended day (3:30 to 5:30pm), with a day camp week",
+     "price": "$60 a week",
+     "kind": "an add-on",
+     "length": "5 afternoons",
+     "where": "at the camp",
+     "before": "paid with the day camp week",
+     "after": "nothing more"
+    },
+    {
+     "name": "School-holiday day camp (one day), ages 5 to 10",
+     "price": "$65",
+     "kind": "one price",
+     "length": "9:00am to 3:30pm",
+     "where": "at the camp",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "groups of 10 campers, 2 counselors each",
+     "note": "on school holidays in the school year; the same forms and pick-up list as day camp; free to cancel until 24 hours before"
+    },
+    {
+     "name": "Camp tour with the director",
+     "price": "free",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the camp",
+     "before": "nothing taken",
+     "after": "nothing owed",
+     "note": "for a family thinking about camp; the child may come along; Sundays from October to May"
+    },
+    {
+     "name": "Backyard camp week (Lee Backyard Camps), ages 5 to 10",
+     "price": "$900 for up to 6 children",
+     "kind": "one price",
+     "length": "Mon to Thu, 9:00am to noon",
+     "where": "at the host family's home",
+     "before": "a $225 deposit when booking, with the $675 rest charged to the saved card when the week is done",
+     "after": "nothing more",
+     "capacity": "up to 6 children, 2 counselors",
+     "note": "the host parent books; each child's own parent fills that child's forms and pick-up list on the secure page; an adult from the host family stays at the home every morning"
+    },
+    {
+     "name": "Backyard camp day",
+     "price": "$250 for up to 6 children",
+     "kind": "one price",
+     "length": "3 hours",
+     "where": "at the host family's home",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "An extra morning, added to a backyard camp week",
+     "price": "$225",
+     "kind": "an add-on",
+     "length": "3 hours",
+     "where": "at the host family's home",
+     "before": "paid in full when added, by one pay link",
+     "after": "nothing more"
+    },
+    {
+     "name": "Camp-style birthday party (Lee Backyard Camps' second kind of work)",
+     "price": "$250",
+     "kind": "one price",
+     "length": "2 hours, up to 15 children",
+     "where": "at the customer's place",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "a party leader runs games; the host's adults stay in charge of the children",
+     "addOns": "each extra half hour $60; a second party leader for more than 15 children $90 (the example business's own prices)"
+    }
+   ],
+   "placement": "by the camper's age on the first day of the session; overnight cabins by the grade finished in June and by gender; one cabin-mate request, kept where it fits",
+   "capacity": "8 campers and 2 counselors a cabin; 10 campers and 2 counselors a day camp group; 6 children and 2 counselors at a backyard camp; a ratio from the state's form wins; each place is one camper with their own check-in code",
+   "waitlist": "a full session keeps a free waitlist in order; when a place opens, Sam OKs the offer to the next family, which has 48 hours to take it and pay the deposit (the camp's setting); no thanks takes the family off the list for that week; no reply in 48 hours passes the place to the next family and keeps the family on the list for a later opening",
+   "minimum": "none: a session runs with the campers it has",
+   "siblings": "each child is their own booking, in the session that fits their age; a sibling can be in another session the same week, with their own code and forms",
+   "moves": "free to another week of the same kind until May 1, while places are left; after that, Sam decides",
+   "online": "never: camp is in person",
+   "nobodyHome": "never: at a backyard camp, an adult from the host family stays at the home the whole morning",
+   "notOurs": "the camp's daily schedule, cabin assignments beyond the booking, activities and staff hiring stay in the camp's own tools; Rosie finds, asks, registers, checks campers in and out, and takes payment"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "each camper's age on the first day of the session, and the grade they finish in June (they set the session and the cabin group)",
+    "day camp or overnight, and which week",
+    "for an overnight week: girls' or boys' cabins",
+    "for a backyard camp: the home's town (the travel area; the street address goes on the secure page), and how many children and their ages",
+    "for a camp tour: who is coming, and the child's age"
+   ],
+   "afterTime": [
+    "one cabin-mate request, kept where it fits",
+    "for day camp: who drops off and picks up most days",
+    "anything the counselors should know that isn't health, like a first time away from home",
+    "for a backyard camp: a shaded part of the yard, and a bathroom inside the children can use"
+   ],
+   "securePage": [
+    "the parent or guardian's yes that they may register the child, and the camp's agreement and risk notice, signed for the child",
+    "the camper's full name and birth date, the home address and two emergency contacts",
+    "the health form, the shot record (or the papers the state's rules accept instead), and a medicine form for each medicine, signed where the camp asks",
+    "allergies, health needs and any custody order, for the camp nurse and the director only",
+    "the pick-up list: the adults who may take the child home, and anyone who may not, with a copy of any court order",
+    "a yes or no for photos of the child",
+    "the card for the deposit or the full price"
+   ],
+   "whoMayBook": "a parent or legal guardian, 18 or older, registers a camper, signs and pays; a teen gets a link to send to a parent; for a backyard camp, the host parent books the week and each child's own parent fills that child's forms"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a child hurt, very sick or in danger right now; a child who is missing",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a report of abuse or neglect at a camp",
+     "say": "If a child is in danger now, call 911. You can also call your state's child abuse hotline. A person on Rosie's team will follow up.",
+     "booking": "no booking in that chat; a person on Rosie's team follows up"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "an allergy, asthma, a medicine or a health need",
+     "what": "the booking goes on; the details go on the secure page for the camp nurse; Rosie gives no health advice"
+    },
+    {
+     "words": "a food allergy that needs an epinephrine pen",
+     "what": "the booking goes on; the nurse reads the form before camp, and the pen comes to check-in in its labeled box"
+    },
+    {
+     "words": "a custody order, or a person who may not pick up",
+     "what": "the booking goes on; the order goes on the secure page for Sam and the check-in staff, never in a text"
+    },
+    {
+     "words": "a first time away from home, or homesick worries",
+     "what": "the booking goes on; the note goes to the head counselor on the secure page"
+    }
+   ],
+   "weather": "lightning or a storm warning: campers go to the camp's shelter under its written emergency plan, and Sam sends families a short update with no child's name; a day the camp closes gets a make-up day or a refund for that day (the camp's setting)",
+   "children": "a child is never alone with one adult out of sight of others; a child goes only to an adult on the pick-up list, with photo ID for anyone staff don't know; a missing child: the camp's emergency plan, 911, and the parent called right away; a sick or hurt child: first aid, 911 when it's serious, and the nurse or Sam calls the parent right away; any worry about a child's safety goes to Sam at once, and Sam reports it where the state's rules require",
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "The camp's agreement and risk notice",
+     "when": "signed on the secure page while registering",
+     "who": "a parent or guardian signs for the child",
+     "result": "signed: the booking goes on; not signed in 10 minutes: nothing is booked"
+    },
+    {
+     "name": "The pick-up list and the photo yes or no",
+     "when": "on the secure page while registering; the parent can change them until pick-up",
+     "result": "only adults on the list take the child home; no answer to photos counts as no"
+    },
+    {
+     "name": "Health form, shot record and medicine forms",
+     "when": "open when registering; due May 15 (the camp's setting; the state's rules can set more)",
+     "who": "the parent fills them; the camp nurse reads each one",
+     "result": "still missing: one reminder a week, then Sam calls; no camper checks in without them"
+    },
+    {
+     "name": "Backyard camp: each child's forms and the yard check",
+     "when": "each child's own parent fills that child's forms by 7 days before the first day; the host fills the yard check while booking",
+     "result": "the yard has a fence or a clear edge, shade, water and a bathroom inside; a pool is gated and locked; pets stay inside; a child with no forms doesn't join"
+    },
+    {
+     "name": "Camp tour",
+     "when": "optional, before registering",
+     "result": "nothing to sign; no forms"
+    }
+   ],
+   "prep": "for the check-in note: the check-in window and the closing-day pick-up time; medicines in their original labeled boxes for the nurse; the camp's own packing list; photo ID for anyone picking up; for a backyard camp: the yard and the bathroom ready, pets inside, and each child's snack and water bottle"
+  },
+  "pf.visit": {
+   "checkIn": "overnight: on check-in day, the parent gives the camper's check-in code at the check-in table, the nurse takes any medicines and checks the forms, and the head counselor walks the camper to the cabin; day camp: each day the adult dropping off signs the camper in with the code, and signs out at pick-up; backyard camp: the code at the host's door on the first day, then each child signed in and out by their own adult each day; a camp tour: the code at the camp office",
+   "children": "a child goes home only with an adult on the pick-up list; staff check photo ID for anyone they don't know; someone not on the list waits while the parent is called, and the child stays with staff; the parent can add a name on the secure page, and the ID is checked at pick-up",
+   "lateEntry": "check-in is a window (2:00 to 4:00pm on Sundays); a family running late texts, and the camp waits until 6:00pm (the camp's setting)",
+   "changes": "a cabin or counselor change inside the camp is the camp's own; a change of session or dates is texted to the parent with a yes first",
+   "done": "the check-in code on the first day, the sign-out at closing-day pick-up, and the head counselor's DONE once every camper has gone home",
+   "note": "health records and incident notes stay in the camp's own records on the secure page; a short end-of-week note may go to the parent by private link"
+  },
+  "pf.money": {
+   "before": "a camp session: a deposit when registering ($250 overnight, $400 two-week, $75 day camp), with the rest charged to the saved card when the session is done; or paid in full when registering, by choice; a camp tour: free, nothing taken; a backyard camp week: a $225 deposit when booking, with the rest charged to the saved card when the week is done; a school-holiday day camp, a backyard camp day and a birthday party: paid in full when booking",
+   "installments": "none through Rosie: the rest is charged once, when the session is done; a charge on a set day isn't offered (Rosie never charges the rest on a date by itself)",
+   "caps": "any limit on deposits or on money taken ahead for camp, and any bond or account kept apart: from the state's form",
+   "cancel": "the camp's own dated schedule, agreed on the secure page before paying: cancel by May 1, everything back but a $50 fee; May 2 to Jun 11, half the price back; after Jun 11, nothing back, unless Sam decides an exception. A backyard camp week: until 14 days before the first day, everything back but $50; then half, until 7 days before; then nothing, unless Sam decides. A school-holiday day camp or a party: free to cancel until 24 hours before (a party: 14 days); later, or a no-show, what's kept is Sam's call. A longer cancel right from the state's form wins. The tiers are each camp's own setting, shown on the secure page before paying: a camp can add one, like 'the deposit is kept' between two dates",
+   "campCancels": "the camp cancels a session or a day: a full refund of everything paid, or a free move, the family's choice; never a fee",
+   "fees": "no late-cancel or no-show fee on top: only the dated schedule applies; a refund the schedule gives in time goes out by itself, without Sam's OK; anything outside the schedule (a late cancel, a no-show, an exception) waits for Sam's yes by reply, with one reminder after 24 hours, and no answer means a full refund",
+   "leaveEarly": "a camper who goes home early (homesick, or sent home under the camp's rules): nothing back for days missed, unless Sam decides; a camper sent home sick or hurt: Sam decides a credit or a part refund",
+   "tips": "no tips line",
+   "tax": "no tax line, unless the owner sets one",
+   "fee2": "pays Rosfield's $2 for each confirmed booking, counted at its first check-in: one $2 for each camper's session, however many days or weeks it covers; no visit, no $2",
+   "unpaidRest": "the rest declined at the end: one pay link, then Sam decides; Rosie never cancels a camper or charges again on its own"
+  },
+  "pf.messages": {
+   "never": "a child's last name, birth date, allergies, medicines, health needs, custody orders, the pick-up list (and who may not pick up) and photos never go in a text; texts to the parent may use the child's first name; texts to Sam or the staff carry none of it: they name the parent and the session, and link to the secure page",
+   "to": "texts go to the parent who registered; another parent or guardian only once added on the secure page with their own yes",
+   "languages": "English and Spanish",
+   "minors": "a teen gets a link to send to a parent; Rosie never texts a child",
+   "photos": "photos of a child are shared only with the parent's yes, and never by text",
+   "duringCamp": "news about a sick or hurt child comes by a call from the nurse or Sam, never by text; group updates (a storm, a delay) name no child",
+   "pickUp": "a same-day pick-up change by text is only a request: the text to the camp names the parent and the time, never the adult or the child; staff check the adult against the list on the secure page, with photo ID; a new adult is added only by the parent on the secure page, never from a text reply"
+  },
+  "pf.staff": {
+   "skills": "head counselor (a cabin group or a day camp group), counselor, camp nurse, waterfront staff, backyard camp counselor, party leader",
+   "certificates": "first aid and CPR for every counselor; a water safety certificate for anyone guarding the lake or pool; switches from the state's form, on by default",
+   "nurse": "a licensed nurse (or the health supervisor the state's rules allow) reads every health form before camp and runs check-in medicines; a switch from the state's form",
+   "checks": "a background check on file for every staff member and regular volunteer before they start, where the state's rules require it (on by default); renewed on the state's schedule",
+   "ratio": "8 campers and 2 counselors a cabin; 10 campers and 2 counselors a day camp group; 6 children and 2 counselors at a backyard camp (the example camps' settings; a ratio from the state's form wins)",
+   "supervision": "two adults with any group of children; counselors under 18 never count toward the ratio",
+   "whoOKs": "Sam OKs waitlist offers, moves after May 1, refunds and exceptions; Pat may OK waitlist offers and moves too, and Sam's answer wins; Hannah, the camp nurse, answers health questions",
+   "license": "the camp nurse's nursing license, checked on the state's lookup; no other person license unless the state's form names one"
+  },
+  "pf.rules": {
+   "items": [
+    "the camp license or permit and its health inspections: switches from the state's form",
+    "background checks, first aid and CPR, and waterfront certificates: switches from the state's form",
+    "a written emergency plan (storms, fire, a missing child), shown as the camp's own statement where the state's rules require it",
+    "shot records: the camp asks for the record, or the papers the state's rules accept instead",
+    "medicines: kept and given by the nurse from the original labeled box, logged, and returned at pick-up; a camper carries an inhaler or an epinephrine pen only where the form allows",
+    "money taken ahead for camp: any limit, bond, account kept apart or cancel right comes from the state's form",
+    "the dated refund schedule is shown and agreed before anything is paid",
+    "a worry about a child's safety: Sam reports it where the state's rules require",
+    "phone calls: the line always says first that the call is recorded",
+    "records kept 7 years; health records kept as long as the state's rules say"
+   ],
+   "weather": "lightning: everyone indoors or to the shelter, and back out only after the camp's set time with none (like 30 minutes)",
+   "photos": "photos of a child: only with the parent's yes (no answer counts as no)"
+  },
+  "pf.edges": {
+   "applies": [
+    "a full session: the free waitlist, offered in order with Sam's OK and 48 hours to take it; no reply passes it on and keeps the family listed",
+    "siblings in different sessions: each child is their own booking, with their own code and forms",
+    "an age or grade outside the session: Rosie shows only the sessions that fit",
+    "health forms missing on May 15: one reminder a week, Sam calls by Jul 1, and no camper checks in without them",
+    "the rest declined when the session is done: one pay link, then Sam decides; Rosie never cancels a camper on its own",
+    "the camp cancels a session (a water or building problem): a full refund or a free move",
+    "a storm or lightning: the shelter under the emergency plan, and a short update to families with no names",
+    "a sick or hurt child: first aid, 911 when it's serious, and the parent called right away by the nurse or Sam, never by text",
+    "a missing child: the camp's emergency plan, 911, and the parent called right away",
+    "someone not on the pick-up list: the child stays with staff while the parent is called; a new name goes on the secure page, and photo ID is checked",
+    "a custody order: kept on the secure page for the director and check-in staff; the child goes only to a listed adult",
+    "homesick: the head counselor calls the parent; going home early gets nothing back unless Sam decides",
+    "running late to check-in: the camp waits until 6:00pm with a text",
+    "a backyard camp yard that isn't safe on arrival (an open pool, no shade or bathroom): no camp that day, and a make-up day or a refund"
+   ],
+   "generic": "all others handled the generic way"
+  },
+  "pf.facts": [
+   "classes",
+   "groups",
+   "children",
+   "incare",
+   "forms",
+   "multiday",
+   "waitlist"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "2 days before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Jess and Kai (head counselors) · Hannah (camp nurse)",
+   "cust": "Alex M. (a parent, for Ava, 11, and Max, 7) · other families",
+   "other": "Others (a bank, another parent or guardian)"
+  },
+  "B": {
+   "staff": "Tyler and Nadia (backyard camp counselors)",
+   "cust": "Alex M. (the host parent, for Ella, 8) · the other children's parents",
+   "other": "Others (a bank, another child's parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Jess"
+  },
+  "B": {
+   "staff": "Tyler"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Jess and Kai are head counselors; Jess also leads backyard camps."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Jess: head counselor, backyard camps"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Jess: head counselor and backyard camps"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every camp session and backyard camps"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Overnight and day camp on the lake, ages 6 to 14."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Backyard camp weeks and camp parties, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A backyard camp week"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact.",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you an emergency contact."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Barbershop, plumbing, electrical",
+    "Overnight camp, backyard camps, parties"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most camps set it."
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Backyard camps: allowed where you are, for those cleared"
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, Overnight Week 2 takes a $250 deposit; the $900 rest is paid after the week."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "Overnight Week 2 can take a $250 deposit when booked. The other $900 is charged to the saved card at the end."
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Overnight Week 2 · $250 deposit"
+   ],
+   [
+    "After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "After that, or a no-show: what the camp's signed refund schedule says, only if you say yes"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Special requests come to you first."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A camp's example: 'Camp needs this summer's health forms first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "The leadership week always stays with Jess."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a horse-riding week, which isn't on the camp's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Lakeside Camp doesn't run horse-riding weeks."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A week for Ava and a day camp week for Max work the same way."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a day camp week for Max before the times, so the times fit it."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "You told us the day camp week is for Max, and that you're Max's parent."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Ava's sleeping bag was torn at camp."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says Ava's sleeping bag was torn at camp."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At a camp tour, a parent stays with the child, so nothing more happens."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: Ava moved to the lake cabin, top bunk"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you run day camp for 7-year-olds?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: Day Camp Week 6 (ages 6 to 8) is $325. Want a week?"
+   ],
+   [
+    "Good morning! Dee W. asked overnight for a skin fade today.",
+    "Good morning! Dee W. asked overnight for a camp tour today."
+   ],
+   [
+    "Skin fade · $40",
+    "Camp tour · free"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds archery lessons to Lee Lakeside Camp."
+   ],
+   [
+    "NEW massage",
+    "NEW archery lessons"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Archery lessons for Lee Lakeside Camp: is it the same company?"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a camp tour for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Lee Lakeside Camp: you now have two camp tours on Sat Nov 7."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a day camp week at $300, an old price. Rosie answers with the real price, $325. That's the price Ben sees before saying yes."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A day camp week at Lee Lakeside Camp is $325, not $300. Here are the open weeks at $325."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Day camp week $325 ($340 from Nov 2) · Overnight week $1,150 · Extended day $75"
+   ],
+   [
+    "A haircut at Lee's Barbershop:",
+    "{{name}} at Lee Lakeside Camp:"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Register my daughter for a camp week at Lee Lakeside Camp, starting Saturday."
+   ],
+   [
+    "Alex M. · Haircut",
+    "Alex M. · Camp week"
+   ],
+   [
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "Lee Lakeside Camp · Day camp week: your 3:00pm"
+   ],
+   [
+    "Lee's Barbershop · Haircut",
+    "Lee Lakeside Camp · {{name}}"
+   ],
+   [
+    "Paid at the chair",
+    "At the office: nothing to pay"
+   ],
+   [
+    "Tells Riley it's still waiting",
+    "Tells Kai it's still waiting"
+   ],
+   [
+    "Tells Riley it's a no",
+    "Tells Kai it's a no"
+   ],
+   [
+    "Riley asks for a day off",
+    "Kai asks for a day off"
+   ],
+   [
+    "Alex pays at the chair",
+    "Nothing is paid at the office"
+   ],
+   [
+    "Notes what's there before the work",
+    "Checks things at the start"
+   ],
+   [
+    "Riley adds notes for next time",
+    "Adds notes for next time"
+   ],
+   [
+    "Riley helps; Sam is told at once",
+    "Staff help; the parent is called"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Camp could mean a day camp or an overnight camp."
+   ],
+   [
+    "Saves the time for 10 minutes",
+    "Saves the pick for 10 minutes"
+   ],
+   [
+    "Shows sessions with seats left",
+    "Shows sessions with places left"
+   ],
+   [
+    "Asks for another day",
+    "Asks for another week"
+   ],
+   [
+    "What happens before Sat 11:00am?",
+    "What happens before the day?"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a camp week and extended day"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A camp books a place in a session, or the director's time for a tour."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A gas company's example: a gas smell gets 'leave the house now'."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A camp week is rated, so the camp takes the first branch."
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration EX-4411"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's camp work takes no jobs sent now, at the camp or away."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only at the business's own place."
+   ],
+   [
+    "BS20981",
+    "EX-1042"
+   ],
+   [
+    "Books the groom's party together",
+    "Books two campers together"
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the camp's list"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the week?"
+   ],
+   [
+    "Riley finishes the work",
+    "Staff text DONE"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Backyard Camps'"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Lakeside Camp LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Lakeside Camp"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Backyard Camps"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Camp at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Camp Parties"
+   ],
+   [
+    "plumbing and electrical",
+    "backyard camps and parties"
+   ],
+   [
+    "Electrical",
+    "Parties"
+   ],
+   [
+    "electrical",
+    "parties"
+   ],
+   [
+    "Plumbing",
+    "Backyard camps"
+   ],
+   [
+    "plumbing",
+    "backyard camps"
+   ],
+   [
+    "plumber",
+    "counselor"
+   ],
+   [
+    "Riley Chen",
+    "Jess Chen"
+   ],
+   [
+    "Riley",
+    "Jess"
+   ],
+   [
+    "Avery Diaz",
+    "Kai Diaz"
+   ],
+   [
+    "Avery",
+    "Kai"
+   ],
+   [
+    "Jordan Price",
+    "Tyler Price"
+   ],
+   [
+    "Jordan",
+    "Tyler"
+   ],
+   [
+    "Casey Moore",
+    "Nadia Moore"
+   ],
+   [
+    "Casey",
+    "Nadia"
+   ],
+   [
+    "88 Elm St",
+    "2250 Lake Rd"
+   ],
+   [
+    "Elm St",
+    "Lake Rd"
+   ],
+   [
+    "1200 Main St",
+    "60 Meadow Rd"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Overnight week"
+   ],
+   [
+    "Signature cut and shave",
+    "Overnight week"
+   ],
+   [
+    "A beard trim",
+    "Extended day"
+   ],
+   [
+    "a beard trim",
+    "extended day"
+   ],
+   [
+    "Beard trim",
+    "Extended day"
+   ],
+   [
+    "beard trim",
+    "extended day"
+   ],
+   [
+    "color quote",
+    "special request"
+   ],
+   [
+    "Haircuts",
+    "Day camp weeks"
+   ],
+   [
+    "haircuts",
+    "day camp weeks"
+   ],
+   [
+    "Haircut",
+    "Day camp week"
+   ],
+   [
+    "haircut",
+    "day camp week"
+   ],
+   [
+    "house calls",
+    "backyard camps"
+   ],
+   [
+    "house call",
+    "backyard camp"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "priced at the chair",
+    "priced at check-in"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at check-in"
+   ],
+   [
+    "at the chair",
+    "at check-in"
+   ],
+   [
+    "At the chair",
+    "At check-in"
+   ],
+   [
+    "barbershop",
+    "camp"
+   ],
+   [
+    "barbers",
+    "counselors"
+   ],
+   [
+    "Barber",
+    "Counselor"
+   ],
+   [
+    "barber",
+    "counselor"
+   ],
+   [
+    "shops",
+    "camps"
+   ],
+   [
+    "Shop",
+    "Camp"
+   ],
+   [
+    "shop",
+    "camp"
+   ],
+   [
+    "Skin fades",
+    "Overnight weeks"
+   ],
+   [
+    "skin fades",
+    "overnight weeks"
+   ],
+   [
+    "Skin fade",
+    "Overnight week"
+   ],
+   [
+    "skin fade",
+    "overnight week"
+   ],
+   [
+    "Kids cuts",
+    "Day camp weeks"
+   ],
+   [
+    "kids cuts",
+    "day camp weeks"
+   ],
+   [
+    "Kids cut",
+    "Day camp week"
+   ],
+   [
+    "kids cut",
+    "day camp week"
+   ],
+   [
+    "Groom's package",
+    "Two-week session"
+   ],
+   [
+    "Color and cut",
+    "Leadership week"
+   ],
+   [
+    "color and cut",
+    "leadership week"
+   ],
+   [
+    "Color correction",
+    "Counselor-in-training week"
+   ],
+   [
+    "color correction",
+    "counselor-in-training week"
+   ],
+   [
+    "Color touch-up",
+    "Make-up day"
+   ],
+   [
+    "color touch-up",
+    "make-up day"
+   ],
+   [
+    "barbershops",
+    "camps"
+   ],
+   [
+    "a instructor",
+    "an instructor"
+   ]
+  ],
+  "B": [
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Jess and Kai are head counselors; Jess also leads backyard camps."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Jess: head counselor, backyard camps"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Jess: head counselor and backyard camps"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every camp session and backyard camps"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Overnight and day camp on the lake, ages 6 to 14."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Backyard camp weeks and camp parties, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A backyard camp week"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact.",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you an emergency contact."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most camps start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules camps often set."
+   ],
+   [
+    "A late cancel or a no-show: only the policy's fee may be kept, up to the $89 service call.",
+    "A late cancel or a no-show: only the signed schedule's share may be kept, up to the $225 deposit."
+   ],
+   [
+    "A late-cancel or nobody-home fee, up to the $89 service call, is charged only after Sam confirms it.",
+    "A late-cancel or nobody-home fee, up to the $225 deposit, is kept only after Sam confirms it."
+   ],
+   [
+    "After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "After that, or nobody home: what the signed refund schedule says, only if you say yes"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Tyler also run a camp-style birthday party?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Camp-style birthday party · $250"
+   ],
+   [
+    "Change: Alex M. added a camera inspection to the Thu visit.",
+    "Change: Alex M. added a camp-style birthday party to the Thu visit."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about the backyard camp for Ella. A text back is fine."
+   ],
+   [
+    "It's a leak under the sink, today, starts at 3:00pm,",
+    "It's a backyard camp day, today, starts at 3:00pm,"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: how many children, their ages, and the yard's size."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Reply here, and it goes to Sam. How was the camp with Jordan?"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "We'd like a backyard camp for Ella and five friends."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "There's a wasp nest by the backyard play area."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep the children inside, and to call 911 if anyone is hurt."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Keep the children inside, away from the nest."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Our backyard flooded in the storm."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can two counselors run a backyard camp day this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa camp day Thu 12pm Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Camp at my house for the kids' fits a backyard camp week."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a camp in a park the city closed."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding an extended day? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many children, and their ages?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Six children, ages 7 to 9."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $1,800 two-week backyard camp is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a shaded spot for the children?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, under the big tree"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $900 backyard camp week needs none."
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Backyard Camps · {{name}}"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · {{name}}"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Tyler's times show: Tyler runs the two-week camps."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can the kids bring their own snacks?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a storm is coming in."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like lightning or someone hurt, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "There's thunder close by now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Bring the children inside, away from windows, until 30 minutes after the last thunder."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a shaded spot and water ready."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scuff on the patio door"
+   ],
+   [
+    "Under the sink, before",
+    "Patio door, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Play area, before"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "The parents ask Tyler for an extended day."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 extended day, 2 more hours"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: extended day, 2 more hours, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Extended day, 2 more hours · $160"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 extended-day quote is good for 7 days."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Tyler's phone, you said yes to an extended day for $160."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Tyler finds a broken fence board by the play area."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD broken fence board, play moved"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Broken fence board"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Tyler found a broken fence board by the play area and moved the games away from it."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a broken fence board"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: games by the fence"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say a game cracks a patio pot, and Tyler texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a patio pot"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked patio pot"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "A camp game cracked a patio pot at Alex M.'s."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 900 camp week"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE Ella's group loved the relay. Bring more cones next time."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Tyler left paint on the patio."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found paint on the patio this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Tyler run another camp morning next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Tyler's next times for a camp morning."
+   ],
+   [
+    "Good morning! Nora S. asked overnight for a drain clearing today.",
+    "Good morning! Nora S. asked overnight for a backyard camp day today."
+   ],
+   [
+    "Drain clearing · $179",
+    "Backyard camp day · $250"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise backyard camp week to 950"
+   ],
+   [
+    "Reading it back: drain clearing goes to $199 for new bookings.",
+    "Reading it back: the backyard camp week goes to $950 for new bookings."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the backyard camp week to $950 for visits from Mon Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Weeks already booked keep $900, even after Nov 2."
+   ],
+   [
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $950 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $900."
+   ],
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: backyard camp week $950 from Mon Nov 2. Weeks already booked keep $900. Plans go to $950 from Wed Nov 25, only with a yes."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for a backyard camp week at $850, an old price. Rosie answers with the real price, $900. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A backyard camp week with Lee Home Services is $900, not $850. Here are the open times at $900."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Backyard camp week $900 ($950 from Nov 2) · Backyard camp day $250"
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the backyard camp day from paid in full to a $75 deposit."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Camp days already booked keep what they paid."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds camp parties to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW camp parties"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Camp parties for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the two-week camp quote before booking."
+   ],
+   [
+    "Lin agreed to the business's service call fee when booking.",
+    "Lin agreed to the camp's refund schedule when booking."
+   ],
+   [
+    "Charge or keep the service call fee?",
+    "Keep the deposit?"
+   ],
+   [
+    "Lee Home Services took the service call fee you agreed to when you booked.",
+    "Lee Home Services kept the deposit, under the refund schedule you signed."
+   ],
+   [
+    "Service call fee",
+    "Deposit kept"
+   ],
+   [
+    "The service call is $89.",
+    "The deposit is $225."
+   ],
+   [
+    "Tells Casey it's still waiting",
+    "Tells Tyler it's still waiting"
+   ],
+   [
+    "Tells Casey it's a no",
+    "Tells Tyler it's a no"
+   ],
+   [
+    "Casey asks for a day off",
+    "Tyler asks for a day off"
+   ],
+   [
+    "Rosa",
+    "Marta"
+   ],
+   [
+    "Jordan feels unsafe and leaves",
+    "Tyler feels unsafe: children inside"
+   ],
+   [
+    "Notes what's there before the work",
+    "Checks things at the start"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Camp could mean a day camp or an overnight camp."
+   ],
+   [
+    "Saves the time for 10 minutes",
+    "Saves the pick for 10 minutes"
+   ],
+   [
+    "Asks for another day",
+    "Asks for another week"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A gas company's example: a gas smell gets 'leave the house now'."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration EX-4410"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's camp work takes no jobs sent now, at the camp or away."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "We couldn't find registration EX-4410 for Lee Backyard Camps on the state's lookup."
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only at the business's own place."
+   ],
+   [
+    "BS20981",
+    "EX-1042"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Backyard Camps'"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Lakeside Camp"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Backyard Camps LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Backyard Camps"
+   ],
+   [
+    "leehomeservices.com",
+    "leebackyardcamps.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Camp at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Camp Parties"
+   ],
+   [
+    "plumbing and electrical",
+    "backyard camps and parties"
+   ],
+   [
+    "Electrical",
+    "Parties"
+   ],
+   [
+    "electrical",
+    "parties"
+   ],
+   [
+    "Plumbing",
+    "Backyard camps"
+   ],
+   [
+    "plumbing",
+    "backyard camps"
+   ],
+   [
+    "plumber",
+    "counselor"
+   ],
+   [
+    "Riley Chen",
+    "Jess Chen"
+   ],
+   [
+    "Riley",
+    "Jess"
+   ],
+   [
+    "Avery Diaz",
+    "Kai Diaz"
+   ],
+   [
+    "Avery",
+    "Kai"
+   ],
+   [
+    "Jordan Price",
+    "Tyler Price"
+   ],
+   [
+    "Jordan",
+    "Tyler"
+   ],
+   [
+    "Casey Moore",
+    "Nadia Moore"
+   ],
+   [
+    "Casey",
+    "Nadia"
+   ],
+   [
+    "88 Elm St",
+    "2250 Lake Rd"
+   ],
+   [
+    "Elm St",
+    "Lake Rd"
+   ],
+   [
+    "1200 Main St",
+    "60 Meadow Rd"
+   ],
+   [
+    "42 Oak St",
+    "27 Aspen Ct"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Overnight week"
+   ],
+   [
+    "Beard trim",
+    "Extended day"
+   ],
+   [
+    "beard trim",
+    "extended day"
+   ],
+   [
+    "Haircut",
+    "Day camp week"
+   ],
+   [
+    "haircut",
+    "day camp week"
+   ],
+   [
+    "house calls",
+    "backyard camps"
+   ],
+   [
+    "house call",
+    "backyard camp"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at check-in"
+   ],
+   [
+    "at the chair",
+    "at check-in"
+   ],
+   [
+    "barbershop",
+    "camp"
+   ],
+   [
+    "barbers",
+    "counselors"
+   ],
+   [
+    "Barber",
+    "Counselor"
+   ],
+   [
+    "barber",
+    "counselor"
+   ],
+   [
+    "shops",
+    "camps"
+   ],
+   [
+    "Shop",
+    "Camp"
+   ],
+   [
+    "shop",
+    "camp"
+   ],
+   [
+    "after the job",
+    "after the session"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Backyard camp week"
+   ],
+   [
+    "Drain clearings",
+    "Backyard camp weeks"
+   ],
+   [
+    "drain clearings",
+    "backyard camp weeks"
+   ],
+   [
+    "Drain clearing",
+    "Backyard camp week"
+   ],
+   [
+    "drain clearing",
+    "backyard camp week"
+   ],
+   [
+    "Water heater flush",
+    "Backyard camp day"
+   ],
+   [
+    "Water heater replacement",
+    "Two-week backyard camp"
+   ],
+   [
+    "Sewer camera inspection",
+    "Camp-style birthday party"
+   ],
+   [
+    "sewer camera inspection",
+    "camp-style birthday party"
+   ],
+   [
+    "Service call",
+    "Planning visit"
+   ],
+   [
+    "service call",
+    "planning visit"
+   ],
+   [
+    "Kitchen drain",
+    "Backyard camp week"
+   ],
+   [
+    "Yard drain",
+    "Backyard camp day"
+   ]
+  ]
+ },
+ "keep": [
+  "visit fee",
+  "leak",
+  "Grace"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex registers Ava, 11, for Overnight Week 2 at Lee Lakeside Camp, Sat Oct 24 to Fri Oct 30 (fall break): girls' cabins, ages 9 to 14, 8 campers and 2 counselors a cabin. Alex pays a $250 deposit; the $900 rest is charged to the saved card when the week is done. The health forms go on the secure page for Hannah, the camp nurse, and Ava goes home only with an adult on the pick-up list. Pick a money choice at the top: the deposit, paid in full, or a free camp tour.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a backyard camp at home, 27 Aspen Ct, for Ella, 8, and five friends: Tyler and Nadia come for four mornings from Thu Oct 22 (fall break), 8:00am to noon. Alex pays a $225 deposit; the $675 rest is charged to the saved card when the week is done. Each child's own parent fills that child's forms and pick-up list on the secure page. Pick a money choice at the top: the deposit, or the week paid in full."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|full|none",
+    "list|none|none"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: Ava's Overnight Week 2, Sat Oct 24 to Fri Oct 30 (fall break), $1,150. A $250 deposit is paid on the secure page when registering, and the $900 rest is charged to the saved card when the week is done (Rosie never charges the rest on a date by itself). Day camp weeks ($325, $75 deposit) and the two-week session ($2,150, $400 deposit) are paid this way too. The camp's dated refund schedule is its own signed terms, shown before paying.",
+    "list|full|none": "The same Overnight Week 2, paid in full when registering: $1,150. The same signed refund schedule applies.",
+    "list|none|none": "A free 45-minute camp tour with Sam, the director, Sat Oct 24 at 11:00am, for Alex and Ava. Nothing is taken and no card is saved: a YES books it, and nothing is owed after."
+   },
+   "amounts": {
+    "*": {
+     "price": "$1,150",
+     "deposit": "$250",
+     "rest": "$900",
+     "fee": "$250",
+     "name": "Overnight Week 2"
+    },
+    "list|*|*": {
+     "price": "$1,150",
+     "name": "Overnight Week 2"
+    },
+    "list|deposit|*": {
+     "price": "$1,150",
+     "deposit": "$250",
+     "rest": "$900",
+     "fee": "$250",
+     "name": "Overnight Week 2"
+    },
+    "list|full|*": {
+     "price": "$1,150",
+     "paid": "$1,150",
+     "fee": "$250",
+     "name": "Overnight Week 2"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Camp tour (45 min)",
+     "deposit": "$0",
+     "rest": "$0",
+     "fee": "$0"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extended day (after-care)",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$75",
+      "fee": "$75"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "School-holiday day camp",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$65",
+      "paid": "$65",
+      "fee": "$65"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Overnight Week 2 (a camp credit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|full|none"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|deposit|card": "The main story: a backyard camp at Alex's home, four mornings from Thu Oct 22, 8:00am to noon, for up to 6 children: $900. A $225 deposit when booking, and the $675 rest charged to the saved card when the week is done. The refund schedule is the company's own signed terms, shown before paying.",
+    "list|full|none": "The same backyard camp week, paid in full when booking: $900. A backyard camp day ($250) and a camp-style birthday party ($250) are paid this way too."
+   },
+   "amounts": {
+    "*": {
+     "price": "$900",
+     "deposit": "$225",
+     "rest": "$675",
+     "fee": "$225",
+     "name": "Backyard camp week"
+    },
+    "list|*|*": {
+     "price": "$900",
+     "name": "Backyard camp week"
+    },
+    "list|deposit|*": {
+     "price": "$900",
+     "deposit": "$225",
+     "rest": "$675",
+     "fee": "$225",
+     "name": "Backyard camp week"
+    },
+    "list|full|*": {
+     "price": "$900",
+     "paid": "$900",
+     "fee": "$225",
+     "name": "Backyard camp week"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Backyard camp day",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$250",
+      "paid": "$250",
+      "fee": "$250"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Camp-style birthday party",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$250",
+      "paid": "$250",
+      "fee": "$250"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Backyard camp week (a camp credit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Backyard camps, parties and the camp all pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A camp books places in a session and counselors' time. Cabin beds are part of each session's cap, not spaces booked on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The camp runs sessions on a set table (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No camp work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Camp is in person, so a session or a tour is never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "A camp week isn't a repeat plan: next summer is a new registration."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A camp bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The camp books places in a session and the director's time for tours, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "An overnight week is a place in a set session with fixed dates (the session branch), not a stay picked by its own start and end."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "A camp place names no counselor, and a camp tour is always with Sam, the director."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "Another adult",
+    "why": "Every camper is a child, so a parent or guardian registers (the child branch). A grandparent can pay on the page ('Someone else pays')."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "An adult the booker acts for",
+    "why": "Every camper is a child, registered by a parent or guardian."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "A camp sells no packages or memberships: each session is its own registration."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A camp sells no packs or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A camp week isn't a repeat plan: next summer is a new registration."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "The camp's agreement is signed with the forms on the secure page (the form step), so no second contract is signed here."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "Check-in is a two-hour window run by the camp's staff, so one counselor running late changes nothing for a family."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "A camp week isn't a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "A camp week isn't a repeat plan. The rest is charged once, when the session is done."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "A camp week isn't a repeat plan, and the price is fixed when registering."
+   },
+   {
+    "op": "before",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "type": "split",
+      "line": [
+       "7.13",
+       "7.16"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks if health forms are needed",
+      "q": "A camp session, or a tour?",
+      "does": "A camp session needs this season's health forms before the first day. A camp tour needs none, so it skips this.",
+      "more": [
+       "The plug-in names the forms: a health form, the shot record, and a medicine form for each medicine.",
+       "They're due May 15, the camp's setting. The state's rules can set more."
+      ],
+      "needs": [
+       "booked",
+       "pf.first_steps"
+      ],
+      "branches": [
+       {
+        "label": "A camp session",
+        "when": {
+         "before": [
+          "deposit",
+          "full"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A7-x02",
+          "line": [
+           "7.13"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Wed Oct 21, 7:40pm",
+          "title": "Reminds Alex about the health forms",
+          "does": "Back to Alex, months later. The camp asks for this season's health details from Apr 1, so medicines are current. Alex gets one text with the link.",
+          "more": [
+           "The forms opened at registration. Alex can fill them any time before May 15.",
+           "The text names the forms, never a health detail.",
+           "No reply is needed. A form still missing on May 15 gets the steps in 'A form isn't done by its due date'."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Lee Lakeside Camp: Ava's health forms for Overnight Week 2 are due Fri Oct 23.",
+            {
+             "card": {
+              "title": "Health forms · Ava",
+              "lines": [
+               "Health form",
+               "Shot record",
+               "A medicine form for each medicine",
+               "Due Fri Oct 23"
+              ],
+              "button": "Fill them in",
+              "link": "rosfield.com/h/a2"
+             }
+            }
+           ]
+          ],
+          "needs": [
+           "pf.first_steps",
+           "pf.messages"
+          ],
+          "tells": [
+           "cust"
+          ]
+         },
+         {
+          "id": "A7-x03",
+          "line": [
+           "7.13"
+          ],
+          "who": "cust",
+          "to": "san",
+          "via": "page",
+          "t": "Thu Oct 22, 8:30pm",
+          "title": "Alex fills in Ava's health forms",
+          "does": "Alex fills in the health form, adds the shot record, and fills a medicine form for Ava's inhaler. It's all on the secure page, never in a text.",
+          "more": [
+           "The shot record is a photo or a file, or the papers the state's rules accept instead.",
+           "The medicine form says when it's taken, signed where the camp asks.",
+           "Allergies, health needs and any custody order go here too, for Hannah and Sam only.",
+           "Alex can update the forms until check-in. Hannah is told 'updated', never what changed.",
+           "Rosie shows the camp only 'done' or 'missing' in lists. The answers open only for Hannah and Sam."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "",
+            {
+             "form": [
+              "Health form · done",
+              "Shot record · added",
+              "Medicine form · inhaler · done",
+              "Allergies and health needs · done"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.first_steps",
+           "pf.messages"
+          ],
+          "gives": [
+           "forms_done"
+          ]
+         },
+         {
+          "id": "A7-x04",
+          "line": [
+           "7.13"
+          ],
+          "who": "san",
+          "to": "staff",
+          "via": "msg",
+          "t": "Fri Oct 23, 10:00am",
+          "title": "Hannah reads Ava's health forms",
+          "does": "Hannah, the camp nurse, reads each camper's forms as they come in. She plans for Ava's inhaler, and marks the forms read.",
+          "more": [
+           "The text to Hannah names the parent and the session, never a child's detail.",
+           "A question goes to Alex on the secure page, never by text.",
+           "Hannah's read is noted with the booking, with the date.",
+           "Where the state's rules let a health supervisor stand in for a nurse, the plug-in says so."
+          ],
+          "say": [
+           [
+            "san",
+            "staff",
+            "Health forms done for Alex M.'s camper, Overnight Week 2. They open only on your signed-in phone.",
+            {
+             "card": {
+              "title": "Health forms · Overnight Week 2",
+              "lines": [
+               "Registered by Alex M.",
+               "Read them on the secure page"
+              ],
+              "button": "Read the forms",
+              "link": "rosfield.com/h/n2"
+             },
+             "as": "Hannah"
+            }
+           ],
+           [
+            "staff",
+            "san",
+            "Read. Plan noted.",
+            {
+             "as": "Hannah"
+            }
+           ],
+           [
+            "san",
+            "staff",
+            "Saved: forms read, Fri Oct 23.",
+            {
+             "as": "Hannah"
+            }
+           ]
+          ],
+          "needs": [
+           "forms_done",
+           "pf.staff",
+           "pf.messages"
+          ],
+          "tells": [
+           "staff"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "A camp tour",
+        "when": {
+         "before": [
+          "none",
+          "card"
+         ]
+        },
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A7-02",
+    "steps": [
+     {
+      "id": "A7-x05",
+      "line": [
+       "7.1"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Fri Oct 23, 10:00am",
+      "title": "Sends the check-in note",
+      "does": "Back to Alex: camp is two days away. Alex gets the check-in note: when and where, the code, what the nurse needs, and how pick-up works.",
+      "more": [
+       "Medicines come in their original labeled boxes, for Hannah at check-in.",
+       "Pick-up is only by an adult on the pick-up list, with photo ID.",
+       "The camp's own packing list is on the secure page.",
+       "No note goes for a cancelled booking, or after Alex texts STOP."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Camp is tomorrow! Here's Ava's check-in note.",
+        {
+         "card": {
+          "title": "Lee Lakeside Camp · Overnight Week 2",
+          "lines": [
+           "Check-in Sat Oct 24, 11:00am to 12:30pm · 2250 Lake Rd",
+           "Bring medicines in their labeled boxes for the nurse",
+           "Pick-up Fri Oct 30, 10:00am to noon",
+           "Pick-up only by an adult on your list, with photo ID"
+          ],
+          "button": "Packing list",
+          "link": "rosfield.com/c/r2"
+         },
+         "code": "5160"
+        }
+       ]
+      ],
+      "vary": {
+       "before:none": {
+        "t": "Sat Oct 24, 8:00am",
+        "does": "Back to Alex: the tour is today. Alex gets a short note with the time, where to park and the code.",
+        "more": [
+         "No note goes for a cancelled booking, or after Alex texts STOP."
+        ],
+        "say": [
+         [
+          "san",
+          "cust",
+          "Your camp tour is today at 11:00am with Sam.",
+          {
+           "card": {
+            "title": "Lee Lakeside Camp · camp tour",
+            "lines": [
+             "Sat Oct 24 · 11:00am",
+             "Park by the office · 2250 Lake Rd"
+            ]
+           },
+           "code": "5160"
+          }
+         ]
+        ]
+       }
+      },
+      "needs": [
+       "booked",
+       "code",
+       "pf.first_steps",
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "Missing health forms are handled before camp ('A form isn't done by its due date'). At the table, a parent fills anything missing on the secure page before the code is taken."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off for work at a camp."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "A camper who is sick or hurt is 'Someone is hurt or feels sick'. Going home early is 'Alex has to leave early'."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the camp for work."
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "Alex asks how Ava is doing",
+     "end": "merge",
+     "when": {
+      "before": [
+       "deposit",
+       "full"
+      ]
+     },
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.12"
+       ],
+       "who": "cust",
+       "to": "san",
+       "via": "msg",
+       "t": "Mon Oct 26, 8:00pm",
+       "title": "Alex asks how Ava is settling in",
+       "does": "Alex texts to ask how Ava is doing. Jess gets the question, and answers with a short note. The text to Jess names the parent, never the child.",
+       "more": [
+        "No answer in 2 hours: the camp office calls Alex.",
+        "Jess never shares health news by text: Hannah calls for that.",
+        "Campers don't use phones at camp."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "Is Ava doing OK? It's her first time away."
+        ],
+        [
+         "san",
+         "staff",
+         "Alex M. (Overnight Week 2) asks how their camper is settling in. Reply with a short note, or 1 to call Alex."
+        ],
+        [
+         "staff",
+         "san",
+         "Doing great: sailing today, and making friends."
+        ],
+        [
+         "san",
+         "cust",
+         "Jess says Ava is doing great: sailing today, and making friends."
+        ]
+       ],
+       "needs": [
+        "pf.messages"
+       ],
+       "tells": [
+        "cust",
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "A storm warning",
+     "end": "merge",
+     "when": {
+      "before": [
+       "deposit",
+       "full"
+      ]
+     },
+     "steps": [
+      {
+       "id": "A8-x02",
+       "line": [
+        "8.6"
+       ],
+       "who": "owner",
+       "to": "san",
+       "via": "msg",
+       "t": "Wed Oct 28, 4:10pm",
+       "title": "Sam sends families a safety update",
+       "does": "A storm warning comes in. Campers go to the shelter under the camp's emergency plan. Sam texts one update, and every family gets it.",
+       "more": [
+        "The update names no child.",
+        "Sam sends the next update when the warning ends.",
+        "Lightning: everyone stays indoors until the camp's set time with none."
+       ],
+       "say": [
+        [
+         "owner",
+         "san",
+         "Storm warning: all campers in the dining hall shelter, all safe"
+        ],
+        [
+         "san",
+         "cust",
+         "Lee Lakeside Camp update: a storm warning is in effect. All campers are safe in the dining hall shelter, under the camp's emergency plan. Sam will send the next update."
+        ]
+       ],
+       "needs": [
+        "pf.safety",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "A pick-up change by text",
+     "end": "merge",
+     "when": {
+      "before": [
+       "deposit",
+       "full"
+      ]
+     },
+     "steps": [
+      {
+       "id": "A8-x03",
+       "line": [
+        "8.23"
+       ],
+       "who": "cust",
+       "to": "san",
+       "via": "msg",
+       "t": "Tue Oct 27, 10:00am",
+       "title": "Alex texts that Karen picks up Max",
+       "does": "Say Max is in Day Camp Week 6. Alex texts that Karen, Max's grandmother, will pick Max up at 2pm. It goes to the camp as Alex's request, and staff check the pick-up list on the secure page.",
+       "more": [
+        "Rosie never OKs a pick-up person itself, and never says by text who is on the list.",
+        "Staff check the adult against the list on the secure page, with photo ID.",
+        "Someone not on the list: Alex adds them on the secure page first. Until then, Max stays with staff.",
+        "The text to the camp names only the parent and the time, never the adult or the child."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "My mom Karen will pick up Max at 2 today."
+        ],
+        [
+         "san",
+         "staff",
+         "Request from Alex M.'s number: an early pick-up for the day camper at 2pm today. Check the adult against the pick-up list on the secure page, with photo ID.",
+         {
+          "as": "Kai"
+         }
+        ],
+        [
+         "san",
+         "cust",
+         "Passed to Lee Lakeside Camp. At 2pm, staff check the adult against Max's pick-up list on the secure page, with photo ID. Anyone not on it yet: add them there first: rosfield.com/c/r2"
+        ]
+       ],
+       "needs": [
+        "pf.visit",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust",
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A camp bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A camp week and a tour are rated: no camp work is named only."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Nothing is sold at pick-up or on a tour. A cancel right for camp sold ahead, where the state's rules give one, came in writing at registration."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "Next summer is the family's own new registration, never booked at pick-up."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A camp sends no proposals: each session is registered on its own."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "A camp week can't be redone. A family who feels it fell short asks for money back, or complains, and Sam decides."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing from camp comes back later. Jess's end-of-week note comes with the receipt."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Lost and found is the camp's own, and never carries a storage fee."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "A camp takes new families."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Backyard camps and parties need no state license here, so the company gives only its registration (S1-61). Where the state's form names one, this branch comes back."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Backyard camps, parties and the camp all pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A camp books places in a session and counselors' time. Cabin beds are part of each session's cap, not spaces booked on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The camp runs sessions on a set table (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No camp work is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "A backyard camp week isn't a repeat plan: another week is its own booking."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Several services at once",
+    "why": "A backyard camp week is one service."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for camp."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A backyard camp starts at a set time (B4-84), never in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A backyard camp is mornings, not a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "The host books the whole group, not seats."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Backyard camps take no jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Asks for one person by name",
+    "why": "Counselors come as the pair Sam sets for each week. A family can ask Sam about a counselor by text."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "An adult the booker acts for",
+    "why": "A backyard camp is for children, booked by the host parent."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "The camp's agreement is part of each child's forms (the form step), so no other contract is signed."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "A backyard camp week isn't a plan: each week is its own booking."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Backyard camps take no jobs sent now, so nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Backyard camps take no jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "The pro runs late",
+    "why": "The counselors arrive 30 minutes before camp starts, so a short delay changes nothing for families. A longer one is 'Tyler can't come'."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "A backyard camp week isn't a plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "A backyard camp week isn't a plan, and its price is set when booking."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A backyard camp week isn't a plan. The rest is charged once, when the week is done."
+   },
+   {
+    "op": "after",
+    "at": "B7-05",
+    "steps": [
+     {
+      "id": "B7-x01",
+      "line": [
+       "7.1"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Wed Oct 21, 6:00pm",
+      "title": "Sends the first-day note",
+      "does": "Back to Alex: camp starts tomorrow. Alex gets the first-day note: the times, the code for the door, and how drop-off and pick-up work.",
+      "more": [
+       "All six children's forms are in, and Tyler and Nadia have read them.",
+       "Each child's own adult signs the child in at the side gate.",
+       "A child goes home only with an adult on that child's pick-up list, with photo ID for anyone the counselors don't know.",
+       "No note goes for a cancelled booking, or after Alex texts STOP."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Camp starts tomorrow! Here's your first-day note.",
+        {
+         "card": {
+          "title": "Lee Backyard Camps · Backyard camp week",
+          "lines": [
+           "Tyler and Nadia arrive at 7:30am to set up",
+           "Drop-off 7:55 to 8:00am at the side gate",
+           "Pick-up at noon, only by an adult on each child's list",
+           "Yard ready · bathroom open · dog inside"
+          ]
+         },
+         "code": "3906"
+        }
+       ]
+      ],
+      "needs": [
+       "booked",
+       "code",
+       "pf.first_steps",
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Backyard camps take no jobs sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "An adult from the host family stays home every camp morning."
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Someone not on a child's list",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.23"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Sat Oct 24, 12:00pm",
+       "title": "Keeps the child; asks that child's parent",
+       "does": "At noon, an adult who isn't on a child's pick-up list comes for that child. The child stays with the counselors, and Tyler calls that child's parent right away.",
+       "more": [
+        "Yes: the parent adds the adult on the secure page, and the counselors check photo ID.",
+        "No, or the parent can't be reached: the child stays with the counselors, and Sam calls the parent.",
+        "Rosie never adds anyone to a pick-up list from a text reply.",
+        "The text to the parent names no child and no adult."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "PICKUP an adult not on the list is here for a camper at Alex M.'s"
+        ],
+        [
+         "san",
+         "staff",
+         "Keep the child with you, and call that child's parent now. The number is on the secure page."
+        ],
+        [
+         "san",
+         "cust",
+         "Lee Backyard Camps: someone who isn't on your child's pick-up list came for your child. Your child is staying with the counselors, and Tyler is calling you now. To add someone, use your secure page: rosfield.com/f/r4",
+         {
+          "as": "Dee"
+         }
+        ]
+       ],
+       "needs": [
+        "pf.visit",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Thunder ends a morning early",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.6"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Fri Oct 23, 10:40am",
+       "title": "Takes everyone inside at the first thunder",
+       "does": "At 10:40am, Tyler hears thunder. Everyone goes inside the host's home at once. After 30 minutes with more thunder, the parents are called to pick up early.",
+       "more": [
+        "The plug-in's rule: everyone indoors at the first thunder or lightning, back out after 30 minutes with none.",
+        "Each child still goes only to an adult on that child's list.",
+        "A group update to the parents names no child."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "THUNDER everyone inside at 27 Aspen Ct, 10:40am"
+        ],
+        [
+         "san",
+         "cust",
+         "Thunder at the backyard camp: all the children are safe inside. If it goes on, please come for your child by 11:30am, with photo ID."
+        ]
+       ],
+       "needs": [
+        "pf.safety",
+        "pf.visit"
+       ],
+       "tells": [
+        "cust"
+       ]
+      },
+      {
+       "id": "B8-x03",
+       "line": [
+        "8.6"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Fri Oct 23, 12:15pm",
+       "title": "Offers a make-up or a refund for the morning",
+       "does": "The morning ended early, before halfway. Alex picks a make-up morning, or a refund for it. No reply in 24 hours: it's refunded.",
+       "more": [
+        "Past halfway, a morning counts as given (the business's setting).",
+        "Never a fee: the business stopped it for safety.",
+        "The other mornings go on as booked."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Thunder ended this morning's camp early. Pick a make-up morning, or a refund for it.",
+         {
+          "times": [
+           "Mon Oct 26 · 8:00am to noon · Tyler and Nadia"
+          ],
+          "buttons": [
+           [
+            "C",
+            "Refund · $225"
+           ]
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.money"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A backyard camp week is paid as a deposit and one rest, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Nothing extra is sold at the home during camp, and a camp week already given has no cancel period."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A camp week can't be redone. A family who feels it fell short asks for money back, or complains, and Sam decides."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Next visit booked at checkout",
+    "why": "Next summer is a new booking, never made at pick-up."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Backyard camps send no proposals: each week is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing comes back later. Tyler's notes stay on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A camp asks families for a rating after the week."
+   }
+  ]
+ },
+ "notes": "Refit Tue Oct 27 2026 (R14) to the REDESIGN 2 master: plug-in facts (classes: sessions by age group, groups: a backyard group of up to 6, children, incare: campers in the camp's care overnight, forms: health forms, shot record and medicine forms, multiday: overnight and multi-day weeks, waitlist), no switches, settings (set start; free cancel until 2 days before, then the deposit may be kept; the camp's signed dated refund schedule is its own terms, S1-21), money facts per path with names, rename pairs, few ops. The rest after a deposit is charged to the saved card when the week is done: the master never charges it on a date by itself (D66 #7), so 'charged May 1' is gone from the plug-in and the examples. The free tour is now the free path (list|none|none). Every old say/vary words op is gone (the record words deposits, fees and refunds now). keep 'Grace': the master's own 'grace time' (the swim pilot's Grace is not in these flows). Kept: valid off ops, own steps (health-forms check A7-x01, check-in note A7-x05, Ava settling in, storm update, pick-up change by text, B first-day note, someone not on a child's list, thunder).\nPilot: swim (a class school for young children: placed by age into small groups with caps, a parent registers, health notes and a pick-up list on the secure page, a child goes only to a listed adult; its flow B already runs at the family's home, which fits a backyard camp week). Martial arts (a free trial at the school) and dance (monthly enrollment) fit less. Swim's ops were the start; every shown step was rewritten for camp, and swim's rename pairs were replaced.\nNames: Sam Lee's main company is Lee Backyard Camps LLC (backyard camp weeks and days at families' homes; second kind of work: camp-style birthday parties), office 60 Meadow Rd, leebackyardcamps.com, registration EX-4410 (backyard camps need no license). Second company: Lee Lakeside Camp LLC (day and overnight camp on its own grounds, 2250 Lake Rd), camp license EX-1042. Both numbers are made-up examples. Alex's home is 27 Aspen Ct.\nStaff: Jess Chen and Kai Diaz (head counselors) and Hannah Reyes, RN (camp nurse) at the camp (A); Tyler Price and Nadia Moore run backyard camps (B). Alex M. has no set pronoun. Children (Ava, 11, and Max, 7, in A; Ella, 8, in B) get no pronouns and are never named in staff or owner texts: those name the parent and the session.\nFlow A main (list|deposit|none): Wed Oct 21, 2026 7:15pm Alex asks an AI. Ava gets Overnight Week 2 (Sun Jul 11 to Sat Jul 17, 2027, girls' cabins, ages 9 to 14): $250 deposit, $900 rest charged Sat May 1. Max goes on the full Day Camp Week 6 waitlist; a place opens Tue Mar 9 and Sam OKs the offer (48 hours). Health forms Apr 1 to 13 (own steps A7-x02 to A7-x04), check-in note Fri Jul 9, check-in Sun Jul 11 2:30pm, closing-day pick-up Sat Jul 17 10:30am, rating Mon Jul 19.\nFlow A other paths: list|full|none is the same week paid in full ($1,150, by choice or after May 1). list|none|counter is a free 45-minute camp tour with Sam, Sun Nov 8 1:00pm: no money and no card. The tour shares the main steps through variants with November times. The forms steps sit in an own split (A7-x01) the tour skips, and the three own A8 branches only run on the deposit and full paths.\nFlow B (list|deposit|none main, list|full|none): a backyard camp week at Alex's home, Mon Jun 21 to Thu Jun 24, 2027, 9:00am to noon, Ella and five friends, Tyler and Nadia. $225 deposit, $675 rest charged Mon Jun 7. Each child's own parent fills that child's forms and pick-up list on the secure page; an adult of the host family stays home all morning.\nWhy B is a backyard camp week: it's the less usual side of camp work (at a family's home, a small group, two counselors), keeps the camp's rules (forms, pick-up list, ratio), and uses flow B's at-the-customer's-place steps.\nMoney paths: camps take a deposit with the rest on one set day, or full price; a tour is free. No hold, no card-only, no bill after, no photo or visit pricing. The master's paid-in-full sign-up example is not a reason for more paths.\nOne set day: the rest is charged once (May 1 at the camp; 14 days before at a backyard camp). Paying over several set days isn't in the master, so it's a gap ('Payment plan over several set days'), not drawn.\nRefunds follow the camp's dated schedule (pf.money): by May 1 all but $50; May 2 to Jun 11 half; after that nothing unless Sam decides. The camp cancels: a full refund or a free move. An in-time cancel refunds by the schedule without asking Sam (the master's rule); a late cancel asks Sam (A7-06 to A7-08).\nSchool-holiday day camp ($65, one day, paid in full) was added to the plug-in so the October story in section 11 books a real camp service. The section 11 examples on other paths use it.\nWaitlist: the master offers a freed spot automatically for 30 minutes. The camp's setting is Sam's OK, in waitlist order, and 48 hours, drawn by words at A4-61 and B4-65 and listed as a gap for the master.\nNothing moves on silence: a stand-in counselor, a camp move and a cancel wait for Alex or Sam (B7-22, S11-46, S11-49). A move by the camp with no reply in 3 days stands, and Sam calls Alex.\nSign-up: kinds Backyard camps, Parties, Summer camp. Backyard camps need no license (registration only); the camp license, inspections and background checks are switches from the state's form. Nothing names one state or city.\nsplitsKept: S2-28 (the nurse's license is checked; counselors need none), A4-66 (a place in a session, and Sam's time for a tour), A8-67 (a parent stays on a tour; a camper is left at camp), B8-67 (the host's adult stays home; the other children are in the counselors' care).\nOffs: every branch that can't happen at a camp (holds, plans, ordered parts, drop-offs, health plans, counselor upsells, a counselor running late at a two-hour check-in) is off with the camp's reason.\nOutdated in the old flowchart: UltraCamp, CampDoc and their sync steps (Rosie's own tools are used), the 30-minute hold (the master saves 10 minutes), and one-state laws (New York, California, Alabama, Michigan, Texas), which became switches or the camp's own statements.\nClocks: every listed path runs forward in the steps this overlay changes. Some back-steps are drawn by the master and left alone: A6-14 after Sam's call branch (A6-26), the next-morning question placed before visit events (A8-12, B8-42), the section 11 AWAY summary before Friday's what-ifs (S11-19), S11-52 after S11-43, S11-64 after S11-77 (B), and B3-02, B3-03, B4-77 after Tuesday what-ifs.\nReview Oct 24: refunds the dated schedule gives in time go out by themselves (pf.money.fees now says so; A5-16 and A7-06 match); a missed waitlist offer passes on and keeps the family listed, as the old flowchart did (pf.services.waitlist, A4-61, B4-65); the tour path reads as a tour through Sam's OK, the forms and notice steps, money questions and disputes; a pick-up change by text names nobody (A8-x03) and an adult not on a child's list means a call, never a text reply (B8-x01); Sam is the backyard stand-in (Kai works only at the camp); only Tyler leads parties (S11-46); backyard camps need no license in a second state either (S11-77). \nMoney fix Oct 27 2026 (D65/D66): camps take a deposit with the rest charged to the saved card when the session (or backyard week) is done, or full price; a tour is free. The camp cancel dates (May 1, Jun 11) stay as refund tiers; a backyard week is refunded in full but $50 until 14 days before the first day. Any older wording above about a date or free-cancel moment for the rest is from the earlier pass and no longer applies.",
+ "splitsKept": {
+  "A": [
+   "A4-66",
+   "A8-67",
+   "S2-28",
+   "A4-43",
+   "S1-60"
+  ],
+  "B": [
+   "B8-67",
+   "S2-28"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "We'd share only where they're working, only after a missed check.",
+    "Barbershop, plumbing, electrical",
+    "Each service starts the way most barbershops set it.",
+    "House calls: allowed where you are, for those cleared",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "Groom's package · $40 deposit",
+    "After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Color quotes come to you first.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Color always stays with Riley.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Good morning! Dee W. asked overnight for a skin fade today.",
+    "Skin fade · $40",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "A haircut at Lee's Barbershop:",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Alex M. · Haircut",
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "Lee's Barbershop · Haircut",
+    "Paid at the chair",
+    "Tells Riley it's still waiting",
+    "Tells Riley it's a no",
+    "Riley asks for a day off",
+    "Alex pays at the chair",
+    "Notes what's there before the work",
+    "Riley adds notes for next time",
+    "Riley helps; Sam is told at once",
+    "A haircut could mean a salon or a barbershop.",
+    "Saves the time for 10 minutes",
+    "Shows sessions with seats left",
+    "Asks for another day",
+    "What happens before Sat 11:00am?",
+    "Books a haircut and a beard trim",
+    "A barbershop books a person's time.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "like a burst pipe or a lockout",
+    "A cut is rated, so the shop takes the first branch.",
+    "Registration 2020-1187",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "BS20981",
+    "Books the groom's party together",
+    "Takes the price from the shop's board",
+    "What happens at the chair?",
+    "Riley finishes the work",
+    "Lee Home Services'",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "A beard trim",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "color quote",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "house call",
+    "price board",
+    "priced at the chair",
+    "Priced at the chair",
+    "at the chair",
+    "At the chair",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "skin fades",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Color touch-up",
+    "color touch-up",
+    "barbershops"
+   ],
+   "B": [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact.",
+    "We'd share only where they're working, only after a missed check.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "A late cancel or a no-show: only the policy's fee may be kept, up to the $89 service call.",
+    "A late-cancel or nobody-home fee, up to the $89 service call, is charged only after Sam confirms it.",
+    "After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Change: Alex M. added a camera inspection to the Thu visit.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "It's a leak under the sink, today, starts at 3:00pm,",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "My kitchen drain is clogged.",
+    "Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Shut the cold-water valve, above the heater.",
+    "My gas water heater got wet in a flood.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Please clear the cabinet under the sink.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Good morning! Nora S. asked overnight for a drain clearing today.",
+    "Drain clearing · $179",
+    "raise drain clearing to 199",
+    "Reading it back: drain clearing goes to $199 for new bookings.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Drain clearings already booked keep only their saved card.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Lin agreed to the business's service call fee when booking.",
+    "Charge or keep the service call fee?",
+    "Lee Home Services took the service call fee you agreed to when you booked.",
+    "Service call fee",
+    "The service call is $89.",
+    "Tells Casey it's still waiting",
+    "Tells Casey it's a no",
+    "Casey asks for a day off",
+    "Rosa",
+    "Jordan feels unsafe and leaves",
+    "Notes what's there before the work",
+    "A haircut could mean a salon or a barbershop.",
+    "Saves the time for 10 minutes",
+    "Asks for another day",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "like a burst pipe or a lockout",
+    "Registration 2019-0451",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "Plumbing license",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "BS20981",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "house call",
+    "at the chair",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "after the job",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "Water heater replacement",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call",
+    "service call",
+    "Kitchen drain",
+    "Yard drain"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-24": "0a292df05b",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A7-01": "afb51b5e1b",
+   "A7-02": "987e1a14cd",
+   "A8-02": "15f418fec4",
+   "A8-03": "7accda6f86",
+   "A8-86": "c989a99e52",
+   "A8-53": "33f4da69f5",
+   "A8-32": "632f2b5b40",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A4-43": "c17d56f766"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B4-32": "fcfe092e37",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B7-05": "e28a131872",
+   "B8-58": "6a101417a1",
+   "B8-69": "5d0e4c0045",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B10-05": "a326ea3c0b",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255"
+  }
+ }
+}

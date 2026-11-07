@@ -1,0 +1,6332 @@
+{
+ "id": "tattoo",
+ "name": "Tattoo studio",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "hair",
+ "plugin": {
+  "pf.license": {
+   "need": "always: tattooing and body piercing are licensed where the state's rules require it (a switch from the state form)",
+   "who": "both, as the state's form says: the studio holds an establishment license or health permit, and each artist and piercer holds their own license or registration",
+   "studio": "the studio's license or health permit: a switch from the state form (some states or counties license only the place, some only the person, most both)",
+   "artist": "each artist's and piercer's license or registration, and any bloodborne-pathogens training card the state asks for: a switch from the state form",
+   "ask": "the studio's license or permit number; each artist's number in their invite reply (or the owner sends it)",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "artistAge": "an artist's minimum age: a switch from the state form",
+   "away": "tattooing or piercing away from the studio only in a licensed mobile studio, or at an event with its own permit, where the state's rules allow it (a switch from the state form); never inside a home",
+   "mobileStudio": "the mobile studio's own license or permit, where the state's rules require one",
+   "eventPermit": "an event or guest-spot permit before a convention or an event, where the state's rules require it",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance where the state's form or a venue asks for it",
+   "booth": "an artist who rents a station is their own business: their own license, prices and Stripe",
+   "piercing": "body piercing is its own kind of work, with its own license where the state asks"
+  },
+  "pf.services": {
+   "shape": "sessions booked with a chosen artist; a custom piece's length is set by its design, a big piece runs over several sessions",
+   "examples": "the example studio's own prices (Lee Tattoo Studio and Lee Mobile Tattoo), not a standard",
+   "list": [
+    {
+     "name": "Free consult",
+     "price": "free",
+     "kind": "a first step",
+     "length": "30 min",
+     "where": "at the studio",
+     "before": "nothing",
+     "after": "nothing",
+     "note": "for big or custom pieces; it sets the placement, size and plan"
+    },
+    {
+     "name": "Flash tattoo (from the flash wall)",
+     "price": "$140",
+     "kind": "one price",
+     "length": "up to 2½ hours",
+     "where": "at the studio",
+     "before": "a $40 deposit",
+     "after": "the rest at the desk",
+     "note": "the design is already drawn, so no preview is sent"
+    },
+    {
+     "name": "Custom tattoo",
+     "price": "priced from the customer's reference photos (the example: $300 for a palm-sized piece)",
+     "kind": "quoted from photos first",
+     "length": "set by the design",
+     "where": "at the studio",
+     "before": "a $100 deposit once the price is OK'd, counted toward it",
+     "after": "the rest at the desk",
+     "note": "Sam OKs every custom quote; the artist shares the design before the session"
+    },
+    {
+     "name": "Half sleeve session, by the hour",
+     "price": "$180 an hour, from $540 (3 hours), set at the session",
+     "kind": "quoted at the visit",
+     "length": "3 to 5 hours a session; a half sleeve takes 2 or 3 sessions",
+     "where": "at the studio",
+     "before": "the $100 drawing fee as a deposit, counted toward the price",
+     "after": "the rest at the desk, for the time used",
+     "note": "a free consult comes first; each session is its own booking, at least 3 weeks apart so the skin heals"
+    },
+    {
+     "name": "Small add-on",
+     "price": "$100",
+     "kind": "one price",
+     "length": "up to 30 min",
+     "where": "at the studio",
+     "before": "added to a booking",
+     "after": "at the desk",
+     "note": "like a small heart next to a piece; priced and OK'd before it's done"
+    },
+    {
+     "name": "Lobe piercing",
+     "price": "$35, plus jewelry",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the studio, or in the mobile studio at the customer's home for $75 with a $40 deposit and the rest on the bill",
+     "before": "nothing",
+     "after": "at the desk",
+     "note": "adults only (18 and up, with a photo ID); nothing is taken when it's booked"
+    },
+    {
+     "name": "Nostril piercing",
+     "price": "$40, plus jewelry",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the studio",
+     "before": "nothing",
+     "after": "at the desk"
+    },
+    {
+     "name": "Helix piercing",
+     "price": "$55, plus jewelry",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the studio",
+     "before": "nothing",
+     "after": "at the desk"
+    },
+    {
+     "name": "Touch-up of the studio's own work",
+     "price": "free within 3 months, once it has healed",
+     "kind": "a free fix",
+     "length": "30 min",
+     "where": "where the piece was done",
+     "before": "nothing",
+     "after": "nothing"
+    },
+    {
+     "name": "Custom piece in the mobile studio",
+     "price": "priced from photos (the example: $640)",
+     "kind": "quoted from photos first",
+     "length": "set by the design",
+     "where": "in the licensed mobile studio, parked at the customer's place",
+     "before": "a 25% deposit once the price is OK'd",
+     "after": "the rest on the bill Rosie texts after the session",
+     "note": "Sam OKs quotes over $500; the design is shared before the session"
+    },
+    {
+     "name": "Flash piece in the mobile studio",
+     "price": "$179",
+     "kind": "one price",
+     "length": "1 to 2 hours",
+     "where": "in the mobile studio",
+     "before": "a $40 deposit",
+     "after": "on the bill"
+    },
+    {
+     "name": "Small flash in the mobile studio",
+     "price": "$150",
+     "kind": "one price",
+     "length": "1 hour",
+     "where": "in the mobile studio",
+     "before": "a $40 deposit",
+     "after": "on the bill"
+    },
+    {
+     "name": "Cover-up in the mobile studio",
+     "price": "set at the visit; only the $89 trip fee is promised",
+     "kind": "quoted at the visit",
+     "length": "set at the visit",
+     "where": "in the mobile studio",
+     "before": "the $89 trip fee as a deposit",
+     "after": "on the bill"
+    },
+    {
+     "name": "Lettering piece in the mobile studio",
+     "price": "$199 ($249 when Sam does it)",
+     "kind": "one price",
+     "length": "1 to 2 hours",
+     "where": "in the mobile studio",
+     "before": "a $40 deposit",
+     "after": "on the bill"
+    },
+    {
+     "name": "Lobe piercing, both ears, in the mobile studio",
+     "price": "$45, plus jewelry",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "in the mobile studio",
+     "before": "a $40 deposit; none when it's added to a tattoo visit",
+     "after": "on the bill"
+    },
+    {
+     "name": "Nostril piercing in the mobile studio",
+     "price": "$50, plus jewelry",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "in the mobile studio",
+     "before": "a $40 deposit",
+     "after": "on the bill"
+    },
+    {
+     "name": "Piercing party",
+     "price": "a free consult, then a quote",
+     "kind": "quoted after a consult",
+     "length": "set by the quote",
+     "where": "in the mobile studio",
+     "before": "set with the quote",
+     "after": "on the bill",
+     "note": "each person signs their own consent form and shows their own ID"
+    },
+    {
+     "name": "Trip fee",
+     "price": "$89",
+     "kind": "one price",
+     "length": "on every mobile studio visit",
+     "where": "at the customer's place",
+     "before": "counted toward the piece",
+     "after": "counted toward the piece"
+    },
+    {
+     "name": "Extra time",
+     "price": "$120 an hour ($140 with Dante)",
+     "kind": "per hour",
+     "length": "added at the visit",
+     "where": "in the mobile studio",
+     "before": "added to the booking",
+     "after": "on the bill"
+    }
+   ],
+   "capacity": "one artist per booking; matching tattoos for a group are one booking, each person with their own consent form",
+   "skills": "custom work, flash, lettering, cover-ups, piercing; custom pieces offer only the artist who drew them",
+   "online": "in person only: tattooing, piercing and the free consult are done at the studio or the mobile studio, not by video",
+   "nobodyHome": "never: the person getting the tattoo is always there",
+   "healingGap": "at least 3 weeks between sessions of one piece, so the skin heals (the example studio's rule)",
+   "sessionLength": "up to 5 hours a session (the example studio's rule)",
+   "sessions": "a big piece's sessions are each booked on their own, at least 3 weeks apart; where Sam sets it, all of them can be booked together, with a stage bill after each"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "tattoo or piercing",
+    "where on the body, and about how big",
+    "the style: flash from the wall, or custom",
+    "color, or black and grey",
+    "a cover-up of an old tattoo, or new skin",
+    "first tattoo or not",
+    "for a big piece: a consult first"
+   ],
+   "afterTime": [
+    "anything the artist should know about the design",
+    "for the mobile studio: where it can park, and the owner's OK"
+   ],
+   "securePage": [
+    "18 or older, and a photo ID will be shown at the studio",
+    "the consent and release form, signed for every session",
+    "blood thinners or a bleeding problem",
+    "pregnant or breastfeeding",
+    "skin or healing problems, like keloids, at the spot",
+    "allergies, like latex, inks or ointments",
+    "reference photos and a photo of the spot"
+   ],
+   "whoMayBook": "adults only: an adult books a tattoo or a piercing for themselves, and shows a photo ID showing 18 or older at every session; nobody under 18 is booked (the studio's own rule, and the state's where it's stricter)"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "trouble breathing, or a swollen face, lips or throat after a tattoo or piercing",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a high fever, or red streaks spreading from a new tattoo or piercing",
+     "say": "See a doctor today. If it's hard to breathe, call 911.",
+     "booking": "no booking until a doctor says it's OK"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a red, sore or itchy new tattoo with no fever",
+     "what": "wash it gently with mild soap and water; the artist answers on the secure page; see a doctor if a fever starts"
+    },
+    {
+     "words": "a sunburn, rash, cut or infection at the spot before a session",
+     "what": "the spot is never tattooed; the artist checks it first, and the session moves at no fee"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking; Rosie and the AI never give health advice"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Consent and health form",
+     "when": "before every session, on the secure page (or on the studio's tablet at check-in)",
+     "who": "everyone, for every tattoo and piercing",
+     "goodFor": "one session",
+     "result": "any yes on the health questions goes to the artist to read before the session; the artist OKs it, calls first, or calls it off with a full refund"
+    },
+    {
+     "name": "Free consult",
+     "when": "before a big or custom piece, at least 2 days before the session, at the studio",
+     "who": "half sleeves, cover-ups and big custom pieces",
+     "goodFor": "3 months (the example studio's rule)",
+     "result": "the placement, size and plan; the artist sets the price, and the customer says yes or cancels with a full refund"
+    },
+    {
+     "name": "Design shared before the session",
+     "when": "1 or 2 days before a custom session, on the secure page",
+     "who": "custom pieces (flash is already on the wall)",
+     "result": "the customer replies looks right, or asks for changes; changes or no reply never cancel: the artist settles them at the start of the session, before any stencil"
+    },
+    {
+     "name": "Event or mobile studio permit",
+     "when": "before a guest spot, an event or a mobile studio visit, where the state's rules require it",
+     "who": "the business gets it",
+     "result": "on file before the day, or the visit moves"
+    }
+   ],
+   "reaction": "a past reaction to an ink: the booking waits for Sam's OK, and the reason stays in the record, never in a text",
+   "prep": "for the confirmation and the reminder: bring a photo ID; eat beforehand; no alcohol or drugs for 24 hours before; keep the spot out of the sun; wear clothes that leave the spot easy to reach"
+  },
+  "pf.visit": {
+   "checkIn": "the check-in code at the front desk; in the mobile studio, at the door of the customer's place",
+   "proof": "before any work, every session: a photo ID showing 18 or older, the person sober, and the consent form signed (an unsigned one is signed on the studio's tablet first); no ID, or impaired: no tattoo today, and the owner decides about the deposit",
+   "beforeWork": "the artist checks the skin at the spot, places the stencil, and the customer OKs it in the mirror before the first line",
+   "changes": "a design change, more time or a small add-on is priced and OK'd before it's done; by the hour, the time used is billed",
+   "done": "the check-in code, or DONE from the artist; the piece is cleaned and wrapped, and the aftercare goes out with the receipt",
+   "late": "up to 30 minutes late, the session is shorter (by the hour, billed for the time used); later, it moves to the next open time, and the owner decides about the deposit"
+  },
+  "pf.money": {
+   "before": "a deposit for tattoos ($40 for flash, $100 for a custom piece once its price is OK'd, the $100 drawing fee for a half sleeve session, the example studio's amounts), counted toward the price; nothing taken for piercings; a 25% deposit for a custom piece in the mobile studio",
+   "caps": "deposit cap: from the state form",
+   "multiSession": "a piece over several sessions: each session is paid at its end, or each stage is billed when it's done where Sam books them together; the studio can keep one deposit on file and take it off the last session (the master doesn't have this yet: see the gap)",
+   "cancel": "free to cancel or move until 24 hours before at the studio, and until 7am on the day of the session for the mobile studio (the owner's settings; many studios pick 48 or 72 hours); a deposit moves with a moved session",
+   "fees": "late cancel or no-show: the deposit may be kept, never more; the owner confirms each time, and no answer means a full refund",
+   "refunds": "a full refund if the studio cancels, the artist is out and the customer picks no new date, or the consult or health read rules the piece out",
+   "tips": "on: at the desk, or a tip line on the bill Rosie texts; tips go to the artist",
+   "tax": "a tax line for jewelry and aftercare products, where the state's rules require it",
+   "fee2": "Rosfield's $2 applies"
+  },
+  "pf.messages": {
+   "never": "health answers, health questions, healing photos, reference images and ID details never go in a text or through the AI: only the secure page and the customer's record; the artist answers health questions in their own words on the secure page",
+   "languages": "English and Spanish",
+   "minors": "nobody under 18 is booked, so no text goes to a parent about a child"
+  },
+  "pf.staff": {
+   "licenses": "each artist's and piercer's license per state, where the state's form says so",
+   "skills": "custom work, flash, lettering, cover-ups, piercing; only the artist who drew a custom piece is offered for it",
+   "supervision": "apprentices work only under a licensed artist, where the state's rules allow",
+   "oks": "Sam OKs every custom quote, a past ink reaction, and same-day or new-customer bookings he set to ask first",
+   "healthRead": "the artist reads any yes on the health form before the session and replies OK, call first, or no; no reply: Sam is asked",
+   "standIn": "a custom piece stays with its artist: if they're out, only their next dates are offered; flash and piercing can go to another artist with the skill",
+   "away": "only artists cleared for the mobile studio, and named on any event permit, are offered there"
+  },
+  "pf.rules": {
+   "minAge": "the minimum age for a tattoo, and whether a parent's consent can lower it: a switch from the state form (the example studio: 18 and up only)",
+   "piercingMinors": "adults only: nobody under 18 is tattooed or pierced here (the studio's own rule, which is never lower than the state's)",
+   "placement": "any place on the body the state's rules don't allow tattooed: a switch from the state form, used only in that state",
+   "consentForm": "what the consent form must say (aftercare, a note about giving blood) and how long it's kept: a switch from the state form",
+   "impaired": "no tattoo for anyone who seems drunk or high: the studio's own rule, and the state's where it has one",
+   "photoId": "a photo ID showing the age is checked before every session",
+   "showLicense": "the license or permit is shown where the state asks: posted at the studio, and on the mobile studio",
+   "away": "work away from the studio only where the state allows it, and only for the services it allows (a switch from the state form)",
+   "records": "consent forms, ID checks and session notes kept with the customer's record: 7 years, or longer where the state asks"
+  },
+  "pf.edges": {
+   "noId": "no photo ID showing 18 or older, or the person seems impaired: no tattoo today, and the owner decides about the deposit",
+   "designChange": "the customer asks for design changes: the artist settles them at the start of the session, before any stencil",
+   "healthYes": "a yes on the health form: the artist reads it and replies OK, call first, or no; a no is a full refund",
+   "artistOut": "the artist is out: a custom piece gets only that artist's next dates, or a full refund; flash may go to another artist",
+   "lateArrival": "up to 30 minutes late: a shorter session; later: the next open time, and the owner decides about the deposit",
+   "healingGap": "a next session less than 3 weeks after the last one isn't offered",
+   "touchUp": "a free touch-up within 3 months, once healed (the example studio's promise)",
+   "reaction": "a reaction or a sign of infection after a session: the safety words first, aftercare tips, and Sam is told at once",
+   "stop": "the customer texts STOP: the session stays, and the consent form is signed on the studio's tablet at check-in",
+   "group": "matching tattoos for a group: one booking, each person 18 or older with their own consent form and ID",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "forms",
+   "documents",
+   "groups",
+   "extrawork",
+   "photos"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Theo and Nina (tattoo artists)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Dante and Kira (artists in the mobile studio)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a bank, a landlord, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Theo"
+  },
+  "B": {
+   "staff": "Dante"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "{{svc.intext:Haircut}}",
+    "{{svc.intext:Tattoo}}"
+   ],
+   [
+    "{{due:$245}}",
+    "{{due:the rest}}"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A flash piece' or 'a cover-up' fits a tattoo."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for laser removal, which isn't on the studio's list."
+   ],
+   [
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A piercing could mean the studio or the mobile studio. Why: each kind asks its own questions, and nothing is guessed."
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex arrives at the studio. The plug-in asks for a photo ID showing 18 or older, so the desk checks it first."
+   ],
+   [
+    "The plug-in says a color and cut is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says a custom tattoo is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some pieces take several sessions, like a half sleeve in two or three. Where the plug-in says so, all the times are picked now, at least 3 weeks apart."
+   ],
+   [
+    "A leak repair from $89, priced at the visit. The $89 service call is paid up front as the deposit, counted toward the bill.",
+    "A cover-up, priced at the visit once Jordan sees the old tattoo. The $89 trip fee is paid up front as the deposit, counted toward the bill."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A groom books matching flash for himself and four friends on one morning. Rosie finds stations side by side across Riley and Avery."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "It's 11:00am, and Alex is at the desk. Alex reads the code from the confirmation or the reminder, and Riley texts it in."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a lobe piercing. Rosie finds one time long enough for both, and adds the prices: $140 and $35."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A session is rated, so the studio takes the first branch."
+   ],
+   [
+    "Alex asks Sam in person about Saturday. Sam, a barber or the desk can book for a customer by text or on the portal.",
+    "Alex asks Sam in person about Saturday. Sam, an artist or the desk can book for a customer by text or on the portal."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Riley can start late and keep to the time left, or you can move to a later time."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A tattoo for Alex and a lobe piercing for a teen work the same way. Both are asked before the times."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds tattoo removal to Lee's Barbershop. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Sam set this line at sign-up: the number customers call for what only an artist should answer."
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Reading it back: accept the lobe piercing today at 2:00pm with Avery. Say yes to go ahead."
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "It's a lobe piercing today at 2:00pm with Avery, for a new customer. It's $35. Accept it?"
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley, so Riley's next times show. Custom work always stays with Riley."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A tattoo studio takes no drop-offs. A tailor, a groomer or a bike repairer does."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A tattoo example: a red, sore new tattoo gets 'wash it gently, and see a doctor if a fever starts'."
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free touch-up within 3 months."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: many states license tattooing only inside a studio or a permitted mobile studio."
+   ],
+   [
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "A tattoo studio runs no classes. A yoga studio, a gym or a school does."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a tattoo on Saturday."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The studio's plug-in adds its own: trouble breathing, a swollen face or throat, or a high fever after a tattoo or piercing."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Tattoo removal for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "I got a sunburn on the spot. Can I still come in?"
+   ],
+   [
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Lee's Barbershop will touch it up for free. Pick a time:"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a lobe piercing is $35, with a parent there and ID for both. Want a time?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: every piece has a set time."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero un tatuaje el sábado."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's request has none of them, so nothing is sent here."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the studio show photos of your tattoo? Yes / No"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises $100; the rest is set at the session"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A piercing could mean the studio or the mobile studio"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my friend sit with me during my session?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, custom work and mobile visits"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A drop of ink stained my shirt."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can I add a small heart next to it on Saturday?"
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next session at the desk"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you pierce teens? My son is 15."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Helix piercing"
+   ],
+   [
+    "Books the groom's party together",
+    "Books matching tattoos together"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a flash tattoo and a piercing"
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "The studio's plug-in has its consent and health form."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "One line looks patchy now that it's healed."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like the free 30-minute design consult"
+   ],
+   [
+    "barber, color and house calls",
+    "artist, custom work and mobile visits"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "A deposit when they book"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Piercing, flash and an add-on"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like tattoos?"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens in the chair?"
+   ],
+   [
+    "to the price at the chair",
+    "to the price at the session"
+   ],
+   [
+    "The $140 Groom's package",
+    "The $140 flash tattoo"
+   ],
+   [
+    "Water heater replacement",
+    "Custom piece"
+   ],
+   [
+    "Haircuts work like this",
+    "Tattoos work like this"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Teen lobe piercing (with a parent)"
+   ],
+   [
+    "Signature cut and shave",
+    "Helix piercing"
+   ],
+   [
+    "signature cut and shave",
+    "helix piercing"
+   ],
+   [
+    "like a skin-test result",
+    "like the inks used and how it healed"
+   ],
+   [
+    "A barbershop has none.",
+    "The studio has none: the consent form is on the secure page."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Flash piece"
+   ],
+   [
+    "Gloss to finish · $15",
+    "20 more minutes of shading · $60"
+   ],
+   [
+    "pays for the consult",
+    "pays for the drawing"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Tattoo Studio LLC"
+   ],
+   [
+    "The Groom's package",
+    "The flash tattoo"
+   ],
+   [
+    "the Groom's package",
+    "the flash tattoo"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the session"
+   ],
+   [
+    "priced at the chair",
+    "priced at the session"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tattoo's"
+   ],
+   [
+    "Water heater flush",
+    "Small flash"
+   ],
+   [
+    "water heater flush",
+    "small flash"
+   ],
+   [
+    "Sam adds a barber",
+    "Sam adds an artist"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tattoo"
+   ],
+   [
+    "like a burst pipe",
+    "like a last-minute piece"
+   ],
+   [
+    "Color correction",
+    "Half sleeve session"
+   ],
+   [
+    "color correction",
+    "half sleeve session"
+   ],
+   [
+    "set at the chair",
+    "set at the session"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Tattoo Studio"
+   ],
+   [
+    "written estimate",
+    "consent form"
+   ],
+   [
+    "hot towel shave",
+    "helix piercing"
+   ],
+   [
+    "Groom's package",
+    "Flash tattoo"
+   ],
+   [
+    "the $25 consult",
+    "the $100 drawing fee"
+   ],
+   [
+    "like a haircut",
+    "like a flash tattoo"
+   ],
+   [
+    "Drain clearing",
+    "Flash piece"
+   ],
+   [
+    "drain clearing",
+    "flash piece"
+   ],
+   [
+    "Signature cut",
+    "Helix piercing"
+   ],
+   [
+    "signature cut",
+    "helix piercing"
+   ],
+   [
+    "Color and cut",
+    "Custom tattoo"
+   ],
+   [
+    "color and cut",
+    "custom tattoo"
+   ],
+   [
+    "a shorter cut",
+    "a shorter session"
+   ],
+   [
+    "A leak repair",
+    "A cover-up"
+   ],
+   [
+    "Kitchen drain",
+    "Flash piece"
+   ],
+   [
+    "the visit fee",
+    "the trip or drawing fee"
+   ],
+   [
+    "Color quotes",
+    "Custom quotes"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Tattoo"
+   ],
+   [
+    "Lee Electric",
+    "Lee Piercing"
+   ],
+   [
+    "Jordan Price",
+    "Dante Cole"
+   ],
+   [
+    "1200 Main St",
+    "415 Grand Ave"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "water heater",
+    "custom piece"
+   ],
+   [
+    "NEW massage",
+    "NEW tattoo removal"
+   ],
+   [
+    "color quote",
+    "custom quote"
+   ],
+   [
+    "house calls",
+    "mobile visits"
+   ],
+   [
+    "$25 consult",
+    "$100 drawing fee"
+   ],
+   [
+    "the $20 fee",
+    "the late fee"
+   ],
+   [
+    "barbershops",
+    "tattoo studios"
+   ],
+   [
+    "Casey Moore",
+    "Kira Moss"
+   ],
+   [
+    "Leak repair",
+    "Cover-up"
+   ],
+   [
+    "leak repair",
+    "cover-up"
+   ],
+   [
+    "patch test",
+    "consult"
+   ],
+   [
+    "does color",
+    "does custom work"
+   ],
+   [
+    "house call",
+    "mobile visit"
+   ],
+   [
+    "Beard trim",
+    "Small add-on"
+   ],
+   [
+    "beard trim",
+    "small add-on"
+   ],
+   [
+    "Barbershop",
+    "Tattoo studio"
+   ],
+   [
+    "barbershop",
+    "tattoo studio"
+   ],
+   [
+    "Electrical",
+    "Piercing"
+   ],
+   [
+    "electrical",
+    "piercing"
+   ],
+   [
+    "Riley Chen",
+    "Theo Banks"
+   ],
+   [
+    "Avery Diaz",
+    "Nina Ruiz"
+   ],
+   [
+    "Electric.",
+    "My wrist, about 2 inches."
+   ],
+   [
+    "kids cuts",
+    "teen piercings"
+   ],
+   [
+    "Skin fade",
+    "Nostril piercing"
+   ],
+   [
+    "skin fade",
+    "nostril piercing"
+   ],
+   [
+    "a $20 fee",
+    "a late fee"
+   ],
+   [
+    "88 Elm St",
+    "88 Alder St"
+   ],
+   [
+    "42 Oak St",
+    "42 Cedar Ln"
+   ],
+   [
+    "visit fee",
+    "trip or drawing fee"
+   ],
+   [
+    "JP031552",
+    "TA031552"
+   ],
+   [
+    "MP045210",
+    "TE045210"
+   ],
+   [
+    "kids cut",
+    "teen piercing"
+   ],
+   [
+    "Kids cut",
+    "Teen piercing"
+   ],
+   [
+    "Haircuts",
+    "Tattoos"
+   ],
+   [
+    "haircuts",
+    "tattoos"
+   ],
+   [
+    "A barber",
+    "An artist"
+   ],
+   [
+    "a barber",
+    "an artist"
+   ],
+   [
+    "Plumbing",
+    "Mobile tattooing"
+   ],
+   [
+    "plumbing",
+    "mobile tattooing"
+   ],
+   [
+    "plumbers",
+    "artists"
+   ],
+   [
+    "BS20981",
+    "TE20981"
+   ],
+   [
+    "EC22871",
+    "BP22871"
+   ],
+   [
+    "JE30417",
+    "BP30417"
+   ],
+   [
+    "the cut",
+    "the tattoo"
+   ],
+   [
+    "Haircut",
+    "Tattoo"
+   ],
+   [
+    "haircut",
+    "tattoo"
+   ],
+   [
+    "$20 fee",
+    "late fee"
+   ],
+   [
+    "Barbers",
+    "Artists"
+   ],
+   [
+    "barbers",
+    "artists"
+   ],
+   [
+    "plumber",
+    "artist"
+   ],
+   [
+    "Plumber",
+    "Artist"
+   ],
+   [
+    "Barber",
+    "Artist"
+   ],
+   [
+    "barber",
+    "artist"
+   ],
+   [
+    "Jordan",
+    "Dante"
+   ],
+   [
+    "Elm St",
+    "Alder St"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "Gloss",
+    "Extra shading"
+   ],
+   [
+    "gloss",
+    "extra shading"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Riley",
+    "Theo"
+   ],
+   [
+    "Avery",
+    "Nina"
+   ],
+   [
+    "Casey",
+    "Kira"
+   ],
+   [
+    "cuts",
+    "tattoos"
+   ],
+   [
+    "$125",
+    "$600"
+   ],
+   [
+    "$110",
+    "$540"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "$90",
+    "$300"
+   ],
+   [
+    "$85",
+    "$280"
+   ],
+   [
+    "$70",
+    "$200"
+   ],
+   [
+    "$25",
+    "$100"
+   ],
+   [
+    "$20",
+    "$100"
+   ],
+   [
+    "$15",
+    "$60"
+   ],
+   [
+    "85",
+    "280"
+   ],
+   [
+    "80",
+    "280"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "No tattoo today; the price stays open"
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't do laser removal."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a drop of ink stained a shirt today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "fine lines, black and grey, healed well before"
+   ],
+   [
+    "Theo and Nina cut hair",
+    "Theo and Nina tattoo"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a consent form. The $179 drain needs none.",
+    "Every tattoo needs the consent form, signed on the secure page first."
+   ],
+   [
+    "To save cards for the late fee, connect Stripe",
+    "To take deposits by card, connect Stripe"
+   ]
+  ],
+  "B": [
+   [
+    "{{svc.intext:Haircut}}",
+    "{{svc.intext:Tattoo}}"
+   ],
+   [
+    "{{due:$245}}",
+    "{{due:the rest}}"
+   ],
+   [
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A piercing could mean the studio or the mobile studio. Why: each kind asks its own questions, and nothing is guessed."
+   ],
+   [
+    "A leak repair from $89, priced at the visit. The $89 service call is paid up front as the deposit, counted toward the bill.",
+    "A cover-up, priced at the visit once Jordan sees the old tattoo. The $89 trip fee is paid up front as the deposit, counted toward the bill."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can pierce your ears at the studio for $35, or at your home for $75. Where would you like it?"
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Jordan does the cover-up today, $165. The $80 dark shading stays good until Thu Oct 29."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a custom piece is priced from photos, so Rosie's first text asks for them."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to wash it gently, and to see a doctor today if a fever starts or the redness spreads."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where on the body, how big, the style, and if the person is 18 or older."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Lávelo con agua y jabón suave. Si le da fiebre o el rojo se extiende, vea a un médico hoy."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep it cool and out of the sun. A burned spot can't be tattooed, so Jordan will check it first."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: he's the one who does custom pieces."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Wash it with mild soap and water. If you get a fever or the redness spreads, see a doctor today."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like tattoo removal."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The mobile studio's power failed, so Jordan stopped before the shading."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Each piece gets the consent form, where the state's rules require one."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face or a high fever, gets the safety steps first."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For tattooing, trouble breathing, a swollen face or throat, or a high fever stops the booking."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A piece in the mobile studio happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "If your face or throat is swelling, or it's hard to breathe, call 911 now."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A tattoo example: a red, sore new tattoo gets 'wash it gently, and see a doctor if a fever starts'."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say Alex books matching flash for 4 friends at one address."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can I take ibuprofen before a tattoo?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Henna art for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: trouble breathing, a swollen face or throat, or a high fever."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: many states license tattooing only inside a studio or a permitted mobile studio."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add reference photos and a photo of the spot, and an artist will price your piece."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does tattoos and piercings, not tattoo removal."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE fine lines, black and grey. Healed well before."
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 after each of the 3 sessions"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan looks at the old tattoo and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan looked at your old tattoo. Here's the price to cover it today."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to a small star next to the piece for $160."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your piece is inside the free touch-up, so this visit is free."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the artist, one line each. Each one signs their own consent form."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds henna art to Lee Home Services."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your custom piece's price is with Lee Home Services."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a small flash piece."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Please keep the spot clean and dry, with no lotion."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: every piece has a set time."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said their throat is swelling after a tattoo."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The piercing is $45 for both lobes, plus jewelry."
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do a small lettering piece?"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 dark shading stays good until Thu Oct 29."
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Home Services' quote for your full sleeve."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can an artist do a flash piece at my place this Thursday?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 small star next to the piece"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan do a small piece on my wrist next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free touch-up lasts."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the spot got sunburned."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A piercing could mean the studio or the mobile studio"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My friends leave town tomorrow. Can someone come tonight?"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene fiebre? ¿Se le hincha la cara o la garganta?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a lobe piercing."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The spot on my arm got sunburned today."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE skin clear, stencil placed"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also pierce my ears?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I put lotion on the spot before you come?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD power failed, stopped"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: do you have a fever? Is your face or throat swelling?"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "My new tattoo is red and it burns."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please eat first, bring a photo ID, and no alcohol for 24 hours."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 star quote is good for 7 days."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "The mobile studio's power fails."
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Healed well before."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks for a small star next to the piece."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It's inside the 3-month free touch-up."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "One line looks patchy once it heals, 4 weeks later."
+   ],
+   [
+    "with one arrival window and one code",
+    "with one start time and one code"
+   ],
+   [
+    "Both fit in the same arrival window.",
+    "Both fit in the same session."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a laser removal clinic near you."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "One line looks patchy now that it's healed."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Small star next to the piece · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the shading"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left ink wrappers in the driveway."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 cover-up 165 dark shading 80"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the power checked first"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Helix piercing"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE ink stain on the couch cushion"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is this your first tattoo?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the power failed"
+   ],
+   [
+    "The estimate becomes its own job",
+    "The quote becomes its own booking"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows a clean cushion."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa flash Thu 12pm Casey"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Tattooing books a set start time."
+   ],
+   [
+    "An estimate becomes its own job",
+    "A quote becomes its own booking"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It's just red."
+   ],
+   [
+    "barber, color and house calls",
+    "artist, custom work and mobile visits"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I want a small flash piece at my place."
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Piercing, flash and an add-on"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Small star next to the piece"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 full sleeve, 3 sessions"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE fine lines, black and grey."
+   ],
+   [
+    "to be next for that window",
+    "to be next for that time"
+   ],
+   [
+    "From $89, set at the visit",
+    "Set at the visit"
+   ],
+   [
+    "a water heater replacement",
+    "a custom piece"
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $2,400 full sleeve"
+   ],
+   [
+    "Sale agua del calentador.",
+    "Mi tatuaje nuevo está rojo y me arde."
+   ],
+   [
+    "Mold behind the sink wall",
+    "The power unit"
+   ],
+   [
+    "The $140 Groom's package",
+    "The $140 flash tattoo"
+   ],
+   [
+    "Water heater replacement",
+    "Custom piece"
+   ],
+   [
+    "water heater replacement",
+    "custom piece"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW henna art"
+   ],
+   [
+    "A gas smell at the home",
+    "A swollen face or throat after a tattoo"
+   ],
+   [
+    "Jordan found more work.",
+    "Here's the price for the extra you asked for."
+   ],
+   [
+    "Sewer camera inspection",
+    "Lettering piece"
+   ],
+   [
+    "sewer camera inspection",
+    "lettering piece"
+   ],
+   [
+    "signature cut and shave",
+    "helix piercing"
+   ],
+   [
+    "Just the kitchen sink.",
+    "My ankle. Not my first."
+   ],
+   [
+    "Under the sink, before",
+    "The spot, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your full sleeve"
+   ],
+   [
+    "Today's estimate visit",
+    "Today's visit"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Tattoo"
+   ],
+   [
+    "credited to the repair",
+    "counted toward the piece"
+   ],
+   [
+    "replaces water heaters",
+    "does custom pieces"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Ink stain on the cushion"
+   ],
+   [
+    "Cabinet floor, before",
+    "The stencil, placed"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Tattoo LLC"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Cover-up design · $165"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo está rojo."
+   ],
+   [
+    "leehomeservices.com",
+    "leemobiletattoo.com"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the session"
+   ],
+   [
+    "priced at the chair",
+    "priced at the session"
+   ],
+   [
+    "the shutoff valves",
+    "the star"
+   ],
+   [
+    "Water heater flush",
+    "Small flash"
+   ],
+   [
+    "water heater flush",
+    "small flash"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Tattoo's"
+   ],
+   [
+    "Supply line · $80",
+    "Dark shading over the old lines · $80"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Tattoo"
+   ],
+   [
+    "like a burst pipe",
+    "like a last-minute piece"
+   ],
+   [
+    "the shutoff valve",
+    "the piece"
+   ],
+   [
+    "The repair price",
+    "The cover-up price"
+   ],
+   [
+    "the repair price",
+    "the cover-up price"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "written estimate",
+    "consent form"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Tattoo Studio"
+   ],
+   [
+    "Color correction",
+    "Half sleeve session"
+   ],
+   [
+    "set at the chair",
+    "set at the session"
+   ],
+   [
+    "Repipe · $2,400",
+    "Full sleeve · $2,400"
+   ],
+   [
+    "arriving 8–10am",
+    "8:00am"
+   ],
+   [
+    "Drain clearings",
+    "Flash pieces"
+   ],
+   [
+    "hot towel shave",
+    "helix piercing"
+   ],
+   [
+    "Groom's package",
+    "Flash tattoo"
+   ],
+   [
+    "the $25 consult",
+    "the $100 drawing fee"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 flash"
+   ],
+   [
+    "Drain clearing",
+    "Tattoo"
+   ],
+   [
+    "drain clearing",
+    "tattoo"
+   ],
+   [
+    "like a haircut",
+    "like a flash tattoo"
+   ],
+   [
+    "A leak repair",
+    "A cover-up"
+   ],
+   [
+    "a leak repair",
+    "a cover-up"
+   ],
+   [
+    "Kitchen drain",
+    "Tattoo"
+   ],
+   [
+    "Signature cut",
+    "Helix piercing"
+   ],
+   [
+    "signature cut",
+    "helix piercing"
+   ],
+   [
+    "the visit fee",
+    "the trip or drawing fee"
+   ],
+   [
+    "Color and cut",
+    "Custom tattoo"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Tattoo"
+   ],
+   [
+    "Lee Electric",
+    "Lee Piercing"
+   ],
+   [
+    "Jordan Price",
+    "Dante Cole"
+   ],
+   [
+    "1200 Main St",
+    "415 Grand Ave"
+   ],
+   [
+    "water heater",
+    "custom piece"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Leak repair",
+    "Cover-up"
+   ],
+   [
+    "leak repair",
+    "cover-up"
+   ],
+   [
+    "Casey Moore",
+    "Kira Moss"
+   ],
+   [
+    "house calls",
+    "mobile visits"
+   ],
+   [
+    "$25 consult",
+    "$100 drawing fee"
+   ],
+   [
+    "barbershops",
+    "tattoo studios"
+   ],
+   [
+    "Yard drain",
+    "Tattoo"
+   ],
+   [
+    "the repair",
+    "the piece"
+   ],
+   [
+    "Electrical",
+    "Piercing"
+   ],
+   [
+    "electrical",
+    "piercing"
+   ],
+   [
+    "Riley Chen",
+    "Theo Banks"
+   ],
+   [
+    "Avery Diaz",
+    "Nina Ruiz"
+   ],
+   [
+    "Beard trim",
+    "Small add-on"
+   ],
+   [
+    "beard trim",
+    "small add-on"
+   ],
+   [
+    "Barbershop",
+    "Tattoo studio"
+   ],
+   [
+    "barbershop",
+    "tattoo studio"
+   ],
+   [
+    "does color",
+    "does custom work"
+   ],
+   [
+    "house call",
+    "mobile visit"
+   ],
+   [
+    "Electric.",
+    "My wrist, about 2 inches."
+   ],
+   [
+    "88 Elm St",
+    "88 Alder St"
+   ],
+   [
+    "42 Oak St",
+    "42 Cedar Ln"
+   ],
+   [
+    "a $20 fee",
+    "a late fee"
+   ],
+   [
+    "a plumber",
+    "an artist"
+   ],
+   [
+    "visit fee",
+    "trip or drawing fee"
+   ],
+   [
+    "JP031552",
+    "TA031552"
+   ],
+   [
+    "MP045210",
+    "TE045210"
+   ],
+   [
+    "Plumbing",
+    "Mobile tattooing"
+   ],
+   [
+    "plumbing",
+    "mobile tattooing"
+   ],
+   [
+    "plumbers",
+    "artists"
+   ],
+   [
+    "a barber",
+    "an artist"
+   ],
+   [
+    "BS20981",
+    "TE20981"
+   ],
+   [
+    "EC22871",
+    "BP22871"
+   ],
+   [
+    "JE30417",
+    "BP30417"
+   ],
+   [
+    "plumber",
+    "artist"
+   ],
+   [
+    "Plumber",
+    "Artist"
+   ],
+   [
+    "Barbers",
+    "Artists"
+   ],
+   [
+    "barbers",
+    "artists"
+   ],
+   [
+    "the cut",
+    "the tattoo"
+   ],
+   [
+    "Haircut",
+    "Tattoo"
+   ],
+   [
+    "haircut",
+    "tattoo"
+   ],
+   [
+    "$20 fee",
+    "late fee"
+   ],
+   [
+    "Jordan",
+    "Dante"
+   ],
+   [
+    "Elm St",
+    "Alder St"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "Barber",
+    "Artist"
+   ],
+   [
+    "barber",
+    "artist"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "Riley",
+    "Theo"
+   ],
+   [
+    "Avery",
+    "Nina"
+   ],
+   [
+    "Casey",
+    "Kira"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "it's about a leaking pipe under my sink.",
+    "it's about a red, sore spot after my tattoo."
+   ],
+   [
+    "'My sink won't drain' fits a tattoo.",
+    "'A small star on my wrist' fits a tattoo."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found the spot is raw and weepy this morning."
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Outline and color fill"
+   ],
+   [
+    "replace both shutoff valves",
+    "add a small star next to the piece"
+   ],
+   [
+    "Leave the supply line.",
+    "Leave the dark shading."
+   ],
+   [
+    "repipe",
+    "full sleeve"
+   ],
+   [
+    "cracks the cabinet floor",
+    "marks the cushion"
+   ],
+   [
+    "cracked the cabinet floor",
+    "stained the cushion"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like tattooing a stranger's skin without asking."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And which spot is it, and is it red or swollen?"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a small star? Say so."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a cover-up, today,"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it's my first"
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s piece, done Thu Oct 22, is patchy now."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a consent form. The $179 drain needs none.",
+    "Every tattoo needs the consent form, signed on the secure page first."
+   ],
+   [
+    "Theo and Nina cut hair",
+    "Theo and Nina tattoo"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "the kitchen drain",
+    "the flash piece"
+   ],
+   [
+    "To save cards for the late fee, connect Stripe",
+    "To take deposits by card, connect Stripe"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "lawyer",
+  "Lawyer",
+  "law office",
+  "Law office",
+  "Grace",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a custom tattoo with Theo at Lee Tattoo Studio, for Sat Oct 24 at 11:00am. Theo prices it from Alex's reference photos and shares the design before the session; the studio checks Alex's photo ID first. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Tattoo's licensed mobile studio, parked at Alex's home at 42 Cedar Ln, where the state's rules allow a mobile studio. Dante tattoos a custom forearm piece there Thu Oct 22 at 8:00am. It's priced from Alex's photos, with a 25% deposit."
+ },
+ "money": {
+  "A": {
+   "main": "photos|deposit|counter",
+   "combos": [
+    "photos|deposit|counter",
+    "visit|deposit|counter",
+    "list|deposit|counter",
+    "list|none|counter",
+    "list|none|none"
+   ],
+   "examples": {
+    "photos|deposit|counter": "The main story: a custom tattoo, priced by Theo from Alex's reference photos at $300 and OK'd by Sam. A $100 deposit now, the $200 rest at the desk.",
+    "visit|deposit|counter": "A half sleeve session by the hour ($180 an hour), from $540 and set at the session. A free consult comes first. The $100 drawing fee is the deposit, counted toward the price.",
+    "list|deposit|counter": "A $140 flash tattoo from the studio's flash wall. A $40 deposit now, the $100 rest at the desk.",
+    "list|none|counter": "A $35 lobe piercing for an adult. Nothing is taken: a YES books it. Alex pays at the desk.",
+    "list|none|none": "A free 30-minute consult with Theo. Nothing is taken, and nothing is paid after."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$0",
+     "name": "Tattoo"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Free consult"
+    },
+    "list|none|counter": {
+     "price": "$35",
+     "name": "Lobe piercing"
+    },
+    "list|deposit|counter": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Flash tattoo"
+    },
+    "visit|deposit|counter": {
+     "price": "set at the session",
+     "deposit": "$100",
+     "rest": "set at the session",
+     "fee": "$100",
+     "name": "Half sleeve session"
+    },
+    "photos|deposit|counter": {
+     "price": "$300",
+     "deposit": "$100",
+     "rest": "$200",
+     "fee": "$100",
+     "name": "Custom tattoo"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Flash tattoo",
+     "price": "list",
+     "before": "deposit",
+     "after": "counter",
+     "amounts": {
+      "price": "$140",
+      "deposit": "$40",
+      "rest": "$100",
+      "fee": "$40"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Small add-on",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$100"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "photos|deposit|bill",
+   "combos": [
+    "photos|deposit|bill",
+    "list|deposit|bill",
+    "visit|deposit|bill"
+   ],
+   "examples": {
+    "photos|deposit|bill": "The main story: a custom forearm piece in the mobile studio, priced by Dante from Alex's photos at $640 and OK'd by Sam. A $160 deposit now, the $480 rest on the bill Rosie texts.",
+    "list|deposit|bill": "A $150 small flash piece from the mobile studio's list. A $40 deposit now, the rest on the bill Rosie texts.",
+    "visit|deposit|bill": "A cover-up of an old tattoo, priced at the visit once Dante sees it. The $89 trip fee is paid up front as the deposit, counted toward the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$0",
+     "name": "Tattoo"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Small flash in the mobile studio"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Custom piece in the mobile studio"
+    },
+    "visit|deposit|*": {
+     "price": "set at the visit",
+     "deposit": "$89",
+     "rest": "set at the visit",
+     "fee": "$89",
+     "name": "Cover-up in the mobile studio"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Small flash in the mobile studio",
+     "price": "list",
+     "before": "deposit",
+     "after": "bill",
+     "amounts": {
+      "price": "$150",
+      "deposit": "$40",
+      "rest": "$110",
+      "fee": "$40"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Extra time",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$120"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the search goes on, with a note for the artist."
+   },
+   {
+    "op": "words",
+    "at": "A8-28",
+    "does": "Nothing goes out until someone OKs it, and Sam gets one reminder. Alex can wait, or stop for today.",
+    "more": [
+     "1 Wait: the price goes out as soon as it's OK'd.",
+     "2 Not today: nothing is tattooed, and the OK'd price comes by text later, good for 7 days.",
+     "Still no OK by 8pm: no price is sent, and Alex pays only the $100 drawing fee."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Theo's price for your half sleeve session is with the owner. You can wait for it, or stop for today. The $100 drawing fee covers the drawing.",
+      {
+       "buttons": [
+        "Wait for it",
+        "Not today"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-30",
+    "does": "Nothing is tattooed today. The $100 drawing fee pays for the drawing, so nothing more is charged. The price stays good for 7 days."
+   },
+   {
+    "op": "words",
+    "at": "A10-08",
+    "say": [
+     [
+      "cust",
+      "san",
+      "One line looks patchy now that it's healed."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says one line of the Oct 24 tattoo looks patchy now that it's healed. It's inside the 3-month free touch-up.",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Tattoo Studio will touch it up for free. Pick a time:",
+      {
+       "times": [
+        "Tue Nov 17 · 11:00am · Theo",
+        "Wed Nov 18 · 3:00pm · Theo"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Tattoo",
+       "At the customer's place",
+       "Mobile tattooing TE045210",
+       "Yes"
+      ],
+      [
+       "Dante Cole",
+       "Lee Mobile Tattoo",
+       "At the customer's place",
+       "Mobile tattooing TA031552 · piercing BP30417",
+       "Once Sam says yes"
+      ],
+      [
+       "Kira Moss",
+       "Lee Mobile Tattoo",
+       "At the customer's place",
+       "Mobile tattooing, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Tattoo",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Theo Banks",
+       "Lee Tattoo Studio",
+       "At the studio, and mobile visits",
+       "Artist and piercer, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Nina Ruiz",
+       "Lee Tattoo Studio",
+       "At the studio",
+       "Artist, as given, not checked",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Tattooing and piercing pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Tattoo work adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Tattoo work books artists, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The studio runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Tattoo work is never sent now: every piece has a set time."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "Tattoo work has no repeat plan: each piece is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A tattoo studio bills no plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Tattoo work is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "Every session needs the consent and health form, so it's on the main path (A4-x01), not a branch."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The studio sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The studio sells no packs or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "Tattoo work needs no written contract: the consent form is signed on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio: the customer is in the chair."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Each session is paid at the counter when it's done."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each session is paid at the counter when it's done."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A tattoo studio bills no plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Nothing is signed at the studio that carries a cancel period."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The studio sends no proposals: the next piece starts with a consult or a booking."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Tattoo work has no results that come later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A session is rated."
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The piercing plug-in loads the same way, with its own services and license form.",
+     "A piercing party starts with a free consult, then a quote.",
+     "AI assistants find Lee Mobile Tattoo under mobile tattooing and under piercing."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Piercing next. Send a photo of your piercing prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Piercing prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Piercing price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trip fee",
+          "$89, counted toward the piercing"
+         ],
+         [
+          "Lobe piercing, both ears",
+          "$45, plus jewelry"
+         ],
+         [
+          "Nostril piercing",
+          "$50, plus jewelry"
+         ],
+         [
+          "Piercing party",
+          "Free consult, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like mobile tattooing. Send only what's different.",
+      {
+       "card": {
+        "title": "Piercing, set like mobile tattooing",
+        "lines": [
+         "At the customer's place, in the mobile studio",
+         "A $40 deposit at booking",
+         "Paid after, the way you picked for mobile tattooing",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says if this piece needs a first step, like a free consult or a past reaction to check. Rosie checks before the secure link, so the page knows what to ask.",
+    "more": [
+     "A consult is a free 30-minute talk about the design, at the studio.",
+     "Big pieces, cover-ups and half sleeves start with one, at least 2 days before the session.",
+     "A small custom piece like Alex's, flash and piercings need none.",
+     "Every booking also gets the consent and health form: the next step."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "A consult is a free 30-minute talk about the design, at the studio.",
+       "Big pieces, cover-ups and half sleeves start with one, at least 2 days before the session.",
+       "A small custom piece like Alex's, flash and piercings need none.",
+       "Every booking also gets the consent and health form: the next step.",
+       "Its page not finished: it stays booked, with nothing taken."
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "A4-43",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "line": [
+       "4.14",
+       "4.11"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "page",
+      "title": "Puts the consent and health form on the page",
+      "does": "Every tattoo and piercing needs the plug-in's consent and health form, signed for each session. It goes on the secure link Alex gets next.",
+      "more": [
+       "It asks: 18 or older, blood thinners, pregnancy, skin or healing problems at the spot, and allergies.",
+       "For a custom piece, it also holds the reference photos and a photo of the spot.",
+       "The consent form gives the aftercare, and a note about giving blood where the state's rules ask.",
+       "Health answers stay on the page and in Theo's record, never in a text or through the AI.",
+       "Any yes goes to Theo to read before the booking is written.",
+       "It's due now, inside the saved time. Not signed, the time is let go."
+      ],
+      "form": [
+       [
+        "I'm 18 or older and will bring a photo ID",
+        "Yes"
+       ],
+       [
+        "Blood thinners or a bleeding problem",
+        "No"
+       ],
+       [
+        "Pregnant or breastfeeding",
+        "No"
+       ],
+       [
+        "Skin or healing problems at the spot",
+        "No"
+       ],
+       [
+        "Allergies, like latex, inks or ointments",
+        "No"
+       ],
+       [
+        "Consent and release, with the aftercare",
+        "Signed"
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.questions",
+       "pf.messages"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-32",
+    "more": [
+     "Each person signs their own consent form and shows their own photo ID."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-30",
+    "more": [
+     "Each session is paid at the desk when it's done. Sam can keep one deposit on file for the last session."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-80",
+    "more": [
+     "Adults only at this studio: a tattoo or a piercing is booked by an adult (18 or older), for themselves."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-01",
+    "more": [
+     "Alex's health answers are all no, so nothing waits for Theo's read.",
+     "A yes on the health form goes to Theo first: the branch where an expert reads the answers."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.14"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 3:00pm",
+      "title": "Shares the design before the session",
+      "does": "A custom piece has its design drawn for Alex. Theo shares it on the secure page before the session, never as a picture in a text.",
+      "more": [
+       "Flash is already drawn on the wall, so it skips this.",
+       "The design and the time Alex OKs it stay with the booking."
+      ],
+      "q": "Is the design drawn for this piece?",
+      "needs": [
+       "pf.first_steps",
+       "pf.messages"
+      ],
+      "branches": [
+       {
+        "label": "Custom: the design is shared",
+        "when": {
+         "price": [
+          "photos",
+          "visit"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A7-x02",
+          "type": "split",
+          "line": [
+           "4.14",
+           "7.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Thu Oct 22, 3:00pm",
+          "title": "Alex looks at Theo's design",
+          "does": "Theo uploads the design, and Alex gets a link to see it. Alex replies 1 if it looks right, or 2 to ask for changes on the page.",
+          "more": [
+           "Changes, or no reply, never cancel or move the session.",
+           "A change that alters the price is priced and OK'd first."
+          ],
+          "q": "What does Alex reply?",
+          "say": [
+           [
+            "staff",
+            "san",
+            "DESIGN Alex M. uploaded"
+           ],
+           [
+            "san",
+            "cust",
+            "Theo's design for your Sat Oct 24 tattoo is ready to see.",
+            {
+             "card": {
+              "title": "Your design · Lee Tattoo Studio",
+              "lines": [
+               "Sat Oct 24 · 11:00am · Theo",
+               "Changes are written on the page, not by text"
+              ],
+              "button": "See the design",
+              "link": "rosfield.com/d/a7"
+             },
+             "buttons": [
+              "Looks right",
+              "Ask for changes"
+             ]
+            }
+           ],
+           [
+            "cust",
+            "san",
+            "1"
+           ]
+          ],
+          "needs": [
+           "pf.first_steps"
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Looks right",
+            "end": "merge",
+            "steps": []
+           },
+           {
+            "label": "2 Changes, or no reply",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "A7-x03",
+              "line": [
+               "4.14",
+               "7.14"
+              ],
+              "who": "san",
+              "to": "staff",
+              "via": "msg",
+              "title": "Tells Theo to settle it at the start",
+              "does": "Theo sees Alex's notes on the page. Changes are drawn at the start of the session, before any stencil goes on.",
+              "say": [
+               [
+                "san",
+                "staff",
+                "Alex M. asked for changes to the Sat 11:00am design. Notes: rosfield.com/d/a7t"
+               ]
+              ],
+              "tells": [
+               "staff"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Flash or piercing: none",
+        "when": {
+         "price": [
+          "list"
+         ]
+        },
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex arrives at the studio. Before any work, the desk checks a photo ID showing 18 or older, and that the consent form is signed.",
+    "more": [
+     "Every session, every time, whatever was ticked online. The desk looks at the ID but doesn't copy it.",
+     "Alex must be sober: nobody who seems drunk or high is tattooed.",
+     "An unsigned consent form is signed on the studio's tablet first.",
+     "The code is taken only once nothing required is missing. A 'checked' note with the time goes on the booking."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-51",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M.: no photo ID showing 18 or older."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex in the chair, Sat 11:00am. Theo checks the skin at the spot, then places the stencil. Alex OKs it in the mirror before the first line.",
+    "more": [
+     "Any change Alex asked for on the design is drawn now, before the stencil.",
+     "Broken skin, a rash or a sunburn at the spot is never tattooed: the session moves with no fee.",
+     "A photo of the spot is kept with the booking, and Alex can see it on the secure page.",
+     "A later complaint is checked against it."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE skin clear at the spot. Stencil placed, Alex OK'd it in the mirror.",
+      {
+       "photos": [
+        "The spot, with the stencil"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Sat Oct 24 at Lee Tattoo Studio:",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Service"
+        ],
+        "rows": [
+         [
+          "10:00am",
+          "Ben T.",
+          "Nostril piercing"
+         ],
+         [
+          "11:00am",
+          "Alex M.",
+          "Lobe piercing"
+         ],
+         [
+          "11:30am",
+          "Dana R.",
+          "Flash tattoo"
+         ],
+         [
+          "2:00pm",
+          "Tess L.",
+          "Helix piercing"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open them",
+        "link": "rosfield.com/d/r24"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 15"
+     ],
+     [
+      "san",
+      "cust",
+      "Theo is running about 15 minutes behind. Your 11:30am flash tattoo will start about 11:45am.",
+      {
+       "as": "Dana",
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-01",
+    "does": "Alex paid at the desk, so the studio gave its own receipt. Rosie texts the aftercare, and says no card is kept.",
+    "more": [
+     "Any promise the plug-in or Sam sets is on the receipt, like a free touch-up within 3 months.",
+     "Healing questions and photos go to Theo on the secure page, never in a text.",
+     "Alex can ask for a copy later, like any record."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your session is paid,. Here's your aftercare.",
+      {
+       "card": {
+        "title": "Aftercare · Lee Tattoo Studio",
+        "lines": [
+         "How to care for your new tattoo",
+         "Free touch-up within 3 months, once it heals",
+         "Healing questions and photos go here, not by text"
+        ],
+        "button": "Read it",
+        "link": "rosfield.com/a/a14"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-07",
+    "more": [
+     "A piece over several sessions books the next one at least 3 weeks later, so the skin heals.",
+     "Each session is its own booking, with its own consent form, ID check and code."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-08",
+    "more": [
+     "The studio's own work gets a free touch-up within 3 months, once it has healed."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-42",
+    "more": [
+     "Healing questions and photos go behind the secure link to the artist, never in a text.",
+     "A fever, or red streaks spreading from the tattoo: see a doctor today. Trouble breathing: call 911."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-12",
+    "more": [
+     "A health question, like 'Can I take ibuprofen first?', goes to Theo on the secure page.",
+     "Rosie and the AI never give health advice."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "The studio runs no classes: each customer gives their own code.",
+    "label": "A class: names on a roster"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "Nothing is left at the studio: the customer is in the chair.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "does": "One money card: each service, its price, what's taken when they book, and how it's paid after.",
+    "more": [
+     "Tattoos take a deposit when booked: $40 for flash, $100 for a custom piece. Piercings take nothing when booked.",
+     "The rest is paid at the desk after the session. Nothing is charged later on its own, and no card is held.",
+     "The late-cancel or no-show fee is the deposit, never more.",
+     "Custom work is quoted from the customer's reference photos first, and Sam OKs every custom quote.",
+     "A free consult or touch-up: nothing taken, nothing after."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. For each service, what's taken when they book. I've started each one from the plug-in.",
+      {
+       "card": {
+        "title": "Every studio service, to start",
+        "lines": [
+         "Custom tattoo: priced from photos, a $100 deposit",
+         "Flash tattoo: a $40 deposit",
+         "Half sleeve session: the $100 drawing fee, as the deposit",
+         "Lobe piercing: nothing taken",
+         "Free consult: nothing taken"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Set"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's every studio service and its money.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Custom tattoo",
+          "From photos",
+          "$100 deposit",
+          "The rest at the desk"
+         ],
+         [
+          "Flash tattoo",
+          "$140",
+          "$40 deposit",
+          "The rest at the desk"
+         ],
+         [
+          "Half sleeve session",
+          "$180 an hour, from $540",
+          "$100 drawing fee",
+          "The rest at the desk"
+         ],
+         [
+          "Lobe piercing",
+          "$35",
+          "Nothing taken",
+          "At the desk"
+         ],
+         [
+          "Free consult",
+          "Free",
+          "Nothing taken",
+          "Nothing"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:photos+before:deposit+after:counter": {
+      "does": "One money card: each service, its price, what's taken when they book, and how it's paid after.",
+      "more": [
+       "Tattoos take a deposit when booked: $40 for flash, $100 for a custom piece. Piercings take nothing when booked.",
+       "The rest is paid at the desk after the session. Nothing is charged later on its own, and no card is held.",
+       "The late-cancel or no-show fee is the deposit, never more.",
+       "Custom work is quoted from the customer's reference photos first, and Sam OKs every custom quote.",
+       "A free consult or touch-up: nothing taken, nothing after."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. For each service, what's taken when they book. I've started each one from the plug-in.",
+        {
+         "card": {
+          "title": "Every studio service, to start",
+          "lines": [
+           "Custom tattoo: priced from photos, a $100 deposit",
+           "Flash tattoo: a $40 deposit",
+           "Half sleeve session: the $100 drawing fee, as the deposit",
+           "Lobe piercing: nothing taken",
+           "Free consult: nothing taken"
+          ]
+         },
+         "buttons": [
+          "Right for all of them"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Set"
+       ],
+       [
+        "san",
+        "owner",
+        "Here's every studio service and its money.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom tattoo",
+            "From photos",
+            "$100 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Flash tattoo",
+            "$140",
+            "$40 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Half sleeve session",
+            "$180 an hour, from $540",
+            "$100 drawing fee",
+            "The rest at the desk"
+           ],
+           [
+            "Lobe piercing",
+            "$35",
+            "Nothing taken",
+            "At the desk"
+           ],
+           [
+            "Free consult",
+            "Free",
+            "Nothing taken",
+            "Nothing"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "price:visit+before:deposit+after:counter": {
+      "does": "One money card: each service, its price, what's taken when they book, and how it's paid after.",
+      "more": [
+       "Tattoos take a deposit when booked: $40 for flash, $100 for a custom piece. Piercings take nothing when booked.",
+       "The rest is paid at the desk after the session. Nothing is charged later on its own, and no card is held.",
+       "The late-cancel or no-show fee is the deposit, never more.",
+       "Custom work is quoted from the customer's reference photos first, and Sam OKs every custom quote.",
+       "A free consult or touch-up: nothing taken, nothing after."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. For each service, what's taken when they book. I've started each one from the plug-in.",
+        {
+         "card": {
+          "title": "Every studio service, to start",
+          "lines": [
+           "Custom tattoo: priced from photos, a $100 deposit",
+           "Flash tattoo: a $40 deposit",
+           "Half sleeve session: the $100 drawing fee, as the deposit",
+           "Lobe piercing: nothing taken",
+           "Free consult: nothing taken"
+          ]
+         },
+         "buttons": [
+          "Right for all of them"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Set"
+       ],
+       [
+        "san",
+        "owner",
+        "Here's every studio service and its money.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom tattoo",
+            "From photos",
+            "$100 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Flash tattoo",
+            "$140",
+            "$40 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Half sleeve session",
+            "$180 an hour, from $540",
+            "$100 drawing fee",
+            "The rest at the desk"
+           ],
+           [
+            "Lobe piercing",
+            "$35",
+            "Nothing taken",
+            "At the desk"
+           ],
+           [
+            "Free consult",
+            "Free",
+            "Nothing taken",
+            "Nothing"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "before:deposit+after:counter": {
+      "does": "One money card: each service, its price, what's taken when they book, and how it's paid after.",
+      "more": [
+       "Tattoos take a deposit when booked: $40 for flash, $100 for a custom piece. Piercings take nothing when booked.",
+       "The rest is paid at the desk after the session. Nothing is charged later on its own, and no card is held.",
+       "The late-cancel or no-show fee is the deposit, never more.",
+       "Custom work is quoted from the customer's reference photos first, and Sam OKs every custom quote.",
+       "A free consult or touch-up: nothing taken, nothing after."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. For each service, what's taken when they book. I've started each one from the plug-in.",
+        {
+         "card": {
+          "title": "Every studio service, to start",
+          "lines": [
+           "Custom tattoo: priced from photos, a $100 deposit",
+           "Flash tattoo: a $40 deposit",
+           "Half sleeve session: the $100 drawing fee, as the deposit",
+           "Lobe piercing: nothing taken",
+           "Free consult: nothing taken"
+          ]
+         },
+         "buttons": [
+          "Right for all of them"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Set"
+       ],
+       [
+        "san",
+        "owner",
+        "Here's every studio service and its money.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom tattoo",
+            "From photos",
+            "$100 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Flash tattoo",
+            "$140",
+            "$40 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Half sleeve session",
+            "$180 an hour, from $540",
+            "$100 drawing fee",
+            "The rest at the desk"
+           ],
+           [
+            "Lobe piercing",
+            "$35",
+            "Nothing taken",
+            "At the desk"
+           ],
+           [
+            "Free consult",
+            "Free",
+            "Nothing taken",
+            "Nothing"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:counter": {
+      "does": "One money card: each service, its price, what's taken when they book, and how it's paid after.",
+      "more": [
+       "Tattoos take a deposit when booked: $40 for flash, $100 for a custom piece. Piercings take nothing when booked.",
+       "The rest is paid at the desk after the session. Nothing is charged later on its own, and no card is held.",
+       "The late-cancel or no-show fee is the deposit, never more.",
+       "Custom work is quoted from the customer's reference photos first, and Sam OKs every custom quote.",
+       "A free consult or touch-up: nothing taken, nothing after."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. For each service, what's taken when they book. I've started each one from the plug-in.",
+        {
+         "card": {
+          "title": "Every studio service, to start",
+          "lines": [
+           "Custom tattoo: priced from photos, a $100 deposit",
+           "Flash tattoo: a $40 deposit",
+           "Half sleeve session: the $100 drawing fee, as the deposit",
+           "Lobe piercing: nothing taken",
+           "Free consult: nothing taken"
+          ]
+         },
+         "buttons": [
+          "Right for all of them"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Set"
+       ],
+       [
+        "san",
+        "owner",
+        "Here's every studio service and its money.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom tattoo",
+            "From photos",
+            "$100 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Flash tattoo",
+            "$140",
+            "$40 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Half sleeve session",
+            "$180 an hour, from $540",
+            "$100 drawing fee",
+            "The rest at the desk"
+           ],
+           [
+            "Lobe piercing",
+            "$35",
+            "Nothing taken",
+            "At the desk"
+           ],
+           [
+            "Free consult",
+            "Free",
+            "Nothing taken",
+            "Nothing"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:none": {
+      "does": "One money card: each service, its price, what's taken when they book, and how it's paid after.",
+      "more": [
+       "Tattoos take a deposit when booked: $40 for flash, $100 for a custom piece. Piercings take nothing when booked.",
+       "The rest is paid at the desk after the session. Nothing is charged later on its own, and no card is held.",
+       "The late-cancel or no-show fee is the deposit, never more.",
+       "Custom work is quoted from the customer's reference photos first, and Sam OKs every custom quote.",
+       "A free consult or touch-up: nothing taken, nothing after."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. For each service, what's taken when they book. I've started each one from the plug-in.",
+        {
+         "card": {
+          "title": "Every studio service, to start",
+          "lines": [
+           "Custom tattoo: priced from photos, a $100 deposit",
+           "Flash tattoo: a $40 deposit",
+           "Half sleeve session: the $100 drawing fee, as the deposit",
+           "Lobe piercing: nothing taken",
+           "Free consult: nothing taken"
+          ]
+         },
+         "buttons": [
+          "Right for all of them"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Set"
+       ],
+       [
+        "san",
+        "owner",
+        "Here's every studio service and its money.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom tattoo",
+            "From photos",
+            "$100 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Flash tattoo",
+            "$140",
+            "$40 deposit",
+            "The rest at the desk"
+           ],
+           [
+            "Half sleeve session",
+            "$180 an hour, from $540",
+            "$100 drawing fee",
+            "The rest at the desk"
+           ],
+           [
+            "Lobe piercing",
+            "$35",
+            "Nothing taken",
+            "At the desk"
+           ],
+           [
+            "Free consult",
+            "Free",
+            "Nothing taken",
+            "Nothing"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-14",
+    "does": "A deposit is taken when a tattoo is booked, and it's counted toward the price. The rest is paid at the desk after the session. A piercing takes nothing when booked.",
+    "more": [
+     "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+     "Anything added at the desk is priced first, and paid there.",
+     "A tip at the desk is the studio's own way. Rosie never asks for one.",
+     "Each customer gets a 4-digit check-in code, given at the visit.",
+     "Card payments cost only Stripe's fee."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Tattoos and piercings work like this:",
+      {
+       "card": {
+        "title": "A deposit, counted toward the price",
+        "lines": [
+         "A tattoo: a deposit when booked, then the rest at the desk",
+         "A piercing: nothing taken; the YES books it",
+         "A late cancel or no-show may keep the deposit, never more"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "After the session, it's paid at the desk, by card or cash. I send no bill."
+     ]
+    ],
+    "vary": {
+     "price:photos+before:deposit+after:counter": {
+      "does": "A deposit is taken when a tattoo is booked, and it's counted toward the price. The rest is paid at the desk after the session. A piercing takes nothing when booked.",
+      "more": [
+       "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+       "Anything added at the desk is priced first, and paid there.",
+       "A tip at the desk is the studio's own way. Rosie never asks for one.",
+       "Each customer gets a 4-digit check-in code, given at the visit.",
+       "Card payments cost only Stripe's fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Tattoos and piercings work like this:",
+        {
+         "card": {
+          "title": "A deposit, counted toward the price",
+          "lines": [
+           "A tattoo: a deposit when booked, then the rest at the desk",
+           "A piercing: nothing taken; the YES books it",
+           "A late cancel or no-show may keep the deposit, never more"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "After the session, it's paid at the desk, by card or cash. I send no bill."
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "price:visit+before:deposit": {
+      "does": "A deposit is taken when a tattoo is booked, and it's counted toward the price. The rest is paid at the desk after the session. A piercing takes nothing when booked.",
+      "more": [
+       "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+       "Anything added at the desk is priced first, and paid there.",
+       "A tip at the desk is the studio's own way. Rosie never asks for one.",
+       "Each customer gets a 4-digit check-in code, given at the visit.",
+       "Card payments cost only Stripe's fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Tattoos and piercings work like this:",
+        {
+         "card": {
+          "title": "A deposit, counted toward the price",
+          "lines": [
+           "A tattoo: a deposit when booked, then the rest at the desk",
+           "A piercing: nothing taken; the YES books it",
+           "A late cancel or no-show may keep the deposit, never more"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "After the session, it's paid at the desk, by card or cash. I send no bill."
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:deposit+after:counter": {
+      "does": "A deposit is taken when a tattoo is booked, and it's counted toward the price. The rest is paid at the desk after the session. A piercing takes nothing when booked.",
+      "more": [
+       "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+       "Anything added at the desk is priced first, and paid there.",
+       "A tip at the desk is the studio's own way. Rosie never asks for one.",
+       "Each customer gets a 4-digit check-in code, given at the visit.",
+       "Card payments cost only Stripe's fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Tattoos and piercings work like this:",
+        {
+         "card": {
+          "title": "A deposit, counted toward the price",
+          "lines": [
+           "A tattoo: a deposit when booked, then the rest at the desk",
+           "A piercing: nothing taken; the YES books it",
+           "A late cancel or no-show may keep the deposit, never more"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "After the session, it's paid at the desk, by card or cash. I send no bill."
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:none+after:counter": {
+      "does": "A deposit is taken when a tattoo is booked, and it's counted toward the price. The rest is paid at the desk after the session. A piercing takes nothing when booked.",
+      "more": [
+       "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+       "Anything added at the desk is priced first, and paid there.",
+       "A tip at the desk is the studio's own way. Rosie never asks for one.",
+       "Each customer gets a 4-digit check-in code, given at the visit.",
+       "Card payments cost only Stripe's fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Tattoos and piercings work like this:",
+        {
+         "card": {
+          "title": "A deposit, counted toward the price",
+          "lines": [
+           "A tattoo: a deposit when booked, then the rest at the desk",
+           "A piercing: nothing taken; the YES books it",
+           "A late cancel or no-show may keep the deposit, never more"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "After the session, it's paid at the desk, by card or cash. I send no bill."
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:none+after:none": {
+      "does": "A deposit is taken when a tattoo is booked, and it's counted toward the price. The rest is paid at the desk after the session. A piercing takes nothing when booked.",
+      "more": [
+       "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+       "Anything added at the desk is priced first, and paid there.",
+       "A tip at the desk is the studio's own way. Rosie never asks for one.",
+       "Each customer gets a 4-digit check-in code, given at the visit.",
+       "Card payments cost only Stripe's fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Tattoos and piercings work like this:",
+        {
+         "card": {
+          "title": "A deposit, counted toward the price",
+          "lines": [
+           "A tattoo: a deposit when booked, then the rest at the desk",
+           "A piercing: nothing taken; the YES books it",
+           "A late cancel or no-show may keep the deposit, never more"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "After the session, it's paid at the desk, by card or cash. I send no bill."
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are the rules studios like yours often set. Your call: keep them, or change any. They become your own rules. You follow your state's rules for your trade.",
+      {
+       "list": {
+        "head": [
+         "Rule",
+         "Suggested"
+        ],
+        "rows": [
+         [
+          "Hours",
+          "Your studio hours"
+         ],
+         [
+          "Cancel",
+          "Free until 24 hours before. After that, or a no-show: the deposit may be kept, never more, only if you say yes"
+         ],
+         [
+          "Same-day and new customers",
+          "Ask you first"
+         ],
+         [
+          "Custom quotes",
+          "Sam OKs every custom quote"
+         ],
+         [
+          "Your phone line",
+          "Missed and after-hours calls go to Rosie"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here are the rules studios like yours often set. Your call: keep them, or change any. They become your own rules. You follow your state's rules for your trade.",
+        {
+         "list": {
+          "head": [
+           "Rule",
+           "Suggested"
+          ],
+          "rows": [
+           [
+            "Hours",
+            "Your studio hours"
+           ],
+           [
+            "Cancel",
+            "Free until 24 hours before. After that, or a no-show: the deposit may be kept, never more, only if you say yes"
+           ],
+           [
+            "Same-day and new customers",
+            "Ask you first"
+           ],
+           [
+            "Custom quotes",
+            "Sam OKs every custom quote"
+           ],
+           [
+            "Your phone line",
+            "Missed and after-hours calls go to Rosie"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "Keep them",
+          "Change one"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-67",
+    "does": "The plug-in says whether a child may be left without a parent. Adults only at this studio: no child is booked, so nothing more happens here.",
+    "more": [
+     "Adults only: a child is never booked or left here.",
+     "Safe default: a parent stays."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-80",
+    "label": "A teen may agree alone",
+    "why": "Adults only (18 and up) at the studio: no teen books, even with a parent."
+   },
+   {
+    "op": "off",
+    "at": "A4-80",
+    "label": "A teen books alone",
+    "why": "Adults only (18 and up) at the studio: no teen books."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "Adults only: no child is one of the people on a booking."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Adults only: no child is left at the studio."
+   },
+   {
+    "op": "words",
+    "at": "S12-32",
+    "does": "Ben T. books a nostril piercing for Sat Nov 7 at 2:00pm. A second one at 2:30pm comes from another app. Rosie asks once which Ben meant. Nothing is charged twice.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Tattoo Studio: you now have two visits on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+      {
+       "buttons": [
+        "Keep both",
+        "Just one: keep 2:00pm"
+       ],
+       "as": "Ben T.",
+       "stop": "first"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-84",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how Lee Tattoo Studio will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "A neighborhood tattoo studio on Alder St. Custom tattoos, flash and piercings, by appointment."
+        ]
+       },
+       "photos": [
+        "The studio front",
+        "The tattoo chairs",
+        "A clean station"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam raises the custom tattoo's deposit from $100 to $150, for new bookings only. Each change is read back first.",
+    "more": [
+     "Custom tattoos already booked keep their $100 deposit.",
+     "A deposit is taken when the customer books, and comes off the price.",
+     "A deposit stays within the owner's own limit, where one is set.",
+     "The price-OK limit changes the same way: from now on, and read back first."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, with a note for the artist. Here it's Rosa's call, in Spanish. The English is under each line."
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa, in Spanish. She was given the safety steps, and her health note is on the portal.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "A health note · safety steps given",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If your face or throat is swelling, or it's hard to breathe, call 911 now."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI described a medical emergency. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A medical emergency, no name given",
+         "Told to call 911 now"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-02",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Tattoo Studio can pierce your ears at the studio for $35, or in the mobile studio at your home for $75. Where would you like it?",
+      {
+       "buttons": [
+        "At my home",
+        "At the studio"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-01",
+    "more": [
+     "Tattooing away from the studio happens only in a licensed mobile studio, where the state's rules allow one.",
+     "That's a switch from the state form. It's never done inside the home.",
+     "Where the state's rules don't allow it, the AI hears to book at Lee Tattoo Studio instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "more": [
+     "Examples: a contract for work over a set amount, or the right to cancel a sale made at home.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date. Sam is reminded before it's late.",
+     "The $179 and $150 flash pieces need no notice here. Each piece gets the consent form, where the state's rules require one."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-97",
+    "does": "Say the piece is a big one that starts with a free consult, at least 2 days before. The AI says so, and the open times start only after it.",
+    "more": [
+     "The consult itself is booked once the time is saved.",
+     "A flash piece, or a custom piece like Alex's, needs none, so the times start today."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A piece this big starts with a free consult, at least 2 days before the session. So the first open times are from Thursday."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I'd like it done soon. Can someone come tonight?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Lee Mobile Tattoo can't send someone tonight. Its soonest times are next, starting Thu Oct 22."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "A what-if: the plug-in's first step isn't done by the day before. Say Alex's piece needs a free consult first, and it hasn't happened yet. Sam decides.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The consult for Alex M.'s piece (Thu 8:00am) hasn't happened yet.",
+      {
+       "buttons": [
+        "Move the visit",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Your piece needs its free consult first, so Lee Mobile Tattoo needs to move your visit. There's no fee.",
+      {
+       "times": [
+        "Mon Oct 26 · 8:00am · Dante",
+        "Tue Oct 27 · 8:00am · Dante"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "A what-if: the plug-in asks Alex to sign the consent and health form on the secure page by 10am the day before. It isn't signed. Alex gets one reminder, then Sam decides.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Reminder: please sign the consent and health form for tomorrow's visit. It takes a minute.",
+      {
+       "card": {
+        "title": "Consent and health form",
+        "lines": [
+         "Was due today, Wed Oct 21, at 10am",
+         "For Thu Oct 22 · 8:00am · Dante"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/f/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. still hasn't signed the consent and health form for Thu 8:00am, 4 hours after the reminder.",
+      {
+       "buttons": [
+        "Keep the visit",
+        "Move it",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-05",
+    "more": [
+     "A bill that matches the list or an OK'd quote never needs an OK.",
+     "Anything Alex added before the visit is its own line, like a lettering piece.",
+     "A different total over Sam's $500 goes to Sam first. Dante can leave while it waits.",
+     "No answer from Sam in 30 minutes: Alex is told it's with the owner."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "more": [
+     "Over $500, Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+     "The $89 trip fee is part of the price.",
+     "No phone at hand: Alex can answer on Dante's own phone, and the choice is saved with the time.",
+     "Any fact the state's rules require, like a license number, is on the quote.",
+     "One outcome isn't a tap: a bigger piece can become its own booking."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "more": [
+     "The note says what was found, what wasn't done and why.",
+     "It never names a company.",
+     "Only the work done is charged.",
+     "Sam is told, and the note and photos stay with the job.",
+     "Once the power unit is fixed, Alex picks a time for the rest, with no fee."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD power failed, stopped",
+      {
+       "photos": [
+        "The power unit"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "The mobile studio's power failed, so Dante stopped before the shading.",
+      {
+       "card": {
+        "title": "Safety note · 42 Cedar Ln",
+        "lines": [
+         "Found: the mobile studio's power failed",
+         "Not done: the shading",
+         "We'll text you times for the rest once it's fixed, with no fee"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-62",
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 2400 full sleeve, 3 sessions"
+     ],
+     [
+      "san",
+      "cust",
+      "Here's Lee Mobile Tattoo's quote for your full sleeve. Read it and sign on your secure page.",
+      {
+       "card": {
+        "title": "Full sleeve · $2,400",
+        "lines": [
+         "$800 when you sign, then $800 after sessions 2 and 3",
+         "OK'd by Sam · good until Thu Nov 5",
+         "Sign to book the session days"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/h1"
+       },
+       "as": "Harper J."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-63",
+    "does": "Harper and Sam sign. The $800 start payment is taken as the deposit, and Harper picks the session days, 3 weeks apart so the skin heals. Each day gets its own code.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Signed by you and Sam. Your $800 deposit is paid. Pick your session days, 3 weeks apart:",
+      {
+       "times": [
+        "Mon Nov 2, Nov 23 and Dec 14 · 8am–1pm · Dante",
+        "Mon Nov 9, Nov 30 and Dec 21 · 8am–1pm · Dante"
+       ],
+       "as": "Harper J."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee Mobile Tattoo",
+      "Mobile tattooing · within 25 miles of 415 Grand Ave, Springfield"
+     ],
+     [
+      "Prices",
+      "Flash piece $179 ($199 from Nov 2) · Small flash $150 · Lettering $199 · Custom pieces priced from photos"
+     ],
+     [
+      "To book",
+      "A deposit: $40 for flash, 25% for a custom piece, the $89 trip fee for a cover-up"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Tattoo Studio",
+      "88 Alder St, Springfield · (555) 010-0177"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-70",
+    "does": "Morgan P. cancelled her custom piece in time, so her deposit is refunded. Where the state's rules require it, the refund has a date. Sam was reminded each day, and the date passed.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Morgan P.'s deposit refund was due yesterday. A person from Rosie's team will call you today.",
+      {
+       "buttons": [
+        "It's done",
+        "Call me now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "Extra work sold at the home can be cancelled in the cancel period the state's rules set. No extra work is sold at a tattoo visit, so nothing waits here.",
+    "more": [
+     "An extra piece is added before the visit, or booked as its own visit.",
+     "A cancel of a piece booked ahead follows the cancel rules Alex agreed to."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Tattoo",
+       "At the customer's place",
+       "Mobile tattooing TE045210",
+       "Yes"
+      ],
+      [
+       "Dante Cole",
+       "Lee Mobile Tattoo",
+       "At the customer's place",
+       "Mobile tattooing TA031552 · piercing BP30417",
+       "Once Sam says yes"
+      ],
+      [
+       "Kira Moss",
+       "Lee Mobile Tattoo",
+       "At the customer's place",
+       "Mobile tattooing, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Tattoo",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Theo Banks",
+       "Lee Tattoo Studio",
+       "At the studio, and mobile visits",
+       "Artist and piercer, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Nina Ruiz",
+       "Lee Tattoo Studio",
+       "At the studio",
+       "Artist, as given, not checked",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Tattooing and piercing pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Tattoo work adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Tattoo work books artists, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The studio runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Tattoo work is never sent now: every piece has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Tattooing is done in person. A consult by video books with the studio, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Tattoo work bills no plan or warranty."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A tattoo session has a set start, not an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Tattoo work is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "The mobile studio sells no seats in a session: each booking has its own artist."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Tattoo work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "Every session needs the consent and health form, so it's on the main path (B4-x01), not a branch."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "The consent form is signed on the secure page instead of a contract."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Tattoo work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Tattoo work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "Tattoo work has no repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Tattoo work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Tattoo work always needs the customer there, so a visit with nobody home never happens."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "Tattoo work always needs the customer there, so there's no visit with nobody home and a gate code."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the artist's care: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Alex is in the chair the whole time, so no update is texted."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "The person getting the tattoo pays for it."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each session is billed when it's done."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Tattoo work bills no plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "The business sends no proposals: the next piece starts with a consult or a booking."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Tattoo work has no report that comes later."
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The piercing plug-in loads the same way, with its own services and license form.",
+     "A piercing party starts with a free consult, then a quote.",
+     "AI assistants find Lee Mobile Tattoo under mobile tattooing and under piercing."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Piercing next. Send a photo of your piercing prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Piercing prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Piercing price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trip fee",
+          "$89, counted toward the piercing"
+         ],
+         [
+          "Lobe piercing, both ears",
+          "$45, plus jewelry"
+         ],
+         [
+          "Nostril piercing",
+          "$50, plus jewelry"
+         ],
+         [
+          "Piercing party",
+          "Free consult, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like mobile tattooing. Send only what's different.",
+      {
+       "card": {
+        "title": "Piercing, set like mobile tattooing",
+        "lines": [
+         "At the customer's place, in the mobile studio",
+         "A $40 deposit at booking",
+         "Paid after, the way you picked for mobile tattooing",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Prices on the board never need your OK. Should custom quotes, from photos or at the session, come to you first?",
+      {
+       "buttons": [
+        "Yes, every time",
+        "Send them",
+        "Over an amount"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "These are the booking rules I suggest:",
+      {
+       "card": {
+        "title": "Lee Tattoo Studio · booking rules",
+        "lines": [
+         "Hours: from your Google listing",
+         "Free to cancel or move until 24 hours before",
+         "A no-show is marked 15 minutes after the start",
+         "Late cancel or no-show: the deposit may be kept, if you say so",
+         "Same-day bookings and new customers ask you first",
+         "If an artist can't come: another with the skill, but custom work stays with its artist"
+        ]
+       },
+       "buttons": [
+        "Keep these",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam raises the custom piece's deposit from 25% to 30%, for new bookings only. Each change is read back first.",
+    "more": [
+     "Custom pieces already booked keep their 25% deposit.",
+     "A deposit is taken when the customer books, and comes off the price.",
+     "A deposit stays within the state's limits, from the plug-in.",
+     "A deposit on a price set at the visit is never more than its starting price.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "Rosie checks this before the secure page, so the page knows what to ask. The plug-in says if this piece needs a first step, like a free consult or a permit.",
+    "more": [
+     "A consult is a free 30-minute talk about the design, at the studio.",
+     "A big piece or a full sleeve starts with one.",
+     "The mobile studio's permit, where the state's rules require one, is the business's to get.",
+     "Every booking also gets the consent and health form: the next step."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "A consult is a free 30-minute talk about the design, at the studio.",
+       "A big piece or a full sleeve starts with one.",
+       "The mobile studio's permit, where the state's rules require one, is the business's to get.",
+       "Every booking also gets the consent and health form: the next step.",
+       "Its page not finished: it stays booked, with nothing taken."
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B4-38",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "line": [
+       "4.14",
+       "4.11"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "page",
+      "title": "Puts the consent and health form on the page",
+      "does": "Every tattoo and piercing needs the plug-in's consent and health form, signed for each session. It goes on the secure link Alex gets next.",
+      "more": [
+       "It asks: 18 or older, blood thinners, pregnancy, skin or healing problems at the spot, and allergies.",
+       "The consent form gives the aftercare, and a note about giving blood where the state's rules ask.",
+       "Health answers stay on the page and in Dante's record, never in a text or through the AI.",
+       "Any yes goes to Dante to read before the booking is written.",
+       "It's due now, inside the saved time. Not signed, the time is let go."
+      ],
+      "form": [
+       [
+        "I'm 18 or older and will show a photo ID",
+        "Yes"
+       ],
+       [
+        "Blood thinners or a bleeding problem",
+        "No"
+       ],
+       [
+        "Pregnant or breastfeeding",
+        "No"
+       ],
+       [
+        "Skin or healing problems at the spot",
+        "No"
+       ],
+       [
+        "Allergies, like latex, inks or ointments",
+        "No"
+       ],
+       [
+        "Consent and release, with the aftercare",
+        "Signed"
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.questions",
+       "pf.messages"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-84",
+    "does": "A tattoo session starts at a set time, not an arrival window. Only people free, skilled and licensed for the mobile studio are shown, soonest first.",
+    "more": [
+     "The confirmation, the reminder and the on-my-way text say the same start.",
+     "Drive time from the place Alex gave is counted.",
+     "Only Dante does custom pieces here, so the photos path shows only Dante's times.",
+     "Kira does flash, cover-ups and script."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Mobile Tattoo can start at a set time:",
+      {
+       "times": [
+        "Thu Oct 22 · 8:00am · Dante",
+        "Thu Oct 22 · 1:00pm · Kira",
+        "Fri Oct 23 · 8:00am · Dante"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "before",
+    "at": "B7-55",
+    "steps": [
+     {
+      "id": "B7-x01",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.14"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Tue Oct 20, 3:00pm",
+      "title": "Shares the design before the session",
+      "does": "A custom piece has its design drawn for Alex. Dante shares it on the secure page before the session, never as a picture in a text.",
+      "more": [
+       "Flash is already drawn, and a cover-up is drawn at the visit, once Dante sees the old tattoo.",
+       "The design and the time Alex OKs it stay with the booking."
+      ],
+      "q": "Is the design drawn before the visit?",
+      "needs": [
+       "pf.first_steps",
+       "pf.messages"
+      ],
+      "branches": [
+       {
+        "label": "Custom: the design is shared",
+        "when": {
+         "price": [
+          "photos"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B7-x02",
+          "type": "split",
+          "line": [
+           "4.14",
+           "7.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Tue Oct 20, 3:00pm",
+          "title": "Alex looks at Dante's design",
+          "does": "Dante uploads the design, and Alex gets a link to see it. Alex replies 1 if it looks right, or 2 to ask for changes on the page.",
+          "more": [
+           "Changes, or no reply, never cancel or move the session.",
+           "A change that alters the price is priced and OK'd first."
+          ],
+          "q": "What does Alex reply?",
+          "say": [
+           [
+            "staff",
+            "san",
+            "DESIGN Alex M. uploaded"
+           ],
+           [
+            "san",
+            "cust",
+            "Dante's design for your Thu Oct 22 tattoo is ready to see.",
+            {
+             "card": {
+              "title": "Your design · Lee Mobile Tattoo",
+              "lines": [
+               "Thu Oct 22 · 8:00am · Dante",
+               "Changes are written on the page, not by text"
+              ],
+              "button": "See the design",
+              "link": "rosfield.com/d/r4"
+             },
+             "buttons": [
+              "Looks right",
+              "Ask for changes"
+             ]
+            }
+           ],
+           [
+            "cust",
+            "san",
+            "1"
+           ]
+          ],
+          "needs": [
+           "pf.first_steps"
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Looks right",
+            "end": "merge",
+            "steps": []
+           },
+           {
+            "label": "2 Changes, or no reply",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "B7-x03",
+              "line": [
+               "4.14",
+               "7.14"
+              ],
+              "who": "san",
+              "to": "staff",
+              "via": "msg",
+              "title": "Tells Dante to settle it at the start",
+              "does": "Dante sees Alex's notes on the page. Changes are drawn at the start of the session, before any stencil goes on.",
+              "say": [
+               [
+                "san",
+                "staff",
+                "Alex M. asked for changes to the Thu 8:00am design. Notes: rosfield.com/d/r4t"
+               ]
+              ],
+              "tells": [
+               "staff"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Flash or cover-up: none",
+        "when": {
+         "price": [
+          "list",
+          "visit"
+         ]
+        },
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that the spot got sunburned. Rosie runs the plug-in's danger check again, then offers a later time, with no fee.",
+    "more": [
+     "Real danger, like a swollen face or a high fever, gets the safety steps first.",
+     "If anyone is at risk, the text says to call 911.",
+     "A burned or broken spot is never tattooed. Dante checks it at the visit too.",
+     "No reply: the visit stays, and Dante checks the spot first."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The spot on my arm got sunburned today."
+     ],
+     [
+      "san",
+      "cust",
+      "Keep it cool and out of the sun. A burned spot can't be tattooed, so Dante can move your session a week later, with no fee.",
+      {
+       "times": [
+        "Thu Oct 29 · 8:00am · Dante"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep Thursday"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "more": [
+     "Each job shows what to bring, from the plug-in, like the stencil, the inks and new needles.",
+     "Alex's access notes from booking show too, like where the mobile studio parks.",
+     "No OMW by 7:45: Dante is nudged, then Sam.",
+     "Tattoo work is never sent now, so every job is on the day list."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Thu Oct 22. Text OMW when you leave.",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Job"
+        ],
+        "rows": [
+         [
+          "8:00am",
+          "Alex M. · 42 Cedar Ln",
+          "Custom piece, about 3½ hours"
+         ],
+         [
+          "1:00pm",
+          "Kim L.",
+          "Flash piece"
+         ],
+         [
+          "3:00pm",
+          "Drew",
+          "Small flash"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers, photos and designs",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open the day",
+        "link": "rosfield.com/d/j22"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 7:35am",
+    "more": [
+     "Dante drives the mobile studio over and parks it where Alex said.",
+     "The photo link is where a plain text finds the photo.",
+     "If Alex texted STOP, Dante calls instead.",
+     "The text says the set start: 8:00am."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 7:55am"
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "t": "Thu Oct 22, 7:55am",
+    "does": "Back to Alex's door, 7:55am. Before any work, Dante checks a photo ID showing 18 or older, and that the consent form is signed.",
+    "more": [
+     "Every session, every time, whatever was ticked online. Dante looks at the ID but doesn't copy it.",
+     "Alex must be sober: nobody who seems drunk or high is tattooed.",
+     "An unsigned consent form is signed on Dante's tablet first.",
+     "No ID showing 18 or older, or Alex seems impaired: no tattoo today. That goes as 'Can't go ahead', and Sam decides about the deposit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Alex comes out to the mobile studio. Dante checks the skin at the spot, then places the stencil. Alex OKs it in the mirror before the first line.",
+    "more": [
+     "Any change Alex asked for on the design is drawn now, before the stencil.",
+     "A cover-up priced at the visit gets its stencil once Alex OKs the price.",
+     "Broken skin, a rash or a sunburn at the spot is never tattooed: the session moves with no fee.",
+     "A photo of the spot is kept with the booking, and Alex can see it on the secure page.",
+     "A later complaint is checked against it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "does": "Back to Alex, Thu 9:15am: the money is in. The receipt goes out by text and email, with the plug-in's aftercare."
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "does": "Alex's piece runs long, so Dante will start Kim's session about 30 minutes late. Kim hears it now and picks.",
+    "more": [
+     "Kim can keep the later start, or change the time with no fee.",
+     "Can't make it at all: Sam is asked who goes, or Kim gets new times with no fee."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 30"
+     ],
+     [
+      "san",
+      "cust",
+      "Dante from Lee Mobile Tattoo is running about 30 minutes behind, so your session today will start about 30 minutes late.",
+      {
+       "buttons": [
+        "That works",
+        "Change the time"
+       ],
+       "as": "Kim L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-54",
+    "does": "A what-if: something the plug-in requires is missing, like a photo ID. The work doesn't start. Whether a fee may apply depends on whose side it's on.",
+    "more": [
+     "The customer's side: no photo ID showing 18 or older, the consent form not signed, or Alex seems impaired.",
+     "The business's side: a conflict, a health read that says no, or a permit the business needed."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M.: no photo ID showing 18 or older."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-03",
+    "more": [
+     "Alex's health answers are all no, so nothing waits for Dante's read.",
+     "A yes on the health form goes to Dante first: the branch where an expert reads the answers."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-32",
+    "more": [
+     "Tattoos are for adults only here. A teen can't book one, even with a parent; only a teen's piercing, where the state's rules allow it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-35",
+    "more": [
+     "Healing questions and photos go behind the secure link to the artist, never in a text.",
+     "A fever, or red streaks spreading from the tattoo: see a doctor today. Trouble breathing: call 911."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-08",
+    "more": [
+     "The business's own work gets a free touch-up within 3 months, once it has healed."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-18",
+    "more": [
+     "A piece over several sessions books the next one at least 3 weeks later, so the skin heals.",
+     "Each session is its own booking, with its own consent form, ID check and code."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-16",
+    "more": [
+     "A health question, like 'Can I take ibuprofen first?', goes to Dante on the secure page.",
+     "Rosie and the AI never give health advice."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "why": "No extra work is sold at the visit, so there's nothing to keep or cancel.",
+    "label": "Keeps it"
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "why": "No extra work is sold at the visit, so there's nothing to keep or cancel.",
+    "label": "Cancels inside the period"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "does": "One money card for the mobile studio: each service, its price, what's taken when they book, and how it's paid after.",
+    "more": [
+     "A custom piece at the customer's place: priced from photos, with a 25% deposit once Sam OKs the price.",
+     "A small flash piece: a $40 deposit, and the rest on the bill.",
+     "A cover-up: the $89 trip fee is the deposit, and it counts toward the bill.",
+     "The $89 trip fee is counted toward a custom or flash piece. Nothing is charged later on its own.",
+     "The late-cancel or no-show fee is the deposit, never more."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now, for each service: where it happens and when it's paid. I've started each one from the plug-in.",
+      {
+       "card": {
+        "title": "Every mobile studio service, to start",
+        "lines": [
+         "Custom piece at the customer's place: priced from photos, a 25% deposit",
+         "Small flash: a $40 deposit, the rest on the bill",
+         "Cover-up: the $89 trip fee, as the deposit",
+         "The rest is on the bill after the session"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Set"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's every mobile studio service and its money.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Custom piece",
+          "From photos",
+          "25% deposit ($160 on $640)",
+          "The rest on the bill"
+         ],
+         [
+          "Small flash",
+          "$150",
+          "$40 deposit",
+          "The rest on the bill"
+         ],
+         [
+          "Cover-up",
+          "Set at the visit",
+          "$89 trip fee, as the deposit",
+          "The rest on the bill"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "does": "One money card for the mobile studio: each service, its price, what's taken when they book, and how it's paid after.",
+      "more": [
+       "A custom piece at the customer's place: priced from photos, with a 25% deposit once Sam OKs the price.",
+       "A small flash piece: a $40 deposit, and the rest on the bill.",
+       "A cover-up: the $89 trip fee is the deposit, and it counts toward the bill.",
+       "The $89 trip fee is counted toward a custom or flash piece. Nothing is charged later on its own.",
+       "The late-cancel or no-show fee is the deposit, never more."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now, for each service: where it happens and when it's paid. I've started each one from the plug-in.",
+        {
+         "card": {
+          "title": "Every mobile studio service, to start",
+          "lines": [
+           "Custom piece at the customer's place: priced from photos, a 25% deposit",
+           "Small flash: a $40 deposit, the rest on the bill",
+           "Cover-up: the $89 trip fee, as the deposit",
+           "The rest is on the bill after the session"
+          ]
+         },
+         "buttons": [
+          "Right for all of them"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Set"
+       ],
+       [
+        "san",
+        "owner",
+        "Here's every mobile studio service and its money.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom piece",
+            "From photos",
+            "25% deposit ($160 on $640)",
+            "The rest on the bill"
+           ],
+           [
+            "Small flash",
+            "$150",
+            "$40 deposit",
+            "The rest on the bill"
+           ],
+           [
+            "Cover-up",
+            "Set at the visit",
+            "$89 trip fee, as the deposit",
+            "The rest on the bill"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:deposit+after:bill": {
+      "does": "One money card for the mobile studio: each service, its price, what's taken when they book, and how it's paid after.",
+      "more": [
+       "A custom piece at the customer's place: priced from photos, with a 25% deposit once Sam OKs the price.",
+       "A small flash piece: a $40 deposit, and the rest on the bill.",
+       "A cover-up: the $89 trip fee is the deposit, and it counts toward the bill.",
+       "The $89 trip fee is counted toward a custom or flash piece. Nothing is charged later on its own.",
+       "The late-cancel or no-show fee is the deposit, never more."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now, for each service: where it happens and when it's paid. I've started each one from the plug-in.",
+        {
+         "card": {
+          "title": "Every mobile studio service, to start",
+          "lines": [
+           "Custom piece at the customer's place: priced from photos, a 25% deposit",
+           "Small flash: a $40 deposit, the rest on the bill",
+           "Cover-up: the $89 trip fee, as the deposit",
+           "The rest is on the bill after the session"
+          ]
+         },
+         "buttons": [
+          "Right for all of them"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Set"
+       ],
+       [
+        "san",
+        "owner",
+        "Here's every mobile studio service and its money.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom piece",
+            "From photos",
+            "25% deposit ($160 on $640)",
+            "The rest on the bill"
+           ],
+           [
+            "Small flash",
+            "$150",
+            "$40 deposit",
+            "The rest on the bill"
+           ],
+           [
+            "Cover-up",
+            "Set at the visit",
+            "$89 trip fee, as the deposit",
+            "The rest on the bill"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "price:visit+before:deposit+after:bill": {
+      "does": "One money card for the mobile studio: each service, its price, what's taken when they book, and how it's paid after.",
+      "more": [
+       "A custom piece at the customer's place: priced from photos, with a 25% deposit once Sam OKs the price.",
+       "A small flash piece: a $40 deposit, and the rest on the bill.",
+       "A cover-up: the $89 trip fee is the deposit, and it counts toward the bill.",
+       "The $89 trip fee is counted toward a custom or flash piece. Nothing is charged later on its own.",
+       "The late-cancel or no-show fee is the deposit, never more."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now, for each service: where it happens and when it's paid. I've started each one from the plug-in.",
+        {
+         "card": {
+          "title": "Every mobile studio service, to start",
+          "lines": [
+           "Custom piece at the customer's place: priced from photos, a 25% deposit",
+           "Small flash: a $40 deposit, the rest on the bill",
+           "Cover-up: the $89 trip fee, as the deposit",
+           "The rest is on the bill after the session"
+          ]
+         },
+         "buttons": [
+          "Right for all of them"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Set"
+       ],
+       [
+        "san",
+        "owner",
+        "Here's every mobile studio service and its money.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom piece",
+            "From photos",
+            "25% deposit ($160 on $640)",
+            "The rest on the bill"
+           ],
+           [
+            "Small flash",
+            "$150",
+            "$40 deposit",
+            "The rest on the bill"
+           ],
+           [
+            "Cover-up",
+            "Set at the visit",
+            "$89 trip fee, as the deposit",
+            "The rest on the bill"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-14",
+    "does": "A deposit is taken when the customer books, and it's counted toward the price. The rest is on the bill Rosie texts after the session.",
+    "more": [
+     "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+     "A cover-up is priced at the visit. Its $89 trip fee is the deposit, and it counts toward the final price.",
+     "Anything added at the visit is priced first, and billed on the bill.",
+     "Each customer gets a 4-digit check-in code, given at the visit.",
+     "Card payments cost only Stripe's fee."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile tattooing works like this:",
+      {
+       "card": {
+        "title": "A deposit, then the bill",
+        "lines": [
+         "A small flash piece: $40 when booked, the rest on the bill",
+         "A custom piece: 25% when booked, the rest on the bill",
+         "A cover-up: the $89 trip fee when booked, counted toward the bill"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "After the session, Rosie texts the bill. Nothing else is taken."
+     ]
+    ],
+    "vary": {
+     "before:deposit": {
+      "does": "A deposit is taken when the customer books, and it's counted toward the price. The rest is on the bill Rosie texts after the session.",
+      "more": [
+       "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+       "A cover-up is priced at the visit. Its $89 trip fee is the deposit, and it counts toward the final price.",
+       "Anything added at the visit is priced first, and billed on the bill.",
+       "Each customer gets a 4-digit check-in code, given at the visit.",
+       "Card payments cost only Stripe's fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Mobile tattooing works like this:",
+        {
+         "card": {
+          "title": "A deposit, then the bill",
+          "lines": [
+           "A small flash piece: $40 when booked, the rest on the bill",
+           "A custom piece: 25% when booked, the rest on the bill",
+           "A cover-up: the $89 trip fee when booked, counted toward the bill"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "After the session, Rosie texts the bill. Nothing else is taken."
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     },
+     "price:visit+before:deposit+after:bill": {
+      "does": "A deposit is taken when the customer books, and it's counted toward the price. The rest is on the bill Rosie texts after the session.",
+      "more": [
+       "A late cancel or a missed visit may keep the deposit, never more. The owner confirms it each time.",
+       "A cover-up is priced at the visit. Its $89 trip fee is the deposit, and it counts toward the final price.",
+       "Anything added at the visit is priced first, and billed on the bill.",
+       "Each customer gets a 4-digit check-in code, given at the visit.",
+       "Card payments cost only Stripe's fee."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Mobile tattooing works like this:",
+        {
+         "card": {
+          "title": "A deposit, then the bill",
+          "lines": [
+           "A small flash piece: $40 when booked, the rest on the bill",
+           "A custom piece: 25% when booked, the rest on the bill",
+           "A cover-up: the $89 trip fee when booked, counted toward the bill"
+          ]
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "After the session, Rosie texts the bill. Nothing else is taken."
+       ]
+      ],
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are the rules mobile studios like yours often set. Your call: keep them, or change any. They become your own rules. You follow your state's rules for your trade.",
+      {
+       "list": {
+        "head": [
+         "Rule",
+         "Suggested"
+        ],
+        "rows": [
+         [
+          "Hours",
+          "Your mobile studio hours"
+         ],
+         [
+          "Cancel",
+          "Free until 7am on the day of the session. After that, or nobody home: the deposit may be kept, never more, only if you say yes"
+         ],
+         [
+          "Same-day jobs",
+          "Ask you first"
+         ],
+         [
+          "Price OKs",
+          "Custom quotes over $500 come to you first"
+         ],
+         [
+          "Travel area",
+          "25 miles from your studio"
+         ],
+         [
+          "Your phone line",
+          "Missed and after-hours calls go to Rosie"
+         ],
+         [
+          "Bills I send",
+          "A tip line on each bill"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-92",
+    "label": "A teen may agree alone",
+    "why": "Adults only (18 and up) at the studio: no teen books, even with a parent."
+   },
+   {
+    "op": "off",
+    "at": "B4-92",
+    "label": "A teen books alone",
+    "why": "Adults only (18 and up) at the studio: no teen books."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "Adults only: no child is one of the people on a booking."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A tattoo session is rated, like the studio's."
+   },
+   {
+    "op": "words",
+    "at": "S12-32",
+    "does": "Ivy C. books a small flash piece for Mon Nov 9 in the morning. A second one comes from another app. Rosie asks once which Ivy meant. Nothing is charged twice.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Tattoo: you have two sessions on Mon Nov 9. They're at 10:00am and 12:00pm. Keep both, or was that the same visit? No reply by 6:00pm Sun Nov 8: we keep 10:00am.",
+      {
+       "buttons": [
+        "Keep both",
+        "Just one: keep 10:00am"
+       ],
+       "as": "Ivy C.",
+       "stop": "first"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-84",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how Lee Mobile Tattoo will look to customers and AI assistants. I drafted it from your website and Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Custom tattoos and piercings at your place, in our licensed mobile studio, within 25 miles. By appointment."
+        ]
+       },
+       "photos": [
+        "The mobile studio",
+        "The team",
+        "A finished piece"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A4-80",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28"
+  ]
+ },
+ "notes": "From hair (the chair pilot): a tattoo studio runs like a salon chair. A booking is with one artist by name, custom work is priced from the customer's photos or set at a consult, a deposit is taken, and the rest is paid at the desk. What hair lacks is added here: the consent and health form on every booking, the artist's read of a yes, a design shared before the session, a photo ID and sobriety check before any work, the stencil OK, aftercare with the receipt, and free touch-ups.\nNames: Sam Lee's main company is Lee Mobile Tattoo LLC (a licensed mobile studio that parks at the customer's place, with piercing as its second kind of work; office 415 Grand Ave). His second company is Lee Tattoo Studio LLC (the studio, 88 Alder St). The master's shape is kept: flow A's story is at the studio, flow B's at the mobile company.\nPeople: Theo Banks and Nina Ruiz at the studio (the master's Riley and Avery); Dante Cole and Kira Moss in the mobile studio (Jordan and Casey). Alex's home is 42 Cedar Ln. License numbers use TA (artist), TE (establishment) and BP (piercer).\nPrices are the example studio's own, not a standard. Flow A: custom tattoo from photos $300 ($100 deposit, $200 at the desk), half sleeve session by the hour $180 an hour from $540 (the $100 drawing fee as the deposit), flash $140 ($40 deposit), lobe piercing $35 (nothing taken), small add-on $100. Flow B: custom piece from photos $640 (25% deposit, $480 rest), small flash $150 ($40 deposit), cover-up priced at the visit (the $89 trip fee as the deposit).\nFlow A renames the master's amounts: $90 to $300, $20 to $100, $70 to $200, $85 to $280, $110 to $540, $25 to $100, $15 to $60, $125 to $600. Flow B keeps the master's numbers.\nMoney paths, flow A: photos|deposit|counter (main: a custom tattoo from reference photos), visit|deposit|counter (a half sleeve session by the hour, priced at the session after a free consult), list|deposit|counter (flash from the wall), list|none|counter (a piercing). Left out: a card saved only for fees, holds, the full price up front, and the bill or card after (the studio has a desk).\nMoney paths, flow B: photos|deposit|bill (main), photos|deposit|none (the rest charged when free cancel ends), list|deposit|bill (small flash), visit|deposit|bill (a cover-up). Left out: holds, nothing taken, the card charged at DONE and the business's own way. The sign-up words (S1-13, S1-14, S1-16, S1-21, S1-38, S1-41, S1-42, S1-45, S1-47) now say how tattoo work really takes money: deposits, never a hold or a card saved only for fees.\nFlow B is the less usual side: a licensed mobile studio parked at the customer's place, where the state's rules allow tattooing away from a studio (a switch from the state form; never inside a home). Times there are a set start (B4-83 keeps only '2 A set start time'); Alex's piece starts Thu 8:00am. Dante is on the way 7:35am, checks in 7:55am, and texts DONE at 11:35am for a 3½-hour piece (9:10am for the small flash, 10:15am for the cover-up).\nFlow A's main clock: Alex asks Wed 7:15pm, Theo prices Thu 9:10am, booked 9:49am, the design is shared Thu 3:00pm, the reminder goes Fri 10:00am, the session is Sat 11:00am, the rating Sat 4:00pm.\nThe consent and health form is on the main path in both flows (own steps A4-x01 and B4-x01), so A4-43 and B4-38 turn off their 'A form signed on the secure page' branch and keep 'No' for pieces with no consult.\nOwn steps A7-x01 to A7-x03 and B7-x01 to B7-x03: the design is shared before a custom session; changes or no reply never cancel, and are drawn at the start, before the stencil. Flash, piercings and cover-ups skip it (a money split by price).\nThe ID check uses the master's A8-02 and B8-45 (both branches kept): no photo ID showing 18 or older, or the person seems impaired, means no tattoo today, and Sam decides about the deposit.\nThe minimum age for a tattoo and any parent rule are the state form's switches (pf.rules minAge). The example studio tattoos only at 18 and up; a teen's piercing is booked by a parent, where the state allows. A4-70 keeps both branches (splitsKept) because it depends on the state and the service.\nLicenses for the studio and for each artist are switches from the state form, so S1-60, S1-63 and S2-28 keep both branches (splitsKept).\nA7-61 keeps both branches: flash and piercing can go to another artist, but a custom piece stays with its artist.\nCancel window: the master's 24 hours before is kept (the owner's setting; many studios pick 48 or 72 hours).\nA piece over several sessions: each session is paid at the desk; one deposit kept for the last session isn't in the master yet (gap 'Deposit carried to the last visit').\nOff (both flows): no agreement to sign before going live, no spaces, no classes, nothing sent now (tattoo work always has a set time), no repeat plans, packages or memberships, no plan or insurance, no damage holds, no contracts (the consent form instead), no drop-offs or stays, no rentals or items left behind, no permit inspections or outside checks, no weather limit, no proposals.\nNew kinds of work in S11-58: tattoo removal for the studio (flow A), henna art for the mobile company (flow B).\nS11-56 now raises a deposit (the studio never uses holds). The what-ifs in sections 11 and 12 that held money for a flash request (Nora S.) now hold its $40 deposit until Sam accepts.\nkeep: none. Every barbershop, plumbing and hair word is renamed.\nReview (Oct 23): photos|deposit|none dropped: tattoo work is paid at the end of the session (the old chart and the plug-in), and only the master's sign-up example charged the rest on a set day. No extra work is sold and done at the visit in the mobile studio (a tattoo can't be undone inside a cancel period): extras are added before (B7-31) or booked on their own (B8-27). Flow B says it runs only where the state's rules allow a licensed mobile studio (B4-01, the story). Mobile piercing prices and the mobile studio's 7am free-cancel are in the plug-in. Health details stay out of texts to Sam too (B3-19, B3-22).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "The plug-in says a color and cut is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Alex asks Sam in person about Saturday. Sam, a barber or the desk can book for a customer by text or on the portal.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "A barbershop has none, so nothing is sent here.",
+    "May the shop show photos of your hair? Yes / No",
+    "Promises the $25 consult; priced at the chair",
+    "A haircut could mean a salon or a barbershop",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "The cape clip ripped my shirt collar.",
+    "Can I add a beard trim on Saturday?",
+    "Books the next visit at the chair",
+    "Do you do kids cuts? My son is 8.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "Books a haircut and a beard trim",
+    "A barbershop's plug-in has none.",
+    "The cut is uneven on one side.",
+    "like a 15-minute style consult",
+    "barber, color and house calls",
+    "A card saved for the $20 fee",
+    "Haircut, fade and beard trim",
+    "Does it work like haircuts?",
+    "What happens at the chair?",
+    "to the price at the chair",
+    "Haircuts work like this",
+    "Kids cut (12 and under)",
+    "Signature cut and shave",
+    "like a skin-test result",
+    "A barbershop has none.",
+    "Gloss to finish · $15",
+    "pays for the consult",
+    "Lee's Barbershop LLC",
+    "The Groom's package",
+    "the Groom's package",
+    "Priced at the chair",
+    "priced at the chair",
+    "Lee Home Services'",
+    "Sam adds a barber",
+    "Lee Home Services",
+    "like a burst pipe",
+    "Color correction",
+    "color correction",
+    "set at the chair",
+    "Lee's Barbershop",
+    "written estimate",
+    "hot towel shave",
+    "Groom's package",
+    "the $25 consult",
+    "like a haircut",
+    "Drain clearing",
+    "Signature cut",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "a shorter cut",
+    "the visit fee",
+    "Color quotes",
+    "at the chair",
+    "At the chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "water heater",
+    "NEW massage",
+    "color quote",
+    "house calls",
+    "$25 consult",
+    "the $20 fee",
+    "barbershops",
+    "Casey Moore",
+    "patch test",
+    "does color",
+    "house call",
+    "Beard trim",
+    "beard trim",
+    "Barbershop",
+    "barbershop",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electric.",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "a $20 fee",
+    "88 Elm St",
+    "visit fee",
+    "JP031552",
+    "MP045210",
+    "kids cut",
+    "Kids cut",
+    "Haircuts",
+    "haircuts",
+    "A barber",
+    "a barber",
+    "Plumbing",
+    "plumbing",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "the cut",
+    "Haircut",
+    "haircut",
+    "$20 fee",
+    "Barbers",
+    "barbers",
+    "plumber",
+    "Plumber",
+    "Barber",
+    "barber",
+    "Jordan",
+    "Elm St",
+    "Oak St",
+    "Gloss",
+    "gloss",
+    "shops",
+    "Riley",
+    "Avery",
+    "Casey",
+    "cuts",
+    "$125",
+    "$110",
+    "Shop",
+    "shop",
+    "$90",
+    "$85",
+    "$70",
+    "$25",
+    "$20",
+    "$15",
+    "85",
+    "80",
+    "Only the consult; the price stays open",
+    "doesn't do perms.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "visit fee"
+   ],
+   "B": [
+    "{{due:$245}}",
+    "Rosie's decision: if the words fit two kinds of work, the AI asks which one first. A haircut could mean a salon or a barbershop. Why: each kind asks its own questions, and nothing is guessed.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Your drain is under warranty, so this visit is free.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Your water heater price is with Lee Home Services.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Jordan says no. Please wait until the job is done.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Told to leave, then call 911 and the gas company",
+    "Can Jordan also run a camera down my sewer line?",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "Alex texts that the sink is now overflowing.",
+    "A haircut could mean a salon or a barbershop",
+    "It's overflowing. Can someone come tonight?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "First: is anyone hurt? Do you smell gas?",
+    "Water is coming out of the water heater.",
+    "Please clear the cabinet under the sink.",
+    "The $160 valve quote is good for 7 days.",
+    "Jordan finds mold behind the sink wall.",
+    "Old pipes: bring the camera next time.",
+    "Jordan finds corroded shutoff valves.",
+    "It's under the 1-year labor warranty.",
+    "The drain clogs again 2 weeks later.",
+    "with one arrival window and one code",
+    "Both fit in the same arrival window.",
+    "You can look for a roofer near you.",
+    "The kitchen drain is clogged again.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Call a mold cleanup company first",
+    "DAMAGE cracked the cabinet floor",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "The estimate becomes its own job",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Plumbing books a 2-hour window.",
+    "An estimate becomes its own job",
+    "No. It doesn't smell like gas.",
+    "barber, color and house calls",
+    "My kitchen drain is clogged.",
+    "Haircut, fade and beard trim",
+    "Replace both shutoff valves",
+    "QUOTE 2400 repipe, 3 stages",
+    "NOTE grease clog 12 ft in.",
+    "to be next for that window",
+    "From $89, set at the visit",
+    "a water heater replacement",
+    "Harper J.'s $2,400 repipe",
+    "Sale agua del calentador.",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "NEW heating and cooling",
+    "A gas smell at the home",
+    "Jordan found more work.",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "Today's estimate visit",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "replaces water heaters",
+    "Cracked cabinet floor",
+    "Cabinet floor, before",
+    "Lee Home Services LLC",
+    "Shutoff valve · $165",
+    "No. No huele a gas.",
+    "leehomeservices.com",
+    "the shutoff valves",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services'",
+    "Supply line · $80",
+    "Lee Home Services",
+    "like a burst pipe",
+    "the shutoff valve",
+    "The repair price",
+    "the repair price",
+    "Service call fee",
+    "service call fee",
+    "written estimate",
+    "Lee's Barbershop",
+    "Repipe · $2,400",
+    "arriving 8–10am",
+    "Drain clearings",
+    "hot towel shave",
+    "DONE 179 drain",
+    "Drain clearing",
+    "drain clearing",
+    "like a haircut",
+    "A leak repair",
+    "a leak repair",
+    "Kitchen drain",
+    "the visit fee",
+    "Service call",
+    "service call",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "water heater",
+    "at the chair",
+    "Leak repair",
+    "leak repair",
+    "Casey Moore",
+    "house calls",
+    "barbershops",
+    "Yard drain",
+    "the repair",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "Barbershop",
+    "barbershop",
+    "does color",
+    "house call",
+    "Electric.",
+    "88 Elm St",
+    "42 Oak St",
+    "a $20 fee",
+    "a plumber",
+    "visit fee",
+    "JP031552",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "a barber",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "plumber",
+    "Plumber",
+    "Barbers",
+    "barbers",
+    "the cut",
+    "Haircut",
+    "haircut",
+    "$20 fee",
+    "Jordan",
+    "Elm St",
+    "Oak St",
+    "Barber",
+    "barber",
+    "Labor",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "Shop",
+    "shop",
+    "it's about a leaking pipe under my sink.",
+    "I found water damage under the sink this morning.",
+    "Shutoff valve and wall pipe",
+    "replace both shutoff valves",
+    "Leave the supply line.",
+    "repipe",
+    "cracks the cabinet floor",
+    "cracked the cabinet floor",
+    "Like tapping a neighbor's water line without asking.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Adding a faucet check? Say so.",
+    "It's a leak under the sink, today,",
+    "Yes, it won't drain",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "visit fee",
+    "the kitchen drain"
+   ]
+  },
+  "A": {
+   "A3-23": "4a8b7c72a2",
+   "A8-28": "ce2597e46a",
+   "A8-30": "c0f4d7c935",
+   "A10-08": "b60e30f285",
+   "S2-21": "bf6617b6d3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "S1-38": "b50b0bd4e8",
+   "A4-32": "d5a284a416",
+   "A4-30": "59603c2ded",
+   "A4-80": "624ec2e303",
+   "A6-01": "df3c5778ea",
+   "A7-01": "afb51b5e1b",
+   "A8-02": "15f418fec4",
+   "A8-51": "71142aa1fa",
+   "A8-23": "e3a35f7f9e",
+   "A8-01": "750bd94ee4",
+   "A7-14": "6a57738a17",
+   "A10-01": "77ff9c7550",
+   "A10-07": "bc852cf77d",
+   "A10-42": "4f28189298",
+   "A7-12": "05f64179a4",
+   "A8-03": "7accda6f86",
+   "S1-13": "eca22651fd",
+   "S1-14": "c6cd09f2c0",
+   "S1-21": "913a9558f4",
+   "A8-67": "e9fd748fc5",
+   "A4-24": "0a292df05b",
+   "S12-32": "69107511cd",
+   "S1-84": "1747e13d81",
+   "S11-56": "bd841a4732"
+  },
+  "B": {
+   "B3-18": "a4b81ea9b3",
+   "B3-22": "19f64ba1ba",
+   "B3-19": "2f53161fb2",
+   "B4-02": "d857c517c8",
+   "B4-01": "15f683e6cb",
+   "B4-28": "506d267aaf",
+   "B4-97": "04796bf8db",
+   "B4-15": "f13240b9c6",
+   "B7-61": "342b55fd9b",
+   "B9-05": "6cbce323ed",
+   "B8-20": "53903a8275",
+   "B8-30": "a1ef4983e4",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "S11-57": "2f34f23d8a",
+   "S11-70": "e3cd4d5dcd",
+   "B10-05": "a326ea3c0b",
+   "S2-21": "bf6617b6d3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B8-22": "50d78f1af0",
+   "B9-06": "f091432f2d",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "S1-38": "6301c86637",
+   "S11-56": "8b6c6c101f",
+   "B4-84": "549b5c1a9d",
+   "B7-17": "ac1fd212f3",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B10-01": "814aa1fde7",
+   "B7-18": "d53cef58f7",
+   "B8-54": "0f180048ca",
+   "B4-32": "fcfe092e37",
+   "B10-35": "5ed99b23b3",
+   "B10-08": "01bac94fd8",
+   "B10-18": "3d7ba16539",
+   "B7-16": "3177c3701b",
+   "S1-13": "6964bfbe60",
+   "S1-14": "518f77ff70",
+   "S1-21": "334e0a791c",
+   "B4-92": "36a6823417",
+   "B10-32": "7713bff255",
+   "S12-32": "be8428996a",
+   "S1-84": "d0fb822383"
+  }
+ }
+}

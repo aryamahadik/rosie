@@ -1,0 +1,3428 @@
+{
+ "id": "windows",
+ "name": "Window & gutter cleaner",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "cleaner",
+ "plugin": {
+  "pf.license": {
+   "need": "Usually none for window or gutter cleaning. Where the state's or city's rules require a business registration or license, the form asks for it.",
+   "ask": "The company's business registration number, where the form asks for one.",
+   "who_holds": "The business. Window cleaners need no license of their own unless the state's form says so.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "repair_work": "Gutter repair and gutter guards are home-improvement work, not cleaning. Some states require a home-improvement or contractor registration for them, sometimes only over an amount or on homes the owner lives in. From the state form; without it, those quotes aren't sent.",
+   "insurance_bond": "Liability insurance is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "not_this_work": "Putting new glass in a window frame, roof repair and pressure washing a roof aren't window cleaning. Rope descent on tall buildings and lift work need a crew trained and equipped for it."
+  },
+  "pf.services": {
+   "pattern": "Set service: a crew at the customer's home or storefront, priced by window count and stories, often repeating in spring and fall.",
+   "list": [
+    {
+     "name": "Windows inside and out",
+     "price_kind": "per unit: up to 20 windows on a home up to 2 stories, then a price for each window over 20",
+     "example": "$179 for up to 20 windows, $8 for each one over (the example business's own prices)",
+     "length": "set by the answers: about 2 hours for a crew of two, up to 20 windows",
+     "where": "at the customer's place; an adult must be home for the inside windows",
+     "money": "a card saved for the $89 trip fee; Rosie texts the bill after",
+     "weather": "outside work has a weather limit Sam sets: rain all day or wind over 25 mph moves it, free"
+    },
+    {
+     "name": "Outside windows only",
+     "price_kind": "per unit, the same way",
+     "example": "$150 for up to 20 windows",
+     "length": "about 2 hours for one person",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "Sam's example: paid in full when booked",
+     "weather": "the same weather limit"
+    },
+    {
+     "name": "3-story home windows",
+     "price_kind": "quoted from the customer's photos first",
+     "example": "$640 for a 3-story home with 34 windows and a steep back roof",
+     "length": "a day for the tall-ladder crew",
+     "where": "at the customer's place; only the crew set up for 3 stories goes",
+     "money": "a 25% deposit once the quote is OK'd, where the state's caps allow; the rest on the bill"
+    },
+    {
+     "name": "Hard-water stain treatment",
+     "price_kind": "quoted at the visit, after a test spot on the glass",
+     "example": "only the $89 trip fee is promised; the example visit: $245 (stain treatment $165, glass sealant $80)",
+     "where": "at the customer's place",
+     "money": "a card saved for the $89 trip fee; the bill after"
+    },
+    {
+     "name": "Solar panel cleaning",
+     "price_kind": "one price, up to 20 panels",
+     "example": "$199",
+     "where": "at the customer's place, dry roof only",
+     "money": "a card saved for the $89 trip fee; the bill after"
+    },
+    {
+     "name": "Plan: windows every spring and fall",
+     "price_kind": "a per-visit price",
+     "example": "$179 a visit, twice a year",
+     "where": "at the customer's place",
+     "money": "a card saved; each visit charged at its own DONE"
+    },
+    {
+     "name": "Storefront glass",
+     "price_kind": "a per-visit price, on a plan",
+     "example": "every 2 weeks, outside glass, one bill a month",
+     "where": "at the customer's shop; nobody needs to be there",
+     "money": "Rosfield's bill once a month"
+    },
+    {
+     "name": "By the hour",
+     "price_kind": "per hour",
+     "example": "$120 an hour, 1-hour minimum",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Add-ons",
+     "price_kind": "one price each, added only when the customer asks",
+     "example": "skylight $25 (dry roof only); rescreen 3 torn screens $95; tracks and sills $160"
+    },
+    {
+     "name": "Trip fee",
+     "price_kind": "one price",
+     "example": "$89: a card saved at booking, charged only for a late cancel or no way in that Sam confirms, or owed when a job priced at the visit isn't done",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Gutter cleaning (the second kind of work)",
+     "price_kind": "by stories, up to 160 feet of gutter",
+     "example": "1 story $149, 2 stories $189, debris bagged and taken away, downspouts cleared; gutter guards: a free estimate visit, then a quote",
+     "length": "about 2 hours for a crew of two",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "a card saved for the $89 trip fee; the bill after"
+    },
+    {
+     "name": "Screen and storm window repair at the shop (Lee Screen Repair)",
+     "price_kind": "one price by size, from photos, or at the counter",
+     "example": "screen repair $35, pet screen $40, screen wash $20, spline repair $25, screen door $55, storm window rebuild $140, patio screen door rebuild from photos, storm window repair priced at the counter after a $25 bench check",
+     "where": "dropped off at the shop; a screen can also be fixed at the customer's home ($75)",
+     "money": "nothing taken; paid at the counter at pick-up"
+    }
+   ],
+   "instant_booking": "Homes up to 2 stories with a normal roof and under 40 windows book from the list. Taller, steeper or bigger homes, and businesses, are priced from photos first.",
+   "capacity": "A crew of two for inside and out on a full home; one person for outside only. A drop-off needs one person at the counter.",
+   "nobody_home": "Yes, for outside windows only, gutters and storefront glass. DONE with after photos confirms it. Inside windows need an adult home.",
+   "online": "No.",
+   "not_offered": "Glass replacement in a frame, roof repair, rope or lift work unless a crew is set up for it.",
+   "drop_off_slots": "Screens and storm windows are booked into drop-off slots by the shop's daily number, with no screen tech named."
+  },
+  "pf.questions": {
+   "before_times": [
+    "How many stories, and how steep is the roof?",
+    "How many windows, and inside and out, or outside only?",
+    "Storm windows or screens, and how many?",
+    "Skylights or solar panels?",
+    "For gutters: gutter guards, and about how many feet, if known",
+    "For a drop-off: the screen's size, or the storm window's size and what's broken"
+   ],
+   "after_a_time": [
+    "Will an adult be home for the inside windows?",
+    "Pets in the yard, and where they'll be",
+    "Where the crew can park the ladder truck",
+    "Anything to move from the sills"
+   ],
+   "secure_page_only": [
+    "Gate or door codes",
+    "Alarm codes",
+    "Where the power line comes to the house, if the customer knows"
+   ],
+   "who_may_book": "An adult who lives in the home, or the owner, a landlord or a manager they name. A storefront: its owner or manager."
+  },
+  "pf.safety": {
+   "words": [
+    "a power line touching the house, a gutter or a tree near the windows",
+    "a gutter or downspout hanging loose",
+    "broken glass in a window",
+    "a wasp or bee nest at a window or gutter",
+    "someone fell from a ladder or a roof"
+   ],
+   "what_happens": [
+    "A power line touching the house or gutters: stay away, and call the electric company's emergency line, or 911 if it's sparking. No booking until the customer says the utility made it safe.",
+    "A hanging gutter: keep people and cars out from under it. Fixing it is repair work, quoted on site. The cleaning can still be booked.",
+    "Broken glass: keep children and pets away. Glass work isn't cleaning; the AI can look for a glass shop. Other windows can still be booked.",
+    "A nest: the crew works around it, or it waits for pest control. The note says which windows were left.",
+    "A fall: call 911. No booking."
+   ],
+   "booking_goes_on": "Yes, for a hanging gutter, broken glass or a nest, with that part left out. No, for a power line on the house or a fall."
+  },
+  "pf.first_steps": {
+   "none": "None for homes up to 2 stories.",
+   "photos": "3 stories, a steep roof, 40 or more windows, or a business: priced from the customer's photos first.",
+   "estimate": "Gutter guards: a free estimate visit first, then a quote.",
+   "rope_work": "Rope or lift work on a tall building: the building owner's written OK that each roof anchor is sound, before any time is offered. Sam gets it as a to-do.",
+   "prep_for_reminder": [
+    "Clear the inside window sills",
+    "Keep the driveway free for the ladder truck",
+    "Unlock the side gate, and keep pets inside",
+    "Leave screens in: the crew takes them out"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Someone home: the code at the door, entered by the crew lead. Nobody home (outside only, gutters, storefronts): no code; DONE with after photos.",
+   "walk_through": "Before ladders go up, the crew lead walks around the house: cracked panes, fogged glass between panes (a failed seal cleaning can't fix), torn screens, where the power line comes in, and the wind. Photos of anything already wrong.",
+   "ladders": "Ladders on firm, level ground, kept well clear of power lines, with stand-offs at the gutters. Anyone on a roof ties off first. No ladders in strong wind.",
+   "wind_on_the_day": "Wind over the limit at the house: inside windows are done today, outside work moves to a new day at no cost, and it's billed once when it's all done.",
+   "changes_at_visit": "Add-ons only when the customer asks, priced before they're done. Hard-water stains are priced after a test spot. Gutter repair found at the visit is quoted only where the license plug-in allows it. A right to cancel where the state's rules give one for work sold at the home.",
+   "drop_off": "At the shop: the code is given at the counter when the screen is left. Status words IN, READY. READY comes with a photo. Pick-up only by the customer or someone they name.",
+   "proof_done": "After photos of each side of the house; gutters: before and after photos, debris bagged and taken away. DONE with photos when nobody's home.",
+   "breakage": "Reported with photos the same day; the owner decides how to make it right."
+  },
+  "pf.money": {
+   "start": "Window and gutter cleaning: a card saved for the $89 trip fee at booking, then Rosie texts the bill after the job. Pay by the link, the saved card, on the crew's phone, or cash or check.",
+   "other_choices": "Sam can set nothing taken, a card saved and charged at DONE, or paid in full when booked, per service. Plans: a card saved, each visit charged at its own DONE.",
+   "deposits": "None by default. A 25% deposit on a big job priced from photos, if Sam sets it. Deposit cap: from the state form.",
+   "fees": "Late cancel or no way in: the trip fee (the example: $89), never more than it. On a job with a deposit (a 3-story home), what's kept follows the terms agreed, never more than the deposit. The owner confirms each one; no answer, no fee. A move for weather is always free, and no fee is even asked.",
+   "drop_offs": "Lee Screen Repair: nothing taken; paid at the counter at pick-up.",
+   "tips": "Optional, all to the crew. A tip line only if the owner turns it on.",
+   "tax": "A sales tax line only where the state taxes window cleaning, from the state form.",
+   "emergency_prices": "During a declared emergency, the state form's price rule applies.",
+   "rosfield_fee": "The usual $2 per confirmed booking. A plan counts once a month."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate, door and alarm codes",
+    "Where a key is kept"
+   ],
+   "photos": "Photos of the home go only to the customer and the business.",
+   "languages": "English and Spanish. The crew's language shows on the job.",
+   "minors": "Nobody under 18 books. A teen at home isn't the adult for the inside windows."
+  },
+  "pf.staff": {
+   "skills": [
+    "Windows up to 2 stories, inside and out",
+    "3-story homes and steep roofs (the tall-ladder crew)",
+    "Hard-water stain treatment",
+    "Gutter cleaning",
+    "Screen and storm window repair, and door rebuilds"
+   ],
+   "crews": "Two on a full home: a crew lead, who holds the code and texts DONE, and a helper. One person for outside only.",
+   "heights": "Each crew is matched to the highest home it's set up for. Only the tall-ladder crew is sent to 3 stories. Rope or lift work only by a crew trained and equipped for it.",
+   "licenses": "None per person unless the state's form says so.",
+   "new_person_ok": "Another crew lead can stand in, at the same time and price, if the customer says yes or doesn't answer by the evening before.",
+   "who_oks": "The owner OKs quotes over the limit. The office manager may too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "ladders_and_heights": "Rosie's rule: no ladder near a live line, no ladders in strong wind, a tie-off on any roof step. Where the safety rules set more, they come from the plug-in.",
+   "weather": "A weather limit per outside service, set by Sam. A move for weather is free, whoever calls it.",
+   "plans": [
+    "The plan's terms show before any card: how often, the price a visit, when it's charged, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking.",
+    "One reply ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask.",
+    "Any reminder the state's rules require for a running plan."
+   ],
+   "add_on_at_home": "A right to cancel where the state's rules give one for work sold at the home.",
+   "written_contract": "Above an amount, where the state's rules require it.",
+   "gutter_repair": "Lead-safe steps when a repair disturbs old paint, where the state's rules require them.",
+   "records": "7 years, with the before and after photos."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "Weather over the limit the day before: Rosie checks the forecast for each outside job; Sam keeps it or moves it, free.",
+    "Wind at the house on the day: inside windows done now, outside moved free, one bill at the end.",
+    "A power line or a hanging gutter: safety steps first.",
+    "Something breaks or was already broken: the walk-through photos show which.",
+    "Streaks: tell the business within 7 days; a free touch-up. Gutters that spill over within 30 days: a free check.",
+    "A crew lead out: another crew lead is offered at the same time; no answer, they keep the time.",
+    "Spring and fall plans: skip, pause or end, and a plan's price change.",
+    "A screen or storm window not picked up: reminders; after the free days, a storage fee only if the owner starts it, after written notice.",
+    "A gate code that fails when nobody needs to be home: the crew waits 15 minutes, then leaves; the owner decides any fee."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "dropoff",
+   "photos",
+   "extrawork",
+   "documents",
+   "tips"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Emery and Rory (screen techs)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Ellis and Shay (crew leads)",
+   "cust": "Alex M. (customer) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Emery"
+  },
+  "B": {
+   "staff": "Ellis"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most window cleaning businesses set it."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Gutter repair: a quote from photos first"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter at pick-up"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, no card saved"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood screen shop on Mill St. Window screens, screen doors and storm windows fixed."
+   ],
+   [
+    "The chairs",
+    "The workbench"
+   ],
+   [
+    "A chair, ready",
+    "A screen, ready"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Window cleaning for homes in Springfield. Windows inside and out, and gutters, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A window job"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a new glass pane, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Screen Repair doesn't replace glass."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7",
+    "Ben T. books a screen repair for Sat Nov 7"
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7",
+    "you now have two screen repairs on Sat Nov 7"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Storm window quotes come to you first. Board prices never need one"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Emery: screen tech, storm windows, home visits"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A storm window's example: 'A storm window rebuild needs a quick fit check first. Had one at Lee's in the last 3 months?'"
+   ],
+   [
+    "Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Quotes already sent keep their price."
+   ],
+   [
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Nia K.'s refund for a cancelled screen repair was due yesterday."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Priced by window count and stories. Taller homes are priced from photos. A power line on the house stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Screens and storm windows are dropped off at the shop and picked up when ready. A screen can also be fixed at the customer's home."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Both go in one drop-off slot, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Emery can still take the screen in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no screen tech. A day shows only if a screen tech with the skill is in."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Lee Screen Repair's visits are drop-offs. A repair shop, a tailor or a groomer works the same way."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A window crew's example: a hanging gutter gets 'keep people and cars away from it'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. No screen and no sizes came in."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A building manager drops off screens from five apartments on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: one 30x48 window screen, gray mesh, silver frame"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Emery suggests a new time, so the cracked glass can be boxed first, with no fee."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds slots side by side, within the day's drop-off number."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Screen Repair sent you a proposal: Emery's storm window plan."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your screen repair is part of a plan, every 4 weeks."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like broken glass."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Blind repair for Lee Screen Repair: is it the same company?"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The glass on my storm window cracked more. Can I still bring it in?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A screen repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the mesh on Saturday's screen is loose at one corner."
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24 · 11:00am drop-off · screen repair"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "For a storm window: carry cracked glass flat, with tape over the crack."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says a corner of the screen frame came back bent"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 bench check, then a price"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop off a second screen at the same time?"
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Emery's storm window plan after a bench check"
+   ],
+   [
+    "so Quinn S.'s license isn't checked yet",
+    "so Quinn S.'s details aren't checked yet"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Window cleaning · gutter cleaning"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a spline and corner repair is $25."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A corner of my screen frame came back bent."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds blind repair to Lee Screen Repair."
+   ],
+   [
+    "so Avery's license isn't checked yet",
+    "so Avery's details aren't checked yet"
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. screen repair Sat 11am"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A screen shop books a drop-off slot."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a glass shop or a screen shop"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for screens checked every spring."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Screen door repair"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you fix bent screen corners too?"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group drop-off together"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The mesh is loose at one corner."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Screen Repair · drop-off"
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Emery stopped Alex M.'s screen repair."
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken to book"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything the shop should know?"
+   ],
+   [
+    "your first color plan visit",
+    "your first storm window drop-off"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a screen fixed on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero arreglar un mosquitero el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a spring screen check"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Emery sees the storm window"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A screen repair needs only the screen itself."
+   ],
+   [
+    "plumbing and electrical",
+    "window and gutter cleaning"
+   ],
+   [
+    "Signature cut and shave",
+    "Screen door repair"
+   ],
+   [
+    "like a skin-test result",
+    "like a frame's size"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of your screen door"
+   ],
+   [
+    "A barbershop has none.",
+    "A screen shop has none."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s screen repair."
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so a no-show costs nothing"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Storm window plan"
+   ],
+   [
+    "Haircut every 4 weeks",
+    "Screen check every spring"
+   ],
+   [
+    "also does color and",
+    "also does door rebuilds and"
+   ],
+   [
+    "photos of your hair",
+    "photos of your screen"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Window Cleaning's"
+   ],
+   [
+    "A color correction",
+    "A storm window repair"
+   ],
+   [
+    "a color correction",
+    "a storm window repair"
+   ],
+   [
+    "Riley · Sat Oct 24",
+    "Emery · picked up Tue Oct 27"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Window Cleaning"
+   ],
+   [
+    "barber, color and",
+    "screen tech, door rebuilds and"
+   ],
+   [
+    "a package of cuts",
+    "a package of repairs"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Screen Repair"
+   ],
+   [
+    "Color correction",
+    "Storm window repair"
+   ],
+   [
+    "color correction",
+    "storm window repair"
+   ],
+   [
+    "Only the consult",
+    "Only the bench check"
+   ],
+   [
+    "Groom's package",
+    "Storm window rebuild"
+   ],
+   [
+    "Gloss to finish",
+    "New weatherstrip"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "service, color",
+    "service, door rebuilds"
+   ],
+   [
+    "2 Consult only",
+    "2 Bench check only"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "signature cut",
+    "screen door repair"
+   ],
+   [
+    "Color and cut",
+    "Patio screen door rebuild"
+   ],
+   [
+    "color and cut",
+    "patio screen door rebuild"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Windows"
+   ],
+   [
+    "Lee Electric",
+    "Lee Gutters"
+   ],
+   [
+    "1200 Main St",
+    "220 Mill St"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Consult only",
+    "Bench check only"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "$25 consult",
+    "$25 bench check"
+   ],
+   [
+    "color quote",
+    "door quote"
+   ],
+   [
+    "NEW massage",
+    "NEW blind repair"
+   ],
+   [
+    "the consult",
+    "the bench check"
+   ],
+   [
+    "a staff cut",
+    "the office's screens"
+   ],
+   [
+    "Electrical",
+    "Gutter cleaning"
+   ],
+   [
+    "electrical",
+    "gutter cleaning"
+   ],
+   [
+    "Barbershop",
+    "Screen repair"
+   ],
+   [
+    "barbershop",
+    "screen shop"
+   ],
+   [
+    "Beard trim",
+    "Screen wash"
+   ],
+   [
+    "beard trim",
+    "screen wash"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "patch test",
+    "fit check"
+   ],
+   [
+    "88 Elm St",
+    "15 Front St"
+   ],
+   [
+    "Skin fade",
+    "Pet screen repair"
+   ],
+   [
+    "skin fade",
+    "pet screen repair"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "on Elm St",
+    "on Front St"
+   ],
+   [
+    "MP045210",
+    "LLC 0220142"
+   ],
+   [
+    "Plumbing",
+    "Window cleaning"
+   ],
+   [
+    "plumbing",
+    "window cleaning"
+   ],
+   [
+    "Kids cut",
+    "Spline repair"
+   ],
+   [
+    "kids cut",
+    "spline repair"
+   ],
+   [
+    "Haircuts",
+    "Screen repairs"
+   ],
+   [
+    "haircuts",
+    "screen repairs"
+   ],
+   [
+    "cut hair",
+    "repair screens"
+   ],
+   [
+    "Plumber",
+    "Window cleaning"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "barbers",
+    "screen techs"
+   ],
+   [
+    "Haircut",
+    "Screen repair"
+   ],
+   [
+    "haircut",
+    "screen repair"
+   ],
+   [
+    "Jordan",
+    "Ellis"
+   ],
+   [
+    "Barber",
+    "Screen tech"
+   ],
+   [
+    "barber",
+    "screen tech"
+   ],
+   [
+    "Casey",
+    "Shay"
+   ],
+   [
+    "Riley",
+    "Emery"
+   ],
+   [
+    "Avery",
+    "Rory"
+   ],
+   [
+    "gloss",
+    "new weatherstrip"
+   ]
+  ],
+  "B": [
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam. Streaks: tell us within 7 days for a free touch-up."
+   ],
+   [
+    "Nora S. asked overnight for a drain clearing today.",
+    "Nora S. asked overnight for a window cleaning today."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Gutter repair: a quote from photos first"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most screen shops start."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter at pick-up"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, no card saved"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules screen shops often set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood screen shop on Mill St. Window screens, screen doors and storm windows fixed."
+   ],
+   [
+    "The chairs",
+    "The workbench"
+   ],
+   [
+    "A chair, ready",
+    "A screen, ready"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Window cleaning for homes in Springfield. Windows inside and out, and gutters, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A window job"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Emery: screen tech, storm windows, home visits"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Window Cleaning. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my house."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my windows. They need a cleaning. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My windows are filthy' fits windows inside and out."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like using a neighbor's roof without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a screen wash? Say so.'"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Window Cleaning can clean your windows:"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, Alex will be home"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 window cleaning needs none."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Gutter rehang and new hangers · $540"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found streaks on the big front window this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's an outside window wash, today"
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9",
+    "you have two window cleanings on Mon Nov 9"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Priced by window count and stories. Taller homes are priced from photos. A power line on the house stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Screens and storm windows are dropped off at the shop and picked up when ready. A screen can also be fixed at the customer's home."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Window Cleaning cleans windows and gutters, not roofs. Nothing was saved. You can look for a roofer near you."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Stay away from the power line, and keep everyone back. Call the electric company's emergency line, or 911 if it's sparking."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said a power line is touching the house. They got the safety message, and nothing was booked."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep people and cars away from the gutter, and to call 911 if a power line is down."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: how many windows and stories, inside or out, screens and storm windows, and the roof."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Rope work here needs the roof anchors checked first. That takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No se pare debajo del canalón y aleje los carros. Si un cable de luz toca la casa, llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep people and cars out from under the hanging gutter. The crew will work around it."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "treats the stains today, $165. The $80 glass sealant stays good until Thu Oct 29."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Can someone clean my windows inside and out Thursday morning? It's a 2-story house in Springfield."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Ellis found a wasp nest under the back eaves and stopped work on those windows."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay out from under the hanging gutter. If a power line is down, stay away and call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Window Cleaning doesn't do, like a roof repair."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For window cleaning, a power line touching the house or gutters stops the booking."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Ellis finds a wasp nest under the back eaves. The plug-in says the crew stops there"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Window cleaning happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A window crew's example: a hanging gutter gets 'keep people and cars away from it'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A gutter is hanging over my door."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The power line to my house sags onto the gutter. Is that safe?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone clean my outside windows this Thursday? What does it cost?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Pressure washing for Lee Window Cleaning: is it the same company?"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of each side of your home, and a crew lead will price the job."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a power line touching the house, a hanging gutter or broken glass."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE back screens stuck in old frames. Bring the frame tool next time."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how many windows, how many stories, and inside, outside or both?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Windows inside and out with Lee Window Cleaning are $179, not $150."
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the stain treatment only, $165. Leave the glass sealant."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Ellis tests a spot on the glass and texts the price with its lines."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for windows inside and out at $150, an old price."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Ellis tested the stains. Here's the price to treat them today."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Ellis went to get the tall ladder and will be back about 9:30am."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Ellis's next times for your office windows."
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to rehang the back gutters, from Ellis's notes."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s windows, cleaned Thu Oct 22, have streaks on three upstairs panes."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. Solar panels are $199, from the list."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "That's under our streak-free promise, so this visit is free."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds pressure washing to Lee Window Cleaning."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Ellis says no. Leave them in: the crew takes them out."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for the windows every spring and fall."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Ellis also clean my solar panels?"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to stay away, then call the utility or 911"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 tracks and sills, all 18 windows"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Un canalón cuelga sobre mi puerta."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "the storefront windows at two shops every 2 weeks"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Ellis clean the windows at my office next week?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Ellis's ladder cracked a porch light at Alex M.'s."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the promise lasts: 7 days for streaks."
+   ],
+   [
+    "come back next fall for a water heater flush",
+    "come back next fall for the outside windows"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Guests come tomorrow. Can someone come tonight?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE crack in the corner of a basement pane"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about the solar panels."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Un cable de luz toca la casa?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The gutter is hanging lower now."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Ellis also clean my solar panels?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Ellis needs the tall ladder from the shop for the back."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I take the screens out before you come?"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like rehanging the gutters Ellis noted"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wasp nest under the back eaves, stopped"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the inside window sills."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is a power line touching the house?"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on: the cleaning can still be done."
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "Ellis is the one who does 3-story homes"
+   ],
+   [
+    "so Reese K.'s license isn't checked yet",
+    "so Reese K.'s details aren't checked yet"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Window cleaning · gutter cleaning"
+   ],
+   [
+    "like water near outlets or a gas smell",
+    "like a power line down or a falling gutter"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Ellis finds the window tracks and sills caked with dirt."
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a building's anchor check that isn't in"
+   ],
+   [
+    "priced a water heater replacement for",
+    "priced a 3-story job for"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Streaks show on three upstairs windows 2 days later."
+   ],
+   [
+    "so Casey's license isn't checked yet",
+    "so Casey's details aren't checked yet"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "There are streaks on three upstairs windows."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Ellis's crew left drips on the sills."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 stain treatment 165 glass sealant 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the back windows under the eaves"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Ellis slips off the ladder's bottom rung and texts HURT."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call pest control first"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Rehang the back gutters"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Will someone be home for the inside windows?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wasp nest under the back eaves"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE ladder cracked the porch light"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting the tall ladder, back 9:30"
+   ],
+   [
+    "the water heater flush you asked",
+    "the outside windows you asked"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Ellis's ladder cracks a porch light"
+   ],
+   [
+    "The job should be done by 10am.",
+    "The job should be done by about 10:30am."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped off the bottom rung, need to stop"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. No power line is touching it."
+   ],
+   [
+    "replacing both shutoff valves",
+    "cleaning the tracks and sills"
+   ],
+   [
+    "Alex asks an AI for a plumber",
+    "Alex asks an AI to book a window cleaning"
+   ],
+   [
+    "water heater flush, 12 months",
+    "outside windows, 12 months"
+   ],
+   [
+    "replace both shutoff valves",
+    "clean the tracks and sills"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Tracks and sills"
+   ],
+   [
+    "the sink is now overflowing",
+    "the gutter is now hanging lower"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's window cleaning"
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout or a tow"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Windows before guests"
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the job"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wasp nest under the back eaves"
+   ],
+   [
+    "Water heater replacement",
+    "3-story home windows"
+   ],
+   [
+    "water heater replacement",
+    "3-story home windows"
+   ],
+   [
+    "The repair price is good",
+    "The price is good"
+   ],
+   [
+    "plumbing and electrical",
+    "window and gutter cleaning"
+   ],
+   [
+    "Sewer camera inspection",
+    "Solar panel cleaning"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW pressure washing"
+   ],
+   [
+    "sewer camera inspection",
+    "solar panel cleaning"
+   ],
+   [
+    "A gas smell at the home",
+    "A power line touching the house"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration LLC 0220142"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Windows inside and out"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your building's windows"
+   ],
+   [
+    "Just the kitchen sink.",
+    "18 windows, 2 stories, inside and out."
+   ],
+   [
+    "Under the sink, before",
+    "Basement pane, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked porch light"
+   ],
+   [
+    "Cabinet floor, before",
+    "Porch light, before"
+   ],
+   [
+    "your new pipes are in",
+    "the middle floors are done"
+   ],
+   [
+    "1-year labor warranty",
+    "streak-free promise"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Stain treatment · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 tracks and sills quote"
+   ],
+   [
+    "Both rentals' visits",
+    "Both shops' visits"
+   ],
+   [
+    "Drain clearing plans",
+    "Window plans"
+   ],
+   [
+    "leehomeservices.com",
+    "leewindowcleaning.com"
+   ],
+   [
+    "also does color and",
+    "also does door rebuilds and"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 tracks and sills"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Ningún cable toca la casa."
+   ],
+   [
+    "Water heater flush",
+    "Outside windows only"
+   ],
+   [
+    "water heater flush",
+    "outside windows only"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Window Cleaning's"
+   ],
+   [
+    "the shutoff valves",
+    "the tracks and sills"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 10:15am"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Window Cleaning"
+   ],
+   [
+    "camera inspection",
+    "solar panel cleaning"
+   ],
+   [
+    "barber, color and",
+    "screen tech, door rebuilds and"
+   ],
+   [
+    "the kitchen drain",
+    "the windows"
+   ],
+   [
+    "Supply line · $80",
+    "Glass sealant · $80"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Screen Repair"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa windows"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Drain clearings",
+    "Window cleanings"
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "Drain clearing",
+    "Windows inside and out"
+   ],
+   [
+    "drain clearing",
+    "windows inside and out"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 windows"
+   ],
+   [
+    "today's repair",
+    "today's work"
+   ],
+   [
+    "Kitchen drain",
+    "Windows, inside and out"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 office building job"
+   ],
+   [
+    "cut your hair",
+    "fix your screens"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Windows"
+   ],
+   [
+    "Lee Electric",
+    "Lee Gutters"
+   ],
+   [
+    "1200 Main St",
+    "220 Mill St"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Water heater",
+    "3-story home"
+   ],
+   [
+    "water heater",
+    "3-story home"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "shop's chair",
+    "shop's counter"
+   ],
+   [
+    "Leak repair",
+    "Hard-water stain treatment"
+   ],
+   [
+    "leak repair",
+    "hard-water stain treatment"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "Electrical",
+    "Gutter cleaning"
+   ],
+   [
+    "electrical",
+    "gutter cleaning"
+   ],
+   [
+    "Barbershop",
+    "Screen repair"
+   ],
+   [
+    "barbershop",
+    "screen shop"
+   ],
+   [
+    "Yard drain",
+    "Outside windows"
+   ],
+   [
+    "yard drain",
+    "outside windows"
+   ],
+   [
+    "88 Elm St",
+    "15 Front St"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "42 Oak St",
+    "31 Cedar Rd"
+   ],
+   [
+    "MP045210",
+    "LLC 0220142"
+   ],
+   [
+    "Plumbing",
+    "Window cleaning"
+   ],
+   [
+    "plumbing",
+    "window cleaning"
+   ],
+   [
+    "cut hair",
+    "repair screens"
+   ],
+   [
+    "Rental 1",
+    "Shop 1"
+   ],
+   [
+    "Rental 2",
+    "Shop 2"
+   ],
+   [
+    "Plumber",
+    "Window cleaning"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "barbers",
+    "screen techs"
+   ],
+   [
+    "haircut",
+    "screen repair"
+   ],
+   [
+    "Jordan",
+    "Ellis"
+   ],
+   [
+    "Barber",
+    "Screen tech"
+   ],
+   [
+    "barber",
+    "screen tech"
+   ],
+   [
+    "Casey",
+    "Shay"
+   ],
+   [
+    "Riley",
+    "Emery"
+   ],
+   [
+    "Avery",
+    "Rory"
+   ],
+   [
+    "Labor",
+    "By the hour"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off at Lee Screen Repair, Sat Oct 24, leaves a torn window screen at the counter, and picks it up fixed a few days later. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Window Cleaning for 31 Cedar Rd: 18 windows inside and out, Thu Oct 22, arriving 8–10am, with Ellis's crew. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 window screen repair. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+    "photos|none|counter": "A patio screen door rebuild, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+    "visit|none|counter": "A storm window repair, priced at the counter. Only the $25 bench check is promised."
+   },
+   "amounts": {
+    "*": {
+     "name": "Window screen repair"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Window screen repair"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Patio screen door rebuild"
+    },
+    "visit|*|*": {
+     "name": "Storm window repair"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "list|full|none",
+    "photos|deposit|bill",
+    "visit|card|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: 18 windows inside and out, $179. A card is saved for the $89 trip fee at booking. Ellis texts DONE with the lines, and Rosie texts the bill.",
+    "list|none|bill": "The same $179 windows. Nothing is taken. Rosie texts the bill after the job.",
+    "list|card|card": "The same $179 windows. A card is saved and charged $179 when Ellis texts DONE, the way plan customers pay.",
+    "list|full|none": "Outside windows only, $150, paid in full when booking: Sam's setting for that service.",
+    "photos|deposit|bill": "A 3-story home's windows, priced from photos at $640. Sam OKs it. A $160 deposit now; the rest on the bill.",
+    "visit|card|bill": "Hard-water stain treatment, priced at the visit after a test spot. A card is saved; the $89 trip fee is owed even after a no to the price."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Windows inside and out"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Windows inside and out"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Outside windows only"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "3-story home windows"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "3-story home windows"
+    },
+    "visit|*|*": {
+     "name": "Hard-water stain treatment"
+    }
+   }
+  }
+ },
+ "keep": [
+  "drips",
+  "leak"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee Screen Repair. Quinn gets one invite and replies YES. This work needs no license of its own, so none is asked.",
+    "more": [
+     "Quinn can be booked once Sam says yes.",
+     "No reply in 48 hours: one reminder, then Sam is told.",
+     "Sam sets the skills: like screens, but not door rebuilds yet."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Screen Repair. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "This work licenses nobody, so what comes due is the business's insurance certificate. Reminders go 30 days and 7 days before.",
+    "more": [
+     "A new certificate in the business's name keeps 'insured' on the listing.",
+     "Not renewed by the date: 'insured' comes off the listing. Bookings go on.",
+     "Where a state's form asks for a business registration, it comes due the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Screen Repair's insurance certificate ends in 30 days.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "Send the new certificate before it ends",
+         "Not renewed: 'insured' comes off the listing",
+         "Bookings go on as before"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/ins"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Where the state's form requires a business registration, Rosie checks no registration; the owner says when one lapses. Here, Sam says it is lapsed, so new bookings pause at once.",
+    "more": [
+     "Every 30 days by default.",
+     "Bookings already made go ahead. Rosie's team reviews them within 1 business day.",
+     "Customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Screen Repair's registration is lapsed.",
+      {
+       "card": {
+        "title": "New bookings paused",
+        "lines": [
+         "Bookings already made go ahead",
+         "Renew it, then reply here",
+         "Customers aren't told why"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a registration to clean windows or gutters, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Screen repair needs no license where Sam works, so a screen can be fixed at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state licenses screen or glass work, its form asks for the license here instead.",
+     "Each screen tech can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Ellis: window and gutter cleaning, 3-story homes",
+         "Shay: window cleaning, up to 2 stories",
+         "Emery: screen repair, door rebuilds and home visits",
+         "Rory: screen repair, at the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Screen Repair. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Emery"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Window Cleaning. Sam Lee added you to the team for window and gutter cleaning jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Ellis"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Emery replies YES, then checks what Sam set. One reply covers everything Emery does for the shop.",
+    "more": [
+     "No license number is asked: screen repair needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Rory, Ellis and Shay join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Emery"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Screen Repair! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Emery Chen · Lee Screen Repair",
+        "lines": [
+         "Every shop service, door rebuilds and home visits",
+         "Hours: the shop's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Emery"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Emery"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Window cleaning, gutter cleaning and screen repair need no state license where Sam works (the plug-in's license form); the company gives its registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The window cleaning plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and screen techs are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: window, gutter and screen work."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Window cleaners and screen techs need no license of their own unless the state's form says so (the plug-in's staff part)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Window and gutter cleaning are never sent now: they're booked ahead, around the weather."
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "t": "Tue Oct 27, 6:00pm",
+    "does": "A few hours after the pick-up, inside text hours. One question, with one tap on a page, so a rating is never mixed up with a reply to a booking text."
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex brings the screen to the counter. Alex reads the code from the confirmation or the reminder, and Emery texts it in.",
+    "more": [
+     "At Lee Screen Repair, the visit is a drop-off: the code is given when the screen is left.",
+     "The desk can type the code on the portal's Today page instead.",
+     "The code also confirms the visit for Rosfield's $2."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M., Sat 11:00am. One window screen, 30 by 48."
+     ],
+     [
+      "san",
+      "cust",
+      "Your screen is checked in at Lee Screen Repair with Emery. We'll text you when it's ready. Thanks, Alex!"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "Lee Screen Repair's main path above is the drop-off. This branch is a mail-in: a screen shipped to the shop has no code, so DONE comes when it arrives.",
+    "more": [
+     "At pick-up, the screen goes only to the customer or someone they name.",
+     "Next come the before notes, the price or the OK, and the repair. READY and the pick-up come after the work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Emery fixes the screen over a day or two: what was booked, and anything Alex said yes to.",
+    "more": [
+     "Emery texts IN and READY as it goes.",
+     "Next, Alex hears it's ready, picks it up and pays at the counter."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "t": "Tue Oct 27, 2:00pm",
+    "does": "The screen is fixed. Emery texts READY with a photo. Rosie tells Alex in the shop's name: what was done, the pick-up times and anything due.",
+    "more": [
+     "Only Alex, or someone Alex names, can pick it up.",
+     "Anything still due is paid at the counter at pick-up.",
+     "Alex can reply within 24 hours if something's wrong, and Sam is told.",
+     "Sent inside text hours. A late READY waits for 9am."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "READY Alex M.",
+      {
+       "photos": [
+        "Screen, fixed"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your screen is fixed and ready at Lee Screen Repair.",
+      {
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "What was done: on your page, with a photo",
+         "Pick-up: any time the shop is open",
+         "Bring the code you used to drop it off",
+         "Anything due: paid at the counter",
+         "Something wrong? Reply within 24 hours"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/r/a7"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "does": "Alex gives the drop-off code at pick-up, or the person Alex named on the secure page shows an ID. The screen is shown at the counter, and handed over once anything due is paid.",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: the screen stays, and they're asked to come back with Alex's code.",
+     "Anything due is paid at the counter, the shop's own way.",
+     "A mailed-in screen is sent back instead, once anything due is paid.",
+     "Not picked up by the end of the pick-up hours: it goes as 'An item isn't picked up', after the visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Show Alex the screen, and hand it over once anything due is paid."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "At Lee Screen Repair, Alex pays when picking up the screen."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A screen or storm window drop-off is never booked for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The screen shop sells no repeating plan: each repair is its own drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The screen shop sells no repeating plan."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A screen repair at the counter needs no written contract."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee Screen Repair books drop-off slots, set by how many screens it takes in a day."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no screen tech. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The plug-in names no form to sign for screen repair."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A screen waits in its drop-off slot, so a screen tech running late moves only the ready time (A8-11), never the drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The screen shop sells no repeating plan."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The screen is left at the shop: READY and the pick-up follow the repair."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A screen repair is rated."
+   },
+   {
+    "op": "off",
+    "at": "A7-02",
+    "label": "A plan or count is due",
+    "why": "Lee Screen Repair sells no plans or packs and books no groups."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at a screen shop."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The screen shop sends no proposals: the screen is READY and picked up."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Reese K. to Lee Window Cleaning. Reese gets one invite and replies YES. This work needs no license of its own, so none is asked.",
+    "more": [
+     "Reese can be booked once Sam says yes.",
+     "No reply in 48 hours: one reminder, then Sam is told.",
+     "Sam sets the skills: like windows up to 2 stories, not 3-story homes yet."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Window Cleaning. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "This work licenses nobody, so what comes due is the business's insurance certificate. Reminders go 30 days and 7 days before.",
+    "more": [
+     "A new certificate in the business's name keeps 'insured' on the listing.",
+     "Not renewed by the date: 'insured' comes off the listing. Bookings go on.",
+     "Where a state's form asks for a business registration, it comes due the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Window Cleaning's insurance certificate ends in 30 days.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "Send the new certificate before it ends",
+         "Not renewed: 'insured' comes off the listing",
+         "Bookings go on as before"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/ins"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Where the state's form requires a business registration, Rosie checks no registration; the owner says when one lapses. Here, Sam says it is lapsed, so new bookings pause at once.",
+    "more": [
+     "Every 30 days by default.",
+     "Bookings already made go ahead. Rosie's team reviews them within 1 business day.",
+     "Customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Lee Window Cleaning's registration is lapsed.",
+      {
+       "card": {
+        "title": "New bookings paused",
+        "lines": [
+         "Bookings already made go ahead",
+         "Renew it, then reply here",
+         "Customers aren't told why"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Ellis replies YES, then checks what Sam set. One reply covers every kind of work Ellis does.",
+    "more": [
+     "No license number is asked: window and gutter cleaning need none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Shay, Emery and Rory join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Ellis"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Window Cleaning! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Ellis Price · Lee Window Cleaning",
+        "lines": [
+         "Every window cleaning job, and gutter cleaning",
+         "3-story homes: the tall-ladder crew",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Ellis"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Ellis"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a registration to clean windows or gutters, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Screen repair needs no license where Sam works, so a screen can be fixed at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Ellis: window and gutter cleaning, 3-story homes",
+         "Shay: window cleaning, up to 2 stories",
+         "Emery: screen repair, door rebuilds and home visits",
+         "Rory: screen repair, at the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Screen Repair. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Emery"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Window Cleaning. Sam Lee added you to the team for window and gutter cleaning jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Ellis"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Window cleaning, gutter cleaning and screen repair need no state license where Sam works (the plug-in's license form); the company gives its registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The window cleaning plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and screen techs are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: window, gutter and screen work."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Window cleaners and screen techs need no license of their own unless the state's form says so (the plug-in's staff part)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Window and gutter cleaning are never sent now: they're booked ahead, around the weather."
+   },
+   {
+    "op": "more",
+    "at": "B7-01",
+    "more": [
+     "The window plug-in's prep: clear the inside sills, keep the driveway free for the truck, and unlock the side gate."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "For gutters, the before and after photos come with the receipt."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-08",
+    "more": [
+     "Streaks: tell the business within 7 days for a free touch-up.",
+     "Gutters that spill over within 30 days of a cleaning get a free check the same way."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-05",
+    "more": [
+     "The plug-in's other questions before times: storm windows or screens, skylights, and how steep the roof is.",
+     "3 stories, a steep roof or 40 or more windows send the job to a quote from photos."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "Homes up to 2 stories with a normal roof and under 40 windows are priced from the list. That's the plug-in's rule.",
+     "Taller or steeper homes, 40 or more windows, and businesses are priced from photos first.",
+     "The price and length come from the answers: windows, stories, screens and storm windows."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Say Alex asks for the windows every spring and fall. Lee Window Cleaning offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "more": [
+     "The AI never offers a plan the customer didn't ask for.",
+     "A plan needs its own yes: its terms show on the secure page, before any card.",
+     "Each visit gets its own reminder and code. Alex can skip, pause or end the plan by text.",
+     "Each visit's day is picked when it comes up, around the weather.",
+     "Rosfield's $2 counts once a month for a plan."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can you do our windows every spring and fall?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee Window Cleaning has a spring and fall plan: windows inside and out, $179 a visit, in April and October. Each visit is booked and paid like a single one. Want it?",
+      {
+       "buttons": [
+        "Yes, spring and fall",
+        "Just this once"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "does": "The page shows the spring and fall plan's terms: $179 a visit, in April and October, paid after each visit. It says how to skip, pause or end, too. Alex says yes to them on their own.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Spring and fall window plan",
+        "lines": [
+         "$179 a visit, in April and October",
+         "Each visit is booked and paid like this one",
+         "Runs until you end it",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes, so Alex has them in writing.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       },
+       {
+        "label": "Yes: spring and fall",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to the plan on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: how often, the price a visit, how it's paid, and that it runs until Alex ends it.",
+           "Each spring and fall visit gets its own day, picked with Alex about 3 weeks before.",
+           "Ending it takes one reply. Visits already done stay paid.",
+           "Any reminder the state's rules require for a running plan comes from the plug-in."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your plan with Lee Window Cleaning is set.",
+            {
+             "card": {
+              "title": "Windows every spring and fall · $179 a visit",
+              "lines": [
+               "This Thursday's visit is the first",
+               "We text you about 3 weeks before each one to pick a day",
+               "Paid after each visit, like this one",
+               "Runs until you end it"
+              ]
+             },
+             "buttons": [
+              "End the plan"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ],
+          "vary": {
+           "price:photos": {
+            "t": "Mon Oct 19, 7:59pm"
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "A side gate code is typed on the page the same way. Only the crew lead sees it.",
+     "Pets: kept inside while the ladders are up.",
+     "Screens stay in: the crew takes them out and puts them back."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "For windows: Ellis walks around the house first. Cracked panes, fogged glass and torn screens get photos.",
+     "Fogged glass between two panes is a failed seal. Cleaning can't fix it, so Alex is told before work starts.",
+     "Ellis finds where the power line comes in and checks the wind before any ladder goes up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Gutter repair found on the visit is home-improvement work. It's quoted only where the license plug-in allows it."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Wind over the limit at the house",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.19"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:40am",
+       "title": "Ellis stops the ladder work for the wind",
+       "does": "Gusts at the house go over Sam's limit after Ellis checks in. Ladders come down. The inside windows need no ladder, so they're done now.",
+       "more": [
+        "The plug-in sets the limit: here, wind over 25 mph.",
+        "Rosie's rule: no ladders in strong wind, whatever the job.",
+        "Ellis never has to argue it with Alex. The text is enough."
+       ],
+       "needs": [
+        "pf.edges",
+        "pf.visit"
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "WIND gusts 30, ladders down. Doing inside windows now"
+        ],
+        [
+         "san",
+         "staff",
+         "Got it. Inside windows today. I'll offer Alex a new day for the outside."
+        ]
+       ],
+       "tells": [
+        "staff"
+       ]
+      },
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.19",
+        "9.12"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:42am",
+       "title": "Moves the outside windows, at no cost",
+       "does": "Alex hears that the inside windows are done today and the outside moves to Mon Oct 26. There's no fee, and one bill comes when it's all done.",
+       "more": [
+        "Nobody needs to be home for outside windows, so no reply keeps Monday. Sam is told.",
+        "Monday gets its own on-my-way text. It's the same booking, so one $2 for the whole job.",
+        "Another day: Alex picks a new time, as when a customer moves it."
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Too windy for ladders this morning, so Ellis's crew is doing your inside windows now. The outside windows move to Mon Oct 26, arriving 8–10am, at no cost.",
+         {
+          "card": {
+           "title": "Your windows · two days",
+           "lines": [
+            "Today: inside windows",
+            "Mon Oct 26 · arriving 8–10am: outside windows",
+            "One bill when it's all done"
+           ]
+          },
+          "buttons": [
+           "That works",
+           "Another day"
+          ]
+         }
+        ]
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Window jobs are booked in arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Window jobs are visits, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Window jobs book a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Window cleaning is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Window cleaning is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Window cleaning is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A window crew never looks after a child; an adult on the booking must be there for the inside windows."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "Hard-water stains are priced and treated at the visit; a stain job never turns into a project."
+   },
+   {
+    "op": "words",
+    "at": "B8-52",
+    "t": "Thu Oct 22, 10:35am"
+   },
+   {
+    "op": "words",
+    "at": "B8-10",
+    "t": "Thu Oct 22, 10:50am"
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "does": "Alex's job runs long, so Ellis will reach Kim about 11:15am. That's still inside Kim's window, so Kim just hears the new time.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 45"
+     ],
+     [
+      "san",
+      "cust",
+      "Ellis from Lee Window Cleaning is running behind and expects to reach you about 11:15am, still inside your 10am–12pm window.",
+      {
+       "buttons": [
+        "That works",
+        "Change the time"
+       ],
+       "as": "Kim L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Window cleaning visits are rated, like every visit."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34",
+   "B4-78",
+   "B8-69",
+   "B8-72"
+  ]
+ },
+ "notes": "Refit Tue Oct 27 (R09, REDESIGN 2 master): facts plans (spring and fall), dropoff (the screen shop), photos, extrawork, documents (a written contract for gutter work above an amount; B8-93 [An estimate becomes its own job] stays off), tips. Settings: cutoff 24 hours before in A and B; arrival windows in B. No holds: B's $89 trip fee is a card saved (main list|card|bill), the late-cancel and no-way-in fee, owed after a no to a visit price; A takes nothing. Amounts with names per path. Deleted: ops on removed steps, the sign-up money words (S1-13, S1-14, S1-21), four stacked S1-38 ops (the second kind of work and the shop are rename pairs now: gutter cleaning and screen repair need no license; the shop takes nothing), B3-05 and B8-23 (money and hold words), S11-56, every money words op per path, A4-50 (frozen until 9:15am), A4-14 and A4-15 (the master says drop-off slots), the off on A4-66 [A person's time] (it broke every A path), offs made redundant by facts. New off: A7-02 [A plan or count is due] (replaces the A7-94 offs), A8-67 [Yes: a child may be left], A10-45 [The business sends a proposal], B10-32 [No: named-only work]. keep: leak (section 13).\nBefore the refit (history):\nPilot: started from the cleaner (Set service), since window cleaning runs the same way: a crew at the customer's home, priced by the home's size, spring and fall plans, outside work with nobody home, and a drop-off shop for flow A. \"from\" is set to cleaner.\nFlow B, the usual side: Lee Window Cleaning LLC (window cleaning, plus gutter cleaning as its second kind of work). Flow A, the less usual side: Lee Screen Repair LLC, Sam's second company, where screens and storm windows are dropped off for repair, or priced at the counter.\nNames: Jordan and Casey became crew leads Ellis and Shay; Riley and Avery became screen techs Emery and Rory. The master's partner Jamie is Sage, since Jamie was a cleaner pilot name. Addresses: 31 Cedar Rd (Alex), 220 Mill St, 15 Front St.\nEvery master number is kept so sums still add up: $179 windows inside and out (up to 20), $150 outside windows only, $640 3-story home from photos, $245 hard-water stain treatment priced at the visit ($165 + $80 sealant), $89 trip fee, $199 solar panels. Shop: $35 screen repair, $40 pet screen, $20 screen wash, $25 spline repair, $55 screen door, $140 storm window rebuild, $90 patio door from photos, $25 bench check, $75 at the home. All are the example business's own prices.\nThe old flowchart's $60 trip fee became the $89 trip fee, so the master's single fee reads right (the cleaner pilot did the same).\nMoney B: the main path is list|hold|bill: Rosie's starting answer holds the $89 trip fee, and the bill is texted after (the old flow was paid after, on the crew's phone, by link or by check: all are B9 branches). Also used: nothing taken (the owner's choice, like the old flow), a card saved and charged at DONE (plan customers), outside windows only paid in full and a 25% deposit on a 3-story home (both are Sam's sign-up settings in the master's dialogue), and hard-water stains priced at the visit.\nMoney A: nothing taken, paid at the counter at pick-up, on all three price kinds (list, a patio door from photos, a storm window priced at the counter). S1-42 and S1-45 words start every shop service with nothing taken, so there's no card and no no-show fee; the $75 home visit stays paid when booked.\nWindow and gutter cleaning are never sent now: they're booked ahead, around the weather. Every sent-now branch is off (B4-81, B4-16, B6-03, B7-55, B8-58, S2-30).\nPlug-in splits kept whole (splitsKept): B4-57 (a written contract only over the plug-in's amount, like a 3-story job or gutter repair, where the state's rules require it), B4-78 (own or rent: ladder and gutter work on a rented home), B8-69 and B8-70 (outside windows, gutters and storefronts need nobody home; inside windows need an adult), B8-72 (torn screens can go to the shop; most jobs take nothing away), A8-02 (the screen or its sizes must come in).\nWeather: the master's forecast check (B7-35) carries Kim's outside windows, with the plug-in's limit (rain all day, or wind over 25 mph). The owner's one-text weather day is a gap. Wind at the house on the day is an own branch on B8-22 (B8-x01, B8-x02: inside done now, outside moved free, one bill, one $2) and a gap too.\nGutter repair found at a visit is home-improvement work: quoted only where the license plug-in allows it (S13-15, B8-23 more). The bigger job (B8-27, B8-28 words) is a $640 gutter rehang; a fogged picture window ($900, new glass) is the photos path's bigger job.\nLicenses: window, gutter and screen work need none where Sam works, so S1-60 and S1-63 take registration only and S2-28 no person license. S11-48, S11-50 and S11-51 words fit work with no license: new people join with a plain YES, and the insurance certificate and the business registration come due instead of a license.\nTiming: Alex's 18 windows take a crew of two about 2 hours, so DONE, the bill and the receipt moved from about 9:10am to 10:15am (rename pairs on the times). Flow A's rating comes after the pick-up (A10-02 at Tue Oct 27, 6pm).\nOff in flow A: plans, packages, memberships, insurance and first steps at the screen shop; child customers; person's-time and by-name branches, since drop-off slots name no screen tech; a weather limit and day-before holds for drop-offs; results and rentals later.\nOff in flow B: the live line, video sessions, sent now, classes, a damage hold, a plan or warranty that pays, a form to sign, deliveries, an outside check partway, a permit inspection, a report later and rented items. An estimate becoming its own job is off for stain treatment, which is priced and done at the visit.\nPlan: the spring and fall plan is asked for at booking (B4-44, B5-21 words) and its terms are texted back (own B6-x01, B6-x02, from the old flowchart's wg25f). Visits picked when they come due is a gap.\nKeep: no words are kept. The coverage file maps all 68 old nodes and 54 branch options.\nReview (Oct 22): the plan split after booking (B6-x01) shows 'No plan' first, since Alex's main story is one visit; Sam's sign-up on the photos path keeps the outside-only job paid in full (S1-13, S1-14, S1-16), as on the full-price path; the S11-56 what-ifs switch between ways the plug-in uses.\nReview, times: on the photos path the 3-story job takes Ellis's tall-ladder crew all day (DONE 3:00pm, bill 3:02pm, receipt 3:05pm, rating 4:30pm), and Kim's outside windows go to Shay that day.\ntouch-up 4 (Oct 23): keep 'drips': a crew leaving drips on the sills is a real window cleaning complaint.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each service starts the way most barbershops set it.",
+    "Panel upgrade: a free estimate, then a quote",
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Ben T. books a skin fade for Sat Nov 7",
+    "you now have two skin fades on Sat Nov 7",
+    "Color quotes come to you first. Board prices never need one",
+    "Riley: barber, color, house calls",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "A barbershop has none, so nothing is sent here.",
+    "says the cape clip ripped a shirt collar today",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Promises the $25 consult; priced at the chair",
+    "Can my son wait in the shop during my cut?",
+    "like Riley's color plan after a consult",
+    "so Quinn S.'s license isn't checked yet",
+    "Plumbing JP031552 · electrical JE30417",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "so Avery's license isn't checked yet",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "A barbershop books a person's time.",
+    "Wants Saturday morning, with Riley",
+    "could mean a salon or a barbershop",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Do you do kids cuts? My son is 8.",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Lee's Barbershop · with Riley",
+    "Riley stopped Alex M.'s cut.",
+    "A card saved for the $20 fee",
+    "Anything Riley should know?",
+    "your first color plan visit",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "once Riley sees the hair",
+    "A haircut needs nothing.",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "like a skin-test result",
+    "Add photos of your hair",
+    "A barbershop has none.",
+    "Stopped Alex M.'s cut.",
+    "No card, so no $20 fee",
+    "Proposal · Color plan",
+    "Haircut every 4 weeks",
+    "also does color and",
+    "photos of your hair",
+    "Lee Home Services'",
+    "A color correction",
+    "a color correction",
+    "Riley · Sat Oct 24",
+    "Lee Home Services",
+    "barber, color and",
+    "a package of cuts",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Only the consult",
+    "Groom's package",
+    "Gloss to finish",
+    "11:00am · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "service, color",
+    "2 Consult only",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "Consult only",
+    "house calls",
+    "House calls",
+    "$25 consult",
+    "color quote",
+    "NEW massage",
+    "the consult",
+    "a staff cut",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "patch test",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "the chair",
+    "visit fee",
+    "on Elm St",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "gloss"
+   ],
+   "B": [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Nora S. asked overnight for a drain clearing today.",
+    "Panel upgrade: a free estimate, then a quote",
+    "Its money card is set the way most barbershops start.",
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Here are the rules barbershops often set.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley: barber, color, house calls",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "Me, and yes. It's my kitchen.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services can clear the drain:",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Shutoff valve and wall pipe · $540",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "you have two drain clearings on Mon Nov 9",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Your drain is under warranty, so this visit is free.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Jordan says no. Please wait until the job is done.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Told to leave, then call 911 and the gas company",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "The plug-in says how long the warranty lasts.",
+    "come back next fall for a water heater flush",
+    "It's overflowing. Can someone come tonight?",
+    "BEFORE old water stain on the cabinet floor",
+    "Say Alex also asks about a dripping faucet.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "Can Jordan also look at a dripping faucet?",
+    "Jordan needs a part from the supply house.",
+    "Can I run the dishwasher before you come?",
+    "like replacing the old pipes Jordan noted",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Then the booking goes on, marked urgent.",
+    "he's the one who replaces water heaters",
+    "so Reese K.'s license isn't checked yet",
+    "Plumbing JP031552 · electrical JE30417",
+    "like water near outlets or a gas smell",
+    "Jordan finds corroded shutoff valves.",
+    "like a permit it needed that isn't in",
+    "priced a water heater replacement for",
+    "The drain clogs again 2 weeks later.",
+    "so Casey's license isn't checked yet",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Call a mold cleanup company first",
+    "Proposal · Replace the old pipes",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "UPDATE getting a part, back 9:30",
+    "the water heater flush you asked",
+    "Jordan cracks the cabinet floor",
+    "The job should be done by 10am.",
+    "HURT cut my hand, need to stop",
+    "No. It doesn't smell like gas.",
+    "replacing both shutoff valves",
+    "Alex asks an AI for a plumber",
+    "water heater flush, 12 months",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "the sink is now overflowing",
+    "next week's drain cleaning",
+    "like an overflowing drain",
+    "Overflowing kitchen drain",
+    "covers part of the repair",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "The repair price is good",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "NEW heating and cooling",
+    "sewer camera inspection",
+    "A gas smell at the home",
+    "Registration 2019-0451",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "stage 2 of your repipe",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Cracked cabinet floor",
+    "Cabinet floor, before",
+    "your new pipes are in",
+    "1-year labor warranty",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "Both rentals' visits",
+    "Drain clearing plans",
+    "leehomeservices.com",
+    "also does color and",
+    "the $160 valve work",
+    "No. No huele a gas.",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services'",
+    "the shutoff valves",
+    "Thu Oct 22, 9:10am",
+    "Lee Home Services",
+    "camera inspection",
+    "barber, color and",
+    "the kitchen drain",
+    "Supply line · $80",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "BOOK Tessa drain",
+    "Service call fee",
+    "service call fee",
+    "Drain clearings",
+    "Book the repair",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "today's repair",
+    "Kitchen drain",
+    "$2,400 repipe",
+    "cut your hair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "Service call",
+    "service call",
+    "Water heater",
+    "water heater",
+    "at the chair",
+    "shop's chair",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Yard drain",
+    "yard drain",
+    "88 Elm St",
+    "visit fee",
+    "42 Oak St",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "Rental 1",
+    "Rental 2",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "Labor"
+   ]
+  },
+  "A": {
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S1-61": "7421d186d5",
+   "S1-43": "e16d5048f3",
+   "S2-22": "6fe11c094c",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A10-02": "c9223be948",
+   "A8-03": "7accda6f86",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-43": "7b0f73c701",
+   "A8-50": "0f26abfc87",
+   "A8-54": "bc2f9467fd",
+   "A9-03": "219c966588",
+   "A4-24": "0a292df05b",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-02": "987e1a14cd",
+   "A8-67": "e9fd748fc5",
+   "A10-45": "855be6050a"
+  },
+  "B": {
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S2-06": "b78d25d6e2",
+   "S1-61": "e30e71f65d",
+   "S1-43": "dd3ae2a1a9",
+   "S2-22": "6fe11c094c",
+   "S2-05": "5051cc07a8",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B7-01": "f7a5523875",
+   "B10-01": "814aa1fde7",
+   "B10-08": "01bac94fd8",
+   "B4-05": "fb3a9061c8",
+   "B4-07": "9d0dbc90ad",
+   "B4-44": "514c8ab30c",
+   "B5-21": "925b7342ed",
+   "B6-13": "ed1f412f7d",
+   "B4-34": "74ff52d83d",
+   "B8-18": "530038d2b8",
+   "B8-23": "dd780a2ec8",
+   "B8-22": "50d78f1af0",
+   "B4-83": "a7473a80ea",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "B8-52": "6f008512da",
+   "B8-10": "5c9d4b937f",
+   "B7-18": "d53cef58f7",
+   "B10-32": "7713bff255"
+  }
+ }
+}

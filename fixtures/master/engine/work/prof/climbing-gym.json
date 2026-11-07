@@ -1,0 +1,3842 @@
+{
+ "id": "climbing-gym",
+ "name": "Climbing gym",
+ "style": "Class",
+ "pattern": "class",
+ "from": "gym",
+ "cast": {
+  "A": {
+   "staff": "Dana and the front desk",
+   "cust": "Alex M. (a first-timer) · other climbers and guests"
+  },
+  "B": {
+   "staff": "Marcus and Priya (operators who go out)",
+   "cust": "Alex M. (books for the school) · teachers and parents",
+   "other": "Others (a school, a park district, a host)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dana"
+  },
+  "B": {
+   "staff": "Marcus"
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "none for the gym itself: the business registration and the owner's ID are on file; nothing is looked up",
+   "staff": "no state license for instructors; the gym's own instructor check, first aid and CPR, set by the owner and kept with their end dates (on file, not looked up)",
+   "mobile wall": "where the state's rules treat a mobile climbing wall as a ride: its inspection or permit kept with its end date as the wall's papers (S1-81); no event is offered past that date",
+   "insurance": "the gym's own liability cover; a host who asks for a certificate gets it from the business, outside Rosie",
+   "job limits": "the owner's own: the most climbers per staff member and the wall's most climbers at once"
+  },
+  "pf.services": {
+   "A": [
+    {
+     "name": "Climbing session (day pass)",
+     "price": "list, $25",
+     "length": "2 hours",
+     "booked as": "a seat in a session: the gym's open-climbing window, with the number of spots the owner gives Rosie",
+     "place": "at the gym",
+     "money": "nothing taken when booked; paid at the desk"
+    },
+    {
+     "name": "Intro to climbing class",
+     "price": "list, $59 with the day pass and gear",
+     "length": "90 minutes",
+     "booked as": "a seat in a class: 6 seats, 1 instructor, at least 2 to run",
+     "place": "at the gym",
+     "money": "paid in full when booked"
+    },
+    {
+     "name": "Belay check",
+     "price": "free with any visit",
+     "length": "15 minutes at check-in",
+     "booked as": "a first step at the start of the first roped visit, not booked on its own",
+     "place": "at the gym",
+     "money": "nothing"
+    },
+    {
+     "name": "Private coaching",
+     "price": "list, $75",
+     "length": "1 hour",
+     "booked as": "a person's time; the customer may name a coach",
+     "place": "at the gym",
+     "money": "a card saved for a $25 late-cancel or no-show fee; paid at the desk"
+    },
+    {
+     "name": "Kids' climbing class (ages 6 to 12)",
+     "price": "list, $35",
+     "length": "75 minutes",
+     "booked as": "a seat in a class: 8 seats, 1 coach for 8 kids, at least 3 to run",
+     "place": "at the gym",
+     "money": "paid in full when booked; the child may be left with the coach"
+    },
+    {
+     "name": "Birthday party",
+     "price": "list, $320 for up to 10 climbers; $25 each extra climber",
+     "length": "2 hours: 1 hour climbing with a staff belayer, 1 hour in the party room",
+     "booked as": "a space (the party room) plus staff",
+     "place": "at the gym",
+     "money": "a $100 deposit when booked; the $220 rest at the desk on the day"
+    },
+    {
+     "name": "Monthly membership / 10-visit punch card",
+     "price": "$85 a month / $200",
+     "booked as": "a credit that pays a climbing session or a class seat",
+     "money": "charged when bought; the membership charges again monthly only after its own yes"
+    },
+    {
+     "name": "Youth climbing team",
+     "price": "$120 a month",
+     "booked as": "a repeat plan: one weekly practice, a seat each week",
+     "money": "a repeat plan with its own yes"
+    }
+   ],
+   "B": [
+    {
+     "name": "Mobile climbing wall at your event",
+     "price": "list, $750 for 3 hours",
+     "length": "3 hours of climbing, plus about 1 hour to set up and 1 to pack up",
+     "booked as": "the wall (a thing: one event at a time) plus 2 staff operators; a set start",
+     "place": "at the customer's place: a school, a park, a business or a yard, with flat ground 30 by 20 feet, truck access and 25 feet of clear sky",
+     "money": "a $250 deposit when booked; the $500 rest on the bill Rosie sends after"
+    },
+    {
+     "name": "Backyard party wall",
+     "price": "list, $550 for 2 hours",
+     "length": "2 hours",
+     "booked as": "the wall plus 2 staff",
+     "place": "at the customer's home",
+     "money": "paid in full when booked"
+    }
+   ]
+  },
+  "pf.questions": {
+   "before times": [
+    "How many climbers? (sets the class seats, the party size, or the wall's staff)",
+    "Has each climber climbed with ropes before, and passed a belay check at a gym? (sets whether the belay check comes first, or the intro class fits better)",
+    "For a child: which class age band (6 to 12)? Never the exact age.",
+    "B: the event's address, and the ground and space at the spot (flat, 30 by 20 feet, truck access)"
+   ],
+   "after a time": [
+    "Shoe size for rental shoes (optional)",
+    "Anything the instructor should know? (optional)"
+   ],
+   "secure page only": [
+    "the waiver for each climber: past injuries or health conditions the climber chooses to tell, an emergency contact",
+    "a child's name and the adults who may pick them up from a kids' class"
+   ],
+   "who may book": "an adult for themselves; a parent or guardian for a child; climbers 14 to 17 may climb in open sessions only with a parent's or guardian's signed waiver; under 14 in open climbing only with an adult who stays in the gym; a teen never books alone (a parent books)"
+  },
+  "pf.safety": {
+   "stop words": [
+    "someone fell or is hurt now, a head injury, can't move, chest pain: the 911 safety message, no booking",
+    "drunk, high, or plans to climb after drinking: not today (no climbing under the influence)"
+   ],
+   "tell the customer": "Climbing has a real risk of falls and injury. Staff check every knot and belay; follow their checks. Wear clothes you can move in; rental shoes at the desk. No climbing after alcohol or drugs.",
+   "staff stops": "a climber who fails a knot or belay check climbs only on bouldering and auto-belays that visit; an unsafe climber is stopped (the visit ends for safety)",
+   "booking continues": "yes, after the safety steps, for anything but an emergency or intoxication",
+   "B": "high wind, lightning or rain on the wall: climbing stops until it's safe; the operators decide on site"
+  },
+  "pf.first_steps": [
+   {
+    "what": "Liability waiver",
+    "when": "signed on the secure page before the first climb; on file for 12 months, so later bookings skip it",
+    "who": "each climber for themselves; a parent or guardian for each child; at a party or an event each child's own parent",
+    "late": "not signed by check-in: signs at the desk on the day, or doesn't climb"
+   },
+   {
+    "what": "Belay check",
+    "when": "at the start of the first roped visit, about 15 minutes",
+    "who": "climbers who want to belay or climb on ropes without staff",
+    "fail": "climbs on bouldering and auto-belays that visit, or books the intro class; nothing extra is charged"
+   },
+   {
+    "what": "First-visit orientation",
+    "when": "10 minutes at check-in",
+    "who": "first-time climbers"
+   }
+  ],
+  "pf.visit": {
+   "check-in": "the code at the front desk; a class or a party: names ticked on the roster; the waiver on file is checked at check-in",
+   "B check-in": "the code at the event with the host; each climber's waiver checked at the wall",
+   "changes at the visit": "rental shoes and harness priced at the desk ($6 and $5); a party's extra climbers at $25 each, OK'd by the person who booked",
+   "done": "the desk or the coach texts DONE; a class: the roster",
+   "children": "kids' classes: the child is left with the coach and handed only to an adult the parent listed; parties and open climbing: a parent or adult stays"
+  },
+  "pf.money": {
+   "ways": "day pass: nothing when booked, paid at the desk; classes and kids' classes: paid in full when booked; private coaching: card saved for the fee, paid at the desk; party: $100 deposit, rest at the desk; B event: $250 deposit, rest on the bill; B backyard party: paid in full",
+   "packs": "memberships and punch cards charged when bought; a credit pays one session or seat",
+   "memberships": "a membership charged monthly through Rosie: 1% of each charge to Rosie, no $2 on its members' classes; a member who pays at the desk: $2 per class at check-in (the owner can turn those bookings off)",
+   "fees": "the owner's own: free cancel until the owner's cutoff (flow A: 24 hours before; flow B events: 2 days before); after that or a no-show, a class keeps its price, coaching a $25 fee, a party its deposit, a wall its deposit; each asked of the owner",
+   "two dollars": "yes, $2 a booking",
+   "tips": "no tip line",
+   "caps": "any deposit cap from the state form, as the owner's own rule",
+   "reserved time": "a class seat, a party, a coaching hour and the mobile wall are reserved time, charged in full: a customer who stops or leaves early gets nothing back for time not used (S13-55; any refund is the owner's call); a stop the gym makes for safety, like wind on the wall, is the gym's side for the part not given"
+  },
+  "pf.messages": {
+   "never in a text": "injuries, health conditions, pregnancy, a fall or an incident report, a child's name or age, waiver answers",
+   "languages": "English and Spanish",
+   "minors": "a child's details stay on the secure page; texts go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": "instructor (classes, coaching, belay checks), kids' coach, party host, mobile-wall operator, desk",
+   "ratios": "a class: 1 instructor per 6 adults or 8 kids; a party: 1 staff belayer per 5 climbers; the mobile wall: 2 operators",
+   "stand-ins": "any instructor with the skill may teach a class or a party (nobody is named); a coaching session that named a coach is never moved to another coach on silence",
+   "who OKs": "the owner OKs prices, refunds and fees"
+  },
+  "pf.rules": {
+   "switches": [
+    "minimum ages per service: the owner's own",
+    "a waiver before any climb",
+    "where the state's rules require it: the mobile wall's ride inspection or permit on file",
+    "a deposit cap where the state form names one"
+   ],
+   "cancel": "the owner's own rule; suggested: free until 24 hours before"
+  },
+  "pf.edges": {
+   "late": "a class starts on time; late more than 10 minutes to an intro class: the climber may miss the safety part and climb bouldering only (the owner's rule)",
+   "no-show": "the owner decides any fee each time",
+   "too few": "a class under its fewest at the cutoff: the owner runs it or cancels; a cancel returns everything paid",
+   "weather (B)": "wind or lightning stops the wall; the event can move or end; the owner decides any refund",
+   "injury": "first aid by staff, 911 by staff if needed; the owner is told at once; nothing about it in texts",
+   "capacity": "Rosie books only the spots the owner gives it per session, or reads them from the gym's own connected system"
+  },
+  "pf.facts": [
+   "classes",
+   "packs",
+   "plans",
+   "groups",
+   "firststeps",
+   "forms",
+   "children",
+   "spaces",
+   "waitlist",
+   "extrawork",
+   "documents",
+   "capacitycheck"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "2 days before"
+   }
+  }
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|none|counter",
+    "list|card|counter",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|full|none": "The $59 intro to climbing class, paid in full when booked.",
+    "list|none|counter": "A $25 climbing session. Nothing is taken: a yes saves the spot. Alex pays at the desk.",
+    "list|card|counter": "A $75 private coaching hour. A card is saved for the gym's $25 fee. Alex pays at the desk.",
+    "list|deposit|counter": "The $320 birthday party. A $100 deposit now, and $220 at the desk on the day."
+   },
+   "amounts": {
+    "*": {
+     "name": "Climbing session"
+    },
+    "list|full|*": {
+     "price": "$59",
+     "paid": "$59",
+     "fee": "$59",
+     "name": "Intro to climbing class"
+    },
+    "list|none|*": {
+     "price": "$25",
+     "name": "Climbing session"
+    },
+    "list|card|*": {
+     "price": "$75",
+     "fee": "$25",
+     "name": "Private coaching"
+    },
+    "list|deposit|*": {
+     "price": "$320",
+     "deposit": "$100",
+     "rest": "$220",
+     "fee": "$100",
+     "name": "Birthday party"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Private coaching",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$75",
+      "fee": "$25"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Intro to climbing class",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$59",
+      "paid": "$59",
+      "fee": "$59"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Climbing session (membership)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|bill",
+   "combos": [
+    "list|deposit|bill",
+    "list|full|none"
+   ],
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|deposit|bill": "The mobile climbing wall for a school fair: $750 for 3 hours. A $250 deposit now; the $500 rest on the bill after.",
+    "list|full|none": "The backyard party wall: $550 for 2 hours, paid in full when booked."
+   },
+   "amounts": {
+    "*": {
+     "name": "Mobile climbing wall"
+    },
+    "list|deposit|*": {
+     "price": "$750",
+     "deposit": "$250",
+     "rest": "$500",
+     "fee": "$250",
+     "name": "Mobile climbing wall"
+    },
+    "list|full|*": {
+     "price": "$550",
+     "paid": "$550",
+     "fee": "$550",
+     "name": "Backyard party wall"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra hour of climbing",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$200",
+      "fee": "$250"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Backyard party wall",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$550",
+      "paid": "$550",
+      "fee": "$550"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Mobile wall (prepaid event)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "the price of Owen's plan on Mon Oct 26: $40 a visit",
+    "the price of Owen's plan on Mon Oct 26: $85 a month"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Ben's AI asks for a private coaching hour at $65, an old price."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A private coaching hour at Lee's Barbershop is $75, not $65."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $75 private coaching quote."
+   ],
+   [
+    "The color and cut can take a $20 deposit once",
+    "The birthday party can take a $100 deposit once"
+   ],
+   [
+    "and the plan ends after your last $35 visit.",
+    "and the plan ends after your last month."
+   ],
+   [
+    "the color and cut takes a $20 deposit once",
+    "the birthday party takes a $100 deposit once"
+   ],
+   [
+    "The plan ends after its last visit at $35.",
+    "The plan ends after its last month at $85."
+   ],
+   [
+    "Rosie answers with the real price, $40.",
+    "Rosie answers with the real price, $75."
+   ],
+   [
+    "the shop for $35, or at your home for $75.",
+    "the gym for $25, or a coach at your home for $75."
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A belay check is on the price list: free."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Intro to climbing class · $59"
+   ],
+   [
+    "The signature cut, $55, is paid in full",
+    "The intro to climbing class, $59, is paid in full"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a Kids' class (ages 6 to 12) is $35."
+   ],
+   [
+    "Haircut plans go to $40 from Wed Nov",
+    "Climbing plans go to $85 a month from Wed Nov"
+   ],
+   [
+    "Reply 1 to keep it at $40 a visit",
+    "Reply 1 to keep it at $85 a month"
+   ],
+   [
+    "Haircuts already booked keep $35",
+    "Climbing sessions already booked keep $25"
+   ],
+   [
+    "Color and cut · $90, from photos",
+    "Private coaching · $75"
+   ],
+   [
+    "A plan goes to $40 from Wed Nov",
+    "A plan goes to $85 a month from Wed Nov"
+   ],
+   [
+    "a house call, $75, paid in full",
+    "a coaching hour at home, $75, with a card saved for the $25 fee"
+   ],
+   [
+    "charges $35 to your saved card",
+    "charges $85 to your saved card"
+   ],
+   [
+    "Color correction · $25 deposit",
+    "Private coaching · $25 fee"
+   ],
+   [
+    "Sam raises the haircut to $40",
+    "Sam raises the climbing session to $35"
+   ],
+   [
+    "at $35 a visit, every 4 weeks",
+    "at $85 a month"
+   ],
+   [
+    "adds the prices: $35 and $20.",
+    "adds the prices: $25 and free."
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Birthday party · $100 deposit"
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2)",
+    "Climbing session $25 ($35 from Nov 2)"
+   ],
+   [
+    "the $20 fee, if you confirm",
+    "the $25 fee, if you confirm"
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Birthday party · $100 deposit"
+   ],
+   [
+    "$40 for the Groom's package",
+    "$100 for the birthday party"
+   ],
+   [
+    "Adding a beard trim, +$20?",
+    "Adding rental shoes, +$6?"
+   ],
+   [
+    "The $70 rest is refunded",
+    "The $50 rest is refunded"
+   ],
+   [
+    "$40 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "So is a house call, $75.",
+    "A coaching hour at home is $75, with a card saved for the $25 fee."
+   ],
+   [
+    "the haircut goes to $40",
+    "the climbing session goes to $35"
+   ],
+   [
+    "like $90. Nothing more",
+    "like $75. Nothing more"
+   ],
+   [
+    "the open times at $40.",
+    "the open times at $75."
+   ],
+   [
+    "Haircut at home · $75",
+    "Private coaching at home · $75"
+   ],
+   [
+    "$40 a visit (now $35)",
+    "$85 a month (now $75)"
+   ],
+   [
+    "From $110, set at the",
+    "From $75, set at the"
+   ],
+   [
+    "$89 service-call fee",
+    "$25 fee"
+   ],
+   [
+    "It's $20. Accept it?",
+    "It's $25. Accept it?"
+   ],
+   [
+    "A $35 haircut can w",
+    "A $25 climbing session can w"
+   ],
+   [
+    "$20 payment through",
+    "$25 payment through"
+   ],
+   [
+    "$160, charged when",
+    "$200, charged when"
+   ],
+   [
+    "Saved: haircut $40",
+    "Saved: climbing session $35"
+   ],
+   [
+    "$100 after the vis",
+    "$220 after the vis"
+   ],
+   [
+    "Plan charge · $35",
+    "Plan charge · $85"
+   ],
+   [
+    "Pack of 5 visits",
+    "10-visit card"
+   ],
+   [
+    "Beard trim · $20",
+    "Belay check · free"
+   ],
+   [
+    "like $20 of $90.",
+    "like $25 of $75."
+   ],
+   [
+    "Skin fade · $40",
+    "Private coaching · $75"
+   ],
+   [
+    "Beard trim $20",
+    "Belay check free"
+   ],
+   [
+    "$20 taken when",
+    "$100 taken when"
+   ],
+   [
+    "Skin fade $40",
+    "Private coaching $75"
+   ],
+   [
+    "Haircut · $35",
+    "Climbing session · $25"
+   ],
+   [
+    "the $100 rest",
+    "the $220 rest"
+   ],
+   [
+    "other $100 is",
+    "other $220 is"
+   ],
+   [
+    "A $35 haircut",
+    "A $25 climbing session"
+   ],
+   [
+    "$140 an hour",
+    "$75 an hour"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $25"
+   ],
+   [
+    "$35 a visit",
+    "$85 a month"
+   ],
+   [
+    "$40 a visit",
+    "$85 a month"
+   ],
+   [
+    "$40 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$20 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$25 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$20 fee",
+    "$25 fee"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some gyms and studios are registered as a place."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Intro climbing, belay checks and kids' climbing."
+   ],
+   [
+    "The chairs",
+    "The walls"
+   ],
+   [
+    "A chair, ready",
+    "A spot, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a coach who rents space,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents space, with their own clients."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Dana and Sol coach classes; Dana also runs private coaching."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Dana: coach, private coaching, kids' climbing"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Dana: coach, private coaching and kids' climbing"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every climbing class, private coaching and kids' climbing"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'class' could mean a gym or a school."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Mobile climbing walls and party walls, within 25 miles."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "J: a belay re-check in the first 2 weeks, done at the desk, free."
+   ],
+   [
+    "a color touch-up checked from photos is free",
+    "a belay re-check done at the desk is free"
+   ],
+   [
+    "Color touch-up",
+    "Belay re-check"
+   ],
+   [
+    "color touch-up",
+    "belay re-check"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Private coaching quotes come to you first."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A gym's example: 'A first class needs the waiver first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Private coaching always stays with Dana."
+   ],
+   [
+    "A chair renter asked for by name",
+    "A space renter asked for by name"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A top rope' or 'a boulder' fits a climbing session."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a swim lesson, which isn't on the gym's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Rock Gym doesn't do swim lessons."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free entrance:"
+   ],
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's employer for a staff class."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this class."
+   ],
+   [
+    "How would you like it on top?",
+    "Any injury the coach should know about?"
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a 10-visit card at the gym."
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, make it a private coaching' goes back to the times."
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter class."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Dana can do a shorter class in the time left"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the lobby during my class?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring water and a towel on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring water and a towel."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the gym, the customer is already there, so there's no door check."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Dana stopped Alex M.'s class."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Dana goes over the next class."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Lee's Rock Gym: you now have two classes on Sat Nov 7."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. No photo ID that matches the waiver."
+   ],
+   [
+    "Sat Oct 24 · 2:00pm · Riley",
+    "Sat Oct 24 · 1:00pm · Dana"
+   ],
+   [
+    "2 At my home",
+    "2 At my office"
+   ],
+   [
+    "A barbershop's services need none.",
+    "Classes need none. A membership needs one where the state's rules ask."
+   ],
+   [
+    "A barbershop sells its packages only at the shop.",
+    "Some businesses sell packages only at their own desk."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds private coaching to Lee's Rock Gym."
+   ],
+   [
+    "NEW massage",
+    "NEW private coaching"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Private coaching for Lee's Rock Gym: is it the same company?"
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: 9:00am, Dana"
+   ],
+   [
+    "so Quinn S.'s license isn't checked yet",
+    "so Quinn S.'s coaching papers aren't on file yet"
+   ],
+   [
+    "Gemini hears right away that 2:00pm was just taken, and gets the next times.",
+    "Gemini hears right away that the last spot was just taken, and gets the next classes."
+   ],
+   [
+    "Dee can ask to be next for 2:00pm.",
+    "Dee can ask to be next for that spot."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A gym books a seat in a class, and a day pass is a seat in the day's open hours."
+   ],
+   [
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Oct 24 · 11:00am · Intro to climbing class · Dana · 4 seats left"
+   ],
+   [
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "Sat Nov 21 · 11:00am · Intro to climbing class · Dana · 8 seats left"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute belay check"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a climber who feels faint gets 'stop, sit down, and call 911 if it's serious'."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 session; priced at the desk"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A class is rated, so the gym takes the first branch."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a weekly climbing plan with Dana."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Dana sees how you move"
+   ],
+   [
+    "Barbering workshop",
+    "Intro to climbing class"
+   ],
+   [
+    "Riley's color plan after a consult",
+    "Dana's private coaching plan after an assessment"
+   ],
+   [
+    "sent you a proposal: Riley's color plan.",
+    "sent you a proposal: Dana's private coaching plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Private coaching plan"
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a time for your first coaching hour:"
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration EX-1042"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Climbing takes no jobs sent now, at the gym or away."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the gym show photos of you in class?"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Climbing plan · every week"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Rental shoes and harness · $11"
+   ],
+   [
+    "gloss",
+    "rental gear"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "First aid EX-2087"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Walls'"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Rock Gym LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Rock Gym"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Walls"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Youth Teams"
+   ],
+   [
+    "Lee Electric",
+    "Lee Party Rooms"
+   ],
+   [
+    "plumbing and electrical",
+    "climbing and parties"
+   ],
+   [
+    "Plumbing and electrical",
+    "Climbing and parties"
+   ],
+   [
+    "Electrical",
+    "Parties"
+   ],
+   [
+    "electrical",
+    "parties"
+   ],
+   [
+    "Plumbing",
+    "Climbing"
+   ],
+   [
+    "plumbing",
+    "climbing"
+   ],
+   [
+    "plumber",
+    "coach"
+   ],
+   [
+    "Plumber",
+    "Coach"
+   ],
+   [
+    "Riley Chen",
+    "Dana Chen"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery Diaz",
+    "Sol Diaz"
+   ],
+   [
+    "Avery",
+    "Sol"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Price"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey Moore",
+    "Priya Moore"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "88 Elm St",
+    "24 Quarry Rd"
+   ],
+   [
+    "Elm St",
+    "Spruce St"
+   ],
+   [
+    "1200 Main St",
+    "310 Cedar Ave"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "Oak St",
+    "Willow Rd"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Intro to climbing class"
+   ],
+   [
+    "Signature cut and shave",
+    "Intro to climbing class"
+   ],
+   [
+    "Signature cut",
+    "Intro to climbing class"
+   ],
+   [
+    "signature cut",
+    "intro to climbing class"
+   ],
+   [
+    "Groom's package",
+    "Birthday party"
+   ],
+   [
+    "Skin fade",
+    "Private coaching"
+   ],
+   [
+    "skin fade",
+    "private coaching"
+   ],
+   [
+    "A beard trim",
+    "A belay check"
+   ],
+   [
+    "a beard trim",
+    "a belay check"
+   ],
+   [
+    "Beard trim",
+    "Belay check"
+   ],
+   [
+    "beard trim",
+    "belay check"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' class (ages 6 to 12)"
+   ],
+   [
+    "kids cuts",
+    "kids' classes"
+   ],
+   [
+    "Kids cut",
+    "Kids' class"
+   ],
+   [
+    "kids cut",
+    "kids' class"
+   ],
+   [
+    "a color and cut",
+    "a private coaching hour"
+   ],
+   [
+    "Color and cut",
+    "Private coaching hour"
+   ],
+   [
+    "color and cut",
+    "private coaching hour"
+   ],
+   [
+    "A color correction",
+    "A coaching hour"
+   ],
+   [
+    "a color correction",
+    "a coaching hour"
+   ],
+   [
+    "Color correction",
+    "Coaching hour"
+   ],
+   [
+    "color correction",
+    "coaching hour"
+   ],
+   [
+    "color quote",
+    "private coaching quote"
+   ],
+   [
+    "a consult",
+    "a first-visit check"
+   ],
+   [
+    "consult",
+    "first-visit check"
+   ],
+   [
+    "Consult",
+    "First-visit check"
+   ],
+   [
+    "Haircuts",
+    "Climbing sessions"
+   ],
+   [
+    "haircuts",
+    "climbing sessions"
+   ],
+   [
+    "Haircut",
+    "Climbing session"
+   ],
+   [
+    "haircut",
+    "climbing session"
+   ],
+   [
+    "house calls",
+    "events"
+   ],
+   [
+    "House calls",
+    "Events"
+   ],
+   [
+    "house call",
+    "event"
+   ],
+   [
+    "House call",
+    "Event"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "priced at the chair",
+    "priced at the session"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the session"
+   ],
+   [
+    "set at the chair",
+    "set at the session"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "chairs side by side",
+    "mats side by side"
+   ],
+   [
+    "Barbershop",
+    "Gym"
+   ],
+   [
+    "barbershops",
+    "fitness gyms"
+   ],
+   [
+    "barbershop",
+    "gym"
+   ],
+   [
+    "Barbers",
+    "Coaches"
+   ],
+   [
+    "barbers",
+    "coaches"
+   ],
+   [
+    "Barber",
+    "Coach"
+   ],
+   [
+    "barber",
+    "coach"
+   ],
+   [
+    "shops",
+    "gyms"
+   ],
+   [
+    "Shop",
+    "Gym"
+   ],
+   [
+    "shop",
+    "gym"
+   ],
+   [
+    "Drain clearing",
+    "Mobile climbing wall"
+   ],
+   [
+    "Water heater flush",
+    "Intro climbing class"
+   ],
+   [
+    "Panel upgrade",
+    "Party room upgrade"
+   ],
+   [
+    "landlord",
+    "employer"
+   ],
+   [
+    "After the job",
+    "After the session"
+   ],
+   [
+    "Drains have a set price.",
+    "Classes have a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Each person who joins signs their own waiver."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone unwell right now stops the booking."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "BS20981",
+    "EX-2087"
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The coach's first-aid card has expired."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a climbing session on Saturday."
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books the same class every week"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for the same Saturday climbing class every week."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group of friends together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "Five friends book one intro class together for a birthday."
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for an intake"
+   ],
+   [
+    "The rash on my scalp got worse.",
+    "My knee got worse since I booked. Can I still come?"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M. 15 minutes into class."
+   ],
+   [
+    "I put a note and a photo on the page.",
+    "I put a note on the page."
+   ],
+   [
+    "The note and photo are on the secure page.",
+    "The note is on the secure page."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: first climb, belay check done, wants to try bouldering"
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free make-up class."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "My harness felt loose, so I couldn't finish."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the harness felt loose in Saturday's class."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una clase de escalada el sábado."
+   ],
+   [
+    "License renewal",
+    "Certificate renewal"
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like a belay check result."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The harness strap ripped my shirt collar."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the harness strap ripped a shirt today."
+   ],
+   [
+    "Add photos",
+    "Tell us about the group"
+   ],
+   [
+    "water heater",
+    "party wall"
+   ],
+   [
+    "teacher",
+    "coach"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up class, if Sam says so"
+   ],
+   [
+    "patch test with a wait",
+    "belay check with a wait"
+   ],
+   [
+    "the $25 assessment",
+    "the $25 session"
+   ],
+   [
+    "Springfield",
+    "Riverton"
+   ]
+  ],
+  "B": [
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a mobile wall at $600, an old price."
+   ],
+   [
+    "Lee Home Services: $160 for today's extra work.",
+    "Lee Walls: $200 for today's extra work."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2)",
+    "Mobile climbing wall $750 ($800 from Nov 2)"
+   ],
+   [
+    "your plan renews on Tue Dec 1 at $179 a visit",
+    "your plan renews on Tue Dec 1 at $750 a visit"
+   ],
+   [
+    "Send {{alex.staff}} $600 for the water heater",
+    "Send {{alex.staff}} $550 for the party wall"
+   ],
+   [
+    "Drain clearing plans go to $199 from Wed Nov",
+    "Mobile wall plans go to $800 from Wed Nov"
+   ],
+   [
+    "Reading it back: drain clearing goes to $199",
+    "Reading it back: the mobile wall goes to $800"
+   ],
+   [
+    "The plan ends after its last visit at $179.",
+    "The plan ends after its last visit at $750."
+   ],
+   [
+    "Rosie answers with the real price, $179.",
+    "Rosie answers with the real price, $750."
+   ],
+   [
+    "the color and cut takes a $89 deposit once",
+    "the mobile wall takes a $250 deposit once"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · Backyard party wall · $550"
+   ],
+   [
+    "Morgan's plan on Mon Oct 26: $199 a visit",
+    "Morgan's plan on Mon Oct 26: $750 a visit"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Mobile walls already booked keep $750"
+   ],
+   [
+    "Done: the $160 valve work is cancelled,",
+    "Done: the $200 extra hour is cancelled,"
+   ],
+   [
+    "Sam raises the drain clearing to $199",
+    "Sam raises the mobile wall to $800"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Extra hour · $200"
+   ],
+   [
+    "A plan goes to $199 from Wed Nov",
+    "A plan goes to $800 from Wed Nov"
+   ],
+   [
+    "Water heater replacement · $640",
+    "Backyard party wall · $550"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra hour · $200"
+   ],
+   [
+    "Late-cancel or nobody-home fee",
+    "Late-cancel or nobody-home fee"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "School 1 · Tue Oct 20 · $750"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "School 2 · Wed Oct 21 · $750"
+   ],
+   [
+    "Saved: drain clearing $199",
+    "Saved: mobile wall $800"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $750 wall's papers are kept on file."
+   ],
+   [
+    "only the $89 service call",
+    "only the $250 fee"
+   ],
+   [
+    "$179, paid after the job",
+    "$750, paid after the event"
+   ],
+   [
+    "for $160. You can cancel",
+    "for $200. You can cancel"
+   ],
+   [
+    "The service call is $89.",
+    "The mobile wall deposit is $250."
+   ],
+   [
+    "Sam OKs prices over $500",
+    "Sam OKs prices over $800"
+   ],
+   [
+    "keep it at $199 a visit",
+    "keep it at $750 a visit"
+   ],
+   [
+    "Water heater flush $150",
+    "Extra hour $200"
+   ],
+   [
+    "$199 a visit (now $179)",
+    "$750 a visit (now $700)"
+   ],
+   [
+    "the open times at $179.",
+    "the open times at $750."
+   ],
+   [
+    "your plan charges $358",
+    "your plan charges $750"
+   ],
+   [
+    "Drain clearing · $179",
+    "Mobile wall · $750"
+   ],
+   [
+    "your last $179 visit",
+    "your last $750 visit"
+   ],
+   [
+    "for $160. It's added",
+    "for $200. It's added"
+   ],
+   [
+    "From $89, set at the",
+    "From $750, set at the"
+   ],
+   [
+    "the $89 service call",
+    "the $250 fee"
+   ],
+   [
+    "$89 service-call fee",
+    "$250 fee"
+   ],
+   [
+    "for a $20 fee you OK",
+    "for a $250 fee you OK"
+   ],
+   [
+    "never more than $89.",
+    "never more than $250."
+   ],
+   [
+    "the $160 valve work",
+    "the $200 extra hour"
+   ],
+   [
+    "The $110 rest after",
+    "The $500 rest after"
+   ],
+   [
+    "$20 payment through",
+    "$250 payment through"
+   ],
+   [
+    "$700, charged when",
+    "$750, charged when"
+   ],
+   [
+    "Plan charge · $358",
+    "Plan charge · $750"
+   ],
+   [
+    "is $179, not $150.",
+    "is $750, not $600."
+   ],
+   [
+    "Pack of 5 visits",
+    "Prepaid wall event"
+   ],
+   [
+    "Each visit: $150",
+    "Each visit: $750"
+   ],
+   [
+    "$89 service call",
+    "$250 fee"
+   ],
+   [
+    "your $640 price",
+    "your $550 price"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every year"
+   ],
+   [
+    "the $640 quote",
+    "the $550 quote"
+   ],
+   [
+    "now, for $160.",
+    "now, for $200."
+   ],
+   [
+    "Price a visit",
+    "Price a visit"
+   ],
+   [
+    "$89, credited",
+    "$250, credited"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $250"
+   ],
+   [
+    "$140 an hour",
+    "$75 an hour"
+   ],
+   [
+    "$40 deposit",
+    "$250 deposit"
+   ],
+   [
+    "$89 deposit",
+    "$250 deposit"
+   ],
+   [
+    "the $89 fee",
+    "the $250 fee"
+   ],
+   [
+    "Plan charge",
+    "Plan charge"
+   ],
+   [
+    "$89 fee",
+    "$250 fee"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some gyms and studios are registered as a place."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Mobile climbing walls and party walls."
+   ],
+   [
+    "The chairs",
+    "The walls"
+   ],
+   [
+    "A chair, ready",
+    "A wall, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a coach who rents space,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents space, with their own clients."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Marcus and Priya run the walls; Marcus also leads the warm-up."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Marcus: operator, warm-ups, party walls"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Marcus: operator, warm-ups and party walls"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every mobile wall, party wall and warm-up"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'class' could mean a gym or a school."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Mobile walls and backyard parties, within 25 miles."
+   ],
+   [
+    "can clear the drain:",
+    "can set up a climbing wall:"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "Our school fair wants a climbing wall."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a climbing wall for our school fair."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a climber who feels faint gets 'stop, sit down, and call 911 if it's serious'."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can you set up a climbing wall at our school this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa climbing wall Thu 12pm Priya"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'A climbing day for our team' fits a mobile wall."
+   ],
+   [
+    "like a roof leak.",
+    "like a swim lesson."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a park class with no permit."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The gym's own sessions are in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Walls brings a wall to your event for $750, or a backyard wall for $550."
+   ],
+   [
+    "'Adding a faucet check?",
+    "'Adding an extra hour?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many climbers, and is there room for the wall?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 10 climbers."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some groups want the wall more than one day, like a school week."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a wall at the school every month."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "has a yearly flush plan, $150 a visit.",
+    "has a monthly climbing plan."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Monthly climbing plan"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a coaching hour after the climb."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Marcus also add a coaching hour after the climb?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The extra hour is quoted before the yes."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there room for the wall?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a flat gym floor"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The wall's inspection papers are kept on file."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Marcus also add an extra hour?"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Marcus's group asks for an extra hour."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to an extra hour for $200."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Marcus finds a wet, slippery floor under the wall."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says the wall stops there, so Alex gets a written note."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Marcus found a slippery floor and stopped the wall for safety."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say a hold comes loose on the wall, and Marcus texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "A hold came loose on the wall at Alex M.'s event."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Marcus left mats and cones in the room."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the gym wall this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marcus come back next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Marcus's next times for a climbing wall."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a climbing wall, today,"
+   ],
+   [
+    "At my home",
+    "At my school"
+   ],
+   [
+    "so Reese K.'s license isn't checked yet",
+    "so the wall's papers aren't on file yet"
+   ],
+   [
+    "Nobody was home for",
+    "Nobody showed up for"
+   ],
+   [
+    "nobody was home for any of them",
+    "they missed them all"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 8:50am"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 7:50am"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 7:35am"
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no front desk at a school."
+   ],
+   [
+    "you're home",
+    "you're here"
+   ],
+   [
+    "like nobody home",
+    "like a no-show"
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Alex's school in Riverton is inside it."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI described an emergency. They got the 911 message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "An emergency described in the chat"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Every 12 months",
+    "Every month"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Alex is home",
+    "Alex is here"
+   ],
+   [
+    "they're home",
+    "they're here"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "for today's work",
+    "for today's climb"
+   ],
+   [
+    "someone in the home",
+    "someone in the room"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both schools' events go on one bill on the 1st."
+   ],
+   [
+    "Only a teen is home",
+    "Only a teen is at the door"
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every month?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Monthly office strength class plan"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds a party wall to Lee Walls."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Party walls for Lee Walls: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW party wall"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should climbers eat before the event?"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Can a coach come tonight for a team climb?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "does the extra hour today, $200. The $750 wall quote stays good until Thu Oct 29."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $750 wall quote stays good until Thu Oct 29."
+   ],
+   [
+    "a home-repair class",
+    "a park climbing day"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $750 wall gets a rental agreement to sign."
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "The wall books a set start time."
+   ],
+   [
+    "home-repair class",
+    "park climbing day"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 750 wall, 3 hours"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your wall"
+   ],
+   [
+    "Repipe · $2,400",
+    "Mobile wall · $750"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$250 deposit to book, $500 on the bill after"
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $750 wall"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a set of walls Marcus suggested"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a quote for a wall, from Marcus's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Quote · School fair wall"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration EX-3091"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Climbing walls take no jobs sent now, at the gym or away."
+   ],
+   [
+    "Your water heater contract",
+    "Your wall rental agreement"
+   ],
+   [
+    "like a move-out day",
+    "like a school field day"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the extra hour only, $200. The rest stays as booked."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no clear space for the wall"
+   ],
+   [
+    "no proof Alex may have this work done",
+    "no signed waiver"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE wall inspection Mon Oct 26"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Wall inspection EX-2087"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Walls'"
+   ],
+   [
+    "water heater quote",
+    "wall quote"
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "The wall has a set start time, as Sam set at sign-up. The crew comes an hour early to set up."
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Rock Gym"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Walls LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Walls"
+   ],
+   [
+    "leehomeservices.com",
+    "leeclimbingwalls.example"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Party Rooms"
+   ],
+   [
+    "Lee Electric",
+    "Lee Youth Teams"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile walls and parties"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile walls and parties"
+   ],
+   [
+    "Electrical",
+    "Parties"
+   ],
+   [
+    "electrical",
+    "parties"
+   ],
+   [
+    "Plumbing",
+    "Mobile walls"
+   ],
+   [
+    "plumbing",
+    "mobile walls"
+   ],
+   [
+    "plumber",
+    "coach"
+   ],
+   [
+    "Plumber",
+    "Coach"
+   ],
+   [
+    "Riley Chen",
+    "Dana Chen"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery Diaz",
+    "Sol Diaz"
+   ],
+   [
+    "Avery",
+    "Sol"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Price"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey Moore",
+    "Priya Moore"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "88 Elm St",
+    "24 Quarry Rd"
+   ],
+   [
+    "Elm St",
+    "Spruce St"
+   ],
+   [
+    "1200 Main St",
+    "310 Cedar Ave"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "42 Oak St",
+    "5 Summit Plaza"
+   ],
+   [
+    "Oak St",
+    "Willow Rd"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Backyard party wall"
+   ],
+   [
+    "Signature cut",
+    "Backyard party wall"
+   ],
+   [
+    "Beard trim",
+    "Belay check"
+   ],
+   [
+    "beard trim",
+    "belay check"
+   ],
+   [
+    "consult",
+    "first-visit check"
+   ],
+   [
+    "Haircut",
+    "Mobile wall"
+   ],
+   [
+    "haircut",
+    "mobile wall"
+   ],
+   [
+    "house calls",
+    "events"
+   ],
+   [
+    "House calls",
+    "Events"
+   ],
+   [
+    "house call",
+    "event"
+   ],
+   [
+    "House call",
+    "Event"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the session"
+   ],
+   [
+    "at the chair",
+    "at the wall"
+   ],
+   [
+    "Barbershop",
+    "Gym"
+   ],
+   [
+    "barbershops",
+    "fitness gyms"
+   ],
+   [
+    "barbershop",
+    "gym"
+   ],
+   [
+    "Barbers",
+    "Coaches"
+   ],
+   [
+    "barbers",
+    "coaches"
+   ],
+   [
+    "Barber",
+    "Coach"
+   ],
+   [
+    "barber",
+    "coach"
+   ],
+   [
+    "shops",
+    "gyms"
+   ],
+   [
+    "Shop",
+    "Gym"
+   ],
+   [
+    "shop",
+    "gym"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Mobile wall event"
+   ],
+   [
+    "Drain clearings",
+    "Mobile wall events"
+   ],
+   [
+    "drain clearings",
+    "mobile wall events"
+   ],
+   [
+    "Drain clearing",
+    "Mobile wall event"
+   ],
+   [
+    "drain clearing",
+    "mobile wall event"
+   ],
+   [
+    "a water heater replacement",
+    "a backyard party wall"
+   ],
+   [
+    "Water heater replacement",
+    "Backyard party wall"
+   ],
+   [
+    "water heater replacement",
+    "backyard party wall"
+   ],
+   [
+    "a water heater flush",
+    "an intro climbing day"
+   ],
+   [
+    "Water heater flush",
+    "Intro climbing day"
+   ],
+   [
+    "water heater flush",
+    "intro climbing day"
+   ],
+   [
+    "replaces water heaters",
+    "runs climbing walls at events"
+   ],
+   [
+    "A leak repair",
+    "A wall check"
+   ],
+   [
+    "a leak repair",
+    "a wall check"
+   ],
+   [
+    "Leak repair",
+    "Wall check"
+   ],
+   [
+    "leak repair",
+    "wall check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Wall inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "wall inspection"
+   ],
+   [
+    "Sewer camera report",
+    "Wall inspection report"
+   ],
+   [
+    "sewer camera report",
+    "wall inspection report"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "credited to the repair",
+    "counted toward the session"
+   ],
+   [
+    "Panel upgrade",
+    "Party room upgrade"
+   ],
+   [
+    "landlord",
+    "employer"
+   ],
+   [
+    "after the job",
+    "after the session"
+   ],
+   [
+    "After the job",
+    "After the session"
+   ],
+   [
+    "Drains have a set price.",
+    "Walls have a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Each person who joins signs their own waiver."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone unwell right now stops the booking."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "BS20981",
+    "EX-2087"
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The wall's inspection papers show as expired."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "The wall has a set start time, as Sam set at sign-up. The crew comes an hour early to set up."
+   ],
+   [
+    "Arrival windows",
+    "Set start time"
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "arriving 8–10am",
+    "8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "2–4pm",
+    "2:00pm"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero un muro para la feria de la escuela."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "I'd like a wall for the school fair next month."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told her health answers go on the secure page, and to call 911 if anyone feels unwell."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien se siente mal ahora mismo?"
+   ],
+   [
+    "Do you smell gas?",
+    "Does anyone feel unwell right now?"
+   ],
+   [
+    "No huele a gas.",
+    "Nadie."
+   ],
+   [
+    "It doesn't smell like gas.",
+    "Nobody."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Sus respuestas de salud van en la página segura, solo para el entrenador. Si alguien se siente mal, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Your health answers go on the secure page, only for the coach."
+   ],
+   [
+    "If you smell gas, get out and call 911.",
+    "If anyone feels unwell, call 911."
+   ],
+   [
+    "If you smell gas, leave the house now.",
+    "If someone has chest pain or fainted, call 911 now."
+   ],
+   [
+    "Then call 911 and the gas company.",
+    "Stay with them until help comes."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "I had a fall last month. Can I still climb?"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is it safe for me to climb?"
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a climbing gym near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the wall goes, how many climbers, and the space."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone unwell right now, like chest pain or fainting."
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 10 climbers, mixed levels."
+   ],
+   [
+    "Electric.",
+    "About 10, mostly new to it."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a wall is a set price for its hours, so Rosie's first text asks for the event's time and place."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a school books the wall for 2 events at one address."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a coaching hour after the climb."
+   ],
+   [
+    "Both jobs go in one booking, with one arrival window and one code.",
+    "Both go in one booking, with one start time and one code."
+   ],
+   [
+    "Both fit in the same arrival window.",
+    "Both fit in the same morning."
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which school fund should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "The school's activity fund, through its office."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a clear space about 30 by 20 feet?"
+   ],
+   [
+    "Drive time from the jobs before and after is checked again.",
+    "Drive time from the events before and after is checked again."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a space 30 by 20 feet. Everyone joining signs their own waiver first."
+   ],
+   [
+    "Please wait until the job is done.",
+    "Please keep kids off the wall until the crew says so."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the gym was given to another team."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone unwell right now, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Our event moved to Thursday morning. Can you come sooner?"
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Thanks for telling us."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a wall at two schools every term."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's wall?"
+   ],
+   [
+    "Kitchen drain",
+    "School wall"
+   ],
+   [
+    "Yard drain",
+    "Park wall"
+   ],
+   [
+    "Answers, photos and gate codes",
+    "Answers, notes and gate codes"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Saved with Alex M.'s job.",
+    "Saved with Alex M.'s session."
+   ],
+   [
+    "Most jobs have a price before the visit.",
+    "Most sessions have a price before the visit."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 750 wall 200 extra hour"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Extra hour · $200"
+   ],
+   [
+    "Supply line · $80",
+    "Rental agreement · no charge"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "Book the repair",
+    "Book the wall"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 200 an extra hour"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: an extra hour, $200."
+   ],
+   [
+    "Replace both shutoff valves",
+    "An extra hour"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $200 quote is good for 7 days."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wet floor at the wall, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wet floor by the wall"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wet patch by the wall"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the top-rope climbs"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE setting up, start 8:05"
+   ],
+   [
+    "The job should be done by 10am.",
+    "The event still ends by 10am."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT twisted my ankle, need to stop"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 750 wall"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE 11 climbers, mixed levels."
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Next time: bring 4 more mats."
+   ],
+   [
+    "the shutoff valves",
+    "the second rope"
+   ],
+   [
+    "the kitchen drain",
+    "the school wall"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your event"
+   ],
+   [
+    "Rental 1",
+    "School 1"
+   ],
+   [
+    "Rental 2",
+    "School 2"
+   ],
+   [
+    "Alex's home warranty covers part of the repair.",
+    "Alex's school fund covers part of the wall."
+   ],
+   [
+    "Sam bills the warranty company the business's own way.",
+    "Sam bills the school fund the business's own way."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "Your school fund covers the rest."
+   ],
+   [
+    "Each rejoins: the job stays on Alex's record.",
+    "Each rejoins: the session stays on Alex's record."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Alex says the class ended 20 minutes early."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what the business promises."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Our wall ended 20 minutes early."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M. says the Thu Oct 22 wall ended 20 minutes early."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Sam OK'd a free make-up event for your team."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the gym floor"
+   ],
+   [
+    "Cabinet floor, before",
+    "Gym floor, before"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the school to dry the floor first"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratch on the gym floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratch on the floor"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the wall inspection link"
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Nora can ask to be next for that time."
+   ],
+   [
+    "A plan or warranty pays",
+    "A school fund pays"
+   ],
+   [
+    "Books one job for a group",
+    "Books one event for a group"
+   ],
+   [
+    "water heater",
+    "party wall"
+   ],
+   [
+    "the shutoff valve",
+    "the extra hour"
+   ],
+   [
+    "teacher",
+    "coach"
+   ],
+   [
+    "that window",
+    "that time"
+   ],
+   [
+    "yard drain",
+    "backyard party"
+   ],
+   [
+    "a private class at home",
+    "a private coaching hour at home"
+   ],
+   [
+    "Tonight 6-9pm: 12 booked. How many more tables can you take?",
+    "Saturday 10am: 12 booked. How many more spots can you take?"
+   ],
+   [
+    "The $640 party wall",
+    "The $550 party wall"
+   ],
+   [
+    "$160",
+    "$200"
+   ],
+   [
+    "replace both shutoff valves",
+    "an extra hour"
+   ],
+   [
+    "shutoff valve",
+    "extra hour"
+   ],
+   [
+    "Springfield",
+    "Riverton"
+   ]
+  ]
+ },
+ "keep": [
+  "gym",
+  "Gym",
+  "coach",
+  "Coach",
+  "late-cancel fee",
+  "Late-cancel fee",
+  "leak",
+  "color"
+ ],
+ "story": {
+  "A": "Alex books a seat in the gym's Saturday intro to climbing class, pays in full on the page, signs the waiver there, checks in at the desk with the code, does the belay check, and climbs.",
+  "B": "Alex books the gym's mobile climbing wall for a school fair: a $250 deposit, the host's rental agreement and each climber's waiver on the page, two operators set up at the school, and the rest comes on the bill."
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-26",
+    "more": [
+     "In a class, each climber gets their own seat and their own code. A parent signs for a child's waiver on a link Alex forwards."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-02",
+    "more": [
+     "A health yes on the waiver doesn't hold the booking: the coach reads it before the climb (A6-15)."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-12",
+    "more": [
+     "A health question, like 'Can I climb with a sore knee?', gets no advice from Rosie. It goes to the gym privately."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "Here: Omar walks in on Saturday at 9:45am. The 10:00am session with Sol has room, so Omar gets a spot and a code.",
+     "Omar signs the waiver on the desk, shows a photo ID, and pays $25 at the front desk."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-15",
+    "more": [
+     "For a class, Alex picks a session from the timetable, and its coach comes with it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here it's the gym's waiver and the health questions.",
+     "Alex is new, so they're done now, before the money step.",
+     "They stay on file for 1 year.",
+     "The health questions are a short yes or no check, like a past injury, a heart condition or fainting.",
+     "Any yes stays on the page for the coach.",
+     "A parent or guardian signs for anyone under 18.",
+     "Where the state's rules limit what a waiver can say, the state's form sets the words."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A5-22",
+    "more": [
+     "Lee's Rock Gym sells two here: a 10-visit card for $200 and a monthly membership for $85.",
+     "A membership never turns into a plan without its own yes.",
+     "Where the state's rules set a written contract or a cancel period for a membership, the page shows it before the yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A same-day session at the gym books any spot left until it starts, unless Sam set it to ask first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "A climbing gym needs no state license: registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A climbing gym pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "No: people",
+    "why": "The gym books its party room (a space) and, in flow B, its mobile wall (a thing)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The gym runs classes and open-climbing sessions on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No state license for instructors; the gym's own checks."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A climbing gym bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "Anyone may book; no members-only booking."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with the gym."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A climbing gym bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the gym."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The gym sells passes, seats, cards and memberships from its list: it sends no proposals."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing from a class comes back later."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "A set start time is the wall's start at the event, with the crew an hour early to set up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-34",
+    "more": [
+     "A staff member can stop anyone who looks unwell, follows the business's first-aid steps, and calls 911 if it's serious.",
+     "Rosie plays no part in care. Notes go on the secure page, never in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-45",
+    "more": [
+     "Marcus's roster shows who has signed."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "A climbing gym needs no state license: registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A climbing gym pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "No: people",
+    "why": "The gym books its party room (a space) and its mobile wall (a thing)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The gym runs classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No state license for instructors; the gym's own checks."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Set start time",
+    "why": "An event wall starts at a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "The wall is booked whole, not by the seat, in flow B."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for the wall."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or benefit pays part of a wall booking."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A wall booking is a deposit and a bill, not stages."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing from a wall comes back later."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "A8-67"
+  ],
+  "B": [
+   "B8-67"
+  ]
+ },
+ "notes": "Test-drive on the REDESIGN 2 master (Tue Oct 27 2026, 1:47am), kept as the verified base: plug-in facts, services, prices, rules and the decided fixes (reserved time charged in full, monthly membership on its own yes, capacity from the spots the owner gives Rosie, wind stops the wall with the gym's side for the part not given).\nBuilt on the gym parent (gym.json, refitted) for the rename pairs (indexed overrides), the first steps and check-in words, and the gym's own ops re-written for climbing (no HIIT, bikes, massage or Omar/Bri/Jamal/Kofi/Nadia names).\nFlow A: a climbing gym (day pass, intro and kids' classes, private coaching, birthday party, 10-visit card and monthly membership, youth team). Flow B: the gym's mobile climbing wall brought to events (set start, $250 deposit, rest on the bill) and a backyard party wall paid in full.\nMoney: amounts rows per path (price, paid, deposit, rest, fee, name). Free cancel: flow A uses the master's own cutoff (no setting), flow B 2 days before.\nNo $2 off op (S1-62) is kept as the test-drive decided: D97 keeps the $2 on for every profession; the parent's copy of that op is the same op, not turned on.\nNo license lookup, no 'checked' wording (D96): the license/registration line says nothing is looked up.\nCapacity: Rosie books only the spots the owner gives it per session, or reads the gym's own connected system (D88); D87 check-in is on (fact capacitycheck).\nChildren: kids' classes leave the child with the coach only to an adult the parent listed; parties and open climbing keep a parent or adult in the gym (A8-67 kept both ways; B8-67 kept).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "the price of Owen's plan on Mon Oct 26: $40 a visit",
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "The color and cut can take a $20 deposit once",
+    "and the plan ends after your last $35 visit.",
+    "the color and cut takes a $20 deposit once",
+    "The plan ends after its last visit at $35.",
+    "Rosie answers with the real price, $40.",
+    "A beard trim is on the price board: $20.",
+    "Signature cut and hot towel shave · $55",
+    "The signature cut, $55, is paid in full",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Haircut plans go to $40 from Wed Nov",
+    "Reply 1 to keep it at $40 a visit",
+    "Haircuts already booked keep $35",
+    "Color and cut · $90, from photos",
+    "A plan goes to $40 from Wed Nov",
+    "a house call, $75, paid in full",
+    "charges $35 to your saved card",
+    "Color correction · $25 deposit",
+    "Sam raises the haircut to $40",
+    "at $35 a visit, every 4 weeks",
+    "adds the prices: $35 and $20.",
+    "Groom's package · $40 deposit",
+    "Haircut $35 ($40 from Nov 2)",
+    "the $20 fee, if you confirm",
+    "Color and cut · $20 deposit",
+    "$40 for the Groom's package",
+    "Adding a beard trim, +$20?",
+    "The $70 rest is refunded",
+    "$40 taken when they book",
+    "So is a house call, $75.",
+    "the haircut goes to $40",
+    "like $90. Nothing more",
+    "the open times at $40.",
+    "Haircut at home · $75",
+    "$40 a visit (now $35)",
+    "From $110, set at the",
+    "$89 service-call fee",
+    "It's $20. Accept it?",
+    "A $35 haircut can w",
+    "$20 payment through",
+    "$160, charged when",
+    "Saved: haircut $40",
+    "$100 after the vis",
+    "Plan charge · $35",
+    "Pack of 5 visits",
+    "Beard trim · $20",
+    "like $20 of $90.",
+    "Skin fade · $40",
+    "Beard trim $20",
+    "$20 taken when",
+    "Skin fade $40",
+    "Haircut · $35",
+    "the $100 rest",
+    "other $100 is",
+    "A $35 haircut",
+    "$140 an hour",
+    "Refund · $20",
+    "$35 a visit",
+    "$40 a visit",
+    "$40 deposit",
+    "$20 deposit",
+    "$25 deposit",
+    "$20 fee",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "A haircut could mean a salon or a barbershop.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "a color touch-up checked from photos is free",
+    "Color touch-up",
+    "color touch-up",
+    "Color quotes come to you first.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Color always stays with Riley.",
+    "A chair renter asked for by name",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Access, like a step-free chair:",
+    "like Alex's employer for a staff cut.",
+    "My employer pays for this cut.",
+    "How would you like it on top?",
+    "Alex bought a package of cuts at the shop.",
+    "'Yes, make it a fade' goes back to the times.",
+    "No reply by 11:00am means the shorter cut.",
+    "Riley can do a shorter cut in the time left",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Riley stopped Alex M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "Sat Oct 24 · 2:00pm · Riley",
+    "2 At my home",
+    "A barbershop's services need none.",
+    "A barbershop sells its packages only at the shop.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "first tomorrow: 10:00am, Riley",
+    "so Quinn S.'s license isn't checked yet",
+    "Gemini hears right away that 2:00pm was just taken, and gets the next times.",
+    "Dee can ask to be next for 2:00pm.",
+    "A barbershop books a person's time.",
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "15-minute style consult",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "like a burst pipe or a lockout",
+    "Promises the $25 consult; priced at the chair",
+    "A cut is rated, so the shop takes the first branch.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "once Riley sees the hair",
+    "Barbering workshop",
+    "Riley's color plan after a consult",
+    "sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "Pick a time for your first color plan visit:",
+    "Registration 2020-1187",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "May the shop show photos of your hair?",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Plumbing JP031552 · electrical JE30417",
+    "Lee Home Services'",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Main St",
+    "Oak St",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "Groom's package",
+    "Skin fade",
+    "skin fade",
+    "A beard trim",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "a color and cut",
+    "Color and cut",
+    "color and cut",
+    "A color correction",
+    "a color correction",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "a consult",
+    "consult",
+    "Consult",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "price board",
+    "Price board",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "at the chair",
+    "At the chair",
+    "chairs side by side",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "Drain clearing",
+    "Panel upgrade",
+    "After the job",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "MP045210",
+    "BS20981",
+    "The lookup shows the license as expired.",
+    "I'd like a cut on Saturday.",
+    "Priced from your photos",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning.",
+    "Asks Alex for photos",
+    "The rash on my scalp got worse.",
+    "Stopped Alex M.'s cut.",
+    "I put a note and a photo on the page.",
+    "The note and photo are on the secure page.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Quiero un corte el sábado.",
+    "License renewal",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Add photos",
+    "water heater",
+    "teacher",
+    "Books a free fix, if Sam says so",
+    "patch test with a wait",
+    "Springfield"
+   ],
+   "B": [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Lee Home Services: $160 for today's extra work.",
+    "Kitchen drain clearing $179 ($199 from Nov 2)",
+    "your plan renews on Tue Dec 1 at $179 a visit",
+    "Drain clearing plans go to $199 from Wed Nov",
+    "Reading it back: drain clearing goes to $199",
+    "The plan ends after its last visit at $179.",
+    "Rosie answers with the real price, $179.",
+    "Contract · Water heater replacement · $640",
+    "Morgan's plan on Mon Oct 26: $199 a visit",
+    "Drain clearings already booked keep $179",
+    "Done: the $160 valve work is cancelled,",
+    "Sam raises the drain clearing to $199",
+    "Replace both shutoff valves · $160",
+    "A plan goes to $199 from Wed Nov",
+    "Water heater replacement · $640",
+    "Sewer camera inspection · $199",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "Saved: drain clearing $199",
+    "The $179 drain needs none.",
+    "only the $89 service call",
+    "$179, paid after the job",
+    "for $160. You can cancel",
+    "The service call is $89.",
+    "keep it at $199 a visit",
+    "Water heater flush $150",
+    "$199 a visit (now $179)",
+    "the open times at $179.",
+    "your plan charges $358",
+    "Drain clearing · $179",
+    "your last $179 visit",
+    "for $160. It's added",
+    "From $89, set at the",
+    "the $89 service call",
+    "$89 service-call fee",
+    "for a $20 fee you OK",
+    "never more than $89.",
+    "the $160 valve work",
+    "The $110 rest after",
+    "$20 payment through",
+    "$700, charged when",
+    "Plan charge · $358",
+    "is $179, not $150.",
+    "Pack of 5 visits",
+    "Each visit: $150",
+    "$89 service call",
+    "your $640 price",
+    "Yes, every year",
+    "the $640 quote",
+    "now, for $160.",
+    "Price a visit",
+    "$89, credited",
+    "Refund · $20",
+    "$140 an hour",
+    "$40 deposit",
+    "$89 deposit",
+    "the $89 fee",
+    "Plan charge",
+    "$89 fee",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "A haircut could mean a salon or a barbershop.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "can clear the drain:",
+    "My kitchen drain is clogged.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "like a roof leak.",
+    "Like tapping a neighbor's water line without asking.",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "'Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "has a yearly flush plan, $150 a visit.",
+    "Yearly water heater flush plan",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Jordan finds corroded shutoff valves.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "At my home",
+    "so Reese K.'s license isn't checked yet",
+    "Nobody was home for",
+    "nobody was home for any of them",
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:05am",
+    "There's no counter at a home.",
+    "you're home",
+    "like nobody home",
+    "Alex's home in Springfield is inside it.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Every 12 months",
+    "I'm home",
+    "Alex is home",
+    "they're home",
+    "wasn't home",
+    "for today's work",
+    "someone in the home",
+    "Both rentals' visits go on one bill on the 1st.",
+    "Only a teen is home",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Yearly water heater flush plan",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "It's overflowing. Can someone come tonight?",
+    "like a burst pipe or a lockout",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "a home-repair class",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Plumbing books a 2-hour window.",
+    "home-repair class",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Harper J.'s $2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "Registration 2019-0451",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Your water heater contract",
+    "like a move-out day",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "CANT START no proof Alex may have this work done",
+    "no proof Alex may have this work done",
+    "LATE camera report Mon Oct 26",
+    "Plumbing JP031552 · electrical JE30417",
+    "Lee Home Services'",
+    "water heater quote",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Main St",
+    "42 Oak St",
+    "Oak St",
+    "beard trim",
+    "consult",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "Price board",
+    "at the chair",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "a water heater replacement",
+    "Water heater replacement",
+    "water heater replacement",
+    "a water heater flush",
+    "Water heater flush",
+    "water heater flush",
+    "replaces water heaters",
+    "A leak repair",
+    "a leak repair",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "Service call fee",
+    "service call fee",
+    "Service call",
+    "service call",
+    "credited to the repair",
+    "Panel upgrade",
+    "after the job",
+    "After the job",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "MP045210",
+    "BS20981",
+    "The lookup shows the license as expired.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Arrival windows",
+    "Arrival times:",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "2–4pm",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Do you smell gas?",
+    "No huele a gas.",
+    "It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater.",
+    "If you smell gas, get out and call 911.",
+    "If you smell gas, leave the house now.",
+    "Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood.",
+    "Is it safe to turn back on?",
+    "You can look for a roofer near you.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Electric.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Can you flush my water heater every year, too?",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say Alex also asks about a dripping faucet.",
+    "Both jobs go in one booking, with one arrival window and one code.",
+    "Both fit in the same arrival window.",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "Is the sink still full of water?",
+    "Drive time from the jobs before and after is checked again.",
+    "Please clear the cabinet under the sink.",
+    "Please wait until the job is done.",
+    "Alex texts that the sink is now overflowing.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Kitchen drain",
+    "Yard drain",
+    "Answers, photos and gate codes",
+    "Under the sink, before",
+    "Saved with Alex M.'s job.",
+    "Most jobs have a price before the visit.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "The repair price is good for 7 days.",
+    "Book the repair",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves",
+    "The $160 valve quote is good for 7 days.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "UPDATE getting a part, back 9:30",
+    "The job should be done by 10am.",
+    "HURT cut my hand, need to stop",
+    "The before photo shows no crack.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in.",
+    "Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "the kitchen drain",
+    "stage 2 of your repipe",
+    "Rental 1",
+    "Rental 2",
+    "Alex's home warranty covers part of the repair.",
+    "Sam bills the warranty company the business's own way.",
+    "Your home warranty covers the rest.",
+    "Each rejoins: the job stays on Alex's record.",
+    "The drain clogs again 2 weeks later.",
+    "The plug-in says how long the warranty lasts.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty, so this visit is free.",
+    "BEFORE old water stain on the cabinet floor",
+    "Cabinet floor, before",
+    "Call a mold cleanup company first",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Texts the camera report link",
+    "Nora can ask to be next for that window.",
+    "A plan or warranty pays",
+    "Books one job for a group",
+    "water heater",
+    "the shutoff valve",
+    "teacher",
+    "that window",
+    "yard drain",
+    "a private class at home",
+    "Tonight 6-9pm: 12 booked. How many more tables can you take?",
+    "$160",
+    "replace both shutoff valves",
+    "shutoff valve",
+    "Springfield"
+   ]
+  },
+  "A": {
+   "A4-26": "add3e44476",
+   "A6-02": "d7d5a3ecf5",
+   "A7-12": "05f64179a4",
+   "A3-20": "b8251d2535",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A5-22": "7576898f14",
+   "S2-31": "320ac5e4cb",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-28": "c8e677520c",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a"
+  },
+  "B": {
+   "B4-15": "f13240b9c6",
+   "B8-34": "643812e26f",
+   "B8-45": "09e62897a6",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255",
+   "B10-38": "867fe1ab7c"
+  }
+ }
+}

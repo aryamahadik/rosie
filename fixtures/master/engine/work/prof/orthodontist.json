@@ -1,0 +1,2894 @@
+{
+ "id": "orthodontist",
+ "name": "Orthodontist",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "dentist",
+ "plugin": {
+  "pf.license": {
+   "need": "each orthodontist holds their own license from the state's dental board; an orthodontic assistant holds one only where the state licenses assistants",
+   "who": "each person; the practice too where the state's form registers dental offices or their owners",
+   "ask": "each person's license number in their invite reply, or the owner sends it; the practice's registration and any mobile permit number come from the owner. The owner may leave a number out",
+   "check": "Rosie does not look up, check or verify a license number. The owner gives it, and it is shown where the state asks",
+   "blocks": "no booking is held or refused because of a license: the owner states it, and that is the record",
+   "away": "visits at a care home, a school or a home only where the state's rules allow mobile or portable orthodontic work; a mobile or portable dental permit where the state's form asks for one (a switch)",
+   "sedation": "no sedation: the example office does none, so Rosie never offers it",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "if the owner records an expiry date, Rosie reminds the owner 30 days before it; Rosie does not check the license",
+   "insurance": "malpractice insurance where the state's form asks for it; the owner states it, and Rosie does not check it"
+  },
+  "pf.services": {
+   "shape": "visit types in a chair, each with a set length; a braces start is a bonding visit, then set adjustment visits; an emergency fix is booked the same day with the owner's OK; every visit needs a free chair",
+   "examples": "the example offices' own prices (Lee Orthodontics and Lee Mobile Braces), not a standard; a plan pays its own share for braces, up to its yearly limit, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "New patient check (X-rays and photos, then the orthodontist's exam)",
+     "price": "$35",
+     "kind": "one price; the plan's estimate is shown when a plan pays",
+     "length": "60 min: 30 with the assistant (X-rays, photos, the bite), then 30 with the orthodontist",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "the patient's share at the front desk",
+     "note": "new-patient times are kept apart (Sam's booking rules)"
+    },
+    {
+     "name": "Braces (full treatment, child, teen or adult)",
+     "price": "$5,500 for the whole treatment (the example office's price)",
+     "kind": "one price for the whole treatment, paid in parts",
+     "length": "90 min for the bonding visit, then set adjustment visits",
+     "where": "at the office",
+     "before": "a $500 deposit when starting, or the whole price paid in one payment",
+     "after": "the rest at the front desk, in parts at the visits",
+     "note": "a signed treatment agreement on the secure page first; no monthly charge on a card"
+    },
+    {
+     "name": "Monthly adjustment (wire or braces check)",
+     "price": "included in the braces price",
+     "kind": "no separate charge",
+     "length": "30 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "nothing more",
+     "note": "part of the braces treatment, booked as a set visit"
+    },
+    {
+     "name": "Retainer repair, quoted from photos",
+     "price": "$90 (the example office's price, quoted from photos first)",
+     "kind": "quoted from photos first",
+     "length": "2 visits: the photos, then the fitting",
+     "where": "at the office",
+     "before": "a $20 deposit once the orthodontist's quote is OK'd",
+     "after": "the rest ($70) at the front desk, at the visit",
+     "note": "the orthodontist OKs the quote and the price is shown before any deposit"
+    },
+    {
+     "name": "Broken bracket or poking wire (emergency visit)",
+     "price": "the $25 check is promised; any repair is priced at the chair (the example: $110 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min, same day",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "the owner OKs same-day times first"
+    },
+    {
+     "name": "Retainer (new one, made from the scan)",
+     "price": "$140",
+     "kind": "one price",
+     "length": "30 min, to fit and check",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "for a lost or broken retainer after treatment; a plan may not pay it"
+    },
+    {
+     "name": "Braces check and retainer fitting",
+     "price": "$55",
+     "kind": "one price, paid in full when booked",
+     "length": "30 min",
+     "where": "at the office",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "no plan pays it"
+    },
+    {
+     "name": "Braces check at a care home",
+     "price": "$179",
+     "kind": "one price; the plan's share when a plan pays",
+     "length": "45 min, with a portable kit",
+     "where": "at the customer's place (a care home or a home)",
+     "before": "nothing taken when a plan pays; private pay gets Rosfield's bill after the visit",
+     "after": "the office bills the plan its own way; private pay: Rosie texts the bill"
+    },
+    {
+     "name": "Broken bracket or poking wire at a care home",
+     "price": "the $89 visit fee is promised; any repair is priced at the visit (the example: $245 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min",
+     "where": "at the customer's place",
+     "before": "nothing taken",
+     "after": "the office's own way"
+    },
+    {
+     "name": "New retainer, quoted from the care-home scan",
+     "price": "$640 (the example office's price, quoted from photos first)",
+     "kind": "quoted from photos first",
+     "length": "3 visits: the scan, the fitting, the delivery",
+     "where": "at the customer's place",
+     "before": "a $160 deposit when the quote is OK'd (25%)",
+     "after": "Rosie texts the bill for the $480 rest when the orthodontist texts DONE"
+    },
+    {
+     "name": "School orthodontic screening day",
+     "price": "set with the school: free to families, or billed to each child's plan",
+     "kind": "one price per child",
+     "length": "a whole morning, one portable kit",
+     "where": "at the school (the host's place)",
+     "before": "nothing taken",
+     "after": "the office bills plans its own way",
+     "note": "each child needs a parent's or guardian's signed consent on the secure page"
+    }
+   ],
+   "capacity": "one patient per chair; the office's chairs and the portable kit are booked like people",
+   "nobodyHome": "never: the patient is always there",
+   "online": "none: a braces check or a fitting needs the chair; a question by video is answered by the office, not booked as a visit"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, your child, or someone you help (a care home resident)",
+    "new or returning patient",
+    "which visit: the office's own visit types only (a new patient check, braces, clear aligners, a retainer, or an emergency visit), never a symptom typed into the AI",
+    "a dental or orthodontic plan (its name only) or paying yourself",
+    "early morning, midday or afternoon"
+   ],
+   "afterTime": [
+    "anything the office should know to help, like a wheelchair or needing an interpreter",
+    "for a care home or school visit: the place's name, the room, and who meets the orthodontist"
+   ],
+   "securePage": [
+    "birth date",
+    "plan member ID, the plan holder and a photo of the plan card",
+    "health history: medicines, allergies and conditions",
+    "consent and the privacy notice",
+    "a parent's or guardian's consent for anyone under 18, or the consent of the person who decides for an adult who can't"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18; a guardian or health care agent for an adult who can't consent; the care home's staff for a resident, with the decider's consent on the secure page; a minor alone only where the state's rules let minors consent to orthodontic care (a switch)",
+   "neverAsked": "symptoms, reasons or results are never asked or typed in the AI chat"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "face or jaw swelling with a fever, or trouble breathing or swallowing",
+     "say": "This needs care now. Go to the nearest emergency room or call 911. Don't wait for an orthodontic visit.",
+     "booking": "no booking; the same words are repeated if a same-day request is declined"
+    },
+    {
+     "words": "a tooth knocked loose or out, or bleeding that won't stop",
+     "say": "Call the office's own line now, or go to the emergency room. Keep a tooth that came out in milk.",
+     "booking": "no booking by the AI; the office's own line"
+    },
+    {
+     "words": "swallowed something poisonous, or too much of a medicine",
+     "say": "Call Poison Help now at 1-800-222-1222, or 911 if they're not awake or not breathing.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a poking wire, a loose bracket or a sore mouth with nothing else",
+     "what": "matched to the office's own emergency visit; Rosie never judges how urgent it is"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history, consent and the plan's papers",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+     "who": "every new patient; returning patients once a year, or when their health changes",
+     "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or the door, before any work), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day (the example office's rule), or sooner where the rules require it",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "A signed treatment agreement for braces or aligners",
+     "when": "on the secure page, before the bonding visit, with the price and the parts shown first",
+     "who": "every braces or aligner patient, and the parent or guardian for a child",
+     "result": "not signed by the bonding visit: the visit waits; Sam moves it or cancels with no fee"
+    },
+    {
+     "name": "The care home's OK",
+     "when": "before any visit there",
+     "who": "the host place agrees to host the visits",
+     "result": "no OK: no times at that place"
+    }
+   ],
+   "prep": "arrive 15 minutes early; bring a photo ID and the plan card; at a care home: the resident's medicine list ready with the nurse"
+  },
+  "pf.visit": {
+   "checkIn": "at the office: the check-in code at the front desk; at a care home or school: the code from the patient, or from the nurse or staff member named on the booking",
+   "beforeWork": "the orthodontic assistant takes the X-rays and photos first; the orthodontist reads the health history and checks for changes before any work",
+   "changes": "a broken bracket or a wire fix is priced and OK'd before it's done; the plan's estimate is shown first; a new step (a spacer, a bonding, a new wire) is booked as its own visit only with the patient's yes",
+   "done": "the check-in code or DONE; the orthodontist's notes, X-rays and photos stay in the office's own records, never in Rosie or a text",
+   "away": "a portable kit (a light, a chair, a camera); the care home's nurse is told when the visit is done"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking for a new patient check or a braces check (the office bills dental and orthodontic plans); a card saved only where the office turns on its missed-visit fee; braces or clear aligners: a $500 deposit when starting, or the whole price in one payment; a retainer repair from photos: a $20 deposit once the quote is OK'd; at a care home: nothing taken when a plan pays, a $160 deposit for a new retainer from the scan, the rest on Rosfield's bill",
+   "plans": "the plans the office takes (its own list); the front desk checks each plan by hand and records it: active or not, what it pays for braces and up to what yearly limit; the patient's share is an estimate, not a promise",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "fees": "the missed-visit fee: $20 at the example office, only when the owner turns it on; a card is saved for it, and the same fee applies to every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "claims sent by the office; the patient pays their share at the front desk, its own way; braces are paid in parts at the front desk over the visits, never charged by Rosie on a set day; a balance after the plan pays is billed by the office, not by Rosie's text; at a care home, the office bills its own way",
+   "rosfield": "the business pays Rosfield's $2 per confirmed booking, as every business does (the $2 is counted when the visit's check-in code is entered; no visit, no $2); card payments also cost Stripe's own card fee",
+   "caps": "deposit cap: from the state form; fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the results or the orthodontist's name (when the orthodontist comes to a care home, school or home, the name stays, for the door check); X-rays and photos never go through Rosie",
+   "staff": "texts to the owner and staff use the patient's initials only (A.M., never Alex M.)",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian; a minor who may consent alone gets texts only on their own phone, with no visit type",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the orthodontist"
+  },
+  "pf.staff": {
+   "licenses": "each orthodontist's own license, per state; an orthodontic assistant's own license only where the state licenses assistants",
+   "skills": "orthodontists: exams, braces, clear aligners, retainers and emergency fixes; orthodontic assistants: X-rays, photos, and the bracket and wire work the state allows; only people cleared for mobile visits go to care homes and schools",
+   "supervision": "an assistant works only while the orthodontist is in the office or on the portable visit, as the state's rules allow (a switch: some states let assistants work alone at schools and care homes)",
+   "oks": "the owner OKs same-day emergency times, braces or aligner quotes over $500, and anything an assistant flags",
+   "standIn": "an assistant out: the orthodontist does the fitting, or new times; the orthodontist out: another orthodontist takes the visit, or new times with no fee",
+   "away": "the team at a care home or school is the people cleared for mobile visits, with the portable kit"
+  },
+  "pf.rules": {
+   "records": "orthodontic records are kept by the office for as long as the state's rules require (a child's records may be kept longer); a delete request removes only Rosie's own booking details, never the office's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "the license shown where the state asks: posted at the office, and on a visit away from it",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "host": "a visit at a care home or school only under the host's written OK, and the host's sign-in rules; visit days at a host's place (S1-58) need the host's standing OK on file; the example's care home visits are booked one resident at a time under the care home's OK, so no visit days are set",
+   "ads": "no free-consult or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "more than 15 minutes late: still seen, but part of the visit may move to another day (the office decides; Rosie never changes the booking itself)",
+   "standIn": "an orthodontist or assistant out: a stand-in who may do that part, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any work), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "twoBookings": "a patient with a treatment visit and a check both open: Rosie asks which one before any change",
+   "healthQuestion": "a question about medicine or care before the visit goes to the orthodontist; Rosie gives no advice",
+   "careHome": "the resident is out (at the hospital, or asleep): the nurse says so, and the visit moves with no fee",
+   "other": "all other edge cases the generic way",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): a broken bracket or a poking wire gets the soonest same-day time, with the owner's OK; swelling with a fever, or trouble breathing or swallowing, gets the 911 words"
+  },
+  "pf.facts": [
+   "planbill",
+   "forms",
+   "children",
+   "incare",
+   "photos",
+   "extrawork",
+   "documents"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Orthodontics",
+   "staff": "Nina (orthodontist) and Owen (orthodontic assistant)",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Mobile Braces",
+   "staff": "Priya (orthodontist) and Ben (orthodontic assistant), who travel with a portable kit",
+   "cust": "Alex M. (patient, lives at Riverside care home) · other patients",
+   "other": "Others (the care home's nurse, a school nurse, a parent or guardian, a family member who pays, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nina"
+  },
+  "B": {
+   "staff": "Priya"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "A card is saved when the customer books, and nothing is charged. For the clear aligners, it's charged only for the office's $20 fee, and only after Sam says yes.",
+    "A card is saved when the customer books, and nothing is charged. It's charged only for the office's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "Braces can take a $500 deposit when booked. The other $5,000 is charged to the saved card over the visits."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Go to the emergency room or call 911 now."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "Braces can take a $500 deposit when booked. The other $5,000 is on the bill, over the visits."
+   ],
+   [
+    "Ben's AI asks for a clear aligner at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for a retainer repair at $85, an old price. Rosie answers with the real price, $90."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, braces take a $500 deposit; the $5,000 rest is paid over the visits."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "Braces can take a $500 deposit when booked. The other $5,000 is paid at the front desk, over the visits."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the wire is poking, if it's still bleeding, and if the bracket is loose."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if her face is swollen with a fever."
+   ],
+   [
+    "The clear aligners can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90.",
+    "A retainer repair can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si tiene la cara hinchada con fiebre o le cuesta respirar, vaya a urgencias o llame al 911."
+   ],
+   [
+    "Saved: adjustment $40 for visits from Mon Nov 2. Adjustments already booked keep $35.",
+    "Saved: new patient check $40 for visits from Mon Nov 2. Checks already booked keep $35."
+   ],
+   [
+    "A clear aligner at Lee Orthodontics is $40, not $35. Here are the open times at $40.",
+    "A retainer repair at Lee Orthodontics is $90, not $85. Here are the open times at $90."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If your face is swollen with a fever, or you can't breathe, go to the emergency room or call 911."
+   ],
+   [
+    "The clear aligners can be paid in full once Nina's photo quote is OK'd, like $90.",
+    "A retainer repair can be paid in full once Nina's photo quote is OK'd, like $90."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "Prices: Adjustment $35 ($40 from Nov 2) · Clear aligner $40 · Retainer check $20",
+    "Prices: New patient check $35 · Braces $5,500 · Retainer repair $90"
+   ],
+   [
+    "Set. For a adjustment, the customer picks the place and sees both prices first.",
+    "Set. For a new patient check, the customer picks the place and sees both prices first."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The braces check, $55, is paid in full when booked. So is a home visit, $75."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's exam for a son, so the times fit it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An orthodontist's example: a poking wire gets 'call the office now'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My gum is bleeding and won't stop."
+   ],
+   [
+    "Alex wants it at home: a home visit, $75, paid in full when booking.",
+    "Alex wants it at home: a care-home visit, $75, paid in full when booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face with a fever, or trouble breathing."
+   ],
+   [
+    "can cut your hair at the office for $35, or at your home for $75",
+    "can see you at the office for $35, or at your home for $179"
+   ],
+   [
+    "can cut your hair at the office for $35, or at your home for $75",
+    "can see you at the office for $35, or at your home for $179"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A band color's example: 'Band color here needs a quick bite check first."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My gum is sore and got worse. Can I still come in?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A visit is rated, so the office takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Orthodontics takes no jobs sent now. The office takes none."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times",
+    "Alex picked a child's exam for a son first"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me sangra la encía y no para."
+   ],
+   [
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "a swollen face with a fever, or trouble breathing"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has an adjustment plan with Nina, every 6 weeks."
+   ],
+   [
+    "Reading it back: the adjustment goes to $40",
+    "Reading it back: the new patient check goes to $40"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Tiene la cara hinchada con fiebre?"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Braces, aligners and retainers."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the face swollen with a fever?"
+   ],
+   [
+    "a $40 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show photos of your smile?"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Braces check and retainer"
+   ],
+   [
+    "Drain clearing and water heaters",
+    "Braces and retainers"
+   ],
+   [
+    "Sam raises the adjustment to $40",
+    "Sam raises the new patient check to $40"
+   ],
+   [
+    "clear aligners at $85, not $90?",
+    "retainer repair at $85, not $90?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The wire is poking on one side."
+   ],
+   [
+    "Color quotes come to you first",
+    "Quotes come to you first"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly retainer check plan"
+   ],
+   [
+    "Adjustment at the office · $35",
+    "New patient check at the office · $35"
+   ],
+   [
+    "Adjustment at their home · $75",
+    "New patient check at their home · $75"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no fever."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile Braces and Lee Retainers"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Braces · $500 deposit"
+   ],
+   [
+    "C $40 deposit when they book.",
+    "C $160 deposit when they book."
+   ],
+   [
+    "a leak under the chair, today",
+    "a broken bracket, today"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Adjustment plan · every 6 weeks"
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Retainer repair · $20 deposit"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una cita el sábado."
+   ],
+   [
+    "Adjustment plans go to $40",
+    "Check plans go to $40"
+   ],
+   [
+    "Nina's new price for today",
+    "Nina's new price for today"
+   ],
+   [
+    "$40 taken when they book",
+    "$500 taken when they book"
+   ],
+   [
+    "Water heater replacement",
+    "New retainer, quoted from the scan"
+   ],
+   [
+    "water heater replacement",
+    "new retainer, quoted from the scan"
+   ],
+   [
+    "plumbing and electrical",
+    "orthodontics and retainers"
+   ],
+   [
+    "Plumbing and electrical",
+    "Orthodontics and retainers"
+   ],
+   [
+    "Signature cut and shave",
+    "Braces check and retainer"
+   ],
+   [
+    "signature cut and shave",
+    "braces check and retainer"
+   ],
+   [
+    "Color always stays with",
+    "Band color always stays with"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute bite check"
+   ],
+   [
+    "the $40, if you confirm",
+    "the $20, if you confirm"
+   ],
+   [
+    "or at your home for $75",
+    "or at your home for $179"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Braces LLC"
+   ],
+   [
+    "color and house calls",
+    "band color and home visits"
+   ],
+   [
+    "1-year labor warranty",
+    "1-year warranty on the work"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Orthodontics LLC"
+   ],
+   [
+    "$100 after the visit",
+    "$5,000 over the visits"
+   ],
+   [
+    "photos of your hair",
+    "photos of your smile"
+   ],
+   [
+    "The $110 rest after",
+    "The $480 rest after"
+   ],
+   [
+    "Clear aligner · $40",
+    "Retainer repair · $90"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tiene fiebre."
+   ],
+   [
+    "said they smell gas",
+    "said their face is swollen with a fever"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Braces'"
+   ],
+   [
+    "color, house calls",
+    "band color, home visits"
+   ],
+   [
+    "home warranty plan",
+    "orthodontic plan"
+   ],
+   [
+    "Water heater flush",
+    "Retainer adjustment"
+   ],
+   [
+    "water heater flush",
+    "retainer adjustment"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Braces"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Orthodontics"
+   ],
+   [
+    "Lee Family Dental",
+    "Lee Orthodontics"
+   ],
+   [
+    "can cut your hair",
+    "can see you"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Orthodontics"
+   ],
+   [
+    "plumbing license",
+    "orthodontist license"
+   ],
+   [
+    "Plumbing license",
+    "Orthodontist license"
+   ],
+   [
+    "hot towel shaves",
+    "retainer checks"
+   ],
+   [
+    "Color correction",
+    "Bracket repair"
+   ],
+   [
+    "color correction",
+    "bracket repair"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do tooth pulls"
+   ],
+   [
+    "Service call fee",
+    "Emergency fee"
+   ],
+   [
+    "service call fee",
+    "emergency fee"
+   ],
+   [
+    "Gloss to finish",
+    "Retainer case"
+   ],
+   [
+    "gloss to finish",
+    "retainer case"
+   ],
+   [
+    "Groom's package",
+    "Retainer"
+   ],
+   [
+    "asks for a perm",
+    "asks for a tooth pull"
+   ],
+   [
+    "Drain clearing",
+    "Braces check"
+   ],
+   [
+    "drain clearing",
+    "braces check"
+   ],
+   [
+    "F $40 deposit.",
+    "F $500 deposit."
+   ],
+   [
+    "Groom's party",
+    "family"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "signature cut",
+    "braces check"
+   ],
+   [
+    "Color and cut",
+    "Clear aligners"
+   ],
+   [
+    "color and cut",
+    "clear aligners"
+   ],
+   [
+    "water heaters",
+    "retainers"
+   ],
+   [
+    "Panel upgrade",
+    "Clear aligner upgrade"
+   ],
+   [
+    "panel upgrade",
+    "clear aligner upgrade"
+   ],
+   [
+    "home warranty",
+    "orthodontic plan"
+   ],
+   [
+    "Color and cut",
+    "Retainer repair"
+   ],
+   [
+    "color and cut",
+    "retainer repair"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "Jordan Price",
+    "Priya Shah"
+   ],
+   [
+    "water heater",
+    "retainer"
+   ],
+   [
+    "Water heater",
+    "Retainer"
+   ],
+   [
+    "service call",
+    "emergency visit"
+   ],
+   [
+    "Service call",
+    "Emergency visit"
+   ],
+   [
+    "Casey Moore",
+    "Ben Cole"
+   ],
+   [
+    "electrician",
+    "orthodontic assistant"
+   ],
+   [
+    "barbershops",
+    "orthodontic offices"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "color quote",
+    "band color quote"
+   ],
+   [
+    "Color quote",
+    "Band color quote"
+   ],
+   [
+    "my cleaning",
+    "my visit"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "$40 deposit",
+    "$500 deposit"
+   ],
+   [
+    "Toner · $20",
+    "Retainer polish · $20"
+   ],
+   [
+    "drying fans",
+    "a portable kit"
+   ],
+   [
+    "Riley Chen",
+    "Nina Park"
+   ],
+   [
+    "Avery Diaz",
+    "Owen Reyes"
+   ],
+   [
+    "Electrical",
+    "Retainer care"
+   ],
+   [
+    "electrical",
+    "retainer care"
+   ],
+   [
+    "Barbershop",
+    "Orthodontics office"
+   ],
+   [
+    "barbershop",
+    "orthodontics office"
+   ],
+   [
+    "skin fades",
+    "clear aligners"
+   ],
+   [
+    "Beard trim",
+    "Retainer polish"
+   ],
+   [
+    "beard trim",
+    "retainer polish"
+   ],
+   [
+    "patch test",
+    "bite check"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color plan",
+    "band color plan"
+   ],
+   [
+    "burst pipe",
+    "poking wire"
+   ],
+   [
+    "88 Elm St",
+    "410 Harbor Ave"
+   ],
+   [
+    "42 Oak St",
+    "64 Linden Rd"
+   ],
+   [
+    "kids cuts",
+    "children's braces"
+   ],
+   [
+    "Skin fade",
+    "Clear aligner"
+   ],
+   [
+    "skin fade",
+    "clear aligner"
+   ],
+   [
+    "hot towel",
+    "retainer"
+   ],
+   [
+    "Cape clip",
+    "Bib clip"
+   ],
+   [
+    "cape clip",
+    "bib clip"
+   ],
+   [
+    "plumbers",
+    "orthodontists"
+   ],
+   [
+    "Plumbing",
+    "Orthodontics"
+   ],
+   [
+    "plumbing",
+    "orthodontics"
+   ],
+   [
+    "Haircuts",
+    "Checks"
+   ],
+   [
+    "haircuts",
+    "checks"
+   ],
+   [
+    "this cut",
+    "this check"
+   ],
+   [
+    "Kids cut",
+    "Child's braces"
+   ],
+   [
+    "kids cut",
+    "child's braces"
+   ],
+   [
+    "cut hair",
+    "adjust braces"
+   ],
+   [
+    "the leak",
+    "the bracket"
+   ],
+   [
+    "plumber",
+    "orthodontist"
+   ],
+   [
+    "barbers",
+    "orthodontists"
+   ],
+   [
+    "Haircut",
+    "Check"
+   ],
+   [
+    "haircut",
+    "check"
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "Massage",
+    "Retainer repair"
+   ],
+   [
+    "massage",
+    "retainer repair"
+   ],
+   [
+    "dentist",
+    "orthodontist"
+   ],
+   [
+    "Dentist",
+    "Orthodontist"
+   ],
+   [
+    "Jordan",
+    "Priya"
+   ],
+   [
+    "Barber",
+    "Orthodontist"
+   ],
+   [
+    "barber",
+    "orthodontist"
+   ],
+   [
+    "my cut",
+    "my check"
+   ],
+   [
+    "shaves",
+    "checks"
+   ],
+   [
+    "a pipe",
+    "a wire"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Owen"
+   ],
+   [
+    "Casey",
+    "Ben"
+   ],
+   [
+    "a cut",
+    "a check"
+   ],
+   [
+    "beard",
+    "retainer"
+   ],
+   [
+    "gloss",
+    "retainer case"
+   ],
+   [
+    "Gloss",
+    "Retainer case"
+   ],
+   [
+    "shave",
+    "check"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "toner",
+    "retainer polish"
+   ],
+   [
+    "cape",
+    "bib"
+   ],
+   [
+    "perm",
+    "tooth pull"
+   ],
+   [
+    "Perm",
+    "Tooth pull"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ]
+  ],
+  "B": [
+   [
+    "A card is saved when the customer books, and nothing is charged. For the clear aligners, it's charged only for the office's $20 fee, and only after Sam says yes.",
+    "A card is saved when the customer books, and nothing is charged. It's charged only for the office's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "Braces can take a $500 deposit when booked. The other $5,000 is charged to the saved card over the visits."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Go to the emergency room or call 911 now."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "Braces can take a $500 deposit when booked. The other $5,000 is on the bill, over the visits."
+   ],
+   [
+    "Ben's AI asks for a clear aligner at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for a retainer repair at $85, an old price. Rosie answers with the real price, $90."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, braces take a $500 deposit; the $5,000 rest is paid over the visits."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "Braces can take a $500 deposit when booked. The other $5,000 is paid at the front desk, over the visits."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the wire is poking, if it's still bleeding, and if the bracket is loose."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if her face is swollen with a fever."
+   ],
+   [
+    "The clear aligners can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90.",
+    "A retainer repair can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si tiene la cara hinchada con fiebre o le cuesta respirar, vaya a urgencias o llame al 911."
+   ],
+   [
+    "Saved: adjustment $40 for visits from Mon Nov 2. Adjustments already booked keep $35.",
+    "Saved: new patient check $40 for visits from Mon Nov 2. Checks already booked keep $35."
+   ],
+   [
+    "A clear aligner at Lee Orthodontics is $40, not $35. Here are the open times at $40.",
+    "A retainer repair at Lee Orthodontics is $90, not $85. Here are the open times at $90."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If your face is swollen with a fever, or you can't breathe, go to the emergency room or call 911."
+   ],
+   [
+    "The clear aligners can be paid in full once Nina's photo quote is OK'd, like $90.",
+    "A retainer repair can be paid in full once Nina's photo quote is OK'd, like $90."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "Prices: Adjustment $35 ($40 from Nov 2) · Clear aligner $40 · Retainer check $20",
+    "Prices: New patient check $35 · Braces $5,500 · Retainer repair $90"
+   ],
+   [
+    "Set. For a adjustment, the customer picks the place and sees both prices first.",
+    "Set. For a new patient check, the customer picks the place and sees both prices first."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The braces check, $55, is paid in full when booked. So is a home visit, $75."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's exam for a son, so the times fit it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An orthodontist's example: a poking wire gets 'call the office now'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My gum is bleeding and won't stop."
+   ],
+   [
+    "Alex wants it at home: a home visit, $75, paid in full when booking.",
+    "Alex wants it at home: a care-home visit, $75, paid in full when booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face with a fever, or trouble breathing."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning?",
+    "My bracket is loose. Can an orthodontist come Thursday morning?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE bracket loose on the top row. Old wires: bring the X-rays next time."
+   ],
+   [
+    "can cut your hair at the office for $35, or at your home for $75",
+    "can see you at the office for $35, or at your home for $179"
+   ],
+   [
+    "can cut your hair at the office for $35, or at your home for $75",
+    "can see you at the office for $35, or at your home for $179"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A band color's example: 'Band color here needs a quick bite check first."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "which bracket is loose, and is anything poking anywhere else?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My gum is sore and got worse. Can I still come in?"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like fixing a neighbor's braces without asking."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A visit is rated, so the office takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Orthodontics takes no jobs sent now. The office takes none."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times",
+    "Alex picked a child's exam for a son first"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Priya also check my retainer?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can an orthodontist check a poking wire this Thursday?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me sangra la encía y no para."
+   ],
+   [
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "a swollen face with a fever, or trouble breathing"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has an adjustment plan with Nina, every 6 weeks."
+   ],
+   [
+    "new pipes put in one day and finished another",
+    "a retainer fitted over two visits"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a poking wire at my care home."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My wire pokes' fits a broken bracket."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the wire is poking the cheek now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The wire is poking the cheek now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stain on the chair floor"
+   ],
+   [
+    "Reading it back: the adjustment goes to $40",
+    "Reading it back: the new patient check goes to $40"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Tiene la cara hinchada con fiebre?"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Braces, aligners and retainers."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I eat before you come?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the space in front of the chair."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the face swollen with a fever?"
+   ],
+   [
+    "a $40 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show photos of your smile?"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The bracket loosens again 2 weeks later."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 bracket 165 wire 80"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Braces check and retainer"
+   ],
+   [
+    "Drain clearing and water heaters",
+    "Braces and retainers"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the wire still poking the cheek?"
+   ],
+   [
+    "Sam raises the adjustment to $40",
+    "Sam raises the new patient check to $40"
+   ],
+   [
+    "clear aligners at $85, not $90?",
+    "retainer repair at $85, not $90?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The wire is poking on one side."
+   ],
+   [
+    "Color quotes come to you first",
+    "Quotes come to you first"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly retainer adjustment plan"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly retainer check plan"
+   ],
+   [
+    "Adjustment at the office · $35",
+    "New patient check at the office · $35"
+   ],
+   [
+    "Adjustment at their home · $75",
+    "New patient check at their home · $75"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no fever."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile Braces and Lee Retainers"
+   ],
+   [
+    "an overflowing drain at night",
+    "a poking wire at night"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Braces · $500 deposit"
+   ],
+   [
+    "C $40 deposit when they book.",
+    "C $160 deposit when they book."
+   ],
+   [
+    "a leak under the chair, today",
+    "a broken bracket, today"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Adjustment plan · every 6 weeks"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Bracket and wire"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both brackets"
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Retainer repair · $20 deposit"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una cita el sábado."
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 check needs none."
+   ],
+   [
+    "Harper J.'s estimate visit",
+    "Harper J.'s braces visit"
+   ],
+   [
+    "Adjustment plans go to $40",
+    "Check plans go to $40"
+   ],
+   [
+    "Nina's new price for today",
+    "Nina's new price for today"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Poking wire"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · braces"
+   ],
+   [
+    "$40 taken when they book",
+    "$500 taken when they book"
+   ],
+   [
+    "Water heater replacement",
+    "New retainer, quoted from the scan"
+   ],
+   [
+    "water heater replacement",
+    "new retainer, quoted from the scan"
+   ],
+   [
+    "plumbing and electrical",
+    "orthodontics and retainers"
+   ],
+   [
+    "Plumbing and electrical",
+    "Orthodontics and retainers"
+   ],
+   [
+    "Signature cut and shave",
+    "Braces check and retainer"
+   ],
+   [
+    "signature cut and shave",
+    "braces check and retainer"
+   ],
+   [
+    "Color always stays with",
+    "Band color always stays with"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute bite check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Retainer check"
+   ],
+   [
+    "sewer camera inspection",
+    "retainer check"
+   ],
+   [
+    "the $40, if you confirm",
+    "the $20, if you confirm"
+   ],
+   [
+    "or at your home for $75",
+    "or at your home for $179"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Braces check"
+   ],
+   [
+    "kitchen drain clearing",
+    "braces check"
+   ],
+   [
+    "Under the sink, before",
+    "Under the chair, before"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Braces LLC"
+   ],
+   [
+    "color and house calls",
+    "band color and home visits"
+   ],
+   [
+    "1-year labor warranty",
+    "1-year warranty on the work"
+   ],
+   [
+    "Cabinet floor, before",
+    "Chair floor, before"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Orthodontics LLC"
+   ],
+   [
+    "$100 after the visit",
+    "$5,000 over the visits"
+   ],
+   [
+    "photos of your hair",
+    "photos of your smile"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it's poking"
+   ],
+   [
+    "Sewer camera report",
+    "X-ray report"
+   ],
+   [
+    "sewer camera report",
+    "X-ray report"
+   ],
+   [
+    "Heating and cooling",
+    "Clear aligners"
+   ],
+   [
+    "heating and cooling",
+    "clear aligners"
+   ],
+   [
+    "The $110 rest after",
+    "The $480 rest after"
+   ],
+   [
+    "Clear aligner · $40",
+    "Retainer repair · $90"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tiene fiebre."
+   ],
+   [
+    "said they smell gas",
+    "said their face is swollen with a fever"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Braces'"
+   ],
+   [
+    "color, house calls",
+    "band color, home visits"
+   ],
+   [
+    "home warranty plan",
+    "orthodontic plan"
+   ],
+   [
+    "Water heater flush",
+    "Retainer adjustment"
+   ],
+   [
+    "water heater flush",
+    "retainer adjustment"
+   ],
+   [
+    "Water heater flush",
+    "Retainer adjustment"
+   ],
+   [
+    "water heater flush",
+    "retainer adjustment"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Braces"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Orthodontics"
+   ],
+   [
+    "Lee Family Dental",
+    "Lee Orthodontics"
+   ],
+   [
+    "the cabinet floor",
+    "the chair floor"
+   ],
+   [
+    "a dripping faucet",
+    "a loose retainer"
+   ],
+   [
+    "can cut your hair",
+    "can see you"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Orthodontics"
+   ],
+   [
+    "plumbing license",
+    "orthodontist license"
+   ],
+   [
+    "Plumbing license",
+    "Orthodontist license"
+   ],
+   [
+    "hot towel shaves",
+    "retainer checks"
+   ],
+   [
+    "Color correction",
+    "Bracket repair"
+   ],
+   [
+    "color correction",
+    "bracket repair"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do tooth pulls"
+   ],
+   [
+    "Service call fee",
+    "Emergency fee"
+   ],
+   [
+    "service call fee",
+    "emergency fee"
+   ],
+   [
+    "a drain cleaning",
+    "a retainer check"
+   ],
+   [
+    "Gloss to finish",
+    "Retainer case"
+   ],
+   [
+    "gloss to finish",
+    "retainer case"
+   ],
+   [
+    "Groom's package",
+    "Retainer"
+   ],
+   [
+    "asks for a perm",
+    "asks for a tooth pull"
+   ],
+   [
+    "the water valve",
+    "the wax"
+   ],
+   [
+    "Repipe · $2,400",
+    "Braces · $2,400"
+   ],
+   [
+    "Drain clearing",
+    "Braces check"
+   ],
+   [
+    "drain clearing",
+    "braces check"
+   ],
+   [
+    "shutoff valves",
+    "brackets"
+   ],
+   [
+    "drain cleaning",
+    "retainer check"
+   ],
+   [
+    "F $40 deposit.",
+    "F $500 deposit."
+   ],
+   [
+    "Groom's party",
+    "family"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "signature cut",
+    "braces check"
+   ],
+   [
+    "Color and cut",
+    "Clear aligners"
+   ],
+   [
+    "color and cut",
+    "clear aligners"
+   ],
+   [
+    "water heaters",
+    "retainers"
+   ],
+   [
+    "Panel upgrade",
+    "Clear aligner upgrade"
+   ],
+   [
+    "panel upgrade",
+    "clear aligner upgrade"
+   ],
+   [
+    "home warranty",
+    "orthodontic plan"
+   ],
+   [
+    "shutoff valve",
+    "bracket"
+   ],
+   [
+    "Shutoff valve",
+    "Bracket"
+   ],
+   [
+    "camera report",
+    "X-ray report"
+   ],
+   [
+    "cabinet floor",
+    "chair floor"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 braces"
+   ],
+   [
+    "Color and cut",
+    "Retainer repair"
+   ],
+   [
+    "color and cut",
+    "retainer repair"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "Jordan Price",
+    "Priya Shah"
+   ],
+   [
+    "water heater",
+    "retainer"
+   ],
+   [
+    "Water heater",
+    "Retainer"
+   ],
+   [
+    "service call",
+    "emergency visit"
+   ],
+   [
+    "Service call",
+    "Emergency visit"
+   ],
+   [
+    "faucet check",
+    "retainer check"
+   ],
+   [
+    "Casey Moore",
+    "Ben Cole"
+   ],
+   [
+    "electrician",
+    "orthodontic assistant"
+   ],
+   [
+    "barbershops",
+    "orthodontic offices"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "color quote",
+    "band color quote"
+   ],
+   [
+    "Color quote",
+    "Band color quote"
+   ],
+   [
+    "my cleaning",
+    "my visit"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Leak repair",
+    "Bracket repair"
+   ],
+   [
+    "leak repair",
+    "bracket repair"
+   ],
+   [
+    "Supply line",
+    "Wire"
+   ],
+   [
+    "supply line",
+    "wire"
+   ],
+   [
+    "overflowing",
+    "poking"
+   ],
+   [
+    "$40 deposit",
+    "$500 deposit"
+   ],
+   [
+    "Toner · $20",
+    "Retainer polish · $20"
+   ],
+   [
+    "drying fans",
+    "a portable kit"
+   ],
+   [
+    "Riley Chen",
+    "Nina Park"
+   ],
+   [
+    "Avery Diaz",
+    "Owen Reyes"
+   ],
+   [
+    "Electrical",
+    "Retainer care"
+   ],
+   [
+    "electrical",
+    "retainer care"
+   ],
+   [
+    "Barbershop",
+    "Orthodontics office"
+   ],
+   [
+    "barbershop",
+    "orthodontics office"
+   ],
+   [
+    "skin fades",
+    "clear aligners"
+   ],
+   [
+    "Beard trim",
+    "Retainer polish"
+   ],
+   [
+    "beard trim",
+    "retainer polish"
+   ],
+   [
+    "patch test",
+    "bite check"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color plan",
+    "band color plan"
+   ],
+   [
+    "burst pipe",
+    "poking wire"
+   ],
+   [
+    "water line",
+    "wire"
+   ],
+   [
+    "88 Elm St",
+    "410 Harbor Ave"
+   ],
+   [
+    "42 Oak St",
+    "64 Linden Rd"
+   ],
+   [
+    "kids cuts",
+    "children's braces"
+   ],
+   [
+    "Skin fade",
+    "Clear aligner"
+   ],
+   [
+    "skin fade",
+    "clear aligner"
+   ],
+   [
+    "hot towel",
+    "retainer"
+   ],
+   [
+    "Cape clip",
+    "Bib clip"
+   ],
+   [
+    "cape clip",
+    "bib clip"
+   ],
+   [
+    "plumbers",
+    "orthodontists"
+   ],
+   [
+    "Plumbing",
+    "Orthodontics"
+   ],
+   [
+    "plumbing",
+    "orthodontics"
+   ],
+   [
+    "Haircuts",
+    "Checks"
+   ],
+   [
+    "haircuts",
+    "checks"
+   ],
+   [
+    "this cut",
+    "this check"
+   ],
+   [
+    "Kids cut",
+    "Child's braces"
+   ],
+   [
+    "kids cut",
+    "child's braces"
+   ],
+   [
+    "cut hair",
+    "adjust braces"
+   ],
+   [
+    "the leak",
+    "the bracket"
+   ],
+   [
+    "plumber",
+    "orthodontist"
+   ],
+   [
+    "barbers",
+    "orthodontists"
+   ],
+   [
+    "Haircut",
+    "Check"
+   ],
+   [
+    "haircut",
+    "check"
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "Massage",
+    "Retainer repair"
+   ],
+   [
+    "massage",
+    "retainer repair"
+   ],
+   [
+    "dentist",
+    "orthodontist"
+   ],
+   [
+    "Dentist",
+    "Orthodontist"
+   ],
+   [
+    "cabinet",
+    "chair"
+   ],
+   [
+    "clogged",
+    "loose"
+   ],
+   [
+    "shutoff",
+    "bracket"
+   ],
+   [
+    "Shutoff",
+    "Bracket"
+   ],
+   [
+    "Jordan",
+    "Priya"
+   ],
+   [
+    "Barber",
+    "Orthodontist"
+   ],
+   [
+    "barber",
+    "orthodontist"
+   ],
+   [
+    "my cut",
+    "my check"
+   ],
+   [
+    "shaves",
+    "checks"
+   ],
+   [
+    "a pipe",
+    "a wire"
+   ],
+   [
+    "valves",
+    "brackets"
+   ],
+   [
+    "faucet",
+    "retainer"
+   ],
+   [
+    "repipe",
+    "braces"
+   ],
+   [
+    "heater",
+    "retainer"
+   ],
+   [
+    "Heater",
+    "Retainer"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Owen"
+   ],
+   [
+    "Casey",
+    "Ben"
+   ],
+   [
+    "a cut",
+    "a check"
+   ],
+   [
+    "beard",
+    "retainer"
+   ],
+   [
+    "gloss",
+    "retainer case"
+   ],
+   [
+    "Gloss",
+    "Retainer case"
+   ],
+   [
+    "shave",
+    "check"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "valve",
+    "bracket"
+   ],
+   [
+    "pipes",
+    "wires"
+   ],
+   [
+    "clogs",
+    "loosens"
+   ],
+   [
+    "drain",
+    "bracket"
+   ],
+   [
+    "Drain",
+    "Bracket"
+   ],
+   [
+    "flush",
+    "check"
+   ],
+   [
+    "sewer",
+    "braces"
+   ],
+   [
+    "Sewer",
+    "Braces"
+   ],
+   [
+    "toner",
+    "retainer polish"
+   ],
+   [
+    "cape",
+    "bib"
+   ],
+   [
+    "perm",
+    "tooth pull"
+   ],
+   [
+    "Perm",
+    "Tooth pull"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "pipe",
+    "wire"
+   ],
+   [
+    "Pipe",
+    "Wire"
+   ],
+   [
+    "clog",
+    "loose bracket"
+   ],
+   [
+    "sink",
+    "chair"
+   ],
+   [
+    "Sink",
+    "Chair"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "Visit fee",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee, an orthodontist, signs up two companies by text. Then Alex books a new patient check with Nina at Lee Orthodontics for Sat Oct 24 at 11:00am. The desk checks Alex's plan by hand, keeps the health forms on the secure page, and takes Alex's share at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who lives at Riverside care home, books a braces check there with Lee Mobile Braces. Priya brings a portable kit Thu Oct 22, arriving 8 to 10am. The office bills Alex's plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|deposit|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 new patient check with X-rays. Nothing is taken. The desk checks Alex's plan, and Alex pays the share at the front desk.",
+    "list|card|counter": "The same check where the office turns on its $20 missed-visit fee. A card is saved for it, never for a fee-free patient.",
+    "list|deposit|counter": "Braces or clear aligners, $5,500 in all: a $500 deposit when starting, and the $5,000 rest paid at the front desk over the visits.",
+    "list|full|none": "A $55 braces check and retainer fitting, paid in full when booked. Nothing more is owed after.",
+    "photos|deposit|counter": "A retainer repair quoted from Alex's photos at $90. A $20 deposit once the quote is OK'd, and the $70 rest at the visit.",
+    "visit|none|counter": "A broken bracket the same day. Only the $25 check is promised; any repair is priced first, with Alex's yes."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "New patient check"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "New patient check with X-rays"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "New patient check with X-rays"
+    },
+    "list|deposit|*": {
+     "price": "$5,500",
+     "deposit": "$500",
+     "rest": "$5,000",
+     "fee": "$20",
+     "name": "Braces or clear aligners (full treatment)"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Braces check and retainer fitting"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Retainer repair, quoted from photos"
+    },
+    "photos|deposit|*": {
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "fee": "$20",
+     "name": "Retainer repair, quoted from photos"
+    },
+    "visit|*|*": {
+     "name": "Bracket repair"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Retainer",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$140"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Retainer, paid in full when booked",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$140",
+      "paid": "$140"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|none|bill",
+    "visit|none|own",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a $179 braces check at Riverside care home. Nothing is taken. The office bills Alex's plan its own way.",
+    "list|none|bill": "The same check, paid privately: nothing is taken when booking, and Rosie texts the bill when Priya texts DONE.",
+    "visit|none|own": "A broken bracket at the care home. Only the $89 visit fee is promised; the repair is priced at the visit, with Alex's yes first.",
+    "photos|deposit|bill": "A new retainer, quoted by Priya from photos of the care-home scan at $640. A $160 deposit when the quote is OK'd, and Rosie texts the bill for the $480 rest."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Braces check at a care home"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Braces check at a care home"
+    },
+    "visit|*|*": {
+     "name": "Broken bracket at a care home"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "New retainer, quoted from the scan"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$40",
+     "name": "New retainer, quoted from the scan"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Second patient's braces check at the same care home",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$179"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Retainer adjustment, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "An orthodontist always holds a license: the owner states it, and Rosie doesn't check it. Registration-only is not this work.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Orthodontic work pays the $2 like every business: no health exemption (D97).",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Orthodontic work books people (an orthodontist or an assistant), never spaces.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Orthodontic work runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each orthodontist and assistant holds their own license.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "No orthodontic work is sent now, and nobody is on call (pf.edges.urgent).",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A braces or aligner visit books a person's time.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Health work is sensitive (the switch is on), so no rating is asked.",
+    "label": "Yes, a rating is asked"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A braces or aligner visit books a person's time.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A braces or aligner visit books a person's time, never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left at the office: the patient is in the chair.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A parent or guardian stays for a child's orthodontic visit (pf.questions.whoMayBook).",
+    "label": "Yes: a child may be left"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "The patient is always there for a visit at a care home.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Mobile orthodontics takes no jobs sent now (S2-30), so this is never offered.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "Nobody is on call for orthodontic work (S2-30).",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "A visit always needs the patient there, so there's no visit with nobody home.",
+    "label": "The way in fails"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never left in the orthodontist's care at home: an adult on the booking is there (B8-09).",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "An orthodontist always holds a license: the owner states it, and Rosie doesn't check it.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Orthodontic work pays the $2 like every business: no health exemption (D97).",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Orthodontic work books people, never spaces.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Orthodontic work runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each orthodontist and assistant holds their own license.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "No orthodontic work is sent now, and nobody is on call (pf.edges.urgent).",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Mobile orthodontics books a 2-hour arrival window.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "An orthodontic visit is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Mobile orthodontics sells no seats in a session: each patient has their own visit.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "No orthodontic visit is sent now (S2-30).",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "No orthodontic visit is sent now (S2-30).",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Health work is sensitive (the switch is on), so no rating is asked.",
+    "label": "Yes, a rating is asked"
+   }
+  ]
+ },
+ "notes": "Start: the dentist (clinic), refitted Oct 27. Names: Sam Lee, an orthodontist, owns Lee Mobile Braces LLC (the master's main company: mobile orthodontics at schools and care homes, 75 Mill Rd) and Lee Orthodontics LLC (the second company: the office, 410 Harbor Ave). Flow A is at the office; flow B at Riverside care home, 64 Linden Rd, where Alex lives. Staff: Nina (orthodontist) and Owen (assistant) at the office; Priya (orthodontist) and Ben (assistant) on the mobile team. Prices keep the master's own numbers where its examples add up: check $35, fee $20, retainer $140, care-home check $179, care-home visit fee $89, new retainer $150 with a $40 deposit. Braces ($5,500, a $500 deposit or one payment) and clear aligners are new example prices. The $2 applies (D97): the 'No $2' branch of S1-62 is off, and no no2 switch is set. Licenses are optional and never checked (D96). Health work: sensitive on, so no rating is asked (A10-34 / B10-32 stay on the no-rating branch).",
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex picked a kids cut for a son before the times",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Classic cuts, fades and hot towel shaves.",
+    "May the shop show photos of your hair?",
+    "Signature cut and hot towel shave",
+    "Drain clearing and water heaters",
+    "The cut is uneven on one side.",
+    "Color quotes come to you first",
+    "Lee Plumbing and Lee Electric",
+    "Groom's package · $40 deposit",
+    "Haircut plan · every 4 weeks",
+    "Color and cut · $20 deposit",
+    "Quiero un corte el sábado.",
+    "$40 taken when they book",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "Color always stays with",
+    "15-minute style consult",
+    "the $40, if you confirm",
+    "color and house calls",
+    "Lee's Barbershop LLC",
+    "$100 after the visit",
+    "photos of your hair",
+    "Lee Home Services'",
+    "color, house calls",
+    "home warranty plan",
+    "Lee Home Services",
+    "Elm Street Dental",
+    "Lee's Barbershop",
+    "hot towel shaves",
+    "Color correction",
+    "color correction",
+    "doesn't do perms",
+    "Gloss to finish",
+    "Groom's package",
+    "asks for a perm",
+    "Drain clearing",
+    "F $40 deposit.",
+    "groom's party",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "water heaters",
+    "Panel upgrade",
+    "home warranty",
+    "Color and cut",
+    "color and cut",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Casey Moore",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "color quote",
+    "Color quote",
+    "my cleaning",
+    "Price board",
+    "price board",
+    "$40 deposit",
+    "Toner · $20",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "house call",
+    "color plan",
+    "burst pipe",
+    "88 Elm St",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "hot towel",
+    "cape clip",
+    "Plumbing",
+    "plumbing",
+    "Haircuts",
+    "haircuts",
+    "this cut",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Massage",
+    "massage",
+    "dentist",
+    "Dentist",
+    "Jordan",
+    "Barber",
+    "barber",
+    "my cut",
+    "shaves",
+    "Riley",
+    "Avery",
+    "Casey",
+    "a cut",
+    "beard",
+    "gloss",
+    "Gloss",
+    "shave",
+    "shops",
+    "toner",
+    "cape",
+    "perm",
+    "shop",
+    "Shop"
+   ],
+   "B": [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Like tapping a neighbor's water line without asking.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "new pipes put in one day and finished another",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Classic cuts, fades and hot towel shaves.",
+    "Can I run the dishwasher before you come?",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "The drain clogs again 2 weeks later.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Drain clearing and water heaters",
+    "Is the sink still full of water?",
+    "Yearly water heater flush plan",
+    "Yearly water heater flush plan",
+    "No. It doesn't smell like gas.",
+    "Lee Plumbing and Lee Electric",
+    "an overflowing drain at night",
+    "C $40 deposit when they book.",
+    "Shutoff valve and wall pipe",
+    "Replace both shutoff valves",
+    "The $179 drain needs none.",
+    "Overflowing kitchen drain",
+    "Right to cancel · repipe",
+    "Water heater replacement",
+    "water heater replacement",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "or at your home for $75",
+    "Kitchen drain clearing",
+    "Under the sink, before",
+    "Lee Home Services LLC",
+    "color and house calls",
+    "1-year labor warranty",
+    "Cabinet floor, before",
+    "Yes, it won't drain",
+    "Sewer camera report",
+    "sewer camera report",
+    "Heating and cooling",
+    "heating and cooling",
+    "The $110 rest after",
+    "No. No huele a gas.",
+    "said they smell gas",
+    "Lee Home Services'",
+    "color, house calls",
+    "home warranty plan",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services",
+    "Elm Street Dental",
+    "the cabinet floor",
+    "a dripping faucet",
+    "can cut your hair",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "hot towel shaves",
+    "Service call fee",
+    "service call fee",
+    "a drain cleaning",
+    "the water valve",
+    "Repipe · $2,400",
+    "Drain clearing",
+    "drain clearing",
+    "shutoff valves",
+    "drain cleaning",
+    "water heaters",
+    "Panel upgrade",
+    "home warranty",
+    "shutoff valve",
+    "Shutoff valve",
+    "camera report",
+    "cabinet floor",
+    "$2,400 repipe",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Water heater",
+    "service call",
+    "Service call",
+    "faucet check",
+    "Casey Moore",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "my cleaning",
+    "Price board",
+    "Leak repair",
+    "leak repair",
+    "Supply line",
+    "supply line",
+    "overflowing",
+    "$40 deposit",
+    "drying fans",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "beard trim",
+    "house call",
+    "burst pipe",
+    "water line",
+    "88 Elm St",
+    "42 Oak St",
+    "hot towel",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "the leak",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "dentist",
+    "Dentist",
+    "cabinet",
+    "clogged",
+    "shutoff",
+    "Shutoff",
+    "Jordan",
+    "Barber",
+    "barber",
+    "shaves",
+    "valves",
+    "faucet",
+    "repipe",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "shave",
+    "shops",
+    "valve",
+    "pipes",
+    "clogs",
+    "drain",
+    "Drain",
+    "flush",
+    "sewer",
+    "Sewer",
+    "perm",
+    "shop",
+    "Shop",
+    "pipe",
+    "clog",
+    "sink"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A10-34": "78c2d9a6a3",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B8-03": "ac9d404766",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B10-32": "7713bff255"
+  }
+ }
+}

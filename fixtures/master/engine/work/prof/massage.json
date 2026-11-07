@@ -1,0 +1,4947 @@
+{
+ "id": "massage",
+ "name": "Massage therapy",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "hair",
+ "plugin": {
+  "pf.license": {
+   "need": "always: massage therapy is licensed where the state's rules require it; many states license each therapist, and some cities or states also license the place",
+   "who": "both: each therapist holds their own license, and the studio or company holds a business or place license where the state or city issues one",
+   "ask": "the studio's or company's license number where one is issued; each therapist sends their own number in their invite reply (or the owner sends it)",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "away": "massage at a home, hotel or office only where the state's rules allow it away from a licensed place; some ask for an outcall permit (a switch from the state form)",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance where the state's form asks for it",
+   "background": "a background check where the state's form asks for one",
+   "showNumber": "each therapist's license number shows on listings, times and confirmations where the state's rules require it",
+   "skinCare": "skin care is its own kind of work, with an esthetician's license where the state asks"
+  },
+  "pf.services": {
+   "shape": "set sessions by length, with a therapist the client picks or any free one; add-ons; packs of sessions, memberships and gift cards",
+   "examples": "the example businesses' own prices (Lee Massage Studio and Lee Mobile Massage), not a standard",
+   "list": [
+    {
+     "name": "30-min massage",
+     "price": "$35",
+     "kind": "one price",
+     "length": "30 min, plus 15 min to reset the room",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk",
+     "note": "back, neck and shoulders, or one area"
+    },
+    {
+     "name": "30-min deep tissue",
+     "price": "$40",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk"
+    },
+    {
+     "name": "60-min massage",
+     "price": "$55",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Prenatal massage",
+     "price": "$55",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk",
+     "note": "only therapists trained in prenatal massage; offered on the secure page when the health form says pregnant"
+    },
+    {
+     "name": "Teen massage (13 to 17)",
+     "price": "$25",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the front desk",
+     "note": "a parent or guardian books it and stays in the room"
+    },
+    {
+     "name": "Hot stones (add-on)",
+     "price": "$20",
+     "kind": "one price",
+     "length": "added to a massage, same time",
+     "where": "at the studio",
+     "before": "with the massage",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Relax package (massage, hot stones, foot scrub)",
+     "price": "$140",
+     "kind": "one price",
+     "length": "2½ hours, one whole block",
+     "where": "at the studio",
+     "before": "a card saved for the $40 fee",
+     "after": "at the front desk"
+    },
+    {
+     "name": "30-min massage at home",
+     "price": "$75",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the client's home",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "only therapists Sam allows to work away from the studio"
+    },
+    {
+     "name": "90-min massage at home",
+     "price": "$179",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the client's home",
+     "before": "a card saved for $89 (about half the price, for the late-cancel or no-show fee), or, where Sam sets it, a card saved and charged at DONE",
+     "after": "Rosie texts the bill, with a tip line"
+    },
+    {
+     "name": "60-min massage at home or a hotel",
+     "price": "$150",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the client's home, or a hotel room where the state's rules and Sam allow it",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "a hotel visit is always paid in full when booking"
+    },
+    {
+     "name": "Prenatal massage at home",
+     "price": "$150",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the client's home",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "only therapists trained in prenatal massage; offered on the secure page when the health form says pregnant"
+    },
+    {
+     "name": "Couples massage lesson",
+     "price": "$199",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the client's home",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Chair massage at an office or event",
+     "price": "$120 an hour for each therapist, 1-hour minimum",
+     "kind": "per hour",
+     "length": "set by the hours booked",
+     "where": "at an office or event",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Office or event wellness day",
+     "price": "priced from the client's answers (people, hours, therapists); over $500 goes to Sam first (the example's own setting)",
+     "kind": "set by the customer's answers",
+     "length": "set by the quote",
+     "where": "at an office or event",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill",
+     "note": "over the plug-in's amount, a contract is signed first"
+    },
+    {
+     "name": "Extra time",
+     "price": "$120 an hour",
+     "kind": "per hour",
+     "length": "added to a visit away from the studio, before it starts",
+     "where": "at the client's place",
+     "before": "added to the booking",
+     "after": "on the bill"
+    },
+    {
+     "name": "Pack of 5 30-min massages",
+     "price": "$150 (the example studio's price)",
+     "kind": "a pack",
+     "length": "5 visits",
+     "where": "at the studio",
+     "before": "paid in full on the secure page or at the desk, where Sam sells it",
+     "after": "each visit uses one"
+    },
+    {
+     "name": "Membership",
+     "price": "$49 a month (the example studio's price), one 60-min massage a month",
+     "kind": "a membership",
+     "length": "monthly",
+     "where": "at the studio",
+     "before": "charged monthly, with its own yes to the terms",
+     "after": "each visit uses the month's credit"
+    },
+    {
+     "name": "Gift card",
+     "price": "any amount",
+     "kind": "a gift card",
+     "length": "",
+     "where": "both",
+     "before": "typed on the secure page",
+     "after": "comes off what's paid"
+    }
+   ],
+   "travel": "included in the price at home inside the 25-mile area (the example's setting); a travel fee for farther towns where Sam sets one",
+   "capacity": "one therapist per booking; a couples massage needs two therapists free at once (and a couples room at the studio); a group is one booking with several people",
+   "skills": "Swedish, deep tissue, sports, prenatal, hot stones, chair massage; prenatal massage offers only therapists trained for it",
+   "online": "no: massage is done in person",
+   "nobodyHome": "never: the client must be there"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "the length and kind of massage (relaxing, deep tissue, prenatal, hot stones)",
+    "a therapist by name, or a woman or a man, only if the client asks",
+    "for a teen: the age (13 to 17); a parent or guardian books",
+    "away from the studio: what kind of place (a home, a hotel, an office) and the town, before any times"
+   ],
+   "afterTime": [
+    "pressure: light, medium or firm",
+    "areas to focus on, and areas to skip",
+    "away from the studio: parking, stairs, pets, and a quiet room with space for the table"
+   ],
+   "securePage": [
+    "18 or older",
+    "the health form: pain or injuries now, recent surgery, pregnancy, blood thinners, heart or blood pressure problems, skin problems, allergies to oils or lotions",
+    "a teen's parent: the consent, and staying in the room",
+    "a hotel guest: the name the room is booked under, and the room number"
+   ],
+   "whoMayBook": "an adult, for themselves or another adult; a parent or guardian for a teen 13 to 17, who stays in the room (at 16 or 17, where the state's rules allow it, the parent may waive staying in writing on the secure page); no one under 13 (the example studio's setting)"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, sudden numbness or weakness in the legs, loss of bladder or bowel control",
+     "say": "This could be an emergency. Call 911 now. A massage can wait.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a calf that is red, swollen and painful (it can be a blood clot)",
+     "say": "Please see a doctor today, before any massage.",
+     "booking": "no booking until a doctor says it's OK"
+    }
+   ],
+   "refuse": {
+    "words": "a request for sexual services, or to skip the sheet that covers the client",
+    "say": "This studio offers therapeutic massage only. This request can't be booked.",
+    "what": "the exact words go to the business's safety log; Sam picks: refuse and block that chat or number, or it was innocent and a therapeutic massage may be booked (every later message is checked again); no reply in 2 of Sam's text hours: nothing is booked"
+   },
+   "goOn": [
+    {
+     "words": "a sunburn, a fresh bruise, a rash or a cut in one area",
+     "what": "the therapist skips that area; the massage goes on"
+    },
+    {
+     "words": "a fever or the flu",
+     "what": "the visit moves with no fee"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health form",
+     "when": "on the secure page before the first visit (due when booking, inside the saved 10 minutes); a returning client confirms or updates it by the day before (the studio: 6pm; the mobile business: 10am)",
+     "goodFor": "12 months, or until the client's health changes",
+     "result": "most answers change nothing; a flag (blood thinners, a recent surgery, a heart problem) goes to the therapist to read before it books; pregnant: the page offers the prenatal massage instead"
+    },
+    {
+     "name": "Therapist's read of a flag",
+     "when": "before the booking is written, in the therapist's text hours; no answer in 1 hour: Sam, a licensed therapist, reads it",
+     "result": "OK as booked; OK with a note for the session (lighter pressure, an area skipped); one question on the secure page, like a doctor's OK; or no, with the reason kept private"
+    },
+    {
+     "name": "A teen's consent",
+     "when": "on the secure page, from the parent or guardian who books",
+     "result": "the parent shows an ID at check-in and stays in the room"
+    }
+   ],
+   "prep": "for the reminder: come 10 minutes early; eat lightly; tell the studio on the secure page about any health change; away from the studio: a quiet room with space for the table, pets in another room"
+  },
+  "pf.visit": {
+   "checkIn": "at the studio: the check-in code at the front desk; at a home, hotel or office: the code at the door, from the client who booked",
+   "beforeWork": "the therapist goes over the health form, the pressure and the areas with the client in the room before starting; the client undresses alone, to their comfort, and stays covered by a sheet except the area being worked on",
+   "changes": "an add-on or extra time is priced and OK'd before it's done; the client can ask for lighter pressure, or to stop, at any time",
+   "stop": "the therapist may end a session that crosses a line and leave the room; Sam decides any charge (only what the client agreed to) and any block; it goes in the safety log",
+   "away": "only therapists Sam allows go to homes, hotels and offices; hotel rooms only where the state's rules and Sam allow it, for a guest booking in their own name; the therapist's DONE is the safety check-out: no DONE 15 minutes after the booked end, Rosie texts, then calls the therapist, then tells Sam with the address",
+   "done": "the check-in code, or DONE from the therapist; the therapist's notes (pressure, areas, what helped) go in the client's private record"
+  },
+  "pf.money": {
+   "before": "at the studio: a card saved for the late-cancel and no-show fee; at a home: a card saved for the $89 fee (about half the 90-min price), or a card saved and charged at DONE where Sam sets it; a 60-min or prenatal massage at home and a hotel visit paid in full when booking",
+   "caps": "deposit and fee caps: from the state form",
+   "cancel": "free to cancel until 24 hours before at the studio, and until 8pm the evening before for a visit away from it (the owner's settings)",
+   "fees": "late cancel or no-show: $20 at the studio ($40 for the Relax package); $89 for the 90-min massage at home; Sam confirms each fee, never more than what was agreed; late arrival: the session ends on time at full price; at the studio, no word 15 minutes after the start is a no-show (the studio's setting)",
+   "conduct": "a session ended for the client's conduct: charged only what the booking page said, and only if Sam says so",
+   "packs": "packs of sessions, memberships and gift cards: sold at the studio, or on the secure page where Sam turns it on; a visit uses a credit, and a late cancel may use up the credit instead of a card fee where Sam sets it",
+   "tips": "on: at the front desk, or a tip line on the bill Rosie texts; tips go to the therapist in full",
+   "tax": "a tax line where the state's rules tax massage or the products sold",
+   "insurance": "none in the example: the studio bills no plan; a practice that bills injury or auto claims would turn it on",
+   "fee2": "Rosfield's $2 applies"
+  },
+  "pf.messages": {
+   "never": "health answers, pregnancy, injuries, medicines, a doctor's note and the therapist's notes never go in a text or through the AI: only the secure page and the client's private record; a hotel room number only on the secure page",
+   "tone": "no words in any text that could read as anything but therapeutic massage",
+   "languages": "English and Spanish",
+   "minors": "a teen's booking texts go only to the parent or guardian; Rosie never texts the teen"
+  },
+  "pf.staff": {
+   "licenses": "each therapist's own massage license, per state; skin care: an esthetician's license where the state asks",
+   "skills": "Swedish, deep tissue, sports, prenatal, hot stones, chair massage, couples lessons; only therapists trained in prenatal massage are offered for it",
+   "gender": "each therapist's gender is set only so a client can ask for a woman or a man; it's a filter used only when the client asks",
+   "supervision": "students work only under a licensed therapist, where the state's rules allow it (none in the example)",
+   "oks": "Sam OKs same-day visits and new clients at the studio; he can set every visit away from the studio to ask him first; a health flag goes to the booked therapist, then to Sam after 1 hour",
+   "standIn": "a stand-in must fit what the client asked (a woman, if asked) and the service's skill, and gets the health form and the notes",
+   "away": "only therapists Sam allows are offered for homes, hotels and offices"
+  },
+  "pf.rules": {
+   "showLicense": "the license number on listings, times and confirmations, and posted at the studio, where the state's rules require it",
+   "draping": "the client stays covered except the area being worked on, always in the example and where the state's rules require it; a request to skip it is refused",
+   "hours": "no sessions in hours the state's or city's rules forbid for massage (a switch from the state form), whatever the business's own hours say",
+   "away": "massage away from a licensed place only where the state allows it; hotel rooms only where the state's rules allow it and Sam turns them on",
+   "minors": "a parent's written consent, and a parent in the room, where the state's rules require it",
+   "reset": "15 minutes between clients to reset the room (the example studio's setting)",
+   "records": "health forms and session notes kept 7 years, or longer where the state asks"
+  },
+  "pf.edges": {
+   "improper": "a request for sexual services: refused, logged and sent to Sam (pf.safety)",
+   "lateArrival": "the session ends on time at full price; at the studio, no word 15 minutes after the start is a no-show",
+   "runsLate": "the therapist runs late: the client keeps the full time if the next booking and the 15-minute reset still fit; if not, a new time with no fee",
+   "standIn": "a stand-in who fits what the client asked and the skill, with the health form and notes; or new times with no fee",
+   "healthChange": "a new injury or illness before the visit: the client updates the form; the therapist decides; a move has no fee",
+   "conduct": "a session ended for the client's conduct: Sam decides any charge (only what was agreed) and any block",
+   "awaySafety": "the safety check-out after visits at a home, hotel or office",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "plans",
+   "packs",
+   "forms",
+   "children",
+   "aftercare",
+   "tips"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Luis and Nina (massage therapists)",
+   "cust": "Alex M. (client) · other clients"
+  },
+  "B": {
+   "staff": "Ethan and Leah (massage therapists who travel)",
+   "cust": "Alex M. (client) · other clients",
+   "other": "Others (a bank, a hotel, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Luis"
+  },
+  "B": {
+   "staff": "Ethan"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Board prices never need one. A health form flag goes to the therapist first"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Massage at homes, hotels and offices in Springfield, within 25 miles."
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Relaxing, deep tissue and prenatal massage."
+   ],
+   [
+    "A water heater job",
+    "A massage room"
+   ],
+   [
+    "asks for a perm",
+    "asks for physical therapy"
+   ],
+   [
+    "like a color correction done in two steps",
+    "like a series of weekly massages after an injury"
+   ],
+   [
+    "books a skin fade for",
+    "books a 30-min deep tissue for"
+   ],
+   [
+    "skin fades",
+    "30-min deep tissue massages"
+   ],
+   [
+    "skin fade",
+    "30-min deep tissue"
+   ],
+   [
+    "Skin fade",
+    "30-min deep tissue"
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "It's a teen massage today at 2:00pm with Avery, for a new client. It's $25."
+   ],
+   [
+    "accept the beard trim today at 2:00pm with Avery",
+    "accept the teen massage today at 2:00pm with Avery"
+   ],
+   [
+    "Color and cut · $90",
+    "Team chair massage · $90"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "1 color quote",
+    "1 quote"
+   ],
+   [
+    "the $90 color quote",
+    "the $90 quote for her team"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the lobby during my massage?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My lower back got worse since I booked. Can I still come in?"
+   ],
+   [
+    "until it clears, with no fee",
+    "until it settles, with no fee"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Riley still ends at 11:30am, so you'd get about 15 minutes, at the same price. Or move to a later time."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the massage?"
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair.",
+    "It's 11:00am, and Alex is at the front desk."
+   ],
+   [
+    "A service priced at the chair gets its price now.",
+    "A massage always has its price before the visit."
+   ],
+   [
+    "in the chair",
+    "on the table"
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped Alex M.'s massage. I put a note on the page."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Riley stopped Alex M.'s massage. The note is on the secure page."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Massage oil stained my good shirt."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says massage oil stained a shirt today."
+   ],
+   [
+    "Examples: an ID for an 18+ service, a signed form, or gear for a class.",
+    "Example: a teen massage needs the parent there, with an ID."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M.'s son. No parent is here to stay in the room."
+   ],
+   [
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "A massage studio runs no classes. A yoga studio, a gym or a school does."
+   ],
+   [
+    "DONE 35 haircut",
+    "DONE 35 massage"
+   ],
+   [
+    "A cut is rated",
+    "A massage is rated"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do teen massages? My son is 15."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a teen massage (13 to 17) is $25, with you in the room."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero un masaje el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a massage every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a massage every 4 weeks."
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds times across Riley and Avery, two at a time, in rooms side by side."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A 30-min massage for Alex and a teen massage for a son work the same way."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do physical therapy."
+   ],
+   [
+    "Anything Riley should know?",
+    "Pressure: light, medium or firm? Any areas to focus on or skip?"
+   ],
+   [
+    "A barbershop sells its packages only at the shop.",
+    "The studio sells packs and its $49-a-month membership here too. A membership visit uses the month's credit."
+   ],
+   [
+    "Haircut plan",
+    "Massage plan"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Another therapist is offered only if Alex asks."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds acupuncture to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Acupuncture for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW acupuncture"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The studio's plug-in adds its own: chest pain, or sudden numbness or weakness in the legs."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the pressure and the areas that helped."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's 30-min massage needs none, so nothing is sent here."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group's massages together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A bride books massages for herself and three friends on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: firm pressure, low back and hips, skip the feet"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A massage could mean a studio or a therapist who comes to you"
+   ],
+   [
+    "A booked window stays right",
+    "A booked time stays right"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: studio massage, hot stones, house calls"
+   ],
+   [
+    "Avery: barber",
+    "Avery: studio massage and prenatal"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio massage, hot stones and house calls"
+   ],
+   [
+    "An apprentice",
+    "A massage student"
+   ],
+   [
+    "an apprentice",
+    "a massage student"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: every massage has a set time."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states allow massage only in a licensed place, or ask for an extra permit away from it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A massage example: a swollen, painful calf gets 'see a doctor before any massage'."
+   ],
+   [
+    "Panel upgrade",
+    "Skin care series"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "like a burst pipe",
+    "like a lockout"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Massage's"
+   ],
+   [
+    "Drain clearing",
+    "90-min massage"
+   ],
+   [
+    "written estimate",
+    "contract"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Massage Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Massage Studio"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Massage"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Massage"
+   ],
+   [
+    "Lee Electric",
+    "Lee Skin Care"
+   ],
+   [
+    "JP031552",
+    "MT031552"
+   ],
+   [
+    "MP045210",
+    "MB045210"
+   ],
+   [
+    "BS20981",
+    "ME20981"
+   ],
+   [
+    "EC22871",
+    "SC22871"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "Electrical",
+    "Skin care"
+   ],
+   [
+    "electrical",
+    "skin care"
+   ],
+   [
+    "Plumbing",
+    "Mobile massage"
+   ],
+   [
+    "plumbing",
+    "mobile massage"
+   ],
+   [
+    "plumber",
+    "therapist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "60-min massage"
+   ],
+   [
+    "Signature cut and shave",
+    "60-min massage"
+   ],
+   [
+    "signature cut",
+    "60-min massage"
+   ],
+   [
+    "Groom's package",
+    "Relax package"
+   ],
+   [
+    "Skin fade",
+    "30-min deep tissue"
+   ],
+   [
+    "skin fade",
+    "30-min deep tissue"
+   ],
+   [
+    "a beard trim",
+    "hot stones"
+   ],
+   [
+    "A beard trim",
+    "Hot stones"
+   ],
+   [
+    "Beard trim",
+    "Hot stones"
+   ],
+   [
+    "beard trim",
+    "hot stones"
+   ],
+   [
+    "Kids cut",
+    "Teen massage"
+   ],
+   [
+    "kids cut",
+    "teen massage"
+   ],
+   [
+    "Haircuts",
+    "Massages"
+   ],
+   [
+    "haircuts",
+    "massages"
+   ],
+   [
+    "Haircut",
+    "30-min massage"
+   ],
+   [
+    "haircut",
+    "30-min massage"
+   ],
+   [
+    "Barbershop",
+    "Massage studio"
+   ],
+   [
+    "barbershops",
+    "massage studios"
+   ],
+   [
+    "barbershop",
+    "massage studio"
+   ],
+   [
+    "barbers",
+    "therapists"
+   ],
+   [
+    "Barber",
+    "Therapist"
+   ],
+   [
+    "barber",
+    "therapist"
+   ],
+   [
+    "Barbering",
+    "Massage"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Riley Chen",
+    "Luis Ortiz"
+   ],
+   [
+    "Riley",
+    "Luis"
+   ],
+   [
+    "Avery Diaz",
+    "Nina Park"
+   ],
+   [
+    "Avery",
+    "Nina"
+   ],
+   [
+    "Jordan Price",
+    "Ethan Cole"
+   ],
+   [
+    "Jordan",
+    "Ethan"
+   ],
+   [
+    "Casey Moore",
+    "Leah Grant"
+   ],
+   [
+    "Casey",
+    "Leah"
+   ],
+   [
+    "88 Elm St",
+    "35 Willow St"
+   ],
+   [
+    "1200 Main St",
+    "500 Pine St"
+   ],
+   [
+    "Elm St",
+    "Willow St"
+   ],
+   [
+    "Oak St",
+    "Aspen Ct"
+   ],
+   [
+    "A repair studio, a tailor",
+    "A repair shop, a tailor"
+   ],
+   [
+    "A trim",
+    "A massage"
+   ],
+   [
+    "a fade",
+    "a stretch"
+   ]
+  ],
+  "B": [
+   [
+    "found more work. Add it today?",
+    "can add the extra time. Add it today?"
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "can clear the drain",
+    "can come for your massage"
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can come for your massage at a set time"
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam."
+   ],
+   [
+    "like new pipes put in one day and finished another",
+    "like a series of weekly massages after an injury"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Massage at homes, hotels and offices in Springfield, within 25 miles."
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "A water heater job",
+    "A massage room set up at a home"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a massage at my home this week."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A deep tissue massage could mean a massage therapist or a physical therapist."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My back is so tight' fits a 90-min massage."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like asking to skip the sheet over the client."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how long a massage, and any area to skip?"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding 30 more minutes? Say so.'"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 massage needs none."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Any area the therapist should skip?"
+   ],
+   [
+    "Yes, it won't drain",
+    "My feet, please"
+   ],
+   [
+    "finds corroded shutoff valves",
+    "is asked for 30 more minutes"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 30 more minutes, the client asked"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "30 more minutes, $60"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "30 more minutes · $60"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $60 price for 30 more minutes is good for 7 days."
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "30 more minutes for $60"
+   ],
+   [
+    "the shutoff valves",
+    "the 30 more minutes"
+   ],
+   [
+    "Replace both shutoff valves",
+    "30 more minutes"
+   ],
+   [
+    "cracks the cabinet floor",
+    "scratches the floor with the table"
+   ],
+   [
+    "Cabinet floor, before",
+    "Bedroom floor, before"
+   ],
+   [
+    "Under the sink, before",
+    "Massage spot, before"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My shoulder is bruised this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a 90-min massage at home, today"
+   ],
+   [
+    "two drain clearings",
+    "two 90-min massages"
+   ],
+   [
+    "A repair is rated",
+    "A massage is rated"
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "A massage is never quoted at the visit."
+   ],
+   [
+    "the cancelled extra work",
+    "the cancelled pack"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "It's $179. Accept it?"
+   ],
+   [
+    "Nora can ask to be next for that window",
+    "Nora can ask to be next for that time"
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "can do a 30-min massage at the studio for $35, or at your home for $75"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The studio is in the other flow."
+   ],
+   [
+    "with one arrival window and one code",
+    "with one start time and one code"
+   ],
+   [
+    "Both fit in the same arrival window.",
+    "Jordan does both, one after the other."
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "A massage books a set start time."
+   ],
+   [
+    "Written estimate and terms",
+    "Contract and terms"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "60-min massage at home, every 4 weeks"
+   ],
+   [
+    "Every 12 months",
+    "Every 4 weeks"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Another therapist is offered only if they fit what Alex asked."
+   ],
+   [
+    "Rental 1",
+    "Morgan"
+   ],
+   [
+    "Rental 2",
+    "Jamie"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:00am"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START a teen's massage, and no parent is home"
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like Jordan's table breaking at the door"
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Every massage has a set price, so nothing is priced here."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan strains a wrist and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT strained my wrist, need to stop"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no stain."
+   ],
+   [
+    "for today's work",
+    "for today's massage"
+   ],
+   [
+    "stage 2 of your repipe",
+    "day 2 of your wellness week"
+   ],
+   [
+    "Book a free fix",
+    "Book a free visit"
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Jordan to come back in 3 months, after a long trip."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: 90-min massage at home, in 3 months"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the 90-min massage you asked Jordan about in mid-Dec."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds stretch sessions to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Stretch sessions for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW stretch sessions"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I take a hot shower before you come?"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a client's AI said they have chest pain."
+   ],
+   [
+    "A gas smell at the home",
+    "Chest pain at the home"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now; a massage can wait"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 office event is over the plug-in's amount, so it gets a contract to sign."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does massage and skin care, not physical therapy."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a physical therapist near you."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My back is killing me. Can someone come tonight?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say an office manager books chair massage for 4 people at one office."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the therapist, one line each."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE oil stain on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Oil stain on the rug"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan's massage oil stained Alex M.'s rug."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene dolor en el pecho, o le falta el aire?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: do you have chest pain, or trouble breathing?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo me duele la pantorrilla."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Just my calf hurts."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No se dé masaje en esa pierna. Vea a un médico hoy. Si le falta el aire, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't have that leg massaged. See a doctor today. If you get short of breath, call 911."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to see a doctor today before any massage, and to call 911 if she gets short of breath."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For massage, chest pain, trouble breathing or sudden weakness in the legs stops the booking."
+   ],
+   [
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Call 911 now. A massage can wait."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: chest pain, trouble breathing, or sudden numbness or weakness in the legs."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like a massage at home."
+   ],
+   [
+    "Sale agua del calentador.",
+    "Me duele la pantorrilla y está hinchada."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "My calf hurts and it's swollen."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a therapist come for a massage this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa 90min Thu 12pm Casey"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "I hurt my back lifting yesterday. Is a deep tissue massage safe?"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like physical therapy."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the length and kind of massage, the pressure, and any areas to focus on or skip."
+   ],
+   [
+    "Just the kitchen sink.",
+    "90 minutes, deep tissue."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a massage at home every 4 weeks."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every 4 weeks, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Home Services has a plan every 4 weeks, $150 a visit."
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every 4 weeks?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 4 weeks"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a 30-min massage for a partner."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also give my partner a 30-min massage?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "It's added as its own line, at the list price."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Pressure: light, medium or firm? Any area to skip?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a quiet room with space for the table, and pets in another room."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like chest pain or sudden weakness in the legs, gets the safety steps first."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also teach my partner and me some massage?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan for two: a 90-min massage at home each, every 4 weeks."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's massage?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scratch on the floor by the window"
+   ],
+   [
+    "Under the sink, before",
+    "Where the table goes, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "The floor, before"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE firm pressure, tight low back and hips, skip the feet. Bring the bolster next time."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left oil on my couch."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come back next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a 90-min massage."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the office event quote before booking."
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Back pain, tonight"
+   ],
+   [
+    "plumbing license MP045210",
+    "massage business license MP045210"
+   ],
+   [
+    "Plumbing license",
+    "Massage business license"
+   ],
+   [
+    "A booked window stays right",
+    "A booked time stays right"
+   ],
+   [
+    "arriving 8–10am",
+    "starting at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starting at 12:00pm"
+   ],
+   [
+    "arriving 10am–12pm",
+    "starting at 10:00am"
+   ],
+   [
+    "arriving 2–4pm",
+    "starting at 2:00pm"
+   ],
+   [
+    "10am–12pm window",
+    "10:00am time"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "10am–12pm",
+    "10:00am"
+   ],
+   [
+    "7am Thu",
+    "8pm Wed"
+   ],
+   [
+    "7am on the visit day",
+    "8pm the evening before"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: studio massage, hot stones, house calls"
+   ],
+   [
+    "Avery: barber",
+    "Avery: studio massage and prenatal"
+   ],
+   [
+    "An apprentice",
+    "A massage student"
+   ],
+   [
+    "an apprentice",
+    "a massage student"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: every massage has a set time."
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "Nothing is priced at the visit: every massage has a set price."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states allow massage only in a licensed place, or ask for an extra permit away from it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A massage example: a swollen, painful calf gets 'see a doctor before any massage'."
+   ],
+   [
+    "Panel upgrade",
+    "Skin care series"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "like a burst pipe",
+    "like a lockout"
+   ],
+   [
+    "after the job",
+    "after the visit"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Massage's"
+   ],
+   [
+    "Kitchen drain clearing",
+    "90-min massage at home"
+   ],
+   [
+    "Water heater replacement",
+    "Office chair massage event"
+   ],
+   [
+    "water heater replacement",
+    "office chair massage event"
+   ],
+   [
+    "Water heater flush",
+    "60-min massage at home"
+   ],
+   [
+    "Leak repair",
+    "Sports massage"
+   ],
+   [
+    "leak repair",
+    "sports massage"
+   ],
+   [
+    "Sewer camera inspection",
+    "Couples massage lesson"
+   ],
+   [
+    "sewer camera inspection",
+    "couples massage lesson"
+   ],
+   [
+    "Service call fee",
+    "No-show fee"
+   ],
+   [
+    "service call fee",
+    "no-show fee"
+   ],
+   [
+    "Service call",
+    "No-show fee"
+   ],
+   [
+    "service call",
+    "no-show fee"
+   ],
+   [
+    "credited to the repair",
+    "only if you say so"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "the kitchen drain",
+    "the 90-min massage"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 90min massage"
+   ],
+   [
+    "Kitchen drain",
+    "90-min massage"
+   ],
+   [
+    "kitchen drain",
+    "90-min massage"
+   ],
+   [
+    "Drain clearings",
+    "90-min massages"
+   ],
+   [
+    "Drain clearing",
+    "90-min massage"
+   ],
+   [
+    "drain clearing",
+    "90-min massage"
+   ],
+   [
+    "water heater contract",
+    "office event contract"
+   ],
+   [
+    "written estimate",
+    "contract"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Massage Studio"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Massage LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Massage"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilemassage.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Massage"
+   ],
+   [
+    "Lee Electric",
+    "Lee Skin Care"
+   ],
+   [
+    "JP031552",
+    "MT031552"
+   ],
+   [
+    "MP045210",
+    "MB045210"
+   ],
+   [
+    "BS20981",
+    "ME20981"
+   ],
+   [
+    "EC22871",
+    "SC22871"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "Electrical",
+    "Skin care"
+   ],
+   [
+    "electrical",
+    "skin care"
+   ],
+   [
+    "Plumbing",
+    "Mobile massage"
+   ],
+   [
+    "plumbing",
+    "mobile massage"
+   ],
+   [
+    "plumber",
+    "therapist"
+   ],
+   [
+    "haircut",
+    "30-min massage"
+   ],
+   [
+    "barbershops",
+    "massage studios"
+   ],
+   [
+    "barbershop",
+    "massage studio"
+   ],
+   [
+    "barbers",
+    "therapists"
+   ],
+   [
+    "Barber",
+    "Therapist"
+   ],
+   [
+    "barber",
+    "therapist"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Riley Chen",
+    "Luis Ortiz"
+   ],
+   [
+    "Riley",
+    "Luis"
+   ],
+   [
+    "Avery Diaz",
+    "Nina Park"
+   ],
+   [
+    "Avery",
+    "Nina"
+   ],
+   [
+    "Jordan Price",
+    "Ethan Cole"
+   ],
+   [
+    "Jordan",
+    "Ethan"
+   ],
+   [
+    "Casey Moore",
+    "Leah Grant"
+   ],
+   [
+    "Casey",
+    "Leah"
+   ],
+   [
+    "88 Elm St",
+    "35 Willow St"
+   ],
+   [
+    "1200 Main St",
+    "500 Pine St"
+   ],
+   [
+    "42 Oak St",
+    "9 Aspen Ct"
+   ],
+   [
+    "Elm St",
+    "Willow St"
+   ]
+  ]
+ },
+ "keep": [
+  "massage",
+  "heater",
+  "visit fee",
+  "Visit fee",
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a 30-min massage with Luis at Lee Massage Studio, for Sat Oct 24 at 11:00am. Alex fills in a health form on the secure page, and a card is saved for the studio's $20 fee. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a 90-min massage at home, 9 Aspen Ct, with Ethan from Lee Mobile Massage, Thu Oct 22 at 8:00am. The health form is on the secure page. The money choice at the top picks the path: a card saved for the $89 fee and a bill after, a card charged at the end, or a 60-min massage paid in full."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|card|bill"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 30-min massage with Luis. A card is saved for the studio's $20 fee. Alex pays at the front desk, with any tip.",
+    "list|card|bill": "The same massage on a day with nobody at the front desk. A card is saved for the $20 fee, and Rosie texts the bill, with a tip line, when Luis texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "30-min massage"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "30-min massage"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Hot stones",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "30-min massage at home",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$75",
+      "paid": "$75",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "30-min massage (pack)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|card|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 90-min massage at Alex's home. A card is saved for the $89 late-cancel and no-show fee. Rosie texts the bill, with a tip line, when Ethan texts DONE.",
+    "list|card|card": "The same massage at home. A card is saved, and it's charged $179 when Ethan texts DONE.",
+    "list|full|none": "A $150 60-min massage at Alex's home, paid in full when booking. A hotel visit is always paid this way."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "90-min massage at home"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "90-min massage at home"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$89",
+     "name": "60-min massage at home"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra 30 minutes",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$60",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "60-min massage at home",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "60-min massage at home (membership)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Every massage has a set price by its length, so nothing is priced from photos or at the table.",
+     "The long services show their time, so the room is saved for all of it, plus 15 minutes to reset it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the studio's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "30-min massage",
+          "$35 · 30 min"
+         ],
+         [
+          "30-min deep tissue",
+          "$40 · 30 min"
+         ],
+         [
+          "Hot stones (added to a massage)",
+          "$20"
+         ],
+         [
+          "Teen massage (13 to 17)",
+          "$25 · 30 min"
+         ],
+         [
+          "60-min massage",
+          "$55 · 60 min"
+         ],
+         [
+          "Prenatal massage",
+          "$55 · 60 min"
+         ],
+         [
+          "Relax package (massage, hot stones, foot scrub)",
+          "$140 · 2½ hours"
+         ],
+         [
+          "Pack of 5 30-min massages",
+          "$150"
+         ],
+         [
+          "Membership",
+          "$49 a month · one 60-min massage"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "Every studio service saves a card for the $20 fee, or $40 for the Relax package.",
+     "Each one is paid at the front desk, the studio's own way.",
+     "A 30-min massage at home is a house call: $75, paid in full when booked.",
+     "A house call is paid when booked, since there's no front desk at a home.",
+     "A pack or a membership is paid when it's bought, at the desk or on the secure page. Each visit uses one credit.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your studio, paid at the front desk, your own way",
+         "A card saved when they book, for a $20 fee you OK"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "G a card saved too, for a 40 fee. A at their home too, 75, paid when they book"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. For a 30-min massage, the client picks the place and sees both prices first.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "30-min massage at the studio",
+          "$35",
+          "Card saved for the $20 fee",
+          "At the front desk"
+         ],
+         [
+          "30-min massage at their home",
+          "$75",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "Deep tissue, teen massage, hot stones",
+          "$40, $25, $20",
+          "Card saved for the $20 fee",
+          "At the front desk"
+         ],
+         [
+          "60-min and prenatal massage",
+          "$55",
+          "Card saved for the $20 fee",
+          "At the front desk"
+         ],
+         [
+          "Relax package",
+          "$140",
+          "Card saved for the $40 fee",
+          "At the front desk"
+         ],
+         [
+          "Pack of 5, membership",
+          "$150, $49 a month",
+          "Paid when bought",
+          "Each visit uses one"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:counter": {
+      "addSay": []
+     },
+     "before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Saturday mornings Luis works alone: send the bill then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Saturday mornings, any service: the bill I send, with a tip line. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, Saturday mornings are paid by the bill Rosie sends."
+      ]
+     },
+     "before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Saturday mornings Luis works alone: send the bill then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Saturday mornings, any service: the bill I send, with a tip line. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, Saturday mornings are paid by the bill Rosie sends."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Prices on the board never need your OK. Some health form answers need a therapist's read before booking. Who reads them?",
+      {
+       "buttons": [
+        "The booked therapist",
+        "Only me"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "These are the booking rules I suggest:",
+      {
+       "card": {
+        "title": "Lee Massage Studio · booking rules",
+        "lines": [
+         "Hours: from your Google listing",
+         "Free to cancel until 24 hours before",
+         "A no-show is marked 15 minutes after the start",
+         "Fee: $20, or $40 for the Relax package",
+         "Same-day bookings and new clients ask you first",
+         "15 minutes to reset the room after each client",
+         "If a therapist can't come: another who does that service and fits what the client asked, same time and price"
+        ]
+       },
+       "buttons": [
+        "Keep these",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "does": "Every price on the board books without an OK. A health form answer that needs a therapist's read waits for that read before it books.",
+    "more": [
+     "Sam keeps Rosie's suggested rules with one tap.",
+     "The fee is charged only after Sam says yes.",
+     "Pat OKs only Lee Mobile Massage prices over $500. At the studio, only Sam OKs prices.",
+     "A flag, like blood thinners or a recent surgery, goes to the booked therapist. No answer in 1 hour: Sam reads it."
+    ],
+    "vary": {
+     "after:bill": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Prices on the board never need your OK. Some health form answers need a therapist's read before booking. Who reads them?",
+        {
+         "buttons": [
+          "The booked therapist",
+          "Only me"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "owner",
+        "These are the booking rules I suggest:",
+        {
+         "card": {
+          "title": "Lee Massage Studio · booking rules",
+          "lines": [
+           "Hours: from your Google listing",
+           "Free to cancel until 24 hours before",
+           "A no-show is marked 15 minutes after the start",
+           "Fee: $20, or $40 for the Relax package",
+           "Same-day bookings and new clients ask you first",
+           "15 minutes to reset the room after each client",
+           "If a therapist can't come: another who does that service and fits what the client asked, same time and price",
+           "Bills I send: Saturdays, with a tip line"
+          ]
+         },
+         "buttons": [
+          "Keep these",
+          "Change one"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "does": "Every price on the board books without an OK. A health form answer that needs a therapist's read waits for that read before it books."
+     }
+    }
+   },
+   {
+    "op": "branch",
+    "at": "A3-22",
+    "branch": {
+     "label": "Asks for sexual services",
+     "end": "merge",
+     "steps": [
+      {
+       "type": "split",
+       "id": "A3-x01",
+       "line": [
+        "3.9",
+        "11.24"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "chat",
+       "title": "Refuses it, then asks Sam",
+       "q": "What does Sam pick?",
+       "does": "A what-if: the words ask for sexual services. Rosie refuses in one plain line and books nothing. The exact words go to the studio's safety log, and Sam decides.",
+       "more": [
+        "Rosie refuses and reports. It never decides alone.",
+        "A note asking to skip the sheet that covers the client is refused the same way.",
+        "Sam's 2 hours count only in Sam's text hours.",
+        "Every later message is checked again."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "Lee Massage Studio offers therapeutic massage only. This request can't be booked."
+        ],
+        [
+         "san",
+         "owner",
+         "A request was refused, and nothing is booked. Its exact words are in the safety log. It came by AI chat, with no name yet.",
+         {
+          "card": {
+           "title": "Refused request",
+           "lines": [
+            "Therapeutic massage only",
+            "Nothing booked"
+           ],
+           "button": "See the words",
+           "link": "rosfield.com/s/a1"
+          },
+          "buttons": [
+           "Refuse and block",
+           "It was innocent"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.safety"
+       ],
+       "tells": [
+        "agent",
+        "owner"
+       ],
+       "branches": [
+        {
+         "label": "1 Refuse and block",
+         "end": "end",
+         "endText": "That chat can't book the studio. The report stays in the safety log."
+        },
+        {
+         "label": "2 It was innocent",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "A3-x02",
+           "line": [
+            "3.9"
+           ],
+           "who": "san",
+           "to": "agent",
+           "via": "chat",
+           "title": "Lets a therapeutic booking go on",
+           "does": "Sam says it was innocent. The AI hears that the studio can book a therapeutic massage, and every new message is checked again.",
+           "say": [
+            [
+             "san",
+             "agent",
+             "Lee Massage Studio can book a therapeutic massage. What would you like?"
+            ]
+           ],
+           "tells": [
+            "agent"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "No reply in 2 hours",
+         "end": "end",
+         "endText": "Nothing is booked. Sam gets one reminder, and the report stays in the log.",
+         "steps": [
+          {
+           "id": "A3-x03",
+           "line": [
+            "3.9"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "title": "Reminds Sam once; books nothing",
+           "does": "Sam hasn't answered in 2 of their text hours. Nothing is booked, and Sam gets one reminder.",
+           "say": [
+            [
+             "san",
+             "owner",
+             "Still waiting on the refused request from earlier. Nothing is booked until you pick.",
+             {
+              "buttons": [
+               "Refuse and block",
+               "It was innocent"
+              ]
+             }
+            ]
+           ],
+           "tells": [
+            "owner"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "A4-66",
+    "more": [
+     "Each time keeps 15 minutes after it free, to reset the room.",
+     "Times never fall in hours the state's rules forbid for massage, whatever the studio's own hours say.",
+     "A therapist's license number shows with the times, where the state's rules require it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-16",
+    "more": [
+     "Gender is only a filter, used when Alex asks. Nobody is shown or hidden for it otherwise."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-25",
+    "does": "A teen massage is for ages 13 to 17. Alex picked one for a son before the times, so the times fit it. Alex is the parent, so Alex books, pays and gets the texts.",
+    "more": [
+     "A parent stays in the room for the whole massage, and shows an ID at check-in.",
+     "At 16 or 17, where the state's rules allow it, the parent may waive staying, in writing on the secure page.",
+     "Texts go only to the parent's phone. Rosie never texts the teen.",
+     "The studio books no one under 13."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "The teen massage is for your son, who's 15. Are you the teen's parent or guardian? A parent stays in the room."
+     ],
+     [
+      "cust",
+      "agent",
+      "Yes, I'm the parent."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in says if this work needs a first step: a health form, a consent or a waiver. Massage needs a health form before the first visit, only on the secure page.",
+    "more": [
+     "It goes on the secure link Alex gets next.",
+     "Due now: the booking waits for it, within the saved time. Not signed by then, the time is let go.",
+     "Due by a date: one reminder before it. Not done by then, the owner decides: keep, move, or cancel with no fee.",
+     "A signed form stays on file for the plug-in's time, so a later booking skips it.",
+     "Its answers stay on the page, never in a text.",
+     "Here it's the health form. A new client fills it in now, and a returning client checks it by the day before."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "does": "On the secure page, Alex answers one short question: are texts to this phone safe? A massage studio shows no photos of clients, so there's no photo question.",
+    "more": [
+     "Texts aren't safe, like a shared phone: Alex picks this page, email or a call. Rosie then reaches Alex only that way.",
+     "Here, Alex says texts are safe."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "One quick question.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-65",
+    "steps": [
+     {
+      "type": "split",
+      "id": "A4-x01",
+      "line": [
+       "4.11",
+       "4.14",
+       "13.5"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex checks the health form",
+      "q": "Do the answers change the booking?",
+      "does": "On the same secure page, Alex checks the health form on file and says what changed. The answers stay on the page and in the studio's record, never in a text or through the AI.",
+      "more": [
+       "Most answers change nothing, like Alex's sore lower back.",
+       "A new client fills in the whole form here.",
+       "Each answer gets the danger check too.",
+       "Luis reads the form in the room before the massage."
+      ],
+      "form": [
+       [
+        "Anything changed since your last visit?",
+        "A sore lower back, from running"
+       ],
+       [
+        "A surgery in the last 6 months?",
+        "No"
+       ],
+       [
+        "Pregnant?",
+        "No"
+       ],
+       [
+        "Blood thinners, or a heart or blood pressure problem?",
+        "No"
+       ],
+       [
+        "Allergies to oils or lotions?",
+        "None"
+       ],
+       [
+        "Areas to skip",
+        "Feet"
+       ]
+      ],
+      "needs": [
+       "contact",
+       "pf.questions",
+       "pf.first_steps",
+       "pf.messages",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "Nothing that changes it",
+        "end": "merge"
+       },
+       {
+        "label": "Pregnant: prenatal instead",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A4-x02",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "page",
+          "title": "Offers the prenatal massage on the page",
+          "does": "A what-if: Dee says on the form that she's pregnant. The page offers the prenatal massage instead, with Nina, who is trained for it, before anything is taken.",
+          "more": [
+           "It shows its own price and length first: $55, 60 minutes.",
+           "Nothing about it goes in a text. The texts say only 'your massage'.",
+           "No prenatal-trained therapist free then: the page offers Nina's next times.",
+           "Dee can also stop here. The saved time is let go, and nothing is taken."
+          ],
+          "form": [
+           [
+            "Your massage",
+            "Prenatal massage · 60 min · $55"
+           ],
+           [
+            "With",
+            "Nina, trained in prenatal massage"
+           ],
+           [
+            "Time",
+            "Sat Oct 24 · 12:30pm"
+           ]
+          ],
+          "needs": [
+           "pf.services",
+           "pf.staff"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "A flag for the therapist",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A4-x03",
+          "line": [
+           "6.1",
+           "4.14"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Marks it for the therapist's read",
+          "does": "A what-if: Ben says they take blood thinners. The booking waits for the therapist's read after the money step, as the plug-in says. Ben's answer stays on the page.",
+          "more": [
+           "Other flags: a surgery in the last 6 months, or a heart or blood pressure problem.",
+           "The read comes next, as 'An expert reads the answers'.",
+           "Nothing is taken until the therapist says OK."
+          ],
+          "needs": [
+           "pf.first_steps"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Danger on the form",
+        "end": "end",
+        "endText": "No booking. The page shows the safety words, and nothing is taken.",
+        "steps": [
+         {
+          "id": "A4-x04",
+          "line": [
+           "3.9",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "page",
+          "title": "Stops the booking; says see a doctor",
+          "does": "A what-if: Kim writes that one calf is red, swollen and sore. That can be a blood clot, so the page stops the booking and shows the plug-in's safety words.",
+          "more": [
+           "Chest pain or trouble breathing gets 'call 911 now' instead.",
+           "Nothing is booked or taken. The saved time is let go.",
+           "Kim can book again once a doctor says a massage is OK."
+          ],
+          "form": [
+           [
+            "Please see a doctor today",
+            "A massage can wait until your doctor says it's OK"
+           ],
+           [
+            "Chest pain or trouble breathing?",
+            "Call 911 now"
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-02",
+    "more": [
+     "Here, a health form flag, like blood thinners or a recent surgery, goes to the booked therapist to answer.",
+     "An OK can come with a note for the session, like lighter pressure or an area to skip.",
+     "No answer in 1 hour of text hours: Sam, a licensed therapist, reads it instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam raises the Relax package's late-cancel fee from $40 to $50, for new bookings only. Each change is read back first.",
+    "more": [
+     "Relax packages already booked keep their $40 fee.",
+     "A fee stays within the state's limits, from the plug-in.",
+     "Sam can also switch a service to nothing taken, a card saved or paid in full, within those limits.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "more": [
+     "2, Move my visit: Alex gets open times, with no fee.",
+     "With no reply, the later start stands.",
+     "Alex keeps the full time only if the next client and the 15-minute room reset still fit. Here they do: Dana is at 12:00pm."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 15"
+     ],
+     [
+      "san",
+      "cust",
+      "Luis is running about 15 minutes late, so your 11:00am starts about 11:15am. You still get the full 30 minutes.",
+      {
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-23",
+    "does": "Say another client, Tess L., has a 60-min massage with hot stones this Sat at 2:00pm. The stone heater breaks, so each booking with hot stones is offered a change, with no fee.",
+    "more": [
+     "The plug-in says what each service needs, like a room, a tool or a crew.",
+     "No reply in 24 hours: Sam is asked to call.",
+     "Money paid ahead is lowered to match, and the difference is refunded.",
+     "Bookings that don't need it aren't touched. Alex's booking gets the same offer if it has hot stones."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "Stone heater broken until Mon"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Tess. The hot stones part of your Sat 2:00pm visit can't be done. Keep the 60-min massage for $55, or pick a new time, with no fee. If you paid ahead, the $20 difference comes back.",
+      {
+       "buttons": [
+        "Keep the massage",
+        "A new time",
+        "Cancel, no fee"
+       ],
+       "as": "Tess"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "What should I wear for my massage?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: What should I wear for my massage?",
+      {
+       "buttons": [
+        "Your comfort",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Luis says: wear what's comfortable. You undress alone, to your comfort, and a sheet covers you the whole time."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Sat Oct 24 at Lee Massage Studio:",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Client",
+         "Service"
+        ],
+        "rows": [
+         [
+          "10:00am",
+          "Ben T.",
+          "30-min deep tissue"
+         ],
+         [
+          "11:00am",
+          "Alex M.",
+          "30-min massage"
+         ],
+         [
+          "12:00pm",
+          "Dana R.",
+          "60-min massage"
+         ],
+         [
+          "2:00pm",
+          "Tess L.",
+          "60-min massage, hot stones"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Health forms, answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open them",
+        "link": "rosfield.com/d/r24"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex in the massage room, Sat 11:00am. Luis goes over the health form with Alex: what hurts, the pressure, and what to skip. No photos of a client are ever taken.",
+    "more": [
+     "Alex undresses alone, to their comfort, and stays covered by a sheet except the area being worked on.",
+     "Anything to skip, like a bruise, goes in Alex's private record on the secure page, never in a text.",
+     "A later complaint is checked against it.",
+     "The plug-in names the checks, and which services need them."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE Alex M.: went over the health form in the room. Notes on the secure page."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-33",
+    "does": "Luis suggests a longer massage next time and mentions it in the room. Only if Alex wants it does Luis text NEXT. Then Alex gets its price and times. Today's visit stays as booked.",
+    "more": [
+     "Rosie never offers it on its own.",
+     "Nothing extra is done today without Alex's yes.",
+     "It's priced from the board, like any booking."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. wants a 60-min massage. Own visit."
+     ],
+     [
+      "san",
+      "cust",
+      "You asked Luis about a 60-min massage. It's its own visit, at the board's price.",
+      {
+       "card": {
+        "title": "60-min massage · $55",
+        "lines": [
+         "Its own visit"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/b/a9"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-40",
+    "more": [
+     "The therapist may also end a session the client takes past a line. It goes in the safety log.",
+     "Then Sam decides any charge, only what the booking page said, and may block the client."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the search goes on, with a note for the therapist.",
+    "more": [
+     "A massage example: a sunburn or a fresh bruise gets 'the therapist skips that spot'.",
+     "A red, swollen calf isn't one of these: it stops the booking until a doctor says OK.",
+     "Alex's 30-min massage needs none, so nothing is sent here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This could be an emergency. With chest pain, trouble breathing or sudden weakness in the legs, call 911 now. A massage can wait."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-39",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Massage oil stained my good shirt."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. says massage oil stained a shirt today.",
+      {
+       "card": {
+        "title": "Damage report · Alex M.",
+        "lines": [
+         "Sat Oct 24 · with Luis",
+         "Before record saved"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/d/a10"
+       },
+       "buttons": [
+        "Pay for it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks for telling us. We've passed it to the owner, who will reply."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Massage is licensed: the company and each therapist, where the state asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Massage and skin care pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Massage adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Massage books therapists. A room is saved with the therapist, never booked alone."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Massage runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each therapist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Massage is never sent now: every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Massage is done in person."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The studio bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books a therapist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books a therapist's time. The room comes with it."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Massage is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A massage runs with one client."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays in the room for a teen massage, as the plug-in's who-may-book says."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio: the client is on the table."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A massage is paid once, after the visit."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The studio bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A massage needs no proposal: regular visits are a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "A massage has no fix or warranty. A complaint or a refund goes to Sam."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A massage has no results to send later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A massage is rated."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "The studio runs no classes: each client gives their own code.",
+    "label": "A class: names on a roster"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "Nothing is left at the studio: the client is on the table.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "The studio books new clients too: the health form is the first step, not a list of its own customers."
+   },
+   {
+    "op": "off",
+    "at": "A8-85",
+    "label": "It needs another day",
+    "why": "A massage ends on time in one visit: more time is a new booking."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "A massage is priced by its length, so every service is on the list. Nothing is priced from photos or at the visit."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your mobile massage services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Mobile massage prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Mobile massage price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "90-min massage at home",
+          "$179"
+         ],
+         [
+          "60-min massage at home or a hotel",
+          "$150"
+         ],
+         [
+          "Couples massage lesson",
+          "$199 · 90 min"
+         ],
+         [
+          "Chair massage at an office or event",
+          "$120 an hour for each therapist"
+         ],
+         [
+          "Extra time",
+          "$120 an hour, added before the visit"
+         ],
+         [
+          "Late cancel or no-show at home",
+          "$89, only if you say so"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "Where: at the business, at the customer's place, or both. Sam keeps mobile massage at the customer's place.",
+     "Price: from the list, quoted from photos first, or quoted at the visit.",
+     "Before: nothing, a card saved, a deposit, or the full price.",
+     "After the visit: Rosie texts the bill, the saved card is charged, or the business bills its own way.",
+     "The full price needs a price set before the visit. A deposit can also be taken on a starting price, never more than it.",
+     "The $89 no-show fee and extra time at $120 an hour aren't booked alone. They go on the visits above.",
+     "The state's caps on deposits win. They come from the plug-in."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now, for each service: where it happens and when it's paid. I've started each one from the plug-in. Send only what's different, like 'B paid in full'.",
+      {
+       "card": {
+        "title": "Every mobile massage service, to start",
+        "lines": [
+         "Where: at the customer's place",
+         "Before: a card saved, for the $89 no-show fee",
+         "After: paid after the visit"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "B paid in full when they book"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Here's mobile massage now.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "90-min massage at home",
+          "$179",
+          "Card saved",
+          "After the visit"
+         ],
+         [
+          "60-min massage at home or a hotel",
+          "$150",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "Couples massage lesson",
+          "$199",
+          "Card saved",
+          "After the visit"
+         ],
+         [
+          "Chair massage at an office or event",
+          "$120 an hour",
+          "Card saved",
+          "After the visit"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "addSay": []
+     },
+     "after:card": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:full": {
+      "addSay": []
+     },
+     "price:list+before:deposit+after:bill": {
+      "addSay": []
+     },
+     "price:list+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are my suggested starting rules for mobile massage. You can change any of them.",
+      {
+       "list": {
+        "head": [
+         "Rule",
+         "Suggested"
+        ],
+        "rows": [
+         [
+          "Open",
+          "Mon–Fri 7:30am–5:30pm"
+         ],
+         [
+          "Times",
+          "A set start time"
+         ],
+         [
+          "Notice",
+          "At least 3 hours"
+         ],
+         [
+          "Books ahead",
+          "Up to 60 days"
+         ],
+         [
+          "Same-day visits",
+          "Ask you first"
+         ],
+         [
+          "Free to cancel",
+          "Until 8pm the evening before"
+         ],
+         [
+          "After that, or nobody home",
+          "Up to the $89 no-show fee, or what was paid, only if you say so"
+         ],
+         [
+          "Travel area",
+          "25 miles from 500 Pine St"
+         ],
+         [
+          "If your person can't come",
+          "Offer a stand-in, same time and price"
+         ]
+        ]
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Want to keep some times for one kind of visit? Other bookings can't take them.",
+      {
+       "buttons": [
+        "No",
+        "Keep some times"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "does": "Rosie suggests rules to start from, never a blank form. Sam keeps them as they are.",
+    "more": [
+     "Sam can change each rule now, by text later, or in the portal.",
+     "The portal is the business's website for Rosie, where owners change prices, hours and rules.",
+     "Kept times are offered only for that kind of visit or customer. Sam keeps none for now.",
+     "A booking keeps the rules it was made with, even if Sam changes them later.",
+     "Each massage starts at a set time, as the plug-in suggests. Nothing is booked in an arrival window.",
+     "No massage is ever sent now, so nobody is on call."
+    ],
+    "vary": {
+     "after:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here are my suggested starting rules for mobile massage. You can change any of them.",
+        {
+         "list": {
+          "head": [
+           "Rule",
+           "Suggested"
+          ],
+          "rows": [
+           [
+            "Open",
+            "Mon–Fri 7:30am–5:30pm"
+           ],
+           [
+            "Times",
+            "A set start time"
+           ],
+           [
+            "Notice",
+            "At least 3 hours"
+           ],
+           [
+            "Books ahead",
+            "Up to 60 days"
+           ],
+           [
+            "Same-day visits",
+            "Ask you first"
+           ],
+           [
+            "Free to cancel",
+            "Until 8pm the evening before"
+           ],
+           [
+            "After that, or nobody home",
+            "Up to the $89 no-show fee, or what was paid, only if you say so"
+           ],
+           [
+            "Travel area",
+            "25 miles from 500 Pine St"
+           ],
+           [
+            "If your person can't come",
+            "Offer a stand-in, same time and price"
+           ]
+          ]
+         },
+         "buttons": [
+          "Keep them",
+          "Change one"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "owner",
+        "Want to keep some times for one kind of visit? Other bookings can't take them.",
+        {
+         "buttons": [
+          "No",
+          "Keep some times"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "does": "Rosie suggests rules to start from, never a blank form. Sam keeps them as they are."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "Sam keeps Rosie's suggested rules with one tap.",
+     "The fee is charged only after Sam says yes.",
+     "Pat OKs only Lee Mobile Massage prices over $500. At the studio, only Sam OKs prices.",
+     "A flag, like blood thinners or a recent surgery, goes to the booked therapist. No answer in 1 hour: Sam reads it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Prices on the board never need your OK. Some health form answers need a therapist's read before booking. Who reads them?",
+      {
+       "buttons": [
+        "The booked therapist",
+        "Only me"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "These are the booking rules I suggest:",
+      {
+       "card": {
+        "title": "Lee Massage Studio · booking rules",
+        "lines": [
+         "Hours: from your Google listing",
+         "Free to cancel until 24 hours before",
+         "A no-show is marked 15 minutes after the start",
+         "Fee: $20, or $40 for the Relax package",
+         "Same-day bookings and new clients ask you first",
+         "15 minutes to reset the room after each client",
+         "If a therapist can't come: another who does that service and fits what the client asked, same time and price"
+        ]
+       },
+       "buttons": [
+        "Keep these",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "does": "Every price on the board books without an OK. A health form answer that needs a therapist's read waits for that read before it books."
+   },
+   {
+    "op": "branch",
+    "at": "B3-17",
+    "branch": {
+     "label": "Asks for sexual services",
+     "end": "merge",
+     "steps": [
+      {
+       "type": "split",
+       "id": "B3-x01",
+       "line": [
+        "3.9",
+        "11.24"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "chat",
+       "title": "Refuses it, then asks Sam",
+       "q": "What does Sam pick?",
+       "does": "A what-if: the words ask for sexual services. Rosie refuses in one plain line and books nothing. The exact words go to the business's safety log, and Sam decides.",
+       "more": [
+        "Rosie refuses and reports. It never decides alone.",
+        "A note asking to skip the sheet that covers the client is refused the same way.",
+        "A therapist goes alone into a home, so Sam can also block an address later, on the Customers page.",
+        "Sam's 2 hours count only in Sam's text hours. Every later message is checked again."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "Lee Mobile Massage offers therapeutic massage only. This request can't be booked."
+        ],
+        [
+         "san",
+         "owner",
+         "A request was refused, and nothing is booked. Its exact words are in the safety log. It came by AI chat, with no name yet.",
+         {
+          "card": {
+           "title": "Refused request",
+           "lines": [
+            "Therapeutic massage only",
+            "Nothing booked"
+           ],
+           "button": "See the words",
+           "link": "rosfield.com/s/b1"
+          },
+          "buttons": [
+           "Refuse and block",
+           "It was innocent"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.safety"
+       ],
+       "tells": [
+        "agent",
+        "owner"
+       ],
+       "branches": [
+        {
+         "label": "1 Refuse and block",
+         "end": "end",
+         "endText": "That chat can't book. The report stays in the safety log."
+        },
+        {
+         "label": "2 It was innocent",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B3-x02",
+           "line": [
+            "3.9"
+           ],
+           "who": "san",
+           "to": "agent",
+           "via": "chat",
+           "title": "Lets a therapeutic booking go on",
+           "does": "Sam says it was innocent. The AI hears that Lee Mobile Massage can book a therapeutic massage, and every new message is checked again.",
+           "say": [
+            [
+             "san",
+             "agent",
+             "Lee Mobile Massage can book a therapeutic massage at home. What would you like?"
+            ]
+           ],
+           "tells": [
+            "agent"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "No reply in 2 hours",
+         "end": "end",
+         "endText": "Nothing is booked. Sam gets one reminder, and the report stays in the log.",
+         "steps": [
+          {
+           "id": "B3-x03",
+           "line": [
+            "3.9"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "title": "Reminds Sam once; books nothing",
+           "does": "Sam hasn't answered in 2 of their text hours. Nothing is booked, and Sam gets one reminder.",
+           "say": [
+            [
+             "san",
+             "owner",
+             "Still waiting on the refused request from earlier. Nothing is booked until you pick.",
+             {
+              "buttons": [
+               "Refuse and block",
+               "It was innocent"
+              ]
+             }
+            ]
+           ],
+           "tells": [
+            "owner"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "B4-77",
+    "more": [
+     "For massage, the kinds of place are a home, a hotel room where Sam allows it, an office or an event.",
+     "A hotel visit is booked in the guest's own name, and the room number goes only on the secure page."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B4-77",
+    "branch": {
+     "label": "A kind of place that's off",
+     "end": "end",
+     "endText": "Nothing saved. The AI hears which places are allowed, like the studio.",
+     "steps": [
+      {
+       "id": "B4-x05",
+       "line": [
+        "4.12"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "chat",
+       "title": "Says which places are allowed",
+       "does": "A what-if: Vera asks for a massage in a hotel room, and hotel visits are off there. Rosie says so plainly before any times, and names the places it can go.",
+       "more": [
+        "Hotel visits are off by default. Sam turns them on where the state's rules allow it.",
+        "With hotels on, the visit is paid in full when booking, and the therapist checks out with DONE.",
+        "The list of places comes from Sam's settings and the plug-in."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "Lee Mobile Massage doesn't go to hotel rooms. It can come to a home or an office, or Vera can book at Lee Massage Studio."
+        ]
+       ],
+       "needs": [
+        "pf.visit",
+        "pf.rules"
+       ],
+       "tells": [
+        "agent"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "vary": {
+     "before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Lee Mobile Massage asks: how long a massage, and what kind: relaxing or deep tissue?"
+       ],
+       [
+        "cust",
+        "agent",
+        "60 minutes, relaxing."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-84",
+    "does": "A massage starts at a set time, so the times read 'starts at 8:00am', not a window. Three choices, soonest first, with only therapists who are free, licensed and cleared to work away from the studio.",
+    "more": [
+     "The confirmation, the reminder and the on-my-way text say the same start.",
+     "Drive time from the place Alex gave is counted, and the time to set up and pack the table.",
+     "Alex may ask for a therapist by name, or for a woman or a man. Only people who fit are shown.",
+     "A therapist's license number shows with the times, where the state's rules require it.",
+     "Times never fall in hours the state's rules forbid for massage."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "The plug-in needs a health form before the first massage. Alex fills it in on the secure page that comes next, before booking.",
+    "more": [
+     "It asks about pain or injuries, recent surgery, pregnancy, blood thinners and allergies to oils.",
+     "A returning client checks it by 10am the day before.",
+     "It stays on file for 12 months, so a later booking only checks it.",
+     "Not done by its due date: one reminder, then Sam decides to keep it, move it, or cancel with no fee.",
+     "Its answers stay on the page, never in a text."
+    ],
+    "form": [
+     [
+      "Form",
+      "Health form · private, on this page only"
+     ],
+     [
+      "Due",
+      "Now, before booking"
+     ],
+     [
+      "Filled in by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-69",
+    "does": "Mobile massage shows no photos of clients or their homes, so the page doesn't ask this.",
+    "more": [
+     "The plug-in says if a business may show photos. Here it never does."
+    ],
+    "say": [],
+    "form": []
+   },
+   {
+    "op": "after",
+    "at": "B4-34",
+    "steps": [
+     {
+      "type": "split",
+      "id": "B4-x01",
+      "line": [
+       "4.11",
+       "4.14",
+       "13.5"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex fills in the health form",
+      "q": "Do the answers change the booking?",
+      "does": "On the same secure page, Alex fills in the plug-in's health form. The answers stay on the page and in Alex's record, never in a text or through the AI.",
+      "more": [
+       "Most answers change nothing, like Alex's sore lower back.",
+       "Each answer gets the danger check too.",
+       "Ethan reads the form on the visit day, and goes over it with Alex before starting."
+      ],
+      "form": [
+       [
+        "Pain or an injury now?",
+        "Sore lower back, from running"
+       ],
+       [
+        "A surgery in the last 6 months?",
+        "No"
+       ],
+       [
+        "Pregnant?",
+        "No"
+       ],
+       [
+        "Blood thinners, or a heart or blood pressure problem?",
+        "No"
+       ],
+       [
+        "Allergies to oils or lotions?",
+        "None"
+       ],
+       [
+        "Areas to skip",
+        "Feet"
+       ]
+      ],
+      "needs": [
+       "link",
+       "pf.questions",
+       "pf.first_steps",
+       "pf.messages",
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "Nothing that changes it",
+        "end": "merge"
+       },
+       {
+        "label": "Pregnant: prenatal instead",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "page",
+          "title": "Offers a prenatal massage on the page",
+          "does": "A what-if: Dee says on the form that she's pregnant. The page offers a prenatal massage instead, with Leah, who is trained for it, before anything is taken.",
+          "more": [
+           "It shows its own price and length first.",
+           "Nothing about it goes in a text. The texts say only 'your massage'.",
+           "No trained therapist free then: the page offers Leah's next times.",
+           "Dee can also stop here. The saved time is let go, and nothing is taken."
+          ],
+          "form": [
+           [
+            "Your massage",
+            "Prenatal massage at home · 60 min · $150"
+           ],
+           [
+            "With",
+            "Leah, trained in prenatal massage"
+           ]
+          ],
+          "needs": [
+           "pf.services",
+           "pf.staff"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "A flag for the therapist",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "6.1",
+           "4.14"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Marks it for the therapist's read",
+          "does": "A what-if: Ben says they had surgery last month. The booking waits for the therapist's read after the money step, as the plug-in says. Ben's answer stays on the page.",
+          "more": [
+           "Other flags: blood thinners, or a heart or blood pressure problem.",
+           "The read comes next, as 'An expert reads answers first'.",
+           "Nothing is taken until the therapist says OK."
+          ],
+          "needs": [
+           "pf.first_steps"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Danger on the form",
+        "end": "end",
+        "endText": "No booking. The page shows the safety words, and nothing is taken.",
+        "steps": [
+         {
+          "id": "B4-x04",
+          "line": [
+           "3.9",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "page",
+          "title": "Stops the booking; says see a doctor",
+          "does": "A what-if: Gail writes that one calf is red, swollen and sore. That can be a blood clot, so the page stops the booking and shows the plug-in's safety words.",
+          "more": [
+           "Chest pain or trouble breathing gets 'call 911 now' instead.",
+           "Nothing is booked or taken. The saved time is let go.",
+           "Gail can book again once a doctor says a massage is OK."
+          ],
+          "form": [
+           [
+            "Please see a doctor today",
+            "A massage can wait until your doctor says it's OK"
+           ],
+           [
+            "Chest pain or trouble breathing?",
+            "Call 911 now"
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches the 60-min massage at home to a card saved for the $89 fee. It counts for new bookings only, and each change is read back first.",
+    "more": [
+     "60-min massages already booked stay paid in full.",
+     "A saved card is charged only for a fee Sam confirms, never more than $89.",
+     "A fee or a deposit stays within the state's limits, from the plug-in.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Should I eat before you come?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Should I eat before you come?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Ethan says yes: a light meal is best, an hour or more before."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that the back is worse. Rosie runs the plug-in's danger check again, then offers an earlier time if one is free.",
+    "more": [
+     "Real danger, like chest pain or sudden weakness in the legs, gets 'call 911 now', and no earlier massage.",
+     "An earlier time shows its price first. No reply: the visit stays as booked.",
+     "If Alex picks the earlier time, Ethan and Leah are told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "My back got worse since I booked. Can someone come sooner?"
+     ],
+     [
+      "san",
+      "cust",
+      "Leah can come sooner, at the same price.",
+      {
+       "times": [
+        "Wed Oct 21 · starting at 2:00pm · Leah"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep Thursday"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "does": "Alex's visit started late, so Ethan will reach Kim about 10:45am, 15 minutes after the start. Kim keeps the full time if Ethan's next visit allows it.",
+    "more": [
+     "If it doesn't, the text says so plainly.",
+     "Kim can change the time with no fee.",
+     "Can't make it at all: Sam is asked who goes, or Kim gets new times with no fee."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 15"
+     ],
+     [
+      "san",
+      "cust",
+      "Ethan from Lee Mobile Massage is running behind and expects to reach you about 10:45am, for your 10:30am massage. You still get the full 60 minutes.",
+      {
+       "buttons": [
+        "That works",
+        "Change the time"
+       ],
+       "as": "Kim L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-19",
+    "more": [
+     "A stand-in must also fit what Alex asked, like a woman or a man."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "more": [
+     "Each job shows what to bring, from the plug-in, like the table, sheets and oils.",
+     "Alex's access notes from booking show too, like where to park.",
+     "No OMW by 7:50: Ethan is nudged, then Sam.",
+     "Ethan drives between visits, and sets up the table at each one."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Thu Oct 22. Text OMW when you leave.",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Client",
+         "Massage"
+        ],
+        "rows": [
+         [
+          "8:00am",
+          "Alex M. · 9 Aspen Ct",
+          "90-min massage"
+         ],
+         [
+          "10:30am",
+          "Kim L.",
+          "60-min massage"
+         ],
+         [
+          "1:00pm",
+          "Drew",
+          "60-min massage at home"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Health forms, answers and door codes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open the day",
+        "link": "rosfield.com/d/j22"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 7:45am"
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before setting up, Ethan photographs where the table goes and notes what's already there. No photo of the client is ever taken.",
+    "more": [
+     "The plug-in names the checks: where the table goes, and the floor under it.",
+     "Alex can see them on the secure page.",
+     "A damage claim later is checked against them.",
+     "Ethan also goes over the health form with Alex: the pressure, and what to skip."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 9:35am"
+   },
+   {
+    "op": "words",
+    "at": "B9-22",
+    "does": "A what-if: say Morgan's plan were billed once a month instead of charged to the saved card. October's two visits, Morgan's and Jamie's, go on one bill on the 1st."
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 9:40am"
+   },
+   {
+    "op": "more",
+    "at": "B8-29",
+    "more": [
+     "A session the client takes past a line ends the same way. It goes in the safety log.",
+     "Then Sam decides any charge, only what the booking page said, and may block the client and the address."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, with a note for the therapist. Here it's Rosa's call, in Spanish. The English is under each line.",
+    "more": [
+     "A massage example: a sunburn or a fresh bruise gets 'the therapist skips that spot'.",
+     "A red, swollen calf isn't one of these: it stops the booking until a doctor says OK.",
+     "Rosa has a fresh bruise on one leg from a fall. The therapist will skip that spot.",
+     "If the leg swells or the pain gets worse, she sees a doctor first."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿tiene dolor en el pecho, o le falta el aire?",
+      {
+       "lang": "es",
+       "en": "First: do you have chest pain, or trouble breathing?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Solo tengo un moretón en la pierna, de una caída.",
+      {
+       "lang": "es",
+       "en": "No. I just have a bruise on my leg, from a fall.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Su terapeuta no dará masaje en esa zona. Si la pierna se hincha o el dolor empeora, vea a un médico antes. Si le falta el aire, llame al 911.",
+      {
+       "lang": "es",
+       "en": "Your therapist won't massage that spot. If the leg swells or the pain gets worse, see a doctor first. If you can't breathe, call 911.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero un masaje en casa, pero tengo un moretón en la pierna.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like a massage at home, but I have a bruise on my leg.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Mobile Massage. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Mobile Massage. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa, in Spanish. Safety steps were given. Notes are on the portal.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "Safety steps given · notes on the portal",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. Call 911 now. A massage can wait."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a client's AI described a medical emergency. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A medical emergency, no name given",
+         "Told to call 911 now; a massage can wait"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can you also come every 4 weeks for a 60-min massage?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee Mobile Massage has a 60-min massage plan every 4 weeks, $150 a visit. Each visit is booked and paid like a single one. Want it every 4 weeks?",
+      {
+       "buttons": [
+        "Yes, every 4 weeks",
+        "Just this once"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "60-min massage at home, every 4 weeks",
+        "lines": [
+         "$150 a visit",
+         "Each visit is paid in full when it's booked",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ],
+    "form": [
+     [
+      "How often",
+      "Every 4 weeks"
+     ],
+     [
+      "Price a visit",
+      "$150"
+     ],
+     [
+      "When it's charged",
+      "When each visit is booked, like a single 60-min massage"
+     ],
+     [
+      "Skip, pause or end",
+      "Any time, by text"
+     ],
+     [
+      "I agree to the plan's terms",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Reminder: please check your health form for tomorrow's visit. It takes a minute.",
+      {
+       "card": {
+        "title": "Health form",
+        "lines": [
+         "Was due today, Wed Oct 21, at 10am",
+         "For Thu Oct 22 · starting at 8:00am · Ethan"
+        ],
+        "button": "Check it",
+        "link": "rosfield.com/f/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. still hasn't checked the health form for Thu 8:00am, 4 hours after the reminder.",
+      {
+       "buttons": [
+        "Keep the visit",
+        "Move it",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee Mobile Massage",
+      "Mobile massage · within 25 miles of 500 Pine St, Springfield"
+     ],
+     [
+      "Prices",
+      "90-min massage at home $179 ($199 from Nov 2) · 60-min massage at home $150"
+     ],
+     [
+      "To book",
+      "90-min: a card saved for the $89 fee on a no-show or a late cancel, charged only with the owner's yes · 60-min: paid in full"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Massage Studio",
+      "35 Willow St, Springfield · (555) 010-0177"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Massage is licensed: the company and each therapist, where the state asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Massage and skin care pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Massage adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Massage books therapists. A room is saved with the therapist, never booked alone."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Massage runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each therapist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Massage is never sent now: every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Massage is done in person."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Lee Mobile Massage bills no health plan, insurance or warranty."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A massage starts at a set time, not in a window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Massage is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile massage sells no seats: each booking has its own therapist."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Massage is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Massage is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Mobile massage runs no group classes."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Massage is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "The client is always there for a massage."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "The client is always there for a massage."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the therapist's care: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B8-97",
+    "label": "A finding stops the work",
+    "why": "A therapist who feels unsafe leaves (the branch above)."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "The client is on the table, so no update is needed."
+   },
+   {
+    "op": "off",
+    "at": "B9-03",
+    "label": "Yes: one pay link",
+    "why": "No extra work is sold at the visit, so nothing is added after a paid-in-full massage."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A massage is paid once, after the visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Lee Mobile Massage bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "A landlord never pays for a massage."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at the visit, so there's nothing to keep or cancel."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at the visit, so there's nothing to cancel."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A massage has no warranty. A complaint or a refund goes to Sam."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A massage needs no proposal: regular visits are a repeat plan."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A massage has no report to send later."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A massage is rated."
+   },
+   {
+    "op": "off",
+    "at": "B8-96",
+    "label": "It needs another day",
+    "why": "A massage ends on time in one visit: more time is a new booking."
+   }
+  ]
+ },
+ "notes": "From hair (the chair pilot): massage is booked like a salon chair, with a therapist the client picks by name (or a woman or a man, when asked) and sessions set by length. Dentist's intake idea is added on top: the master's own form branch (A4-43 / B4-38 'A form signed on the secure page', A7-02 / B7-05 'A form isn't done by its due date') and the expert's read (A6-16 / B6-15) stay on, where hair turned them off.\nNames: Sam Lee's main company is Lee Mobile Massage LLC (massage at homes, hotels, offices and events, 500 Pine St; skin care is its second kind of work, waiting for its esthetician). His second company is Lee Massage Studio LLC (35 Willow St). Flow A's story is at the studio, flow B's at Alex's home, 9 Aspen Ct. S11-58 adds acupuncture to the studio (flow A) and stretch sessions to the mobile business (flow B).\nPeople: Riley and Avery became Luis (he; hot stones and house calls) and Nina (she; prenatal) at the studio; Jordan and Casey became Ethan (he; skin care too) and Leah (she; prenatal) on the mobile team. The master's pronouns stay right. License numbers got massage letters (MT for a therapist, MB for the company, ME for the studio, SC and ES for skin care).\nPrices: the master's numbers are kept as the example businesses' own prices, so every sum, fee and refund stays right: at the studio a 30-min massage $35 (the main story), 30-min deep tissue $40, hot stones $20 (added to a massage), teen massage $25, 60-min or prenatal massage $55, Relax package (2½ hours) $140, a pack of 5 30-min massages $150, a $49-a-month membership; away from it a 90-min massage at home $179, a 60-min massage at home or a hotel $150, a couples massage lesson $199, chair massage at an office or event $120 an hour, extra time $120 an hour. Fees: $20 at the studio ($40 for the Relax package), $89 at home (the master's $89 service call, now the no-show fee, about half the 90-min price).\nTimes: a 30-min massage keeps the master's 11:00 to 11:30am studio clock, with 15 minutes to reset the room (Dana's 12:00pm follows). Flow B books a set start, not a window: B4-83 keeps '2 A set start time', every 'arriving 8–10am' reads 'starting at 8:00am', and the main visit runs OMW 7:45am, check-in 8:00am, DONE 9:35am, bill 9:37am, receipt 9:40am.\nFree cancel: 24 hours before at the studio (the master's Fri 11am). Away from it, until 8pm the evening before (the master's 7am on the visit day was 1 hour before an 8am massage), so the 10am reminder the day before still comes first.\nMoney A: list|card|counter is the main path (a card saved for the $20 fee, paid at the front desk with any tip; the old flowchart's way). list|card|bill is the old flowchart's pay link (ms22b): Luis works Saturday mornings alone, so Rosie texts the bill with a tip line. No hold, deposit or paid in full at the studio: the old flowchart saves a card for every studio service, so S1-42's sign-up was changed (the Relax package keeps a card for the $40 fee, not a hold), and A7-02's 'A day-before hold fails' is off.\nMoney B: list|hold|bill is the main path ($89 held, the bill after with a tip line; the old flowchart held the card for home visits). list|card|card (a card saved and charged at DONE) and list|full|none (a 60-min massage paid in full when booking; a hotel visit is always paid this way) are the other ways mobile massage is paid. S1-13 to S1-18 now list these, with 'B paid in full' and, on the card path, 'A save a card, no hold'. No deposit path: S11-09's office event holds the $89 instead of a 25% deposit.\nPackages, memberships and gift cards are not money paths of their own: they live in A5-01 / B5-01 on the listed paths (a visit uses a credit, a card is still saved for the fee, a gift card comes off the total). The studio sells them at the desk and on the secure page (A5-22). The old flowchart's 'single sessions only' is outdated (the master has lines 4.18 and 5.8 now).\nHealth form: only on the secure page, never through the AI or in a text. At the studio Alex is a returning client, so the form on file (good for 12 months) is checked on the page (A4-43, A4-44, own A4-x01). In flow B Alex is new to Lee Mobile Massage and fills it in (B4-86, own B4-x01). Own split steps after A4-65 and B4-67: nothing changes it; pregnant, so the page offers the prenatal massage (A4-x02, B4-x02); a flag for the therapist's read (A4-x03, B4-x03, then A6-16 / B6-15); danger on the form, like a red, swollen calf (A4-x04, B4-x04).\nThe therapist's read (A6-16, B6-15): a flag goes to the booked therapist, then to Sam after 1 hour; an OK can carry a note (lighter pressure, an area skipped); a doctor's OK is asked as the expert's one question on the secure page (A6-25).\nSafety: the plug-in's danger words are chest pain, trouble breathing and sudden numbness or weakness in the legs (call 911), and a red, swollen calf (see a doctor first). Rosa's Spanish call is a swollen calf; B7-17 'gets worse' is a sore back with an earlier time offered, and chest pain gets 911 with no earlier massage.\nOwn branches: A3-22 and B3-17 'Asks for sexual services' (A3-x01 to x03, B3-x01 to x03: one plain refusal, the exact words in the safety log, Sam picks refuse and block or innocent, no reply in 2 hours books nothing). B4-77 'A kind of place that's off' (B4-x05: hotel rooms are off unless Sam turns them on, where the state allows). B8-40 'No DONE 15 minutes after' (B8-x01, B8-x02: the safety check-out for a therapist alone in a home; DONE or I'm out checks out; no answer, Sam gets the address).\nHotel rooms (the old flowchart left them open): decided. Off by default; Sam can turn them on where the state's rules allow; then the guest books in their own name, the room number goes only on the secure page, it's paid in full when booking, and the check-out timer runs.\nTeens: 13 to 17 only, booked by a parent who stays in the room and shows an ID (at 16 or 17 a written waiver where the state allows). A8-02's 'Something required is missing' is that parent (A8-51 to A8-60), and B8-54 to B8-60 the same at a home.\nNo photos of clients: A4-65 asks only if texts are safe, B4-69 doesn't ask, and the before records (A8-23, B8-18) are the health form talk and photos of where the table goes, never the body.\nOff for massage: no plan or insurance billing (A4-28, A4-54, A7-02, A9-15, B4-43, B4-63, B7-05, B9-19), no first visit booked apart, no paper the business gets, no series, no items held or lent, no weather, no crew, no date that can't move, no minimum, no stays, seats, spaces or drop-offs, never sent now (S2-30, B4-81, B6-03, B7-55, B8-58), no arrival windows, no extra work sold at the table (B8-22, B9-03, B10-05), no delivery or item taken, no reports, no warranty or fix (A10-06, B10-07), no permit inspection, and the master's no-license, no-$2 and extra-agreement branches.\nsplitsKept: A7-61 (hot stones are Luis's only, prenatal Nina's), A8-02 (a teen's parent must be there), B4-57 (an office event over the plug-in's amount gets a contract).\nSection 11 what-ifs follow the plug-in: S11-56 raises the Relax package's fee (flow A) and moves the 60-min massage at home from paid in full to a card saved for the $89 fee (flow B); S11-08 to S11-11 are a team chair massage quote at the studio and an office event at $640 with a card saved for the $89 fee; S11-72 is a cancelled membership or a pack bought at home.\nOutdated in the old flowchart: everything about Square Appointments, Boulevard, Zenoti, Acuity and QuickBooks (Rosie is the software now); 'marks her arrived' (the check-in code); the studio tablet pay page; 'strictest state' rules (each state's own rule now, as switches); Jay's open question on hotels (decided above); the old 4-day hold on the card and refundable deposit (outdated: no holds now; a card is saved for the fee, D65); packages not sold (lines 4.18 and 5.8 now).\nKeep: 'massage' is this work's own word (the master uses it once as S11-58's example new kind of work, which is renamed).\nReview (Oct 23): Rosa's call is a fresh bruise (the therapist skips that spot), since a swollen calf stops the booking; call summaries and safety stops carry no health detail. The 60-min paid-in-full path has its own times (DONE 9:05am, receipt 9:07am, check-out at 9:15am). The 4-week plan is a 60-min massage Alex asks for by name. list|card|card stays: Sam can set a home massage to a card saved and charged at DONE (now in the plug-in). B4-x04 and B4-x05 name Gail and Vera, since Kim L. has a Thursday booking.\ntouch-up 4 (Oct 23): keep 'heater': A7-38's stone heater for hot stone massage is real massage equipment.\nRefit Oct 27 (REDESIGN 2, R06): no holds since D66: every \"held\" fee above is now a card saved for that fee; money words come from the record (amounts per path with name); see work/phase4/log/refit-massage.md.",
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Color quotes come to you first. Board prices never need one",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Sam named you their emergency contact.",
+    "Classic cuts, fades and hot towel shaves.",
+    "A water heater job",
+    "asks for a perm",
+    "like a color correction done in two steps",
+    "books a skin fade for",
+    "skin fades",
+    "skin fade",
+    "Skin fade",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "accept the beard trim today at 2:00pm with Avery",
+    "Color and cut · $90",
+    "Priced from your photos",
+    "1 color quote",
+    "the $90 color quote",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "until it clears, with no fee",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "What happens at the chair?",
+    "It's 11:00am, and Alex is at the chair.",
+    "A service priced at the chair gets its price now.",
+    "in the chair",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Examples: an ID for an 18+ service, a signed form, or gear for a class.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "DONE 35 haircut",
+    "A cut is rated",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Lee's Barbershop doesn't do perms.",
+    "Anything Riley should know?",
+    "A barbershop sells its packages only at the shop.",
+    "Haircut plan",
+    "Color always stays with Riley.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A barbershop has none, so nothing is sent here.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "A haircut could mean a salon or a barbershop",
+    "A booked window stays right",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Every shop service, color and house calls",
+    "An apprentice",
+    "an apprentice",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Panel upgrade",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "like a burst pipe",
+    "Lee Home Services'",
+    "Drain clearing",
+    "written estimate",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Skin fade",
+    "skin fade",
+    "a beard trim",
+    "A beard trim",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "Barbering",
+    "shops",
+    "Shop",
+    "shop",
+    "at the chair",
+    "At the chair",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "A trim",
+    "a fade"
+   ],
+   "B": [
+    "found more work. Add it today?",
+    "Arrival times:",
+    "can clear the drain",
+    "can start the sewer camera inspection at a set time",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "like new pipes put in one day and finished another",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Sam named you their emergency contact.",
+    "A water heater job",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "'Adding a faucet check? Say so.'",
+    "The $179 drain needs none.",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "finds corroded shutoff valves",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "replacing both shutoff valves for $160",
+    "the shutoff valves",
+    "Replace both shutoff valves",
+    "cracks the cabinet floor",
+    "Cabinet floor, before",
+    "Under the sink, before",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "two drain clearings",
+    "A repair is rated",
+    "A job quoted at the visit promises only the service call now.",
+    "the cancelled extra work",
+    "The service call is $89. Accept it?",
+    "Nora can ask to be next for that window",
+    "can cut your hair at the shop for $35, or at your home for $75",
+    "The shop's chair is in the other flow.",
+    "with one arrival window and one code",
+    "Both fit in the same arrival window.",
+    "Plumbing books a 2-hour window.",
+    "Written estimate and terms",
+    "Yearly water heater flush plan",
+    "Every 12 months",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Rental 1",
+    "Rental 2",
+    "Thu Oct 22, 8:20am",
+    "CANT START no proof Alex may have this work done",
+    "like a permit it needed that isn't in",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "The before photo shows no crack.",
+    "for today's work",
+    "stage 2 of your repipe",
+    "Book a free fix",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "You can look for a roofer near you.",
+    "It's overflowing. Can someone come tonight?",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes go to the plumber, one line each.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "My kitchen drain is clogged.",
+    "Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Just the kitchen sink.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Is the sink still full of water?",
+    "Please clear the cabinet under the sink.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Overflowing kitchen drain",
+    "plumbing license MP045210",
+    "Plumbing license",
+    "A booked window stays right",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "7am on the visit day",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "An apprentice",
+    "an apprentice",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A job priced at the visit never takes more than the visit fee.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Panel upgrade",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "like a burst pipe",
+    "after the job",
+    "Lee Home Services'",
+    "Kitchen drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call fee",
+    "service call fee",
+    "Service call",
+    "service call",
+    "credited to the repair",
+    "Labor",
+    "the kitchen drain",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "water heater contract",
+    "written estimate",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "Shop",
+    "shop",
+    "at the chair",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St"
+   ]
+  },
+  "A": {
+   "S1-12": "41b86c1e72",
+   "S1-13": "eca22651fd",
+   "S1-21": "913a9558f4",
+   "A3-22": "0057d8fc9f",
+   "A4-66": "f622d7fe12",
+   "A4-16": "753b207e16",
+   "A4-25": "e9a8fd4868",
+   "A4-43": "c17d56f766",
+   "A4-65": "fa7ec0389d",
+   "A6-02": "d7d5a3ecf5",
+   "S11-56": "bd841a4732",
+   "A7-14": "6a57738a17",
+   "A7-23": "90bc4b1137",
+   "A7-12": "05f64179a4",
+   "A8-01": "750bd94ee4",
+   "A8-23": "e3a35f7f9e",
+   "A8-33": "561bc291a5",
+   "A8-40": "8ce1ecdbe5",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A8-39": "c64da36bdb",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A7-93": "46cca94e45",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A8-03": "7accda6f86",
+   "A8-85": "708cf3f73f"
+  },
+  "B": {
+   "S1-12": "0bea92643b",
+   "S1-13": "6964bfbe60",
+   "S1-21": "334e0a791c",
+   "S1-38": "6301c86637",
+   "B3-17": "3eb7d7f259",
+   "B4-77": "67ff953065",
+   "B4-05": "fb3a9061c8",
+   "B4-84": "549b5c1a9d",
+   "B4-38": "9539521dc7",
+   "B4-69": "350fbaf90a",
+   "B4-34": "74ff52d83d",
+   "S11-56": "8b6c6c101f",
+   "B7-16": "3177c3701b",
+   "B7-17": "ac1fd212f3",
+   "B7-18": "d53cef58f7",
+   "B7-19": "59d20c8e66",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-18": "530038d2b8",
+   "B8-41": "6e8e9825b2",
+   "B9-22": "f691bde396",
+   "B10-01": "814aa1fde7",
+   "B8-29": "fdaaa492b3",
+   "B3-18": "a4b81ea9b3",
+   "B3-11": "e459daf83c",
+   "B3-22": "19f64ba1ba",
+   "B3-19": "2f53161fb2",
+   "B4-44": "514c8ab30c",
+   "B5-21": "925b7342ed",
+   "B7-61": "342b55fd9b",
+   "S11-57": "2f34f23d8a",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B8-97": "1e3f69ef38",
+   "B8-22": "50d78f1af0",
+   "B9-03": "df9548d13f",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-05": "a326ea3c0b",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255",
+   "B8-96": "8d7fd18ef5"
+  }
+ }
+}

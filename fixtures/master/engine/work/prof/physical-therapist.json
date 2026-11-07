@@ -1,0 +1,3358 @@
+{
+ "id": "physical-therapist",
+ "name": "Physical Therapy",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "dentist",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each physical therapist and each physical therapist assistant holds their own active license from the state's physical therapy board",
+   "who": "each person; the practice too, where the state's form registers physical therapy practices or their owners (a switch)",
+   "ask": "each person's license number in their invite reply (or the owner sends it); the practice's registration number from the owner, where the state's form asks for one",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "directAccess": "a switch from the state's form: whether a patient may be seen without a doctor's referral, for how many days or visits, and which therapists may do it (some states ask for extra years, training or a certificate); with no referral, only therapists the state's form allows are offered",
+   "remote": "a video visit only with a therapist licensed in the state the patient is in that day, or holding the state's compact privilege where the state's form allows it",
+   "athleticTraining": "athletic training needs its own license where the state's form asks for one, held by each person who does it",
+   "dryNeedling": "dry needling only by a therapist with the extra training or certificate the state's form asks for, and only where the state allows it (a switch)",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance where the state's form asks for it"
+  },
+  "pf.services": {
+   "shape": "one patient with one therapist at a time, each visit with a set length; every new problem starts with an evaluation by a physical therapist; the evaluation sets the plan of care (how many visits a week, for how many weeks), and those visits are booked as a series with the patient's own yes, or one at a time",
+   "examples": "the example practices' own prices (Lee Physical Therapy and Lee Home Rehab), not a standard; with a health plan, the patient pays the plan's share, like a copay, and the plan pays the rest",
+   "list": [
+    {
+     "name": "Evaluation (a new problem, or after surgery)",
+     "price": "$140 self-pay; with a plan, the plan's share (the example: a $35 copay)",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic, or at home",
+     "before": "nothing taken; a card saved only where the clinic turns on its missed-visit fee, or for a Saturday visit",
+     "after": "the share at the front desk; on Saturdays, when the front desk is closed, the saved card is charged when the therapist texts DONE",
+     "who": "a physical therapist only"
+    },
+    {
+     "name": "Follow-up visit (from the plan of care)",
+     "price": "$110 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the clinic, or at home",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "who": "a physical therapist, or an assistant under the therapist's plan"
+    },
+    {
+     "name": "Progress re-check",
+     "price": "$120 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the clinic, or at home",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "who": "a physical therapist only, when the plan of care calls for it",
+     "note": "the clinic sends the progress note to the doctor itself, never through Rosie"
+    },
+    {
+     "name": "Running form check",
+     "price": "$40",
+     "kind": "one price",
+     "length": "30 min, on the clinic's treadmill",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "who": "a physical therapist"
+    },
+    {
+     "name": "Video follow-up",
+     "price": "$90 self-pay; with a plan, the plan's share where it pays for video",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "by video, counted as at the clinic",
+     "before": "a card saved",
+     "after": "the saved card charged when the therapist texts DONE",
+     "who": "a therapist licensed where the patient is that day",
+     "note": "only for a patient who already has a plan of care"
+    },
+    {
+     "name": "Taping",
+     "price": "$20",
+     "kind": "one price, added to a visit",
+     "length": "10 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "with the visit",
+     "note": "self-pay: most plans don't pay for it"
+    },
+    {
+     "name": "Dry needling",
+     "price": "$40 added to a visit",
+     "kind": "one price, added to a visit",
+     "length": "15 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "who": "only a therapist trained for it (Nina at the example clinic)"
+    },
+    {
+     "name": "Child's visit",
+     "price": "the plan's share, or the self-pay price of the visit",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "a parent or guardian books, signs the consent and stays"
+    },
+    {
+     "name": "Check-in plan visit (after a plan of care ends)",
+     "price": "$60 a visit at the clinic; $150 a visit at home",
+     "kind": "one price, every 4 weeks",
+     "length": "30 to 45 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "each visit paid when it happens, like a single visit",
+     "note": "only with the plan's own yes on the secure page"
+    },
+    {
+     "name": "Home evaluation",
+     "price": "$179 self-pay; with a plan, the office bills the plan",
+     "kind": "one price",
+     "length": "60 to 75 min",
+     "where": "at the patient's home",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "the office bills the plan its own way; self-pay: the saved card charged when the therapist texts DONE",
+     "who": "a physical therapist only"
+    },
+    {
+     "name": "Home follow-up visit",
+     "price": "$150 self-pay; with a plan, the office bills the plan",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the patient's home",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "the office's own way, or the saved card at DONE",
+     "who": "a physical therapist, or an assistant under the therapist's plan"
+    },
+    {
+     "name": "Home safety check",
+     "price": "$160, with a written list of changes",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the patient's home",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "with the visit",
+     "who": "a physical therapist",
+     "note": "the written list comes on the secure page"
+    },
+    {
+     "name": "Fall-risk screen",
+     "price": "$199 ($249 when Sam does it)",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the patient's home",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "with the visit",
+     "who": "a physical therapist"
+    },
+    {
+     "name": "Missed-visit fee",
+     "price": "$20 at the clinic; $89 for a home visit",
+     "kind": "a fee, never booked alone",
+     "where": "both places",
+     "note": "self-pay and fee-allowed patients only, and only when the owner confirms it"
+    },
+    {
+     "name": "Game coverage (athletic training at a game or practice)",
+     "price": "$120 an hour, 2-hour minimum (the example's own)",
+     "kind": "per hour",
+     "where": "at the customer's place (a school or a team's field)",
+     "who": "a licensed athletic trainer",
+     "note": "its own kind of work, with its own license",
+     "before": "nothing taken, or a card saved for a self-pay team",
+     "after": "the business's own way, or the saved card at DONE"
+    }
+   ],
+   "capacity": "one patient per therapist at a time; the clinic's gym is shared and is not booked",
+   "nobodyHome": "never: the patient is always there",
+   "online": "a video follow-up for a patient who already has a plan of care; never a first evaluation"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, or for your child (a parent or guardian books)",
+    "a new problem or after surgery (an evaluation), or a visit from your plan of care",
+    "a doctor's referral or prescription for therapy: yes (from whom) or no",
+    "a health plan (its name only), Medicare, Medicaid, or paying yourself",
+    "from a work injury or a car accident: no, a work injury, or a car accident",
+    "days and times that suit you"
+   ],
+   "afterTime": [
+    "anything that helps at the visit, like a walker, a wheelchair or needing an interpreter",
+    "at home: stairs at the door, where to park, and who will be there"
+   ],
+   "securePage": [
+    "birth date, and 'I'm 18 or older'",
+    "plan member ID, the plan holder and photos of both sides of the plan card",
+    "a photo of the referral, where the state's form or the plan asks for one",
+    "the surgery and its date, and the surgeon's office (the clinic asks the surgeon for the protocol itself)",
+    "health history and consent forms",
+    "for a work injury or a car accident: the claim number and the adjuster's name"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18, who comes to the visit; a guardian or health care agent for an adult who can't consent; a minor alone only where the state's rules allow it (a switch)",
+   "neverAsked": "which surgery and its details, symptoms, the plan's member ID and the referral itself are never asked in the AI chat: only on the secure page"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, or stroke signs (sudden weakness, a drooping face, slurred speech)",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "after surgery: a hot or swollen calf, a fever, or a red or leaking wound",
+     "say": "Call your surgeon's office now, or go to an emergency room if it's closed. If your chest hurts or breathing gets hard, call 911.",
+     "booking": "no booking; the clinic is told, and a booked visit stays unless the patient cancels, with no fee"
+    },
+    {
+     "words": "a fall with a new injury, or a sudden loss of feeling or control",
+     "say": "Call 911, or go to an emergency room now.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "pain or stiffness with nothing else",
+     "what": "matched to an evaluation; Rosie never judges how serious anything is"
+    },
+    {
+     "words": "a fall with no new injury (someone fell, and isn't hurt)",
+     "what": "the safety words first: if they fall and can't get up, or hit their head, call 911; then the booking goes on, marked urgent"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988; the owner can add the clinic's own after-surgery words at sign-up"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "The referral",
+     "when": "asked before the times; a photo on the secure page",
+     "who": "every new patient, where the state's form or the plan needs one (a switch)",
+     "result": "no referral where the state allows a first visit without one: booked and marked 'no referral', with only therapists the state allows; where the state or the plan needs one and there's none: the patient gets one from a doctor first, and nothing is booked"
+    },
+    {
+     "name": "Health history, consent and the plan's papers",
+     "when": "on the secure page only, never by text; due the day before the visit; one reminder before it's due",
+     "who": "every new patient",
+     "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or door first), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The surgeon's protocol and surgery notes",
+     "when": "before the evaluation",
+     "who": "a patient after surgery: the clinic asks the surgeon's office itself",
+     "result": "a to-do for the desk; records go office to office, never through Rosie; late: the therapist calls the surgeon's office on the day"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent on time, as the federal rules say",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "The plan's OK for the visits after the evaluation",
+     "when": "after the evaluation, asked by the desk on the plan's own website",
+     "who": "patients whose plan asks for it",
+     "result": "approved: the series is booked within the approved visits and dates; pending: only the next visit is booked; denied: self-pay, or stop"
+    }
+   ],
+   "prep": "come 15 minutes early to the first visit; bring a photo ID, the plan card, and a walker or cane if you use one; wear shorts or loose clothes"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the check-in code at the front desk; at home: the code at the door, from the patient or the family member named on the booking",
+   "beforeWork": "the therapist reads the health history, the referral and the surgeon's protocol before starting",
+   "changes": "the evaluation sets the plan of care: goals, how many visits a week, for how many weeks, and home exercises; taping or dry needling only with the patient's yes and its price first",
+   "done": "the check-in code or DONE; the evaluation, the plan of care and the visit notes stay in the clinic's own records, never in Rosie or a text; the clinic sends the plan and progress notes to the doctor itself",
+   "home": "at home, the therapist checks stairs, rugs and the bathroom for safety, and goes over the home exercises in person"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking when a plan pays; a card saved only where the clinic turns on its missed-visit fee, for a Saturday visit (no front desk then), or for a self-pay home visit",
+   "plans": "the plans the practice takes (its own list); the front desk checks each plan by hand and records it: active or not, the copay, any deductible left, and whether the plan must OK the visits; the patient's share is an estimate, not a promise",
+   "approvals": "where a plan must OK the visits, the desk asks after the evaluation and records the visits approved, used and left, and the end date; Rosie warns the desk before they run out and never contacts the plan",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "claims": "for a work injury or a car accident, the claim pays; the claim number and the adjuster's OK come first",
+   "fees": "the missed-visit or late-cancel fee: $20 at the example clinic, $89 for a home visit, only when the owner confirms it; the same fee for every patient who may be charged one",
+   "feeFree": "a switch from the state's and the plan's rules: no fee ever for patients a plan or the rules protect (like Medicaid, where that applies); for some plans, like Medicare, only if every patient pays the same fee; the owner can mark any patient fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "the clinic sends the claims; the patient pays the share at the front desk, its own way; a balance after the plan pays is billed by the practice, never by Rosie's text; a deductible not met yet: nothing taken that day, billed later by the practice; home visits: the office bills the plan its own way, and a self-pay visit is charged to the saved card at DONE",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)",
+   "packages": "where a clinic sells self-pay visit packs, it sells them at the clinic only, never while booking; a booking can use a visit from one; prepaid visits follow the state's rules on prepaid care (a written cancel period, a refund of unused visits): a switch",
+   "repeatPlans": "a check-in plan's visits are each paid when they happen, like a single visit: at the front desk, on the saved card at DONE on a day with no front desk, or the office's own way at home; no monthly plan charge and nothing paid ahead"
+  },
+  "pf.messages": {
+   "never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the surgery, the plan, the reason, the results or the therapist's name at the clinic (at home, the therapist's name stays, for the door check)",
+   "staff": "texts to the owner and staff use the patient's initials only (A.M., never Alex M.), with the time and a link: never the surgery or the plan's details",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the therapist"
+  },
+  "pf.staff": {
+   "licenses": "each physical therapist's and each assistant's own license, per state; an athletic trainer's own license for athletic training",
+   "skills": "physical therapists: evaluations, progress re-checks, the plan of care, and every visit; assistants: follow-up visits only, under a therapist's plan of care; dry needling only by a therapist trained for it; only people cleared for home visits go to homes",
+   "supervision": "an assistant works only under a physical therapist's plan of care, with the supervision the state's form sets (a switch: on site, or reachable by phone)",
+   "oks": "the owner OKs same-day times, any custom price (at the clinic, every one; at home, over $500), and anything a therapist flags",
+   "standIn": "an evaluation or a re-check: only another physical therapist; a follow-up: a therapist, or an assistant under the same plan",
+   "noReferral": "with no referral, only therapists the state's form allows to see patients without one"
+  },
+  "pf.rules": {
+   "records": "therapy records are kept by the practice for as long as the state's rules require (a child's records may be kept longer); a delete request removes only Rosie's own booking details, never the practice's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "referralLimit": "a switch from the state's form: how many days or visits a patient may be seen without a referral; the desk counts them, and Rosie reminds the desk before the limit",
+   "planOfCare": "where a plan asks for it, the doctor signs the plan of care; the practice tracks the signature",
+   "showLicense": "the license shown where the state asks: posted at the clinic, and on a home visit",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "ads": "no free-visit or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form",
+   "homeSales": "a written right to cancel extra care sold during a home visit, like a home safety check, where the state's rules give one (a switch from the state's form); the booked visit itself has none"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen, in the time left; later: the desk may move the visit, with no fee",
+   "missedAfterSurgery": "a patient after surgery who misses a visit or doesn't answer the door: the desk calls first, before any fee question, since it can mean something is wrong; at home, nobody answering starts a safety check (the family contact, then a welfare check), never a no-show first",
+   "standIn": "a therapist out: another physical therapist for an evaluation, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any work), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "approvalRunsOut": "the plan's approved visits are about to run out: the desk is warned before the last one, and asks for more or tells the patient the self-pay price",
+   "twoBookings": "a patient with several visits in a series: Rosie asks which visit before any change",
+   "healthQuestion": "a question about pain, medicine or exercises goes to the therapist; Rosie gives no advice",
+   "other": "all other edge cases the generic way",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): a new injury gets the soonest time, with the owner's OK; the after-surgery danger words get the surgeon or 911 words",
+   "freeCheck": "a walker or a brace the therapist set up that feels wrong within 30 days: a free check visit, if the owner OKs it (the example practice's own rule)"
+  },
+  "pf.facts": [
+   "planbill",
+   "forms",
+   "plans",
+   "video",
+   "children",
+   "extrawork",
+   "aftercare"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Physical Therapy",
+   "staff": "Nina and Mia (physical therapists)",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Home Rehab",
+   "staff": "Noah (physical therapist and athletic trainer) and Jess (physical therapist assistant)",
+   "cust": "Alex M. (patient, at home after hip surgery) · other patients",
+   "other": "Others (a family member, a surgeon's office, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nina"
+  },
+  "B": {
+   "staff": "Noah"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "A treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a therapist who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own patients."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see patients at the clinic; Riley also does dry needling and home visits."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Evaluations, follow-up visits and dry needling."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'therapy' visit could mean a physical therapist or a counselor."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Home evaluations and follow-up visits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A home follow-up visit"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached during care?"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most physical therapy clinics set it."
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'Knee rehab' or 'a sore back' fits an evaluation."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for chiropractic care, which isn't on the clinic's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Physical Therapy doesn't do chiropractic care."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free entrance:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "How would you like it on top?",
+    "What would you like to be able to do again?"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, make it an evaluation' goes back to the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter visit in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter visit."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during my visit?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please wear shorts or loose clothes on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please wear shorts or loose clothes."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the clinic, the customer is already there, so there's no door check."
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped part of A.M.'s visit."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the home exercises."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: add balance work next visit"
+   ],
+   [
+    "A.M. says Saturday's cut is uneven on one side.",
+    "A.M. asks for a recheck after Saturday's visit."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "A tip goes the shop's own way.",
+    "Physical therapy takes no tips."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says an ice pack leaked on a jacket today"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The ice pack leaked on my jacket."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a pack of 6 self-pay visits at the clinic."
+   ],
+   [
+    "A beard trim",
+    "Taping"
+   ],
+   [
+    "a beard trim",
+    "taping"
+   ],
+   [
+    "Lena",
+    "Tara"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The physical therapy plug-in adds its own after surgery: a hot or swollen calf, a fever, or a red or leaking wound."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a check-in plan with Nina, every 4 weeks."
+   ],
+   [
+    "like a color correction done in two steps",
+    "like the visits a plan of care sets"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "so I can't reach Elm Street Dental.",
+    "so I can't reach Elm Street Eye Care."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A physical therapy example: a fall with no new injury gets the plug-in's words, then the booking goes on."
+   ],
+   [
+    "A haircut",
+    "An evaluation"
+   ],
+   [
+    "a haircut",
+    "an evaluation"
+   ],
+   [
+    "a kids cut",
+    "a child's visit"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "MP045210",
+    "PT045210"
+   ],
+   [
+    "BS20981",
+    "PR20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states set their own rules for work done away from the business."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Pilates classes for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds Pilates classes to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW Pilates classes"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "An evaluation is rated, so the shop takes the first branch."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the clinic show photos of your smile?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's physical therapy takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Check-in plan · every 4 weeks"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Physical Therapy LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Rehab's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Physical Therapy"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Rehab"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Therapy and Lee Athletic Training"
+   ],
+   [
+    "plumbing and electrical",
+    "home physical therapy and athletic training"
+   ],
+   [
+    "1200 Main St",
+    "640 Main St"
+   ],
+   [
+    "88 Elm St",
+    "75 Park Ave"
+   ],
+   [
+    "Riley Chen",
+    "Nina Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Mia Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Noah Price"
+   ],
+   [
+    "Casey Moore",
+    "Jess Moore"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Mia"
+   ],
+   [
+    "Jordan",
+    "Noah"
+   ],
+   [
+    "Casey",
+    "Jess"
+   ],
+   [
+    "electrical",
+    "athletic training"
+   ],
+   [
+    "Electrical",
+    "Athletic training"
+   ],
+   [
+    "plumber",
+    "therapist"
+   ],
+   [
+    "Plumber",
+    "Therapist"
+   ],
+   [
+    "plumbing",
+    "home physical therapy"
+   ],
+   [
+    "Plumbing",
+    "Home physical therapy"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "Barbershop",
+    "Clinic"
+   ],
+   [
+    "barbers",
+    "therapists"
+   ],
+   [
+    "barber",
+    "therapist"
+   ],
+   [
+    "Barber",
+    "Therapist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Evaluation and taping"
+   ],
+   [
+    "Signature cut and shave",
+    "Evaluation and taping"
+   ],
+   [
+    "hot towel",
+    "dry needling"
+   ],
+   [
+    "signature cut",
+    "evaluation and taping"
+   ],
+   [
+    "Groom's package",
+    "Work conditioning"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "brace fitting"
+   ],
+   [
+    "Color and cut",
+    "Brace fitting"
+   ],
+   [
+    "color correction",
+    "injury visit"
+   ],
+   [
+    "Color correction",
+    "Injury visit"
+   ],
+   [
+    "kids cuts",
+    "children's visits"
+   ],
+   [
+    "Kids cut",
+    "Child's visit"
+   ],
+   [
+    "kids cut",
+    "child's visit"
+   ],
+   [
+    "skin fade",
+    "running form check"
+   ],
+   [
+    "Skin fade",
+    "Running form check"
+   ],
+   [
+    "beard trim",
+    "taping"
+   ],
+   [
+    "Beard trim",
+    "Taping"
+   ],
+   [
+    "haircuts",
+    "evaluations"
+   ],
+   [
+    "Haircuts",
+    "Evaluations"
+   ],
+   [
+    "haircut",
+    "evaluation"
+   ],
+   [
+    "Haircut",
+    "Evaluation"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "dry needling"
+   ],
+   [
+    "Color",
+    "Dry needling"
+   ],
+   [
+    "a patch test",
+    "an exam"
+   ],
+   [
+    "patch test",
+    "exam"
+   ],
+   [
+    "a consult",
+    "an exam"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "is at the chair",
+    "is at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "Home evaluation"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up visit"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like an evaluation on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a check-in visit every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a check-in visit every 4 weeks, after the plan of care ends."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A coach books injury screens for three players on one morning."
+   ],
+   [
+    "staff cut",
+    "staff evaluation"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My knee is more swollen. Can I still come in?"
+   ],
+   [
+    "like a skin-test result",
+    "like the plan of care's goals"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Can Nina go over my home exercises again? I'm not sure I'm doing them right."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una evaluación el sábado."
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Park Ave"
+   ],
+   [
+    "says the cape clip ripped",
+    "says the bib clip ripped"
+   ]
+  ],
+  "B": [
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "A treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a therapist who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own patients."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see patients at the clinic; Riley also does dry needling and home visits."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Evaluations, follow-up visits and dry needling."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'therapy' visit could mean a physical therapist or a counselor."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Home evaluations and follow-up visits, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A home follow-up visit"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most physical therapy clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules clinics often set."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a home visit after my knee surgery."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa home visit Thu 12-2 Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Help walking after surgery' fits a home evaluation."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like care the state's rules don't allow."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The clinic's own visits are in the other flow."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is it after surgery, or a new problem?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes many visits, like 2 home visits a week for 3 weeks."
+   ],
+   [
+    "can clear the drain:",
+    "can do a home evaluation:"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are there steps to get in?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, three steps"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home evaluation needs none."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do a home safety check?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the hip hurts more now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Rest it, and call your surgeon's office. Chest pain or trouble breathing: call 911."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds two loose grab bars."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a loose stair rail."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a therapist stops there, so Alex gets a written note."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a loose stair rail and stopped the stair practice for your safety."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the rail fixed first"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's equipment scuffs the hallway floor, and Jordan texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "Jordan's equipment scuffed the hallway floor at A.M.'s. The before photo shows no scuff."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Alex's knee is sore 2 weeks later. A recheck within 30 days is free, so Sam OKs a free visit at $0, with its own code."
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M. asks for a recheck after the Thu Oct 22 visit. A recheck within 30 days is free."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "A recheck within 30 days is free, so this visit is free."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A recheck within 30 days is free: if something worries you, reply here."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan rushed and didn't explain the exercises."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on my floor from the visit."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come again next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a home follow-up visit."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a home follow-up visit, today,"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I had hip surgery last week and can't drive yet. Can a physical therapist come to my home Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mother needs physical therapy at home."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi mamá necesita terapia física en casa."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien se cayó o está herido?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: has anyone fallen, or is anyone hurt?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie se cayó."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody fell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se cae y no puede levantarse, o se golpea la cabeza, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If she falls and can't get up, or hits her head, call 911."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A physical therapy example: a fall with no new injury gets the plug-in's words, then the booking goes on."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if her mother falls and can't get up, or hits her head."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a physical therapist come to Kim's home this Thursday? What does it cost?"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Physical Therapy can do an evaluation at the clinic for $140, or at your home for $179, before any health plan."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan cares for both parents at one home, with a check-in plan for each, every 4 weeks."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's check-ins?"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "A haircut",
+    "An evaluation"
+   ],
+   [
+    "a haircut",
+    "an evaluation"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomept.com"
+   ],
+   [
+    "MP045210",
+    "PT045210"
+   ],
+   [
+    "BS20981",
+    "PR20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states set their own rules for work done away from the business."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Occupational therapy for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds occupational therapy to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW occupational therapy"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your custom brace job"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a home safety check Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a home safety check, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A home safety check"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's physical therapy takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Rehab LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Rehab's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Physical Therapy"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Rehab"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Therapy and Lee Athletic Training"
+   ],
+   [
+    "plumbing and electrical",
+    "home physical therapy and athletic training"
+   ],
+   [
+    "1200 Main St",
+    "640 Main St"
+   ],
+   [
+    "88 Elm St",
+    "75 Park Ave"
+   ],
+   [
+    "42 Oak St",
+    "16 Ridge Rd"
+   ],
+   [
+    "Riley Chen",
+    "Nina Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Mia Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Noah Price"
+   ],
+   [
+    "Casey Moore",
+    "Jess Moore"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Mia"
+   ],
+   [
+    "Jordan",
+    "Noah"
+   ],
+   [
+    "Casey",
+    "Jess"
+   ],
+   [
+    "electrical",
+    "athletic training"
+   ],
+   [
+    "Electrical",
+    "Athletic training"
+   ],
+   [
+    "plumbing license",
+    "physical therapy license"
+   ],
+   [
+    "Plumbing license",
+    "Physical therapy license"
+   ],
+   [
+    "plumber",
+    "therapist"
+   ],
+   [
+    "Plumber",
+    "Therapist"
+   ],
+   [
+    "plumbing",
+    "home physical therapy"
+   ],
+   [
+    "Plumbing",
+    "Home physical therapy"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "Barbershop",
+    "Clinic"
+   ],
+   [
+    "barbers",
+    "therapists"
+   ],
+   [
+    "barber",
+    "therapist"
+   ],
+   [
+    "Barber",
+    "Therapist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Evaluation and taping"
+   ],
+   [
+    "beard trim",
+    "taping"
+   ],
+   [
+    "Beard trim",
+    "Taping"
+   ],
+   [
+    "haircut",
+    "evaluation"
+   ],
+   [
+    "Haircut",
+    "Evaluation"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "dry needling"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home evaluation"
+   ],
+   [
+    "drain clearing",
+    "home evaluation"
+   ],
+   [
+    "Drain clearing",
+    "Home evaluation"
+   ],
+   [
+    "Water heater replacement",
+    "Custom brace"
+   ],
+   [
+    "water heater replacement",
+    "custom brace"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up visit"
+   ],
+   [
+    "water heater flush",
+    "home follow-up visit"
+   ],
+   [
+    "water heaters",
+    "braces"
+   ],
+   [
+    "water heater",
+    "brace"
+   ],
+   [
+    "leak repair",
+    "injury visit"
+   ],
+   [
+    "Leak repair",
+    "Injury visit"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "no-show fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "Service call",
+    "No-show fee"
+   ],
+   [
+    "Sewer camera inspection",
+    "Fall-risk screen"
+   ],
+   [
+    "sewer camera inspection",
+    "home safety check"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a therapy visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like a chiropractic adjustment"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face or jaw with a fever, or trouble breathing or swallowing."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a loose brace."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are there steps at your door?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "warranty plan",
+    "health plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and plan card ready."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that his hip hurts more now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "My hip hurts more now."
+   ],
+   [
+    "Kitchen drain",
+    "Home evaluation"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace two grab bars"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "replace two grab bars, $160"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Replace two grab bars · $160"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace two grab bars"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 grab bar quote"
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "replacing two grab bars for $160"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a loose stair rail, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a loose stair rail"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the visit"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the outlet fixed first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the hallway floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed hallway floor"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 home evaluation"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M.: added on the secure page."
+   ],
+   [
+    "the shutoff valves",
+    "the grab bars"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My knee has been sore since the visit."
+   ],
+   [
+    "with the store's receipt",
+    "with the lab's receipt"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the home safety report is ready"
+   ],
+   [
+    "Sewer camera report",
+    "home safety report"
+   ],
+   [
+    "Drain clearings already booked",
+    "Home evaluations already booked"
+   ],
+   [
+    "to the repair",
+    "to the treatment"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My hip hurts more today. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back from a doctor's visit 30 minutes late, sorry!"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 custom brace job"
+   ],
+   [
+    "flush",
+    "follow-up visit"
+   ],
+   [
+    "faucet",
+    "brace"
+   ],
+   [
+    "cleaning",
+    "appointment"
+   ],
+   [
+    "Cleaning",
+    "Appointment"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee"
+ ],
+ "story": {
+  "A": "Sam Lee, a physical therapist, signs up two companies by text. Then Alex, back from knee surgery, books a first evaluation with Nina at Lee Physical Therapy for Sat Oct 24 at 11:00am. The front desk checks Alex's health plan by hand, the health forms and the referral stay on the secure page, and Alex pays the $35 copay at the front desk. Nina's plan of care sets 12 visits, which Alex books as a series by text. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, home after hip surgery and not driving yet, books a home evaluation with Noah of Lee Home Rehab. Noah comes Thu Oct 22, arriving 8 to 10am, and sets a plan of home visits. The office bills Alex's health plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: Alex's $140 evaluation with Nina. Nothing is taken. The desk checks Alex's plan, and Alex pays the plan's share (a $35 copay) at the front desk.",
+    "list|card|counter": "The same evaluation where the clinic turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient.",
+    "list|card|card": "A $110 Saturday follow-up, when the front desk is closed: a card is saved, and it's charged when Nina texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Evaluation"
+    },
+    "list|none|*": {
+     "price": "$140",
+     "name": "Evaluation"
+    },
+    "list|card|counter": {
+     "price": "$140",
+     "fee": "$20",
+     "name": "Evaluation"
+    },
+    "list|card|card": {
+     "price": "$110",
+     "fee": "$20",
+     "name": "Follow-up visit"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Taping",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Running form check",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$40",
+      "paid": "$40",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Check-in plan visit",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|card|card"
+   ],
+   "booking": {
+    "times": [
+     "window"
+    ]
+   },
+   "examples": {
+    "list|none|own": "The main story: a $179 home evaluation with Noah. Nothing is taken. The office bills Alex's health plan its own way.",
+    "list|card|card": "The same visit, paid by Alex: a card is saved for the $89 missed-visit fee, and the $179 is charged to it when Noah texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Home evaluation"
+    },
+    "list|card|card": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Home evaluation"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Home safety check",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$160",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Fall-risk screen",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$199",
+      "paid": "$199",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Home check-in plan visit",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A8-35",
+    "more": [
+     "Here: Nina finds a warning sign, so there's no regular visit today. A work conditioning goes on the plan of care."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-20",
+    "more": [
+     "Lee Physical Therapy sends the claim itself. Alex pays the estimated share at the front desk.",
+     "A balance after the plan pays is billed by the clinic, never by Rosie's text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Therapy records stay with the clinic as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For a therapy visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever brings the patient to the clinic."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Physical Therapy, the forms are the health history, the consent and the health plan's papers.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Physical therapy always needs a license: each physical therapist and assistant, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Physical therapy books people (a physical therapist or a PT assistant), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Physical therapy runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each physical therapist and assistant holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No physical therapy is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A therapy visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A therapy visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A therapy visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the clinic: the patient is always there."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's therapy visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's two companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A new injury gets the soonest open time instead, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-50",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.14"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks the state's rule on a referral",
+      "q": "Referral needed, from the state's form?",
+      "does": "The plug-in holds a switch from the state's form: may a patient be seen without a doctor's referral? Alex has one, so the booking goes on.",
+      "more": [
+       "Some states let a first evaluation happen without a referral, for a set number of days or visits.",
+       "Some plans ask for a referral even where the state doesn't.",
+       "The referral's photo goes on the secure page, never through the AI."
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.license"
+      ],
+      "branches": [
+       {
+        "label": "Has a referral",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "None: allowed without one",
+        "steps": [
+         {
+          "id": "A4-x02",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Marks the booking 'no referral'",
+          "does": "The state's form lets a first evaluation happen without a referral. The booking is marked 'no referral', and only therapists the state allows are offered.",
+          "more": [
+           "Some states allow it only for a therapist with more years or a certificate. The state's form says which.",
+           "The desk counts the days or visits the state allows without one.",
+           "Rosie reminds the desk before that limit, so a referral can be asked for in time.",
+           "The plan's rules can still ask for a referral before it pays."
+          ],
+          "needs": [
+           "pf.license",
+           "pf.rules"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "None: one is needed first",
+        "steps": [
+         {
+          "id": "A4-x03",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "chat",
+          "title": "Says a referral comes first",
+          "does": "The state's form, or Alex's plan, needs a referral first, and there's none. Nothing is booked. Alex gets one from a doctor, then books again.",
+          "more": [
+           "Rosie never judges the reason. It only reads the switch from the state's form and the plan.",
+           "Nothing is saved, so nothing runs out."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Lee Physical Therapy needs a doctor's referral before a first visit, where Alex lives. Once Alex has one, booking takes a minute. Nothing is saved for now."
+           ]
+          ],
+          "tells": [
+           "agent"
+          ]
+         }
+        ],
+        "end": "end",
+        "endText": "Nothing booked. Alex books again once a doctor's referral is in hand."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-37",
+    "more": [
+     "The desk also notes the copay, any deductible left, and whether the plan must OK the visits after the evaluation.",
+     "The share is the plan's estimate, not a promise. The clinic bills the plan after the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here: the health history, the consent and a photo of the referral, due the day before.",
+     "A returning patient's consent stays on file for a year. The health history is asked again after surgery."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Physical therapy bills each visit on its own, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Evaluation results and the plan of care go to the doctor office to office, and are shared with the patient in person, never through Rosie."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the clinic: the patient is always there."
+   },
+   {
+    "op": "more",
+    "at": "A8-14",
+    "more": [
+     "After surgery, the desk calls Alex first, before any fee: a missed visit can mean something is wrong."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-45",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.12",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "portal",
+      "t": "Sat Oct 24, 12:00pm",
+      "title": "Nina sets the plan of care",
+      "does": "The evaluation is done. Nina writes the plan of care in the clinic's own record: goals, home exercises, and 2 visits a week for 6 weeks. Rosie keeps only the visit count and the dates.",
+      "more": [
+       "The plan itself, the goals and the findings stay in the clinic's record, never in Rosie or a text.",
+       "The clinic sends the plan to the surgeon itself. Where a plan asks for it, the doctor signs it.",
+       "The follow-ups can be with Nina or Mia, both physical therapists.",
+       "Alex picks the days with the desk: Mon and Wed at 11:00am.",
+       "The desk asks Alex's health plan to OK the 12 visits, on the plan's own website."
+      ],
+      "needs": [
+       "pf.services",
+       "pf.staff"
+      ]
+     },
+     {
+      "id": "A8-x02",
+      "type": "split",
+      "line": [
+       "4.25",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "portal",
+      "t": "Sat Oct 24, 12:02pm",
+      "title": "The desk records the plan's answer",
+      "q": "Does the plan OK the visits?",
+      "does": "The desk asks the plan on its own website and records the answer: the visits OK'd, and until when. Here, the plan OKs 12 visits, until Fri Dec 4.",
+      "more": [
+       "Some plans answer in minutes, some in days.",
+       "Rosie counts each visit against the OK, and warns the desk before the last one.",
+       "With no referral, the state's limit on days or visits is counted the same way."
+      ],
+      "rule": "Rosie's rule: Rosie never contacts a plan. The desk records the plan's answer, and Rosie only counts the visits. Why: Rosie connects only to the calendar and Stripe.",
+      "needs": [
+       "pf.money"
+      ],
+      "branches": [
+       {
+        "label": "OK'd: 12 visits by Dec 4",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Pending: one visit at a time",
+        "steps": [
+         {
+          "id": "A8-x03",
+          "line": [
+           "4.25"
+          ],
+          "who": "staff",
+          "via": "portal",
+          "title": "Books only the next visit, marked pending",
+          "does": "The plan hasn't answered yet. Only the next visit is booked, marked 'OK pending'. The series waits for the plan's answer.",
+          "more": [
+           "Alex hears that if the plan says no, it's $110 a visit self-pay, or a free cancel.",
+           "The desk records the answer when it comes. Then the series text goes out."
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "No: self-pay, or stop",
+        "steps": [
+         {
+          "id": "A8-x04",
+          "line": [
+           "4.25",
+           "4.11"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "visit",
+          "title": "Goes over the self-pay price with Alex",
+          "does": "The plan says no to more visits. The desk shows Alex the self-pay price, $110 a visit, and the right to a written price estimate. Nina can ask the plan to look again.",
+          "more": [
+           "If Alex goes on, the series text shows the self-pay price.",
+           "If Alex stops, nothing more is booked. Today's share is still paid."
+          ]
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     },
+     {
+      "id": "A8-x05",
+      "type": "split",
+      "line": [
+       "4.19",
+       "7.15"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Sat Oct 24, 12:05pm",
+      "title": "Texts the series for Alex's own yes",
+      "q": "Does Alex book the series?",
+      "does": "Alex picked the days at the desk, but the series still needs Alex's own yes by text. One reply can later cancel any visit, or all that are left.",
+      "more": [
+       "The text names only the clinic, the days and the share. The plan of care stays on the secure page.",
+       "Nothing repeats without this yes."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your next visits at Lee Physical Therapy are ready to book.",
+        {
+         "card": {
+          "title": "Lee Physical Therapy · 75 Park Ave",
+          "lines": [
+           "12 visits · Mon and Wed · 11:00am",
+           "Mon Oct 26 to Wed Dec 2",
+           "Each visit is paid like your first one",
+           "Free to cancel any visit until 24 hours before"
+          ],
+          "button": "See the dates",
+          "link": "rosfield.com/v/a3"
+         },
+         "buttons": [
+          "Book all 12",
+          "Just the next one"
+         ]
+        }
+       ]
+      ],
+      "rule": "Rosie's rule: a series of visits needs the customer's own yes, and one reply can cancel any visit or all that are left. Why: nobody is booked again and again without saying so.",
+      "tells": [
+       "cust"
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "branches": [
+       {
+        "label": "1 Book all 12",
+        "steps": [
+         {
+          "id": "A8-x06",
+          "line": [
+           "4.19"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books the 12 visits",
+          "does": "Alex replies 1, so all 12 visits are booked. It's one booking, and each visit gets its own code in its own reminder.",
+          "more": [
+           "Rosie counts the visits against the plan's OK.",
+           "If Alex has another open booking, a reply first asks which one."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "1"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: 12 visits at Lee Physical Therapy.",
+            {
+             "card": {
+              "title": "Lee Physical Therapy · 75 Park Ave",
+              "lines": [
+               "Mon and Wed · 11:00am",
+               "Mon Oct 26 to Wed Dec 2",
+               "Each visit's code comes with its reminder"
+              ]
+             },
+             "buttons": [
+              "Change the next visit",
+              "Cancel the next visit",
+              "Cancel all that are left"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "2 Just the next one",
+        "steps": [
+         {
+          "id": "A8-x07",
+          "line": [
+           "4.19",
+           "10.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books only the next visit",
+          "does": "Alex replies 2, so only Mon Oct 26 is booked. The desk books each next visit at checkout, one at a time.",
+          "say": [
+           [
+            "cust",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: your next visit at Lee Physical Therapy.",
+            {
+             "card": {
+              "title": "Lee Physical Therapy · 75 Park Ave",
+              "lines": [
+               "Mon Oct 26 · 11:00am",
+               "Free to cancel until Sun Oct 25, 11am"
+              ]
+             },
+             "code": "7314",
+             "buttons": [
+              "Change the time",
+              "Cancel the visit"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "No reply in 2 hours",
+        "steps": [
+         {
+          "id": "A8-x08",
+          "line": [
+           "4.19"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Books only the visit agreed at the desk",
+          "does": "No reply, so nothing repeats. Only Mon Oct 26, which Alex agreed to at the desk, is booked. The desk asks again at that visit."
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "A deductible not met yet: nothing is taken today, and the clinic bills Alex later, never by Rosie's text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-07",
+    "more": [
+     "With a plan of care, the series step books the visits instead. This is for one visit at a time."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A10-06",
+    "branch": {
+     "label": "A progress re-check comes due",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A10-x01",
+       "line": [
+        "10.10",
+        "8.12"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "portal",
+       "t": "Wed Nov 11, 12:00pm",
+       "title": "Nina re-checks Alex's progress",
+       "does": "Alex's 6th visit is the progress re-check the plan of care set. Nina measures progress against the goals and updates the plan in the clinic's record.",
+       "more": [
+        "The progress note goes to the surgeon office to office, never through Rosie or a text.",
+        "Rosie only counts the visits: 6 of 12 done, 6 left on the plan's OK.",
+        "More visits after the 12 need the plan's OK again, and Alex's own yes to a new series."
+       ],
+       "needs": [
+        "pf.services",
+        "pf.rules"
+       ]
+      },
+      {
+       "id": "A10-x02",
+       "line": [
+        "4.25",
+        "11.1"
+       ],
+       "who": "san",
+       "to": "staff",
+       "via": "msg",
+       "t": "Mon Nov 30, 8:00am",
+       "title": "Warns the desk before the OK runs out",
+       "does": "Two visits are left on the plan's OK, which ends Fri Dec 4. The desk asks the plan for more, or tells Alex the self-pay price before the last visit.",
+       "more": [
+        "The text names only the patient's initials, the count and the date.",
+        "Rosie never asks the plan itself."
+       ],
+       "say": [
+        [
+         "san",
+         "staff",
+         "A.M.: 2 visits left on the plan's OK, which ends Fri Dec 4.",
+         {
+          "card": {
+           "title": "Visits left · A.M.",
+           "lines": [
+            "10 of 12 done",
+            "OK ends Fri Dec 4"
+           ],
+           "button": "Open the record",
+           "link": "rosfield.com/s/a4"
+          }
+         }
+        ]
+       ],
+       "tells": [
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A clinic sells its visit packs only at the clinic, never while booking (pf.money.packages)."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A therapy visit always needs the patient there."
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Therapy records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "For home physical therapy, the forms are the health history, the consent and the health plan's papers.",
+     "Kept: the patient, or the person who decides, signs them on the secure page at the door before any work."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Home physical therapy takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for physical therapy (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the therapist's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Physical therapy always needs a license: each physical therapist and assistant, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Physical therapy books people (a physical therapist or a PT assistant), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Physical therapy runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each physical therapist and assistant holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No physical therapy is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Home physical therapy books a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A therapy visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Home physical therapy sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No therapy visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No therapy visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A home therapy visit needs no signed contract: the consent is a form on the secure page (B4-86)."
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's two companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A new injury gets the soonest open time instead, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Physical therapy bills each visit on its own, never in stages."
+   },
+   {
+    "op": "after",
+    "at": "B4-05",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.14"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks the state's rule on a referral",
+      "q": "Referral needed, from the state's form?",
+      "does": "The plug-in holds a switch from the state's form: may a patient be seen without a doctor's referral? Alex has one, so the booking goes on.",
+      "more": [
+       "Some states let a first evaluation happen without a referral, for a set number of days or visits.",
+       "Some plans ask for a referral even where the state doesn't.",
+       "The referral's photo goes on the secure page, never through the AI."
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.license"
+      ],
+      "branches": [
+       {
+        "label": "Has a referral",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "None: allowed without one",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Marks the booking 'no referral'",
+          "does": "The state's form lets a first evaluation happen without a referral. The booking is marked 'no referral', and only therapists the state allows are offered.",
+          "more": [
+           "Some states allow it only for a therapist with more years or a certificate. The state's form says which.",
+           "The office counts the days or visits the state allows without one.",
+           "Rosie reminds the office before that limit, so a referral can be asked for in time."
+          ],
+          "needs": [
+           "pf.license",
+           "pf.rules"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "None: one is needed first",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "chat",
+          "title": "Says a referral comes first",
+          "does": "The state's form, or Alex's plan, needs a referral first, and there's none. Nothing is booked. Alex gets one from a doctor, then books again.",
+          "more": [
+           "Rosie never judges the reason. It only reads the switch from the state's form and the plan.",
+           "Nothing is saved, so nothing runs out."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Lee Home Rehab needs a doctor's referral before a first visit, where Alex lives. Once Alex has one, booking takes a minute. Nothing is saved for now."
+           ]
+          ],
+          "tells": [
+           "agent"
+          ]
+         }
+        ],
+        "end": "end",
+        "endText": "Nothing booked. Alex books again once a doctor's referral is in hand."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-27",
+    "more": [
+     "A family member who stays with Alex can get the code, when a mobile is given for them."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a therapy visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever meets the therapist, like a family member at home."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-44",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.12",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "portal",
+      "t": "Thu Oct 22, 9:35am",
+      "title": "Noah sets the plan of home visits",
+      "does": "Noah writes the plan of care in the office's own record. It sets home visits 2 a week for 3 weeks, then the clinic once Alex can drive. Jess, the PT assistant, does most follow-ups.",
+      "more": [
+       "The plan, the goals and the findings stay in the office's record, never in Rosie or a text.",
+       "The office sends the plan to the surgeon itself. Where a plan asks for it, the doctor signs it.",
+       "Where a plan pays for home visits only while leaving home is hard, the office checks that.",
+       "The office asks Alex's plan to OK the 6 visits on the plan's own website. Rosie counts them."
+      ],
+      "needs": [
+       "pf.services",
+       "pf.staff"
+      ]
+     },
+     {
+      "id": "B8-x02",
+      "type": "split",
+      "line": [
+       "4.19",
+       "7.15"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 9:40am",
+      "title": "Texts the home visits for Alex's own yes",
+      "q": "Does Alex book the home visits?",
+      "does": "Alex picked the days with Noah, but the visits still need Alex's own yes by text. One reply can later cancel any visit, or all that are left.",
+      "more": [
+       "At home, the text names who comes, for the door check. The plan of care stays on the secure page.",
+       "Nothing repeats without this yes."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your next home visits are ready to book.",
+        {
+         "card": {
+          "title": "Lee Home Rehab · 16 Ridge Rd",
+          "lines": [
+           "6 visits · Tue and Fri · arriving 9–11am",
+           "Tue Oct 27 to Fri Nov 13",
+           "With Noah or Jess, from Lee Home Rehab",
+           "Each visit is paid like your first one"
+          ],
+          "button": "See the dates",
+          "link": "rosfield.com/v/r6"
+         },
+         "buttons": [
+          "Book all 6",
+          "Just the next one"
+         ]
+        }
+       ]
+      ],
+      "rule": "Rosie's rule: a series of visits needs the customer's own yes, and one reply can cancel any visit or all that are left. Why: nobody is booked again and again without saying so.",
+      "tells": [
+       "cust"
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "branches": [
+       {
+        "label": "1 Book all 6",
+        "steps": [
+         {
+          "id": "B8-x03",
+          "line": [
+           "4.19"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books the 6 home visits",
+          "does": "Alex replies 1, so all 6 visits are booked. It's one booking, and each visit gets its own code in its own on-my-way text.",
+          "more": [
+           "Jess comes for most of them. A new person at the door is named in each reminder.",
+           "If Alex has another open booking, a reply first asks which one."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "1"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: 6 home visits with Lee Home Rehab.",
+            {
+             "card": {
+              "title": "Lee Home Rehab · 16 Ridge Rd",
+              "lines": [
+               "Tue and Fri · arriving 9–11am",
+               "Tue Oct 27 to Fri Nov 13",
+               "Each visit's code comes with its on-my-way text"
+              ]
+             },
+             "buttons": [
+              "Change the next visit",
+              "Cancel the next visit",
+              "Cancel all that are left"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "2 Just the next one",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "line": [
+           "4.19",
+           "10.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books only the next home visit",
+          "does": "Alex replies 2, so only Tue Oct 27 is booked. The office books each next visit, one at a time.",
+          "say": [
+           [
+            "cust",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: your next home visit.",
+            {
+             "card": {
+              "title": "Lee Home Rehab · 16 Ridge Rd",
+              "lines": [
+               "Tue Oct 27 · arriving 9–11am · Jess",
+               "Free to cancel until 7am on the day"
+              ]
+             },
+             "buttons": [
+              "Change the time",
+              "Cancel the visit"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "No reply in 2 hours",
+        "steps": [
+         {
+          "id": "B8-x05",
+          "line": [
+           "4.19"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Books only the visit agreed with Noah",
+          "does": "No reply, so nothing repeats. Only Tue Oct 27, which Alex agreed to with Noah, is booked. Jess asks again at that visit."
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A check-in plan's home visits are each paid when they happen, like a single visit, so no plan charge is ever texted (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "Refit Tue Oct 27 2026 (R07) to the REDESIGN 2 master: plug-in facts (planbill, forms, plans, video, children, extrawork, aftercare), switches (sensitive on; welfare on in flow B only: home visits after surgery), settings (A set start, free cancel until 24 hours before; B arrival windows, free cancel until 7am the day of), money facts per path with names, rename pairs, few ops. Every old say/vary words op is gone (the record and the homes word money, contact and fees). Kept: the referral check (A4-x01 to A4-x03, B4-x01 to B4-x03), the plan of care and series (A8-x01 to A8-x08, B8-x01 to B8-x05) and the progress re-check (A10-x01, A10-x02); B8-x02's money variant removed (one line true on both paths). The home company is now 'Lee Home Rehab' (the longer name pushed S1-78, B7-88, B10-01 and S12-24 over the word limits). keep: 'leak' (the master's privacy-leak lines), 'visit fee' (the master's generic words).\nFrom: dentist (the clinic pilot), reviewed. Why: a physical therapy practice runs like it: health forms and the referral only on the secure page, the desk checks the plan by hand, a copay at the front desk or self-pay, no Rosie $2 for a health practice, and a second side where the pro goes to the patient (the dentist's care-home visits became home visits after surgery).\nNames: Sam Lee, a physical therapist, owns Lee Home Rehab (the master's main company: home physical therapy and athletic training, 640 Main St, a 25-mile travel area) and Lee Physical Therapy (the second company: the clinic, 75 Park Ave, Springfield). Flow A's story is at the clinic; flow B's at Alex's home, 16 Ridge Rd.\nPeople: at the clinic, Nina and Mia (physical therapists; only Nina does dry needling and the clinic's home visits). On the home team, Noah (physical therapist and athletic trainer) and Jess (physical therapist assistant). Sam, Pat and Alex M. stay. The pilot's people (Daniel, Eli, Mei, Lena) are all renamed; other patients keep master names or new ones (Tara, June P., Dee W., Nora S.).\nKinds of work: plumbing became home physical therapy, electrical became athletic training (game coverage, taping, a season plan for a school), the barbershop became the clinic. Licenses are switches from the state's form: each physical therapist's and assistant's own license (Sam's PT045210), and the practice's registration (PR20981) only where the state's form asks.\nJess, the assistant, does follow-up visits only, under a physical therapist's plan of care, with the supervision the state's form sets (S2-15). Only a physical therapist does an evaluation or stands in for one.\nReferral: a switch from the state's form (direct access), in own steps A4-x01 to A4-x03 and B4-x01 to B4-x03: has one; none but allowed (marked 'no referral', only therapists the state allows, the desk counts the days or visits and is reminded before the limit); none and needed (nothing booked). A plan can still ask for one.\nHealth details: the AI hears only the kind of visit (a new problem, or after surgery), referral yes or no, the plan's name, and work injury or car accident. Which surgery, symptoms, the member ID, the referral and the health forms go only on the secure page. Texts carry no visit type, and texts to Sam and staff use initials (A.M.) and no health details; B6-14's staff text no longer names a walker. At home, the therapist's name stays in texts for the door check.\nPrices are the example practices' own: clinic evaluation $140, follow-up $110, progress re-check $120, video follow-up $90, running form check $40, taping $20, dry needling $40, child's visit $110, a plan's $35 copay, a $20 no-show fee only where Sam turns it on. Home: evaluation $179, follow-up $150, home safety check $160, fall-risk screen $199 ($249 with Sam), an $89 no-show fee for self-pay visits only, game coverage $120 an hour with a 2-hour minimum. Check-in plans: $60 a visit at the clinic (going to $70 from Mon Nov 30), $150 a visit every 4 weeks at home. Examples, not a standard.\nMoney A: list|none|counter is the main path (nothing taken; the desk checks the plan; the $35 copay at the front desk). list|card|counter only where the clinic turns on its $20 no-show fee, never for a fee-free patient. list|card|card for Saturday mornings, when Nina works with no front desk and the saved card is charged at DONE. Left out: holds, deposits and full price before (a therapy visit is never paid ahead), photo or at-the-visit pricing (every visit is on the list), and Rosie's texted bill (the clinic has a front desk).\nMoney B: list|none|own is the main path (the office bills Alex's plan its own way, then Alex for any share). list|card|card is self-pay: a card saved, the $179 charged at DONE. Left out: holds, deposits, full price, a texted bill, photo or at-the-visit pricing.\nSign-up words changed to how therapy is paid (S1-13 to S1-18, S1-41 to S1-47): plan patients book with nothing taken; self-pay home patients save a card; the clinic saves a card only for its no-show fee or a Saturday visit. Sam leaves bank transfer off (S1-57); no tips; no $2 (S1-62, S1-26).\nOwn steps: after the evaluation, Nina sets the plan of care (A8-x01), the desk records the plan's answer (A8-x02: OK'd 12 visits by Dec 4, pending one visit at a time, or no: self-pay or stop), and the series goes out for Alex's own yes (A8-x05 to A8-x08: all 12, just the next one, or no reply). Flow B does the same for 6 home visits (B8-x01 to B8-x05). A10-x01 and A10-x02: a progress re-check, and a desk warning before the plan's OK runs out.\nVisits counted against a plan's OK are the overlay's own words; the general version is a gap (Visits counted against an approval, P9).\nDanger: the plug-in adds after-surgery warning signs (a hot or swollen calf, a fever, a red or leaking wound) with 'call your surgeon's office', and 911 for chest pain or trouble breathing. Rosie never judges how serious anything is. At home after surgery, nobody answering starts a safety check before any no-show fee (B8-10); the general version is a gap.\nBranches off where therapy never does them: walk-in lines, a reaction check, a separate first step booked first, own-or-rent questions, a signed contract before money, delivery and setup, items taken away, landlord limits, bigger multi-day jobs, paid in stages, parts billed after, results ready later, items not picked up, rentals coming back, jobs sent now, crews, seats and stays. splitsKept: A7-61 (a stand-in with the skill: Mia, or nobody for dry needling) and A8-02 (what to bring: photo ID and the plan card).\nFlow B: Kim's game coverage is a set game, Thu 3-5pm at Lincoln Field: weather moves it only when the game moves, and a missing treatment table doesn't move it. The window patient after Alex is June P. (B8-33).\nClocks: sign-up and the team run Mon Oct 19 from 2:05pm (the master's 'next morning' MORE became 'a minute later'). Flow B's what-if calls moved to Mon afternoon, before Alex's 6:40pm chat. Alex's clinic visit runs Sat Oct 24 11:00am to the series text at 12:05pm; the home visit Thu Oct 22 from 8:20am to the receipt at 9:45am (a 75-minute evaluation). Section 11 starts again plainly: 'Back to the week before, Thu Oct 22, late at night' (S11-01) and 'Back to Sat Oct 24, in the evening' (S12-01), as the tutor overlay does.\nUnlisted money paths keep the master's own variants (the overlay stores only what its listed paths show), so the read files show the master's example words there.\nNot sure: whether a home no-show fee of $89 suits most practices; how Medicare and Medicaid patients are kept fee-free (a switch in pf.money); whether a state's no-referral limit is counted in days or visits (the desk counts it; Rosie only reminds); the home-bound rule for plan-paid home visits is the office's own check; the right to cancel extra work sold at home (B8-24) depends on the state.\nReview (Oct 23): the plan's name is now asked before the times on both main paths (A4-50, B4-05). The plug-in lists every service the flows show (running form check, check-in plan visits, home safety check, fall-risk screen, game coverage), a fall with no injury as a safety step that lets the booking go on (A3-23, B3-18), visit packs sold only at the clinic (A5-03; A5-22 off), check-in plans paid visit by visit (A7-32, A7-54 on the Saturday card path only; B7-05's plan charge off), the right to cancel extra care sold at home as a switch (B8-24), and the free walker check (B10-08). Texts to Sam and the team carry no health detail (A4-48, A8-38, B4-42, B8-61, S12-21) and use initials (B8-23, B8-26, S11-40). S1-49 and S1-51 speak of saved cards, not holds or deposits. Dee's booking in section 11 follows the path, the S11-57 preview reads right on every path, S11-38 asks about a time still ahead, and the bib clip (a dental word) is gone (A8-39).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Classic cuts, fades and hot towel shaves.",
+    "A haircut could mean a salon or a barbershop.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "or can't be reached while care is due?",
+    "Each service starts the way most barbershops set it.",
+    "A chair renter asked for by name",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Access, like a step-free chair:",
+    "My employer pays for this cut.",
+    "How would you like it on top?",
+    "'Yes, make it a fade' goes back to the times.",
+    "Riley can do a shorter cut in the time left",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Stopped A.M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "A.M. says Saturday's cut is uneven on one side.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "3 jobs",
+    "A tip goes the shop's own way.",
+    "says the cape clip ripped a shirt collar today",
+    "The cape clip ripped my shirt collar.",
+    "Alex bought a package of cuts at the shop.",
+    "A beard trim",
+    "a beard trim",
+    "Lena",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "like a color correction done in two steps",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "so I can't reach Elm Street Dental.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A haircut",
+    "a haircut",
+    "a kids cut",
+    "a house call",
+    "MP045210",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "A cut is rated, so the shop takes the first branch.",
+    "May the shop show photos of your hair?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel",
+    "signature cut",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "a consult",
+    "consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "like a skin-test result",
+    "The cut is uneven on one side.",
+    "Quiero un corte el sábado.",
+    "Step-free door on Elm St",
+    "says the cape clip ripped"
+   ],
+   "B": [
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Classic cuts, fades and hot towel shaves.",
+    "A haircut could mean a salon or a barbershop.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "The shop's chair is in the other flow.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "can clear the drain:",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Alex texts that the sink is now overflowing.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds mold behind the sink wall.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Call a mold cleanup company first",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Your drain is under warranty, so this visit is free.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "3 jobs",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Someone calls for a dentist: a wrong number.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "A haircut",
+    "a haircut",
+    "leehomeservices.com",
+    "MP045210",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "consult",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "water heater",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "credited to the repair",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "warranty plan",
+    "A plan or warranty pays",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Kitchen drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote",
+    "replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "The kitchen drain is clogged again.",
+    "with the store's receipt",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "Drain clearings already booked",
+    "to the repair",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "$2,400 repipe",
+    "flush",
+    "faucet",
+    "cleaning"
+   ]
+  },
+  "A": {
+   "A8-35": "a67e890a5b",
+   "A9-20": "0cfe0e1776",
+   "A10-21": "08514557c8",
+   "A4-64": "b98f95b738",
+   "A7-74": "b3ec278ce4",
+   "S1-26": "155e1542cc",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "S1-29": "ed36650e05",
+   "S2-31": "320ac5e4cb",
+   "A4-50": "6f43775326",
+   "A4-37": "4ee9e74e71",
+   "A4-43": "c17d56f766",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A8-14": "5b54026a9c",
+   "A8-45": "6589a6b4d4",
+   "A9-03": "219c966588",
+   "A10-07": "bc852cf77d",
+   "A5-01": "6c5c5c2f87",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "B8-03": "ac9d404766",
+   "B10-17": "b5f4aef51b",
+   "B7-61": "342b55fd9b",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-67": "b66ffbd04d",
+   "S1-26": "155e1542cc",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B5-34": "917f89b62f",
+   "S1-29": "69d8f12a68",
+   "S2-31": "320ac5e4cb",
+   "B9-19": "b97bfbf0d2",
+   "B4-05": "fb3a9061c8",
+   "B4-27": "4b45128d2c",
+   "B4-74": "bae5529af9",
+   "B8-44": "3847104a93",
+   "B7-91": "7132851ec1",
+   "B10-32": "7713bff255"
+  }
+ }
+}

@@ -1,0 +1,5256 @@
+{
+ "id": "rentals",
+ "name": "Party rentals",
+ "style": "Event",
+ "pattern": "event",
+ "from": "photographer",
+ "plugin": {
+  "pf.license": {
+   "need": "No state license for renting party equipment in most places. The business registration where the state asks for one: from the state form.",
+   "inflatables and rides": "Where the state's form treats an inflatable or a ride as an amusement device, each unit needs what the form names: a permit, a registration, a yearly inspection, or insurance proof. These are switches from the state's form, filled per unit.",
+   "who holds it": "The business holds its registration, its insurance and each unit's papers. Crew members hold no license, unless the state's form names one, like an operator's training.",
+   "what to ask": [
+    "The business registration number, where the state gave one",
+    "For each inflatable: its permit or registration number and its inspection date, where the state's form asks",
+    "The liability insurance certificate and its end date"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "Nothing for tents, tables and chairs. An inflatable is offered only for dates while its papers are current, where the state's form asks for papers.",
+   "renewals": "A reminder 30 days before a unit's inspection or the insurance runs out. After that, the unit is hidden for later dates until new papers are on file.",
+   "insurance or bond": "Liability insurance on file, with its end date. Some homeowners' groups, parks and venues ask for a certificate naming them.",
+   "background checks": "Only where the state's form or a school or park asks.",
+   "event lighting": "String lights and uplights plug into normal outlets or the business's own generator. Any wiring work needs a licensed electrician, from the state's form.",
+   "at the store": "A pick-up counter needs no license of its own in most places: the state form says."
+  },
+  "pf.services": {
+   "delivered and set up (the example: Lee Party Rentals' own list)": [
+    {
+     "service": "Backyard party order: items picked from the list",
+     "price kind": "per item, from the list",
+     "price": "the items, plus delivery (the example: castle bounce house $195, 20x20 tent $225, 5 tables $60, 40 chairs $100, delivery $60: $640)",
+     "length": "setup about 1½ hours; pickup the next morning",
+     "place": "at the customer's place",
+     "before": "orders of $200 or more: a 25% deposit",
+     "after": "the rest on the saved card at DONE"
+    },
+    {
+     "service": "Small order (under $200), like tables and chairs",
+     "price kind": "per item, from the list",
+     "price": "the example: 5 tables and 12 chairs with delivery, $150",
+     "length": "setup about 20 minutes",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Castle bounce house (13x13)",
+     "price kind": "one price, per day",
+     "price": "$195 (the example)",
+     "length": "setup about 30 minutes",
+     "place": "at the customer's place: grass, or hard ground with weights",
+     "before": "with the order",
+     "after": "with the order",
+     "note": "Needs a flat space about 20 by 20 feet and an outlet within 100 feet, or the business's generator"
+    },
+    {
+     "service": "Pumpkin bounce house (smaller)",
+     "price kind": "one price, per day",
+     "price": "$179 (the example)",
+     "length": "setup about 30 minutes",
+     "place": "at the customer's place",
+     "before": "with the order: with delivery it's $239, so a 25% deposit",
+     "after": "the rest on the saved card at DONE"
+    },
+    {
+     "service": "Water slide (inflatable)",
+     "price kind": "one price, per day",
+     "price": "$199 (the example)",
+     "length": "setup about 45 minutes",
+     "place": "at the customer's place, on grass",
+     "before": "with the order",
+     "after": "with the order",
+     "note": "Needs a garden hose; never used in lightning"
+    },
+    {
+     "service": "Frame tents",
+     "price kind": "per tent",
+     "price": "20x20 $225, 20x30 $325 (the example)",
+     "length": "setup about 45 to 90 minutes",
+     "place": "at the customer's place",
+     "before": "with the order",
+     "after": "with the order",
+     "note": "Staked on grass after the utility locate, or weighted on hard ground"
+    },
+    {
+     "service": "Large tent event (big tents, a slope, a deck, or tight space)",
+     "price kind": "quoted from the customer's yard photos first",
+     "price": "the quote (the example: $640, over the owner's $500, so the owner OKs it)",
+     "length": "setup half a day",
+     "place": "at the customer's place",
+     "before": "a signed quote, then a 25% deposit",
+     "after": "the rest on the saved card at DONE"
+    },
+    {
+     "service": "Tables and chairs",
+     "price kind": "per item",
+     "price": "6-ft table $12, folding chair $2.50 (the example)",
+     "length": "",
+     "place": "at the customer's place",
+     "before": "with the order",
+     "after": "with the order"
+    },
+    {
+     "service": "Tent permit service",
+     "price kind": "one price, only where the city requires a permit",
+     "price": "the city's own fee, plus the example's $100 to file it",
+     "length": "",
+     "place": "at the customer's place",
+     "before": "with the order",
+     "after": "with the order",
+     "note": "Added only when the city's rules require a permit for the tent's size or distance from a building"
+    },
+    {
+     "service": "Delivery, setup and pickup",
+     "price kind": "travel fee, by distance",
+     "price": "$60 within 10 miles, then $3 a mile, up to 25 miles (the example)",
+     "length": "",
+     "place": "at the customer's place",
+     "before": "in the first price, always",
+     "after": ""
+    },
+    {
+     "service": "Tent lighting (Lee Event Lighting)",
+     "price kind": "one price, by person",
+     "price": "string lights for a 20x20 tent $199; $249 when Tasha designs them (the example)",
+     "length": "about 30 minutes",
+     "place": "at the customer's place",
+     "before": "with the order",
+     "after": "with the order"
+    },
+    {
+     "service": "Setup labor beyond the usual (a deck, stairs, a long carry)",
+     "price kind": "per hour, by person",
+     "price": "$120 an hour; $140 with Derek, the lead for big tents (the example)",
+     "length": "",
+     "place": "at the customer's place",
+     "before": "with the order",
+     "after": "with the order"
+    },
+    {
+     "service": "Uplights, set of 8 (Lee Event Lighting)",
+     "price kind": "one price",
+     "price": "$149 (the example)",
+     "length": "about 20 minutes",
+     "place": "at the customer's place",
+     "before": "with the order",
+     "after": "with the order"
+    },
+    {
+     "service": "Quiet generator, for a day",
+     "price kind": "one price, per day",
+     "price": "$150 a day (the example)",
+     "length": "",
+     "place": "at the customer's place",
+     "before": "with the order",
+     "after": "with the order",
+     "note": "For a yard with no outlet within 100 feet; the crew sets it up and runs the cords"
+    }
+   ],
+   "picked up at the store (the example: Lee Party Supply's own list)": [
+    {
+     "service": "Party table package (6 tables, 40 chairs)",
+     "price kind": "one price, for the weekend",
+     "price": "$140 (the example)",
+     "length": "pick-up about 15 minutes; back by Monday 10am",
+     "place": "at the store's counter",
+     "before": "a $40 deposit",
+     "after": "the $100 rest at the counter, at pick-up"
+    },
+    {
+     "service": "Popcorn machine",
+     "price kind": "one price, for the weekend",
+     "price": "$35 (the example)",
+     "length": "pick-up about 15 minutes",
+     "place": "at the store's counter",
+     "before": "a card saved for the $20 late-cancel or no-show fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Cotton candy machine",
+     "price kind": "one price",
+     "price": "$40 (the example)",
+     "length": "",
+     "place": "at the store's counter",
+     "before": "a card saved",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Chocolate fountain",
+     "price kind": "one price",
+     "price": "$55 (the example)",
+     "length": "",
+     "place": "at the store's counter",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Linen pack (4 tablecloths)",
+     "price kind": "one price",
+     "price": "$20 (the example)",
+     "length": "",
+     "place": "at the store's counter",
+     "before": "a card saved",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Kids' table and 6 chairs",
+     "price kind": "one price",
+     "price": "$25 (the example)",
+     "length": "",
+     "place": "at the store's counter",
+     "before": "a card saved",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Table package delivered",
+     "price kind": "one price",
+     "price": "$75 more to deliver it (the example)",
+     "length": "",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "The same package, booked in flow B"
+    }
+   ],
+   "stock": "Each item is counted by date: how many the business owns, minus every order that overlaps that day, minus cleaning time after a return. Two bookings never take the same item on the same date. Saved for 10 minutes while the customer books.",
+   "capacity": "Delivery windows follow the crews and trucks free that day. A big tent needs a two-person crew.",
+   "nobody needs to be home": "Never for inflatables and tents: an adult signs the safety rules at setup. Tables and chairs only: may be left with a photo, where the owner allows it.",
+   "online": "None."
+  },
+  "pf.questions": {
+   "before times (they set the price, the items or the window)": [
+    "The party's date and hours, and the town or ZIP (for the delivery fee)",
+    "The items and how many, picked from the list",
+    "The ground: grass, concrete, a deck or other",
+    "A flat space for each item, and its size",
+    "An outdoor outlet within 100 feet, or the generator",
+    "For a tent: how far from the house, open or closed sides"
+   ],
+   "after a time is picked": [
+    "Where in the yard each item goes",
+    "The gate width, and any steps or slopes on the way in",
+    "Pets, and where they'll be during setup",
+    "May the crew stake into the lawn?",
+    "Private lines to flag, like sprinklers, a pet fence or gas to a grill"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "Gate or door codes",
+    "The signed rental agreement and safety rules",
+    "Access needs",
+    "The card"
+   ],
+   "who may book": "An adult who may have the items set up at the address. An adult is home at setup to sign the safety rules."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "Someone hurt or not breathing, or an inflatable lifting or blowing over right now",
+     "says": "If someone is hurt or not breathing, call 911 now. If an inflatable is lifting in the wind, get everyone off and away from it, then unplug the blower.",
+     "booking": "No booking in that chat; the business is told."
+    },
+    {
+     "words": "A downed power line, or a tent touching a power line",
+     "says": "Stay away from the line and call 911 and the power company.",
+     "booking": "No booking in that chat."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "Wind, rain or lightning on the party day",
+     "says": "Keep everyone off the inflatable. The crew won't set one up in high wind, rain or lightning, and the weather move is free.",
+     "booking": "Goes on; the crew decides at setup."
+    },
+    {
+     "words": "A sparking blower, or a cord in water",
+     "says": "Unplug the blower at the outlet if it's safe, and keep everyone away. We'll send someone.",
+     "booking": "Goes on, marked urgent for the owner."
+    }
+   ],
+   "always the rules": "Inflatables are staked, or weighted on hard ground, every time. Never used in high wind, rain or lightning: the unit maker's wind limit, or a stricter one where the state's rules set it. An adult watches the whole time. Age, size and rider limits are posted on each unit.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The rental agreement and safety rules, signed on the secure page",
+     "for": "Every delivered order",
+     "timing": "When booking, before any money is taken"
+    },
+    {
+     "step": "The utility locate (call 811) before any stake goes in",
+     "for": "Tents staked into a lawn",
+     "timing": "A to-do for the business when booked. The waiting time is the state's own, from its form. No locate cleared by the day before: weights, never stakes"
+    },
+    {
+     "step": "The customer flags private lines: sprinklers, a pet fence, lamp wiring, gas to a grill or fire pit",
+     "for": "Staked items",
+     "timing": "On the secure page, then flags before setup. The crew uses weights over any flagged line"
+    },
+    {
+     "step": "A tent permit, where the city's rules require one for the tent's size",
+     "for": "Large tents",
+     "timing": "A to-do for the business, filed before the date the city sets. Not back in time: a smaller tent with no permit, or a free move"
+    },
+    {
+     "step": "A site check, from yard photos or a visit",
+     "for": "Large tents, slopes and decks",
+     "timing": "Before the quote"
+    }
+   ],
+   "prep for the reminder": [
+    "Turn sprinklers off the night before",
+    "Flag any private lines in the yard",
+    "Keep pets inside during setup",
+    "Clear the setup area and the path from the gate",
+    "An adult home during the delivery window, to sign the safety rules"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code, given to the crew lead at the door. Someone else at the home can get the code, when a mobile is given for them.",
+   "check-in at the store": "The code at the counter, or the counter staff types it.",
+   "before setup": "The crew checks the wind and the spot against the booking: ground, space, power, the locate marks and the customer's flags. Over the wind limit: the inflatable isn't set up, and the customer gets a free new date or its price back. A stake spot on a flagged line: weights there instead, at no charge.",
+   "setup": "Every inflatable is staked, or weighted on hard ground. Tents are staked after the locate, or weighted. Before and after photos are taken.",
+   "proof it's done": "The safety walk-through: the adult in charge signs the safety rules and the delivery on the secure page (an adult watches at all times, the posted age and size limits, no shoes, no flips, everyone off in wind or rain, unplug if the blower stops). Then the crew lead texts DONE.",
+   "work changes at setup": "Added items only with the customer's yes, priced from the list, with stock checked first. Paid by one pay link.",
+   "pickup": "The next morning, or the same evening (the owner's setting). The crew counts and checks every item, with photos. Damage or cleaning found goes to the owner with the photos; no card hold.",
+   "at the store": "The counter staff checks each item out with the customer and takes photos. The customer brings everything back by the return time, and it's checked in the same way."
+  },
+  "pf.money": {
+   "starting answers": [
+    "Orders of $200 or more: a 25% deposit when booking; the rest on the saved card when the crew lead marks the job done",
+    "Orders under $200: the full price when booking",
+    "Large tents: a signed quote first, then the same deposit",
+    "Pick-up at the store: a deposit or a card saved, and the rest at the counter; small items paid in full"
+   ],
+   "limits": [
+    "Deposit cap: from the state form",
+    "Free to cancel until 5pm the day before delivery (the example). After that, the deposit may be kept, or a small order's $60 delivery fee, only if the owner confirms. No answer: no fee",
+    "Weather: an inflatable the crew won't set up for wind, rain or lightning gets a free new date or comes off the order",
+    "The business cancels or changes the plan: a full refund of anything not delivered"
+   ],
+   "delivery fee": "In the first price, always, by distance from the warehouse.",
+   "tips": "Off by default.",
+   "tax": "Sales tax on rentals where the state taxes them: a rate the owner sets.",
+   "Rosfield's $2": "Applies: a rental company pays Rosfield's $2 for each confirmed booking.",
+   "damage": "No card holds. Damage or cleaning found at pickup (the example: $75 cleaning, $35 a broken chair) goes to Sam with the photos; Rosie never charges it on its own, and any new amount needs the customer's own yes."
+  },
+  "pf.messages": {
+   "never in a text": "Gate codes, the street address in texts to others, and access notes stay on the secure page. An injury report goes to the owner only.",
+   "languages": "English and Spanish.",
+   "minors": "Children use the items, but only an adult books, signs and is home at setup."
+  },
+  "pf.staff": {
+   "roles": [
+    "Crew lead (drives, sets up, does the safety walk-through)",
+    "Crew helper",
+    "Counter staff at the store",
+    "Lighting tech"
+   ],
+   "skills": [
+    "Inflatables",
+    "Frame tents",
+    "Big tents (two-person crew)",
+    "Tables and chairs",
+    "Tent lighting",
+    "Store counter"
+   ],
+   "supervision": "A new helper works only with a crew lead on the same job. Inflatable operator training, where the state's form asks for it.",
+   "driving": "A driver's license for anyone who drives the truck. A commercial license only where the truck's weight needs one: from the state form.",
+   "who OKs what": "The owner OKs quotes over the owner's limit, and big tents on a slope or a deck.",
+   "stand-ins": "Any crew lead with the skill for the items. A rental is booked for items and a date, not one crew lead, so the customer isn't asked; the on-my-way text names who comes."
+  },
+  "pf.rules": {
+   "rental agreement": "The business's own agreement and safety rules, filled in from the order, signed by the customer on the secure page before money is taken. Any parts the state's rules add come from the state form.",
+   "stock": "Two bookings never take the same item on the same date. A unit out for repair or cleaning is hidden until it's back.",
+   "inflatable papers": "Where the state's form asks: a unit is offered only while its permit, inspection and insurance are current. Any injury report to the state, where its form requires one.",
+   "utility locate": "No stakes before the locate clears; the waiting time comes from the state's form. Private lines flagged by the customer get weights.",
+   "tent permit": "Where the city's rules require one for the tent's size or distance from a building: filed by the business, from the state or city form. Never stated as one rule for all.",
+   "weather": "The unit maker's wind limit, or a stricter one where the state's rules set it. No inflatable in rain or lightning.",
+   "cancel": "Free until 5pm the day before delivery (the example). After that, what may be kept follows the agreement, only if the owner confirms. Where the state's rules limit what may be kept, the form says.",
+   "records": "Agreements, safety sign-offs, setup and pickup photos and payments kept 7 years, as for every kind of work."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for party rentals:",
+   "party rentals": [
+    "An item is booked that day: the next free item is offered, or it's dropped",
+    "Wind, rain or lightning over the limit: no inflatable; a free new date or its price back",
+    "Wind picks up during the party: everyone off, the blower unplugged, the owner told",
+    "A child is hurt: the 911 words, the owner called at once; Rosie never says who's at fault",
+    "The locate or the permit isn't back: weights instead of stakes, or a smaller tent",
+    "A unit is damaged at another party: the next free unit for less, or dropped, with no fee",
+    "The customer adds items: stock checked first, then priced from the list",
+    "Damage or cleaning found at pickup: the owner calls the customer, with photos; any new amount needs the customer's own yes",
+    "Overhead power lines over a tent spot: the tent goes elsewhere, or not at all",
+    "A customer picking up at the store returns late: one reminder, then the owner calls"
+   ]
+  },
+  "pf.facts": [
+   "forms",
+   "documents",
+   "photos",
+   "extrawork"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": {
+     "window": 2
+    }
+   },
+   "cutoff": "5pm the day before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Wes and Zoe (counter staff)"
+  },
+  "B": {
+   "staff": "Derek and Tasha (crew leads)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Wes"
+  },
+  "B": {
+   "staff": "Derek"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about your rentals wasn't right, reply here."
+   ],
+   [
+    "a travel fee",
+    "a delivery fee by distance"
+   ],
+   [
+    "Hi, I want to put my barbershop on Rosie",
+    "Hi, I want to put my party supply store on Rosie"
+   ],
+   [
+    "Barbershop, plumbing, electrical",
+    "Party supply store, party rentals, event lighting"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each item starts the way most party supply stores set it."
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Deliveries: the table package only, by Wes"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A party supply store on Canal St. Tables, chairs and party machines to pick up for the weekend."
+   ],
+   [
+    "A neighborhood barbershop on Elm St.",
+    "A party supply store on Canal St."
+   ],
+   [
+    "We couldn't find barbershop license BS20981",
+    "We couldn't find business registration BR-20981"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a photo booth, which isn't on the store's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Party Supply doesn't rent photo booths."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a popcorn machine for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "skin fades",
+    "popcorn machines"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Special prices come to you first. Board prices never need one"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A tent's example: 'A big tent may need a city permit first, where the city's rules require one.'"
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like to rent tables for Saturday."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Wes's next times show first, then Zoe's."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the vehicle the customer brings."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The party rentals plug-in adds its own, like an inflatable lifting in the wind."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A party rental example: a sparking blower gets 'unplug it if it's safe'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A pick-up at the store has none, so nothing is sent here."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A popcorn machine could mean a party rental or a snack supplier."
+   ],
+   [
+    "A barbershop's services need none.",
+    "A pick-up needs none: the rental agreement covers it."
+   ],
+   [
+    "Sam adds massage to",
+    "Sam adds balloon decor to"
+   ],
+   [
+    "NEW massage",
+    "NEW balloon decor"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Balloon decor for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Step-free door on Canal St · loading spot in front"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero rentar mesas para el sábado."
+   ],
+   [
+    "Is this Elm Street Dental?",
+    "Is this Canal Street Dental?"
+   ],
+   [
+    "so I can't reach Elm Street Dental",
+    "so I can't reach Canal Street Dental"
+   ],
+   [
+    "Sam, a barber or the desk can book for a customer by text or on the portal.",
+    "Sam or the counter staff can book for a customer by text or on the portal."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a linen pack. Both are picked up together, at one time, and the prices add up: $35 and $20."
+   ],
+   [
+    "Alex M. asks: Can my son wait in the shop during my cut?",
+    "Alex M. asks: Can my son help load the tables?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son help load the tables?"
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can I add a linen pack on Saturday?"
+   ],
+   [
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "There's one free. Add a linen pack to your Sat 11:00am pick-up?"
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex arrives at the store. The plug-in asks for a photo ID, and the counter checks it first."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "It's 11:00am, and Alex is at the counter. Alex reads the code from the confirmation or the reminder, and Riley texts it in."
+   ],
+   [
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "A party supply store runs no classes. A studio, a gym or a school does."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A party supply store takes no drop-offs. A repair business, a tailor or a groomer does."
+   ],
+   [
+    "From the price list or photos, the price is set. A service priced at the chair gets its price now.",
+    "From the price list or photos, the price is set. A service priced at the counter gets its price now."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The cart scraped my car's bumper."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the store's cart scraped their car's bumper today."
+   ],
+   [
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the store, a parent stays, so nothing more happens."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: brings a pickup truck. Rents tables every fall."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A pick-up is rated, so the store takes the first branch."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next pick-up at the counter"
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like a package for an office's 3 summer picnics, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Barbershop sent you a proposal: a summer picnic package."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Summer picnic package"
+   ],
+   [
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Signed, thanks! Pick a time for your first picnic pick-up:"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "One of the tables wobbles."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says one of Saturday's tables wobbles."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you rent kids' tables? My son turns 8."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a kids' table and 6 chairs is $25. Want a time?"
+   ],
+   [
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute style consult.",
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute decor consult."
+   ],
+   [
+    "The tip line on the bills Rosie texts is turned on or off here too.",
+    "The tip line on the bills Rosie texts is turned on or off here too."
+   ],
+   [
+    "like a haircut at the shop or at home.",
+    "like a table package picked up at a store or delivered."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work is licensed to its own place."
+   ],
+   [
+    "The state's license lookup is down",
+    "The state's lookup is down"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Party rentals and the store take none."
+   ],
+   [
+    "Lee Home Services",
+    "Lee Party Rentals"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Party Supply LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Party Supply"
+   ],
+   [
+    "1200 Main St",
+    "75 Depot Rd"
+   ],
+   [
+    "88 Elm St",
+    "260 Canal St"
+   ],
+   [
+    "Jordan Price",
+    "Derek Price"
+   ],
+   [
+    "Casey Moore",
+    "Tasha Moore"
+   ],
+   [
+    "Riley Chen",
+    "Wes Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Zoe Diaz"
+   ],
+   [
+    "the barbershop's",
+    "the store's"
+   ],
+   [
+    "the barbershop",
+    "the party supply store"
+   ],
+   [
+    "the shop's",
+    "the store's"
+   ],
+   [
+    "The shop's",
+    "The store's"
+   ],
+   [
+    "the shop",
+    "the store"
+   ],
+   [
+    "The shop",
+    "The store"
+   ],
+   [
+    "shop",
+    "store"
+   ],
+   [
+    "Shop",
+    "Store"
+   ],
+   [
+    "plumbing and electrical",
+    "party rentals and event lighting"
+   ],
+   [
+    "Plumbing and electrical",
+    "Party rentals and event lighting"
+   ],
+   [
+    "Drain clearing",
+    "Pumpkin bounce house"
+   ],
+   [
+    "Electrical",
+    "Event lighting"
+   ],
+   [
+    "electrical",
+    "event lighting"
+   ],
+   [
+    "Plumbing",
+    "Party rentals"
+   ],
+   [
+    "plumbing",
+    "party rentals"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "Jordan",
+    "Derek"
+   ],
+   [
+    "Casey",
+    "Tasha"
+   ],
+   [
+    "Riley",
+    "Wes"
+   ],
+   [
+    "Avery",
+    "Zoe"
+   ],
+   [
+    "color quote",
+    "special price"
+   ],
+   [
+    "A barbershop",
+    "A party supply store"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Chocolate fountain"
+   ],
+   [
+    "Signature cut and shave",
+    "Chocolate fountain"
+   ],
+   [
+    "the Groom's package",
+    "the table package"
+   ],
+   [
+    "The Groom's package",
+    "The table package"
+   ],
+   [
+    "Groom's package",
+    "Table package"
+   ],
+   [
+    "Skin fade",
+    "Cotton candy machine"
+   ],
+   [
+    "skin fade",
+    "cotton candy machine"
+   ],
+   [
+    "Beard trim",
+    "Linen pack"
+   ],
+   [
+    "beard trim",
+    "linen pack"
+   ],
+   [
+    "Kids cut",
+    "Kids' table set"
+   ],
+   [
+    "kids cut",
+    "kids' table set"
+   ],
+   [
+    "Color and cut",
+    "Fair machines, 3 days"
+   ],
+   [
+    "color and cut",
+    "fair machines"
+   ],
+   [
+    "Color correction",
+    "Balloon wall"
+   ],
+   [
+    "color correction",
+    "balloon wall"
+   ],
+   [
+    "Haircuts",
+    "Popcorn machines"
+   ],
+   [
+    "haircuts",
+    "popcorn machines"
+   ],
+   [
+    "Haircut",
+    "Popcorn machine"
+   ],
+   [
+    "haircut",
+    "popcorn machine"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "house calls",
+    "deliveries"
+   ],
+   [
+    "house call",
+    "delivery"
+   ],
+   [
+    "barbers",
+    "counter staff"
+   ],
+   [
+    "Barber",
+    "Counter clerk"
+   ],
+   [
+    "barber",
+    "counter clerk"
+   ],
+   [
+    "counter staff'",
+    "counter staff's"
+   ],
+   [
+    "a solo float studio",
+    "a solo party-gear renter"
+   ],
+   [
+    "A studio, a gym or a school does",
+    "A gym, a school or a club does"
+   ]
+  ],
+  "B": [
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Where in the yard does the bounce house go?'"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A party order from the list needs none."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If something about your rentals wasn't right, reply here."
+   ],
+   [
+    "Lin agreed to the business's service call fee when booking.",
+    "Lin agreed to the business's no-show fee when booking."
+   ],
+   [
+    "Charge or keep the service call fee?",
+    "Charge or keep the no-show fee?"
+   ],
+   [
+    "If Sam set a travel fee for farther towns, the price shows with it.",
+    "Sam's delivery fee is by distance: $60 within 10 miles, then $3 a mile. It shows in the first price."
+   ],
+   [
+    "a travel fee",
+    "a delivery fee by distance"
+   ],
+   [
+    "Plumbing, electrical, barbershop",
+    "Party rentals, event lighting, party supply store"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the items and how many, the party's hours, the ground, the space and the power."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A bounce house could mean a party rental or a play-place visit."
+   ],
+   [
+    "Lee Home Services took the service call fee you agreed to when you booked.",
+    "Lee Party Rentals took the no-show fee you agreed to when you booked."
+   ],
+   [
+    "Service call fee",
+    "No-show fee"
+   ],
+   [
+    "Service call",
+    "Delivery and setup"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Party rentals for backyard parties in Springfield: bounce houses, tents, tables and chairs, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A tent, set up"
+   ],
+   [
+    "Once a barber is confirmed and you say yes. Stripe still to connect",
+    "Once the counter staff join and you say yes. Stripe still to connect"
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee Party Supply for its table package instead. It's picked up at the store or delivered, so Alex sees both prices first."
+   ],
+   [
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "Wes also delivers the table package. Sam set each place's price and money at sign-up."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Party Supply's table package is $140 picked up at the store, or $215 delivered. Where would you like it?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a bounce house for Saturday. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Something for the kids to jump on' fits a bounce house."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Tonight, please turn off the sprinklers and flag any private lines in the yard."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a rut in the lawn where the tent was."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a bounce house for a party, today"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "The delivery fee is $60. Accept it?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can you bring a bounce house this Thursday? What does it cost?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Party Rentals can set up your party order:"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE party order set up"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like staking a tent on a neighbor's lawn."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding string lights for the tent? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Party Rentals asks: is the party at a home, a park or somewhere else? And is the setup spot grass or hard ground, with an outlet within 100 feet?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Grass, and an outlet on the porch."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for string lights in the tent. Both go in one booking, with one setup window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also hang string lights in the tent?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. Tent lighting is $199 from the list. Both fit in the same setup window."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's stake nicks a sprinkler line that wasn't flagged, and Jordan texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE stake nicked a sprinkler line"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Sprinkler line"
+   ],
+   [
+    "cracked the cabinet floor",
+    "nicked a sprinkler line with a stake"
+   ],
+   [
+    "The before photo shows no crack.",
+    "It wasn't flagged on the page or in the yard."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also bring a water slide?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Water slide · $199"
+   ],
+   [
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Alex asks for 10 more chairs at setup. The price is read back, and Alex says yes before they're set out."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 25 10 more chairs, asked at setup"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "10 more chairs, $25"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $25 chair price is good for 7 days."
+   ],
+   [
+    "$160 for today's extra work",
+    "$25 for today's extra chairs"
+   ],
+   [
+    "the shutoff valves",
+    "the extra chairs"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Backyard party order"
+   ],
+   [
+    "Kitchen drain",
+    "Backyard party order"
+   ],
+   [
+    "kitchen drain",
+    "backyard party order"
+   ],
+   [
+    "Yard drain",
+    "Tables and chairs"
+   ],
+   [
+    "Water heater fix",
+    "Tent check"
+   ],
+   [
+    "$40 deposit",
+    "$160 deposit"
+   ],
+   [
+    "$110 rest",
+    "$480 rest"
+   ],
+   [
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "Cancel your party rental order (Thu 8–10am)?"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Party rental orders have a price before the visit: from the list, or a signed quote."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "10 folding chairs · $25"
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to 10 more chairs for $25."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left tent stakes in the lawn."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can I rent the castle bounce house again next month?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are the next open dates for the castle bounce house."
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan went back for more stakes."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting more stakes, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Jordan went back for more stakes and will be back about 9:30am. Setup should be done by 10am."
+   ],
+   [
+    "Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "Alex asks an AI for party rentals on Mon Oct 19, 6:40pm."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa tables Thu 12-2 Casey"
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Tables and chairs"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A party order happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "like a roof leak",
+    "like catering"
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Party Rentals rents and sets up party equipment, but doesn't cater. Nothing was saved. You can look for a caterer near you."
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "A job quoted at a site visit promises only the visit fee now."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos",
+    "The plug-in says a large tent is quoted from yard photos"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your yard, and a crew lead will price the tent."
+   ],
+   [
+    "Your water heater price is with",
+    "Your tent price is with"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your tent this time"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The party is Thursday. Can someone come tonight?"
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "he's the one who leads big tents"
+   ],
+   [
+    "Written estimate and terms",
+    "Written quote and terms"
+   ],
+   [
+    "water heater contract",
+    "tent quote"
+   ],
+   [
+    "Lee Home Services has no open times for this job in the next 60 days.",
+    "Lee Home Services has no open times for this order in the next 6 months."
+   ],
+   [
+    "like a haircut at the shop or at home.",
+    "like a table package picked up at a store or delivered."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work is licensed to its own place."
+   ],
+   [
+    "Drain clearing · $179",
+    "Pumpkin bounce house · $239 with delivery"
+   ],
+   [
+    "Sam adds heating and cooling to",
+    "Sam adds DJ services to"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW DJ services"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "DJ services for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "The whole team, since no person license is needed"
+   ],
+   [
+    "The state's license lookup is down",
+    "The state's lookup is down"
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the party rentals plug-in now, and the others when Sam gets to them."
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Plumbing is live!",
+    "Party rentals are live!"
+   ],
+   [
+    "Plumbing is live.",
+    "Party rentals are live."
+   ],
+   [
+    "Plumbing stays live, and the rest waits, saved.",
+    "Party rentals stay live, and the rest waits, saved."
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Mon–Sat 7:30am–6pm"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Party rentals and the store take none."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Party Rentals LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Party Rentals"
+   ],
+   [
+    "leehomeservices.com",
+    "leepartyrentals.com"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Party Supply"
+   ],
+   [
+    "1200 Main St",
+    "75 Depot Rd"
+   ],
+   [
+    "88 Elm St",
+    "260 Canal St"
+   ],
+   [
+    "42 Oak St",
+    "18 Birch Ln"
+   ],
+   [
+    "Jordan Price",
+    "Derek Price"
+   ],
+   [
+    "Casey Moore",
+    "Tasha Moore"
+   ],
+   [
+    "Riley Chen",
+    "Wes Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Zoe Diaz"
+   ],
+   [
+    "the barbershop",
+    "the party supply store"
+   ],
+   [
+    "the shop's",
+    "the store's"
+   ],
+   [
+    "The shop's",
+    "The store's"
+   ],
+   [
+    "the shop",
+    "the store"
+   ],
+   [
+    "The shop",
+    "The store"
+   ],
+   [
+    "shop",
+    "store"
+   ],
+   [
+    "Shop",
+    "Store"
+   ],
+   [
+    "plumbing and electrical",
+    "party rentals and event lighting"
+   ],
+   [
+    "Plumbing and electrical",
+    "Party rentals and event lighting"
+   ],
+   [
+    "Drain clearings",
+    "Pumpkin bounce houses"
+   ],
+   [
+    "drain clearings",
+    "pumpkin bounce houses"
+   ],
+   [
+    "Drain clearing",
+    "Pumpkin bounce house"
+   ],
+   [
+    "drain clearing",
+    "pumpkin bounce house"
+   ],
+   [
+    "Water heater replacement",
+    "Large tent event"
+   ],
+   [
+    "water heater replacement",
+    "large tent event"
+   ],
+   [
+    "Water heater flush",
+    "Party rental order"
+   ],
+   [
+    "water heater flush",
+    "party rental order"
+   ],
+   [
+    "Sewer camera inspection",
+    "Water slide"
+   ],
+   [
+    "sewer camera inspection",
+    "water slide"
+   ],
+   [
+    "Leak repair",
+    "Tent site visit"
+   ],
+   [
+    "leak repair",
+    "tent site visit"
+   ],
+   [
+    "Electrical",
+    "Event lighting"
+   ],
+   [
+    "electrical",
+    "event lighting"
+   ],
+   [
+    "Plumbing",
+    "Party rentals"
+   ],
+   [
+    "plumbing",
+    "party rentals"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "Jordan",
+    "Derek"
+   ],
+   [
+    "Casey",
+    "Tasha"
+   ],
+   [
+    "Riley",
+    "Wes"
+   ],
+   [
+    "Avery",
+    "Zoe"
+   ],
+   [
+    "$89 service call",
+    "$60 delivery fee"
+   ],
+   [
+    "service call",
+    "delivery fee"
+   ],
+   [
+    "water heater",
+    "tent"
+   ],
+   [
+    "Sam adds a crew lead",
+    "Sam adds a crew helper"
+   ],
+   [
+    "a solo float studio",
+    "a solo party-gear renter"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "color",
+  "lighting",
+  "session",
+  "running late",
+  "backup"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex reserves a party table package at Lee Party Supply, Sam's own store, and picks it up from Wes at the counter on Sat Oct 24 at 11:00am. The pick-up depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Party Rentals for a backyard birthday party: a bounce house, a tent, tables and chairs. Derek's crew delivers and sets up Thu Oct 22 from 8 to 10am and picks it all up the next morning. A deposit holds the date and the items, and the rest goes on the saved card when Derek marks the job done."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|card|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: a $140 party table package (6 tables, 40 chairs) picked up at Lee Party Supply. A $40 deposit when booking, the $100 rest at the counter at pick-up.",
+    "list|card|counter": "A $35 popcorn machine for the weekend. A card is saved for the store's $20 late-cancel or no-show fee. Alex pays at the counter.",
+    "list|full|none": "A $55 chocolate fountain, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Popcorn machine"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Popcorn machine"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Party table package"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$20",
+     "name": "Chocolate fountain"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|full|none",
+    "photos|deposit|card"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: a backyard party order from the list: a castle bounce house, a 20x20 tent, 5 tables and 40 chairs, with $60 delivery: $640. A $160 deposit when booking; the $480 rest is charged to the saved card when Derek marks the job done.",
+    "list|full|none": "A small order under $200: 5 tables and 12 chairs, delivered, $150, paid in full when booking.",
+    "photos|deposit|card": "A large tent on a sloped yard, quoted from Alex's yard photos at $640 (over $500, so Sam OKs it). Alex signs the quote; a $160 deposit when booking, and the $480 rest on the saved card at DONE."
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from yard photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$60",
+     "name": "Backyard party order"
+    },
+    "list|*|*": {
+     "price": "$640",
+     "name": "Backyard party order"
+    },
+    "list|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Backyard party order"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$60",
+     "name": "Small table and chair order"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Large tent event"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Large tent event"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Renting party equipment needs no state license in most places: the company gives its business registration (S1-61). Inflatable papers are per unit, from the state's form."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A rental company pays Rosfield's $2 for each confirmed booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The party rentals plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Rental items are counted as stock on each booking; the team books crews, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: deliveries and pick-ups."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Crew members and counter staff need no person license in most places (S2-29). A driver's license for the truck is the team's own rule."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Rentals are booked ahead for a date and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Here it's Lee Party Rentals' registration, 2019-0451. Inflatables add each unit's papers, where the state's form asks."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "The same as party rentals: Sam sends a photo and checks what Rosie read. Nothing is typed from scratch.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the store's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Item",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Popcorn machine · weekend",
+          "$35"
+         ],
+         [
+          "Cotton candy machine",
+          "$40"
+         ],
+         [
+          "Linen pack (4 tablecloths)",
+          "$20"
+         ],
+         [
+          "Kids' table and 6 chairs",
+          "$25"
+         ],
+         [
+          "Chocolate fountain",
+          "$55"
+         ],
+         [
+          "Party table package (6 tables, 40 chairs)",
+          "$140"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Party Rentals is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Business card"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Party Rentals is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Party rentals need no state license where you work: only the business registration, and each inflatable's papers where the state's form asks. What's the registration number?"
+     ],
+     [
+      "owner",
+      "san",
+      "2019-0451"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Party rental price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most party rental businesses start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Party Rentals, to start",
+        "lines": [
+         "Every rental order",
+         "Where: delivered and set up at the customer's place",
+         "When they book: $200 or more, a 25% deposit; under $200, the full price",
+         "After the job: the rest on the saved card at DONE"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules party rental businesses often set. Your call: keep them, or change any. They become its own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Party Rentals: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Party Rentals will look to customers and AI assistants. I drafted it from your website and Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Party rentals for backyard parties in Springfield: bounce houses, tents, tables and chairs, delivered and set up within 25 miles."
+        ]
+       },
+       "photos": [
+        "The truck",
+        "The team",
+        "A tent, set up"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Party Rentals the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Party Rentals · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s01"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ],
+     [
+      "san",
+      "owner",
+      "Event lighting next: same company, so only what's new. It needs no state license where you work, so I've set it like party rentals. Send only what's different.",
+      {
+       "card": {
+        "title": "Event lighting, set like party rentals",
+        "lines": [
+         "At the customer's place, money as for party rentals",
+         "String lights for a 20x20 tent: $199, or $249 when Tasha designs them",
+         "It goes live once Tasha, who hangs your lights, joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where rented items may be delivered and set up, and who may go. Rosie checks that before a delivery is offered.",
+    "rule": "Rosie's rule: a service can't be set at the customer's place where the plug-in says it isn't allowed. Why: some work is licensed to its own place."
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the party rentals team too, since Sam goes out on big tents.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Derek Price and Tasha Moore are crew leads. Tasha hangs lights too. Wes Chen and Zoe Diaz run the store's counter. Wes also delivers the table package"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Derek Price: party rentals, big tents too",
+         "Tasha Moore: party rentals and event lighting",
+         "Wes Chen: the store, and table deliveries",
+         "Zoe Diaz: the store"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Setup labor is $140 an hour with Derek, and $120 with anyone else. Tent lighting is $249 when Tasha designs it, or $199.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Setup labor",
+          "Derek",
+          "$140 an hour"
+         ],
+         [
+          "Setup labor",
+          "Anyone else",
+          "$120 an hour"
+         ],
+         [
+          "Tent lighting",
+          "Tasha's design",
+          "$249"
+         ],
+         [
+          "Tent lighting",
+          "Anyone else",
+          "$199"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Tasha Moore"
+     ],
+     [
+      "Company",
+      "Lee Party Rentals"
+     ],
+     [
+      "Kinds of work",
+      "Party rentals, event lighting"
+     ],
+     [
+      "Jobs",
+      "Bounce houses, small tents, tables and chairs, lighting"
+     ],
+     [
+      "Hours",
+      "Mon–Sat 7:30am–6pm"
+     ],
+     [
+      "Tasha agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Party Rentals as a crew helper. Reese gets one invite, and replies YES. Nobody here needs a person license, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Party Rentals. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Party Rentals",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Derek Price",
+       "Lee Party Rentals",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Tasha Moore",
+       "Lee Party Rentals",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Party Rentals",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Wes Chen",
+       "Lee Party Supply",
+       "At the store, and table deliveries",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Zoe Diaz",
+       "Lee Party Supply",
+       "At the store",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined, and nobody needs a license check. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Derek: party rentals, big tents too",
+         "Tasha: party rentals and lighting",
+         "Wes: the store, and table deliveries",
+         "Zoe: the store"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Party Supply. Sam Lee added you to the store's team. Reply YES to join and get your pick-ups here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Wes"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Party Rentals. Sam Lee added you to the team for party rentals and event lighting. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Tasha"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Back to Wes, who joined at 2:40pm. Sam entered these details when adding Wes. So Wes only links a phone calendar and picks when the day list comes.",
+    "more": [
+     "One calendar covers both companies, so Wes is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Wes picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Zoe, Derek and Tasha set up their profiles the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Wes Chen · my profile",
+        "lines": [
+         "No license needed",
+         "Every store pick-up, and table deliveries",
+         "The store's hours"
+        ]
+       },
+       "as": "Wes"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Wes"
+      }
+     ]
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, event lighting and the store now show to AI assistants too. Each person hears they can be booked for their own work: Zoe at the store, Tasha for party rentals and lighting.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Party Supply can book you from now on, at the store and for table deliveries. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Wes"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Party Supply can book you from now on, at the store. Your day list comes at the time you picked.",
+      {
+       "as": "Zoe"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Party Rentals can book you for party rentals from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Derek"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Event lighting and Lee Party Supply now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no papers; the owner says when an inspection or a paper runs out. Here, castle bounce house 2's inspection ran out, so it's hidden for later dates at once.",
+    "more": [
+     "Every 30 days by default, and again before each date runs out.",
+     "Orders already booked with that unit get the next free unit, or a free change.",
+     "It shows again once the new paper is on file."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Castle bounce house 2's yearly inspection ran out today.",
+      {
+       "card": {
+        "title": "Castle 2 · hidden for new dates",
+        "lines": [
+         "2 orders booked with it: the other castle goes instead",
+         "Upload the new inspection to show it again"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Rosie checks registrations and unit papers on the state's own lookup, where there is one. While it's down, nothing new is checked. What's already checked stays bookable.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's lookup is down, so the new water slide's permit isn't checked yet. It isn't offered until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can I pick up 6 tables and 40 chairs at Lee Party Supply on Saturday?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-05",
+    "say": [
+     [
+      "agent",
+      "san",
+      "Hi, I'm an automated assistant from Google, calling for a customer, Alex. Can Lee Party Supply have 6 tables and 40 chairs ready for pick-up Saturday morning? What does it cost?"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Pick-ups happen at the store's counter, or the item is delivered (flow B)."
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "For the table package: about how many guests, and do you need tablecloths too?"
+     ],
+     [
+      "cust",
+      "agent",
+      "About 40. No tablecloths."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The store sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "One order is one pick-up, however big the party."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a party rental."
+   },
+   {
+    "op": "before",
+    "at": "A4-66",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "line": [
+       "4.29"
+      ],
+      "who": "san",
+      "via": "auto",
+      "t": "Wed Oct 21, 7:16pm",
+      "title": "Checks the items are free those days",
+      "does": "Rosie counts each item for the pick-up and return days: how many the store owns, minus every order that overlaps. Only then are pick-up times shown.",
+      "more": [
+       "Two orders never take the same item on the same days. Items are saved with the time while Alex books.",
+       "An item booked that weekend: the next free one is offered, at its own price, or Alex drops it.",
+       "Nothing left: Rosie says so plainly, and nothing is saved.",
+       "Cleaning time after a return counts too."
+      ],
+      "rule": "Rosie's rule: an item is offered only if it's free for the whole rental. Why: two parties can't share one set of tables.",
+      "needs": [
+       "pf.services"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The store books a pick-up time at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The store books a pick-up time at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The pick-up time is booked; the return time comes with the order."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Customers book items and a pick-up time, not a counter clerk by name."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Two quick questions.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way",
+        "May the store show photos of your party setup? Yes / No"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "Only an adult books a rental, even a kids' table set."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every pick-up signs the rental agreement on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The store sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The store sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The store sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "A pick-up has no problem that gets worse before the visit."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The store sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The store sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The store sells no repeat plans."
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my brother help load the tables?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can my brother help load the tables?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Wes says yes: anyone can help load, and Wes brings the cart."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex at the counter, Sat 11:00am. Before hand-over, Wes and Alex count and check each item, and Wes notes what's already there.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE 6 tables, 40 chairs counted. One table top scratched.",
+      {
+       "photos": [
+        "Tables and chairs, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s order."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "Nothing at the counter stops a pick-up for health reasons; a missing ID goes as something required that's missing."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays with any child at the store."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing of the customer's is left at the store."
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "Before Alex pays, Wes and Alex load the car together. A swap Alex asks for now, like a wobbly table, is done before paying.",
+    "more": [
+     "Wes shows how to fold and carry the tables safely."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Alex M.: brings a pickup truck. Rents tables every fall."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Pick-ups are paid at booking or at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each pick-up is paid on its own."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a party rental."
+   },
+   {
+    "op": "after",
+    "at": "A10-01",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.13"
+      ],
+      "who": "cust",
+      "to": "staff",
+      "via": "visit",
+      "t": "Mon Oct 26, 9:30am",
+      "title": "Alex brings everything back",
+      "does": "Alex brings the order back to the counter before 10am Monday. Wes counts and checks each item against the pick-up photos.",
+      "more": [
+       "Wes texts what came back, with photos.",
+       "Something missing or broken: Sam calls Alex. Rosie never charges for it on its own.",
+       "Any new amount needs Alex's own yes in their own chat.",
+       "Not back by 10am: Alex gets one reminder text, and Sam is told."
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "BACK all items",
+        {
+         "photos": [
+          "Items, back"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Thanks, Alex! Everything is back at Lee Party Supply."
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "t": "Mon Oct 26, 11:00am"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Each pick-up is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A pick-up has no result later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing of the customer's is ever left at the store."
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Alex M. needs help at the counter. Record on the secure page."
+     ],
+     [
+      "san",
+      "owner",
+      "Wes says Alex M. needed help at the counter. Wes is with Alex. The record is on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-32",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Party Supply sent you a proposal: a summer picnic package. Read it, then sign or decline on the secure page.",
+      {
+       "card": {
+        "title": "Proposal · Summer picnic package",
+        "lines": [
+         "3 pick-ups with Wes",
+         "Good until Sat Nov 7"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/p/a15"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in names one form: the rental agreement, with how to use each item safely. Alex signs it on the secure page before pick-up.",
+    "form": [
+     [
+      "Form",
+      "Rental agreement"
+     ],
+     [
+      "Due",
+      "Before pick-up"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-43",
+    "more": [
+     "Some places allow it only with insurance on file.",
+     "Times at the customer's place offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-02",
+    "more": [
+     "Each person has one calendar across every kind of work and both companies.",
+     "Pat was added earlier, to OK prices. Pat takes no visits.",
+     "Not yet: nobody is texted. Sam can say yes later, or add them with ADD."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "At the store, prices are the same whoever is at the counter.",
+     "A person can have their own price list, their own hourly rate, or a different price for one service."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-48",
+    "more": [
+     "Reese can be booked once Sam says yes, and only with a crew lead on the same job.",
+     "A driver's license is on file before Reese drives the truck: the team's own rule."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-05",
+    "more": [
+     "Zoe gets the same invite. Derek and Tasha get theirs from Lee Party Rentals.",
+     "Pat gets one too, to OK prices for Lee Party Rentals.",
+     "Nobody is asked for a license number: this work needs none.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S12-19",
+    "more": [
+     "A paper's receipt counts while the lookup catches up."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Renting party equipment needs no state license in most places: the company gives its business registration (S1-61). Inflatable papers are per unit, from the state's form."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A rental company pays Rosfield's $2 for each confirmed booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The party rentals plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Rental items are counted as stock on each booking; the team books crews, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: deliveries and pick-ups."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Crew members and counter staff need no person license in most places (S2-29). A driver's license for the truck is the team's own rule."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Rentals are booked ahead for a date and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Here it's Lee Party Rentals' registration, 2019-0451. Inflatables add each unit's papers, where the state's form asks."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Rosie reads Sam's price list and fills the plug-in's list of items. It asks about anything it can't read, and never makes up a price.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your rental items and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Party rental prices",
+        "lines": [
+         "One row per item, with how many you own"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Item",
+        "Price kind",
+        "Price",
+        "How many you own"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Rental price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Item",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Delivery, setup and pickup",
+          "$60 within 10 miles, then $3 a mile"
+         ],
+         [
+          "Castle bounce house · 2 owned",
+          "$195 a day"
+         ],
+         [
+          "Pumpkin bounce house · 1 owned",
+          "$179 a day"
+         ],
+         [
+          "20x20 frame tent · 3 owned",
+          "$225"
+         ],
+         [
+          "Large tent",
+          "Quoted from the customer's photos"
+         ],
+         [
+          "Water slide · 1 owned",
+          "$199 a day"
+         ],
+         [
+          "6-ft table · 60 owned",
+          "$12"
+         ],
+         [
+          "Folding chair · 400 owned",
+          "$2.50"
+         ],
+         [
+          "Setup labor",
+          "$120 an hour, 1-hour minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Event lighting next: same company, so only what's new. It needs no state license where you work. Send your lighting prices."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Lighting price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like party rentals. Send only what's different.",
+      {
+       "card": {
+        "title": "Event lighting, set like party rentals",
+        "lines": [
+         "At the customer's place, money as for party rentals",
+         "String lights for a 20x20 tent: $199, or $249 when Tasha designs them",
+         "It goes live once Tasha, who hangs your lights, joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee Party Supply is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Store front"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the store is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. A party supply store needs no state license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most party supply stores start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Party Supply, to start",
+        "lines": [
+         "Every store item",
+         "Picked up at your counter, paid there, your own way",
+         "When they book: a card saved, for a $20 fee you OK"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules party supply stores often set. Your call: keep them, or change any. They become the store's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for the store, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Party Supply will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "A party supply store on Canal St. Tables, chairs and party machines to pick up for the weekend."
+        ]
+       },
+       "photos": [
+        "The store front",
+        "The counter",
+        "A table package, ready"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Party Supply the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Party Supply · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where rented items may be delivered and set up, and who may go. Rosie checks that before a delivery is offered.",
+    "rule": "Rosie's rule: a service can't be set at the customer's place where the plug-in says it isn't allowed. Why: some work is licensed to its own place."
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the party rentals team too, since Sam goes out on big tents.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Derek Price and Tasha Moore are crew leads. Tasha hangs lights too. Wes Chen and Zoe Diaz run the store's counter. Wes also delivers the table package"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Derek Price: party rentals, big tents too",
+         "Tasha Moore: party rentals and event lighting",
+         "Wes Chen: the store, and table deliveries",
+         "Zoe Diaz: the store"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "does": "Setup labor is $140 an hour with Derek, and $120 with anyone else. Tent lighting is $249 when Tasha designs it, or $199.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Setup labor",
+          "Derek",
+          "$140 an hour"
+         ],
+         [
+          "Setup labor",
+          "Anyone else",
+          "$120 an hour"
+         ],
+         [
+          "Tent lighting",
+          "Tasha's design",
+          "$249"
+         ],
+         [
+          "Tent lighting",
+          "Anyone else",
+          "$199"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Tasha Moore"
+     ],
+     [
+      "Company",
+      "Lee Party Rentals"
+     ],
+     [
+      "Kinds of work",
+      "Party rentals, event lighting"
+     ],
+     [
+      "Jobs",
+      "Bounce houses, small tents, tables and chairs, lighting"
+     ],
+     [
+      "Hours",
+      "Mon–Sat 7:30am–6pm"
+     ],
+     [
+      "Tasha agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Party Rentals as a crew helper. Reese gets one invite, and replies YES. Nobody here needs a person license, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Party Rentals. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Party Rentals",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Derek Price",
+       "Lee Party Rentals",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Tasha Moore",
+       "Lee Party Rentals",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Party Rentals",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Wes Chen",
+       "Lee Party Supply",
+       "At the store, and table deliveries",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Zoe Diaz",
+       "Lee Party Supply",
+       "At the store",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined, and nobody needs a license check. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Derek: party rentals, big tents too",
+         "Tasha: party rentals and lighting",
+         "Wes: the store, and table deliveries",
+         "Zoe: the store"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Party Rentals. Sam Lee added you to the team for party rentals and event lighting. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Tasha"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Back to Derek, who joined at 2:40pm. Sam entered these details when adding Derek. So Derek only links a phone calendar and picks when the day list comes.",
+    "more": [
+     "One calendar covers both kinds of work, so Derek is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Derek picks 7:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Tasha, Wes and Zoe set up their profiles the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 7am",
+      {
+       "card": {
+        "title": "Derek Price · my profile",
+        "lines": [
+         "Every rental, big tents too",
+         "Mon–Sat, 7:30am–6pm",
+         "Lee Party Rentals' 25 miles"
+        ]
+       },
+       "as": "Derek"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 7:00am.",
+      {
+       "as": "Derek"
+      }
+     ]
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, event lighting and the store now show to AI assistants too. Each person hears they can be booked for their own work: Tasha for party rentals and lighting, Zoe at the store.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Party Rentals can book you for party rentals from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Derek"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Party Supply can book you from now on, at the store and for table deliveries. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Wes"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Party Supply can book you from now on, at the store. Your day list comes at the time you picked.",
+      {
+       "as": "Zoe"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Event lighting and Lee Party Supply now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no papers; the owner says when an inspection or a paper runs out. Here, castle bounce house 2's inspection ran out, so it's hidden for later dates at once.",
+    "more": [
+     "Every 30 days by default, and again before each date runs out.",
+     "Orders already booked with that unit get the next free unit, or a free change.",
+     "It shows again once the new paper is on file."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Castle bounce house 2's yearly inspection ran out today.",
+      {
+       "card": {
+        "title": "Castle 2 · hidden for new dates",
+        "lines": [
+         "2 orders booked with it: the other castle goes instead",
+         "Upload the new inspection to show it again"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Rosie checks registrations and unit papers on the state's own lookup, where there is one. While it's down, nothing new is checked. What's already checked stays bookable.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state's lookup is down, so the new water slide's permit isn't checked yet. It isn't offered until it is. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "does": "Alex uses any AI assistant, like ChatGPT. The AI passes on the items, the area and the day, with no name or address yet. The example is a backyard party order from Sam's list.",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can you set up a bounce house, a tent, 5 tables and 40 chairs in my backyard Thursday? It's my kid's birthday party, 3 to 6pm. I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? El viento tumbó la carpa de la fiesta de ayer.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? The wind knocked down the tent from yesterday's party.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Party Rentals. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Party Rentals. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A party rental example: a tent blown down in the night gets 'keep everyone away, and don't move it'.",
+     "Rosa is told to keep everyone away, and to call 911 if the tent touches a power line. An early pickup is booked next."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay alguien herido? ¿La carpa toca algún cable eléctrico?",
+      {
+       "lang": "es",
+       "en": "First: is anyone hurt? Is the tent touching a power line?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Nadie está herido. No toca cables.",
+      {
+       "lang": "es",
+       "en": "No. Nobody is hurt. It isn't touching any lines.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Mantenga a todos lejos de la carpa y no la mueva. Si toca un cable, llame al 911.",
+      {
+       "lang": "es",
+       "en": "Keep everyone away from the tent and don't move it. If it touches a line, call 911.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. An inflatable lifting in the wind, someone hurt on one, or a tent on a power line stops the booking.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If someone is hurt, call 911 now. If an inflatable is lifting in the wind, get everyone off and away from it, then unplug the blower."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said a bounce house is lifting in the wind. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "An inflatable lifting in the wind",
+         "Told to get everyone off, unplug it, and call 911 if anyone is hurt"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Our own generator got wet in the rain. Is it safe to plug a bounce house into it?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't answer safety questions about generators or wiring. If anything sparks, keep everyone away and call 911. To talk to the crew, call Lee Party Rentals at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: the items and how many, the party's hours, the ground, the space and the power.",
+     "Its danger words: an inflatable lifting in the wind, someone hurt, a tent near a power line.",
+     "Its first steps: the rental agreement and safety rules, and a utility locate before tent stakes.",
+     "Who can stand in for whom, and how the delivery is checked in: the code at the door.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Party Rentals asks: is the setup spot grass or hard ground, and is there an outdoor outlet within 100 feet?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Grass, and flat. There's an outlet on the back of the house."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "Party rentals sell no repeat plans: each party is its own order."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "A rental is one order for one address; a block party is one customer's order."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No warranty or plan pays for a party rental."
+   },
+   {
+    "op": "words",
+    "at": "B4-97",
+    "does": "Say the plug-in sets a first step with a lead time, like the city's tent permit for a big tent. The AI says so, and the open dates start only after it.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "This tent needs a city permit first. It takes about a week here, so the first open dates are next week."
+     ]
+    ]
+   },
+   {
+    "op": "before",
+    "at": "B4-83",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.29"
+      ],
+      "who": "san",
+      "to": "agent",
+      "via": "chat",
+      "t": "Mon Oct 19, 6:41pm",
+      "title": "Checks each item is free that day",
+      "q": "Is every item free on Thu Oct 22?",
+      "does": "Rosie counts each item for the party's date: how many Sam owns, minus every order that day. Only then are setup times shown.",
+      "more": [
+       "Cleaning time after a return counts too, so an item back late Wednesday isn't offered early Thursday.",
+       "Two orders never take the same item on the same date. Items are saved with the time while Alex books.",
+       "A unit out for repair, or one whose papers run out first, isn't counted."
+      ],
+      "rule": "Rosie's rule: an item is offered only if it's free that day. Why: two parties can't share one bounce house.",
+      "needs": [
+       "pf.services"
+      ],
+      "branches": [
+       {
+        "label": "All free that day",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "One item is booked",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.29"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "chat",
+          "title": "Offers the next free item",
+          "does": "Say both castle bounce houses are booked that day. Rosie offers the next free one, at its own price. Alex takes it, or drops that item.",
+          "more": [
+           "The rest of the order stays as asked.",
+           "No yes: the order goes on without that item."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Both castle bounce houses are booked Thu Oct 22. The pumpkin bounce house is free that day, at $179 instead of $195.",
+            {
+             "buttons": [
+              "Take it",
+              "Skip the bounce house"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.services"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "Nothing left that day",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "4.16"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "chat",
+          "title": "Says nothing is left that day",
+          "does": "Say every bounce house and tent is booked Thu Oct 22. Rosie says so plainly. Nothing is saved, and the AI can look elsewhere.",
+          "say": [
+           [
+            "san",
+            "agent",
+            "Lee Party Rentals is fully booked for bounce houses and tents on Thu Oct 22. Nothing was saved."
+           ]
+          ],
+          "needs": [
+           "pf.services"
+          ]
+         }
+        ],
+        "end": "end",
+        "endText": "Nothing saved or booked. The AI can look elsewhere."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Deliveries come in 2-hour setup windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A rental's pickup is booked with the order; the times read as setup windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Rentals have no seats or sessions."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Asks for one person by name",
+    "why": "Customers book items and a window, not a crew lead by name."
+   },
+   {
+    "op": "more",
+    "at": "B4-23",
+    "more": [
+     "The items are saved with the time: no other order can take them for that date."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Where in the yard does the bounce house go, and how wide is the gate?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Back corner, by the fence. The gate is 48 inches."
+     ]
+    ],
+    "form": [
+     [
+      "Parking",
+      "In the driveway, for the truck"
+     ],
+     [
+      "Pets",
+      "A dog, kept inside during setup"
+     ],
+     [
+      "Gate or door code",
+      "None"
+     ],
+     [
+      "Private lines to flag",
+      "A sprinkler line along the back fence"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "Every delivered order has two first steps. The rental agreement and safety rules are signed on the secure page that comes next. A utility locate clears before any tent stakes go in.",
+    "form": [
+     [
+      "Form",
+      "Rental agreement and safety rules"
+     ],
+     [
+      "Due",
+      "Before setup"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-34",
+    "does": "Where the plug-in or Sam needs a written contract, it's signed before any money is taken. A quoted order needs a signed quote. Orders from the list use the rental agreement instead."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "Party rentals sell no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Rentals are never sent now, and nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Rentals are never sent now (B4-81), so 'Send someone now' is never offered."
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Thu 12pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. Thu Oct 22, arriving 12 to 2pm, with Derek? / Setup by 2pm, before the party",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Rentals are never sent now, so every order gets the reminder."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "A party rental has no problem that gets worse before the visit. A changed order goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "Party rentals sell no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "Party rentals sell no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "Party rentals sell no repeat plans."
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Do we need to be home for setup?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Do we need to be home for setup?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Derek says yes: an adult needs to be home at setup to sign the safety rules."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Rentals are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "An adult must be home at setup to sign the safety rules."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A crew never looks after a child: an adult on the booking signs the safety rules."
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before setup, Derek photographs the yard and notes what's already there. The photos stay with the order.",
+    "more": [
+     "The plug-in names the checks, like the lawn, the fence and the flags.",
+     "Alex can see them on the secure page.",
+     "A damage claim later is checked against them.",
+     "The pickup photos are taken from the same spots."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE soft spot by the fence, sprinkler flags in place",
+      {
+       "photos": [
+        "Back yard, before",
+        "Flagged sprinkler line"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s order."
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-18",
+    "steps": [
+     {
+      "line": [
+       "8.6",
+       "8.19"
+      ],
+      "id": "B8-x01",
+      "type": "split",
+      "who": "staff",
+      "to": "san",
+      "via": "visit",
+      "t": "Thu Oct 22, 8:25am",
+      "title": "Checks the wind and the spot",
+      "q": "Safe to set up as booked?",
+      "does": "Before anything goes up, Derek reads the wind meter. Then Derek walks the yard against Alex's answers: the ground, the space, the outlet and the flags.",
+      "more": [
+       "The wind limit is the unit maker's, or a stricter one where the state's rules set it.",
+       "Overhead lines, a slope or soft ground near each spot are checked too."
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "vary": {
+       "price:list+before:full+after:none": {
+        "does": "Before anything goes out, Derek walks the patio against Alex's answers: the space and the way in. Tables and chairs need no wind check or stakes."
+       }
+      },
+      "branches": [
+       {
+        "label": "Calm; the spot is as booked",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Wind over the limit now",
+        "steps": [
+         {
+          "line": [
+           "8.19"
+          ],
+          "id": "B8-x02",
+          "who": "staff",
+          "to": "san",
+          "via": "msg",
+          "title": "Holds off what's over its wind limit",
+          "does": "The wind is over the bounce house's limit, so it isn't set up today. Alex picks a free new date for it, or its price back. Everything else goes up.",
+          "more": [
+           "Sam is told at once.",
+           "No reply by 2pm: its price comes back, and Sam is told.",
+           "The crew never sets up an inflatable over the limit, even if asked."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "WIND 22 mph, no bounce house"
+           ],
+           [
+            "san",
+            "cust",
+            "Derek measured wind at 22 mph, over the bounce house's safe limit, so it won't be set up today. Your tent, tables and chairs are going up now.",
+            {
+             "buttons": [
+              "$195 back",
+              "A new date for it"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ],
+          "vary": {
+           "price:list+before:full+after:none": {
+            "does": "Tables and chairs have no wind limit, so this doesn't come up for Alex's small order. It's drawn for bounce houses and tents.",
+            "say": []
+           },
+           "price:photos+before:deposit+after:card": {
+            "does": "The wind is over the tent's limit. Derek waits up to an hour, then sets up only if it drops. If not, Alex picks a free new date or a full refund.",
+            "say": [
+             [
+              "staff",
+              "san",
+              "WIND 30 mph, tent on hold"
+             ],
+             [
+              "san",
+              "cust",
+              "Derek measured wind at 30 mph, too strong to put up your tent safely. Derek will wait up to an hour. If it doesn't drop, you pick a free new date or a full refund.",
+              {
+               "buttons": [
+                "A new date",
+                "Full refund"
+               ]
+              }
+             ]
+            ]
+           }
+          }
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "A stake spot is on a flagged line",
+        "steps": [
+         {
+          "line": [
+           "8.19"
+          ],
+          "id": "B8-x03",
+          "who": "staff",
+          "to": "san",
+          "via": "msg",
+          "title": "Uses weights over the flagged line",
+          "does": "One stake spot is on the sprinkler line Alex flagged. Derek won't stake there. Two water barrels hold that corner instead, at no extra charge.",
+          "say": [
+           [
+            "staff",
+            "san",
+            "WEIGHTS on the back corner, sprinkler line flagged"
+           ]
+          ],
+          "needs": [
+           "pf.visit"
+          ],
+          "vary": {
+           "price:list+before:full+after:none": {
+            "does": "No stakes go in for tables and chairs, so this doesn't come up for Alex's small order. It's drawn for tents and bounce houses.",
+            "say": []
+           }
+          }
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     },
+     {
+      "line": [
+       "8.17",
+       "8.12"
+      ],
+      "id": "B8-x04",
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "t": "Thu Oct 22, 8:30am",
+      "title": "Sets up; walks Alex through the safety rules",
+      "does": "The crew stakes the bounce house and the tent, plugs in the blower, and sets out the tables and chairs. Then Derek walks Alex through the safety rules, and Alex signs for the delivery.",
+      "more": [
+       "The rules: an adult always watches, no shoes, posted age and size limits, everyone off in wind or rain.",
+       "If the blower stops, keep everyone off as it folds down. At the party's end, unplug it.",
+       "Derek takes after photos from the same spots as the before photos.",
+       "Alex signs on the secure page. No adult to sign: no inflatable or tent is left. Tables and chairs may be left, with photos."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "DELIVERED bounce house staked, tent up, 5 tables, 40 chairs",
+        {
+         "photos": [
+          "Bounce house, staked",
+          "Tent, staked",
+          "Tables and chairs"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your rentals are set up. Please check them, then sign for the delivery and the safety rules.",
+        {
+         "card": {
+          "title": "Delivery · Backyard party order",
+          "lines": [
+           "Set up by Derek · Thu Oct 22 · 18 Birch Ln",
+           "An adult watches the bounce house at all times",
+           "Everyone off in wind or rain"
+          ],
+          "button": "Check and sign",
+          "link": "rosfield.com/s/r4"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "vary": {
+       "price:list+before:full+after:none": {
+        "does": "The crew sets out 5 tables and 12 chairs on the patio. Alex checks the count and signs for the delivery.",
+        "more": [
+         "Alex signs on the secure page. No adult to sign: no inflatable or tent is left. Tables and chairs may be left, with photos."
+        ],
+        "say": [
+         [
+          "staff",
+          "san",
+          "DELIVERED 5 tables, 12 chairs on the patio",
+          {
+           "photos": [
+            "Tables and chairs"
+           ]
+          }
+         ],
+         [
+          "san",
+          "cust",
+          "Your tables and chairs are out. Please check the count and sign for the delivery.",
+          {
+           "card": {
+            "title": "Delivery · Tables and chairs",
+            "lines": [
+             "Set up by Derek · Thu Oct 22 · 18 Birch Ln",
+             "5 tables, 12 chairs"
+            ],
+            "button": "Check and sign",
+            "link": "rosfield.com/s/r4"
+           }
+          }
+         ]
+        ]
+       },
+       "price:photos+before:deposit+after:card": {
+        "does": "The crew stakes the large tent, with leg extensions on the slope, and sets out the tables and chairs. Then Derek goes over the tent's safety rules, and Alex signs for the delivery.",
+        "more": [
+         "The tent's rules: open the sides in wind, everyone out in storms, no candles or flames near the walls.",
+         "Derek takes after photos from the same spots as the before photos.",
+         "Alex signs on the secure page. No adult to sign: no inflatable or tent is left. Tables and chairs may be left, with photos."
+        ],
+        "say": [
+         [
+          "staff",
+          "san",
+          "DELIVERED tent staked with leg extensions, tables and chairs out",
+          {
+           "photos": [
+            "Tent, staked",
+            "Leg extensions on the slope"
+           ]
+          }
+         ],
+         [
+          "san",
+          "cust",
+          "Your tent is up. Please check it, then sign for the delivery and the tent's safety rules.",
+          {
+           "card": {
+            "title": "Delivery · Large tent",
+            "lines": [
+             "Set up by Derek · Thu Oct 22 · 18 Birch Ln",
+             "Open the sides in wind",
+             "Everyone out in a storm"
+            ],
+            "button": "Check and sign",
+            "link": "rosfield.com/s/r4"
+           }
+          }
+         ]
+        ]
+       }
+      }
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Derek and Alex check the setup together. Anything wrong is fixed before Derek texts DONE.",
+    "more": [
+     "The plug-in names what's checked: stakes or weights at every point, the blower's cord clear, the tent tight.",
+     "After photos are taken from the same angles as the before photos."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE soft ground by the back fence. Stake the tent nearer the patio next time."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private record."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Party rentals are paid as a deposit and the rest, or in full; no stage bills."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each party order is paid on its own."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a party rental."
+   },
+   {
+    "op": "after",
+    "at": "B10-01",
+    "steps": [
+     {
+      "id": "B10-x01",
+      "type": "split",
+      "line": [
+       "8.20",
+       "3.9"
+      ],
+      "who": "san",
+      "via": "auto",
+      "t": "Thu Oct 22, 3:00pm",
+      "title": "Watches for safety words during the party",
+      "q": "What happens during the party?",
+      "does": "Alex can text Rosie anytime during the party. Safety words always come first, and Sam is told at once.",
+      "more": [
+       "Texts about safety go at any hour, not only in text hours.",
+       "Rosie never says who is at fault, and never offers money. Sam decides."
+      ],
+      "needs": [
+       "pf.safety"
+      ],
+      "branches": [
+       {
+        "label": "Nothing: the party goes fine",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Wind or rain picks up",
+        "steps": [
+         {
+          "id": "B10-x02",
+          "line": [
+           "3.9",
+           "8.6"
+          ],
+          "who": "cust",
+          "to": "san",
+          "via": "msg",
+          "title": "Texts that it's getting windy",
+          "does": "Alex texts that the bounce house is leaning. Rosie sends the safety steps at once, and Sam is told.",
+          "more": [
+           "Sam decides about any refund for the time lost, as the rental agreement says.",
+           "The crew picks it up as planned, or sooner if Sam sends them."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "It's getting really windy, and the bounce house is leaning"
+           ],
+           [
+            "san",
+            "cust",
+            "Get everyone off the bounce house now and keep them away. Then unplug the blower and let it fold down. Sam at Lee Party Rentals has been told."
+           ],
+           [
+            "san",
+            "owner",
+            "Alex M. says the bounce house is leaning in the wind (18 Birch Ln). Alex got the safety steps.",
+            {
+             "buttons": [
+              "I'll call Alex",
+              "Send a crew"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ],
+          "vary": {
+           "price:list+before:full+after:none": {
+            "does": "Alex texts that a gust is tipping the chairs. Rosie says to stack them out of the wind, and Sam is told.",
+            "say": [
+             [
+              "cust",
+              "san",
+              "It's really windy, and the chairs keep tipping over"
+             ],
+             [
+              "san",
+              "cust",
+              "Stack the chairs and lay them down out of the wind. Keep everyone clear of anything that blows. Sam at Lee Party Rentals has been told."
+             ]
+            ]
+           },
+           "price:photos+before:deposit+after:card": {
+            "does": "Alex texts that the tent is shaking in the wind. Rosie sends the safety steps at once, and Sam is told.",
+            "say": [
+             [
+              "cust",
+              "san",
+              "It's getting really windy, and the tent is shaking"
+             ],
+             [
+              "san",
+              "cust",
+              "Get everyone out of the tent and away from the poles. Open the sides so the wind passes through. Sam at Lee Party Rentals has been told."
+             ],
+             [
+              "san",
+              "owner",
+              "Alex M. says the tent is shaking in the wind (18 Birch Ln). Alex got the safety steps.",
+              {
+               "buttons": [
+                "I'll call Alex",
+                "Send a crew"
+               ]
+              }
+             ]
+            ]
+           }
+          }
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "Someone is hurt",
+        "steps": [
+         {
+          "id": "B10-x03",
+          "line": [
+           "8.20",
+           "13.4"
+          ],
+          "who": "cust",
+          "to": "san",
+          "via": "msg",
+          "title": "Texts that a child is hurt",
+          "does": "Alex texts that a child fell. Rosie sends the 911 words first and tells Sam at once. It never says who is at fault.",
+          "more": [
+           "Sam and the business's insurer handle it, outside Rosie.",
+           "Any report the state's rules require, like an injury report for an inflatable, is Sam's to file: the plug-in's form says.",
+           "Health details stay off texts. Sam hears them on the call with Alex."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "A kid fell off the bounce house and bumped their head"
+           ],
+           [
+            "san",
+            "cust",
+            "If the child isn't awake, isn't breathing normally, or is badly hurt, call 911 now. Keep everyone off the bounce house. Sam at Lee Party Rentals has been told and will call you."
+           ],
+           [
+            "san",
+            "owner",
+            "Urgent: Alex M. reports someone hurt at the bounce house (18 Birch Ln). Alex has the 911 message. Please call Alex now."
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ],
+          "vary": {
+           "price:list+before:full+after:none": {
+            "say": [
+             [
+              "cust",
+              "san",
+              "A kid fell off one of the chairs and bumped their head"
+             ],
+             [
+              "san",
+              "cust",
+              "If the child isn't awake, isn't breathing normally, or is badly hurt, call 911 now. Sam at Lee Party Rentals has been told and will call you."
+             ],
+             [
+              "san",
+              "owner",
+              "Urgent: Alex M. reports someone hurt at the bounce house (18 Birch Ln). Alex has the 911 message. Please call Alex now."
+             ]
+            ]
+           },
+           "price:photos+before:deposit+after:card": {
+            "say": [
+             [
+              "cust",
+              "san",
+              "A kid tripped on a tent stake and hurt their knee"
+             ],
+             [
+              "san",
+              "cust",
+              "If the child is badly hurt, call 911 now. Keep everyone clear of the stakes. Sam at Lee Party Rentals has been told and will call you."
+             ],
+             [
+              "san",
+              "owner",
+              "Urgent: Alex M. says a child tripped on a tent stake (18 Birch Ln). Alex has the 911 message. Please call Alex now."
+             ]
+            ]
+           }
+          }
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     },
+     {
+      "id": "B10-x04",
+      "line": [
+       "10.13"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "visit",
+      "t": "Fri Oct 23, 9:40am",
+      "title": "Picks up and checks everything",
+      "does": "The next morning, Derek's crew takes everything down, counts it, and checks each item, with photos from the same spots as before.",
+      "more": [
+       "Nobody needs to be home for pickup: the items are in the yard, and the photos are the record.",
+       "The blower was unplugged at the party's end, as the safety rules say.",
+       "Damage or cleaning found: Sam calls Alex, with the photos. Rosie never charges for it on its own.",
+       "Any new amount needs Alex's own yes in their own chat."
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "PICKED UP all items",
+        {
+         "photos": [
+          "Yard, after pickup"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Lee Party Rentals picked everything up. Thanks for choosing us!"
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Sat Oct 24, 11:00am",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for choosing Lee Party Rentals! How did your party rentals go?",
+      {
+       "card": {
+        "title": "Rate your rental",
+        "lines": [
+         "Thu Oct 22 · setup by Derek",
+         "Fri Oct 23 · pickup"
+        ],
+        "button": "Rate it",
+        "link": "rosfield.com/r/r4"
+       },
+       "stars": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Party rentals carry no warranty. A problem during the party goes to Sam at once (B10-x01)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Party rentals have no report or result later."
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Derek to book the same setup for next year's party. Derek texts NEXT. It's past the 6 months Sam books ahead, so Rosie saves it as a reminder.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: the same order, Oct 2027"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Party Rentals books up to 6 months ahead. We'll text you dates for next year's party order in late Apr 2027.",
+      {
+       "buttons": [
+        "Sounds good",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-31",
+    "does": "A what-if: after the party, Sam sends a proposal for more, like a graduation tent package next spring. Alex signs or declines it on the secure page.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Party Rentals sent you a proposal for a graduation tent package next spring.",
+      {
+       "card": {
+        "title": "Proposal · Graduation tent package",
+        "lines": [
+         "Good until Thu Nov 19",
+         "Sign or decline on your secure page"
+        ],
+        "button": "Read it",
+        "link": "rosfield.com/k/r5"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "The extra chairs were set out and used that day, and items already given have no cancel period (B8-24); only something sold at the home and not given yet can have one."
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Derek finds a power line over the tent spot. The plug-in says a tent never goes under a line, so Alex gets a written note and the photo.",
+    "more": [
+     "The note says what was found, what wasn't set up there and why, and where it can go instead.",
+     "It never names a company.",
+     "Sam is told, and the note and photos stay with the order.",
+     "Here the tent goes on the open lawn instead, once Alex says yes."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD power line over the tent spot",
+      {
+       "photos": [
+        "Line over the tent spot"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Derek found a power line over the tent spot, so the tent can't go there.",
+      {
+       "card": {
+        "title": "Safety note · 18 Birch Ln",
+        "lines": [
+         "Found: a power line over the tent spot",
+         "Not set up there: the tent",
+         "It can go on the open lawn instead"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "A what-if: the utility locate for Alex's tent stakes isn't clear by the day before. Sam decides: weights instead of stakes, or a call to Alex.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The utility locate for Alex M.'s tent stakes (Thu 8–10am) isn't clear yet.",
+      {
+       "buttons": [
+        "Use weights",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "The utility marks for your yard aren't done yet, so the crew will hold the tent down with water barrels, not stakes. Your price and time don't change."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each party order is rated."
+   },
+   {
+    "op": "words",
+    "at": "B9-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Party Rentals: $25 for today's extra chairs. Think this is wrong? Reply here, and it goes to Sam.",
+      {
+       "pay": {
+        "amount": "$25",
+        "what": "the extra chairs",
+        "link": "rosfield.com/p/r4x"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-43",
+    "more": [
+     "Some places allow it only with insurance on file.",
+     "Times at the customer's place offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-02",
+    "more": [
+     "Each person has one calendar across every kind of work and both companies.",
+     "Pat was added earlier, to OK prices. Pat takes no visits.",
+     "Not yet: nobody is texted. Sam can say yes later, or add them with ADD."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-15",
+    "more": [
+     "At the store, prices are the same whoever is at the counter.",
+     "A person can have their own price list, their own hourly rate, or a different price for one service."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-48",
+    "more": [
+     "Reese can be booked once Sam says yes, and only with a crew lead on the same job.",
+     "A driver's license is on file before Reese drives the truck: the team's own rule."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-05",
+    "more": [
+     "Derek gets the same invite. Wes and Zoe get theirs from Lee Party Supply.",
+     "Pat gets one too, to OK prices for Lee Party Rentals.",
+     "Nobody is asked for a license number: this work needs none.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S12-19",
+    "more": [
+     "A paper's receipt counts while the lookup catches up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-97",
+    "more": [
+     "The first step itself is filed once the time is saved.",
+     "Alex's 20x20 tent needs no permit, so the dates start today."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "Building rules, like a homeowners' group's hours or proof of insurance, go to Sam to check.",
+     "The plug-in adds its own questions, like private lines to flag before stakes go in."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B5-34",
+    "more": [
+     "Alex's order is from the list, so it needs no contract: the rental agreement covers it.",
+     "A price set at a site visit is signed then, before any money.",
+     "Sam can also ask for a contract on any service, at sign-up or later by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-18",
+    "more": [
+     "Rosie never offers a next booking on its own: only when the customer asks.",
+     "In late Apr 2027, once it's inside the 6 months, Alex gets dates to pick, or skips.",
+     "It's booked with the same money rules as any order."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "No answer from Sam by 6pm: weights, as the plug-in says, and Alex is told.",
+     "The business caused it, so nothing costs Alex more."
+    ]
+   }
+  ]
+ },
+ "notes": "From: photographer (the current, reviewed event pilot). Party rentals run like an event booked for a date: a deposit holds the date and the items, the rest is charged before the day, and the crew arrives in a window at the customer's place. The photographer's ops (plug-in splits, the sent-now offs, the contract split) were the starting map; the rename pairs were rebuilt from the master, since the photographer's pairs turn the master's home words into venue words, and a party rental is delivered to a home. The DJ's speaker rental (a damage hold at hand-over, a rental agreement form, rented items back) shaped flow A.\nNames: Sam Lee's main company is Lee Party Rentals LLC (75 Depot Rd): party rentals, with event lighting as its second kind of work (the master's electrical; it needs no license, so S1-39 waits for Tasha, who hangs the lights, to join). His second company is Lee Party Supply LLC (260 Canal St), the master's barbershop: a store whose items are picked up at the counter and brought back. Flow A's story is at the store, flow B's at the main company.\nPeople: Derek (crew lead, big tents; the master's Jordan) and Tasha (crew lead and lighting; Casey) deliver. Wes (Riley) and Zoe (Avery) run the store's counter. Alex and the staff have no set pronouns: they/them or the name. Customer Alex M. lives at 18 Birch Ln, Springfield (the master's 42 Oak St).\nFlow B's main story (list|deposit|none): Alex's backyard birthday party from the list: a castle bounce house $195, a 20x20 tent $225, 5 tables $60, 40 chairs $100 and delivery $60 = $640 (the example's own prices). A $160 deposit (25%) Mon 6:47pm, the $480 rest when free cancel ends at 5pm Wed (the day before delivery), the $150 damage hold placed Wed 10am with the reminder. Setup Thu Oct 22, arriving 8–10am (Derek, code 3906), DONE 9:50am, the party 3 to 6pm, pickup Fri 9–11am, the hold released Sun 9:40am unless damage is found, the rating Sat 11am.\nMoney paths, flow B: list|deposit|none (main: orders of $200 or more), list|full|none (orders under $200: 5 tables and 12 chairs, $150 with delivery, paid in full; a late cancel keeps the $60 delivery fee), photos|deposit|none (a large tent on a sloped yard, quoted from yard photos at $640, over Sam's $500 so he OKs it, both sign the quote, 25% deposit). Left out: holds before the visit, billing after, the saved card at DONE and the business's own way (rentals are paid before delivery), and the visit price kind. The price kind 'quoted from photos first' is labeled 'Quoted from yard photos first'.\nMoney paths, flow A: list|deposit|counter (main: the $140 party table package, 6 tables and 40 chairs, $40 deposit, $100 at the counter at pick-up Sat 11:00am with Wes, back Mon 10am), list|card|counter (a $35 popcorn machine, a card saved for the $20 late-return fee), list|full|none (a $55 chocolate fountain paid in full). Every pick-up gets a $100 damage hold at hand-over (A5-24 'Yes: held at hand-over', A8-43). Left out: nothing taken (rentals always save a card), holds before, bills and the saved card at DONE (the store has a counter).\nSign-up: S1-12 to S1-21, S1-38, S1-39, S1-41 to S1-47 and S2-02 to S2-24 are words ops in both flows (their master money words are overwritten on every money key): the delivered list with how many of each item Sam owns, the 25% deposit and the rest when free cancel ends, small orders paid in full, the damage hold, no tip line, the store's pick-up board. Licenses: no state license for party rentals or the counter in most places (S1-60, S1-63 take registration only; S2-28 no person license). Inflatable papers (permit, inspection, insurance) are switches from the state's form, per unit (pf.license), and S11-50, S11-51 and S12-19 read as a unit's papers.\nStock: two bookings never take the same item on the same date. Flow B checks it on the main path (own split B4-x01: all free, the next free item offered, or nothing left); flow A with A4-x01. The master's 'Stock held for the job' branches are off (covered on the main path).\nSafety: inflatables are staked, or weighted on hard ground; never used in high wind, rain or lightning (the unit maker's wind limit, or a stricter one where the state's rules set it; no one state's number); an adult watches at all times; age, size and rider limits are posted. Own steps: B8-x01 (the wind and the spot at setup), B8-x02 (an item over its wind limit isn't set up: a free new date or its price back), B8-x03 (weights over a flagged line), B8-x04 (setup, the safety walk-through, the signed delivery), B10-x01 to B10-x03 (safety words during the party: wind, a child hurt; 911 first, Sam told, never who's at fault). Danger words (pf.safety, B3-19): an inflatable lifting in the wind, someone hurt, a tent on a power line. B7-35 and B7-36 are the forecast the day before (a free move or a refund). The utility locate is the business's first step (B4-42); not clear by the day before, weights, never stakes (B7-33). A tent permit is a switch from the city's or state's form (B4-87, B8-61).\nPickup and the damage hold: B7-x01 places the damage hold the day before delivery (the master has no step for it: a gap). Flow B's pickup is on the main path (B10-x04 to B10-x09: counted with photos, released 48 hours after pickup, or Sam decides a fee from the hold with one reminder, never more than the hold); flow A's return is A10-x01 to A10-x06. The master's 'A rented fan comes back' and 'Rented items come back' branches are off. The receipts (B10-01, A10-01) keep the card saved for the hold.\nCrew out: a rental is booked for items and a date, not one crew lead, so B7-56 and A7-59 take 'no person named: Sam staffs it' (B7-57, A7-60), and S11-87, S11-90 take 'Not by name'. A large tent goes only to a big-tent lead (Sam leads it himself when Derek is out).\nOff, flow B: a live line, sent now (all), plans and warranties (B4-43, B4-63, B5-20, B7-05), groups and seats, host visit days, own or rent (B4-78), the problem gets worse, a part is late, a notice due first, a form not signed (signed before money), crews and a date that can't move, the bigger job, the landlord, the delivery branch and the multi-day job and items to the shop (the main path covers delivery), stage bills, tips, parts after, pay over time, insurance, and the after-visit branches a rental never has (warranty, permit inspection, report later, an item not taken back, aftercare). Nobody needs to be home: off (an adult signs at setup).\nOff, flow A: walk-in seats and spaces (a line for the next counter clerk stays), video, plans, series, groups, rooms, insurance, first steps other than the signed agreement, every 'no damage hold', a child booked or left, a stay, crews, set dates, minimums, a shortened late visit (a late pick-up moves to the next open time), day-before holds, a first step not done or changed, ordered items, weather (the customer uses picked-up items), the after-visit results, an item not picked up and aftercare. Kept: A8-02 both branches (a photo ID, or nothing needed: splitsKept).\nSplits kept whole: B4-57 (a list order uses the rental agreement; a quoted tent signs the quote), A8-02.\nWeekly S11 what-ifs: Nora's same-day request is a pumpkin bounce house ($239 with delivery) with nothing taken until Sam accepts, then the $60 deposit charged, never the master's $89 hold; Lin's no-show keeps the $160 deposit or the $60 delivery fee; S11-56 changes a deposit or a small order's full price, never to a hold; the emergency-price what-if is a generator for a day ($190, $150 before).\nTimes: the master's free cancel (7am on the visit day) became 5pm the day before delivery, so the rest is charged Wed 5pm (rename pairs), the declined rest gets one link, Sam decides by 7:45pm, and the receipt for the rest goes at 5:01pm. Words ops set B8-01 back to Thu 7:00am, B8-41 to 9:50am, B10-01 to 9:55am, the pickup Fri 9:40am and the rating Sat 11am; flow A's return Mon 9:30am and its rating Mon 11am.\nhidden-words.js lists 0 spots: every words op writes its words into each money key the master step has, plus an exact key for each listed path.\nMaster issues seen (not fixed here): the 'Nothing entered by night' branch (B8-42, Fri 10am; A8-12, Sun) rejoins before the receipt (B10-01 Thu; A10-01 Sat), so that branch's clock runs back, in the master too; B7-18's LATE (Thu 7:55am) sits before B8-01's 7:00am day list; B8-24 and B10-05 give a right to cancel extra items already used at the party; B10-01 and A10-01 remove the saved card even when a damage hold still needs it (the overlay keeps it); no step places the damage hold the master's B5-27 promises (gap); words ops can't change a step's title or base rule, so titles and rules change only by rename pairs.\nReview (Oct 23): the store's quoted 'balloon arch' (the master's color, renamed) wasn't a plug-in service or a listed path, so Nia's special price is the popcorn and cotton candy machines for a 3-day school fair (S11-08 to S11-11, S11-19, S11-40, S12-20 to S12-22); A8-34 is the chocolate fountain, A10-32 a summer picnic package. Sam's S11-58 'balloon decor' is a new kind of work, and Jules's balloon business (S2-20) is Jules's own. Items set out and used at the party have no cancel period (B8-24, B10-05; branch 'Cancels by Mon Oct 26' off). A cancel or a missed delivery releases any damage hold already on the card (B7-09, B7-14, B7-42, B8-16, B8-60, B8-66). Derek and Sam both lead big tents. Texts to Sam and staff carry no health detail (A8-38).\nOct 27 refit: 'leak' kept: the master's shared privacy lines (S12-29, S13-xx) mean a privacy leak, not water.\nOct 27 refit: \"color\" kept: S13-40 lists race, color, religion or sex (not a hair color). \nMoney fix Oct 27 2026 (D65/D66): the rest of a deposit goes on the saved card when the crew lead marks the job done (the money examples say so), never before delivery or on a date; older wording above (\"the rest is charged Wed 5pm\") is from the earlier pass. Nothing is taken for a same-day request until Sam accepts; then the deposit is charged.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "a travel fee",
+    "Hi, I want to put my barbershop on Rosie",
+    "Barbershop, plumbing, electrical",
+    "Each service starts the way most barbershops set it.",
+    "House calls: allowed where you are, for those cleared",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood barbershop on Elm St.",
+    "We couldn't find barbershop license BS20981",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "skin fades",
+    "Color quotes come to you first. Board prices never need one",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's services need none.",
+    "Sam adds massage to",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Step-free door on Elm St · parking in the back",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Is this Elm Street Dental?",
+    "so I can't reach Elm Street Dental",
+    "Sam, a barber or the desk can book for a customer by text or on the portal.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex M. asks: Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during my cut?",
+    "Can I add a beard trim on Saturday?",
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "A barbershop runs no classes. A studio, a gym or a school does.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "From the price list or photos, the price is set. A service priced at the chair gets its price now.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Books the next visit at the chair",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute style consult.",
+    "The tip line on the bills Rosie texts is turned on or off here too.",
+    "like a haircut at the shop or at home.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The state's license lookup is down",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "1200 Main St",
+    "88 Elm St",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "the barbershop's",
+    "the barbershop",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shop",
+    "Shop",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Drain clearing",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "color quote",
+    "A barbershop",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "at the chair",
+    "in the chair",
+    "house calls",
+    "house call",
+    "barbers",
+    "Barber",
+    "barber",
+    "a solo float studio",
+    "A studio, a gym or a school does"
+   ],
+   "B": [
+    "like 'Is the sink still full of water?'",
+    "The $179 drain needs none.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Lin agreed to the business's service call fee when booking.",
+    "Charge or keep the service call fee?",
+    "If Sam set a travel fee for farther towns, the price shows with it.",
+    "a travel fee",
+    "Plumbing, electrical, barbershop",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "A haircut could mean a salon or a barbershop.",
+    "Lee Home Services took the service call fee you agreed to when you booked.",
+    "Service call fee",
+    "Service call",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Once a barber is confirmed and you say yes. Stripe still to connect",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "The service call is $89. Accept it?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Lee Home Services can clear the drain:",
+    "DONE 179 drain",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor",
+    "The before photo shows no crack.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "The $160 valve quote is good for 7 days.",
+    "$160 for today's extra work",
+    "the shutoff valves",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "kitchen drain",
+    "Yard drain",
+    "Water heater fix",
+    "$40 deposit",
+    "$110 rest",
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Replace both shutoff valves · $160",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Jordan needs a part from the supply house.",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Tessa · Drain clearing",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "like a roof leak",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "A job quoted at the visit promises only the service call now.",
+    "The plug-in says a water heater is priced from photos",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Your water heater price is with",
+    "couldn't price your water heater this time",
+    "It's overflowing. Can someone come tonight?",
+    "he's the one who replaces water heaters",
+    "Written estimate and terms",
+    "water heater contract",
+    "Lee Home Services has no open times for this job in the next 60 days.",
+    "like a haircut at the shop or at home.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Drain clearing · $179",
+    "Sam adds heating and cooling to",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Jordan only, until others are licensed there",
+    "The state's license lookup is down",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Plumbing license",
+    "Plumbing is live!",
+    "Plumbing is live.",
+    "Plumbing stays live, and the rest waits, saved.",
+    "Mon–Fri 7:30am–5:30pm",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee's Barbershop",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "the barbershop",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shop",
+    "Shop",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Leak repair",
+    "leak repair",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$89 service call",
+    "service call",
+    "water heater",
+    "a solo float studio"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-61": "7421d186d5",
+   "S1-12": "41b86c1e72",
+   "S1-38": "b50b0bd4e8",
+   "S1-43": "e16d5048f3",
+   "S2-02": "b2094081ee",
+   "S2-15": "4a64408afc",
+   "S11-48": "03f824b27b",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-24": "0acce38d9e",
+   "S11-50": "c4536a448c",
+   "S12-19": "07db0515b2",
+   "A3-02": "223044a79d",
+   "A3-05": "ec1662d32f",
+   "A4-01": "7e7a61082c",
+   "A4-50": "6f43775326",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-65": "fa7ec0389d",
+   "A4-24": "0a292df05b",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-96": "d540b91653",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A7-12": "05f64179a4",
+   "A8-23": "e3a35f7f9e",
+   "A8-86": "c989a99e52",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A9-15": "bd2a17c3c5",
+   "A10-01": "77ff9c7550",
+   "A10-02": "c9223be948",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A8-38": "5e48b74f3a",
+   "A10-32": "9f84638bce"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-61": "e30e71f65d",
+   "S1-12": "0bea92643b",
+   "S1-38": "6301c86637",
+   "S1-43": "dd3ae2a1a9",
+   "S2-02": "b2094081ee",
+   "S2-15": "4a64408afc",
+   "S11-48": "6fd1c7b7b9",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-24": "593cd0d5cf",
+   "S11-50": "b9d718f51a",
+   "S12-19": "176d3d2beb",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B3-21": "ad48326ac5",
+   "B4-04": "df3ea4b2f5",
+   "B4-05": "fb3a9061c8",
+   "B4-43": "fc9855955a",
+   "B4-97": "04796bf8db",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B4-23": "3bbc0f30df",
+   "B4-34": "74ff52d83d",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B6-06": "1d676278da",
+   "B7-55": "3ce84c57a3",
+   "B7-93": "4d6f89e473",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B7-16": "3177c3701b",
+   "B8-58": "6a101417a1",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B8-18": "530038d2b8",
+   "B8-39": "aa75251207",
+   "B8-44": "3847104a93",
+   "B9-19": "b97bfbf0d2",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-18": "3d7ba16539",
+   "B10-31": "97786c6285",
+   "B10-05": "a326ea3c0b",
+   "B8-30": "a1ef4983e4",
+   "B7-61": "342b55fd9b",
+   "B10-32": "7713bff255",
+   "B9-04": "6017d4c54a"
+  }
+ }
+}

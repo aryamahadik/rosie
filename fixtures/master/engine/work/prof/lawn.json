@@ -1,0 +1,3987 @@
+{
+ "id": "lawn",
+ "name": "Lawn care & landscaper",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "cleaner",
+ "plugin": {
+  "pf.license": {
+   "need": "Mowing, trimming, leaf cleanup, aeration and snow plowing: usually none. Any weed control, insect control or weed-and-feed done for pay: the state's pesticide business license, and a certified applicator for each spray. Where a town or county licenses landscapers, the state's form says so.",
+   "ask": "The company's pesticide business license number, and each applicator's own certification number and category (turf), where the state's form asks for them.",
+   "who_holds": "Both: the company holds the business license, and each person who sprays holds their own certification. Mowing crews need none.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "insurance_bond": "Where the state's form asks for liability insurance or a bond for the pesticide license, it's asked here. Insured is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "not_this_work": "Sprinkler (irrigation) repair is licensed on its own in some states, and tree work near power lines needs a line-clearance crew. Neither is lawn care here."
+  },
+  "pf.services": {
+   "pattern": "Set service: lawn work at the customer's place, mostly a weekly plan on each town's route day, plus seasonal visits. Sam's second company, Lee Mower Shop, takes mowers in at its counter.",
+   "list": [
+    {
+     "name": "First cut and cleanup",
+     "price_kind": "set by the lawn's size (the customer's answer, or the county's lot record)",
+     "example": "up to 1/2 acre, an overgrown lawn: $179 (the example business's own price)",
+     "length": "about 2 hours for a crew of two",
+     "where": "at the customer's place; someone home for the first walk-around, or nobody",
+     "money": "card saved at booking; charged at DONE"
+    },
+    {
+     "name": "Weekly mowing (a plan)",
+     "price_kind": "a price per cut, by lot size",
+     "example": "up to 1/4 acre $55 a cut; up to 1/2 acre $70 a cut. Mow, trim, edge and blow",
+     "length": "about 35 to 50 minutes",
+     "where": "at the customer's place, on the town's route day (the example: Springfield on Thursdays); nobody needs to be home",
+     "season": "April to Thu Nov 19 (the example); the plan pauses for winter and starts again in April after a text in March",
+     "money": "card saved; each cut charged at its own DONE, or one bill a month if Sam picks it"
+    },
+    {
+     "name": "Weed control and fertilizer (weed-and-feed)",
+     "price_kind": "one price by lawn size",
+     "example": "$79 up to 8,000 sq ft",
+     "length": "about 30 minutes, one certified applicator",
+     "where": "at the customer's place; nobody needs to be home",
+     "first_step": "booked at least 2 days out, so neighbor notices can go out where the state's rules require them",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Fertilizer only",
+     "price_kind": "one price",
+     "example": "$59: offered instead of the weed-and-feed where the town bans weed sprays on home lawns",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Core aeration",
+     "price_kind": "one price by lawn size",
+     "example": "$150 up to 1/2 acre, paid in full when booking (the example's prepay price)",
+     "length": "about 45 minutes",
+     "where": "at the customer's place; nobody needs to be home",
+     "first_step": "sprinkler heads and any buried dog-fence wire flagged first"
+    },
+    {
+     "name": "Fall leaf cleanup",
+     "price_kind": "one price by lot size",
+     "example": "$199 up to 1/4 acre",
+     "where": "at the customer's place, October to December"
+    },
+    {
+     "name": "Lawn renovation (a patchy, weedy lawn)",
+     "price_kind": "quoted from the customer's photos first",
+     "example": "$640: weeds out, aeration, overseeding and starter fertilizer",
+     "where": "at the customer's place; certified applicator only, since it includes weed control",
+     "money": "card saved, charged at DONE; a written estimate where the state's rules require one over an amount"
+    },
+    {
+     "name": "Brush clearing (an overgrown lot)",
+     "price_kind": "quoted at the visit, before any work",
+     "example": "only the $89 trip fee is promised",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "By the hour",
+     "price_kind": "per hour",
+     "example": "$120 an hour for a crew of two, 1-hour minimum (beds, hedges, odd jobs)"
+    },
+    {
+     "name": "Add-ons",
+     "price_kind": "one price each, done only when the customer asks",
+     "example": "soil test $45 (results in 1 to 2 days); hedge trim from $60 by length (the example: $160 for a long hedge); bed edging $95; leaf haul-away $40"
+    },
+    {
+     "name": "Trip fee",
+     "price_kind": "one price",
+     "example": "$89 for a one-time visit (a first cut, a cleanup, an aeration, a renovation or a visit priced on site); $25 for a plan mow or a spray. Only for a late cancel, a locked gate or a loose dog the owner confirms. Never more than the visit's price.",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Snow plowing (the second kind of work)",
+     "price_kind": "per plow, by driveway length",
+     "example": "the example business's own list: a 2-car driveway $45 a plow, walks $25; a business lot gets a free estimate, then a quote",
+     "where": "at the customer's place, December to March; nobody needs to be home",
+     "money": "card saved; each plow charged at its own DONE"
+    },
+    {
+     "name": "Mower repair at Lee Mower Shop (Sam's second company)",
+     "price_kind": "one price, from photos, or at the counter",
+     "example": "the example shop's own board (the old flowchart has no mower shop; this side is the example's own): blade sharpening $35, riding mower blades $40, chain sharpening $20, hedge trimmer sharpening $25, push mower tune-up $55, riding mower tune-up $140, a carburetor rebuild from photos, a mower that won't start priced at the counter after a $25 diagnosis",
+     "where": "dropped off at the shop; blades can also be sharpened at the customer's home ($75, billed after)",
+     "money": "nothing taken; paid at the counter at pick-up"
+    }
+   ],
+   "capacity": "A mowing or cleanup crew is two people: a lead and a helper. A spray is one certified applicator. Each crew has a most-stops-a-day number Sam sets (the example: 22).",
+   "route_days": "Weekly mowing is booked on each town's route day (the example: Springfield on Thursdays). Only that day's times show for a plan. A customer who wants another day is told the route day.",
+   "nobody_home": "Yes for plan mows, sprays, aeration, leaf cleanups and plowing: a gate code or an unlocked gate. DONE with a photo confirms it.",
+   "online": "No.",
+   "not_offered": "Sprinkler repair, tree removal and tree work near power lines, and a single mow with no plan (Sam's setting: a one-off is the first cut and cleanup).",
+   "drop_off_slots": "Lee Mower Shop books drop-off slots by how many mowers it takes in a day, with no mechanic named. Once a mower is in, it goes to a mechanic with the skill."
+  },
+  "pf.questions": {
+   "before_times": [
+    "About how big is the lawn: up to 1/4 acre, up to 1/2 acre, or bigger (or Rosie reads the county's lot record from the address)",
+    "When was it last mowed? (over 3 weeks means the first cut and cleanup)",
+    "Weekly mowing, or one visit",
+    "For a spray: anywhere it must not go, like a vegetable garden, a pond or a play area",
+    "For aeration: any sprinkler heads, or a buried dog fence?",
+    "For a drop-off at the mower shop: what kind of mower, and what it needs"
+   ],
+   "after_a_time": [
+    "The gate: a latch, a lock or a code",
+    "Pets, and where they'll be on the visit day",
+    "Steep slopes, ditches or anything the mower must stay away from",
+    "Where the truck and trailer can park",
+    "Will someone be home?"
+   ],
+   "secure_page_only": [
+    "A gate code or a lock combination",
+    "Why someone in the home must stay away from a product, like an allergy or a pregnancy"
+   ],
+   "who_may_book": "An adult who owns or rents the home, or a landlord or property manager they name. A renter booking a lawn renovation or a spray may need the owner's OK."
+  },
+  "pf.safety": {
+   "words": [
+    "a power line down in the yard",
+    "someone swallowed or splashed a lawn chemical",
+    "a gas smell",
+    "a wasp or hornet nest in the yard",
+    "a tree or a big limb down on the house"
+   ],
+   "what_happens": [
+    "A power line down: stay well away, keep children and pets inside, treat it as live. Call 911, then the power company. No crew is booked until the utility says it's safe.",
+    "A chemical swallowed or splashed: call Poison Control at 1-800-222-1222, or 911 if the person isn't breathing or can't wake up. Keep the product label at hand.",
+    "A gas smell: leave and call 911. No booking until it's safe.",
+    "A wasp or hornet nest: the crew leaves that area out. Pest control can come first.",
+    "A tree or limb on the house: call 911 if anyone is hurt; a tree service comes first, then the lawn work."
+   ],
+   "booking_goes_on": "No, for a power line down, a poisoning or a gas smell. Yes, with the area left out, for a nest or a fallen limb in the yard."
+  },
+  "pf.first_steps": {
+   "neighbor_notice": "Before a spray, where the state's rules require it, the applicator gives written notice to the neighbors (door notices, or people on the state's registry within its distance), naming the date and a backup day. Rosie never texts the neighbors. Spray times start after the notice's lead time (the example: 2 days). Sam gets a to-do and replies when it's done.",
+   "customer_notice": "Where the state's rules require it, the customer gets the written spray notice before the first spray: the products, the dates and the safety steps.",
+   "local_limits": "Where a town bans or limits weed sprays on home lawns, the address is checked before the customer's yes, and fertilizer only is offered at its own price.",
+   "aeration_prep": "Flag sprinkler heads and any buried dog-fence wire before aeration. The crew skips flagged spots.",
+   "first_cut": "A lawn not mowed in 3 weeks gets the first cut and cleanup before a weekly plan starts.",
+   "prep_for_reminder": [
+    "Keep pets inside, or where you said",
+    "Pick up toys, hoses and dog waste",
+    "Leave the gate unlocked, or the code on the secure page",
+    "Before a spray: close nearby windows, and keep children and pets off the lawn"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Someone home (the first cut's walk-around, a visit priced on site): the code at the door, entered by the crew lead. Nobody home (plan mows, sprays, aeration, plowing): no code; DONE with a photo of the lawn and the latched gate.",
+   "gate_and_dog": "The crew checks the gate and the dog before mowing. A loose dog: the customer is asked to bring it in within 15 minutes, and only what's safe is mowed. The gate is latched at the end, every time.",
+   "weather": "Rain: the crew lead moves the whole route to the next dry day with one text, and every customer on it is told. A move for weather is free. Sprays: the applicator checks wind and rain against the product label; too windy means fertilizer today and the spray on the notice's backup day, at one price.",
+   "after_spray": "Marker flags at the edges of the treated lawn where the state's rules require them. The keep-off time and the products used are texted to the customer.",
+   "drop_off": "At Lee Mower Shop: the code is given at the counter when the mower is left. Status words IN and READY; READY comes with a photo. Pick-up only by the customer or someone they name.",
+   "changes_at_visit": "Brush clearing is priced before any work. Extra work (beds, a hedge, a leaf haul-away) only when the customer asks, priced first. A right to cancel where the state's rules give one.",
+   "proof_done": "Before and after photos, and a photo of the latched gate. A spray adds the application record the state's rules require.",
+   "redo": "Something missed: tell the business within 24 hours; the crew comes back free, usually the next day."
+  },
+  "pf.money": {
+   "start": "Lawn care: the plug-in starts every service with a card saved at booking for the trip fee, each visit charged at its own DONE. Sam can pick one bill a month for a plan instead, or the full price when booking, as many lawn businesses sell seasonal jobs prepaid (the example: core aeration). Lee Mower Shop: nothing taken and no card saved, so no fee; paid at the counter at pick-up. A blade sharpening at home takes nothing either: Rosie texts the bill after.",
+   "deposits": "None for upkeep. Sam can set one per service, within the state's caps. Deposit cap: from the state form.",
+   "fees": "Late cancel, a locked gate or a loose dog: the business's own trip fee (the example: $89 on a one-time visit, $25 on a plan mow or a spray), never more than the visit's price. The owner confirms each one; no answer, no fee.",
+   "plans": "Each cut is charged at its own DONE. Nothing is charged while the plan is paused for winter. Rosfield's $2 counts once a month for a plan.",
+   "tips": "Optional, all to the crew. A tip line only if the owner turns it on.",
+   "tax": "A sales tax line only where the state taxes lawn care, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate codes and lock combinations",
+    "Health reasons for staying away from a product",
+    "Neighbors' names or numbers: Rosie never texts the neighbors"
+   ],
+   "photos": "Photos of the yard go only to the customer and the business.",
+   "languages": "English and Spanish. Neighbor notices are printed by the business, in the languages the state's rules ask for.",
+   "minors": "Nobody under 18 books. A teen at home isn't the booking's adult."
+  },
+  "pf.staff": {
+   "skills": [
+    "Mowing and cleanups",
+    "Sprays and lawn renovation (certified applicator only)",
+    "Aeration",
+    "Snow plowing",
+    "Mower repair at the shop: sharpening, tune-ups, carburetor work"
+   ],
+   "crews": "Two per mowing or cleanup crew: a lead, who sees the gate code and texts DONE, and a helper.",
+   "licenses": "Each person who sprays holds the state's applicator certification. Where the state allows a registered technician to spray under a certified applicator, the supervision rule comes from its form. Mowing crews and mechanics need none.",
+   "new_person_ok": "Plan mows: any crew with the route may come, since nobody needs to be home. A spray or a renovation: only a certified applicator, never anyone else.",
+   "who_oks": "The owner OKs new mowing customers' prices (he checks the lot) and quotes over the limit. The office manager may too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "pesticide_notices": [
+    "Neighbor notices before a spray: yes or no, the lead time, the distance and the languages, from the state form.",
+    "A written spray notice to the customer before the first spray, where the state's rules require it.",
+    "Marker flags after a spray: yes or no, and how long they stay up, from the state form.",
+    "A moved spray needs a new notice unless the new day is the backup day on the old one."
+   ],
+   "local_bans": "Towns or counties that ban or limit lawn sprays on home lawns: the address is checked before the yes, and the allowed service is offered instead.",
+   "records": "The spray record each state requires (product, its EPA number, the area, the applicator, the weather), kept for the state's time, and 7 years like every booking.",
+   "plans": [
+    "The plan's terms show before any card: how often, the price a cut, when it's charged, the season, and how to end it.",
+    "The plan gets its own yes, apart from the booking, and the terms are texted back.",
+    "At the season's end the plan pauses with one text; nothing is charged while it's paused.",
+    "Before it starts again, a text with the date and the price, and how to end it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask. One reply ends the plan."
+   ],
+   "add_on_at_home": "A right to cancel where the state's rules give one for work sold at the home.",
+   "written_contract": "Above an amount, where the state's rules require it (a lawn renovation).",
+   "landlord": "A renter's spray or renovation may need the owner's OK."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "Rain on a route day: one text from the crew lead moves the whole route to the next dry day; no fee.",
+    "Wind on a spray day: fertilizer today, the spray on the notice's backup day, at one price.",
+    "A loose dog or a locked gate: a 15-minute wait, only what's safe is mowed, and the owner decides any fee.",
+    "Something missed: a free return visit, never money from Rosie.",
+    "A crew lead out: the route moves a day, or Sam runs it. A spray waits for a certified applicator.",
+    "The season ends: the plan pauses, and a text comes before it starts again.",
+    "A town that bans weed sprays: fertilizer only, before the yes.",
+    "A sprinkler head or dog-fence wire hit while aerating: photos the same day; the owner decides.",
+    "Several open bookings (plan mows and a spray): which one is asked first.",
+    "A mower not picked up at the shop: reminders; a storage fee only if the owner starts it, after written notice."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "dropoff",
+   "photos",
+   "extrawork",
+   "documents",
+   "tips",
+   "monthlybill"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Nico and Toby (mechanics)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Andre and Luis (crew leads)",
+   "cust": "Alex M. (customer) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nico"
+  },
+  "B": {
+   "staff": "Andre"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Riding mower quotes come to you first. Board prices never need one"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most lawn care businesses set it."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "A business lot: a free estimate, then a quote"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter at pick-up"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, no card saved"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood mower shop on Depot St. Blades sharpened, mowers tuned and repaired."
+   ],
+   [
+    "The chairs",
+    "The workbench"
+   ],
+   [
+    "A chair, ready",
+    "A mower, ready"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lawn care for homes in Springfield. Mowing, cleanups and aeration, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A lawn after its first cut"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks to fix a pressure washer, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Mower Shop doesn't fix pressure washers."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7",
+    "Ben T. books a blade sharpening for Sat Nov 7"
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7",
+    "you now have two blade sharpenings on Sat Nov 7"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A tune-up's example: 'A riding mower tune-up needs a quick look at its engine first. Had one at Lee's in the last 3 months?'"
+   ],
+   [
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Nia K.'s refund for a cancelled tune-up was due yesterday."
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so no fee"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lawn care and the mower shop take none."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Applicator license CA031552"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The mower deck got a new scratch."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the mower deck got a new scratch today"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you sharpen hedge trimmers too?"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24 · 11:00am drop-off · blade sharpening"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything the mechanic should know?"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. blade sharpening Sat 11am"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds slots side by side, within the day's drop-off number."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Both go in one drop-off slot, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds bike repair to Lee Mower Shop."
+   ],
+   [
+    "NEW massage",
+    "NEW bike repair"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Bike repair for Lee Mower Shop: is it the same company?"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A mower shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no mechanic. A day shows only if a mechanic with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Mower Shop · drop-off"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 diagnosis; priced at the counter"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A sharpening is rated, so the shop takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Nico's yearly tune-up plan after a diagnosis"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Mower Shop sent you a proposal: Nico's yearly tune-up plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Yearly tune-up plan"
+   ],
+   [
+    "your first color plan visit",
+    "your first tune-up visit"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of your mower"
+   ],
+   [
+    "photos of your hair",
+    "photos of your mower"
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 ignition coil + 15 spark plug Alex M."
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Ignition coil $110 · spark plug $15"
+   ],
+   [
+    "Color correction · $110",
+    "New ignition coil · $110"
+   ],
+   [
+    "$110 color correction and $15 gloss",
+    "$110 ignition coil and $15 spark plug"
+   ],
+   [
+    "The color correction alone is the $110 starting price",
+    "The ignition coil alone is the $110 starting price"
+   ],
+   [
+    "Today: the color correction, $110.",
+    "Today: the ignition coil, $110."
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the ignition coil only, $110. No spark plug today."
+   ],
+   [
+    "Gloss to finish",
+    "New spark plug"
+   ],
+   [
+    "gloss",
+    "spark plug"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A pesticide license for sprays, and one for each person who sprays. Mowing is priced by the lawn's size, on a weekly plan. A power line down stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Mowers and blades are dropped off at the shop and picked up when ready. Blades can also be sharpened at the customer's home."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Nico can still take the mower in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Lee Mower Shop's visits are drop-offs. A repair shop, a tailor or a groomer works the same way."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A lawn crew's example: a fallen limb gets 'stay away if it touches a wire'."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A landscaper drops off five mowers for tune-ups on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 21-inch push mower, blade badly nicked, balanced it"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your blade sharpening is part of a plan, every 4 weeks."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like a mower leaking gas."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My mower is leaking gas now. Can I still bring it in?"
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the mower still cuts unevenly after Saturday's sharpening."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "For a mower leaking gas: keep it outside, away from sparks."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop off my hedge trimmer at the same time?"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a mower shop or a hardware store"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a blade sharpening every 4 weeks."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Push mower tune-up"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group drop-off together"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The mower still cuts unevenly."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Nico stopped work on Alex M.'s mower."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like my mower blade sharpened on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero afilar la cuchilla de mi cortacésped el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a sharpening every 4 weeks"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Nico sees the mower"
+   ],
+   [
+    "plumbing and electrical",
+    "lawn care and snow plowing"
+   ],
+   [
+    "Signature cut and shave",
+    "Push mower tune-up"
+   ],
+   [
+    "a Kids cut (12 and under)",
+    "a hedge trimmer sharpening"
+   ],
+   [
+    "like a skin-test result",
+    "like a compression test result"
+   ],
+   [
+    "A barbershop has none.",
+    "A mower shop has none."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped work on Alex M.'s mower."
+   ],
+   [
+    "Haircut every 4 weeks",
+    "Blade sharpening every 4 weeks"
+   ],
+   [
+    "also does color and",
+    "also does carburetors and"
+   ],
+   [
+    "A color correction",
+    "A won't-start repair"
+   ],
+   [
+    "a color correction",
+    "a won't-start repair"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Lawn Care's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Lawn Care"
+   ],
+   [
+    "barber, color and",
+    "mechanic, carburetors and"
+   ],
+   [
+    "a package of cuts",
+    "a package of sharpenings"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Mower Shop"
+   ],
+   [
+    "Color correction",
+    "Won't-start repair"
+   ],
+   [
+    "color correction",
+    "won't-start repair"
+   ],
+   [
+    "Only the consult",
+    "Only the diagnosis"
+   ],
+   [
+    "The Groom's package",
+    "The riding mower tune-up"
+   ],
+   [
+    "the Groom's package",
+    "the riding mower tune-up"
+   ],
+   [
+    "Groom's package",
+    "Riding mower tune-up"
+   ],
+   [
+    "2 Consult only",
+    "2 Diagnosis only"
+   ],
+   [
+    "service, color",
+    "service, carburetors"
+   ],
+   [
+    "signature cut",
+    "push mower tune-up"
+   ],
+   [
+    "Color and cut",
+    "Carburetor rebuild"
+   ],
+   [
+    "color and cut",
+    "carburetor rebuild"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Lawn"
+   ],
+   [
+    "Lee Electric",
+    "Lee Snow"
+   ],
+   [
+    "1200 Main St",
+    "310 Mill Rd"
+   ],
+   [
+    "Consult only",
+    "Diagnosis only"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "$25 consult",
+    "$25 diagnosis"
+   ],
+   [
+    "the consult",
+    "the diagnosis"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "a staff cut",
+    "a work mower's sharpening"
+   ],
+   [
+    "Electrical",
+    "Snow plowing"
+   ],
+   [
+    "electrical",
+    "snow plowing"
+   ],
+   [
+    "Barbershop",
+    "Mower shop"
+   ],
+   [
+    "barbershop",
+    "mower shop"
+   ],
+   [
+    "Beard trim",
+    "Chain sharpening"
+   ],
+   [
+    "beard trim",
+    "chain sharpening"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "patch test",
+    "test run"
+   ],
+   [
+    "88 Elm St",
+    "75 Depot St"
+   ],
+   [
+    "on Elm St",
+    "on Depot St"
+   ],
+   [
+    "Skin fade",
+    "Riding mower blades"
+   ],
+   [
+    "skin fade",
+    "riding mower blade sharpening"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "MP045210",
+    "PB045210"
+   ],
+   [
+    "Plumbing",
+    "Lawn care"
+   ],
+   [
+    "plumbing",
+    "lawn care"
+   ],
+   [
+    "Kids cut",
+    "Hedge trimmer sharpening"
+   ],
+   [
+    "kids cut",
+    "hedge trimmer sharpening"
+   ],
+   [
+    "Haircuts",
+    "Blade sharpenings"
+   ],
+   [
+    "haircuts",
+    "blade sharpening"
+   ],
+   [
+    "cut hair",
+    "fix mowers"
+   ],
+   [
+    "Plumber",
+    "Lawn crew"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "barbers",
+    "mechanics"
+   ],
+   [
+    "Haircut",
+    "Blade sharpening"
+   ],
+   [
+    "haircut",
+    "blade sharpening"
+   ],
+   [
+    "Jordan",
+    "Andre"
+   ],
+   [
+    "Barber",
+    "Mechanic"
+   ],
+   [
+    "barber",
+    "mechanic"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Riley",
+    "Nico"
+   ],
+   [
+    "Avery",
+    "Toby"
+   ],
+   [
+    "color",
+    "carburetor work"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ]
+  ],
+  "B": [
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my lawn."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Nico: mechanic, carburetors, home visits"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "A business lot: a free estimate, then a quote"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most mower shops start."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter at pick-up"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, no card saved"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules mower shops often set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood mower shop on Depot St. Blades sharpened, mowers tuned and repaired."
+   ],
+   [
+    "The chairs",
+    "The workbench"
+   ],
+   [
+    "A chair, ready",
+    "A mower, ready"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lawn care for homes in Springfield. Mowing, cleanups and aeration, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A lawn after its first cut"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my overgrown lawn. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My lawn hasn't been cut in a month' fits a first cut and cleanup."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like cutting down a neighbor's hedge without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a hedge trim? Say so.'"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Lawn Care can do the first cut and cleanup:"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 first cut needs none."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Stump grinding and haul-away · $540"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found ruts in the lawn from the mower this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a brush clearing, today"
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9",
+    "you have two first cuts on Mon Nov 9"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lawn care and the mower shop take none."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Applicator license CA031552"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call pest control first"
+   ],
+   [
+    "asks an AI for a plumber",
+    "asks an AI for a lawn crew"
+   ],
+   [
+    "The job should be done by 10am.",
+    "The job should be done by 10:30am."
+   ],
+   [
+    "Video and Jordan's notes",
+    "Lab results and Andre's notes"
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like neighbor notices it owed that aren't out"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I water the lawn before you come?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone spray the weeds in my lawn this Thursday? What does it cost?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds holiday lighting to Lee Lawn Care."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW holiday lighting"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Holiday lighting for Lee Lawn Care: is it the same company?"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 regrade and sod, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your regrade and sod"
+   ],
+   [
+    "Repipe · $2,400",
+    "Regrade and sod · $2,400"
+   ],
+   [
+    "$800 when the pipes are in",
+    "$800 when the soil is graded"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 regrade and sod"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your regrade and sod"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a lawn renovation Andre noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a lawn renovation, from Andre's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Lawn renovation"
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My party is tomorrow. Can someone mow tonight?"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "First cut before a party"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the front and side only, $165. Leave the back."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "clears the front and side today, $165. The $80 back stays good until Thu Oct 29."
+   ],
+   [
+    "LATE camera report",
+    "LATE soil test report"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A pesticide license for sprays, and one for each person who sprays. Mowing is priced by the lawn's size, on a weekly plan. A power line down stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Mowers and blades are dropped off at the shop and picked up when ready. Blades can also be sharpened at the customer's home."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Lawn Care does lawn care and snow plowing, not sprinkler repair. Nothing was saved. You can look for an irrigation company near you."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to stay away from the limb if it touches a wire, and to call 911 if one is down."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the lawn's size, when it was last mowed, weekly or once, the gate and the dog."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Aléjese de la rama si toca algún cable. Si hay un cable caído, llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay well away from the wire, and keep children and pets inside. Call 911, then the power company."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "We just moved in, and the lawn hasn't been mowed in a month. Can a crew come Thursday morning, then mow every week? I'm in Springfield."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Andre found a wasp nest by your back fence and left that part of the lawn out."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay away from the limb if it touches any wire. If a wire is down, call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Lawn Care doesn't do, like a broken sprinkler line."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For lawn care, a power line down or a swallowed lawn chemical stops the booking."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Andre finds a wasp nest by the back fence. The plug-in says the crew stops there"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A lawn crew's example: a fallen limb gets 'stay away if it touches a wire'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A big limb fell on my lawn in the storm."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is the weed spray safe for my dog?"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your lawn, and a crew lead will price the job."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a power line down, a swallowed lawn chemical, or a gas smell."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE back gate latches inside. Dog in on Thursdays. Keep off the garden."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "about how big is the lawn, and when was it last mowed?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Andre walks the brush and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Andre has walked the brush. Here's the price to clear it today."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Andre went to empty the trailer and will be back about 9:45am."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s strip by the side fence was missed in the Thu Oct 22 cut."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. A fall leaf cleanup is $199, from the list."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "That's under our redo promise, so this visit is free."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Andre's crew also clear the leaves?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 hedge along the drive is overgrown, trim it"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Se cayó una rama grande en mi césped."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a monthly yard cleanup at two rentals"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Andre's crew aerate my lawn next week?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Andre's crew cracked a sprinkler head at Alex M.'s."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the redo promise lasts: tell within 24 hours."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE ruts by the driveway, a bare spot by the shed"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a fall leaf cleanup."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿La rama toca algún cable?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "A storm brought a wire down in the yard."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can the crew also do a fall leaf cleanup?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Andre's trailer is full and needs emptying."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wasp nest by the back fence, left out"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please keep the dog inside, and leave the back gate unlocked."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the limb touching any wire?"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with that spot left out."
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "he's the one who does renovations"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Andre finds the hedge along the drive overgrown."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The next day, Alex finds a strip by the side fence missed."
+   ],
+   [
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Oct 23 · arriving 1–3pm · Andre"
+   ],
+   [
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "Mon Oct 26 · arriving 8–10am · Andre"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The strip by the side fence was missed."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Andre's crew left clippings on the driveway."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 front and side 165 back 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the strip along the back fence"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Andre twists an ankle and texts HURT."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Any beds the mower must avoid?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wasp nest by the back fence"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a sprinkler head by the walk"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE emptying the trailer, back 9:45"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Andre's crew cracks a sprinkler head"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT twisted my ankle, need to stop"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It isn't near any wire."
+   ],
+   [
+    "replacing both shutoff valves",
+    "trimming the hedge along the drive"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the soil test report link"
+   ],
+   [
+    "replace both shutoff valves",
+    "trim the hedge along the drive"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Trim the hedge along the drive"
+   ],
+   [
+    "the sink is now overflowing",
+    "a wire is now down in the yard"
+   ],
+   [
+    "next week's drain cleaning",
+    "next month's cleanup"
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the job"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wasp nest by the back fence"
+   ],
+   [
+    "Water heater replacement",
+    "Lawn renovation"
+   ],
+   [
+    "water heater replacement",
+    "lawn renovation"
+   ],
+   [
+    "The repair price is good",
+    "The clearing price is good"
+   ],
+   [
+    "plumbing and electrical",
+    "lawn care and snow plowing"
+   ],
+   [
+    "Sewer camera inspection",
+    "Fall leaf cleanup"
+   ],
+   [
+    "sewer camera inspection",
+    "fall leaf cleanup"
+   ],
+   [
+    "Kitchen drain clearing",
+    "First cut and cleanup"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "Just the kitchen sink.",
+    "About a quarter acre. Not mowed in a month."
+   ],
+   [
+    "Under the sink, before",
+    "Front lawn, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked sprinkler head"
+   ],
+   [
+    "Cabinet floor, before",
+    "Driveway edge, before"
+   ],
+   [
+    "your new pipes are in",
+    "the soil is graded"
+   ],
+   [
+    "1-year labor warranty",
+    "24-hour redo promise"
+   ],
+   [
+    "for a bathroom drain",
+    "for an aeration"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Front and side · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 hedge trim quote"
+   ],
+   [
+    "leehomeservices.com",
+    "leelawncare.com"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 hedge trim"
+   ],
+   [
+    "Sewer camera report",
+    "Soil test report"
+   ],
+   [
+    "also does color and",
+    "also does carburetors and"
+   ],
+   [
+    "Water heater flush",
+    "Core aeration"
+   ],
+   [
+    "water heater flush",
+    "core aeration"
+   ],
+   [
+    "the shutoff valves",
+    "the hedge trim"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Lawn Care's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Lawn Care"
+   ],
+   [
+    "camera inspection",
+    "leaf cleanup"
+   ],
+   [
+    "the kitchen drain",
+    "the first cut"
+   ],
+   [
+    "Supply line · $80",
+    "Back · $80"
+   ],
+   [
+    "barber, color and",
+    "mechanic, carburetors and"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Mower Shop"
+   ],
+   [
+    "plumbing license",
+    "pesticide license"
+   ],
+   [
+    "Plumbing license",
+    "Pesticide license"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa first cut"
+   ],
+   [
+    "Drain clearings",
+    "First cuts"
+   ],
+   [
+    "Book the repair",
+    "Book the clearing"
+   ],
+   [
+    "Drain clearing",
+    "First cut"
+   ],
+   [
+    "drain clearing",
+    "first cut"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 first cut"
+   ],
+   [
+    "Kitchen drain",
+    "First cut"
+   ],
+   [
+    "cut your hair",
+    "sharpen your mower blade"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Lawn"
+   ],
+   [
+    "Lee Electric",
+    "Lee Snow"
+   ],
+   [
+    "1200 Main St",
+    "310 Mill Rd"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Water heater",
+    "Lawn renovation"
+   ],
+   [
+    "water heater",
+    "lawn renovation"
+   ],
+   [
+    "shop's chair",
+    "shop's counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Leak repair",
+    "Brush clearing"
+   ],
+   [
+    "leak repair",
+    "brush clearing"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "Electrical",
+    "Snow plowing"
+   ],
+   [
+    "electrical",
+    "snow plowing"
+   ],
+   [
+    "Barbershop",
+    "Mower shop"
+   ],
+   [
+    "barbershop",
+    "mower shop"
+   ],
+   [
+    "Yard drain",
+    "Weed-and-feed"
+   ],
+   [
+    "yard drain",
+    "weed-and-feed"
+   ],
+   [
+    "42 Oak St",
+    "9 Meadow Ln"
+   ],
+   [
+    "88 Elm St",
+    "75 Depot St"
+   ],
+   [
+    "MP045210",
+    "PB045210"
+   ],
+   [
+    "Plumbing",
+    "Lawn care"
+   ],
+   [
+    "plumbing",
+    "lawn care"
+   ],
+   [
+    "cut hair",
+    "fix mowers"
+   ],
+   [
+    "Plumber",
+    "Lawn crew"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "barbers",
+    "mechanics"
+   ],
+   [
+    "haircut",
+    "blade sharpening"
+   ],
+   [
+    "Jordan",
+    "Andre"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No toca ningún cable."
+   ],
+   [
+    "Barber",
+    "Mechanic"
+   ],
+   [
+    "barber",
+    "mechanic"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Riley",
+    "Nico"
+   ],
+   [
+    "Avery",
+    "Toby"
+   ],
+   [
+    "flush",
+    "aeration"
+   ],
+   [
+    "Labor",
+    "By the hour"
+   ],
+   [
+    "sewer camera report",
+    "soil test report"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off slot at Lee Mower Shop, Sat Oct 24, leaves a push mower at the counter to have its blade sharpened, and picks it up the same afternoon. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Lawn Care for 9 Meadow Ln: a first cut and cleanup of an overgrown lawn, Thu Oct 22 between 8 and 10am with Andre's crew, then weekly mowing on Thursdays until the season ends. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 blade sharpening. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+    "photos|none|counter": "A carburetor rebuild, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+    "visit|none|counter": "A mower that won't start, priced at the counter. Only the $25 diagnosis is promised."
+   },
+   "amounts": {
+    "*": {
+     "name": "Blade sharpening"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Blade sharpening"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Carburetor rebuild"
+    },
+    "visit|*|*": {
+     "name": "Won't-start repair"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|full|none",
+    "photos|card|card",
+    "visit|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 first cut and cleanup, then weekly mowing. A card is saved and charged $179 when Andre texts DONE.",
+    "list|none|bill": "A $179 first cut. Nothing is taken. Rosie texts the bill after the job.",
+    "list|full|none": "Core aeration, $150, paid in full when booking (the example's prepay price).",
+    "photos|card|card": "A lawn renovation, priced from photos at $640. Sam OKs it. The card is charged at DONE.",
+    "visit|card|card": "Brush clearing on an overgrown lot, priced at the visit. A card is saved; the $89 trip fee is owed even after a no to the price, and the card is charged at DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "First cut and cleanup"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "First cut and cleanup"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Core aeration"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Lawn renovation"
+    },
+    "visit|*|*": {
+     "name": "Brush clearing"
+    }
+   }
+  }
+ },
+ "keep": [
+  "drips",
+  "leak"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "The lawn renovation is never on the list. Each lawn is different, so it's priced from the customer's photos.",
+     "Weekly mowing is priced by lot size: $55 a cut up to 1/4 acre, $70 up to 1/2 acre."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your lawn care services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Lawn care prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Lawn care price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trip fee",
+          "$89, credited to the job"
+         ],
+         [
+          "First cut and cleanup",
+          "$179"
+         ],
+         [
+          "Weekly mowing",
+          "$55 a cut, up to 1/4 acre"
+         ],
+         [
+          "Weed control and fertilizer",
+          "$79"
+         ],
+         [
+          "Core aeration",
+          "$150"
+         ],
+         [
+          "Fall leaf cleanup",
+          "$199"
+         ],
+         [
+          "Brush clearing",
+          "Priced at the visit"
+         ],
+         [
+          "Lawn renovation",
+          "Priced from the customer's photos"
+         ],
+         [
+          "By the hour",
+          "$120 an hour, 1-hour minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-23",
+    "more": [
+     "Lawn care needs the license only for its sprays. Mowing, cleanups and aeration go live on the business registration while it's checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Mower repair needs no license where Sam works, so blades can be sharpened at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state's form asks for a license for this work, it's asked here instead.",
+     "Each mechanic can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-11",
+    "more": [
+     "Lawn care licenses only the people who spray. Here that's Andre, besides Sam.",
+     "Luis mows and does cleanups, and Nico and Toby fix mowers, so none of them is checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Andre sprays, so that applicator license is optional and not checked. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Andre's applicator license is on file as given, and everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Andre: lawn care, sprays and snow plowing",
+         "Luis: lawn care and snow plowing",
+         "Nico: mower repair, carburetors and home visits",
+         "Toby: mower repair"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Lawn care's sprays need the state's pesticide license, so the company takes the license step (pf.license)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The lawn plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and mechanics are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: lawn visits and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each person who sprays needs the state's applicator license (pf.staff)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Lawn work is never sent now: a rush gets the soonest open time (pf.services)."
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Toby gets the same invite from Lee Mower Shop. Andre and Luis get theirs from Lee Lawn Care.",
+     "Only people who spray send a license number. Mechanics just reply YES.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mower Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Nico"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Lawn Care. Sam Lee added you to the team for lawn care and snow plowing. Reply YES to join and get your jobs here by text. If you spray, add your license number. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Andre"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Nico replies YES, then checks what Sam set. One reply covers everything Nico does for the shop.",
+    "more": [
+     "No license number is asked: mower repair needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Toby joins the same way. Andre adds the applicator license number to the YES."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Nico"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Mower Shop! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Nico Chen · Lee Mower Shop",
+        "lines": [
+         "Every shop service, carburetors and home visits",
+         "Hours: the shop's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Nico"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Nico"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex brings the mower to the counter. Alex reads the code from the confirmation or the reminder, and Nico texts it in.",
+    "more": [
+     "At Lee Mower Shop, the visit is a drop-off: the code is given when the mower is left.",
+     "The desk can type the code on the portal's Today page instead.",
+     "The code also confirms the visit for Rosfield's $2."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M., Sat 11:00am. One 21-inch push mower."
+     ],
+     [
+      "san",
+      "cust",
+      "Your mower is checked in at Lee Mower Shop with Nico. We'll text you when it's ready. Thanks, Alex!"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "Lee Mower Shop's main path above is the drop-off. This branch is a mail-in: a blade shipped to the shop has no code, so DONE comes when it arrives.",
+    "more": [
+     "At pick-up, the mower goes only to the customer or someone they name.",
+     "Next come the before notes, the price or the OK, and the work. READY and the pick-up come after it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "t": "Sat Oct 24, 3:30pm",
+    "does": "Alex gives the drop-off code at pick-up, or the person Alex named on the secure page shows an ID. The mower is shown at the counter, and handed over once anything due is paid.",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: the mower stays, and they're asked to come back with Alex's code.",
+     "Anything due is paid at the counter, the shop's own way.",
+     "A mailed-in blade is sent back instead, once anything due is paid.",
+     "Not picked up by the end of the pick-up hours: it goes as 'An item isn't picked up', after the visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Show Alex the mower, and hand it over once anything due is paid."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-15",
+    "more": [
+     "A drop-off names no mechanic. Nico gets it as the one on the counter that day, and the mower goes to whoever has the skill."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "At Lee Mower Shop, Alex pays when picking up the mower."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee Mower Shop books drop-off slots (A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no mechanic. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A mower drop-off is never booked for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The plug-in names no form to sign for mower repair."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A mower waits in its drop-off slot, so a mechanic running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The mower is left at the shop: READY and the pick-up follow the work."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A sharpening is rated."
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW bike repair"
+     ],
+     [
+      "san",
+      "owner",
+      "Bike repair for Lee Mower Shop: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like blade sharpening?",
+      {
+       "card": {
+        "title": "Blade sharpenings work like this",
+        "lines": [
+         "Customers come to you",
+         "Nothing taken",
+         "Paid at the counter"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "more": [
+     "Blade sharpenings already booked keep $35, even after Nov 2.",
+     "A time being saved right now keeps the price on the customer's screen.",
+     "The mower shop sells no plans, so no plan notice goes out.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: blade sharpening $40 for visits from Mon Nov 2. Blade sharpenings already booked keep $35."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "A sharpening at the shop has no cancel period. The shop signs no contracts and sells nothing the state's cancel rules cover."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The mower shop signs no contracts and sells no plans; nothing it sells comes with a cancel period."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The mower shop sells no plans: each sharpening or repair is its own drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The mower shop sells no plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The mower shop sells no plans."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The mower shop sends no proposals or plans: each repair is priced from the board, from photos, or at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Lee Mower Shop sells no plans: each mower is paid at the counter at pick-up."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at a mower shop."
+   },
+   {
+    "op": "off",
+    "at": "A7-02",
+    "label": "A plan or count is due",
+    "why": "Lee Mower Shop sells no plans or packs and books no groups."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "The lawn renovation is never on the list. Each lawn is different, so it's priced from the customer's photos.",
+     "Weekly mowing is priced by lot size: $55 a cut up to 1/4 acre, $70 up to 1/2 acre."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your lawn care services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Lawn care prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Lawn care price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trip fee",
+          "$89, credited to the job"
+         ],
+         [
+          "First cut and cleanup",
+          "$179"
+         ],
+         [
+          "Weekly mowing",
+          "$55 a cut, up to 1/4 acre"
+         ],
+         [
+          "Weed control and fertilizer",
+          "$79"
+         ],
+         [
+          "Core aeration",
+          "$150"
+         ],
+         [
+          "Fall leaf cleanup",
+          "$199"
+         ],
+         [
+          "Brush clearing",
+          "Priced at the visit"
+         ],
+         [
+          "Lawn renovation",
+          "Priced from the customer's photos"
+         ],
+         [
+          "By the hour",
+          "$120 an hour, 1-hour minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-23",
+    "more": [
+     "Lawn care needs the license only for its sprays. Mowing, cleanups and aeration go live on the business registration while it's checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Mower repair needs no license where Sam works, so blades can be sharpened at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-11",
+    "more": [
+     "Lawn care licenses only the people who spray. Here that's Andre, besides Sam.",
+     "Luis mows and does cleanups, and Nico and Toby fix mowers, so none of them is checked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Andre sprays, so that applicator license is optional and not checked. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Andre's applicator license is on file as given, and everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Andre: lawn care, sprays and snow plowing",
+         "Luis: lawn care and snow plowing",
+         "Nico: mower repair, carburetors and home visits",
+         "Toby: mower repair"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Lawn care's sprays need the state's pesticide license, so the company takes the license step (pf.license)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The lawn plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and mechanics are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: lawn visits and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each person who sprays needs the state's applicator license (pf.staff)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Lawn work is never sent now: a rush gets the soonest open time (pf.services)."
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Luis gets the same invite. Nico and Toby get theirs from Lee Mower Shop.",
+     "Only people who spray send a license number. Mowing crews and mechanics just reply YES.",
+     "Pat gets one too, to OK prices for Lee Lawn Care.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Lawn Care. Sam Lee added you to the team for lawn care and snow plowing. Reply YES to join and get your jobs here by text. If you spray, add your license number. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Andre"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Andre replies YES with an applicator license number, then checks what Sam set. One reply covers every kind of work Andre does.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Luis, Nico and Toby join the same way, with no license number."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES CA031552",
+      {
+       "as": "Andre"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Lawn Care! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Andre Price · Lee Lawn Care",
+        "lines": [
+         "Every lawn care job, sprays and snow plowing",
+         "Applicator license CA031552",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Andre"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Andre"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. Stay well away from the wire, and keep children and pets inside. Call 911, then the power company. Yard work can be booked once the power company says it's safe."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said a power line is down in their yard. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A power line down in the yard",
+         "Told to stay away, then call 911 and the power company"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "A lawn not mowed in 3 weeks gets the first cut and cleanup before a weekly plan. That's the plug-in's rule.",
+     "The price comes from the lawn's size: Alex's answer, checked against the county's lot record. Sam sees both."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-43",
+    "more": [
+     "Alex's plan, weekly mowing after the first cut, is the plan branch. Its visits fall on Springfield's route day, Thursday."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Alex wants the lawn mowed every week after the first cut. Lee Lawn Care sells weekly mowing as a plan, so the AI shows its terms. Visits fall on Springfield's route day, Thursday.",
+    "more": [
+     "The AI never offers a plan the customer didn't ask for.",
+     "A plan needs its own yes: its terms show on the secure page, before any card.",
+     "Weekly mowing is booked only on the town's route day. A customer who asks for Monday is told the route day.",
+     "The plan runs until the season ends, Thu Nov 19 here, then pauses for winter. A text comes in March, before it starts again.",
+     "Each mow gets its own DONE with photos. Nobody needs to be home.",
+     "Rosfield's $2 counts once a month for a plan.",
+     "A plan can also come when the plug-in's trigger is met, like plowing after 2 inches of snow.",
+     "Then the crew comes when it snows, and the customer is told."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "After the first cut, can you mow every week?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee Lawn Care's weekly mowing is $55 a cut for a lawn your size, on Thursdays. It runs until the season ends Nov 19, then pauses until spring. Want it?",
+      {
+       "buttons": [
+        "Yes, every week",
+        "Just the first cut"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-97",
+    "does": "Say Alex also wants a weed-and-feed. The plug-in sets a first step with a lead time: neighbor notices, about 2 days ahead, where the state's rules require them. So the spray times start after it.",
+    "more": [
+     "The notices go on paper from the business, never by text from Rosie.",
+     "The first step itself becomes Sam's to-do once the time is saved.",
+     "A first cut has none, so its times start today."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A weed-and-feed needs notices to your neighbors first, about 2 days ahead. So the first spray times are Thursday."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "A gate code or lock combination is typed on the page the same way. Only the crew lead sees it, on the visit day.",
+     "Pets: where they'll be on Thursdays."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B4-30",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.12"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks the town's limits on sprays",
+      "q": "Does the town limit this service?",
+      "does": "The plug-in lists towns that ban or limit weed sprays on home lawns. Rosie checks the street address before Alex's yes. A first cut has no spray, so it goes on.",
+      "more": [
+       "The town's rule is checked on every spray booking, before any money.",
+       "Where a town only limits sprays, like a wider gap from a stream, the plug-in adds that step instead."
+      ],
+      "needs": [
+       "address",
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "No limit here",
+        "end": "merge",
+        "steps": []
+       },
+       {
+        "label": "Weed sprays banned there",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.12",
+           "4.22"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Offers fertilizer only, before the yes",
+          "does": "Say Alex also books the weed-and-feed, and Alex's town bans weed sprays on home lawns. Before the yes, Alex is offered fertilizer only, at its own price.",
+          "more": [
+           "Nothing is booked at the old price.",
+           "Don't book, or no reply in 10 minutes: the saved time is let go, and nothing is charged.",
+           "The first cut and the plan go on either way."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your town doesn't allow weed sprays on home lawns. Lee Lawn Care can spread fertilizer only instead, at $59, not $79.",
+            {
+             "card": {
+              "title": "Fertilizer only · $59",
+              "lines": [
+               "Same day and time",
+               "No weed spray"
+              ]
+             },
+             "buttons": [
+              "Book fertilizer only",
+              "Don't book it"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "does": "The page shows the weekly mowing plan's terms: $55 a cut on Thursdays, charged after each mow, and when the season ends. It says how to skip, pause or end, too. Alex says yes to them on their own.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Weekly mowing · $55 a cut",
+        "lines": [
+         "Thursdays, from Oct 29",
+         "Charged after each mow",
+         "Pauses after Thu Nov 19; a text before it starts in April",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ],
+    "form": [
+     [
+      "How often",
+      "Every week, on Thursdays (Springfield's route day)"
+     ],
+     [
+      "Price a visit",
+      "$55 a cut"
+     ],
+     [
+      "When it's charged",
+      "After each cut, like a single booking"
+     ],
+     [
+      "Season",
+      "Until Thu Nov 19, then paused until spring"
+     ],
+     [
+      "Skip, pause or end",
+      "Any time, by text"
+     ],
+     [
+      "I agree to the plan's terms",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-04",
+    "more": [
+     "New mowing customers can need Sam's OK first: Sam checks the lot on the map before the price stands. That's Sam's own setting."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "does": "Sam says yes with one change, like a higher price a cut for a steep back hill. Rosie reads it back, and nothing goes to Alex until Sam says send it.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "4"
+     ],
+     [
+      "san",
+      "owner",
+      "What's the change?"
+     ],
+     [
+      "owner",
+      "san",
+      "Weekly mowing 65 a cut, not 55: steep hill in back"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. weekly mowing at $65 a cut, not $55, for the steep back hill?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another change"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-29",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Lawn Care can take your booking with one change. Is this OK?",
+      {
+       "card": {
+        "title": "Your Lee Lawn Care visit",
+        "lines": [
+         "Thu Oct 22 · arriving 8–10am · Andre",
+         "Weekly mowing $65 a cut, not $55: the steep back hill takes longer",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Yes, book it",
+        "No, cancel free"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes, so Alex has them in writing.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "Yes: weekly mowing",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to weekly mowing on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: how often, the price a cut, when it's charged, when the season ends, and how to end it.",
+           "Ending it takes one reply. Mows already done stay paid.",
+           "Any reminder the state's rules require for a running plan comes from the plug-in."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your weekly mowing with Lee Lawn Care is set.",
+            {
+             "card": {
+              "title": "Weekly mowing · $55 a cut",
+              "lines": [
+               "Starts Thu Oct 29 · arriving 8–10am · Andre's crew",
+               "Your saved card is charged after each mow",
+               "Pauses after Thu Nov 19, until spring"
+              ]
+             },
+             "buttons": [
+              "End the plan"
+             ]
+            }
+           ]
+          ],
+          "vary": {
+           "price:photos+after:card": {
+            "t": "Mon Oct 19, 7:59pm"
+           },
+           "after:bill": {
+            "say": [
+             [
+              "san",
+              "cust",
+              "Your weekly mowing with Lee Lawn Care is set.",
+              {
+               "card": {
+                "title": "Weekly mowing · $55 a cut",
+                "lines": [
+                 "Starts Thu Oct 29 · arriving 8–10am · Andre's crew",
+                 "We text you the bill after each mow",
+                 "Pauses after Thu Nov 19, until spring"
+                ]
+               },
+               "buttons": [
+                "End the plan"
+               ]
+              }
+             ]
+            ]
+           }
+          },
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "when": {
+         "price": [
+          "list"
+         ],
+         "before": [
+          "card",
+          "none"
+         ]
+        }
+       },
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-07",
+    "more": [
+     "A spray's neighbor notice names its day and a backup day. A move to the backup day needs no new notice; any other day waits for new notices."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-08",
+    "more": [
+     "Cancelling the first cut also ends the weekly plan that starts after it. The text says so before Alex taps."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "For a spray, the plug-in's notice names the products, the planned dates and the safety steps, before the first spray."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "Rain moves the whole route",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.18",
+        "7.12"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 7:00am",
+       "title": "Rain: one text moves the whole route",
+       "does": "A what-if: heavy rain on Thursday morning. Andre texts RAIN, and Springfield's whole route moves to Friday. Every customer on it gets the same text.",
+       "more": [
+        "A move for weather never costs the customer. Free cancel moves with the visit.",
+        "It goes out at once, since it changes today's visit.",
+        "Sam is told and can change it on the Today page.",
+        "A spray on the route moves only to its backup day, or waits for new neighbor notices."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "RAIN Thu route to Fri"
+        ],
+        [
+         "san",
+         "owner",
+         "Andre moved Thursday's Springfield route to Fri Oct 23 for rain: 18 stops. Each customer is told now.",
+         {
+          "buttons": [
+           "OK",
+           "Change it"
+          ]
+         }
+        ],
+        [
+         "san",
+         "cust",
+         "Rain today, so Lee Lawn Care will do your first cut Fri Oct 23, arriving 8–10am. Same price, nothing to do. You can still change it.",
+         {
+          "buttons": [
+           "Fri is fine",
+           "Another time",
+           "Cancel, no fee"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "does": "Back to Alex's yard, 8:20am. Andre checks what the plug-in asked Alex to have ready: the gate open and the dog inside. All set, so the work starts.",
+    "more": [
+     "Examples: a gate key or code, a dog put inside, room for the trailer.",
+     "A dog loose in the yard: Alex is asked to bring it in within 15 minutes. The crew mows only where no dog is loose.",
+     "Missing, but the plug-in lets the visit go on: Andre notes it, and the work starts.",
+     "If the plug-in says it stops the visit, it goes as 'Can't go ahead'."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-17",
+    "does": "A what-if: Kim's weed-and-feed needs nobody home. There's no code. Andre texts DONE with photos, and Kim gets the keep-off time.",
+    "more": [
+     "Kim gets the photos and has 24 hours to say if something's wrong. Sam is told of any reply.",
+     "A gate code from booking lets Andre in.",
+     "Alex's weekly plan mows work the same way: DONE with photos of the lawn and the latched gate."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE flags up",
+      {
+       "photos": [
+        "Kim's lawn, sprayed",
+        "Marker flag at the gate"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Lawn Care sprayed your lawn. Please keep children and pets off it until it's dry, about 4 hours. Leave the flags up until tomorrow. Reply within 24 hours if something's wrong.",
+      {
+       "photos": [
+        "Kim's lawn, sprayed",
+        "Marker flag at the gate"
+       ],
+       "as": "Kim L."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-10",
+    "more": [
+     "Most lawn visits need nobody home, so there's no no-show. It applies only where someone must be home, like a visit priced on site."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-52",
+    "more": [
+     "A lock combination that fails counts the same. The crew lead texts it, and Kim gets the same link."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "For lawn care: before photos of the lawn, and anything already damaged, like a cracked sprinkler head."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Extra work is done only when Alex says yes. Rosie never offers it in its texts."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Too windy to spray",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.19",
+        "7.18"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 10:10am",
+       "title": "Too windy: fertilizer today, spray later",
+       "does": "A what-if at Kim's: Andre checks the wind against the product label. It's too windy to spray, so Andre spreads the fertilizer today. The weed spray moves to the notice's backup day.",
+       "more": [
+        "The plug-in's rule: no spray over the label's wind limit, or with rain due.",
+        "The backup day is on the neighbor notice already, so no new notice is needed.",
+        "One price: the $79 is charged once, when the spray is done.",
+        "Kim can still move or cancel the spray day with no fee."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "WIND fert today, weeds Fri"
+        ],
+        [
+         "san",
+         "cust",
+         "Too windy to spray weeds safely this morning. Andre spread the fertilizer and will spray the weeds Fri Oct 23, the backup day on your neighbors' notice. Same $79 in all, charged when it's done.",
+         {
+          "buttons": [
+           "Fri is fine",
+           "Another day"
+          ],
+          "as": "Kim L."
+         }
+        ]
+       ],
+       "needs": [
+        "pf.visit"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:20am",
+    "vary": {
+     "after:none": {
+      "t": "Thu Oct 22, 9:10am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 10:25am",
+    "vary": {
+     "after:card": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid: $179 to Lee Lawn Care. Missed a spot? Reply within 24 hours for a free return visit.",
+        {
+         "card": {
+          "title": "Receipt · $179",
+          "lines": [
+           "First cut and cleanup · $179",
+           "Charged to your saved card",
+           "Thu Oct 22 · Andre",
+           "Your card stays saved for your weekly mowing"
+          ]
+         }
+        }
+       ]
+      ]
+     },
+     "after:none": {
+      "t": "Thu Oct 22, 9:15am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-25",
+    "t": "Thu Oct 22, 10:20am"
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 10:22am"
+   },
+   {
+    "op": "more",
+    "at": "B10-08",
+    "more": [
+     "It's a free return visit for the missed spot, never money from Rosie."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-35",
+    "more": [
+     "After a spray, the tips are the keep-off time and the products used, with a link to the label.",
+     "Marker flags stay up as long as the state's rules say. Then Alex can pull them."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B10-07",
+    "branch": {
+     "label": "The mowing season ends",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B10-x01",
+       "type": "split",
+       "line": [
+        "7.15",
+        "4.18"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Fri Nov 20, 10:00am",
+       "title": "Pauses the plan for winter",
+       "q": "Does Alex keep the plan?",
+       "does": "Thu Nov 19 was the last mow of Springfield's season. The weekly plan pauses itself with one text. Nothing is charged while it's paused.",
+       "more": [
+        "The season's dates are Sam's, set in the plug-in: April to Thu Nov 19 here.",
+        "The card stays saved for the plan. It's charged again only after the spring text.",
+        "One reply ends the plan, any time."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Thu Nov 19 was your last mow of the season. Your weekly mowing pauses until April, and nothing is charged until then. We'll text you in March, before it starts again.",
+         {
+          "card": {
+           "title": "Weekly mowing · paused",
+           "lines": [
+            "$55 a cut · Thursdays",
+            "Starts again in April, after a text in March"
+           ]
+          },
+          "buttons": [
+           "Keep my plan",
+           "End the plan"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.rules"
+       ],
+       "tells": [
+        "cust"
+       ],
+       "branches": [
+        {
+         "label": "1 Keep my plan, or no reply",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B10-x02",
+           "line": [
+            "7.15"
+           ],
+           "who": "san",
+           "to": "cust",
+           "via": "msg",
+           "t": "Mon Mar 1, 10:00am",
+           "title": "Texts before the plan starts again",
+           "does": "In early March, before any charge, Alex gets the start date and the price a cut. One reply ends the plan.",
+           "more": [
+            "A price change is told at least 30 days before it applies, or earlier where the state's rules ask.",
+            "No reply: the plan starts again on the date given.",
+            "Any reminder the state's rules require for a plan that starts again comes from the plug-in."
+           ],
+           "say": [
+            [
+             "san",
+             "cust",
+             "Your weekly mowing starts again soon.",
+             {
+              "card": {
+               "title": "Weekly mowing · starts Thu Apr 8",
+               "lines": [
+                "$55 a cut, charged after each mow",
+                "Thursdays, Springfield's route day",
+                "Runs until you end it"
+               ]
+              },
+              "buttons": [
+               "End the plan"
+              ]
+             }
+            ]
+           ],
+           "needs": [
+            "pf.rules"
+           ],
+           "tells": [
+            "cust"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "2 End the plan",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B10-x03",
+           "line": [
+            "7.15"
+           ],
+           "who": "san",
+           "to": "cust",
+           "via": "msg",
+           "t": "Fri Nov 20, 10:05am",
+           "title": "Ends the plan with one reply",
+           "does": "Alex taps End the plan. It ends at once: no more visits or charges. Sam and Andre see it on the Today page.",
+           "more": [
+            "Mows already done stay paid.",
+            "Ending takes one reply or the link, never a call."
+           ],
+           "say": [
+            [
+             "cust",
+             "san",
+             "2"
+            ],
+            [
+             "san",
+             "cust",
+             "Your weekly mowing with Lee Lawn Care is ended. No more visits or charges."
+            ]
+           ],
+           "tells": [
+            "cust"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Lawn visits are booked in arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Lawn visits are never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Lawn care books a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Lawn work is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Lawn work is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Lawn work is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A lawn crew never looks after a child; an adult on the booking must be there when someone's home."
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Parking",
+      "On the street, for the crew's trailer"
+     ],
+     [
+      "Pets",
+      "A dog, kept inside on Thursdays"
+     ],
+     [
+      "Gate or door code",
+      "Back gate, latches inside. No code"
+     ],
+     [
+      "Keep off",
+      "The vegetable garden along the back fence"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Lawn visits are rated, like every visit."
+   }
+  ]
+ },
+ "notes": "Refit Tue Oct 27 (R09, REDESIGN 2 master): facts plans, dropoff, photos, extrawork, documents (a written contract for a renovation above an amount), tips (the owner turns the tip line on), monthlybill (Sam may bill a plan once a month). Settings: cutoff 24 hours before in A and B; arrival windows in B. Money: A nothing taken (no fee), B a card saved for the $89 trip fee (the late-cancel, locked-gate and loose-dog fee, owed after a no to a visit price), amounts with names per path. Deleted: the sign-up money words ops (S1-13, S1-14, S1-21, four S1-38 ops that the merge stacked), every money words op per path, A6-03 (frozen until 9:15am) and the money lines of A6-05, A6-07, B6-04 to B6-09, B8-10, S11-14, S11-56; the S1-38 shop card and snow plowing lines are rename pairs now (no license for plowing or mower repair, nothing taken at the shop). A4-66 [A person's time] is back on: a drop-off is a time to bring it in (A4-14). A7-02 [A plan or count is due] is off in A (the shop sells no plans). keep: leak (section 13 says 'a leak' of private details).\nBefore the refit (history):\nFrom: cleaner (the current, reviewed pilot). Why: lawn care runs like house cleaning: a set service at the home, a first visit then a repeating plan on the same weekday, nobody home on plan visits with a gate code, a card saved and charged at DONE, and a drop-off shop as the less usual side.\nFlow B is the usual side: Lee Lawn Care (lawn care, plus snow plowing as its second kind of work, the winter work of a lawn crew). Main story: a $179 first cut and cleanup of an overgrown lawn, Thu Oct 22, 8–10am, Andre's crew, then weekly mowing at $55 a cut on Springfield's route day until the season ends Thu Nov 19.\nFlow A is the less usual side: Lee Mower Shop, Sam's second company, where customers drop off a mower to have its blade sharpened or tuned up and pick it up at the counter. The old flowchart has no shop nodes, so flow A follows the plug-in's safe defaults and the cleaner pilot's drop-off (A4-67, A8-50, A8-54).\nLicenses: mowing needs none; any spray needs the state's pesticide license and a certified applicator. So S1-60 takes '1 A license (lawn sprays)', S2-28 takes '1 Yes, each one who sprays' (Sam and Andre are checked; Luis, Nico and Toby are not), snow plowing and mower repair need none (S1-39 words, S1-63 registration only). Every rule is a switch from the state's form, never one state's number.\nNames: Jordan and Casey become crew leads Andre and Luis (Andre sprays and renovates; Luis mows, cleans up and aerates). Riley and Avery become mechanics Nico and Toby (the master already uses Drew and Jules as customers). The master's partner Jamie becomes Taylor. Alex lives at 9 Meadow Ln; Lee Lawn Care is at 310 Mill Rd; Lee Mower Shop at 75 Depot St.\nPrices keep the master's numbers so sums and fees still add up: $179 first cut, $150 core aeration (prepaid), $640 lawn renovation from photos (over Sam's $500, so Sam OKs it), brush clearing priced at the visit with the $89 trip fee, $199 fall leaf cleanup, $79 weed-and-feed, $55 a cut. The shop: $35 blade sharpening, $55 push mower tune-up, $140 riding mower tune-up, $90 carburetor rebuild from photos, a won't-start repair after a $25 diagnosis, $75 at home.\nThe trip fee is $89 on a one-time visit and $25 on a plan mow or a spray (Kim's spray in B3-05, B8-53), never more than the visit's price, and only when the owner confirms it.\nMoney paths list only how lawn care is really paid. B: list|card|card (main: a card saved, charged at DONE), list|none|bill (billed after), list|full|none (a prepaid aeration: lawn businesses commonly sell seasonal jobs and programs prepaid; kept on review as a judgment call, Oct 22), photos|card|card, visit|card|card. No holds or deposits for upkeep. A: list|none|counter (main), photos|none|counter, visit|none|counter. Review (Oct 22): A's list|card|counter (a card saved for a $20 fee) and list|full|none (a prepaid tune-up) were listed only because the master's sign-up sets a barbershop that way; a mower drop-off names no mechanic, so a missed drop-off costs nobody's time, and small-engine shops are paid at pick-up. Both dropped; the shop's sign-up (S1-42, S1-45, S1-47, S1-49, S1-51) says nothing is taken, and a blade sharpening at home takes nothing either (billed after, B's list|none|bill).\nSign-up words follow that (the SPEC bullet): S1-13 to S1-17 start every lawn service with a card saved for the $89 trip fee, with no holds; the core aeration is the one prepaid service. The mower shop takes nothing, saves no card and charges no fee (S1-42 to S1-51, S11-57), and A7-02's 'A day-before hold fails' is off. S11-56 switches weekly mowing to one bill a month in both flows; S11-04 to S11-86 say Nora's card is saved (no holds); S11-09 and S11-14 save a card, not a deposit or a hold.\nSpray steps live in the master's own hooks, with lawn words: the 2-day lead time for neighbor notices (B4-87), Sam's to-do for the notices (B4-42), the spray notice to the customer (B4-28, B7-30), a moved spray keeping its backup day (B7-06), notices not out in time (B7-33), wind and rain (B7-35, own B8-x01), the spray record (B8-55, B8-56) and the keep-off time and flags (B8-17, B10-22). Rosie never texts the neighbors.\nOwn steps: B4-x01/B4-x02 (a town that bans weed sprays: fertilizer only, before the yes), B6-x01/B6-x02 (the plan's terms texted back, from the cleaner pilot), B7-x01 (rain moves the whole route), B8-x01 (too windy: fertilizer today, the spray on the backup day), B10-x01 to B10-x03 (the season ends: the plan pauses, a text before it starts again, or one reply ends it).\nThe gate and the dog are what Alex was asked to have ready (B8-45 words): a loose dog gets 15 minutes, and only what's safe is mowed; the fee path is the master's (B8-54, B8-60). Nobody needs to be home on plan mows and sprays (B8-17, B8-52 with a gate code); the first cut has Alex home for the walk-around.\nStaff out: the first cut is a crew of two, so B7-56 takes 'A crew of two or more' (B7-53 words: the partner goes alone, for longer; Sam can move the whole route instead). 'A date that can't move' and 'No person' are off.\nTimes run forward on every listed path. B: request Mon 6:40pm, booked 6:48pm, reminder Wed 10am, OMW Thu 8:05am, check-in 8:20am, DONE 10:20am (about 2 hours for a crew of two), receipt 10:25am, rating 11:00am; the bill path's bill 10:22am; the photos path's plan text 7:59pm. A: request Wed 7:15pm, drop-off Sat 11:00am, work done 1:30pm, READY 2:00pm, pick-up 3:30pm, rating 4:00pm.\nOff in B: sent-now branches (lawn is never sent now), live line, video, plan or warranty pays, host visit days, seats, set start or stay times, damage hold, forms, first-step results, a part to the shop and its return, a rented fan, a permit inspection, the outside check, a child in the pro's care, a smallest group. B4-63 is off as a whole (no plan to check).\nOff in A: walk-in lines (a drop-off is checked in at once), a person's time (drop-off slots), a child, plan or insurance, first steps (a mower shop has none), damage hold, crew, a date that can't move, a minimum, late-arrival holds, a mechanic running late (only the ready time moves), results later, rentals.\nKept splits (splitsKept): A8-02 (a mower can come without what's needed); B4-57 (a renovation over the amount needs a written contract), B4-78 (a renter's spray or renovation may need the owner's OK), B8-69 and B8-70 (plan mows need nobody home; the first cut has someone home).\nThe plug-in's season, route days and stops per crew are the example business's own settings, not facts about lawn care in general. Poison Control's number is the national one.\nKeep list: none.\nReview (Oct 22): B5-21's screen shows weekly mowing's terms ($55 a cut, Thursdays, until Nov 19); B4-34's screen matches the story (the back gate, the dog, the garden); flow A's S2-04 screen lists lawn jobs, not a plumber's; the mower shop sells no plans, packs or memberships (A4-28, A5-01, A7-02 plan branches, A10-05 contract and A10-06 proposal branches off), and its weather, first-step, notice and leave-early branches are off too. On the prepaid aeration path, DONE is 9:10am and the receipt 9:15am (a 45-minute job), and Kim's weed-and-feed what-if keeps a card saved.\ntouch-up 4 (Oct 23): keep 'drips': noting a mower's oil drips before work is real for lawn equipment.",
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34",
+   "B4-78",
+   "B8-69"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Color quotes come to you first. Board prices never need one",
+    "Each service starts the way most barbershops set it.",
+    "Panel upgrade: a free estimate, then a quote",
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Ben T. books a skin fade for Sat Nov 7",
+    "you now have two skin fades on Sat Nov 7",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "No card, so no $20 fee",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing JP031552 · electrical JE30417",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "Do you do kids cuts? My son is 8.",
+    "Wants Saturday morning, with Riley",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Anything Riley should know?",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "takes jobs sent now, like a burst pipe",
+    "Promises the $25 consult; priced at the chair",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "Add photos of your hair",
+    "photos of your hair",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Color correction $110 · gloss $15",
+    "Color correction · $110",
+    "$110 color correction and $15 gloss",
+    "The color correction alone is the $110 starting price",
+    "Today: the color correction, $110.",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Gloss to finish",
+    "gloss",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "A barbershop has none, so nothing is sent here.",
+    "Can my son wait in the shop during my cut?",
+    "could mean a salon or a barbershop",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Riley stopped Alex M.'s cut.",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "once Riley sees the hair",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "a Kids cut (12 and under)",
+    "like a skin-test result",
+    "A barbershop has none.",
+    "Stopped Alex M.'s cut.",
+    "Haircut every 4 weeks",
+    "also does color and",
+    "A color correction",
+    "a color correction",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "barber, color and",
+    "a package of cuts",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Only the consult",
+    "The Groom's package",
+    "the Groom's package",
+    "Groom's package",
+    "2 Consult only",
+    "service, color",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "Consult only",
+    "at the chair",
+    "At the chair",
+    "house calls",
+    "House calls",
+    "$25 consult",
+    "the consult",
+    "color quote",
+    "a staff cut",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "patch test",
+    "88 Elm St",
+    "on Elm St",
+    "Skin fade",
+    "skin fade",
+    "the chair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Riley",
+    "Avery",
+    "color",
+    "visit fee"
+   ],
+   "B": [
+    "Me, and yes. It's my kitchen.",
+    "Riley: barber, color, house calls",
+    "Panel upgrade: a free estimate, then a quote",
+    "Its money card is set the way most barbershops start.",
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Here are the rules barbershops often set.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services can clear the drain:",
+    "The $179 drain needs none.",
+    "Shutoff valve and wall pipe · $540",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "you have two drain clearings on Mon Nov 9",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Call a mold cleanup company first",
+    "asks an AI for a plumber",
+    "The job should be done by 10am.",
+    "Video and Jordan's notes",
+    "like a permit it needed that isn't in",
+    "Can I run the dishwasher before you come?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "takes jobs sent now, like a burst pipe",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 when the pipes are in",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "like an overflowing drain",
+    "It's overflowing. Can someone come tonight?",
+    "Overflowing kitchen drain",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "LATE camera report",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Your drain is under warranty, so this visit is free.",
+    "Can Jordan also run a camera down my sewer line?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "The plug-in says how long the warranty lasts.",
+    "BEFORE old water stain on the cabinet floor",
+    "Say Alex also asks about a dripping faucet.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "Can Jordan also look at a dripping faucet?",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Then the booking goes on, marked urgent.",
+    "he's the one who replaces water heaters",
+    "Jordan finds corroded shutoff valves.",
+    "The drain clogs again 2 weeks later.",
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "UPDATE getting a part, back 9:30",
+    "Jordan cracks the cabinet floor",
+    "HURT cut my hand, need to stop",
+    "No. It doesn't smell like gas.",
+    "replacing both shutoff valves",
+    "Texts the camera report link",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "the sink is now overflowing",
+    "next week's drain cleaning",
+    "covers part of the repair",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "The repair price is good",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Cracked cabinet floor",
+    "Cabinet floor, before",
+    "your new pipes are in",
+    "1-year labor warranty",
+    "for a bathroom drain",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "leehomeservices.com",
+    "the $160 valve work",
+    "Sewer camera report",
+    "also does color and",
+    "Water heater flush",
+    "water heater flush",
+    "the shutoff valves",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "camera inspection",
+    "the kitchen drain",
+    "Supply line · $80",
+    "barber, color and",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "BOOK Tessa drain",
+    "Drain clearings",
+    "Book the repair",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "cut your hair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Water heater",
+    "water heater",
+    "shop's chair",
+    "at the chair",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Yard drain",
+    "yard drain",
+    "42 Oak St",
+    "88 Elm St",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "haircut",
+    "Jordan",
+    "No. No huele a gas.",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "flush",
+    "Labor",
+    "sewer camera report",
+    "visit fee"
+   ]
+  },
+  "A": {
+   "S1-12": "41b86c1e72",
+   "S1-23": "39941a5377",
+   "S1-43": "e16d5048f3",
+   "S1-61": "7421d186d5",
+   "S2-11": "07b9eace96",
+   "S2-22": "6fe11c094c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "A8-03": "7accda6f86",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-54": "bc2f9467fd",
+   "A6-15": "1e6395c2f5",
+   "A9-03": "219c966588",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-24": "0a292df05b",
+   "A4-43": "c17d56f766",
+   "A7-93": "46cca94e45",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "S11-58": "87f7492a91",
+   "S11-54": "ce20fc799b",
+   "A10-05": "63c3536c7a",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A10-45": "855be6050a",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5",
+   "A7-02": "987e1a14cd"
+  },
+  "B": {
+   "S1-12": "0bea92643b",
+   "S1-23": "5b2324d920",
+   "S1-43": "dd3ae2a1a9",
+   "S2-11": "07b9eace96",
+   "S2-22": "6fe11c094c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "B3-19": "2f53161fb2",
+   "B4-07": "9d0dbc90ad",
+   "B4-43": "fc9855955a",
+   "B4-44": "514c8ab30c",
+   "B4-97": "04796bf8db",
+   "B4-34": "74ff52d83d",
+   "B4-30": "26ca477d69",
+   "B5-21": "925b7342ed",
+   "B6-04": "6d888abcaa",
+   "B6-06": "1d676278da",
+   "B6-29": "f9c7deba8d",
+   "B6-13": "ed1f412f7d",
+   "B7-07": "954270db4b",
+   "B7-08": "278986b3ba",
+   "B7-61": "342b55fd9b",
+   "B7-05": "e28a131872",
+   "B8-45": "09e62897a6",
+   "B8-17": "dcff722a6d",
+   "B8-10": "5c9d4b937f",
+   "B8-52": "6f008512da",
+   "B8-18": "530038d2b8",
+   "B8-23": "dd780a2ec8",
+   "B8-22": "50d78f1af0",
+   "B8-41": "6e8e9825b2",
+   "B10-01": "814aa1fde7",
+   "B10-25": "3e0bd84dd3",
+   "B9-06": "f091432f2d",
+   "B10-08": "01bac94fd8",
+   "B10-35": "5ed99b23b3",
+   "B10-07": "3737f1d1c8",
+   "B4-83": "a7473a80ea",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

@@ -1,0 +1,2828 @@
+{
+ "id": "masonry",
+ "name": "Masonry (brick, stone, chimney rebuild)",
+ "style": "Project",
+ "pattern": "project",
+ "from": "contractor",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a contractor or masonry registration or license for the company, where the state's form requires one (often by job size or kind of work)",
+   "ask": [
+    "The company's registration or license number, and its class",
+    "Any job-size limit the license has",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business; plus a qualifying person where the state's form names one. Trade subcontractors (scaffold, roofing, gas) hold their own where required.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No masonry work goes live until the company's registration or license checks out, where one is required",
+    "A job over the license's size limit is never offered or quoted: the owner is told why"
+   ],
+   "renewals": "License, insurance and bond dates kept; reminded 30 days out; a lapse pauses new bookings",
+   "lead_safe": "Work that disturbs old paint or mortar in older homes only by a firm and a person certified for lead-safe work, where the rules require it",
+   "design_studio": "A consult at the showroom needs no license in most states. The work it leads to is booked under the contractor license.",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Estimate visit, then project: the job is booked only after a written quote and a signed contract",
+   "B": [
+    {
+     "name": "Estimate visit",
+     "price": "$89, credited to the job if Alex signs (the example business's own price; a free estimate is a starting option)",
+     "length": "45 to 90 minutes",
+     "where": "at the customer's place",
+     "before": "nothing taken (or a card saved for the $89)",
+     "after": "billed only if no contract follows"
+    },
+    {
+     "name": "Chimney rebuild",
+     "price": "quoted after the estimate visit: a written quote within 3 business days, good for 30 days",
+     "length": "about 3 to 6 work days",
+     "where": "at the customer's place",
+     "before": "nothing at booking; a deposit only after the contract is signed",
+     "after": "stage bills as each checked stage is done; the last after the walk-through"
+    },
+    {
+     "name": "Brick or stone wall, steps or veneer",
+     "price": "quoted after the estimate visit",
+     "length": "1 to 5 work days",
+     "where": "at the customer's place",
+     "before": "the same as the chimney",
+     "after": "the same, in stages"
+    },
+    {
+     "name": "Repointing (new mortar joints)",
+     "price": "quoted by the area after the estimate visit",
+     "length": "1 to 4 work days",
+     "where": "at the customer's place",
+     "before": "the same",
+     "after": "the same"
+    },
+    {
+     "name": "Fireplace and flue repair",
+     "price": "quoted after the estimate visit",
+     "length": "1 to 3 work days",
+     "where": "at the customer's place",
+     "before": "the same",
+     "after": "the same"
+    },
+    {
+     "name": "Retaining wall",
+     "price": "quoted after the estimate visit",
+     "length": "2 to 6 work days",
+     "where": "at the customer's place",
+     "before": "the same",
+     "after": "the same"
+    },
+    {
+     "name": "Brick step repair",
+     "price": "priced from photos (example: $640); over $500, Sam OKs it",
+     "length": "1 day",
+     "where": "at the customer's place",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Chimney cap install",
+     "price": "$179, from the list",
+     "length": "1 to 2 hours",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Brick sealing",
+     "price": "$150, from the list (up to 300 square feet); also a yearly plan",
+     "length": "half a day",
+     "where": "at the customer's place",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Chimney inspection",
+     "price": "$199, with a camera check and a written report",
+     "length": "1 hour",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Change order",
+     "price": "priced, written and signed by both before the changed work; added to the next stage bill"
+    },
+    {
+     "name": "Permit, scaffold, brick or stone order and haul-away",
+     "price": "in every quote"
+    }
+   ],
+   "A": [
+    {
+     "name": "Stone consult",
+     "price": "$35, 30 minutes",
+     "where": "at the showroom; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the showroom desk"
+    },
+    {
+     "name": "Stone and brick picks",
+     "price": "$40",
+     "where": "at the showroom",
+     "before": "a card saved",
+     "after": "at the showroom desk"
+    },
+    {
+     "name": "Sample set",
+     "price": "$20, an add-on to take home",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Sealer sample",
+     "price": "$15, an add-on at a consult",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Mortar color pick",
+     "price": "$25",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Wall mock-up session",
+     "price": "$55, 60 minutes; credited to the job if Alex signs",
+     "where": "at the showroom",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Fireplace and chimney design package (layout, stone, 3D drawing)",
+     "price": "$140, 2½ hours",
+     "where": "at the showroom",
+     "before": "the $40 fee held (over 2 hours), or a $40 deposit",
+     "after": "at the showroom desk"
+    },
+    {
+     "name": "Custom stone layout",
+     "price": "priced from the customer's photos and measurements (example: $90); Sam OKs each one",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Veneer redesign",
+     "price": "priced at the showroom after a $25 consult",
+     "where": "at the showroom"
+    }
+   ],
+   "capacity": "One estimator or advisor per booking; one chimney or wall job at a time per crew; the showroom's design table is saved with long sessions",
+   "skills": "Estimates and running a job: lead masons. Stone consults: stone advisors. Scaffold, roofing and gas: subcontractors.",
+   "nobody_home": "Estimates and sealing: nobody needs to be home if the gate is open. Work days: an adult on the booking is reachable by phone.",
+   "online": "No video or phone stone consult: it uses the samples at the showroom",
+   "smallest_job": "A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the example takes no job under a $400 repair)."
+  },
+  "pf.questions": {
+   "before_times": [
+    "What do you want built or repaired? (chimney, wall, steps, fireplace, veneer)",
+    "Rough size or height, or just a guess",
+    "When should it be finished?",
+    "The year the home was built (older homes may need lead-safe or asbestos care, where the rules require it)"
+   ],
+   "after_time": [
+    "Who will sign the contract? Everyone on the deed should be at the estimate visit",
+    "Do you own the property or rent? (the owner must sign)",
+    "Where can the crew set up? Scaffold space, roof or ladder reach, parking",
+    "Pets at home during the work"
+   ],
+   "secure_page_only": [
+    "Budget range",
+    "Photos of the area (optional)",
+    "Gate or lockbox codes"
+   ],
+   "who_may_book": "An adult who owns the property, or someone with the owner's written OK. A renter's job needs the owner to sign.",
+   "studio": [
+    "Which area, and a rough budget (on the secure page)",
+    "Photos or measurements to bring (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "gas smell, smoke or fumes from a flue, a carbon monoxide alarm",
+     "says": "Leave the house now. Then call 911 and the gas company.",
+     "booking": "no booking; a new request must say the home was made safe"
+    },
+    {
+     "words": "a chimney or wall leaning, bricks falling, a crack opening fast",
+     "says": "Keep everyone away from that side, and call 911 if anyone is at risk.",
+     "booking": "no booking until it's safe"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "water coming in around a chimney or through a wall",
+     "says": "Stay away from wet outlets and switches. We'll look at it first.",
+     "booking": "goes on, marked urgent"
+    },
+    {
+     "words": "worry about asbestos or lead dust in old mortar or paint",
+     "says": "Don't scrape, drill or break it. We'll test first.",
+     "booking": "goes on; testing becomes a first step"
+    }
+   ],
+   "business_line": "Questions about whether a chimney can be used, or a wall's strength, go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_quote": "The estimate visit at the property, with everyone who will sign there",
+   "after_contract": [
+    "The cancel window ends before any work or orders, where the state's rules give one",
+    "The permit, pulled by the license holder in the business's name, where the work needs one",
+    "Tests in older homes, where the rules require them: lead-safe setup, asbestos checks of old mortar or flue lining",
+    "The scaffold booked and the brick or stone ordered once the window ends"
+   ],
+   "prep": [
+    "Move cars and anything else away from the wall or chimney side",
+    "Cover or move plants, grills and furniture near the work",
+    "Keep pets inside during the work",
+    "Put any gate or lockbox code on the secure page",
+    "Don't light the fireplace until the lead mason says"
+   ],
+   "studio_prep": [
+    "Bring photos and rough measurements of the area",
+    "Bring any samples or colors you already like"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Estimate visit: the check-in code at the door. Each work day: that day's code, or the lockbox and a start photo when nobody is home. Showroom: the code at the desk.",
+   "at_the_visit": "The estimator measures, photographs and checks the mortar and the chimney from a ladder; the written quote follows within 3 business days, good for 30 days",
+   "changes": "A written change order, priced and signed by both, before any changed work. A cracked flue liner, rotted framing or other hidden damage is priced this way.",
+   "outside_checks": "A check of the flue and the rough work, and a final check, where the permit requires them",
+   "done": "The final check where needed, then the walk-through and punch list, then DONE on the last work day; the care notes go with it",
+   "studio_done": "DONE after the consult, with the stone advisor's notes and the picks saved for the estimate",
+   "before_photos": "The wall or chimney, cracks, loose bricks, and anything nearby that could be hit (windows, gutters, plants)"
+  },
+  "pf.money": {
+   "estimate": "The example's $89 estimate visit is credited to the job; billed only if no contract follows. A free estimate is the safe start.",
+   "no_money_before_contract": "On project work, nothing is taken before the contract is signed by everyone on the deed",
+   "deposit": "Only after signing; the deposit cap comes from the state's form",
+   "kept_apart": "Money paid before the work is kept apart or bonded where the state's rules require it (a switch from the state's form)",
+   "stages": "Each stage is billed only when it's done and any check has passed: the start, the rebuild up to the roofline, the finish. Never ahead of the work",
+   "last_payment": "After the walk-through and the final check",
+   "change_orders": "Added to the next stage bill",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the lead mason texts 'paid check'.",
+   "tips": "No tip line",
+   "tax": "Tax on materials and labor follows the state's form",
+   "studio": "The wall mock-up session's $55 is credited to the job if Alex signs; the $20 missed-consult fee only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate or lockbox codes",
+    "The budget",
+    "Contract, change order and permit papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who lets the crew in"
+  },
+  "pf.staff": {
+   "roles": "Lead masons (Gus, Tobias): estimates, quotes and running the job, with the crew. Stone advisors (Petra, Pavel) at the showroom.",
+   "licenses": "The company holds the contractor registration or license. Where the state's form also licenses each person, each one may add a number (optional, shown as given, not checked by Rosie). Subcontractors hold their own, as the business says.",
+   "lead_safe": "A certified renovator on each job in an older home, where lead-safe rules apply",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another lead mason may take an estimate visit; a job keeps its lead mason unless Sam moves it"
+  },
+  "pf.rules": {
+   "contract": "A written contract for project work where the state's rules require one, signed by everyone on the deed and by the business before any money",
+   "contract_parts": "The parts the state's form lists (license number, dates, price, deposit, cancel notice, any lien notice)",
+   "cancel_window": "A cancel window after signing, where the state's rules give one; work and orders wait for it",
+   "permits": "Pulled by the license holder in the business's name, never the homeowner's",
+   "change_orders": "Written and signed by both before the changed work",
+   "final": "The final check and any permit sign-off before the last payment",
+   "lien_waivers": "Lien waivers from the business and its subcontractors with the last payment, where the state's rules provide them",
+   "show": "The license number on the listing, the quote, the contract and the receipt, where the state's rules require it",
+   "warranty": "1 year on workmanship (the example's). Hairline mortar cracks from normal settling are not a defect; the contract says what is covered.",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "weather": "Rain or frost on a mortar day: the work moves, with no fee; the lead mason checks the forecast the day before",
+   "materials_late": "The brick or stone lot is late: wait, or switch to an in-stock one",
+   "color_match": "New brick and mortar never match old exactly; the quote says so and a sample is shown first",
+   "hidden_conditions": "A cracked flue liner, rotted framing or loose footing found at tear-down: a change order before the fix",
+   "asbestos_found": "Licensed removal first, by its own quote; the start moves, and Alex is told",
+   "permit_late": "The start moves with no fee; Alex is told",
+   "inspection_fails": "The crew fixes it and it's checked again; the next stage and its bill wait",
+   "high_work": "Work above the first floor needs a scaffold or a lift; roofing work goes to a licensed roofer",
+   "cancel_after_window": "Sam and the customer settle it; Rosie moves no money on its own",
+   "nobody_home": "Estimates and sealing with the gate open, with start and end photos",
+   "over_license_limit": "Not offered, and the owner is told why",
+   "walk_through_dispute": "Goes to Sam; the last bill waits",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "stages",
+   "photos",
+   "extrawork",
+   "firststeps",
+   "multiday",
+   "banktransfer"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "$89 service-call fee",
+    "$89 estimate visit fee"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither masonry nor the showroom takes jobs sent now."
+   ],
+   [
+    "The chairs",
+    "The sample walls"
+   ],
+   [
+    "A chair, ready",
+    "A stone display"
+   ],
+   [
+    "JP031552",
+    "MS-10552"
+   ],
+   [
+    "JE30417",
+    "CH-10417"
+   ],
+   [
+    "Groom's package · ",
+    "Fireplace and chimney design package · "
+   ],
+   [
+    "the Groom's package",
+    "the fireplace and chimney design package"
+   ],
+   [
+    "The Groom's package",
+    "The fireplace and chimney design package"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 fireplace and chimney design package"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Petra and Pavel run the stone consults; Petra also does home stone consults"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Petra: stone advisor, mortar color, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Petra: stone advisor, mortar color and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every showroom service, mortar color and home stone consults"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the showroom, and home stone consults"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A brick sample' or 'a stone sample' fits a stone consult."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a builder: 'We'd like stone consults for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A stone consult's example: 'A big wall needs a quick measure check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which brick or stone do you like?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sample set next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the surface"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a licensed carpenter first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "cracks a window sill and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a window sill"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "cracked a window sill at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked window sill"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the showroom and for home stone consults"
+   ],
+   [
+    "two skin fades on",
+    "two stone consults on"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a roofing job, which isn't on the showroom's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Stone Studio doesn't do roofing jobs."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A sample brick fell and chipped my phone."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a sample brick fell and chipped their phone today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "likes red brick, light mortar, a rough stone cap"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a stone consult for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most stone showrooms set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A brick and stone showroom on Hill St. Sample walls, brick and stone, and 3D design."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most stone showrooms start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules stone showrooms often set."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds stone cleaning to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Stone cleaning for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW stone cleaning"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a chimney damaged in a storm"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a mortar color pick is $25"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una consulta de piedra el sábado."
+   ],
+   [
+    "Gloss to finish",
+    "Sealer sample"
+   ],
+   [
+    "gloss",
+    "sealer sample"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a chimney damaged in a storm"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Masonry's"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A mason's example: a leaning chimney gets 'keep everyone away from it'."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A cap or a small repair has a set price. A chimney or a wall is quoted after an estimate visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Drain clearing",
+    "Chimney cap install"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Stone and brick picks at Lee Stone Studio are $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for stone and brick picks at $35"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Petra sees the wall photos"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do mortar color picks? We're redoing the porch."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Stone consults, picks and sample sets at the showroom. A consult at home too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A stone consult could mean a stone showroom or a mason's office."
+   ],
+   [
+    "MP045210",
+    "MS-00123"
+   ],
+   [
+    "EC22871",
+    "CH-00456"
+   ],
+   [
+    "BS20981",
+    "SY-00789"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's walls together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books stone consults for three walls on one morning. Rosie finds times side by side with Petra and Pavel."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A stone consult and a mortar color pick work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your wall"
+   ],
+   [
+    "patch test",
+    "wall measure check"
+   ],
+   [
+    "skin-test result",
+    "wall measure check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the showroom during my stone consult?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The crack in my chimney got worse. Can I still come in?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the side wall."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the side wall"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Hill St"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Masonry"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Stone Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Stone Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Masonry"
+   ],
+   [
+    "Lee Electric",
+    "Lee Chimney Works"
+   ],
+   [
+    "1200 Main St",
+    "415 Kiln Rd"
+   ],
+   [
+    "88 Elm St",
+    "74 Hill St"
+   ],
+   [
+    "Riley",
+    "Petra"
+   ],
+   [
+    "Avery",
+    "Pavel"
+   ],
+   [
+    "Jordan",
+    "Gus"
+   ],
+   [
+    "Casey",
+    "Tobias"
+   ],
+   [
+    "plumbing and electrical",
+    "masonry and chimney work"
+   ],
+   [
+    "Plumbing and electrical",
+    "Masonry and chimney work"
+   ],
+   [
+    "electrical",
+    "chimney work"
+   ],
+   [
+    "Electrical",
+    "Chimney work"
+   ],
+   [
+    "Panel upgrade",
+    "Chimney cap install"
+   ],
+   [
+    "Plumber",
+    "Masonry contractor"
+   ],
+   [
+    "plumber",
+    "lead mason"
+   ],
+   [
+    "plumbing",
+    "masonry"
+   ],
+   [
+    "Plumbing",
+    "Masonry"
+   ],
+   [
+    "barbershop",
+    "stone showroom"
+   ],
+   [
+    "Barbershop",
+    "Stone showroom"
+   ],
+   [
+    "barbers",
+    "stone advisors"
+   ],
+   [
+    "barber",
+    "stone advisor"
+   ],
+   [
+    "Barber",
+    "Stone advisor"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Wall mock-up session"
+   ],
+   [
+    "Signature cut and shave",
+    "Wall mock-up session"
+   ],
+   [
+    "signature cut",
+    "wall mock-up session"
+   ],
+   [
+    "Groom's package",
+    "Fireplace and chimney design package"
+   ],
+   [
+    "Color and cut",
+    "Custom stone layout"
+   ],
+   [
+    "color and cut",
+    "custom stone layout"
+   ],
+   [
+    "Color correction",
+    "Veneer redesign"
+   ],
+   [
+    "color correction",
+    "veneer redesign"
+   ],
+   [
+    "color quote",
+    "design quote"
+   ],
+   [
+    "Kids cut",
+    "Mortar color pick"
+   ],
+   [
+    "kids cut",
+    "mortar color pick"
+   ],
+   [
+    "Skin fade",
+    "Stone and brick picks"
+   ],
+   [
+    "skin fade",
+    "stone and brick picks"
+   ],
+   [
+    "Beard trim",
+    "Sample set"
+   ],
+   [
+    "beard trim",
+    "sample set"
+   ],
+   [
+    "Haircuts",
+    "Stone consults"
+   ],
+   [
+    "haircuts",
+    "stone consults"
+   ],
+   [
+    "Haircut",
+    "Stone consult"
+   ],
+   [
+    "haircut",
+    "stone consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the showroom"
+   ],
+   [
+    "water heaters",
+    "brick steps"
+   ],
+   [
+    "water heater",
+    "brick step"
+   ],
+   [
+    "shops",
+    "showrooms"
+   ],
+   [
+    "shop",
+    "showroom"
+   ],
+   [
+    "Shop",
+    "Showroom"
+   ],
+   [
+    "Elm St",
+    "Hill St"
+   ],
+   [
+    "house calls",
+    "home stone consults"
+   ],
+   [
+    "house call",
+    "home stone consult"
+   ],
+   [
+    "House calls",
+    "Home stone consults"
+   ],
+   [
+    "House call",
+    "Home stone consult"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "a office",
+    "an office"
+   ],
+   [
+    "A excavation",
+    "An excavation"
+   ],
+   [
+    "a excavation",
+    "an excavation"
+   ],
+   [
+    "A edge",
+    "An edge"
+   ],
+   [
+    "a edge",
+    "an edge"
+   ]
+  ],
+  "B": [
+   [
+    "$89 service-call fee",
+    "$89 estimate visit fee"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither masonry nor the showroom takes jobs sent now."
+   ],
+   [
+    "The chairs",
+    "The sample walls"
+   ],
+   [
+    "A chair, ready",
+    "A stone display"
+   ],
+   [
+    "JP031552",
+    "MS-10552"
+   ],
+   [
+    "JE30417",
+    "CH-10417"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Water pressure check",
+    "Mortar check"
+   ],
+   [
+    "Alex books on the shop's booking page",
+    "Alex books on the company's booking page"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Tells Alex it's with the shop",
+    "Tells Alex it's with the company"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Petra and Pavel run the stone consults; Petra also does home stone consults"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Petra: stone advisor, mortar color, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Petra: stone advisor, mortar color and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every showroom service, mortar color and home stone consults"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the showroom, and home stone consults"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A brick sample' or 'a stone sample' fits a stone consult."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a builder: 'We'd like stone consults for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A stone consult's example: 'A big wall needs a quick measure check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which brick or stone do you like?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sample set next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the surface"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a licensed carpenter first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "cracks a window sill and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a window sill"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "cracked a window sill at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked window sill"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the showroom and for home stone consults"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a few are loose"
+   ],
+   [
+    "Leak repair · $245",
+    "Chimney rebuild · $12,000"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 chimney cap install needs none."
+   ],
+   [
+    "Kim L.'s yard drain needs nobody home.",
+    "Kim L.'s chimney cap install needs nobody home."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s chimney, rebuilt Thu Oct 22, has a new crack."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT",
+    "Gus scrapes a hand and texts HURT"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "like a $620 repair",
+    "like a $12,000 chimney"
+   ],
+   [
+    "$620",
+    "$12,000"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And what do you want built or fixed, and about how big is it?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Masonry can come:"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about rebuilding my chimney. A text back is fine."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like building without the permit the work needs."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My chimney is crumbling at the top' fits a chimney rebuild."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a new cap? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the chimney."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a chimney's tear-down days and its rebuild days."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please move your cars and clear the way to the house wall."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a new crack in the brick this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an estimate visit, today,"
+   ],
+   [
+    "The service call is $89.",
+    "The estimate visit is $89."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Gus measures the chimney and texts the quote with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 12000 tear-down and liner 5400 rebuild and cap 6600"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Tear-down and liner · $5,400"
+   ],
+   [
+    "Supply line · $80",
+    "Rebuild and cap · $6,600"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Gus measured the chimney. Here's the written quote."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Tear-down and liner · $5,400"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the tear-down and liner only, $5,400. Leave the rebuild and cap."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Gus does the tear-down and liner, $5,400. The $6,600 rebuild and cap stays good until Thu Oct 29."
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Gus's estimate visit at Harper J.'s is for a $12,000 chimney rebuild."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 12000 chimney rebuild, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Masonry's quote for your chimney rebuild."
+   ],
+   [
+    "Repipe · $2,400",
+    "Chimney rebuild · $12,000"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$1,200 to start, $7,200 when the new chimney is built to the roofline, $3,600 at the finish"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · chimney rebuild"
+   ],
+   [
+    "The $800 start payment",
+    "The $1,200 start payment"
+   ],
+   [
+    "Your $800 start payment",
+    "Your $1,200 start payment"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Say Harper J.'s $12,000 chimney rebuild is billed in three stages"
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: the new chimney is built to the roofline."
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your chimney rebuild"
+   ],
+   [
+    "$800",
+    "$7,200"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most stone showrooms set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A brick and stone showroom on Hill St. Sample walls, brick and stone, and 3D design."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most stone showrooms start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules stone showrooms often set."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds waterproofing to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Waterproofing for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW waterproofing"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I pressure-wash the brick before you come?"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a chimney damaged in a storm"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Gus's notes"
+   ],
+   [
+    "sewer camera report",
+    "chimney inspection report"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$12,000 chimney rebuild"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like adding a stone cap Gus noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to add a stone cap, from Gus's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Add a stone cap"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a chimney damaged in a storm"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Bricks are coming loose fast. Can someone come tonight?"
+   ],
+   [
+    "LATE camera report",
+    "LATE chimney inspection report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A chimney rebuild happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Masonry doesn't do, like a roof repair."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Masonry does masonry and chimney work, not roofing. Nothing was saved. You can look for a roofer near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Masonry's"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what's being built or fixed, about how big, when it should be done, and how high the work is."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, smoke from a flue, or a chimney or wall that is leaning."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE cracked chimney crown, loose bricks near the roofline"
+   ],
+   [
+    "Under the sink, before",
+    "Chimney, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Front wall, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A chimney rebuild is quoted after the estimate visit: only the $89 visit was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Gus finds rotted framing behind the brick. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "rotted framing behind the brick"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Rotted framing behind the brick"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Gus found rotted framing behind the brick and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the brick over the framing"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left brick dust on the porch.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left brick dust on the porch."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Gus look at my side wall next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Gus's next times for a side wall estimate."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the side wall estimate for today"
+   ],
+   [
+    "$245",
+    "$3,600"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Se cayeron ladrillos de la chimenea."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Bricks fell off the chimney."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A mason's example: a leaning chimney gets 'keep everyone away from it'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep away from the chimney, and to call 911 if there's smoke or gas."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Manténgase lejos de la chimenea. Si hay humo o huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay away from the chimney. If there's smoke or a gas smell, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can I use my fireplace before the chimney is fixed?"
+   ],
+   [
+    "a dripping faucet",
+    "a loose brick"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The loose brick is a small repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone come for a masonry estimate this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Estimate visit"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa estimate Thu 12-2 Tobias"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a brick sealing at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's sealing?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I want my chimney rebuilt. Can someone come for an estimate Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the top part, above the roofline."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are any bricks loose?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that bricks are now falling from the chimney."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Bricks are falling from the chimney now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay away from the chimney and the ground below it."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you seal my brick every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Masonry has a yearly brick sealing plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a brick sealing every year."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 3600 chimney rebuild"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE no fire for 7 days. Seal next year."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A joint cracks 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A joint cracked in the new chimney."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your chimney is under warranty"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Gus finds two loose wall caps."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 reset both wall caps, loose"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Reset both wall caps"
+   ],
+   [
+    "both shutoff valves",
+    "both wall caps"
+   ],
+   [
+    "the shutoff valves",
+    "the wall caps"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 wall cap quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 wall cap work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Gus also inspect the flue?"
+   ],
+   [
+    "Sewer camera report",
+    "Chimney inspection report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the chimney inspection report link"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A cap or a small repair has a set price. A chimney or a wall is quoted after an estimate visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Masonry job"
+   ],
+   [
+    "Drain clearings",
+    "Masonry jobs"
+   ],
+   [
+    "drain clearings",
+    "masonry jobs"
+   ],
+   [
+    "Drain clearing",
+    "Masonry job"
+   ],
+   [
+    "drain clearing",
+    "masonry job"
+   ],
+   [
+    "Kitchen drain",
+    "Chimney"
+   ],
+   [
+    "kitchen drain",
+    "chimney"
+   ],
+   [
+    "Water heater flush",
+    "Brick sealing"
+   ],
+   [
+    "water heater flush",
+    "brick sealing"
+   ],
+   [
+    "leehomeservices.com",
+    "leemasonry.com"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Stone consults, picks and sample sets at the showroom. A consult at home too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A stone consult could mean a stone showroom or a mason's office."
+   ],
+   [
+    "MP045210",
+    "MS-00123"
+   ],
+   [
+    "EC22871",
+    "CH-00456"
+   ],
+   [
+    "BS20981",
+    "SY-00789"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The showroom is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Stone Studio can do your stone consult at the showroom for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Masonry LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Masonry"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Stone Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Masonry"
+   ],
+   [
+    "Lee Electric",
+    "Lee Chimney Works"
+   ],
+   [
+    "1200 Main St",
+    "415 Kiln Rd"
+   ],
+   [
+    "88 Elm St",
+    "74 Hill St"
+   ],
+   [
+    "42 Oak St",
+    "9 Linden Way"
+   ],
+   [
+    "Riley",
+    "Petra"
+   ],
+   [
+    "Avery",
+    "Pavel"
+   ],
+   [
+    "Jordan",
+    "Gus"
+   ],
+   [
+    "Casey",
+    "Tobias"
+   ],
+   [
+    "plumbing and electrical",
+    "masonry and chimney work"
+   ],
+   [
+    "Plumbing and electrical",
+    "Masonry and chimney work"
+   ],
+   [
+    "electrical",
+    "chimney work"
+   ],
+   [
+    "Electrical",
+    "Chimney work"
+   ],
+   [
+    "Panel upgrade",
+    "Chimney cap install"
+   ],
+   [
+    "Plumber",
+    "Masonry contractor"
+   ],
+   [
+    "plumber",
+    "lead mason"
+   ],
+   [
+    "plumbing",
+    "masonry"
+   ],
+   [
+    "Plumbing",
+    "Masonry"
+   ],
+   [
+    "barbershop",
+    "stone showroom"
+   ],
+   [
+    "Barbershop",
+    "Stone showroom"
+   ],
+   [
+    "barbers",
+    "stone advisors"
+   ],
+   [
+    "barber",
+    "stone advisor"
+   ],
+   [
+    "Barber",
+    "Stone advisor"
+   ],
+   [
+    "haircut",
+    "stone consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the showroom"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "service call",
+    "estimate visit"
+   ],
+   [
+    "Service call",
+    "Estimate visit"
+   ],
+   [
+    "Water heater replacement",
+    "Brick step repair"
+   ],
+   [
+    "water heater replacement",
+    "brick step repair"
+   ],
+   [
+    "Leak repair",
+    "Chimney rebuild"
+   ],
+   [
+    "leak repair",
+    "chimney rebuild"
+   ],
+   [
+    "Sewer camera inspection",
+    "Chimney inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "chimney inspection"
+   ],
+   [
+    "water heaters",
+    "brick steps"
+   ],
+   [
+    "Water heater",
+    "Brick step"
+   ],
+   [
+    "water heater",
+    "brick step"
+   ],
+   [
+    "shop",
+    "showroom"
+   ],
+   [
+    "Shop",
+    "Showroom"
+   ],
+   [
+    "Elm St",
+    "Hill St"
+   ],
+   [
+    "house calls",
+    "home stone consults"
+   ],
+   [
+    "house call",
+    "home stone consult"
+   ],
+   [
+    "House calls",
+    "Home stone consults"
+   ],
+   [
+    "House call",
+    "Home stone consult"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "a office",
+    "an office"
+   ],
+   [
+    "A excavation",
+    "An excavation"
+   ],
+   [
+    "a excavation",
+    "an excavation"
+   ],
+   [
+    "A edge",
+    "An edge"
+   ],
+   [
+    "a edge",
+    "an edge"
+   ]
+  ]
+ },
+ "keep": [
+  "color",
+  "estimate visit",
+  "Estimate visit",
+  "leak",
+  "valve",
+  "roofing",
+  "Roofing"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Stone Studio, Sam's brick and stone showroom, for a stone consult with Petra on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Masonry to rebuild the chimney at 9 Linden Way. Gus comes for the estimate visit Thu Oct 22 between 8 and 10am, sends a written quote, and runs the job once the contract is signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Stone consult, $35 at the showroom; a card saved for the $20 missed-consult fee; paid at the showroom desk.",
+    "list|none|counter": "Stone consult, $35; nothing taken; a YES books it; paid at the showroom desk.",
+    "list|full|none": "Wall mock-up session, $55, paid in full when booking; credited to the job if Alex signs.",
+    "list|deposit|counter": "Fireplace and chimney design package, $140; a $40 deposit now; the $100 rest at the showroom desk."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Stone consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Stone consult"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Wall mock-up session"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$20",
+     "name": "Fireplace and chimney design package"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "Chimney rebuild: the $89 estimate visit, nothing taken; Gus's written quote; the contract, a $1,200 deposit and stage bills; the last $3,600 on the bill Rosie texts.",
+    "visit|none|own": "The same chimney rebuild, but Sam bills each stage and the last payment his own way; Rosie sends nothing about money.",
+    "visit|card|bill": "The same chimney rebuild, with a card saved for the $89 estimate visit fee when Alex books.",
+    "photos|deposit|bill": "Brick step repair, priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Chimney rebuild"
+    },
+    "visit|*|*": {
+     "price": "$3,600",
+     "name": "Chimney rebuild"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Brick step repair"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Brick step repair"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15"
+  ],
+  "B": [
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A consult is for the property's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "more",
+    "at": "A5-16",
+    "more": [
+     "Sam's setting: a wall mock-up session is credited to the job if Alex goes ahead with Lee Masonry."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the estimate visit at home",
+      "does": "Petra saves Alex's picks for the estimate. If Alex wants the chimney priced, Petra books Gus's estimate visit at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Masonry, Sam's other company. It runs in the other flow.",
+       "The picks and photos go with it, so Gus's quote uses them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: estimate visit at home for the chimney. Picks saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Petra saved your picks. Want Lee Masonry to come measure for a quote?",
+        {
+         "buttons": [
+          "Book the estimate",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Masonry work is licensed or registered as a contractor where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The company and its showroom both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and stone advisors are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, projects and consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Stone advisors and the scaffold subcontractor hold their own licenses where the state's form asks; the company holds the contractor license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "The work is booked ahead; nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Stone consults use the sample walls, boards and screen at the showroom; the plug-in offers no video or phone consult."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The showroom books a stone advisor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The showroom books a stone advisor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The showroom books a stone advisor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A consult has no form to sign first; the job's contract comes after the quote, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the showroom."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "The showroom requires nothing brought: photos and measurements are optional (pf.questions, pf.first_steps studio_prep), and a consult has no form, ID or permit to check."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the showroom."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A job this size never starts at the estimate visit: Alex signs a written contract first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A quote is signed whole, as one contract. A smaller job is a new written quote from Gus, after the call Alex can ask for."
+   },
+   {
+    "op": "after",
+    "at": "B8-63",
+    "steps": [
+     {
+      "id": "B8-x06",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Wed Oct 28, 8:00am",
+      "title": "Sam pulls the permit; a test goes first",
+      "q": "Is it all ready by the start?",
+      "does": "The window ends with no cancel. Sam files the permit in Lee Masonry's name. The house is from 1925, so the old mortar and flue lining are tested first, as the plug-in says.",
+      "more": [
+       "The license holder always pulls the permit, never Alex.",
+       "Sam gets a to-do with each due date, and replies when it's in.",
+       "The test is done by an outside lab, and the result is kept with the job.",
+       "The scaffold is booked and the brick is ordered once the window ends."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s chimney: file the permit and book the mortar and flue lining test. Both are due before the first work day, Mon Nov 2.",
+        {
+         "buttons": [
+          "Both are in",
+          "Not in yet"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner"
+      ],
+      "branches": [
+       {
+        "label": "1 Ready by the start",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 The permit is late",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "7.16",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Fri Oct 30, 10:00am",
+          "title": "Moves the start, with no fee",
+          "does": "The permit is still in review on Fri Oct 30. The business caused the move, so it's free. Alex picks a new start date.",
+          "more": [
+           "Only dates after the permit's new expected date are offered.",
+           "The stage dates move with the start."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your permit is still in review, so Lee Masonry needs to move your start date. There's no fee.",
+            {
+             "times": [
+              "Mon Nov 9 · start · Gus",
+              "Mon Nov 16 · start · Gus"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Asbestos in the old flue lining",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x08",
+          "line": [
+           "7.16",
+           "8.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Thu Oct 29, 10:00am",
+          "title": "Removal goes first, by its own quote",
+          "does": "The lab finds asbestos in the old flue lining. A licensed removal company goes first, with its own price, and Alex's start moves.",
+          "more": [
+           "The crew never disturbs it.",
+           "The removal is a change order or a separate job, as Sam decides with Alex.",
+           "Alex gets the new start date once the removal is booked."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The test found asbestos in the old flue lining. A licensed removal company must take it out first. Sam will send you its price.",
+            {
+             "card": {
+              "title": "Test result · old flue lining",
+              "lines": [
+               "Asbestos found",
+               "Removal first, by a licensed company",
+               "Your start date moves after that"
+              ]
+             }
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Tue Nov 3, 11:30am",
+      "title": "Gus finds a cracked liner: a change order first",
+      "q": "Does Alex sign the change order?",
+      "does": "Inside the old chimney, Gus finds a cracked flue liner that must be replaced. The contract can't change by text alone, so Alex and Sam sign a change order before the fix.",
+      "more": [
+       "It's over Sam's $500, so Sam OKs the price first.",
+       "It gives the price and any days added. It goes on the next stage payment.",
+       "It's signed on the secure page, like the contract.",
+       "Other work goes on while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 1200 replace the cracked flue liner. Adds 1 day",
+        {
+         "photos": [
+          "Cracked flue liner"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Gus found a cracked flue liner in the old chimney. It must be replaced before the new chimney goes up.",
+        {
+         "card": {
+          "title": "Change order 1 · $1,200",
+          "lines": [
+           "Replace the cracked flue liner",
+           "Adds 1 work day",
+           "Added to payment 3"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/r4c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Call me first"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Call first, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x12",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "title": "Asks Sam to call Alex",
+          "does": "Alex wants a call first, or doesn't answer in 4 hours. Sam gets a to-do to call. Nothing is done about the flue until the change order is signed.",
+          "more": [
+           "Other work goes on while it waits.",
+           "If Alex says no, Sam and Alex decide what's next. Rosie moves no money on its own."
+          ],
+          "say": [
+           [
+            "san",
+            "owner",
+            "Alex M. wants a call about change order 1: $1,200 for the cracked flue liner. Please call today.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me at 4pm"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Contractor work is licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The company and its showroom both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and stone advisors are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, projects and consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Stone advisors and the scaffold subcontractor hold their own licenses where the state's form asks; the company holds the contractor license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "The work is booked ahead; nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An estimate visit has no form to sign first; the contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Estimate visits and work days are booked in 2-hour arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "This work books visits and work days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "This work books a crew lead's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking lets the crew in (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A job is rated, like any job."
+   }
+  ]
+ },
+ "notes": "Started from contractor (pattern: project): an estimate visit, a written quote, then a contract and stage bills. Facts, switches, settings and money paths are the parent's, re-worded for this work: documents, stages, photos, extrawork, firststeps, multiday, banktransfer; switch cancelright in flow B only (work sold at the customer's place); arrive A a set start, B a 2-hour window; cutoff 24 hours before.\nFlow B main path visit|none|bill: the booking is the $89 estimate visit, credited to the job; Gus's written quote; the contract signed by everyone on the deed; $1,200 to start, $7,200 when the new chimney is built to the roofline, $3,600 at the finish (a $12,000 chimney rebuild). The $89 keeps the master's numbers true; a free estimate is the owner's choice (pf.money).\nB money paths: visit|none|bill, visit|none|own, visit|card|bill, photos|deposit|bill (Brick step repair, $640 from photos, a $160 deposit). Left out: list paths. Chimney cap install ($179) and Brick sealing ($150) are in pf.services, but the master's booking cards name one list service, so a list path would show the wrong name (MASTER).\nFlow A is Sam's second company, Lee Stone Studio, a stone showroom (the master's Lee's Barbershop). Main path list|card|counter: a $35 stone consult with Petra, a card saved for the $20 missed-consult fee, paid at the showroom desk. The other three: list|none|counter, list|full|none (wall mock-up session, $55, credited to the job if Alex signs), list|deposit|counter (fireplace and chimney design package, $140, $40 deposit).\nFlow A has no video or phone consult: the stone consult uses the sample walls and boards at the showroom (the A4-01 video branch is hidden because the fact `video` is not listed).\nOwn steps: A8-x01 (the stone consult offers the estimate visit at home), B8-x06 to B8-x08 (the permit and a test of the old mortar go first; a late permit moves the start with no fee; asbestos found in the old flue lining means a licensed removal first, by its own quote) and B8-x11 / B8-x12 (a cracked flue liner found inside the old chimney: a change order first, signed by both).\nMasonry is work at height on old buildings: the questions ask the year the home was built and how high the work is (pf.questions), older homes get lead-safe and asbestos care as first steps where the rules require them (pf.first_steps), the scaffold is booked once the cancel window ends, and roofing goes to a licensed roofer (pf.edges high_work).\nBooking choices: B timing settime, times window; A times setstart. Nothing is sent now (S2-30 'Yes' branch off, no `sentnow` fact), so nobody is on call.\nPlug-in splits kept whole (splitsKept): A7-15; B5-34, B7-55, B8-58, B8-69 (as the parent).\nNames: Gus and Tobias are the crew leads (the master's Jordan and Casey), Petra and Pavel the stone advisors (Riley and Avery). None of them is a master customer's name. Addresses: 415 Kiln Rd (the company), 74 Hill St (the showroom), 9 Linden Way (Alex). License numbers use an obviously fake format (MS-00123, CH-00456, SY-00789).\nEvery state rule is a switch from the state's form: the license and its job-size limit, the written contract and its parts, the deposit cap, money kept apart, the cancel window, permits, lien waivers, what must be shown. No state, city or number from one.\nkeep: color (a real word of this work), the estimate visit (the trade's own word), leak and valve (the master's safety examples), roofing (the work it doesn't do).\nRename: the contractor's pairs re-worded for this work (master sentences first, then phrases, then single words); 'cut' and 'hair' words that the master uses for its barbershop are turned into this work's words or removed (S1-38, S1-60, S13-55, B8-34).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "$89 service-call fee",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "JP031552",
+    "JE30417",
+    "Groom's package · ",
+    "the Groom's package",
+    "The Groom's package",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "'A trim' or 'a fade' fits a haircut.",
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "How would you like it on top?",
+    "like the cut in the mirror",
+    "like a mark on an item or the skin",
+    "like a skin reading",
+    "at the shop and for house calls",
+    "two skin fades on",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "a Kids cut (12 and under) is $25",
+    "Quiero un corte el sábado.",
+    "Gloss to finish",
+    "gloss",
+    "takes jobs sent now, like a burst pipe",
+    "A repair shop, a tailor or a groomer does.",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Drain clearing",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "water heaters",
+    "water heater",
+    "shops",
+    "shop",
+    "Shop",
+    "Elm St",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call"
+   ],
+   "B": [
+    "$89 service-call fee",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "JP031552",
+    "JE30417",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Water pressure check",
+    "Alex books on the shop's booking page",
+    "Gives the shop's own line",
+    "Tells Alex it's with the shop",
+    "shop-added",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "At the shop, and house calls",
+    "Call a mold cleanup company first",
+    "cracks the cabinet floor and texts a photo",
+    "DAMAGE cracked the cabinet floor",
+    "cracked the cabinet floor at",
+    "Cracked cabinet floor",
+    "at the shop and for house calls",
+    "Yes, it won't drain",
+    "Leak repair · $245",
+    "The $179 drain needs none.",
+    "Kim L.'s yard drain needs nobody home.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Jordan cuts a hand and texts HURT",
+    "HURT cut my hand, need to stop",
+    "like a $620 repair",
+    "$620",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Like tapping a neighbor's water line without asking.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "The service call is $89.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Right to cancel · repipe",
+    "The $800 start payment",
+    "Your $800 start payment",
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of your repipe",
+    "$800",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "$245",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "leehomeservices.com",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "shop",
+    "Shop",
+    "Elm St",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call"
+   ]
+  },
+  "A": {
+   "A4-24": "0a292df05b",
+   "A5-16": "8045a6b80c",
+   "A8-44": "4410a4860c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B8-93": "c1406fd6bc",
+   "B8-63": "c0d957be82",
+   "B8-37": "3ce85cf051",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

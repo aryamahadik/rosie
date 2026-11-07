@@ -1,0 +1,3294 @@
+{
+ "id": "gutters",
+ "name": "Gutter installer",
+ "style": "Project",
+ "pattern": "project",
+ "from": "roofer",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a contractor, home improvement or gutter license or registration for the company, where the state's form requires one (some states license gutter work with roofing or siding, some under a home improvement registration, some not at all)",
+   "ask": [
+    "The company's license or registration number, and its class",
+    "Any job-size limit the license has",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business; plus a qualifying person where the state's form names one. A crew that lays buried drain pipe holds that license where the state asks.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No gutter work goes live until the company's license checks out, where one is required",
+    "A job over the license's size limit is never offered or quoted: the owner is told why"
+   ],
+   "declared_emergency": "In a declared emergency, the owner says which licenses in that area have lapsed, and a gutter installer new to the state is held until the owner says yes, where the state's rules say so",
+   "renewals": "License, insurance and bond dates kept; reminded 30 days out; a lapse pauses new bookings",
+   "lead_safe": "Work that disturbs painted fascia or trim on older homes only by a firm and a person certified for lead-safe work, where the rules require it",
+   "showroom": "The studio: a registration, and a salesperson's registration for each consultant who sells gutter work, only where the state's form asks",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Inspection, then project: new gutters are booked only after a written estimate and a signed contract",
+   "B": [
+    {
+     "name": "Gutter inspection and estimate",
+     "price": "$89, counted toward the gutter work if Alex signs (the example business's own price; a free estimate is a common starting option)",
+     "length": "30 to 45 minutes",
+     "where": "at the customer's place",
+     "before": "nothing taken (or a card saved for the $89 fee)",
+     "after": "billed only if no contract follows",
+     "report": "photos of each run, the feet measured, the downspouts and their drains, the fascia checked for rot; a written estimate the same day, good for 30 days"
+    },
+    {
+     "name": "New seamless gutters (whole house)",
+     "price": "quoted after the inspection; the example: 160 feet of 5-inch seamless aluminum at $11 a foot ($1,760), plus 6 downspouts at $85 ($510), plus $330 for taking down the old gutters and hauling them away ($2,600 in all)",
+     "length": "1 day for a house up to 200 feet, per crew",
+     "where": "at the customer's place; nobody needs to be home on the work day",
+     "before": "nothing at booking; a deposit only after the contract is signed",
+     "after": "the balance after the final walk-around"
+    },
+    {
+     "name": "Rotted fascia (the board behind the gutter)",
+     "price": "$14 a foot, photos first; up to 20 feet OK'd in the contract",
+     "where": "added to a new gutter job, never booked alone"
+    },
+    {
+     "name": "Gutter repair (re-hang and reseal up to 20 feet, from the list)",
+     "price": "$179, from the list",
+     "length": "1 to 2 hours",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Gutter repair (bigger or unclear damage, quoted at the visit)",
+     "price": "quoted at the visit (example: $245)",
+     "where": "at the customer's place",
+     "before": "nothing, or a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Gutter cleaning (house up to 2 stories)",
+     "price": "$150, from the list",
+     "length": "1 to 2 hours",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "Often rebooked every spring and fall, as a yearly plan"
+    },
+    {
+     "name": "Gutter guards (priced from photos and feet)",
+     "price": "priced from photos (example: $640 for the back of the house); over $500, Sam OKs it",
+     "length": "half a day",
+     "where": "at the customer's place",
+     "before": "a written contract where the state's rules require one, then a 25% deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Gutter flow test and report (for a sale or an insurer)",
+     "price": "$199, with a written report",
+     "length": "60 minutes",
+     "where": "at the customer's place",
+     "before": "nothing taken, or a card saved for the $89 fee",
+     "after": "Rosie texts the bill; the report is sent the same day or the next"
+    },
+    {
+     "name": "Buried drain line (a pipe that carries downspout water away)",
+     "price": "quoted after the inspection; digging starts only after the utility locate",
+     "where": "at the customer's place",
+     "note": "A contract first; waits for the drain installer's own license, where the state asks"
+    },
+    {
+     "name": "Gutter check on a plan",
+     "price": "the list price each visit; for rentals and other buildings",
+     "where": "at the customer's place; nobody needs to be home"
+    },
+    {
+     "name": "Photo quote",
+     "price": "free; a written quote from the photos Alex sends, for small jobs",
+     "where": "by text or the secure page; nobody comes",
+     "before": "nothing taken",
+     "after": "nothing more; Alex can book a visit from the quote"
+    },
+    {
+     "name": "Labor",
+     "price": "$120 an hour, 1-hour minimum",
+     "where": "added to a job, never booked alone"
+    }
+   ],
+   "A": [
+    {
+     "name": "Style consult",
+     "price": "$35, 30 minutes",
+     "where": "at the studio; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the studio desk"
+    },
+    {
+     "name": "Downspout and color pick",
+     "price": "$40",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the studio desk"
+    },
+    {
+     "name": "Quick studio chat",
+     "price": "free, 15 minutes",
+     "where": "at the studio",
+     "before": "nothing taken",
+     "after": "nothing more"
+    },
+    {
+     "name": "Sample kit",
+     "price": "$20, an add-on to take home",
+     "where": "at the studio"
+    },
+    {
+     "name": "Guard match",
+     "price": "$25",
+     "where": "at the studio"
+    },
+    {
+     "name": "Drainage plan session (a plan of the house with its new gutters and drains)",
+     "price": "$55, 60 minutes; counts toward the gutters if Alex signs with Lee Gutters",
+     "where": "at the studio",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Full drainage plan (gutters, downspouts, guards, extensions)",
+     "price": "$140, 2½ hours",
+     "where": "at the studio",
+     "before": "a card saved for the $40 fee (over 2 hours), or a $40 deposit",
+     "after": "at the studio desk"
+    },
+    {
+     "name": "Photo gutter plan",
+     "price": "priced from the customer's photos and measurements (example: $90); Sam OKs each one",
+     "where": "at the studio"
+    },
+    {
+     "name": "Copper gutter match",
+     "price": "priced at the studio after a $25 consult, once the consultant sees the old section",
+     "where": "at the studio"
+    }
+   ],
+   "capacity": "One estimator or consultant per booking; one crew per job, up to 200 feet in a day; the studio's layout table is saved with long sessions",
+   "skills": "Inspections and estimates: estimators. Installs: crew leads with their crews. Buried drain lines: licensed installers. Studio: consultants.",
+   "nobody_home": "Gutter work outside: nobody needs to be home; a start photo and day-end photos. An adult is needed only if the inspection needs a look inside at a wet wall or the basement.",
+   "online": "No video consult: gutter picks use the sample runs at the studio"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What's wrong: gutters that overflow, sag or leak, a storm, or an old house?",
+    "What are the gutters made of now, if you know: aluminum, steel, vinyl or copper?",
+    "About how many feet of gutter, or how big is the house?",
+    "How many stories is the house?",
+    "Is water getting into the house or the basement now?"
+   ],
+   "after_time": [
+    "The year the home was built (painted fascia on older homes may need lead-safe work, where the rules require it)",
+    "OK to put a ladder against the house and take photos?",
+    "Will an adult be home if the inspection needs a look inside?",
+    "Gate, pets and parking (the crew needs room for a truck and a ladder)",
+    "Do you own the home or rent? (the owner signs any contract)",
+    "Is the home in an owners' association or a historic district? (some need approval before a new color or material)"
+   ],
+   "secure_page_only": [
+    "Gate or lockbox codes",
+    "Photos of the damage (optional)",
+    "The association's or district's approval letter, if the home needs one",
+    "Budget (optional)"
+   ],
+   "who_may_book": "An adult who owns the home, or someone with the owner's written OK. Everyone on the home's title signs a gutter contract. A renter may book an inspection or a cleaning only with the owner's OK.",
+   "showroom": [
+    "Which part of the house: the gutters, the downspouts or the guards",
+    "Photos of the house, and an old section if there is one (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a tree or limb on the house or across the gutters, power lines down on or near the house",
+     "says": "Leave the house and stay far from the lines. Then call 911 and the power company.",
+     "booking": "no booking until the house is safe"
+    },
+    {
+     "words": "a wall or ceiling sagging or bulging under the water, gutters pulling the roof edge down",
+     "says": "Get everyone out of the rooms by that wall or ceiling, and call 911 if anyone is at risk.",
+     "booking": "no booking until it's safe"
+    },
+    {
+     "words": "a gas smell, sparking or smoking wires",
+     "says": "Leave the house now. Then call 911 and the gas or power company.",
+     "booking": "no booking"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "water overflowing into the house, the basement or a wall, a wet or stained ceiling or wall",
+     "says": "Keep everyone away from the water and any outlet it reaches. Don't go into a flooded basement. Turn that area off at the breaker only if it's safe to reach. Don't climb a ladder to look.",
+     "booking": "goes on, marked urgent; the soonest inspection time is offered first"
+    },
+    {
+     "words": "a gutter hanging loose or falling",
+     "says": "Keep people and pets away from it. Don't climb a ladder to fix it.",
+     "booking": "goes on, marked urgent; the soonest inspection time is offered first"
+    }
+   ],
+   "business_line": "Questions about whether a roof edge or a wall is safe, or about the structure, go to the business's own line",
+   "never": "Customers are told never to climb a ladder to clean, look at or fix gutters"
+  },
+  "pf.first_steps": {
+   "before_quote": "The inspection at the home: each run measured, the downspouts and where they drain, the fascia checked for rot, photos by side",
+   "after_contract": [
+    "The cancel window ends before any work or orders, where the state's rules give one",
+    "Custom-cut gutter runs and parts are ordered only after the window",
+    "For a buried drain line: the utility locate (buried lines marked) before any digging, and any permit the state's rules require, pulled by the license holder",
+    "A dry forecast for the work day"
+   ],
+   "prep": [
+    "Stay off ladders",
+    "Before the work: move cars, planters and chairs 5 feet from the walls, trim back bushes, and keep pets inside",
+    "An adult home only if the inspection needs a look inside"
+   ],
+   "showroom_prep": [
+    "Bring photos of the house",
+    "Bring an old section of gutter or a paint chip, if there is one"
+   ],
+   "sample_pickup": "A 15-minute sample pickup before a full drainage plan, at least 2 days before, so the runs are seen on the house in daylight"
+  },
+  "pf.visit": {
+   "check_in": "Inspection: the check-in code at the door. Work day: nobody needs to be home; the crew texts a start photo. Studio: the code at the desk.",
+   "at_the_visit": "The gutters are checked from the ground and from a ladder only when it's dry and calm. Photos of each run, feet measured, downspouts and drains traced, fascia checked for rot. The written estimate comes the same day, good for 30 days. Nothing is signed or paid at the inspection.",
+   "bad_weather": "No ladder work in rain, ice or high wind: inspect from the ground, or move the time",
+   "changes": "Rotted fascia at the contract's price per foot, up to the feet OK'd in the contract, with photos and a change order for the record. Past it, a signed change order before that work.",
+   "work_day": "Plants and the AC unit covered or moved; old gutters hauled away the same day; seams sealed and every run hose-tested; a magnet sweep of the yard, driveway and flower beds for screws and cut-off pieces, with photos; day-end photos to the customer",
+   "outside_checks": "None for gutters; a permit inspection only for a buried drain line, where the permit requires it",
+   "done": "The hose test, then the walk-around and sweep, then DONE",
+   "showroom_done": "DONE after the consult, with the picks saved for the inspection and estimate",
+   "before_photos": "Each run, the downspouts, the fascia and any inside stains"
+  },
+  "pf.money": {
+   "inspection": "The example's $89 inspection counts toward the gutter work, and is billed only if no contract follows. A free estimate is a safe start.",
+   "no_money_before_contract": "On new gutters, nothing is taken before the contract is signed by everyone",
+   "deposit": "Only after signing; the deposit cap comes from the state's form",
+   "kept_apart": "Money paid before the work is kept apart or bonded where the state's rules require it (a switch from the state's form)",
+   "balance": "After the hose test and the final walk-around; never ahead of the work",
+   "insurance": "Where a storm claim pays, the money goes to the customer, never through Rosie or the business. The deductible is always the customer's: never paid, waived or rebated.",
+   "storm_prices": "In a declared emergency, prices stay at the list from before it, for as long as the state's rules say",
+   "rosfield_fee": "Rosfield's $2 can be switched off by state and by who pays, where a state's rule on pay for referrals reaches it (a switch from the state's form, for counsel to confirm)",
+   "change_orders": "Added to the balance",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the crew lead texts 'paid check'.",
+   "tips": "No tip line",
+   "tax": "Tax on materials and labor follows the state's form",
+   "showroom": "The drainage plan session's $55 counts toward the gutters if Alex signs with Lee Gutters; the $20 missed-consult fee only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Insurance claim details",
+    "Gate or lockbox codes",
+    "Contract, change order and permit papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home never lets the crew in",
+   "no_claim_ads": "No text ever urges anyone to file an insurance claim"
+  },
+  "pf.staff": {
+   "roles": "Estimators and crew leads (Felix, Ines): inspections, estimates, and installs with their crews. Studio consultants (Mara, Kofi).",
+   "licenses": "The company holds the gutter or contractor license; installers of buried drain lines hold their own where the state asks, checked before they're named on a job",
+   "lead_safe": "A certified renovator on any job that disturbs painted fascia or trim on an older home, where lead-safe rules apply",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another estimator may take an inspection; an install keeps its crew lead unless Sam moves it",
+   "on_call": "None: every job is booked ahead",
+   "power_lines": "A crew never sets a metal ladder against or near an overhead service wire; a wire touching the gutter stops that run (the electric company's job)"
+  },
+  "pf.rules": {
+   "contract": "A written contract for new gutters where the state's rules require one, signed by everyone on title and by the business before any money",
+   "contract_parts": "The parts the state's form lists (license number, price, dates, deposit, cancel notice, any lien or recovery-fund notice)",
+   "cancel_window": "A cancel window after signing, where the state's rules give one; a longer one for contracts signed in a declared emergency, where the rules say so. Work and orders wait for it.",
+   "insurance_claims": "The business never files, adjusts or explains the customer's claim, unless the state's rules allow it; no gifts or rebates tied to an inspection or a claim",
+   "permits": "A buried drain line: pulled by the license holder in the business's name, never the homeowner's, where the rules require one. Gutters alone: none unless the state's rules say so.",
+   "approvals": "An owners' association or historic approval comes from the owner before work starts, where the home needs one",
+   "drain_outlet": "A downspout drain is laid out only where the water may go, as the state's and the place's rules say; never onto a neighbor's land or into the street without the OK the rules require",
+   "change_orders": "Written and signed by both before added work, past what the contract already OK'd",
+   "final": "The hose test and the final walk-around before the balance is asked for",
+   "lien_release": "A lien release with the final payment, where the state's rules provide one",
+   "show": "The license number on the listing, the times read out, the confirmation, the estimate, the contract and the receipt, where the state's rules require it",
+   "storm_prices": "Prices from before a declared emergency, for as long as the state's rules say",
+   "warranty": "5 years on new gutters' workmanship against leaks and sagging, and 1 year on repairs (the example's); the maker's finish warranty registered in the owner's name",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "weather": "No gutter work in rain, ice or high wind, and no sealant below the maker's lowest temperature (the example business's own limits: a 40% chance of rain or more, or under 40 degrees); a weather move never costs the customer",
+   "wet_roof_edge": "Rain at inspection time: a look from the ground, or a new time",
+   "water_getting_in": "Safety steps first, then the soonest inspection time",
+   "hidden_damage": "Rotted fascia: at the contract's price per foot, inside the feet OK'd; past it, a signed change order first",
+   "power_wire": "An electric service wire touching or close to a gutter run: the crew stops that run, the customer gets a written note, and the electric company comes first",
+   "old_paint": "Old paint on fascia that may hold lead: lead-safe work first, where the rules require it",
+   "buried_lines": "Digging for a drain line starts only after the utility locate, and a marked line in the way moves the plan with no fee",
+   "color_match": "An old gutter color or profile that is no longer made: the consultant checks a sample, and the customer picks a close match or a full replacement; an exact match is never promised",
+   "ice_and_snow": "Gutters packed with ice or snow are not cleaned or hung: the visit moves with no fee, and the customer is told",
+   "late_delivery": "Special-order runs and colors are ordered only after the cancel window; a late delivery moves the work day with no fee, and the customer is told",
+   "over_license_limit": "Not offered, and the owner is told why",
+   "nobody_home": "Work days: start and day-end photos",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "photos",
+   "multiday",
+   "extrawork",
+   "stages",
+   "banktransfer"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Mara and Kofi (studio consultants)",
+   "other": "Others (a bank, a landlord)"
+  },
+  "B": {
+   "staff": "Felix and Ines (estimators and crew leads)",
+   "other": "Others (a bank, a landlord)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Mara"
+  },
+  "B": {
+   "staff": "Felix"
+  }
+ },
+ "keep": [
+  "color",
+  "leak",
+  "drips",
+  "roofer",
+  "Roofer",
+  "studio",
+  "Studio",
+  "consultant",
+  "Consultant",
+  "inspection",
+  "Inspection",
+  "Full drainage plan",
+  "Guard match",
+  "guard match"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Gutter Studio, Sam's gutter and drainage studio, to pick a gutter style and color with Mara on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. After a windstorm, Alex books Lee Gutters to look at sagging gutters at 19 Linden Ct. Felix inspects them Thu Oct 22 between 8 and 10am and quotes the repair on the spot. A bigger job, like new gutters, gets a written estimate and a contract first. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Style consult, $35 at the studio; a card saved for the $20 missed-consult fee; paid at the studio desk.",
+    "list|none|counter": "Style consult, $35; nothing taken; a YES books it; paid at the studio desk.",
+    "list|full|none": "Drainage plan session, $55, paid in full when booking; it counts toward the gutters if Alex signs.",
+    "list|deposit|counter": "Full drainage plan, $140; a $40 deposit now; the $100 rest at the studio desk.",
+    "photos|card|counter": "Photo gutter plan, priced from Alex's photos and measurements at $90 (Sam OKs it); a card saved for the $20 fee; paid at the desk.",
+    "visit|card|counter": "Copper gutter match, priced at the studio once Mara sees the old section: only the $25 consult is promised; a card saved; paid at the desk."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Style consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Style consult"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Full drainage plan"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Drainage plan session"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Photo gutter plan"
+    },
+    "visit|*|*": {
+     "name": "Copper gutter match"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "list|card|bill",
+    "photos|deposit|bill",
+    "list|none|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "visit|none|bill": "Sagging, leaking gutters: a repair priced at the visit (the $89 inspection fee is owed even after a no), nothing taken; Rosie texts the bill after. A bigger job, like Harper J.'s $2,400 gutter and drain line, becomes its own job: a signed quote and stage payments.",
+    "visit|none|own": "The same repair priced at the visit, but Sam bills it the business's own way; Rosie sends nothing about money.",
+    "visit|card|bill": "The same repair priced at the visit, with a card saved for the $89 inspection fee when Alex books.",
+    "list|card|bill": "A $179 gutter repair from the list (up to 20 feet re-hung and resealed); a card saved for the $89 fee; Rosie texts the bill after the job.",
+    "photos|deposit|bill": "Gutter guards priced from photos at $640 (over $500, so Sam OKs it); a 25% deposit of $160; the rest on the bill.",
+    "list|none|bill": "A $179 gutter repair for a returning customer: nothing taken; Rosie texts the bill after.",
+    "list|full|none": "A $150 gutter cleaning, paid in full when booking (also the yearly plan)."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Gutter inspection"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Gutter repair"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Gutter cleaning"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Gutter guard install"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Gutter guard install"
+    },
+    "visit|*|*": {
+     "name": "Gutter repair"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "B4-81",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "B8-65"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "style consult",
+    "quick studio chat"
+   ],
+   [
+    "Style consult",
+    "Quick studio chat"
+   ],
+   [
+    "A chair renter",
+    "A desk renter"
+   ],
+   [
+    "like a chair renter",
+    "like a desk renter"
+   ],
+   [
+    "would like to see your hair before pricing it",
+    "would like to see the old gutter before pricing it"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring photos of the house on Saturday."
+   ],
+   [
+    "please come with dry hair",
+    "please bring photos of the house"
+   ],
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Gutter work is licensed or registered at the company, where the state's form requires it."
+   ],
+   [
+    "$89 service-call fee",
+    "$89 inspection fee"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither gutter work nor the studio takes jobs sent now."
+   ],
+   [
+    "The chairs",
+    "The sample runs"
+   ],
+   [
+    "A chair, ready",
+    "A sample run"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Mara and Kofi run the style consults; Mara also does home consults"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Mara and Kofi run the studio"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Style consults, downspout and color picks and sample kits at the studio. Consults at home only where the state's rules allow them."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A gutter studio on Brook Rd. Gutter profiles in aluminum, steel and copper, guard samples, and drainage plans to take home."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most gutter studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules gutter studios often set."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most gutter studios set it."
+   ],
+   [
+    "barbershops",
+    "gutter studios"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Mara: consultant, color, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Mara: consultant, color and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, color and home consults"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and home consults"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the studio and for home consults"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "a office",
+    "an office"
+   ],
+   [
+    "A excavation",
+    "An excavation"
+   ],
+   [
+    "a excavation",
+    "an excavation"
+   ],
+   [
+    "A edge",
+    "An edge"
+   ],
+   [
+    "a edge",
+    "an edge"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a new deck, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Gutter Studio doesn't do decks."
+   ],
+   [
+    "two skin fades on",
+    "two downspout and color picks on"
+   ],
+   [
+    "skin fades",
+    "downspout picks"
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "The drainage plan session, $55, is paid in full when booked."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds gutter guards to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Gutter guards for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW gutter guards"
+   ],
+   [
+    "takes no cut of them",
+    "takes no part of them"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a dead battery"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a guard match is $25"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero escoger el color de las canaletas el sábado."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero escoger el color de las canaletas el sábado."
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A gutter installer's example: water coming into the basement gets 'keep away from wet outlets, and stay off the ladder'."
+   ],
+   [
+    "Electric.",
+    "About 20 squares."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small repairs have a set price. New gutters are quoted after an inspection. A tree on the house stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A contractor or home improvement license behind the company, where the state asks."
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A downspout and color pick at Lee Gutter Studio is $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for a downspout and color pick at $35"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a sample gutter fell and scratched a bag today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A sample gutter fell and scratched my bag."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a sample gutter fell and scratched a bag today."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 5-inch white aluminum, black downspouts, leaf guards on the back"
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "likes 5-inch white, black downspouts, plain corners"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a downspout and color pick for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Mara sees the old section"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you match the fascia color too? Ours is from 1998."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A style consult could mean a gutter studio or a hardware store."
+   ],
+   [
+    "MP045210",
+    "EX-4521"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "BS20981",
+    "EX-2098"
+   ],
+   [
+    "Groom's package · ",
+    "Full drainage plan · "
+   ],
+   [
+    "the Groom's package",
+    "the full drainage plan"
+   ],
+   [
+    "The Groom's package",
+    "The full drainage plan"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 full drainage plan"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A K-style' or 'a half-round' fits a style consult."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a builder: 'We'd like style consults for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A style consult's example: 'A big roofline needs a quick measure check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which color or shape do you like?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sample run next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the fascia"
+   ],
+   [
+    "like a skin reading",
+    "like a moisture reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call the electric company first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "scratches a sample run and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched a sample run"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "scratched a sample run at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched sample run"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work, like salons and groomers, is licensed to its own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Books the groom's party together",
+    "Books three neighbors together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Three neighbors on one street book consults on one morning, to pick a look that fits. Rosie finds times side by side with Mara and Kofi."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A style consult and a guard match work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your house"
+   ],
+   [
+    "patch test",
+    "sample pickup"
+   ],
+   [
+    "skin-test result",
+    "sample Alex picked"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the studio during my consult?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "A big storm is forecast for Saturday morning. Can I still come in?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the garage run."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the garage run"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Brook Rd"
+   ],
+   [
+    "Barber license",
+    "Seller's license"
+   ],
+   [
+    "JP031552",
+    "EX-1552"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "Gloss to finish",
+    "Touch-up paint to finish"
+   ],
+   [
+    "$15 gloss",
+    "$15 touch-up paint"
+   ],
+   [
+    "gloss",
+    "touch-up paint"
+   ],
+   [
+    "an estimate visit",
+    "a measure visit"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Gutters'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Gutters"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Gutter Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Gutter Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Gutters"
+   ],
+   [
+    "Lee Electric",
+    "Lee Drainage"
+   ],
+   [
+    "1200 Main St",
+    "340 Canal St"
+   ],
+   [
+    "88 Elm St",
+    "12 Brook Rd"
+   ],
+   [
+    "Riley",
+    "Mara"
+   ],
+   [
+    "Avery",
+    "Kofi"
+   ],
+   [
+    "Jordan",
+    "Felix"
+   ],
+   [
+    "Casey",
+    "Ines"
+   ],
+   [
+    "plumbing and electrical",
+    "gutters and drainage"
+   ],
+   [
+    "Plumbing and electrical",
+    "Gutters and drainage"
+   ],
+   [
+    "electrical",
+    "drainage"
+   ],
+   [
+    "Electrical",
+    "Drainage"
+   ],
+   [
+    "Panel upgrade",
+    "Drain line install"
+   ],
+   [
+    "Plumber",
+    "Gutter installer"
+   ],
+   [
+    "plumber",
+    "gutter installer"
+   ],
+   [
+    "plumbing",
+    "gutter work"
+   ],
+   [
+    "Plumbing",
+    "Gutter work"
+   ],
+   [
+    "barbershop",
+    "studio"
+   ],
+   [
+    "Barbershop",
+    "Studio"
+   ],
+   [
+    "barbers",
+    "consultants"
+   ],
+   [
+    "barber",
+    "consultant"
+   ],
+   [
+    "Barber",
+    "Consultant"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Drainage plan session"
+   ],
+   [
+    "Signature cut and shave",
+    "Drainage plan session"
+   ],
+   [
+    "signature cut",
+    "drainage plan session"
+   ],
+   [
+    "Groom's package",
+    "Full drainage plan"
+   ],
+   [
+    "Color and cut",
+    "Photo gutter plan"
+   ],
+   [
+    "color and cut",
+    "photo gutter plan"
+   ],
+   [
+    "Color correction",
+    "Copper gutter match"
+   ],
+   [
+    "color correction",
+    "copper gutter match"
+   ],
+   [
+    "color quote",
+    "custom quote"
+   ],
+   [
+    "color plan",
+    "custom plan"
+   ],
+   [
+    "Color plan",
+    "Custom plan"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Guard match"
+   ],
+   [
+    "Kids cut",
+    "Guard match"
+   ],
+   [
+    "kids cut",
+    "guard match"
+   ],
+   [
+    "Skin fade",
+    "Downspout and color pick"
+   ],
+   [
+    "skin fade",
+    "downspout and color pick"
+   ],
+   [
+    "Beard trim",
+    "Sample kit"
+   ],
+   [
+    "beard trim",
+    "sample kit"
+   ],
+   [
+    "Haircuts",
+    "Style consults"
+   ],
+   [
+    "haircuts",
+    "style consults"
+   ],
+   [
+    "Haircut",
+    "Style consult"
+   ],
+   [
+    "haircut",
+    "style consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the studio"
+   ],
+   [
+    "Drain clearing",
+    "Gutter repair"
+   ],
+   [
+    "water heaters",
+    "gutter guards"
+   ],
+   [
+    "water heater",
+    "gutter guard"
+   ],
+   [
+    "Drain",
+    "Gutter repair"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Elm St",
+    "Brook Rd"
+   ]
+  ],
+  "B": [
+   [
+    "A tip line · bank transfer over $500",
+    "Bank transfer over $500"
+   ],
+   [
+    "Sewer camera inspection",
+    "Gutter flow test and report"
+   ],
+   [
+    "sewer camera inspection",
+    "gutter flow test and report"
+   ],
+   [
+    "camera inspection",
+    "flow test and report"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my house."
+   ],
+   [
+    "like a chair renter",
+    "like a desk renter"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. No lines are down and I don't smell gas."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay cables caídos ni huele a gas."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Are any power lines down, or do you smell gas?"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay cables caídos o huele a gas?"
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For gutters, a tree on the house, power lines down, a bulging wall, a gas smell or sparks stops the booking."
+   ],
+   [
+    "$89 service-call fee",
+    "$89 inspection fee"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither gutter work nor the studio takes jobs sent now."
+   ],
+   [
+    "The chairs",
+    "The sample runs"
+   ],
+   [
+    "A chair, ready",
+    "A sample run"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Gutters can fix the sagging gutter:"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Gutters asks: is the job at a home, an office or somewhere else? And how many feet of gutter sag or leak, and is water getting into the house?"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Mara and Kofi run the style consults; Mara also does home consults"
+   ],
+   [
+    "Riley and Avery cut hair",
+    "Mara and Kofi run the studio"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Felix's ladder cracked a patio tile at Alex M.'s."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Style consults, downspout and color picks and sample kits at the studio. Consults at home only where the state's rules allow them."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A gutter studio on Brook Rd. Gutter profiles in aluminum, steel and copper, guard samples, and drainage plans to take home."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most gutter studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules gutter studios often set."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds gutter guards to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Gutter guards for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most gutter studios set it."
+   ],
+   [
+    "barbershops",
+    "gutter studios"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the studio and for home consults"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Mara: consultant, color, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Mara: consultant, color and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, color and home consults"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and home consults"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "a office",
+    "an office"
+   ],
+   [
+    "A excavation",
+    "An excavation"
+   ],
+   [
+    "a excavation",
+    "an excavation"
+   ],
+   [
+    "A edge",
+    "An edge"
+   ],
+   [
+    "a edge",
+    "an edge"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about gutters that overflow on my house. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My gutters overflow' fits a gutter repair."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please move cars, planters and chairs away from the walls, and keep pets inside."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a new stain on the basement wall this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a sagging gutter, this week"
+   ],
+   [
+    "The service call is $89.",
+    "The inspection is $89."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Felix finds the sagging gutter and texts the price with its lines."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a sagging gutter, this week"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Gutter run and hangers · $540"
+   ],
+   [
+    "Supply line · $80",
+    "Downspout · $80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Felix found the damage. Here's the price to fix it today."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Gutter run · $165"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the gutter run only, $165. Leave the downspout."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Felix re-hangs the gutter run today, $165. The $80 downspout stays good until Thu Oct 29."
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Felix's inspection at Harper J.'s is for a $2,400 gutter and downspout job."
+   ],
+   [
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Today's inspection owes only what was promised for it, like the $89 inspection."
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Gutters' quote for your gutters and downspouts."
+   ],
+   [
+    "Repipe · $2,400",
+    "Gutters and downspouts · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the gutters are hung, $800 at the finish"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages, as Sam set it up.",
+    "Say Harper J.'s $2,400 gutter and downspout job is billed in three stages, as Sam set it up."
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: your new gutters are hung."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like fixing a neighbor's gutters without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a downspout? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. The back of the house, over the deck."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a gutter job's hanging day and its pipe day."
+   ],
+   [
+    "The customer is offered an estimate visit, booked like any visit.",
+    "The customer is offered a gutter inspection, booked like any visit."
+   ],
+   [
+    "Lee Home Services · Estimate visit",
+    "Lee Gutters · Gutter inspection"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Felix's ladder cracks a patio tile, and Felix texts a photo."
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · gutters and downspouts"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Say Harper J.'s $2,400 gutter and downspout job is billed in three stages, as Sam set it up."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a dead battery"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 gutter 165 downspout 80"
+   ],
+   [
+    "Sam adds heating and cooling to",
+    "Sam adds gutter guards to"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW gutter guards"
+   ],
+   [
+    "Heating and cooling for",
+    "Gutter guards for"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Felix's notes"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I climb a ladder and clear the gutter myself before you come?"
+   ],
+   [
+    "takes no cut of them",
+    "takes no part of them"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Felix says no. Please stay off the ladder until Felix is there."
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Overflowing gutters"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Leave the house, and stay far from any fallen power lines. Then call 911 and the power company."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said a tree fell across their gutters and the house. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "A tree on the house"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to leave, then call 911 and the power company"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the new downspout Felix noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a new downspout, from Felix's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · New downspout"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My gutters are overflowing into the basement. Can someone look at it soon?"
+   ],
+   [
+    "LATE camera report",
+    "LATE flow test report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Gutter work happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Gutters doesn't do, like paving."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Gutters does gutter and drainage work, not driveways. Nothing was saved. You can look for a paving company near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the gutter's type and length, how many stories, and if water is getting into the house now."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a tree on the house, power lines down, or a wall bulging."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE sagging gutter on the north side, rotted fascia behind it"
+   ],
+   [
+    "Under the sink, before",
+    "North side, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Back of the house, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A gutter repair is priced at the visit: only the $89 inspection was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Felix finds the electric service wire touching a gutter run. The plug-in says a gutter installer stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "an electric service wire touching a gutter run"
+   ],
+   [
+    "Mold behind the sink wall",
+    "An electric service wire touching a gutter run"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Felix found an electric service wire touching a gutter run at your home, and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the front gutter run"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left screws in the flower bed.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left screws in the flower bed."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Felix look at my garage gutters next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Felix's next times for a gutter inspection."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the gutter inspection for today"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Se desbordan las canaletas y entra agua al sótano."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? The gutters are spilling over and water is coming into the basement."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A gutter installer's example: water coming into the basement gets 'keep away from wet outlets, and stay off the ladder'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep away from the water and any outlet it reaches. If a wall bulges, she leaves the room and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Manténgase lejos del agua y de los enchufes que ella toque. Si una pared se abomba, salga del cuarto y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep away from the water and any outlet it reaches. If a wall bulges, leave the room and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe for me to climb a ladder and look at the gutters?"
+   ],
+   [
+    "a dripping faucet",
+    "a loose downspout"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The downspout is a gutter repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a gutter installer clean my gutters this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Gutter cleaning"
+   ],
+   [
+    "Kim L.'s yard drain needs nobody home.",
+    "Kim L.'s gutter cleaning needs nobody home."
+   ],
+   [
+    "yard drain",
+    "gutter cleaning"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa gutter cleaning Thu 12-2 Ines"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a gutter cleaning at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's gutter cleaning?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My gutters overflow when it rains. Can a gutter installer come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the back gutters."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are the gutters full of leaves or water?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that water now runs down the inside of the wall."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Water is running down the inside of the basement wall now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Move things away from the water, and keep away from any outlet it reaches."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you clean my gutters every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Gutters has a yearly cleaning plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a gutter cleaning every year."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 gutter repair"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE 30 feet re-hung on the north side. Fascia is soft: check it next year."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The gutter pulls loose again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The re-hung gutter is pulling loose again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s gutter repair, done Thu Oct 22, is pulling loose again."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Felix scrapes a hand and texts HURT."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT",
+    "Felix scrapes a hand and texts HURT."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your repair is under warranty"
+   ],
+   [
+    "Electric.",
+    "About 20 squares."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Felix finds two bent downspout elbows."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace both elbows, bent"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both elbows"
+   ],
+   [
+    "both shutoff valves",
+    "both elbows"
+   ],
+   [
+    "the shutoff valves",
+    "the elbows"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 elbow quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 elbow work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Felix also run a flow test on my gutters for my insurer?"
+   ],
+   [
+    "Sewer camera report",
+    "Gutter flow test and report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the flow test report link"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 gutters and downspouts"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your gutters and downspouts"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 gutters and downspouts, 3 stages"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small repairs have a set price. New gutters are quoted after an inspection. A tree on the house stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A contractor or home improvement license behind the company, where the state asks."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched a sample run"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "scratched a sample run at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched sample run"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, they overflow"
+   ],
+   [
+    "Leak repair · $245",
+    "Gutter repair · $245"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 gutter repair needs none."
+   ],
+   [
+    "leehomeservices.com",
+    "leegutters.com"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A style consult could mean a gutter studio or a hardware store."
+   ],
+   [
+    "MP045210",
+    "EX-4521"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "BS20981",
+    "EX-2098"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work, like salons and groomers, is licensed to its own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The studio is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Gutter Studio can do your style consult at the studio for $35, or at your home for $75."
+   ],
+   [
+    "JP031552",
+    "EX-1552"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Water pressure check",
+    "Photo quote"
+   ],
+   [
+    "Alex books on the shop's booking page",
+    "Alex books on the company's booking page"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Tells Alex it's with the shop",
+    "Tells Alex it's with the company"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A K-style' or 'a half-round' fits a style consult."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a builder: 'We'd like style consults for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A style consult's example: 'A big roofline needs a quick measure check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which color or shape do you like?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sample run next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the fascia"
+   ],
+   [
+    "like a skin reading",
+    "like a moisture reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call the electric company first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "scratches a sample run and texts a photo"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many feet of gutter sag or leak, and is water getting into the house?"
+   ],
+   [
+    "an estimate visit",
+    "a measure visit"
+   ],
+   [
+    "Shutoff valve",
+    "Gutter run"
+   ],
+   [
+    "shutoff valve",
+    "gutter run"
+   ],
+   [
+    "Supply line",
+    "Downspout"
+   ],
+   [
+    "supply line",
+    "downspout"
+   ],
+   [
+    "sewer camera report",
+    "flow test report"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Gutters'"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Gutters LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Gutters"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Gutter Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Gutters"
+   ],
+   [
+    "Lee Electric",
+    "Lee Drainage"
+   ],
+   [
+    "1200 Main St",
+    "340 Canal St"
+   ],
+   [
+    "88 Elm St",
+    "12 Brook Rd"
+   ],
+   [
+    "42 Oak St",
+    "19 Linden Ct"
+   ],
+   [
+    "Riley",
+    "Mara"
+   ],
+   [
+    "Avery",
+    "Kofi"
+   ],
+   [
+    "Jordan",
+    "Felix"
+   ],
+   [
+    "Casey",
+    "Ines"
+   ],
+   [
+    "plumbing and electrical",
+    "gutters and drainage"
+   ],
+   [
+    "Plumbing and electrical",
+    "Gutters and drainage"
+   ],
+   [
+    "electrical",
+    "drainage"
+   ],
+   [
+    "Electrical",
+    "Drainage"
+   ],
+   [
+    "Panel upgrade",
+    "Drain line install"
+   ],
+   [
+    "Plumber",
+    "Gutter installer"
+   ],
+   [
+    "plumber",
+    "gutter installer"
+   ],
+   [
+    "plumbing",
+    "gutter work"
+   ],
+   [
+    "Plumbing",
+    "Gutter work"
+   ],
+   [
+    "barbershop",
+    "studio"
+   ],
+   [
+    "Barbershop",
+    "Studio"
+   ],
+   [
+    "barbers",
+    "consultants"
+   ],
+   [
+    "barber",
+    "consultant"
+   ],
+   [
+    "Barber",
+    "Consultant"
+   ],
+   [
+    "Haircut",
+    "Style consult"
+   ],
+   [
+    "haircut",
+    "style consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the studio"
+   ],
+   [
+    "credited to the repair",
+    "credited to the gutter work"
+   ],
+   [
+    "service call",
+    "inspection"
+   ],
+   [
+    "Service call",
+    "Inspection"
+   ],
+   [
+    "Water heater replacement",
+    "Gutter guard install"
+   ],
+   [
+    "water heater replacement",
+    "gutter guard install"
+   ],
+   [
+    "Leak repair",
+    "Gutter repair"
+   ],
+   [
+    "leak repair",
+    "gutter repair"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Gutter repair"
+   ],
+   [
+    "Drain clearings",
+    "Gutter repairs"
+   ],
+   [
+    "drain clearings",
+    "gutter repairs"
+   ],
+   [
+    "Drain clearing",
+    "Gutter repair"
+   ],
+   [
+    "drain clearing",
+    "gutter repair"
+   ],
+   [
+    "the kitchen drain",
+    "the gutter repair"
+   ],
+   [
+    "Kitchen drain",
+    "Gutter repair"
+   ],
+   [
+    "kitchen drain",
+    "gutter repair"
+   ],
+   [
+    "Water heater flush",
+    "Gutter cleaning"
+   ],
+   [
+    "water heater flush",
+    "gutter cleaning"
+   ],
+   [
+    "water heaters",
+    "gutter guards"
+   ],
+   [
+    "Water heater",
+    "Gutter guard"
+   ],
+   [
+    "water heater",
+    "gutter guard"
+   ],
+   [
+    "drain",
+    "gutter repair"
+   ],
+   [
+    "Drain",
+    "Gutter repair"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Elm St",
+    "Brook Rd"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A style consult is for the home's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the gutter inspection at home",
+      "does": "Mara saves Alex's picks for the estimate. If Alex wants the gutters priced, Mara books Felix's inspection at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Gutters, Sam's other company. It runs in the other flow.",
+       "The picks and photos go with it, so Felix's estimate uses them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: gutter inspection at home. Picks saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Mara saved your picks. Want Lee Gutters to inspect your gutters for an estimate?",
+        {
+         "buttons": [
+          "Book the inspection",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Gutter work is licensed or registered at the company where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Gutter work and the studio both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The gutter plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Estimators, crews and consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: inspections, gutter jobs and studio consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Studio sellers and pipe installers hold their own registrations or licenses where the state's form asks; gutter work itself is licensed at the company."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Gutter work is booked ahead. Overflowing gutters get the soonest inspection time, but nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Gutter picks use the sample runs at the studio; the plug-in offers no video or phone consult."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The studio books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A studio consult has no form to sign first; the gutter contract comes after the estimate, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "A studio sells no repeat plan: a consult is booked once, when gutters need picking."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plan at the studio (A4-28's plan branch is off), so no plan terms are shown."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plan at the studio, so no plan visit to skip."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plan at the studio, so no plan charge."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plan at the studio, so no plan price to change."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a studio consult; gutters paid from the owner's own claim are flow B's."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a studio consult; gutters paid from the owner's own claim are flow B's."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A studio consult: no child is left with the staff."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "Nothing is done or signed at a gutter inspection (the plug-in's rule): Alex signs a written contract for new gutters first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A gutter estimate is signed whole, as one contract. A small repair is its own written quote from Felix."
+   },
+   {
+    "op": "after",
+    "at": "B8-78",
+    "steps": [
+     {
+      "id": "B8-x07",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Wed Oct 28, 8:00am",
+      "title": "Sam orders the gutters and calls for the locate",
+      "q": "Are the parts in and the locate called in time?",
+      "does": "The cancel window (B8-78) ends Tue Oct 27 with no cancel. Sam orders the gutter runs now, and for any digging calls for the utility locate.",
+      "more": [
+       "Custom-cut runs and parts are never ordered inside the cancel window.",
+       "The locate is called by the license holder, never by Alex, and any digging waits for it.",
+       "Sam gets a to-do with its due date, and replies when it's done."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s new gutters: order the runs and parts. If anything will be dug, call for the utility locate. Both are due before Mon Nov 2.",
+        {
+         "buttons": [
+          "It's done",
+          "Not yet"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner"
+      ],
+      "branches": [
+       {
+        "label": "1 Done in time",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Not yet",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x08",
+          "line": [
+           "7.16",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Fri Oct 30, 10:00am",
+          "title": "Moves the work day, with no fee",
+          "does": "The color is back-ordered, or the locate isn't back, on Fri Oct 30. The business caused the move, so it's free. Alex picks a new work day.",
+          "more": [
+           "Only days after the new expected date are offered.",
+           "The delivery moves with it."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your gutter order is late, so Lee Gutters needs to move your work day. There's no fee.",
+            {
+             "times": [
+              "Mon Nov 9 · 8am · Felix's crew",
+              "Tue Nov 10 · 8am · Felix's crew"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "line": [
+       "8.18",
+       "8.3"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 2, 8:05am",
+      "title": "The crew starts: the old gutters come off",
+      "does": "Felix's crew arrives at 8am. Nobody needs to be home, so Felix texts a start photo instead of a code, and Alex gets it.",
+      "more": [
+       "If Alex is home, the check-in code works as usual.",
+       "The crew covers plants and the AC unit before the old gutters come off.",
+       "No ladder goes near an overhead service wire."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "IN old gutters coming off, north side first",
+        {
+         "photos": [
+          "North side, 8am"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Felix's crew started your new gutters at 8:05am. You'll get photos at the end of the day."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "B8-x12",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 2, 11:00am",
+      "title": "Finds rotted fascia behind the gutters",
+      "q": "Is any fascia rotted, and how much?",
+      "does": "With the old gutters off, Felix finds 12 feet of rotted fascia. That's inside the 20 feet Alex OK'd in the contract, so the crew goes on. Alex gets the photos and change order 1.",
+      "more": [
+       "Each foot is $14, the price in the contract: $168 in all.",
+       "Change order 1 is for the record. It goes on the balance.",
+       "Inside the count, nobody waits on a reply with the roof edge open.",
+       "All the fascia sound: nothing is added, and no change order goes out."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "FASCIA 12 feet rotted, replacing. Inside the 20 OK'd",
+        {
+         "photos": [
+          "Rotted fascia, north side"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Felix's crew found 12 feet of rotted fascia. It's inside the 20 feet you OK'd, so the crew is replacing it now.",
+        {
+         "card": {
+          "title": "Change order 1 · $168",
+          "lines": [
+           "12 feet of fascia at $14",
+           "Inside the 20 feet you OK'd",
+           "Added to your balance"
+          ],
+          "button": "See the photos",
+          "link": "rosfield.com/k/g4c1"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Inside the 20 feet OK'd",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "All sound: nothing added",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Over 20 feet: Alex's yes first",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x13",
+          "line": [
+           "8.8",
+           "8.9"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Asks Alex before the 21st foot",
+          "does": "A what-if: Felix finds 26 feet of rotted fascia, 6 past the 20 Alex OK'd. Those 6 feet need Alex's signed change order first. The crew leaves that spot covered while Alex decides.",
+          "more": [
+           "It's under Sam's $500, so it goes to Alex at once.",
+           "No answer in 1 hour: Sam is asked to call Alex. The open spot stays covered.",
+           "The other 20 feet go on as OK'd."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Felix found 6 more feet of rotted fascia, past the 20 you OK'd. They need your OK before the crew replaces them.",
+            {
+             "card": {
+              "title": "Change order 2 · $84",
+              "lines": [
+               "6 more feet at $14",
+               "Past the 20 you OK'd"
+              ],
+              "button": "Read and sign",
+              "link": "rosfield.com/k/g4c2"
+             },
+             "buttons": [
+              "Sign it",
+              "Call me first"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "price_oks"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x14",
+      "line": [
+       "8.12",
+       "8.18"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 2, 3:30pm",
+      "title": "The new gutters are hung and hose-tested",
+      "does": "By 3:30pm the new gutters and downspouts are hung, the seams are sealed and every run is hose-tested. The crew sweeps the yard and flower beds for screws with a magnet. Alex gets the day's photos.",
+      "more": [
+       "Updates go out inside text hours, in Lee Gutters' name.",
+       "Alex's reply goes to Felix, like a question before the visit."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "UPDATE all runs hung, hose test done. Sweep done",
+        {
+         "photos": [
+          "Front run, done",
+          "Driveway after the sweep"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your new gutters are on and every run carries water away. Here are today's photos. The crew swept the yard, driveway and flower beds."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Felix and Alex look over the gutter repair together. Anything wrong is fixed before Felix texts DONE."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Gutter work is licensed or registered at the company where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Gutter work and the studio both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The gutter plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Estimators, crews and consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: inspections, gutter jobs and studio consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Studio sellers and pipe installers hold their own registrations or licenses where the state's form asks; gutter work itself is licensed at the company."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Gutter work is booked ahead. Overflowing gutters get the soonest inspection time, but nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An inspection has no form to sign first; the contract is signed with the estimate (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Inspections and repairs are booked in 2-hour arrival windows; work days run 8am to 4pm, set with the contract."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Gutter work books visits and work days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Gutter work books an estimator's or a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking meets the crew (the plug-in's messages)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each gutter job is rated."
+   }
+  ]
+ },
+ "notes": "New profession on the REDESIGN 2 master (batch P4, Tue Oct 27 2026), built from roofer (refitted that morning, check-prof 0/0) and shaped like siding (the other P4 build). Why roofer: gutters run the same way: an inspection at the home first, then a written estimate, a contract signed by everyone on title for a new set, a cancel window, the work day, a final walk-around and the last bill. Unlike the roofer: never sent now, one work day (not several), no permit for gutters alone, and no insurance chain (a storm claim, where one pays, is the customer's and is one line in pf.money; the roofer's own insurance steps are not carried).\nFlow B main path (visit|none|bill): sagging, leaking gutters at 19 Linden Ct after a windstorm. The booking is the $89 gutter inspection, credited to the work if Alex signs (billed only if no contract follows); Felix quotes the repair at the visit ($245: gutter run $165 + downspout $80); the bill comes after. Other B paths: visit|none|own, visit|card|bill, list|card|bill and list|none|bill (gutter repair, up to 20 feet re-hung and resealed, $179 from the list), photos|deposit|bill (gutter guards, $640 from photos, 25% deposit $160), list|full|none (gutter cleaning, $150 paid in full, also the yearly plan). The flow test and report ($199) is added at a visit and paid with the rest.\nNew gutters are their own job on the master's estimate path (B8-93 '1 Signs the contract' -> B8-62 -> B8-63 start payment -> B8-78 cancel window, switch cancelright on in B only -> B9-21 stage bills). The master's big-job example is Harper J.'s $2,400 gutters and downspouts in three stages ($800 / $800 / $800). Alex's own estimate in the own steps is a whole-house set: 160 feet of 5-inch seamless aluminum at $11 a foot ($1,760), 6 downspouts at $85 ($510), $330 for taking down and hauling the old gutters: $2,600 in one day.\nOwn steps (B): B8-x07 and B8-x08 Sam orders the custom-cut runs after the cancel window (Wed Oct 28, due before Mon Nov 2) and calls for the utility locate if anything will be dug; a late color or locate moves the work day with no fee (new days Mon Nov 9 or Tue Nov 10); B8-x11 to B8-x14 the work day (start photo, rotted fascia inside the 20 feet OK'd at $14 a foot, past 20 Alex's signed change order first, hung and hose-tested with the screw sweep). Own step in A: A8-x01 offers the inspection at home (it runs in flow B).\nThe stop words: a tree or limb on the house, power lines down, a wall or ceiling sagging under water, gas smell or sparks. Water coming into the house or basement and a gutter hanging loose get the safety steps, then the booking goes on, marked urgent. B8-30's hazard is an electric service wire touching a gutter run (stop that run, written note, the electric company first). A crew never sets a metal ladder near an overhead wire. Nobody climbs a ladder to look or fix.\nLicenses: a contractor, home improvement or gutter license at the company, where the state's form requires one; a job-size limit blocks a quote; drain-pipe installers and studio sellers hold their own where the state asks; lead-safe rules for painted fascia on older homes as a switch. No state, city or law is named; no license numbers except the EX- format. Not booked: a minor; a renter without the owner's OK for a contract; a job over the license limit; a home needing an association or historic approval that is not in.\nFee and money rules: the $89 inspection is the late-cancel and no-show fee (visit|card|bill) and is owed after a no to the price; deposits only after signing; nothing taken before the contract is signed by everyone; the balance after the hose test and walk-around; no tip line (S1-21's tip row is paired out); added work is paid with the rest at the visit (D91). The $89 fee stays for the $179 repair and $150 cleaning too (97 master steps hard-code $89); the owner may set a smaller fee.\nFlow A is the studio (Lee Gutter Studio, Sam's second company, consultants Mara and Kofi): style consult $35 (card saved for the $20 missed-consult fee; or at home for $75), downspout and color pick $40, guard match $25, sample kit $20; drainage plan session $55 paid in full; full drainage plan $140 with a $40 deposit; photo gutter plan $90 from photos (Sam OKs); copper gutter match priced at the studio after the $25 consult. Set starts; no video consult.\nThe second kind of work at sign-up is drainage; the NEW kind of work added later is gutter guards.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "style consult",
+    "Style consult",
+    "A chair renter",
+    "like a chair renter",
+    "would like to see your hair before pricing it",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair",
+    "$89 service-call fee",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley and Avery cut hair",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Each service starts the way most barbershops set it.",
+    "barbershops",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "at the shop and for house calls",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "two skin fades on",
+    "skin fades",
+    "The signature cut, $55, is paid in full when booked.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "takes no cut of them",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "a Kids cut (12 and under) is $25",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Quiero un corte el sábado.",
+    "takes jobs sent now, like a burst pipe",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Electric.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A repair shop, a tailor or a groomer does.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "#2 on the sides, scissors on top, low beard line",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Groom's package · ",
+    "the Groom's package",
+    "The Groom's package",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "'A trim' or 'a fade' fits a haircut.",
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "How would you like it on top?",
+    "like the cut in the mirror",
+    "like a mark on an item or the skin",
+    "like a skin reading",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Barber license",
+    "JP031552",
+    "JE30417",
+    "Gloss to finish",
+    "$15 gloss",
+    "gloss",
+    "an estimate visit",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color plan",
+    "Color plan",
+    "Kids cut (12 and under)",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Drain",
+    "shops",
+    "shop",
+    "Shop",
+    "Elm St"
+   ],
+   "B": [
+    "A tip line · bank transfer over $500",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "camera inspection",
+    "Me, and yes. It's my kitchen.",
+    "like a chair renter",
+    "No. It doesn't smell like gas.",
+    "No. No huele a gas.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "$89 service-call fee",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "Lee Home Services can clear the drain:",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley and Avery cut hair",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "barbershops",
+    "at the shop and for house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "At the shop, and house calls",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "The service call is $89.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "It's a leak under the sink, today",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Say Harper J.'s $2,400 repipe is billed in three stages, as Sam set it up.",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "The customer is offered an estimate visit, booked like any visit.",
+    "Lee Home Services · Estimate visit",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Right to cancel · repipe",
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "like a burst pipe or a lockout",
+    "QUOTE 245 valve 165 supply line 80",
+    "Sam adds heating and cooling to",
+    "NEW heating and cooling",
+    "Heating and cooling for",
+    "Video and Jordan's notes",
+    "Can I run the dishwasher before you come?",
+    "takes no cut of them",
+    "no cut of",
+    "Jordan says no. Please wait until the job is done.",
+    "like an overflowing drain",
+    "Overflowing kitchen drain",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "Kim L.'s yard drain needs nobody home.",
+    "yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan cuts a hand and texts HURT",
+    "Your drain is under warranty",
+    "Electric.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "QUOTE 2400 repipe, 3 stages",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "DAMAGE cracked the cabinet floor",
+    "cracked the cabinet floor at",
+    "Cracked cabinet floor",
+    "Yes, it won't drain",
+    "Leak repair · $245",
+    "The $179 drain needs none.",
+    "leehomeservices.com",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "JP031552",
+    "JE30417",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Water pressure check",
+    "Alex books on the shop's booking page",
+    "Gives the shop's own line",
+    "Tells Alex it's with the shop",
+    "shop-added",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Call a mold cleanup company first",
+    "cracks the cabinet floor and texts a photo",
+    "HURT cut my hand, need to stop",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "an estimate visit",
+    "Shutoff valve",
+    "shutoff valve",
+    "Supply line",
+    "supply line",
+    "sewer camera report",
+    "Lee Home Services'",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "the kitchen drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "drain",
+    "Drain",
+    "shop",
+    "Shop",
+    "Elm St"
+   ]
+  },
+  "A": {
+   "A4-24": "0a292df05b",
+   "A8-44": "4410a4860c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B8-93": "c1406fd6bc",
+   "B8-78": "628ca6843e",
+   "B8-37": "3ce85cf051",
+   "B8-39": "aa75251207",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

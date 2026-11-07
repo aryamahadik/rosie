@@ -1,0 +1,3488 @@
+{
+ "id": "watch-jewelry",
+ "name": "Watch and jewelry repair",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "repair-shop",
+ "plugin": {
+  "pf.license": {
+   "need": "none for repair itself; the business registration, where the city or state asks for one; a precious metals or secondhand dealer license only if the shop buys gold or used jewelry, where the city or state requires one",
+   "ask": [
+    "The business registration number, where the city or state gave one",
+    "A precious metals or secondhand dealer license number, only if the shop buys gold or used jewelry and the city or state requires it"
+   ],
+   "who": "the business. Jewelers and watchmakers need no license of their own",
+   "check": "the state's or city's business lookup; where there's none, a person on Rosie's team checks within 1 business day",
+   "blocks": "a registration the city or state requires that the owner says the business lacks keeps the business offline",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "jeweler's cover for customers' pieces in the shop, in the truck and at the bench, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'; customers see no license claim"
+  },
+  "pf.services": {
+   "pattern": "drop-off: the watch or jewelry is left at the shop and picked up when it's READY; or a mobile jeweler services watches and sizes rings at a home or office",
+   "list": [
+    {
+     "name": "Watch battery change",
+     "price": "one price (the example shop: $35)",
+     "length": "about 20 minutes while you wait",
+     "place": "at the shop, or at the customer's place",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Watch band sizing and repair",
+     "price": "one price",
+     "length": "about 20 minutes while you wait, or left for the day",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Ring sizing",
+     "price": "one price (a larger or smaller size changes the price)",
+     "length": "left 2 to 5 days",
+     "place": "at the shop, or at the customer's place",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Jewelry cleaning and polish",
+     "price": "one price",
+     "length": "about 30 minutes while you wait",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Chain, clasp and prong repair",
+     "price": "one price for a standard repair; a bigger one is quoted at the bench",
+     "length": "left 2 to 5 days",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Watch service (movement overhaul, crystal and gasket)",
+     "price": "quoted after a watch check (the example: $25, counted toward the service): a written estimate with parts and labor lines, OK'd before any work",
+     "length": "the watch check is about 30 minutes; more time needs a new yes",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill Rosie texts with READY"
+    },
+    {
+     "name": "Stone replacement (a stone ordered in)",
+     "price": "priced from the shop's list once the stone is chosen",
+     "length": "left 1 to 2 weeks",
+     "place": "at the shop",
+     "before": "a deposit orders the stone: the example shop takes $40 toward a $140 stone",
+     "after": "the rest at the counter"
+    },
+    {
+     "name": "Custom ring repair",
+     "price": "priced from photos for a first quote; confirmed at the bench",
+     "place": "at the shop, or at the customer's place",
+     "before": "a deposit of 25% once the quote is OK'd, to order the parts",
+     "after": "the rest on the bill Rosie texts"
+    },
+    {
+     "name": "Home or office watch visit (up to 5 watches: battery, band and clean)",
+     "price": "one price (the example: $179 at the customer's place)",
+     "length": "about 2 hours",
+     "place": "at the customer's place",
+     "before": "a card saved for the trip fee",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    },
+    {
+     "name": "Trip to a home or office",
+     "price": "the trip fee (the example: $89), counted toward the repair",
+     "place": "at the customer's place",
+     "before": "a card saved for the trip fee",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    }
+   ],
+   "capacity": "drop-off slots every 30 minutes in open hours; one jeweler per piece; the bench's soldering station and ultrasonic cleaner are saved like equipment",
+   "parts": "batteries, bands, pins and gaskets are in stock and set aside for each booking; stones, crystals and movement parts are ordered once the customer says yes, 3 to 15 business days",
+   "warranty": "on the receipt (the example: 12 months on watch service, 90 days on jewelry repair); never for drops, lost stones, or water damage after a seal test the customer declined",
+   "nobody_home": "no: someone must be there to hand over the piece and OK the work",
+   "online": "no: a watch or a ring is fixed in hand"
+  },
+  "pf.questions": {
+   "before_times": [
+    "The piece: watch, ring, chain, bracelet, earring or other; brand and kind, picked from a list",
+    "What's wrong: stopped, battery, loose band, cracked crystal, wrong size, broken clasp, loose stone, or something else",
+    "Is it a gift, an heirloom or insured?",
+    "For a visit at the customer's place: a home or an office, and the address"
+   ],
+   "after_time": [
+    "Any other problems, like a loose prong or a scratched crystal",
+    "Leave it, or wait for a quick fix like a battery change",
+    "The old parts back? Yes or no"
+   ],
+   "secure_page_only": [
+    "The piece's value and any appraisal, for the shop's cover",
+    "The serial number of a watch",
+    "A door code for an on-site visit: never asked in chat",
+    "Someone else who may pick it up, named in writing, with their ID"
+   ],
+   "who_may_book": "an adult: the piece's owner, or someone they let bring it in; a child never books or drops off jewelry"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "fire",
+    "smoke",
+    "someone burned or hurt"
+   ],
+   "stop_action": "'Call 911' and the generic emergency steps; no booking",
+   "safety_words": [
+    "a swollen, hot or leaking smartwatch battery",
+    "a burning smell from a watch"
+   ],
+   "safety_action": "Rosie says: take it off if that's safe, keep it away from anything that burns, and don't press on it. Then the booking goes on, marked urgent, soonest times first.",
+   "during_work": "a swollen battery found when a watch is opened: the work stops, the watch goes in a fire-safe box, and the customer gets a written note",
+   "can_continue": "yes, after the safety steps"
+  },
+  "pf.first_steps": {
+   "required": "none before the visit",
+   "at_check_in": [
+    "The ticket: the piece is described with the customer, weighed if it is gold, and photographed; stones are counted",
+    "The stated value, kept on the secure page",
+    "An ID for any piece over the shop's limit"
+   ],
+   "prep_for_reminder": [
+    "Bring the box and papers, and an ID",
+    "Take off nothing from a watch band yourself",
+    "For an on-site visit: put the pieces on a clear table, with good light"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "a drop-off: the check-in code at the counter when the piece is left. On-site: the code at the door.",
+   "intake": "the piece and its condition, with photos; stones counted; the stated value on the secure page; the problem in the customer's words",
+   "diagnosis": "the OK'd watch check covers about 30 minutes; more time needs a new yes; no answer is never a yes",
+   "estimate": "written, with parts and labor lines, OK'd before any work; an OK on some lines does only those",
+   "added_work": "anything over the OK'd estimate needs a new yes first, logged with the time",
+   "status_words": [
+    "IN",
+    "CHECKING",
+    "WAITING ON A PART",
+    "AT THE BENCH",
+    "READY"
+   ],
+   "part_test": "every watch is timed and pressure-tested before READY; a faulty part is sent back and another ordered, at no extra charge",
+   "updates": "by text",
+   "ready": "READY says what was done, the total and the pick-up hours",
+   "pick_up": "the piece goes only to the customer, or someone they named, with an ID; it's checked against its photo at the counter",
+   "done_proof": "the drop-off code checks it in; READY and the pick-up close it; on-site, the code at the door and DONE",
+   "late_drop_off": "dropped off any time before closing, and looked at next in line",
+   "unclaimed": "held 90 days, with reminders at 30 and 60 days; then written notice and the state's waiting period",
+   "items_to_the_shop": "on-site: a piece that needs bench work goes to the shop, signed out on a ticket with photos, and comes back on a booked return"
+  },
+  "pf.money": {
+   "before": "the starting answer is nothing taken; the watch check is OK'd on the booking page, not charged",
+   "deposit": "only for a stone or part ordered in for a set price, or custom work: the example shop takes $40 toward a $140 stone at the shop, and 25% toward a custom ring repair priced from photos on-site; deposit cap: from the state form",
+   "after": "paid at the counter at pick-up, with an ID, the shop's own way; or the bill Rosie texts with READY, if the owner turns it on",
+   "on_site": "a card saved for the trip fee; the saved card charged when the jeweler texts DONE, or the bill Rosie texts",
+   "after_a_no": "after a no to the estimate, only the OK'd watch check is owed",
+   "fees": "at the shop: no cancel or no-show fee to start, but a deposit for a stone ordered in may be kept on a late cancel or a no-show, only if the owner says so; on-site: the saved card may be charged the trip fee for a late cancel or nobody there, only if the owner confirms",
+   "storage": "no storage fee to start; an unclaimed piece follows the state's notice and waiting rules: from the state form",
+   "tips": "no tip line to start",
+   "tax": "the shop's tax rate on parts",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "A piece's value, appraisal or serial number",
+    "Photos of the pieces",
+    "A door code"
+   ],
+   "languages": "English and Spanish",
+   "minors": "a minor never books or drops off jewelry; an adult does"
+  },
+  "pf.staff": {
+   "skills": [
+    "watch batteries and bands",
+    "watch service and repair",
+    "ring sizing and soldering",
+    "stone setting",
+    "chain and clasp repair",
+    "on-site visits"
+   ],
+   "licenses": "no person license for watch and jewelry repair",
+   "supervision": "none to start; a trainee works only while a lead jeweler is in, if the owner sets it",
+   "who_oks": "the owner OKs estimates over the owner's amount, added work and any fee",
+   "stand_in": "only someone with the skill for that piece; watch service only by a watchmaker who does it, and stone setting only by a setter"
+  },
+  "pf.rules": {
+   "written_estimate": "switch: a written estimate before any work over an amount: from the state form",
+   "show_registration": "switch: the shop's registration number on estimates and receipts: from the state form",
+   "parts_used": "switch: say whether parts are new, used or rebuilt, and whether they are the maker's, on the estimate and the receipt: from the state form",
+   "old_parts": "switch: offer the old parts and any removed gold or stones back: from the state form",
+   "unclaimed_pieces": "switch: how long a piece is held, what notice is sent, and the waiting period: from the state form",
+   "id_at_pickup": "switch: an ID shown at pick-up for a piece over an amount: the owner's rule",
+   "metals_records": "switch: gold or silver bought or melted is recorded as the city or state requires: from the state form",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A swollen or hot smartwatch battery before the visit: the safety steps first, then the soonest time",
+    "A stone missing when the piece comes back: the ticket and photos decide",
+    "More watch-check time needed",
+    "No answer to the estimate",
+    "A no to the estimate",
+    "More work found",
+    "A stone or part ordered, or late, or faulty when tested",
+    "A swollen battery found when a watch is opened",
+    "A piece over the shop's limit: an ID, and a deposit",
+    "The piece isn't picked up: reminders, written notice, then the state's rules",
+    "The problem comes back under warranty",
+    "A piece damaged at the shop"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "photos",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Elena and Victor (bench jewelers)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Simon and Ruth (mobile jewelers)",
+   "other": "Others (a bank, an office manager)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Elena"
+  },
+  "B": {
+   "staff": "Simon"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "barbershop license",
+    "business registration"
+   ],
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Watch visits have a set price. Jewelry repairs are priced at the visit. A fire or an injury stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Watches and jewelry are dropped off at the shop and picked up when ready. A jeweler can also service watches at the customer's place."
+   ],
+   [
+    "MP045210",
+    "REG-2020-0471"
+   ],
+   [
+    "BS20981",
+    "REG-2020-0533"
+   ],
+   [
+    "BS20918",
+    "REG-2020-0353"
+   ],
+   [
+    "A chair, ready",
+    "A watch, ready"
+   ],
+   [
+    "plumbing service",
+    "watch service"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: new gasket, water-resistant to 30 m, crystal clean"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Elena can still take the watch in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the time left."
+   ],
+   [
+    "please come with dry hair on Saturday.",
+    "please bring an ID on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring an ID."
+   ],
+   [
+    "would like to see your hair before pricing it",
+    "would like to see the piece before pricing it"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this repair."
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s repair"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A watch's example: 'A water-resistant watch needs a quick pressure test first. Had one at Lee's in the last 12 months?'"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Watch service quotes come to you first. Board prices never need one"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A jewelry shop takes drop-offs, as a tailor or a groomer does."
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, or a deposit for a stone ordered in"
+   ],
+   [
+    "Style consult",
+    "Quick look at the piece"
+   ],
+   [
+    "style consult",
+    "quick look at the piece"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "My watch stopped. Can Lee's Jewelry Bench look at it on Saturday?"
+   ],
+   [
+    "once Riley sees the hair.",
+    "once Elena sees the watch."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a gold buy-back, which isn't on the shop's list."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Elena use a new crystal instead?"
+   ],
+   [
+    "asks for a toner instead of the gloss. What's the new price?",
+    "asks for a new crystal instead. What's the new price?"
+   ],
+   [
+    "two skin fades on",
+    "two ring sizings on"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood jewelry shop on Elm St. Watches and jewelry fixed."
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "a beard trim today at 2:00pm with Avery",
+    "a jewelry cleaning today at 2:00pm"
+   ],
+   [
+    "the beard trim today at 2:00pm with Avery",
+    "the jewelry cleaning today at 2:00pm"
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: a 10:00am drop-off"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken when they book"
+   ],
+   [
+    "haircut with Riley",
+    "battery change"
+   ],
+   [
+    "Sat 11am Riley",
+    "Sat 11am drop-off"
+   ],
+   [
+    "at 11:20am on Riley's phone",
+    "at 12:25pm on Elena's phone"
+   ],
+   [
+    "Gloss to finish · $15",
+    "New gasket · $15"
+   ],
+   [
+    "Riley quotes the rest at the chair, before any work.",
+    "Elena writes an estimate before any repair."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was your visit with Elena?"
+   ],
+   [
+    "Sun Oct 25 · 11:00am · Riley",
+    "Mon Oct 26 · 11:00am drop-off"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Do I need to bring the box and papers?"
+   ],
+   [
+    "Walk-in for a haircut",
+    "Walk-in for a battery change"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a watch band sizing is $25."
+   ],
+   [
+    "Your item is still waiting for pick-up.",
+    "Your watch is still waiting for pick-up."
+   ],
+   [
+    "A drop-off item isn't picked up.",
+    "A drop-off piece isn't picked up."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 watch check first"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds engraving to Lee's Jewelry Bench."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Engraving for Lee's Jewelry Bench: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW engraving"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Jewelry Bench doesn't buy gold."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Mobile Jeweler and Lee Ring Sizing."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero que revisen mi reloj el sábado."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A jewelry shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no jeweler. A day shows only if a jeweler with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Jewelry Bench · drop-off"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like the new clasp Elena noted, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Jewelry Bench sent you a proposal: the new clasp Elena noted."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · New clasp"
+   ],
+   [
+    "3 visits with Riley",
+    "One drop-off · about 3 days"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The work is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Drain clearing",
+    "Watch visit"
+   ],
+   [
+    "home warranty plan",
+    "jewelry cover plan"
+   ],
+   [
+    "a package of cuts",
+    "a package of battery changes"
+   ],
+   [
+    "patch test",
+    "pressure test"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A watch repair could mean a jewelry store or a watch bench."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A jewelry shop's plug-in adds danger words, like a swollen battery."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A jewelry shop's example: a swollen battery gets 'take it off if it's safe, and keep it away from anything that burns'."
+   ],
+   [
+    "A barbershop's services need none.",
+    "A jewelry shop needs none at booking: the ticket is written at drop-off."
+   ],
+   [
+    "Books the groom's party together",
+    "Books an office's watches together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "An office manager books battery changes for five staff watches on one morning. Rosie finds bench time side by side across Elena and Victor."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "There's a new scratch on my watch case."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says there's a new scratch on the watch case"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The watch stops again after a day."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the watch stops again since the repair"
+   ],
+   [
+    "Riley looks, then prices it",
+    "Elena checks it, then writes the estimate"
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the watch check; the estimate stays open"
+   ],
+   [
+    "Follows up on an item left behind",
+    "Follows up on a piece left behind"
+   ],
+   [
+    "a skin-test result",
+    "a water-resistance test"
+   ],
+   [
+    "color and house calls",
+    "stone work and mobile visits"
+   ],
+   [
+    "color, house calls",
+    "stone work, mobile visits"
+   ],
+   [
+    "Consult only",
+    "Watch check only"
+   ],
+   [
+    "photos of your hair",
+    "photos of the piece"
+   ],
+   [
+    "a cut on Saturday",
+    "a battery change on Saturday"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a watch service every year"
+   ],
+   [
+    "a cut every 4 weeks",
+    "a watch service every year"
+   ],
+   [
+    "for a staff cut",
+    "for a staff watch"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Jewelry Bench"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Jeweler's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Jeweler"
+   ],
+   [
+    "Electrical",
+    "Ring sizing"
+   ],
+   [
+    "electrical",
+    "ring sizing"
+   ],
+   [
+    "plumber",
+    "jeweler"
+   ],
+   [
+    "Plumber",
+    "Jeweler"
+   ],
+   [
+    "Plumbing",
+    "Watch service"
+   ],
+   [
+    "plumbing",
+    "watch service"
+   ],
+   [
+    "Barbershop",
+    "Jewelry shop"
+   ],
+   [
+    "barbershops",
+    "jewelry shops"
+   ],
+   [
+    "barbershop",
+    "jewelry shop"
+   ],
+   [
+    "barbers",
+    "jewelers"
+   ],
+   [
+    "barber",
+    "jeweler"
+   ],
+   [
+    "Barber",
+    "Jeweler"
+   ],
+   [
+    "cut hair",
+    "fix jewelry"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Elena texts READY when Alex's watch is done. Alex hears what was done, the pick-up hours, and anything due."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your watch is ready for pick-up at Lee's Jewelry Bench."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Tue to Sat, 10am to 6pm"
+   ],
+   [
+    "4471",
+    "5160"
+   ],
+   [
+    "Sofia",
+    "Alex"
+   ],
+   [
+    "Riley",
+    "Elena"
+   ],
+   [
+    "Avery",
+    "Victor"
+   ],
+   [
+    "Jordan",
+    "Simon"
+   ],
+   [
+    "Casey",
+    "Ruth"
+   ],
+   [
+    "88 Elm St",
+    "140 Union St"
+   ],
+   [
+    "Elm St",
+    "Union St"
+   ],
+   [
+    "Oak St",
+    "Aspen Way"
+   ],
+   [
+    "1200 Main St",
+    "22 Bell Ave"
+   ],
+   [
+    "Haircuts",
+    "Battery changes"
+   ],
+   [
+    "haircuts",
+    "battery changes"
+   ],
+   [
+    "A haircut",
+    "A battery change"
+   ],
+   [
+    "a haircut",
+    "a battery change"
+   ],
+   [
+    "Haircut",
+    "Battery change"
+   ],
+   [
+    "haircut",
+    "battery change"
+   ],
+   [
+    "kids cuts",
+    "watch band sizings"
+   ],
+   [
+    "a kids cut",
+    "a watch band sizing"
+   ],
+   [
+    "Kids cut",
+    "Watch band sizing"
+   ],
+   [
+    "kids cut",
+    "watch band sizing"
+   ],
+   [
+    "Skin fade",
+    "Ring sizing"
+   ],
+   [
+    "skin fade",
+    "ring sizing"
+   ],
+   [
+    "fade",
+    "ring sizing"
+   ],
+   [
+    "Beard trim",
+    "Jewelry cleaning"
+   ],
+   [
+    "beard trim",
+    "jewelry cleaning"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Chain repair"
+   ],
+   [
+    "Signature cut and shave",
+    "Chain repair"
+   ],
+   [
+    "signature cut",
+    "chain repair"
+   ],
+   [
+    "Groom's package",
+    "Stone replacement"
+   ],
+   [
+    "Color and cut",
+    "Prong retipping"
+   ],
+   [
+    "color and cut",
+    "prong retipping"
+   ],
+   [
+    "Color correction",
+    "Watch service"
+   ],
+   [
+    "color correction",
+    "watch service"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "$25 consult",
+    "$25 watch check"
+   ],
+   [
+    "Only the consult",
+    "Only the watch check"
+   ],
+   [
+    "the consult",
+    "the watch check"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the repair?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once checked"
+   ],
+   [
+    "priced at the chair",
+    "priced once checked"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "a house call",
+    "an on-site visit"
+   ],
+   [
+    "water heaters",
+    "watch crystals"
+   ],
+   [
+    "water heater",
+    "watch crystal"
+   ],
+   [
+    "Panel upgrade",
+    "Custom setting"
+   ],
+   [
+    "like a burst pipe",
+    "like a swollen battery"
+   ],
+   [
+    "$75",
+    "$124"
+   ],
+   [
+    "Gloss",
+    "New gasket"
+   ],
+   [
+    "gloss",
+    "new gasket"
+   ],
+   [
+    "Toner",
+    "New crystal"
+   ],
+   [
+    "toner",
+    "new crystal"
+   ]
+  ],
+  "B": [
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "BS20981",
+    "REG-2020-0533"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Watch visits have a set price. Jewelry repairs are priced at the visit. A fire or an injury stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Watches and jewelry are dropped off at the shop and picked up when ready. A jeweler can also service watches at the customer's place."
+   ],
+   [
+    "MP045210",
+    "REG-2020-0471"
+   ],
+   [
+    "MP045201",
+    "REG-2020-0417"
+   ],
+   [
+    "A chair, ready",
+    "A watch, ready"
+   ],
+   [
+    "water is off on Main St after 2pm",
+    "Main St is closed after 2pm"
+   ],
+   [
+    "plumbing service",
+    "watch service"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my watch. It stopped. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My watch stopped' fits a watch visit."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like opening a neighbor's box without asking."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it stopped"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 watch visit needs none."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "'s watch, serviced Thu Oct 22, stopped again."
+   ],
+   [
+    "Drain clearings",
+    "Watch visits"
+   ],
+   [
+    "drain clearings",
+    "watch visits"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Clasp and chain repair · $540"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a ring check? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the watches."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Simon scratches a table and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the table"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched table"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "scratched the table at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "heating and cooling",
+    "ring sizing"
+   ],
+   [
+    "Heating and cooling",
+    "Ring sizing"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood jewelry shop on Elm St. Watches and jewelry fixed."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the ring, and a jeweler will price the job."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said a watch battery is swelling."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does watch service and ring sizing, not new jewelry."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a jewelry store near you."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you service my watches every year, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Home Services has a yearly watch service plan, $150 a visit."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a watch service every year."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly watch service plan"
+   ],
+   [
+    "water heater contract",
+    "watch service contract"
+   ],
+   [
+    "replaces water heaters",
+    "replaces watch crystals"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Simon found the problem. Here's the price to fix it today."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Simon finds the problem and texts the price with its lines."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the piece is, what's wrong, and whether it's insured."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I wear the watch until you come?"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Mobile Jeweler and Lee Ring Sizing."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Jewelry Bench can change your watch battery at the shop for $35, or at your home for $75."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's counter is in the other flow."
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both offices' visits go on one bill on the 1st."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the new clasp Simon noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Home Services sent you a proposal for a new clasp, from Simon's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · New clasp"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Simon look at my necklace next week?"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Simon left tools on my table."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My watch stopped."
+   ],
+   [
+    "Just the kitchen sink.",
+    "A steel dive watch. It stops after a day."
+   ],
+   [
+    "a leak under the sink",
+    "a watch that stopped"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please put the watches on the table."
+   ],
+   [
+    "a drain cleaning at two rentals",
+    "a watch visit at two offices"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's watch visit"
+   ],
+   [
+    "clear a yard drain",
+    "service a watch"
+   ],
+   [
+    "Yard drain",
+    "Watch visit"
+   ],
+   [
+    "yard drain",
+    "watch visit"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa watch"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Watch visit"
+   ],
+   [
+    "Kitchen drain",
+    "Watch"
+   ],
+   [
+    "Drain clearing",
+    "Watch visit"
+   ],
+   [
+    "drain clearing",
+    "watch visit"
+   ],
+   [
+    "clear the drain",
+    "service the watches"
+   ],
+   [
+    "your new pipes are in",
+    "your new clasp is on"
+   ],
+   [
+    "a roof leak",
+    "a broken phone"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Simon's notes"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Simon finds a worn clasp."
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "replace the clasp, worn out"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the clasp"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the clasp"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing the clasp"
+   ],
+   [
+    "shutoff valves",
+    "clasp"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say an office manager books the same job for 4 staff at one address."
+   ],
+   [
+    "Each unit's notes",
+    "Each watch's notes"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Jewelry Cover, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "jewelry cover plan"
+   ],
+   [
+    "home warranty",
+    "jewelry cover"
+   ],
+   [
+    "supply house",
+    "parts supplier"
+   ],
+   [
+    "Rental 1",
+    "Office 1"
+   ],
+   [
+    "Rental 2",
+    "Office 2"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the watch is now hot."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The watch is hot and the case is bulging now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Take the watch off if it's safe, and keep it away from anything that burns. Don't press on it."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen battery or a burning smell, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The watch stops again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The watch stops again."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your watch service is under warranty"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I need it for tonight. Can someone come?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Simon also look at my ring?"
+   ],
+   [
+    "$160 valve quote",
+    "$160 clasp quote"
+   ],
+   [
+    "$160 valve work",
+    "$160 clasp work"
+   ],
+   [
+    "a bathroom drain",
+    "your ring"
+   ],
+   [
+    "kitchen drain",
+    "watch"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The ring is a jewelry repair, quoted at the visit."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A watch repair could mean a jewelry store or a watch bench."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A jewelry shop's example: a swollen battery gets 'take it off if it's safe, and keep it away from anything that burns'."
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi reloj está muy caliente."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My watch is very hot."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to take it off if it's safe and step away, and to call 911 if there's a fire."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay fuego?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is there a fire?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay fuego."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no fire."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Quítelo si es seguro y aléjelo de lo que arde. Si hay fuego, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Take it off if it's safe, and keep it away from anything that burns. If there's a fire, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For jewelry repair, a fire, smoke or an injury stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Get away from the watch now, and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My watch got wet in a flood. Is it safe to wear?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "which piece is it, and does it still tick?"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the watch still wet?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE small scratch on the case, crystal clean"
+   ],
+   [
+    "Under the sink, before",
+    "Watch face, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Case back, before"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 watches"
+   ],
+   [
+    "245 valve 165 supply line 80",
+    "245 watch service 165 gasket 80"
+   ],
+   [
+    "Shutoff valve",
+    "Watch service"
+   ],
+   [
+    "Supply line",
+    "New gasket"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE water resistance 30 m. Test the seal each year."
+   ],
+   [
+    "1-year labor warranty",
+    "12-month warranty"
+   ],
+   [
+    "a dripping faucet",
+    "a watch that won't run"
+   ],
+   [
+    "color and house calls",
+    "stone work and mobile visits"
+   ],
+   [
+    "color, house calls",
+    "stone work, mobile visits"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Jewelry Bench"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Jeweler's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Jeweler"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilejeweler.com"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Electrical",
+    "Ring sizing"
+   ],
+   [
+    "electrical",
+    "ring sizing"
+   ],
+   [
+    "plumber",
+    "jeweler"
+   ],
+   [
+    "Plumber",
+    "Jeweler"
+   ],
+   [
+    "Plumbing",
+    "Watch service"
+   ],
+   [
+    "plumbing",
+    "watch service"
+   ],
+   [
+    "Barbershop",
+    "Jewelry shop"
+   ],
+   [
+    "barbershops",
+    "jewelry shops"
+   ],
+   [
+    "barbershop",
+    "jewelry shop"
+   ],
+   [
+    "barbers",
+    "jewelers"
+   ],
+   [
+    "barber",
+    "jeweler"
+   ],
+   [
+    "Barber",
+    "Jeweler"
+   ],
+   [
+    "cut hair",
+    "fix jewelry"
+   ],
+   [
+    "Riley",
+    "Elena"
+   ],
+   [
+    "Avery",
+    "Victor"
+   ],
+   [
+    "Jordan",
+    "Simon"
+   ],
+   [
+    "Casey",
+    "Ruth"
+   ],
+   [
+    "88 Elm St",
+    "140 Union St"
+   ],
+   [
+    "Elm St",
+    "Union St"
+   ],
+   [
+    "42 Oak St",
+    "6 Aspen Way"
+   ],
+   [
+    "1200 Main St",
+    "22 Bell Ave"
+   ],
+   [
+    "a haircut",
+    "a battery change"
+   ],
+   [
+    "Haircut",
+    "Battery change"
+   ],
+   [
+    "fade",
+    "ring sizing"
+   ],
+   [
+    "beard trim",
+    "jewelry cleaning"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once diagnosed"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "Water heater flush",
+    "Crystal replacement"
+   ],
+   [
+    "water heater flush",
+    "crystal replacement"
+   ],
+   [
+    "Water heater replacement",
+    "Ring repair"
+   ],
+   [
+    "water heater replacement",
+    "ring repair"
+   ],
+   [
+    "water heaters",
+    "crystals"
+   ],
+   [
+    "Water heater",
+    "Crystal"
+   ],
+   [
+    "water heater",
+    "crystal"
+   ],
+   [
+    "Sewer camera inspection",
+    "Watch check"
+   ],
+   [
+    "sewer camera inspection",
+    "watch check"
+   ],
+   [
+    "Sewer camera report",
+    "Watch report"
+   ],
+   [
+    "sewer camera report",
+    "watch report"
+   ],
+   [
+    "camera inspection",
+    "watch check"
+   ],
+   [
+    "camera report",
+    "watch report"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Panel upgrade",
+    "Custom setting"
+   ],
+   [
+    "under my sink",
+    "on my watch"
+   ],
+   [
+    "under the sink",
+    "on the watch"
+   ],
+   [
+    "like a burst pipe",
+    "like a swollen battery"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 gasket stays good until Thu Oct 29."
+   ],
+   [
+    "shutoff valve",
+    "gasket"
+   ],
+   [
+    "$75",
+    "$124"
+   ],
+   [
+    "Leak repair",
+    "Jewelry repair"
+   ],
+   [
+    "leak repair",
+    "jewelry repair"
+   ],
+   [
+    "supply line",
+    "gasket"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off at Lee's Jewelry Bench, Sat Oct 24, for a watch that stopped. Elena checks it and writes an estimate. Once Alex OKs it, Elena does the service and texts READY when it's done. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Jeweler to service watches at home, at 6 Aspen Way, and Simon comes Thu Oct 22 between 8 and 10am. The saved card is charged when Simon texts DONE. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "visit|none|counter",
+   "combos": [
+    "visit|none|counter",
+    "list|none|counter",
+    "list|deposit|counter",
+    "visit|deposit|counter"
+   ],
+   "examples": {
+    "visit|none|counter": "The main story: a watch that stopped. Only the $25 watch check is promised. Elena's written estimate is OK'd before any work, and Alex pays at the counter at pick-up, with an ID.",
+    "list|none|counter": "A $35 watch battery change from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|deposit|counter": "A $140 stone replacement, with the stone ordered in. A $40 deposit orders it, and the $100 rest is paid at the counter.",
+    "visit|deposit|counter": "A watch service from $110, priced after the watch check. The $25 check is paid up front as the deposit, counted toward the final price."
+   },
+   "amounts": {
+    "*": {
+     "name": "Battery change"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Battery change",
+     "fee": "$0"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "name": "Stone replacement",
+     "fee": "$40"
+    },
+    "visit|*|*": {
+     "name": "Watch service",
+     "fee": "$0"
+    },
+    "visit|deposit|*": {
+     "deposit": "$25",
+     "name": "Watch service",
+     "fee": "$25"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|card|bill",
+    "visit|card|bill",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 watch visit (up to 5 watches: battery, band and clean) at Alex's place. A card is saved for the $89 trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Simon works alone, so the saved card is charged for the visit when Simon texts DONE.",
+    "list|card|bill": "The same $179 watch visit. A card is saved for the $89 trip fee. Rosie texts the bill after.",
+    "visit|card|bill": "A broken clasp and a loose stone, priced at the visit. A card is saved for the $89 trip fee.",
+    "photos|deposit|bill": "A custom ring repair, priced from photos of the ring at $640. Sam OKs it. A $160 deposit orders the parts, and the rest is on the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Watch visit"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Watch visit"
+    },
+    "visit|*|*": {
+     "name": "Jewelry repair"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Ring repair"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Ring repair"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-38"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every watch and jewelry repair booking through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The watch and jewelry repair plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A jewelry shop books drop-off slots and jewelers, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Watch and jewelry repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Watch and jewelry repair is never sent now: a swollen watch battery gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A piece is fixed in hand. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The shop sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The shop bills no plan or insurance. A customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee's Jewelry Bench books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee's Jewelry Bench books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee's Jewelry Bench books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no jeweler. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "Watch and jewelry repair needs no form first: the ticket is done at drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "A jewelry shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A jewelry shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A jewelry shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A piece waits in its drop-off slot, so a jeweler running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child never leaves a piece at the shop: an adult drops off and picks up."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A repair is paid once: at pick-up, or by the bill."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The shop bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A repair is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "A jewelry shop books no next visit at pick-up: each repair is booked when it's needed."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A repair at the shop needs no contract before booking: the written estimate comes before any work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "The shop sells no plans: each repair is paid at its own pick-up, or by its own bill."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The shop sells no plans or contracts, so nothing signed at the shop has a cancel period."
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Jeweler",
+       "At the customer's place",
+       "None needed · registration on file",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Simon Price",
+       "Lee Mobile Jeweler",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Ruth Moore",
+       "Lee Mobile Jeweler",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Jeweler",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Elena Chen",
+       "Lee's Jewelry Bench",
+       "At the shop, and on-site visits",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Victor Diaz",
+       "Lee's Jewelry Bench",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Simon: watch visits and ring sizing",
+         "Ruth: watch visits",
+         "Elena: watch service and mobile visits",
+         "Victor: battery changes and band sizing"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee's Jewelry Bench. Quinn gets one invite, and replies YES. This work needs no license, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Jewelry Bench. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "A license problem",
+    "why": "This work has no mechanic license, so none can have a problem."
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "The license holder leaves",
+    "why": "This work has no mechanic license, so there is no license holder to leave."
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Elena replies YES, then checks what Sam set. This work needs no license, so no number is asked. One reply covers everything Elena does for Lee's Jewelry Bench.",
+    "more": [
+     "No license number is asked: this work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Victor joins the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Elena"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee's Jewelry Bench! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t02"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Elena"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 8am",
+      {
+       "as": "Elena"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Elena Chen · Lee's Jewelry Bench",
+        "lines": [
+         "Every shop service, watch service and mobile visits",
+         "Hours: the shop's hours",
+         "Languages: English and Spanish",
+         "Day list: 8am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Elena"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Elena"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A piece is never served as a child: an adult books and brings it in."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Watch and jewelry repair needs no state license: the company gives its business registration (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Watch and jewelry repair licenses nobody, so no jeweler takes a license check."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. A piece's value, a serial number and a door code never go in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "For a piece, the counter writes a ticket: the piece described and photographed, any stones counted.",
+     "The stated value goes on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "For a drop-off, Alex gives the code at the counter when leaving the piece.",
+     "The reminder says to bring the box and papers, and an ID."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "At pick-up, Alex shows an ID and the ticket, and the piece is checked against its photo."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-01",
+    "more": [
+     "The shop's warranty, 12 months on watch service here, is on its receipt."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent, with the soonest drop-off first.",
+    "more": [
+     "A jewelry shop's example: a swollen or hot smartwatch battery.",
+     "It gets 'take it off if it's safe, and keep it away from anything that burns'."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "A swollen battery can catch fire. Please take the watch off if it's safe, keep it away from anything that burns, and don't press on it. The soonest drop-off times are next."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No jeweler is named: once the piece is in, the shop gives it to a jeweler with the skill.",
+    "more": [
+     "A wish for one jeweler goes in the notes, and the shop follows it where it can."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.3",
+       "8.21"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 11:05am",
+      "title": "Elena writes the ticket",
+      "does": "Before any work, Elena describes the watch with Alex and photographs it. Any stones are counted, and gold is weighed.",
+      "more": [
+       "Elena notes scratches, a cracked crystal and whether it runs, with photos.",
+       "The stated value goes on the secure page, never in a text.",
+       "The ticket is checked again at pick-up, with an ID.",
+       "It's kept with the booking, and Alex can see it on the secure page."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "TICKET Alex M. Steel watch, small scratch on the case, stopped. Photos added."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s watch as the ticket."
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: battery change $40 for visits from Mon Nov 2. Battery changes already booked keep $35."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A registration shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. Any deposit sits right next to it.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee's Jewelry Bench",
+      "140 Union St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Battery change $35 ($40 from Nov 2) · Ring sizing $40 · Jewelry cleaning $20"
+     ],
+     [
+      "To book",
+      "Nothing taken, or a deposit for a stone ordered in · no cancel or no-show fee"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Mobile Jeweler",
+      "Watch service and ring sizing · within 25 miles of 22 Bell Ave, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam turns on the bill Rosie texts with READY for watch services, for new bookings only. Each change is read back first.",
+    "more": [
+     "Watch services already booked are still paid at the counter.",
+     "The customer can still pay at the counter, the shop's own way.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-78",
+    "say": [
+     [
+      "san",
+      "other",
+      "This is Rosie, an automated assistant for Lee's Jewelry Bench. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check.",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ],
+       "stop": "first",
+       "as": "Morgan Lee"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex brings the watch to the shop. The reminder said to bring the box and papers, and an ID.",
+    "more": [
+     "A piece over the shop's limit is not taken in without an ID. A missing one stops that work (the next branch).",
+     "The reminder already said what to bring.",
+     "The code is taken only once nothing required is missing."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-51",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M. No ID, and the piece is over the shop's limit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "A what-if: Elena opens a watch and finds its battery swollen. Elena stops, and the watch goes into a fire-safe box. Alex gets a written note.",
+    "more": [
+     "The note says what was found, what wasn't done, and why.",
+     "A new battery is quoted before any more work.",
+     "Nothing is charged for the part not done."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD swollen battery, stopped. The watch is in the fire-safe box.",
+      {
+       "photos": [
+        "Swollen battery"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Elena found your watch's battery swollen, so Elena stopped, to keep everyone safe. A new battery is quoted before any more work.",
+      {
+       "card": {
+        "title": "A note from Lee's Jewelry Bench",
+        "lines": [
+         "Found: a swollen battery",
+         "Not done: the rest of the service, for now",
+         "Next: a quote for a new battery"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Elena stopped Alex M.'s service: a swollen battery. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-23",
+    "does": "Alex's watch is ready, but it isn't picked up. The shop holds a piece 90 days. Rosie reminds Alex at 30 and 60 days, then Sam decides what's next.",
+    "more": [
+     "Rosie never starts a fee on its own. It's always Sam's call.",
+     "Two reminders only, inside text hours. No nudges after that."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every watch and jewelry repair booking through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The watch and jewelry repair plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A jewelry shop books drop-off slots and jewelers, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Watch and jewelry repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Watch and jewelry repair is never sent now: a swollen watch battery gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A piece is fixed in hand, where Alex is. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty is billed: a customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "On-site work arrives in a 2-hour window, with a named jeweler (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "On-site work arrives in a 2-hour window, with a named jeweler (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "On-site work arrives in a 2-hour window, with a named jeweler (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "On-site repair needs no first step."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Watch and jewelry repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Watch and jewelry repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Watch and jewelry repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A jeweler never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone must be there to hand over the piece and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for this work."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance is billed."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Watch and jewelry repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Watch and jewelry repair is never sent now (S2-30), so there's no such button."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Someone must be there to hand over the piece and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "Someone must be there to hand over the piece and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A repair is rated, like any job."
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Jeweler",
+       "At the customer's place",
+       "None needed · registration on file",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Simon Price",
+       "Lee Mobile Jeweler",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Ruth Moore",
+       "Lee Mobile Jeweler",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Jeweler",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Elena Chen",
+       "Lee's Jewelry Bench",
+       "At the shop, and on-site visits",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Victor Diaz",
+       "Lee's Jewelry Bench",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Simon: watch visits and ring sizing",
+         "Ruth: watch visits",
+         "Elena: watch service and mobile visits",
+         "Victor: battery changes and band sizing"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee's Jewelry Bench. Quinn gets one invite, and replies YES. This work needs no license, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Jewelry Bench. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "A license problem",
+    "why": "This work has no mechanic license, so none can have a problem."
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "The license holder leaves",
+    "why": "This work has no mechanic license, so there is no license holder to leave."
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Simon replies YES, then checks what Sam set. This work needs no license, so no number is asked. One reply covers everything Simon does for Lee Mobile Jeweler.",
+    "more": [
+     "No license number is asked: this work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Ruth joins the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Simon"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Mobile Jeweler! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t02"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Simon"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 8am",
+      {
+       "as": "Simon"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Simon Price · Lee Mobile Jeweler",
+        "lines": [
+         "Every watch visit, and ring sizing jobs",
+         "Hours: Mon–Fri 7:30am–5:30pm",
+         "Languages: English and Spanish",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Simon"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Simon"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "A repair priced at the visit is done as part of this job, never as its own project."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "A piece is never served as a child: an adult books and is there."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Watch and jewelry repair needs no state license: the company gives its business registration (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Watch and jewelry repair licenses nobody, so no jeweler takes a license check."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. A piece's value, a serial number and a door code never go in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "The jewelry shop plug-in adds danger words. Examples are a swollen or hot smartwatch battery or a burning smell."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "The plug-in asks Alex to put the pieces on a clear table with good light."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Simon describes each piece with Alex, counts any stones, and photographs it before any work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For jewelry repair, a fire, smoke or an injury stops the booking.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. Get away from the watch now, and call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their watch is smoking. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "Smoke from a watch at the home",
+         "Told to step away and call 911"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Simon opens a watch and finds its battery swollen. The plug-in says to stop there, so Alex gets a written note and the photo.",
+    "more": [
+     "The note says what was found, what wasn't done and why, and what to do next.",
+     "A swollen battery isn't safe to work on at a home. The watch goes to the bench in a fire-safe bag.",
+     "Only the work done is charged.",
+     "Sam is told, and the note and photos stay with the job."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD battery swollen, stopped. Watch in the fire-safe bag.",
+      {
+       "photos": [
+        "Swollen battery"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Simon found the watch's battery swollen and stopped, to keep you safe. Please don't wear it.",
+      {
+       "card": {
+        "title": "Safety note · 6 Aspen Way",
+        "lines": [
+         "Found: a swollen battery",
+         "Not done: the service, for now",
+         "Next: a new battery at the bench"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: watch visit $199 for visits from Mon Nov 2. Watch visits already booked keep $179."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A registration shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. Any deposit sits right next to it.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee Mobile Jeweler",
+      "Watch service and ring sizing · within 25 miles of 22 Bell Ave, Springfield · (555) 010-0142"
+     ],
+     [
+      "Prices",
+      "Watch visit $179 ($199 from Nov 2) · Crystal replacement $150"
+     ],
+     [
+      "To book",
+      "A card saved for the $89 trip fee, charged only for a late cancel or a no-show"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee's Jewelry Bench",
+      "Watches and jewelry dropped off · 140 Union St, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-78",
+    "say": [
+     [
+      "san",
+      "other",
+      "This is Rosie, an automated assistant for Lee Mobile Jeweler. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check.",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ],
+       "stop": "first",
+       "as": "Morgan Lee"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-54",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CANT START no adult with an ID at the door"
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "From repair-shop (from: repair-shop), refitted Tue Oct 27 and merged on the REDESIGN 2 master (frozen 9:17am). A watch and jewelry bench runs like a device repair shop: the piece is dropped off, a watch check is OK'd, a written estimate is OK'd before any work, a stone or part is ordered, and READY comes before the pick-up. No base plug-in or old flowchart existed (new profession); the plug-in is built from the trade's norm.\nTwo companies: Lee's Jewelry Bench (the master's barbershop, flow A: the shop for watches and jewelry) and Lee Mobile Jeweler (the master's Lee Home Services, flow B: a jeweler who services watches and sizes rings at homes and offices). Kinds of work: plumbing became watch service, electrical became ring sizing, the later NEW kind is ring sizing (B) and engraving (A). People: Riley and Avery became Elena and Victor (the shop); Jordan and Casey became Simon and Ruth (mobile), so the master's pronouns still fit (Jordan he, Casey she). Addresses: 140 Union St (the shop), 6 Aspen Way (Alex), 22 Bell Ave (the second site).\nNo license: watch and jewelry repair needs no person license; the business gives its registration where the city or state asks (S1-60 '1 A license', S2-28 '1 Yes, each one' and S11-42's two license branches are off; the sign-up license sentences are reworded as registration only). A precious metals or secondhand dealer license matters only if the shop buys gold or used jewelry (pf.rules.metals_records, a switch); Rosie books repair services only, so a gold buy-back is not booked (A4-81).\nFlow A money: main visit|none|counter (a watch that stopped: the $25 watch check is promised, Elena's written estimate is $110 watch service + $15 new gasket = $125 with the check included), list|none|counter ($35 battery change), list|deposit|counter ($140 stone replacement: $40 deposit orders the stone, $100 at the counter), visit|deposit|counter (a watch service from $110: the $25 check is the deposit, counted toward the price). The shop saves no card and takes no full price: no cancel or no-show fee at the shop. An ID is shown at pick-up (pf.rules.id_at_pickup, a switch).\nFlow B money: main list|card|card ($179 watch visit, up to 5 watches, at the customer's place; a card is saved for the $89 trip fee, which is the late-cancel and no-show fee, charged only on Sam's yes, and owed after a no to a visit price: B4-14; the jeweler works alone, so the saved card is charged for the visit at DONE), list|card|bill (Rosie texts the bill), visit|card|bill (a clasp and a loose stone, priced at the visit; a piece that needs bench work goes to the shop on a signed ticket and comes back on a booked return), photos|deposit|bill (a custom ring repair priced from photos: $640, $160 deposit, $480 on the bill). No full price anywhere. All amounts have names per path.\nFacts: dropoff, photos (a custom ring repair priced from photos), extrawork (a part found at the bench, OK'd first). No documents fact: the written estimate is the visit path's own price OK, so B8-93's 'An estimate becomes its own job' branch is off. No switches. Settings: A a set start (drop-off slots), B a 2-hour window; cutoff 24 hours before.\nSafety: fire, smoke or an injury stops the booking; a swollen, hot or leaking smartwatch battery, or a burning smell, gets the safety steps, then the booking goes on, marked urgent. A swollen battery found when a watch is opened stops the work (A8-35 / B8-30). A child never books or drops off jewelry (A4-24 / B4-32 'A child' off).\nOwn step: A8-x01, the ticket at the counter (the piece described and photographed, stones counted, gold weighed, the stated value on the secure page), a real first step of this trade.\nOffs for work this shop never has: video or phone (A4-01, B4-01), plans and insurance, packages, a person by name, plan steps, rented items, 'too few booked', a child left, stage billing, next visit at checkout, a signed contract, nobody-home branches and sent-now steps.\nNot sure (for the verifier): S1-13's sign-up example card still lists 'Paid in full' lines and a $20 fee for services this shop never prepays (master text); A8-02 keeps the 'something required is missing' branch for a piece over the shop's limit with no ID; appraisals and gold buying are left out as other kinds of work; the free watch check in the master's amounts is used by no listed path.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "barbershop license",
+    "EC22871",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "MP045210",
+    "BS20981",
+    "BS20918",
+    "A chair, ready",
+    "plumbing service",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "would like to see your hair before pricing it",
+    "My employer pays for this cut.",
+    "Alex M.'s cut",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Color quotes come to you first. Board prices never need one",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Style consult",
+    "style consult",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "once Riley sees the hair.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Could Riley use a toner instead of the gloss?",
+    "asks for a toner instead of the gloss. What's the new price?",
+    "two skin fades on",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Today · 3:00pm · Avery",
+    "a beard trim today at 2:00pm with Avery",
+    "the beard trim today at 2:00pm with Avery",
+    "first tomorrow: 10:00am, Riley",
+    "A card saved for the $20 fee",
+    "haircut with Riley",
+    "Sat 11am Riley",
+    "at 11:20am on Riley's phone",
+    "Gloss to finish · $15",
+    "Riley quotes the rest at the chair, before any work.",
+    "Wants Saturday morning, with Riley",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "How was your visit with Riley?",
+    "Sun Oct 25 · 11:00am · Riley",
+    "Can my son wait in the shop during my cut?",
+    "Walk-in for a haircut",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Your item is still waiting for pick-up.",
+    "A drop-off item isn't picked up.",
+    "Promises the $25 consult; priced at the chair",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "like Lee Plumbing and Lee Electric.",
+    "Quiero un corte el sábado.",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Drain clearing",
+    "home warranty plan",
+    "a package of cuts",
+    "patch test",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop's services need none.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "Riley looks, then prices it",
+    "Texts Alex the price",
+    "Only the consult; the price stays open",
+    "Follows up on an item left behind",
+    "a skin-test result",
+    "color and house calls",
+    "color, house calls",
+    "Consult only",
+    "photos of your hair",
+    "a cut on Saturday",
+    "Books a cut every 4 weeks",
+    "a cut every 4 weeks",
+    "for a staff cut",
+    "in the chair",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "4471",
+    "Sofia",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "fade",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "$25 consult",
+    "Only the consult",
+    "the consult",
+    "What happens at the chair?",
+    "Priced at the chair",
+    "priced at the chair",
+    "Paid at the chair",
+    "At the chair",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "a house call",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "like a burst pipe",
+    "$75",
+    "Gloss",
+    "gloss",
+    "Toner",
+    "toner"
+   ],
+   "B": [
+    "EC22871",
+    "BS20981",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "MP045210",
+    "MP045201",
+    "A chair, ready",
+    "water is off on Main St after 2pm",
+    "plumbing service",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "Drain clearings",
+    "drain clearings",
+    "Shutoff valve and wall pipe · $540",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "heating and cooling",
+    "Heating and cooling",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "You can look for a roofer near you.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "water heater contract",
+    "replaces water heaters",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Can I run the dishwasher before you come?",
+    "like Lee Plumbing and Lee Electric.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "Both rentals' visits go on one bill on the 1st.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "Just the kitchen sink.",
+    "a leak under the sink",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals",
+    "next week's drain cleaning",
+    "clear a yard drain",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "your new pipes are in",
+    "a roof leak",
+    "Video and Jordan's notes",
+    "Jordan finds corroded shutoff valves.",
+    "replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "shutoff valves",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "supply house",
+    "Rental 1",
+    "Rental 2",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also run a camera down my sewer line?",
+    "$160 valve quote",
+    "$160 valve work",
+    "a bathroom drain",
+    "kitchen drain",
+    "The faucet is a leak repair, quoted at the visit.",
+    "A haircut could mean a salon or a barbershop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Texts Alex the price",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Is the sink still full of water?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "DONE 179 drain",
+    "245 valve 165 supply line 80",
+    "Shutoff valve",
+    "Supply line",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "1-year labor warranty",
+    "a dripping faucet",
+    "color and house calls",
+    "color, house calls",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "plumbing license",
+    "Plumbing license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "a haircut",
+    "Haircut",
+    "fade",
+    "beard trim",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "camera inspection",
+    "camera report",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Panel upgrade",
+    "under my sink",
+    "under the sink",
+    "like a burst pipe",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "shutoff valve",
+    "$75",
+    "Leak repair",
+    "leak repair",
+    "supply line"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A5-19": "5d5db6f3c1",
+   "A10-05": "63c3536c7a",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-42": "fde535c99e",
+   "S2-06": "6b01a08c94",
+   "A4-24": "0a292df05b",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S13-22": "5324c9a041",
+   "A3-20": "b8251d2535",
+   "A6-14": "b17b52115e",
+   "A8-54": "bc2f9467fd",
+   "A10-01": "77ff9c7550",
+   "A3-23": "4a8b7c72a2",
+   "A8-23": "e3a35f7f9e",
+   "S11-54": "ce20fc799b",
+   "S11-57": "a3996ae84e",
+   "S11-56": "bd841a4732",
+   "S1-78": "240d450c92",
+   "A8-02": "15f418fec4",
+   "A8-51": "71142aa1fa",
+   "A8-35": "a67e890a5b",
+   "A10-23": "105d7f426a"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B9-06": "f091432f2d",
+   "B9-19": "b97bfbf0d2",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B8-03": "ac9d404766",
+   "B10-32": "7713bff255",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-42": "8f63c529f7",
+   "S2-06": "b78d25d6e2",
+   "B8-93": "c1406fd6bc",
+   "B4-32": "fcfe092e37",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S13-22": "9c91065dc1",
+   "B3-17": "3eb7d7f259",
+   "B4-34": "74ff52d83d",
+   "B8-18": "530038d2b8",
+   "B3-19": "2f53161fb2",
+   "B8-30": "a1ef4983e4",
+   "S11-54": "f2d479cd60",
+   "S11-57": "2f34f23d8a",
+   "S1-78": "8d0e25526e",
+   "B8-54": "0f180048ca"
+  }
+ }
+}

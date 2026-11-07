@@ -1,0 +1,3290 @@
+{
+ "id": "cleaner",
+ "name": "House cleaner",
+ "style": "Set service",
+ "pattern": "service",
+ "plugin": {
+  "pf.license": {
+   "need": "Usually none for house cleaning. Where the state's or city's rules require a license or a business registration, the form asks for it.",
+   "ask": "The company's business registration or local business license number, where the form asks for one.",
+   "who_holds": "The business. Cleaners need no license of their own unless the state's form says so.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "insurance_bond": "Insured or bonded is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "not_this_work": "Mold removal over the state's size cutoff, and home care (meals, errands, company for an older or disabled person), are licensed in some states. They aren't house cleaning."
+  },
+  "pf.services": {
+   "pattern": "Set service: a fixed service at the customer's place, often repeating, priced by the home's size.",
+   "list": [
+    {
+     "name": "Deep clean",
+     "price_kind": "set by the customer's answers (bedrooms, bathrooms, square feet)",
+     "example": "3 bed, 2 bath: $179 (the example business's own price)",
+     "length": "set by the home's size: about 3 hours for a crew of two",
+     "where": "at the customer's place",
+     "money": "card saved at booking; charged at DONE"
+    },
+    {
+     "name": "Standard clean",
+     "price_kind": "set by the customer's answers",
+     "example": "3 bed, 2 bath: $150 one time",
+     "length": "about 2 hours for a crew of two",
+     "where": "at the customer's place",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Plan visits (standard clean)",
+     "price_kind": "a per-visit price for each plan",
+     "example": "every 1, 2 or 4 weeks: $125, $135 or $145 a visit",
+     "length": "as the standard clean",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "card saved; each visit charged at its own DONE"
+    },
+    {
+     "name": "Move-out clean",
+     "price_kind": "quoted from the customer's photos first",
+     "example": "$640 for a messy 4-bedroom move-out",
+     "where": "at the customer's place, an empty home",
+     "money": "card saved, or a deposit where the state's caps allow; the rest charged at DONE"
+    },
+    {
+     "name": "Heavy clean",
+     "price_kind": "quoted at the visit, before any work (a home not cleaned in a long time)",
+     "example": "only the $89 visit fee is promised",
+     "where": "at the customer's place",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Window washing (the second kind of work)",
+     "price_kind": "from the list, per home",
+     "example": "inside windows $149; inside and outside $189 (the example business's own prices); skylights and high windows: a free estimate, then a quote",
+     "length": "about 2 hours, one window washer",
+     "where": "at the customer's place; outside only: nobody needs to be home",
+     "money": "card saved; charged at DONE",
+     "weather": "outside work has a weather limit Sam sets (rain or high wind); a move for weather is free"
+    },
+    {
+     "name": "By the hour",
+     "price_kind": "per hour",
+     "example": "$120 an hour for a crew of two, 1-hour minimum",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Add-ons",
+     "price_kind": "one price each, added only when the customer asks",
+     "example": "inside the oven and fridge $160; inside windows $95; carpet shampoo $199"
+    },
+    {
+     "name": "Visit fee",
+     "price_kind": "one price",
+     "example": "$89: only for a late cancel or a lockout the owner confirms, or owed when a heavy clean isn't done",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Rug and curtain care at the business",
+     "price_kind": "one price by size, from photos, or at the counter",
+     "example": "small rug $35, runner $40, cushion covers $20, bath mat $25, curtains $55, 8x10 rug $140, stain removal from photos, antique rug priced at the counter after a $25 inspection",
+     "where": "dropped off at the business; a rug can also be washed at the customer's home ($75)",
+     "money": "nothing taken; paid at the counter at pick-up"
+    }
+   ],
+   "capacity": "A home clean takes a crew of two: a lead and a helper. A drop-off needs one person at the counter.",
+   "nobody_home": "Yes, for plan visits: entry by lockbox, door code or a key the business holds. DONE with after photos confirms it.",
+   "online": "No.",
+   "not_offered": "Mold over the state's size cutoff, sewage, biohazards, home care. Outside windows only under window washing.",
+   "drop_off_slots": "Rugs and curtains are booked into drop-off slots by the shop's daily number, with no rug cleaner named; the rug goes to a rug cleaner with the skill once it's in."
+  },
+  "pf.questions": {
+   "before_times": [
+    "Bedrooms, bathrooms and about how many square feet",
+    "Was the home cleaned by a professional in the last 30 days? (sets deep or standard)",
+    "Just once, or a plan every 1, 2 or 4 weeks",
+    "Pets, and where they'll be",
+    "For window washing: inside, outside or both, and how many floors",
+    "For a drop-off: the rug's size and what it's made of"
+   ],
+   "after_a_time": [
+    "Products to use or avoid",
+    "Surfaces that need care, like marble or unsealed wood",
+    "Rooms to skip or focus on",
+    "Parking",
+    "Will someone be home?"
+   ],
+   "secure_page_only": [
+    "How the crew gets in: lockbox, door code, garage code or a key the business holds",
+    "Alarm codes",
+    "Why a product must be avoided, like an allergy"
+   ],
+   "who_may_book": "An adult who lives in the home, or the owner, a landlord or a property manager they name (a move-out clean)."
+  },
+  "pf.safety": {
+   "words": [
+    "mold patch over the state's size cutoff",
+    "sewage or a sewage backup",
+    "biohazards: blood, body fluids, needles",
+    "a gas smell",
+    "floors or stairs that aren't safe to walk",
+    "bedbugs or rodents"
+   ],
+   "what_happens": [
+    "Mold over the cutoff, sewage or biohazards: Rosie says a cleaner can't take that on and points to a specialist. The rest of the home can still be booked with that area left out.",
+    "Sewage: keep children and pets away, and stay out if it's near outlets.",
+    "A gas smell: leave and call 911. No booking until it's safe.",
+    "Bedbugs or rodents: pest control comes first; the clean is booked after.",
+    "Care help (meals, errands, company) isn't cleaning: no booking, and the AI can look for a home-care agency."
+   ],
+   "booking_goes_on": "Yes, with the area left out (mold, sewage, biohazards). No, for home care or a gas smell."
+  },
+  "pf.first_steps": {
+   "first_clean": "A new home's first clean is a deep clean, unless a professional cleaned it in the last 30 days.",
+   "plan": "A plan starts after the first clean. Cancelling the first clean also ends the plan that starts after it, and the customer is told first.",
+   "photos": "A move-out clean is priced from the customer's photos first.",
+   "prep_for_reminder": [
+    "Pick up clutter and toys",
+    "Put pets where you said",
+    "Leave the entry code on the secure page, not in a text",
+    "Put away valuables"
+   ],
+   "rug_dye_test": "Stain removal and antique rugs: a short dye test at the shop first, so the colors won't run in the wash (the example: 15 minutes, at least 2 days before; it stays good for 3 months)."
+  },
+  "pf.visit": {
+   "check_in": "Someone home: the code at the door, entered by the crew lead. Nobody home (most plan visits): no code; the lead opens the lockbox or door code.",
+   "entry_codes": "Shown only to the crew lead, only on the visit day, and each opening is logged. The key goes back in the lockbox at the end.",
+   "lockout": "No way in when nobody needs to be home (a lockbox, door or garage code fails): the crew lead texts it, Alex gets a link for a new code, and the crew waits 30 minutes, then leaves. A lockout fee only if the owner confirms it.",
+   "drop_off": "At the business: the code is given at the counter when the rug or curtains are left. Status words IN, DRYING, READY. READY comes with a photo. Pick-up only by the customer or someone they name.",
+   "changes_at_visit": "Add-ons only when the customer asks, priced before they're done. A heavy clean is priced before any work. A right to cancel where the state's rules give one.",
+   "proof_done": "Before photos, a room-by-room checklist, after photos from the same angles. DONE with after photos when nobody's home.",
+   "breakage": "Reported with photos the same day; the owner decides how to make it right."
+  },
+  "pf.money": {
+   "start": "House cleaning: a card saved at booking, charged at DONE. Drop-offs: nothing taken, paid at the counter at pick-up.",
+   "deposits": "None by default. Sam can set a deposit or the full price per service, within the state's caps (the example: a 25% deposit on a move-out clean priced from photos). Deposit cap: from the state form.",
+   "fees": "Late cancel and lockout: the business's own fee (the example: $89), never more than the visit's price. The owner confirms each one; no answer, no fee.",
+   "plans": "Each plan visit is charged at its own DONE. Rosfield's $2 counts once a month for a plan.",
+   "tips": "Optional, all to the crew. A tip line only if the owner turns it on. How card tips are handled follows the state's rules, from the state form.",
+   "tax": "A sales tax line only where the state taxes house cleaning, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Entry, lockbox, door, garage and alarm codes",
+    "Where a key is kept",
+    "Health reasons, like an allergy behind a product to avoid"
+   ],
+   "photos": "Photos of the home go only to the customer and the business.",
+   "languages": "English and Spanish. The crew's language shows on the job.",
+   "minors": "Nobody under 18 books. A teen at home isn't the booking's adult."
+  },
+  "pf.staff": {
+   "skills": [
+    "Deep and standard cleans",
+    "Move-out cleans",
+    "Carpet shampoo",
+    "Window washing",
+    "Rug washing, stain removal, antique rugs"
+   ],
+   "crews": "Two per home clean: a lead, who holds the entry code and texts DONE, and a helper.",
+   "licenses": "None per person unless the state's form says so.",
+   "new_person_ok": "A cleaner the customer hasn't booked is offered by text first, never sent without an OK. No answer: the rest of the booked crew comes and the clean takes about an hour longer, or it moves with no fee.",
+   "who_oks": "The owner OKs quotes over the limit. The office manager may too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "plans": [
+    "The plan's terms show before any card is asked: how often, the price a visit, when it's charged, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking, and the terms are texted back.",
+    "One reply ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask.",
+    "Any reminder the state's rules require for a running plan."
+   ],
+   "add_on_at_home": "A right to cancel where the state's rules give one for work sold at the home.",
+   "written_contract": "Above an amount, where the state's rules require it.",
+   "landlord": "A move-out clean booked by a renter may need the landlord's or manager's OK.",
+   "records": "7 years, with the before and after photos."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "Lockout: a code that fails when nobody needs to be home. The crew waits 30 minutes, then leaves; the owner decides any fee.",
+    "Something breaks during the clean: photos the same day; the owner decides.",
+    "Missed spots: tell the business within 24 hours; a free re-clean of those areas within 48 hours. A redo, never money from Rosie.",
+    "A crew member is out: a new person is offered first; no answer, the rest of the crew comes for longer.",
+    "Skip, pause or end a plan, and a plan's price change.",
+    "Mold or sewage found during the clean: that area stops; a written note goes to the customer.",
+    "A rug or curtains not picked up: reminders; after the free days, a storage fee only if the owner starts it, after written notice.",
+    "Weather over the limit for outside window washing: Sam keeps the visit or moves it, with no fee.",
+    "Several open bookings (a plan's next visits): which one is asked first."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "firststeps",
+   "sentnow",
+   "dropoff",
+   "photos",
+   "tips",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Rowan and Sasha (rug cleaners)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Robin and Jamie (crew leads)",
+   "cust": "Alex M. (customer) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Rowan"
+  },
+  "B": {
+   "staff": "Robin"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "My employer pays for this cut.",
+    "My landlord pays for this rug wash."
+   ],
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's landlord for a rug in a rental."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please roll the rug, don't fold it, on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please roll the rug, don't fold it."
+   ],
+   [
+    "like the cut in the mirror.",
+    "like the rug laid out at the counter."
+   ],
+   [
+    "would like to see your hair before pricing it.",
+    "would like to see your rug before pricing it."
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Any spots or pet stains to point out? (optional)"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Rowan can still take the rug in when you get here, at the same price. Or you can move to a later time. No reply by 11:00am keeps your drop-off."
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'My rug needs a wash' or 'a dirty runner' fits a rug wash."
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, and add the runner'"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a card saved for the $89 late-cancel fee"
+   ],
+   [
+    "After the job: Rosie sends the bill",
+    "After the clean: the saved card is charged at DONE"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "House cleaning for homes in Springfield. Deep cleans, plan cleans and move-out cleans, within 25 miles."
+   ],
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your rug is clean and ready for pick-up."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most rug cleaners set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Rug washing, stain removal and curtain cleaning."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a leather coat to be cleaned, which isn't on the shop's list."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't clean leather coats."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Rowan: rug cleaner, stain work, home visits"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A stain removal's example: 'Stain removal here needs a quick dye test first."
+   ],
+   [
+    "Color quotes come to you first.",
+    "Stain removal quotes come to you first."
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules cleans rugs on their own, with their own customers."
+   ],
+   [
+    "like a chair renter",
+    "like a cleaner with their own customers"
+   ],
+   [
+    "A chair renter asked for by name",
+    "A cleaner with their own customers, asked for by name"
+   ],
+   [
+    "like a step-free chair",
+    "like a step-free entrance"
+   ],
+   [
+    "A chair, ready",
+    "A rug, washed"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The fringe on my rug got torn."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the fringe on the rug got torn"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you wash bath mats too?"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24 · 11:00am drop-off · rug wash"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything the rug cleaner should know?"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. rug wash Sat 11am"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds slots side by side, within the day's drop-off number."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Both go in one drop-off slot, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds upholstery cleaning to Lee Rug Care."
+   ],
+   [
+    "NEW massage",
+    "NEW upholstery cleaning"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Upholstery cleaning for Lee Rug Care: is it the same company?"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A rug shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no rug cleaner. A day shows only if a rug cleaner with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Rug Care · drop-off"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a clean before guests arrive"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 inspection; priced at the counter"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A rug wash is rated, so the shop takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Rowan's stain plan after an inspection"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Rug Care sent you a proposal: Rowan's stain plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Stain plan"
+   ],
+   [
+    "your first color plan visit",
+    "your first stain plan visit"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of the stain"
+   ],
+   [
+    "photos of your hair",
+    "photos of your rug"
+   ],
+   [
+    "Gloss to finish",
+    "Fringe touch-up"
+   ],
+   [
+    "gloss",
+    "fringe touch-up"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Cleans are priced by the home's size. Plans repeat every 1, 2 or 4 weeks. Sewage or a big mold patch stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Rugs and curtains are dropped off at the shop and picked up when ready. A rug can also be washed at the customer's home."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Rowan can still take the rug in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Lee Rug Care's visits are drop-offs. A repair shop, a tailor or a groomer works the same way."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A cleaner's example: sewage gets 'keep children and pets away, and stay out if it's near outlets'."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A building manager drops off rugs for five apartments on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: wool 3x5, colors held in the dye test, wash cold next time"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your rug wash is part of a plan, every 4 weeks."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like a rug soaked with sewage."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My rug got soaked in a basement flood. Can I still bring it?"
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says a stain is still there after Saturday's wash."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "For rugs: a rug soaked with sewage stays outside, away from children and pets."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop off a second rug at the same time?"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "House cleaning · window washing"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a carpet cleaner or a rug shop"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for the entry rug washed every 4 weeks."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Curtain cleaning"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group drop-off together"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "A stain is still there on one corner."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Rowan stopped Alex M.'s rug wash."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a rug washed on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero lavar una alfombra el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books an entry rug wash every 4 weeks"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Rowan sees the rug"
+   ],
+   [
+    "plumbing and electrical",
+    "house cleaning and window washing"
+   ],
+   [
+    "Signature cut and shave",
+    "Curtain cleaning"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Bath mat wash"
+   ],
+   [
+    "like a skin-test result",
+    "like a dye-test result"
+   ],
+   [
+    "A barbershop has none.",
+    "A rug shop has none."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s rug wash."
+   ],
+   [
+    "Haircut every 4 weeks",
+    "Rug wash every 4 weeks"
+   ],
+   [
+    "also does color and",
+    "also does stain work and"
+   ],
+   [
+    "Water heater flush",
+    "Standard clean"
+   ],
+   [
+    "A color correction",
+    "An antique rug wash"
+   ],
+   [
+    "a color correction",
+    "an antique rug wash"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Cleaning's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Cleaning"
+   ],
+   [
+    "barber, color and",
+    "rug cleaner, stain work and"
+   ],
+   [
+    "a package of cuts",
+    "a package of washes"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Rug Care"
+   ],
+   [
+    "Color correction",
+    "Antique rug wash"
+   ],
+   [
+    "color correction",
+    "antique rug wash"
+   ],
+   [
+    "Only the consult",
+    "Only the inspection"
+   ],
+   [
+    "Groom's package",
+    "Large rug wash"
+   ],
+   [
+    "Drain clearing",
+    "Deep clean"
+   ],
+   [
+    "2 Consult only",
+    "2 Inspection only"
+   ],
+   [
+    "service, color",
+    "service, stain work"
+   ],
+   [
+    "Panel upgrade",
+    "Skylights and high windows"
+   ],
+   [
+    "Signature cut",
+    "Curtain cleaning"
+   ],
+   [
+    "signature cut",
+    "curtain cleaning"
+   ],
+   [
+    "Color and cut",
+    "Stain removal"
+   ],
+   [
+    "color and cut",
+    "stain removal"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Clean"
+   ],
+   [
+    "Lee Electric",
+    "Lee Windows"
+   ],
+   [
+    "1200 Main St",
+    "500 Lake St"
+   ],
+   [
+    "Water heater",
+    "Move-out clean"
+   ],
+   [
+    "water heater",
+    "move-out clean"
+   ],
+   [
+    "Consult only",
+    "Inspection only"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Color always",
+    "Stain work always"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "$25 consult",
+    "$25 inspection"
+   ],
+   [
+    "the consult",
+    "the inspection"
+   ],
+   [
+    "color quote",
+    "stain quote"
+   ],
+   [
+    "a staff cut",
+    "an office rug wash"
+   ],
+   [
+    "Electrical",
+    "Window washing"
+   ],
+   [
+    "electrical",
+    "window washing"
+   ],
+   [
+    "Barbershop",
+    "Rug care"
+   ],
+   [
+    "barbershop",
+    "rug shop"
+   ],
+   [
+    "Beard trim",
+    "Cushion cover wash"
+   ],
+   [
+    "beard trim",
+    "cushion cover wash"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "does color",
+    "does stain work"
+   ],
+   [
+    "patch test",
+    "dye test"
+   ],
+   [
+    "88 Elm St",
+    "64 Pine St"
+   ],
+   [
+    "on Elm St",
+    "on Pine St"
+   ],
+   [
+    "Electric.",
+    "3 bed, 2 bath."
+   ],
+   [
+    "kids cuts",
+    "bath mat washes"
+   ],
+   [
+    "Skin fade",
+    "Runner wash"
+   ],
+   [
+    "two skin fades",
+    "two small rug washes"
+   ],
+   [
+    "skin fade",
+    "runner wash"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "MP045210",
+    "LLC 0451210"
+   ],
+   [
+    "Plumbing",
+    "House cleaning"
+   ],
+   [
+    "plumbing",
+    "house cleaning"
+   ],
+   [
+    "Kids cut",
+    "Bath mat wash"
+   ],
+   [
+    "kids cut",
+    "bath mat wash"
+   ],
+   [
+    "Haircuts",
+    "Rug washes"
+   ],
+   [
+    "haircuts",
+    "rug washes"
+   ],
+   [
+    "cut hair",
+    "clean rugs"
+   ],
+   [
+    "Plumber",
+    "House cleaner"
+   ],
+   [
+    "plumber",
+    "cleaner"
+   ],
+   [
+    "Barbers",
+    "Rug cleaners"
+   ],
+   [
+    "barbers",
+    "rug cleaners"
+   ],
+   [
+    "Haircut",
+    "Rug wash"
+   ],
+   [
+    "haircut",
+    "rug wash"
+   ],
+   [
+    "Jordan",
+    "Robin"
+   ],
+   [
+    "Barber",
+    "Rug cleaner"
+   ],
+   [
+    "barber",
+    "rug cleaner"
+   ],
+   [
+    "Casey",
+    "Jamie"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Riley",
+    "Rowan"
+   ],
+   [
+    "Avery",
+    "Sasha"
+   ],
+   [
+    "flush",
+    "standard clean"
+   ],
+   [
+    "like a burst pipe",
+    "like a clean before guests arrive"
+   ],
+   [
+    "skin fade",
+    "small rug wash"
+   ],
+   [
+    "Style consult",
+    "Rug check"
+   ],
+   [
+    "style consult",
+    "rug check"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ]
+  ],
+  "B": [
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A first clean here is a deep clean, which takes longer, so the first open times are next week."
+   ],
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "BS20981",
+    "REG-2020-0533"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most rug cleaners start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules rug cleaners often set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood rug shop on Pine St. Rug washing, stain removal and curtain cleaning."
+   ],
+   [
+    "The chairs",
+    "The wash floor"
+   ],
+   [
+    "A chair, ready",
+    "A rug, washed"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Robin finds heavy grease inside the oven."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 clean inside the oven, heavy grease"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: inside the oven, $60. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Clean inside the oven · $60"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a deep clean for my apartment."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My place is a mess after a party' fits a deep clean."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like cleaning a neighbor's home without their OK."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding inside the oven? Say so.'"
+   ],
+   [
+    "can clear the drain:",
+    "can do the deep clean:"
+   ],
+   [
+    "Yes, it won't drain",
+    "Avoid bleach; the wood floors are unsealed"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 deep clean needs none."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Kitchen and baths, heavy buildup · $540"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on the hall floor this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a clean before guests, today,"
+   ],
+   [
+    "two drain clearings",
+    "two deep cleans"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I wax the floors before you come?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a cleaner wash my windows this Thursday, inside and out? What does it cost?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds pest control to Lee Home Cleaning."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW pest control"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Pest control for Lee Home Cleaning: is it the same company?"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a clean before guests arrive"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration LLC 0451210"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 after-remodel clean"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your after-remodel clean"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a carpet shampoo Robin noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a carpet shampoo, from Robin's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Carpet shampoo"
+   ],
+   [
+    "like an overflowing drain",
+    "like a clean before guests arrive"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My guests arrive tomorrow. Can someone come tonight?"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Deep clean before guests"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the kitchen and baths only, $165. Leave the rest of the home."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "cleans the kitchen and baths today, $165. The $80 rest of the home stays good until Thu Oct 29."
+   ],
+   [
+    "LATE camera report",
+    "LATE stain report"
+   ],
+   [
+    "No answer in 15 minutes",
+    "No answer in 30 minutes"
+   ],
+   [
+    "Thu Oct 22, 10:20am",
+    "Thu Oct 22, 10:35am"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Cleans are priced by the home's size. Plans repeat every 1, 2 or 4 weeks. Sewage or a big mold patch stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Rugs and curtains are dropped off at the shop and picked up when ready. A rug can also be washed at the customer's home."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Cleaning cleans homes and washes windows. Meals, errands or company is home care, licensed where the state's rules require it. Nothing was saved."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep children and pets away, and to stay out if the water reaches an outlet."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: bedrooms, bathrooms and square feet, a pro clean in the last 30 days, pets, and how the crew gets in."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantenga a los niños y las mascotas lejos del sótano. Si el agua llega a un enchufe, no entre."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep children and pets out of the basement, and stay away if water is near outlets. The crew will leave the basement out."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Can someone deep clean my 3-bedroom house Thursday morning, then every 2 weeks? We have a dog. I'm in Springfield."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Robin found a big mold patch on your bathroom ceiling and left that room out."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep children and pets out of the basement. If the water reaches an outlet, stay out."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Cleaning doesn't do, like home care for an older parent."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For house cleaning, a gas smell stops the booking. Sewage or a big mold patch is left out."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Robin finds a big mold patch on the bathroom ceiling. The plug-in says a cleaner stops there"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A cleaner's example: sewage gets 'keep children and pets away, and stay out if it's near outlets'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? There's sewage in the basement."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is your cleaning spray safe for my asthma?"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of each room, and a cleaner will price the job."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a big mold patch, sewage, biohazards or a gas smell."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE marble counters: stone-safe cleaner only. Dog stays in the yard."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how many bedrooms and bathrooms, and did a pro clean it in the last 30 days?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Robin walks through the home and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Robin has seen your home. Here's the price to clean it today."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Robin went to get more floor cleaner and will be back about 9:30am."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s guest bath was missed in the Thu Oct 22 clean."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. A carpet shampoo is $199, from the list."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "That's under our quality promise, so the re-clean is free."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Robin's crew also shampoo the living room carpet?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 inside the oven and fridge, Alex asked"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hay aguas negras en el sótano."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a standard clean of two rentals every 2 weeks"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Robin's crew come again next week?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Robin's crew cracked a lamp at Alex M.'s."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the promise lasts: tell within 24 hours, re-clean within 48."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scratch on the hall floor"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a carpet shampoo."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿El agua llega a algún enchufe?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Sewage backed up into the basement."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can the crew also shampoo the living room carpet?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Robin's crew runs out of floor cleaner."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD big mold patch, bathroom ceiling, left out"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please pick up clutter, and keep the dog in the yard."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the water near any outlet?"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with that area left out."
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "the one who does move-out cleans"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "House cleaning · window washing"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex, home today, asks Robin's crew to clean inside the oven and fridge too."
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Relocation, the basic package."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The next morning, Alex finds the guest bath was missed."
+   ],
+   [
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Oct 23 · arriving 8–10am · Robin"
+   ],
+   [
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "Sat Oct 24 · arriving 8–10am · Robin"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The guest bath wasn't cleaned."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Robin's crew skipped the guest bath."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 kitchen and baths 165 rest of home 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the main bathroom"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Robin slips on a wet floor and texts HURT."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Curtain cleaning"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Any products to avoid, or surfaces that need care?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: mold on the bathroom ceiling"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a lamp in the living room"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting more floor cleaner, back 9:30"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Robin's crew cracks a lamp"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped on a wet floor, need to stop"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It isn't near the outlets."
+   ],
+   [
+    "replacing both shutoff valves",
+    "cleaning inside the oven and fridge"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the stain report link"
+   ],
+   [
+    "replace both shutoff valves",
+    "clean inside the oven and fridge"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Inside the oven and fridge"
+   ],
+   [
+    "the sink is now overflowing",
+    "sewage backed up into the basement"
+   ],
+   [
+    "who replaces water heaters",
+    "who does move-out cleans"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's clean"
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the clean"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold on the bathroom ceiling"
+   ],
+   [
+    "Water heater replacement",
+    "Move-out clean"
+   ],
+   [
+    "water heater replacement",
+    "move-out clean"
+   ],
+   [
+    "The repair price is good",
+    "The price is good"
+   ],
+   [
+    "plumbing and electrical",
+    "house cleaning and window washing"
+   ],
+   [
+    "Sewer camera inspection",
+    "Carpet shampoo"
+   ],
+   [
+    "sewer camera inspection",
+    "carpet shampoo"
+   ],
+   [
+    "Jordan found more work.",
+    "Here's the add-on you asked Robin for."
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or package pays"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Deep clean"
+   ],
+   [
+    "credited to the repair",
+    "credited to the clean"
+   ],
+   [
+    "replaces water heaters",
+    "does move-out cleans"
+   ],
+   [
+    "Just the kitchen sink.",
+    "3 bed, 2 bath, about 1,800 sq ft. No pro clean this year."
+   ],
+   [
+    "Under the sink, before",
+    "Kitchen, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your clean"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked lamp"
+   ],
+   [
+    "Cabinet floor, before",
+    "Hall floor, before"
+   ],
+   [
+    "your new pipes are in",
+    "the floors are done"
+   ],
+   [
+    "1-year labor warranty",
+    "quality promise"
+   ],
+   [
+    "for a bathroom drain",
+    "for a clean"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Kitchen and baths · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 oven and fridge quote"
+   ],
+   [
+    "the warranty company",
+    "the relocation company"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomecleaning.com"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 oven and fridge clean"
+   ],
+   [
+    "Sewer camera report",
+    "Carpet stain report"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No llega a los enchufes."
+   ],
+   [
+    "also does color and",
+    "also does stain work and"
+   ],
+   [
+    "Insurance pays part",
+    "A package pays part"
+   ],
+   [
+    "Water heater flush",
+    "Standard clean"
+   ],
+   [
+    "water heater flush",
+    "standard clean"
+   ],
+   [
+    "clear a yard drain",
+    "wash the outside windows"
+   ],
+   [
+    "the shutoff valves",
+    "the oven and fridge"
+   ],
+   [
+    "home warranty plan",
+    "relocation package"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Cleaning's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Cleaning"
+   ],
+   [
+    "camera inspection",
+    "carpet shampoo"
+   ],
+   [
+    "the kitchen drain",
+    "the deep clean"
+   ],
+   [
+    "Supply line · $80",
+    "Rest of the home · $80"
+   ],
+   [
+    "barber, color and",
+    "rug cleaner, stain work and"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Rug Care"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa deep clean"
+   ],
+   [
+    "Drain clearings",
+    "Deep cleans"
+   ],
+   [
+    "Book the repair",
+    "Book the clean"
+   ],
+   [
+    "Drain clearing",
+    "Deep clean"
+   ],
+   [
+    "drain clearing",
+    "deep clean"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 deep clean"
+   ],
+   [
+    "today's repair",
+    "today's clean"
+   ],
+   [
+    "Panel upgrade",
+    "Skylights and high windows"
+   ],
+   [
+    "water heaters",
+    "move-out cleans"
+   ],
+   [
+    "Kitchen drain",
+    "Deep clean"
+   ],
+   [
+    "home warranty",
+    "relocation package"
+   ],
+   [
+    "warranty plan",
+    "relocation package"
+   ],
+   [
+    "to the repair",
+    "to the heavy clean"
+   ],
+   [
+    "Signature cut",
+    "Curtain cleaning"
+   ],
+   [
+    "cut your hair",
+    "wash your rug"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Clean"
+   ],
+   [
+    "Lee Electric",
+    "Lee Windows"
+   ],
+   [
+    "1200 Main St",
+    "500 Lake St"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "Service call",
+    "Visit fee"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "Water heater",
+    "Move-out clean"
+   ],
+   [
+    "water heater",
+    "move-out clean"
+   ],
+   [
+    "shop's chair",
+    "shop's counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Leak repair",
+    "Heavy clean"
+   ],
+   [
+    "leak repair",
+    "heavy clean"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Electrical",
+    "Window washing"
+   ],
+   [
+    "electrical",
+    "window washing"
+   ],
+   [
+    "Barbershop",
+    "Rug care"
+   ],
+   [
+    "barbershop",
+    "rug shop"
+   ],
+   [
+    "Yard drain",
+    "Outside windows"
+   ],
+   [
+    "yard drain",
+    "outside windows"
+   ],
+   [
+    "Beard trim",
+    "Cushion cover wash"
+   ],
+   [
+    "beard trim",
+    "cushion cover wash"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "does color",
+    "does stain work"
+   ],
+   [
+    "42 Oak St",
+    "17 Birch Ln"
+   ],
+   [
+    "88 Elm St",
+    "64 Pine St"
+   ],
+   [
+    "Electric.",
+    "3 bed, 2 bath."
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "MP045210",
+    "LLC 0451210"
+   ],
+   [
+    "Plumbing",
+    "House cleaning"
+   ],
+   [
+    "plumbing",
+    "house cleaning"
+   ],
+   [
+    "cut hair",
+    "clean rugs"
+   ],
+   [
+    "Plumber",
+    "House cleaner"
+   ],
+   [
+    "plumber",
+    "cleaner"
+   ],
+   [
+    "Barbers",
+    "Rug cleaners"
+   ],
+   [
+    "barbers",
+    "rug cleaners"
+   ],
+   [
+    "Haircut",
+    "Rug wash"
+   ],
+   [
+    "haircut",
+    "rug wash"
+   ],
+   [
+    "Jordan",
+    "Robin"
+   ],
+   [
+    "Barber",
+    "Rug cleaner"
+   ],
+   [
+    "barber",
+    "rug cleaner"
+   ],
+   [
+    "Casey",
+    "Jamie"
+   ],
+   [
+    "Riley",
+    "Rowan"
+   ],
+   [
+    "Avery",
+    "Sasha"
+   ],
+   [
+    "flush",
+    "standard clean"
+   ],
+   [
+    "Labor",
+    "By the hour"
+   ],
+   [
+    "The $80 supply line stays good",
+    "The $80 rest of the home stays good"
+   ],
+   [
+    "shutoff valve",
+    "kitchen and baths"
+   ],
+   [
+    "like a burst pipe",
+    "like a clean before guests arrive"
+   ],
+   [
+    "sewer camera report",
+    "carpet stain report"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off slot at Lee Rug Care, Sat Oct 24, leaves a small rug at the counter, and picks it up clean a few days later. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Home Cleaning for 17 Birch Ln: a deep clean first, Thu Oct 22 between 8 and 10am with Robin's crew, then a clean every 2 weeks. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|full|none",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 small rug wash. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+    "list|card|counter": "A $35 small rug wash. A card is saved for the shop's $20 fee. Alex pays at the counter at pick-up.",
+    "list|full|none": "Curtain cleaning, $55, paid in full when booking.",
+    "photos|none|counter": "Stain removal, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+    "visit|none|counter": "An antique rug, priced at the counter. Only the $25 inspection is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Small rug wash"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Small rug wash"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Curtain cleaning"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Stain removal"
+    },
+    "visit|*|*": {
+     "name": "Antique rug wash"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Rug pad wash",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Curtain cleaning",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Small rug wash (plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "photos|card|card",
+    "visit|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 deep clean first, then a plan. A card is saved for the $89 late-cancel fee and charged $179 when Robin texts DONE.",
+    "list|none|bill": "A $179 deep clean. Nothing is taken. Rosie texts the bill after the clean.",
+    "photos|card|card": "A move-out clean, priced from photos at $640. Sam OKs it. The card is charged at DONE.",
+    "visit|card|card": "A heavy clean, priced at the visit before any work. A card is saved for the $89 late-cancel fee."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Deep clean"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Deep clean"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Move-out clean"
+    },
+    "visit|*|*": {
+     "name": "Heavy clean"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Inside the oven and fridge",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$60",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Window washing",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Standard clean (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "keep": [
+  "dye",
+  "steamer",
+  "leak",
+  "color"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a license or a registration to clean homes, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Rug care needs no license where Sam works, so a rug can be washed at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state licenses rug care, its form asks for the license here instead.",
+     "Each rug cleaner can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Robin: house cleaning and window washing",
+         "Jamie: house cleaning",
+         "Rowan: rug care, stain work and home visits",
+         "Sasha: rug care"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Rowan replies YES, then checks what Sam set. One reply covers everything Rowan does for the shop.",
+    "more": [
+     "No license number is asked: rug care needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Sasha, Robin and Jamie join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Rowan"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Rug Care! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Rowan Chen · Lee Rug Care",
+        "lines": [
+         "Every shop service, stain work and home visits",
+         "Hours: the shop's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Rowan"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Rowan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: the rug's size and what it's made of. A bigger rug takes longer to dry.",
+     "Pet stains are asked here too, since they change the price.",
+     "Questions that only add detail come later, once a time is saved."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "How big is the rug, and what's it made of?"
+     ],
+     [
+      "cust",
+      "agent",
+      "About 3 by 5 feet. It's wool."
+     ]
+    ],
+    "vary": {
+     "price:list+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "How big is the rug? A big rug takes longer to dry."
+       ],
+       [
+        "cust",
+        "agent",
+        "8 by 10 feet."
+       ]
+      ]
+     },
+     "price:list+before:deposit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "How big is the rug? A big rug takes longer to dry."
+       ],
+       [
+        "cust",
+        "agent",
+        "8 by 10 feet."
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "How many curtain panels, and are they lined?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Two panels, not lined."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "How big is the stain, and what is it?"
+       ],
+       [
+        "cust",
+        "agent",
+        "About the size of my hand. Red wine."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "How old is the rug, and was it ever washed?"
+       ],
+       [
+        "cust",
+        "agent",
+        "It was my grandmother's. Never washed."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "At Lee Rug Care, a time is a drop-off time. Once the rug is in, the shop gives it to a rug cleaner with the skill.",
+     "Stain work shows only the days Rowan works.",
+     "Pick-up comes once it's READY, in the pick-up hours."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No rug cleaner is named: once the rug is in, the shop gives it to a rug cleaner with the skill.",
+    "more": [
+     "A wish for one rug cleaner goes in the notes, and the shop follows it where it can."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "The times came by text on this path, so Alex replies to Rosie's text with a drop-off time.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "A"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A rug or curtain drop-off is never booked for a child."
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex brings the rug to the counter. Alex reads the code from the confirmation or the reminder, and Rowan texts it in.",
+    "more": [
+     "At Lee Rug Care, the visit is a drop-off: the code is given when the rug is left.",
+     "The desk can type the code on the portal's Today page instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M., Sat 11:00am. One wool rug, 3 by 5."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "Lee Rug Care's main path above is the drop-off. This branch is a mail-in: a rug shipped to the shop has no code, so DONE comes when it arrives.",
+    "more": [
+     "At pick-up, the rug goes only to the customer or someone they name.",
+     "Next come the before notes, the price or the OK, and the wash. READY and the pick-up come after the work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Rowan washes and dries the rug over a few days: what was booked, and anything Alex said yes to.",
+    "more": [
+     "Rowan texts IN, DRYING and READY as it goes.",
+     "Next, Alex hears it's ready and picks it up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "At Lee Rug Care, Alex pays when picking up the rug."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "House cleaning, window washing and rug care need no state license where Sam works (pf.license); the company gives its registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The cleaner's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and rug cleaners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: cleans, washes and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Cleaners need no license of their own unless the state's form says so (pf.staff)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "A clean before guests arrive can be sent now (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A rug is washed at the shop or at the home, never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee Rug Care books drop-off slots, set by how many rugs it takes in a day (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The plug-in names no form to sign for rug care."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The rug is left at the shop: READY and the pick-up follow the wash (D29)."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rug wash is rated."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no rug cleaner. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A rug waits in its drop-off slot, so a rug cleaner running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Lee Rug Care takes rugs and curtains; no child is ever left at the shop."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a license or a registration to clean homes, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Rug care needs no license where Sam works, so a rug can be washed at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-38",
+    "more": [
+     "Where a state licenses rug care, its form asks for the license here instead.",
+     "Each rug cleaner can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Robin: house cleaning and window washing",
+         "Jamie: house cleaning",
+         "Rowan: rug care, stain work and home visits",
+         "Sasha: rug care"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Robin replies YES, then checks what Sam set. One reply covers every kind of work Robin does.",
+    "more": [
+     "No license number is asked: this work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Jamie, Rowan and Sasha join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Robin"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Home Cleaning! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Robin Price · Lee Home Cleaning",
+        "lines": [
+         "Every house cleaning job, and window washing",
+         "Crew lead: sees entry codes on visit days",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Robin"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Robin"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "A new home's first clean is the deep clean, unless a pro cleaned it in the last 30 days. That's the plug-in's rule.",
+     "The price and length come from the home's size: bedrooms, bathrooms and square feet."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-43",
+    "more": [
+     "Alex's plan, a clean every 2 weeks after the deep clean, is the plan branch. Its visits keep the same weekday and window."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Alex wants a clean every 2 weeks after the deep clean. Lee Home Cleaning offers plans every 1, 2 or 4 weeks, so the AI shows the terms.",
+    "more": [
+     "The AI never offers a plan the customer didn't ask for.",
+     "Each plan visit keeps the first clean's weekday, window and crew.",
+     "Each visit gets its own reminder. Most need nobody home: the crew uses the lockbox."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "After the deep clean, can you come every 2 weeks?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee Home Cleaning's plan is a standard clean every 2 weeks, $135 a visit, on Thursdays with the same crew. It runs until you end it. Want it?",
+      {
+       "buttons": [
+        "Yes, every 2 weeks",
+        "Just the deep clean"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "A lockbox or garage code is typed on the page the same way. Only the crew lead sees it.",
+     "The key goes back in the lockbox at the end.",
+     "Pets: where they'll be during the clean."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "does": "The page shows the plan's terms: a standard clean every 2 weeks, $135 a visit, paid after each clean. It says how to skip, pause or end, too. Alex says yes to them on their own.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Standard clean plan · every 2 weeks",
+        "lines": [
+         "$135 a visit, charged after each clean",
+         "Same weekday, window and crew as the first clean",
+         "Runs until you end it",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes, so Alex has them in writing.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "Yes: every 2 weeks",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to the plan on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: how often, the price a visit, how each visit is paid, and that it runs until Alex ends it.",
+           "Ending it takes one reply. Visits already done stay paid.",
+           "Any reminder the state's rules require for a running plan comes from the plug-in."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your plan with Lee Home Cleaning is set.",
+            {
+             "card": {
+              "title": "Standard clean every 2 weeks · $135 a visit",
+              "lines": [
+               "Starts Thu Nov 5 · arriving 8–10am · Robin's crew",
+               "After each clean: {{pay.after}}",
+               "Runs until you end it"
+              ]
+             },
+             "buttons": [
+              "End the plan"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-08",
+    "more": [
+     "Cancelling the first clean also ends the plan that starts after it. The text says so before Alex taps."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "more": [
+     "For house cleaning, a cleaner Alex hasn't booked is never sent without an OK.",
+     "Only someone with the skill for the job is offered, from Sam's team list."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-52",
+    "more": [
+     "For house cleaning, a lockbox, door or garage code that fails counts the same. The crew lead texts it, and Alex gets the same link."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-17",
+    "does": "On plan visits, nobody needs to be home. Robin opens the lockbox with the code shown only today. DONE with after photos confirms it.",
+    "more": [
+     "The key goes back in the lockbox at the end.",
+     "Alex gets the photos and has 24 hours to say if a spot was missed. Sam is told of any reply.",
+     "Only for visits the plug-in marks 'nobody needs to be home', like plan cleans."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE",
+      {
+       "photos": [
+        "Kitchen, after",
+        "Living room, after"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Home Cleaning finished your clean, and the key is back in the lockbox. Here are the photos. Reply within 24 hours if a spot was missed.",
+      {
+       "photos": [
+        "Kitchen, after",
+        "Living room, after"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "For house cleaning: before photos of each room, then a room-by-room checklist."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "For house cleaning, an add-on like inside the oven is priced and OK'd this way before it's done."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-08",
+    "more": [
+     "It's a redo of the missed areas, never money from Rosie."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "House cleaning, window washing and rug care need no state license where Sam works (pf.license); the company gives its registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The cleaner's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and rug cleaners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: cleans, washes and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Cleaners need no license of their own unless the state's form says so (pf.staff)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "A clean before guests arrive can be sent now (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "The plug-in names no form to sign for house cleaning."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Cleans are booked in arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Cleans are visits, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Cleans book a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A cleaner never looks after a child; an adult on the booking must be there when someone's home."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "A heavy clean is priced and done at the visit; house cleaning never turns an estimate into a project."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A clean is rated, like most home services."
+   }
+  ]
+ },
+ "notes": "Flow B is the usual side: Lee Home Cleaning (house cleaning, plus window washing as its second kind of work). Flow A is the less usual side: Lee Rug Care, Sam's second company, where customers drop off rugs and curtains and pick them up clean.\nSecond kind of work: window washing, not a licensed trade, so nothing is invented about licenses. House cleaning, window washing and rug care need no state license where Sam works; the sign-up and team license steps say so and check the company's business registration instead (the plug-in's default). Where a state's form asks for one, the same steps ask for it.\nNames: Jordan and Casey become crew leads Robin and Jamie; Riley and Avery become rug cleaners Rowan and Sasha. They're neutral names, so every he, she or they in the master still fits. Addresses: 17 Birch Ln, 500 Lake St, 64 Pine St.\nEvery master number is kept, so sums, deposits and refunds still add up: $179 deep clean, $150 standard clean, $640 move-out clean from photos, $245 heavy clean priced at the visit, $89 visit fee, $35 small rug wash, $55 curtains, $140 large rug, $90 stain removal, $25 inspection.\nThe old flowchart's $50 late-cancel and $75 lockout fees became one $89 visit fee, so the master's single fee reads right. The old 48-hour free-cancel window is left to Sam's booking rules (the master's 7am the day of the visit).\nMain money: B is list|card|card (a card saved, charged at DONE), the way cleaners are paid. A is list|none|counter (nothing taken, paid at the counter at pick-up). Only the combinations the work really uses are listed.\nThe plan is an event, not a money choice: B4-44 and the own split B6-x01 (terms texted back) stay lit on every money path; the main story takes 'Yes: every 2 weeks'. The plan's terms and own yes are the master's now (B5-20, B5-21: G8); a words op gives B5-21 the cleaner's plan, and the own B6-x01 still texts the terms back.\nRename carries the example's own words, sentence by sentence where the master's example message was plumbing or barbering (drains, water heaters, haircuts). Words ops are used only where the meaning changes for this work: licenses, the plan, the lockbox visit, the drop-off, the questions that set the price.\nOff: A4-24 'A child' and A8-32 'A child goes home with an adult' (no child customers at a rug drop-off), B8-22 'A delivery to set up' (a cleaner delivers nothing).\nA lockout (the lockbox code fails on a plan visit, with nobody home) is the master's code-fails path (B8-52, B8-53: G10), with a more line for the lockbox. Rename pairs carry the plug-in's 30-minute wait into B8-52 and B8-53 (the master's example waits 15). Codes themselves are the master's: typed only on the secure page, shown to the crew lead on the day, each view logged (B4-67), so B4-34 and B8-17 keep only the lockbox's key and the plan visits.\nThe both-places service is Lee Rug Care's rug wash: $35 at the shop, or $75 washed at the customer's home.\nThe master's home warranty plan became an employer's relocation package (it can pay for a move-out clean); its Insurance pays part label in flow B reads 'A package pays part'.\nThe large rug wash keeps the master's 2½ hours, so the master's long-service hold logic still reads right; it's the shop's work time, not the drop-off.\nRefit to master v1.1 (Oct 22): the master's drop-off READY (A8-50) is off, since Lee Rug Care's READY comes after the wash (A8-x01). B8-50 (an outside check) and B10-07's permit-inspection branch are off: house cleaning has neither. (v1.2: A8-50 is on again, with the rug's words.)\nThe cleaner doesn't use a deposit on a starting price (G26): the heavy clean's $89 visit fee is saved on the card, so the visit+deposit paths stay out of money.B.combos. Rename pairs only make their words read right.\nJamie is a crew lead (the master's Casey), so the master's new partner Jamie (A4-24, A4-63, B4-72, B4-73) is Jesse here.\nRefit to master v1.2 (Oct 22, evening): staff out is B7-56's split. A home clean is a crew of two, so the main story takes 'A crew of two or more': B7-53's words send the rest of the crew, for longer (was the own B7-x01). 'One person, by name' (window washing) offers Jamie first; with no reply the visit moves to Robin's next open time with no fee (B7-20, B7-22 words), never an unbooked cleaner. A date that can't move (a move-out day) keeps Sam's call on no reply (B7-54).\nRefit to master v1.2: licenses are the master's plug-in splits now (D24): S1-60 and S1-63 take 'No license: registration only' (S1-61, S1-64 with more lines), S2-28 takes 'No person license' (S2-29). The old words ops on S1-23, S1-48 and S2-11 are gone.\nRefit to master v1.2: Lee Rug Care's drop-off follows the master's order (D29): A8-53 takes 'A drop-off or mail-in', and A8-50 (READY, words) and A8-54 (pick-up, words) carry the rug; the own A8-x01 is gone. A walk-in drop-off is checked in at once (A3-32).\nRefit to master v1.2: other plug-in splits keep the cleaner's branches (no classes, people not spaces, no damage hold, by name in flow B, arrival windows, no form, the $2, sent now for a clean before guests). Both stay at B4-81, B7-55, B8-58 (sent now or not), B4-78 (own or rent, for a move-out clean), B4-57 (a contract over the amount), and B7-56's one person, set date and crew. B8-65's outside check, B8-20's 'An estimate becomes its own job' and B10-07's permit inspection are off.\nFinal pass (FIX-pilot-final): the rug drop-off books 'A drop-off slot' (A4-66 → A4-67), not a rug cleaner's time, like the auto-repair pilot. The times read as drop-off times ('Sat Oct 24 · 11:00am drop-off', rename pairs for the master's '<time> · Riley'); Alex can't ask for a rug cleaner by name (a wish goes in the notes); a rug cleaner running late moves only the ready time. A rug cleaner out sick moves nothing for the customer (A7-59 'No name', A7-60's words; S11-87 and S11-90 'Not by name' in flow A), and stain work only Rowan does waits, with the new ready time texted.\nPlug-in splits (check-prof): splitsKept A: A8-02; B: B4-57, B4-78, B4-81, B7-55, B8-58 (per service, as the v1.2 line says), B8-69 and B8-70 (plan visits with nobody home; a first deep clean with someone home), B8-72 (curtains to the shop; a house clean takes nothing away).\nReview (Oct 22, evening): B5-21's terms card now shows the cleaner's plan (every 2 weeks, $135 a visit, after each clean); B10-01's receipt keeps the card for the plan; window washing is in pf.services (its sign-up prices) and Kim's call (B3-05) asks for it; B8-27/B8-28's carpet quote is titled as one; leftover barber and plumbing words cleared (a perm, now a coat to dry clean; a cape clip, kids cuts, the old heater, a rating plate, a lead-safe notice, massage and heating and cooling as Sam's new kind of work, now upholstery cleaning and pest control); flow A's drop-off texts name no rug cleaner; A10-06's results and rentals branches are off; the plan is a rug wash plan throughout.\nKept words (check-prof): 'dye' is the rug dye test (a colorfastness check before stain work, pf.first_steps), and 'steamer' is the shop's curtain steamer (A7-38). Both are rug and curtain care words, not the master barbershop's.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "My employer pays for this cut.",
+    "like Alex's employer for a staff cut.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "like the cut in the mirror.",
+    "would like to see your hair before pricing it.",
+    "How would you like it on top? (optional)",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "'A trim' or 'a fade' fits a haircut.",
+    "'Yes, make it a fade'",
+    "When they book: a card saved for the $89 service-call fee",
+    "After the job: Rosie sends the bill",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "EC22871",
+    "Your item is ready for pick-up.",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "doesn't do perms.",
+    "Riley: barber, color, house calls",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Color quotes come to you first.",
+    "Jules rents a chair, with their own customers.",
+    "like a chair renter",
+    "A chair renter asked for by name",
+    "like a step-free chair",
+    "A chair, ready",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "Do you do kids cuts? My son is 8.",
+    "Wants Saturday morning, with Riley",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Anything Riley should know?",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "takes jobs sent now, like a burst pipe",
+    "Promises the $25 consult; priced at the chair",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "Add photos of your hair",
+    "photos of your hair",
+    "Gloss to finish",
+    "gloss",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "A barbershop has none, so nothing is sent here.",
+    "Can my son wait in the shop during my cut?",
+    "Plumbing JP031552 · electrical JE30417",
+    "could mean a salon or a barbershop",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Riley stopped Alex M.'s cut.",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "once Riley sees the hair",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "like a skin-test result",
+    "A barbershop has none.",
+    "Stopped Alex M.'s cut.",
+    "Haircut every 4 weeks",
+    "also does color and",
+    "A color correction",
+    "a color correction",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "barber, color and",
+    "a package of cuts",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Only the consult",
+    "Groom's package",
+    "Drain clearing",
+    "2 Consult only",
+    "service, color",
+    "Panel upgrade",
+    "Signature cut",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "water heater",
+    "Consult only",
+    "at the chair",
+    "At the chair",
+    "Color always",
+    "house calls",
+    "House calls",
+    "$25 consult",
+    "the consult",
+    "color quote",
+    "a staff cut",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "House call",
+    "does color",
+    "patch test",
+    "88 Elm St",
+    "on Elm St",
+    "Electric.",
+    "kids cuts",
+    "Skin fade",
+    "two skin fades",
+    "skin fade",
+    "the chair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "Barbers",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Riley",
+    "Avery",
+    "like a burst pipe",
+    "skin fade",
+    "Style consult",
+    "style consult"
+   ],
+   "B": [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "EC22871",
+    "BS20981",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves · $160",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "can clear the drain:",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Shutoff valve and wall pipe · $540",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "two drain clearings",
+    "Can I run the dishwasher before you come?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "takes jobs sent now, like a burst pipe",
+    "Registration 2019-0451",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "like an overflowing drain",
+    "It's overflowing. Can someone come tonight?",
+    "Overflowing kitchen drain",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "LATE camera report",
+    "No answer in 15 minutes",
+    "Thu Oct 22, 10:20am",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Your drain is under warranty, so this visit is free.",
+    "Can Jordan also run a camera down my sewer line?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "The plug-in says how long the warranty lasts.",
+    "BEFORE old water stain on the cabinet floor",
+    "Say Alex also asks about a dripping faucet.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "Can Jordan also look at a dripping faucet?",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Then the booking goes on, marked urgent.",
+    "he's the one who replaces water heaters",
+    "Plumbing JP031552 · electrical JE30417",
+    "Jordan finds corroded shutoff valves.",
+    "Willow Home Warranty, the basic plan.",
+    "The drain clogs again 2 weeks later.",
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "UPDATE getting a part, back 9:30",
+    "Jordan cracks the cabinet floor",
+    "HURT cut my hand, need to stop",
+    "No. It doesn't smell like gas.",
+    "replacing both shutoff valves",
+    "Texts the camera report link",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "the sink is now overflowing",
+    "who replaces water heaters",
+    "next week's drain cleaning",
+    "covers part of the repair",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "The repair price is good",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Jordan found more work.",
+    "A plan or warranty pays",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "replaces water heaters",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "Cracked cabinet floor",
+    "Cabinet floor, before",
+    "your new pipes are in",
+    "1-year labor warranty",
+    "for a bathroom drain",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "the warranty company",
+    "leehomeservices.com",
+    "the $160 valve work",
+    "Sewer camera report",
+    "No. No huele a gas.",
+    "also does color and",
+    "Insurance pays part",
+    "Water heater flush",
+    "water heater flush",
+    "clear a yard drain",
+    "the shutoff valves",
+    "home warranty plan",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "camera inspection",
+    "the kitchen drain",
+    "Supply line · $80",
+    "barber, color and",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "BOOK Tessa drain",
+    "Drain clearings",
+    "Book the repair",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "today's repair",
+    "Panel upgrade",
+    "water heaters",
+    "Kitchen drain",
+    "home warranty",
+    "warranty plan",
+    "to the repair",
+    "cut your hair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Water heater",
+    "water heater",
+    "shop's chair",
+    "at the chair",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "House calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Yard drain",
+    "yard drain",
+    "beard trim",
+    "house call",
+    "House call",
+    "does color",
+    "42 Oak St",
+    "88 Elm St",
+    "Electric.",
+    "the chair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "Barbers",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "flush",
+    "Labor",
+    "The $80 supply line stays good",
+    "shutoff valve",
+    "like a burst pipe",
+    "sewer camera report",
+    "Rental 1",
+    "Rental 2"
+   ]
+  },
+  "A": {
+   "S1-61": "7421d186d5",
+   "S1-43": "e16d5048f3",
+   "S2-22": "6fe11c094c",
+   "S2-06": "6b01a08c94",
+   "A4-50": "6f43775326",
+   "A4-14": "95c7ffcfab",
+   "A4-15": "db5792db95",
+   "A4-24": "0a292df05b",
+   "A8-03": "7accda6f86",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-43": "7b0f73c701",
+   "A9-03": "219c966588",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-93": "46cca94e45",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S1-61": "e30e71f65d",
+   "S1-43": "dd3ae2a1a9",
+   "S1-38": "6301c86637",
+   "S2-22": "6fe11c094c",
+   "S2-06": "b78d25d6e2",
+   "B4-07": "9d0dbc90ad",
+   "B4-43": "fc9855955a",
+   "B4-44": "514c8ab30c",
+   "B4-34": "74ff52d83d",
+   "B5-21": "925b7342ed",
+   "B6-13": "ed1f412f7d",
+   "B7-08": "278986b3ba",
+   "B7-20": "364245afef",
+   "B8-52": "6f008512da",
+   "B8-17": "dcff722a6d",
+   "B8-18": "530038d2b8",
+   "B8-23": "dd780a2ec8",
+   "B10-08": "01bac94fd8",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "B10-32": "7713bff255"
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69"
+  ]
+ }
+}

@@ -1,0 +1,3500 @@
+{
+ "id": "surveyor",
+ "name": "Land surveyor",
+ "style": "Service",
+ "pattern": "service",
+ "from": "inspector",
+ "plugin": {
+  "pf.license": {
+   "need": "Each surveyor who leads a survey and signs the plat holds their own state professional surveyor license. A crew member works under the licensed surveyor in charge, who signs. The company holds a firm license or registration where the state asks. Only a licensed surveyor signs a survey drawing.",
+   "ask": "Each surveyor's license number, type and state. The firm's license or registration number, where the state's form asks for one.",
+   "who_holds": "Each licensed surveyor holds their own license. The firm holds its own registration where required. A crew chief who is not licensed never signs.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "Where the state licenses surveyors: no survey is offered until the firm's and the surveyor's numbers check out. A signed survey is offered only with a licensed surveyor in charge.",
+   "insurance_bond": "Professional liability (errors-and-omissions) insurance where the state's form requires it. Shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "shown_to_customers": "The surveyor's license number on the survey agreement, offers, confirmations and the signed survey, where the state's rules require it.",
+   "not_this_work": "Legal advice on a boundary or title dispute, title insurance, building or fencing work, and a boundary opinion the records and the markers on the ground do not support. A survey shows where the lines are by the records and what the crew finds; it does not settle who owns the land."
+  },
+  "pf.services": {
+   "pattern": "Set service: one fieldwork visit at the property, priced by the lot's size, with a signed survey drawing later.",
+   "list": [
+    {
+     "name": "Boundary survey",
+     "price_kind": "set by the customer's answers (lot size, and whether the corners are marked)",
+     "example": "lot up to ¼ acre: $495; ¼ to ½ acre: $595; ½ to 1 acre: $695 (the example business's own prices)",
+     "length": "about 3 hours in the field for a crew of two; the signed survey and the corner markers follow in about 10 business days",
+     "where": "at the property; nobody needs to be there",
+     "money": "a deposit at booking, the rest on the bill after the signed survey is delivered"
+    },
+    {
+     "name": "Corner re-stake",
+     "price_kind": "one price",
+     "example": "$150, about 1 hour: marks reset at the corners of a lot already surveyed",
+     "where": "at the property",
+     "money": "booked like the first survey; paid in full when booking (the example business's setting)"
+    },
+    {
+     "name": "Construction staking (the second kind of work)",
+     "price_kind": "quoted from the plans first",
+     "example": "the corners and the building layout marked for a new build",
+     "where": "at the property"
+    },
+    {
+     "name": "Topographic survey",
+     "price_kind": "set by the surveyor at the visit from the tract's size and terrain; only the $89 trip fee is promised before",
+     "example": "a wooded tract: priced after a walk-through; the fee never depends on where the lines fall",
+     "where": "at the property"
+    },
+    {
+     "name": "Large lot or complex boundary",
+     "price_kind": "quoted from the deed, old plats and aerial photos first",
+     "example": "a 5-acre parcel: $640, with a deposit; Sam OKs any quote over $500",
+     "where": "at the property"
+    },
+    {
+     "name": "Elevation certificate",
+     "price_kind": "one price, an add-on",
+     "example": "$199 (a flood-zone elevation reading); $249 when Sam goes himself",
+     "where": "at the property"
+    },
+    {
+     "name": "Fence line location",
+     "price_kind": "one price, an add-on at the visit",
+     "example": "$160: the existing fence shown on the drawing, only if the client says yes first",
+     "where": "at the property"
+    },
+    {
+     "name": "Trip fee",
+     "price_kind": "one price",
+     "example": "$89: only for a late cancel or no way in that Sam confirms, or a return trip when the ground was not safe or the locate was not done",
+     "where": "never booked alone"
+    },
+    {
+     "name": "Records consult, plat lookups and survey reviews (at Lee Survey Office)",
+     "price_kind": "one price each",
+     "example": "30-minute records consult $35; plat lookup $20; survey review, reading an old survey with you, $40; second look at another firm's survey $55; subdivision planning meeting, about 2½ hours, $140; at the property $75 (the example office's own prices)",
+     "where": "at the office, by video, or at the property",
+     "money": "card saved for the $20 fee; paid at the office after"
+    }
+   ],
+   "start_times": "A 2-hour arrival window, like 8 to 10am. The crew's exact time is texted on the way.",
+   "notice": "2 days' notice by default, plus the time the utility locate takes (about 2 business days). A sooner time only if Sam says yes.",
+   "capacity": "One crew per survey. Construction staking only with a crew that does it.",
+   "nobody_home": "Yes: nobody needs to be there. The crew works outdoors; a gate code, if any, is set at booking and shown only to the crew on the day. The owner is welcome to meet the crew.",
+   "online": "Records consults, plat lookups and survey reviews can be done by video.",
+   "not_offered": "Legal advice, title insurance, fencing or building work, and any promise of where a line falls.",
+   "partner_work": "None. Rosie never names or refers another business."
+  },
+  "pf.questions": {
+   "before_times": [
+    "The town or ZIP, and what kind of land: a lot in a neighborhood, a rural parcel, or a large tract",
+    "About how big the lot is, and whether the corners are marked now",
+    "What the survey is for: a fence, an addition, buying or selling, a boundary question, or a permit",
+    "Add-ons: an elevation certificate",
+    "Do you own the land, or do you have the owner's yes?"
+   ],
+   "after_a_time": [
+    "Dogs or other animals on the land, and where they'll be",
+    "Is the land fenced, gated or overgrown?",
+    "Will you meet the crew?"
+   ],
+   "secure_page_only": [
+    "The street address or the parcel number",
+    "A gate or lock code, typed only by whoever sets it up",
+    "The deed, an earlier survey, a title commitment and any plans"
+   ],
+   "who_may_book": "An adult 18 or older who owns the land or acts for the owner (an agent, an attorney, a builder with the owner's written yes). A neighbor or a tenant never books a survey of land they do not own. The client named on the survey agreement signs it."
+  },
+  "pf.safety": {
+   "words": [
+    "a gas smell or hissing",
+    "sparks or smoke",
+    "live wires hanging down",
+    "a threat from someone at the property"
+   ],
+   "what_happens": [
+    "A gas smell or hissing near a marked line, sparks or smoke: everyone leaves the area first, then calls 911 and the gas company from outside. No booking until it is safe.",
+    "Live wires hanging down: stay away from that area, and call 911 if anyone is in danger. The survey can be booked for the rest of the land; the crew will not enter that area.",
+    "A threat from someone at the property: the booking is paused and Sam is told at once. 911 is given for anyone in danger. The crew never works where it feels unsafe."
+   ],
+   "booking_goes_on": "No, for a gas smell or hissing, sparks, smoke or a threat. Yes, with the unsafe area left out, for live wires. A boundary dispute with a neighbor is not a threat: the booking goes on."
+  },
+  "pf.first_steps": {
+   "agreement": "The business's own survey agreement (the kind of survey, what is delivered, the right to enter the land, and the fee), signed on the secure page before the time is booked. Rosie never writes or edits it.",
+   "locate": "A utility locate request for the corners, made by Sam before the crew drives any marker into the ground, where the state's rules require it. It takes about 2 business days, or what the state's rules set; the first open times start after it.",
+   "documents": "The deed, an earlier survey, a title commitment and any plans, added on the secure page if there are any.",
+   "prep_for_reminder": [
+    "Leave any corner markers, flags or stakes where they are",
+    "Dogs and other animals put away or kept in the house",
+    "Gates unlocked or the code on the secure page; a path cut through thick brush if you can",
+    "Cars and sheds moved off any line you know about"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "If the owner meets the crew, they give the check-in code at the start. If nobody is there, DONE with photos confirms the visit.",
+   "entry_codes": "A gate or lock code is shown only to the crew, only on the day, and each view is logged.",
+   "what_is_checked": "The records are compared with the markers and fences on the ground; corners are found or set with caps and flagged; photos of each corner are taken. Anything the crew can't reach or find is noted in the drawing.",
+   "not_found": "A corner that can't be found or reached is listed as not found. A return trip is offered for the trip fee, with the client's OK.",
+   "walk_through": "If the owner is there, the crew shows the flagged corners. Where a line falls is in the signed survey only; the crew gives no legal opinion on the spot.",
+   "changes_at_visit": "An add-on (an elevation certificate, a fence line location) only if the client says yes first, priced before it is done. The fee never depends on where the lines fall.",
+   "proof_done": "DONE from the crew chief's phone, with photos of the corners. The signed survey follows by the date promised.",
+   "report": "A signed survey drawing sent on a secure link by the date promised at booking (the example: 10 business days). A later date is told to the client before the old one passes. Rosie tracks the date.",
+   "report_release": "Sam picks per service: the signed survey goes out at once, or once the bill is paid. Where the state's rules forbid holding it, it goes out at once."
+  },
+  "pf.money": {
+   "start": "Boundary surveys: a deposit when booking, the rest on the bill after the signed survey is delivered. Consults at the office: a card saved for the fee, paid at the office after.",
+   "other_ways": "Nothing taken and the bill texted after; paid in full when booking (a corner re-stake); a deposit and the rest on the bill for a large lot quoted first.",
+   "deposits": "A deposit of about half of a set-price survey; the cap, if any, comes from the state form. The rest is paid after the signed survey is delivered.",
+   "fees": "Late cancel, or no way in at the arrival window: the business's own trip fee (the example: $89). A return trip when the ground was not safe or the locate was not done: the trip fee. Sam confirms each one; no answer, no fee.",
+   "fee_rule": "The fee never depends on where the lines fall, on a neighbor's agreement, or on the sale closing.",
+   "tips": "No tip line.",
+   "tax": "A sales tax line only where the state taxes survey services, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate and lock codes",
+    "The street address or parcel number in a first text to someone new",
+    "The signed survey or where any line falls: only the secure link",
+    "A boundary dispute's details: only the secure page"
+   ],
+   "who_gets_texts": "The client. A neighbor or anyone else only after their own yes.",
+   "languages": "English and Spanish.",
+   "minors": "Nobody under 18 books or signs the survey agreement."
+  },
+  "pf.staff": {
+   "skills": [
+    "Boundary surveys",
+    "Large lots and complex boundaries",
+    "Corner re-stakes",
+    "Topographic surveys",
+    "Elevation certificates",
+    "Construction staking",
+    "Records consults and survey reviews at the office"
+   ],
+   "licenses": "Each licensed surveyor's own license, where the state licenses surveyors. Only a licensed surveyor signs a drawing.",
+   "stand_in": "Another crew led by a licensed surveyor with the same skills may stand in, with the client's OK first.",
+   "supervision": "A crew member or surveyor-in-training works under the licensed surveyor in charge, who signs the drawing.",
+   "who_oks": "Sam OKs quotes over $500 and every fee. Pat, the office manager, may too; Sam's answer wins."
+  },
+  "pf.rules": {
+   "agreement": "A signed survey agreement before the fieldwork starts, with the right to enter the land, where the state's rules require it.",
+   "locate": "No marker is driven into the ground before the utility locate is done, where the state's rules require one. A visit waits for it, with no fee to the customer.",
+   "report_deadline": "The signed survey reaches the client by the date promised at booking. A later date is told to the client before the old one passes. Rosie tracks the date.",
+   "fee_independence": "The fee can't depend on where the lines fall, on a neighbor's agreement or on the sale closing.",
+   "no_legal_opinion": "A survey shows where the lines are by the records and what the crew finds. It does not settle who owns the land: Rosie says a lawyer can help with that.",
+   "license_shown": "The license number on offers, confirmations and the signed survey, where the state's rules require it.",
+   "records": "10 years, or longer where the state's rules ask: the agreement, the field notes, the photos and the drawing."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "The utility locate is late or marks a line at a corner: the visit waits or the marker moves, with no fee to the customer.",
+    "A corner is buried or can't be found: the crew uses the records to set it where they can, lists what was not found, and a return trip is offered for the trip fee.",
+    "Thick brush, snow or standing water makes the fieldwork unsafe or unreliable: the visit moves to the next good day, with no fee.",
+    "A neighbor won't allow the crew onto their land: the crew works the owner's land only, and the drawing says so.",
+    "The client asks the surveyor to put a line where the client wants it: declined; the survey shows where the records and the ground put it.",
+    "A boundary dispute with a neighbor: Rosie gives no legal advice; the booking goes on, and a lawyer can help with the dispute.",
+    "The client asks for fencing or building: Rosie says this business doesn't do it.",
+    "The signed survey runs late: the client hears the new date before the old one passes.",
+    "Nobody is there and a gate code doesn't work: the crew texts it, and the owner gets a link to send the right one."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "documents",
+   "firststeps",
+   "results",
+   "photos",
+   "video",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "6pm the day before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Irene and Vera (surveyors at the office)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Dominic and Hugo (survey crew chiefs)",
+   "cust": "Alex M. (landowner) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Irene"
+  },
+  "B": {
+   "staff": "Dominic"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "'A trim' or 'a fade' fits",
+    "'A quick chat' or 'a second look' fits"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, but make it shorter' goes back to the times."
+   ],
+   [
+    "Add photos of your hair,",
+    "Add photos or drawings,"
+   ],
+   [
+    "Alex's employer for a staff cut.",
+    "Alex's employer for a staff consult."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this consult."
+   ],
+   [
+    "means the shorter cut.",
+    "means the shorter consult."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the deed and any old survey on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring the deed and any old survey."
+   ],
+   [
+    "Shop's side.",
+    "The office's side."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Riley sums up the consult. A last question is answered before paying, at no extra cost."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Easement research quotes come to you first. List prices never need one"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A re-stake's example: 'A re-stake needs a survey first. Had one with us in the last 5 years?'"
+   ],
+   [
+    "like a patch test with a wait, or a screening",
+    "like a utility locate with a wait, or a title check"
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Construction staking: priced from the plans first"
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a plat lookup. Rosie finds one time long enough for both, with one surveyor, and adds the prices: $35 and $20."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A consult is rated, so the office takes the first branch."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $90 easement research quote. Sam taps Call, and the call goes out from the office's number."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Irene can do a shorter consult in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a records consult at the office or at the property."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A consult for Alex and a second look for a co-owner work the same way. Both are asked before the times."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds construction staking to Lee Survey Office. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Survey Office can book you from now on, at the office and for consults at the property."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Irene, so Irene's next times show. Easement researchs always stay with Irene."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some jobs take several visits, like a subdivision planning meeting done in two meetings."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop.",
+    "You're all set: Lee Survey Office can book you from now on, at the office."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in's example: a gas smell near a marked line gets 'leave, then call 911 and the gas company'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only at a shop or an office."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The survey for this second look wasn't sent."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like what worries the client most."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: wants a fence on the east line. Has the deed and an old survey."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a records consult about my lot on Saturday."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says coffee spilled on a laptop bag in the meeting room today."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Construction staking for Lee Survey Office: is it the same company?"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Ben's AI asks for survey review at $35, an old price."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a subdivision planning meeting is $140, about 2½ hours. Want a time?"
+   ],
+   [
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Lee Survey Office will go over it again for free. Pick a time:"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No work here is sent now: surveys and reviews are always booked ahead."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's consult skipped the easement question."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Survey review at Lee Survey Office is $40, not $35."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero consultar los planos de mi terreno el sábado."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the office show photos from your visit? Yes / No"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A records consult could mean a survey office or a surveyor."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my neighbor join the consult?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, easement researchs and consults at the property"
+   ],
+   [
+    "Avery at the shop, Casey for plumbing.",
+    "Vera at the office, Hugo for boundary surveys."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Irene also does easement researchs and consults at the property"
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the office's list"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Coffee spilled on my laptop bag in the meeting room."
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Records consults at the office work like this:"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Irene: easement researchs and consults at the property"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Second look at a survey"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you stake out a new build too?"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a records consult by video"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The consult skipped my question about the easement."
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like records consults?"
+   ],
+   [
+    "plumbing and electrical",
+    "boundary survey and construction staking"
+   ],
+   [
+    "Plumbing and electrical",
+    "Boundary survey and construction staking"
+   ],
+   [
+    "Signature cut and shave",
+    "Second look at a survey"
+   ],
+   [
+    "Hours: the shop's hours",
+    "Hours: the office's hours"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your drawings"
+   ],
+   [
+    "Haircuts work like this",
+    "Records consults work like this"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Survey Office LLC"
+   ],
+   [
+    "Color and cut · $90",
+    "Addition easement research · $90"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Land Surveying's"
+   ],
+   [
+    "Water heater flush",
+    "Corner re-stake"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Land Surveying"
+   ],
+   [
+    "Groom's package ·",
+    "Subdivision planning meeting ·"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Survey Office"
+   ],
+   [
+    "Color correction",
+    "Easement research"
+   ],
+   [
+    "Only at the shop",
+    "Only at the office"
+   ],
+   [
+    "Groom's package",
+    "subdivision planning meeting"
+   ],
+   [
+    "Book a free fix",
+    "Book a free follow-up"
+   ],
+   [
+    "Drain clearing",
+    "Boundary survey"
+   ],
+   [
+    "A barbershop's",
+    "A survey office's"
+   ],
+   [
+    "signature cut",
+    "second look at a survey"
+   ],
+   [
+    "Avery: barber",
+    "Vera: records consults"
+   ],
+   [
+    "1 color quote",
+    "1 easement research quote"
+   ],
+   [
+    "1 At the shop",
+    "1 At the office"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Boundary"
+   ],
+   [
+    "Lee Electric",
+    "Lee Staking"
+   ],
+   [
+    "1200 Main St",
+    "52 Quarry Rd"
+   ],
+   [
+    "barbershop's",
+    "survey office's"
+   ],
+   [
+    "at the chair",
+    "at the office"
+   ],
+   [
+    "At the chair",
+    "At the office"
+   ],
+   [
+    "At your shop",
+    "At your office"
+   ],
+   [
+    "A barbershop",
+    "A survey office"
+   ],
+   [
+    "house calls",
+    "consults at the property"
+   ],
+   [
+    "House calls",
+    "Consults at the property"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "NEW massage",
+    "NEW construction staking"
+   ],
+   [
+    "electrical",
+    "construction staking"
+   ],
+   [
+    "Electrical",
+    "Construction staking"
+   ],
+   [
+    "barbershop",
+    "survey office"
+   ],
+   [
+    "Barbershop",
+    "Survey office"
+   ],
+   [
+    "Beard trim",
+    "Plat lookup"
+   ],
+   [
+    "beard trim",
+    "plat lookup"
+   ],
+   [
+    "house call",
+    "consult at the property"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "At my home",
+    "At the property"
+   ],
+   [
+    "88 Elm St",
+    "14 Grove Ct"
+   ],
+   [
+    "on Elm St",
+    "on Grove Ct"
+   ],
+   [
+    "Barbering",
+    "Records consults"
+   ],
+   [
+    "Skin fade",
+    "Survey review"
+   ],
+   [
+    "skin fade",
+    "survey review"
+   ],
+   [
+    "plumbing",
+    "boundary survey"
+   ],
+   [
+    "Plumbing",
+    "Boundary survey"
+   ],
+   [
+    "Haircuts",
+    "Records consults"
+   ],
+   [
+    "haircuts",
+    "records consults"
+   ],
+   [
+    "a barber",
+    "a surveyor"
+   ],
+   [
+    "A barber",
+    "A surveyor"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "JP031552",
+    "EX-2055"
+   ],
+   [
+    "MP045210",
+    "EX-3068"
+   ],
+   [
+    "plumber",
+    "surveyor"
+   ],
+   [
+    "Plumber",
+    "Surveyor"
+   ],
+   [
+    "barbers",
+    "surveyors"
+   ],
+   [
+    "Haircut",
+    "Records consult"
+   ],
+   [
+    "haircut",
+    "records consult"
+   ],
+   [
+    "JE30417",
+    "EX-4071"
+   ],
+   [
+    "EC22871",
+    "EX-5084"
+   ],
+   [
+    "BS20981",
+    "EX-6097"
+   ],
+   [
+    "barber",
+    "surveyor"
+   ],
+   [
+    "Barber",
+    "Surveyor"
+   ],
+   [
+    "Jordan",
+    "Dominic"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "Riley",
+    "Irene"
+   ],
+   [
+    "Avery",
+    "Vera"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached on a job?"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most survey offices set it."
+   ],
+   [
+    "A neighborhood survey office on Grove Ct. Classic cuts, fades and hot towel shaves.",
+    "A survey office on Grove Ct. Records consults, survey review and second opinions."
+   ],
+   [
+    "A water heater job",
+    "A boundary survey"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the office's list.",
+    "Alex asks for mold removal, which isn't on the office's list."
+   ],
+   [
+    "two skin fades",
+    "two records consults"
+   ],
+   [
+    "a parent stays for a kids cut",
+    "a parent stays for a records consult"
+   ],
+   [
+    "Kids cut",
+    "Phone question"
+   ],
+   [
+    "Color and cut",
+    "Easement research"
+   ],
+   [
+    "color and cut",
+    "easement research"
+   ],
+   [
+    "Style consult",
+    "Quick question by phone"
+   ],
+   [
+    "the $89 service-call fee",
+    "the $89 trip fee"
+   ],
+   [
+    "Boundary survey for homes in Springfield. Boundary survey and water heaters, within 25 miles.",
+    "Boundary surveys in Springfield. Lots, parcels and large tracts, within 25 miles."
+   ],
+   [
+    "Lee Survey Office doesn't do perms.",
+    "Lee Survey Office doesn't do mold removal."
+   ],
+   [
+    "The chairs",
+    "The meeting room"
+   ],
+   [
+    "A chair, ready",
+    "A desk, ready"
+   ]
+  ],
+  "B": [
+   [
+    "Free until 7am on the visit day.",
+    "Free until 6pm the day before."
+   ],
+   [
+    "Free cancel lasts until 7am on the visit day.",
+    "Free cancel lasts until 6pm the day before."
+   ],
+   [
+    "1 hour's notice",
+    "2 days' notice"
+   ],
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first, since the utility locate comes first"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "The bill after the visit, with a pay link"
+   ],
+   [
+    "After that, or nobody home:",
+    "After that, or no way in:"
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Say Kim L.'s lot needs nobody there."
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $495 survey needs none."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I move the shed before you come?"
+   ],
+   [
+    "says no. Please wait until the job is done.",
+    "says no. Please leave it where it is until the crew has been."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Construction staking: priced from the plans first"
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can start the boundary survey at a set time"
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says a large lot is priced from the deed, old plats and aerial photos first. No time is saved while it's priced."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Dominic finds a wasp nest at the rear corner. The plug-in says a surveyor stays out of an unsafe spot, so Alex gets a written note and the photo."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee Survey Office for a records consult instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A topographic survey is priced at the visit: only the $89 trip fee was promised. The fee never depends on where the lines fall."
+   ],
+   [
+    "Your $800 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then.",
+    "Your $640 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for an elevation certificate. Both go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Survey Office can go over your records at the office for $35, or at the property for $75. Where would you like it?"
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Ivy's AI asks for a boundary survey at $450, an old price. Rosie answers with the real price, $495."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a records consult at the office or at the property."
+   ],
+   [
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "One of the office's surveyors does consults at the property. Sam set each place's price and money at sign-up."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs a utility locate first. It takes about 2 business days, so the first open times start after it."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone out of the back yard, and to leave and call 911 if there's a gas smell."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Survey Office can book you from now on, at the office and for consults at the property."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A boundary survey with Lee Land Surveying is $495, not $450. Here are the open times at $495."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. An elevation certificate is $199 more, the same morning. The crew stays about an hour longer."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No entren al patio y mantengan lejos a los niños y las mascotas. Si huele a gas, salgan y llamen al 911."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 9:52am on Dominic's phone, you said yes to a fence line location for $160."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Dominic is waiting for the utility locate to finish at the rear corner. The crew moves to about 10:00am."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Dominic's times show: he's the one who surveys large parcels."
+   ],
+   [
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "Lee Land Surveying: $640 for your 5-acre parcel survey. Pay by card, or by bank transfer."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I'm putting up a fence in Springfield and need my lot lines marked. Can a surveyor come Thursday morning?"
+   ],
+   [
+    "Each customer gets a 4-digit check-in code, and gives it to the plumber at the door.",
+    "Each customer gets a 4-digit check-in code, and gives it to the surveyor on the day."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Dominic found a wasp nest at the rear corner and didn't go in."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay out of the back yard, and keep children and pets away. If you smell gas, get out and call 911."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Dominic flattened a garden bed at 6 Ridge Rd. The before photo shows the bed whole."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A consult at the property goes on in this flow. The office is in the other flow."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the large lot survey quote before booking."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop.",
+    "You're all set: Lee Survey Office can book you from now on, at the office."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in's example: a power line down in the yard gets 'stay away from that area'."
+   ],
+   [
+    "With Sam's yes, electrical and the shop now show to AI assistants too.",
+    "With Sam's yes, construction staking and the office now show to AI assistants too."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a builder books surveys of 4 lots at one address."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A power line is down in my back yard, and I need a surveyor."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: a fence line location, $160. Sent to Alex."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My yard flooded last week. Is it safe to walk the property line?"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only at a shop or an office."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add the deed and any old survey, and a surveyor will price the survey."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a surveyor mark my lot lines this Thursday? What does it cost?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE old iron pin at the south corner. Gate code at the side gate."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the boundary survey to $525 for visits from Mon Nov 2."
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "A job priced at the visit never takes more than its trip fee."
+   ],
+   [
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "Construction staking and Lee Survey Office now show to AI assistants too."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Surveys already booked keep $495, even after Nov 2."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 fence line location offer is good for 7 days."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No work here is sent now: surveys and reviews are always booked ahead."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your survey price is with Lee Land Surveying."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 fence line location, old fence on the east line"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hay un cable de luz caído en el patio y necesito un topógrafo."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A records consult could mean a survey office or a surveyor."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stake at the north corner"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My fence crew starts Monday. What's the soonest you can come?"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Dominic also check the corner elevations?"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your survey this time"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wasp nest at the rear corner, stayed out"
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Alex's lot in Springfield is inside it."
+   ],
+   [
+    "Casey for plumbing, Avery at the shop.",
+    "Hugo for boundary surveys, Vera at the office."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Irene also does easement researchs and consults at the property"
+   ],
+   [
+    "Alex was told to keep the door closed",
+    "Alex was told to stay back"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Irene: easement researchs and consults at the property"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The survey missed the old fence on the east line."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Fence line location · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not found: the south corner"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Second look at a survey"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the nest removed first"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wasp nest at the rear corner"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE locate marks at the rear corner, waiting"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE flattened a garden bed at the rear corner"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are the corners marked now? Any dogs? Is there a gate?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa elevation certificate Thu 1pm Hugo"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the report link"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Fence line location"
+   ],
+   [
+    "Mold behind the sink wall",
+    "A wasp nest at the rear corner"
+   ],
+   [
+    "Water heater replacement",
+    "5-acre parcel survey"
+   ],
+   [
+    "water heater replacement",
+    "5-acre parcel survey"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Dominic's notes"
+   ],
+   [
+    "plumbing and electrical",
+    "boundary survey and construction staking"
+   ],
+   [
+    "Plumbing and electrical",
+    "Boundary survey and construction staking"
+   ],
+   [
+    "Sewer camera inspection",
+    "Elevation certificate"
+   ],
+   [
+    "sewer camera inspection",
+    "elevation certificate"
+   ],
+   [
+    "Jordan found more work.",
+    "Dominic suggests one more check."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Boundary survey"
+   ],
+   [
+    "stage 2 of your repipe",
+    "the 5-acre parcel survey"
+   ],
+   [
+    "Under the sink, before",
+    "Front of the lot, before"
+   ],
+   [
+    "Just the kitchen sink.",
+    "About a quarter acre, corners buried. No add-ons."
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Elevation certificate"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Land Surveying LLC"
+   ],
+   [
+    "Cabinet floor, before",
+    "Garden bed, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Flattened garden bed"
+   ],
+   [
+    "leehomeservices.com",
+    "leelandsurveying.com"
+   ],
+   [
+    "Sewer camera report",
+    "Signed survey"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Land Surveying's"
+   ],
+   [
+    "Water heater flush",
+    "Corner re-stake"
+   ],
+   [
+    "water heater flush",
+    "corner re-stake"
+   ],
+   [
+    "Every shop service",
+    "Every office service"
+   ],
+   [
+    "the shutoff valves",
+    "the fence line location"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Land Surveying"
+   ],
+   [
+    "the kitchen drain",
+    "the boundary survey"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Survey Office"
+   ],
+   [
+    "plumbing license",
+    "boundary survey license"
+   ],
+   [
+    "Plumbing license",
+    "Boundary survey license"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "like a roof leak",
+    "like a fence company for the fence"
+   ],
+   [
+    "Drain clearing",
+    "Boundary survey"
+   ],
+   [
+    "drain clearing",
+    "boundary survey"
+   ],
+   [
+    "plumbing visit",
+    "boundary survey"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 495 boundary survey"
+   ],
+   [
+    "Avery: barber",
+    "Vera: records consults"
+   ],
+   [
+    "2 At the shop",
+    "2 At the office"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Boundary"
+   ],
+   [
+    "Lee Electric",
+    "Lee Staking"
+   ],
+   [
+    "1200 Main St",
+    "52 Quarry Rd"
+   ],
+   [
+    "barbershop's",
+    "survey office's"
+   ],
+   [
+    "sewer camera",
+    "elevation certificate"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "at the chair",
+    "at the office"
+   ],
+   [
+    "At your shop",
+    "At your office"
+   ],
+   [
+    "house calls",
+    "consults at the property"
+   ],
+   [
+    "House calls",
+    "Consults at the property"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "At my home.",
+    "My own lot."
+   ],
+   [
+    "electrical",
+    "construction staking"
+   ],
+   [
+    "Electrical",
+    "Construction staking"
+   ],
+   [
+    "barbershop",
+    "survey office"
+   ],
+   [
+    "Barbershop",
+    "Survey office"
+   ],
+   [
+    "Beard trim",
+    "Plat lookup"
+   ],
+   [
+    "beard trim",
+    "plat lookup"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "At my home",
+    "At the property"
+   ],
+   [
+    "88 Elm St",
+    "14 Grove Ct"
+   ],
+   [
+    "on Elm St",
+    "on Grove Ct"
+   ],
+   [
+    "42 Oak St",
+    "6 Ridge Rd"
+   ],
+   [
+    "a plumber",
+    "a surveyor"
+   ],
+   [
+    "plumbing",
+    "boundary survey"
+   ],
+   [
+    "Plumbing",
+    "Boundary survey"
+   ],
+   [
+    "a barber",
+    "a surveyor"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "JP031552",
+    "EX-2055"
+   ],
+   [
+    "MP045210",
+    "EX-3068"
+   ],
+   [
+    "plumber",
+    "surveyor"
+   ],
+   [
+    "Plumber",
+    "Surveyor"
+   ],
+   [
+    "Haircut",
+    "Records consult"
+   ],
+   [
+    "JE30417",
+    "EX-4071"
+   ],
+   [
+    "EC22871",
+    "EX-5084"
+   ],
+   [
+    "BS20981",
+    "EX-6097"
+   ],
+   [
+    "barber",
+    "surveyor"
+   ],
+   [
+    "Barber",
+    "Surveyor"
+   ],
+   [
+    "Jordan",
+    "Dominic"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "Riley",
+    "Irene"
+   ],
+   [
+    "Avery",
+    "Vera"
+   ],
+   [
+    "$179",
+    "$495"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached on a job?"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Your signed survey comes by the date on your booking."
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "A neighborhood survey office on Grove Ct. Classic cuts, fades and hot towel shaves.",
+    "A survey office on Grove Ct. Records consults, survey review and second opinions."
+   ],
+   [
+    "A water heater job",
+    "A boundary survey"
+   ],
+   [
+    "two drain clearings",
+    "two boundary surveys"
+   ],
+   [
+    "Water pressure check",
+    "Quick question by phone"
+   ],
+   [
+    "the $89 service-call fee",
+    "the $89 trip fee"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, only for a late cancel or no way in"
+   ],
+   [
+    "E 25% deposit after the quote. C paid in full when they book",
+    "C paid in full when they book"
+   ],
+   [
+    "25% deposit",
+    "Card saved for the $89 fee"
+   ],
+   [
+    "Leak repair",
+    "Topographic survey"
+   ],
+   [
+    "Labor",
+    "Fence line location"
+   ],
+   [
+    "$120 an hour",
+    "$160"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a boundary survey, today,"
+   ],
+   [
+    "accept the leak repair for today",
+    "accept the boundary survey for today"
+   ],
+   [
+    "Accepted: the leak repair today",
+    "Accepted: the boundary survey today"
+   ],
+   [
+    "Alex M. · water heater",
+    "Alex M. · 5-acre parcel"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 large lot survey is over the plug-in's amount, so it gets a quote to sign."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a survey of my lot. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a boundary survey.",
+    "'Where is my property line?' fits a boundary survey."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please leave the corner flags where they are."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a corner stake pulled up this morning."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how big is the lot, and are the corners marked now?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, the corners are buried"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like moving a line to suit the client."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding an elevation certificate? Say so.'"
+   ],
+   [
+    "Say Dominic cracks the cabinet floor and texts a photo.",
+    "Say Dominic flattens a garden bed and texts a photo."
+   ],
+   [
+    "Dominic finds corroded shutoff valves.",
+    "Dominic finds an old fence near the east line."
+   ],
+   [
+    "Boundary survey for homes in Springfield. Boundary survey and water heaters, within 25 miles.",
+    "Boundary surveys in Springfield. Lots, parcels and large tracts, within 25 miles."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most survey offices start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules survey offices often set."
+   ],
+   [
+    "Saved: boundary survey $199 for visits from Mon Nov 2. Drain clearings already booked keep $495. Boundary survey plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: boundary survey $525 for visits from Mon Nov 2. Surveys already booked keep $495."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Surveys already booked keep only their saved card."
+   ],
+   [
+    "The chairs",
+    "The meeting room"
+   ],
+   [
+    "A chair, ready",
+    "A desk, ready"
+   ],
+   [
+    "a camera inspection",
+    "an elevation certificate"
+   ],
+   [
+    "can clear the drain",
+    "can do the boundary survey"
+   ],
+   [
+    "run a camera down my sewer line",
+    "check the corner elevations"
+   ],
+   [
+    "Kitchen drain",
+    "Boundary survey"
+   ],
+   [
+    "Yard drain",
+    "Topographic survey"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex, who owns a lot, books a 30-minute records consult with Irene at Lee Survey Office, Sam's office, for Sat Oct 24 at 11:00am, to read the deed and an old survey. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who owns the lot at 6 Ridge Rd, books Lee Land Surveying for a fence: Alex signs the survey agreement, Dominic's crew marks the corners Thu Oct 22 in the 8 to 10am window, and the signed survey follows Fri. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 records consult. A card is saved for the office's $20 fee. Alex pays at the office after.",
+    "list|none|counter": "A $35 records consult. Nothing is taken: a YES books it. Alex pays at the office after.",
+    "list|full|none": "A second look at another firm's survey, $55, paid in full when booking.",
+    "list|card|card": "A $35 records consult on a Saturday morning, when Irene works alone with no front desk: the saved card is charged when she texts DONE."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Records consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Records consult"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Second look at a survey"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Plat lookup",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Second look at a survey",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|bill",
+   "combos": [
+    "list|deposit|bill",
+    "list|none|bill",
+    "list|full|none",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|deposit|bill": "The main story: a $495 boundary survey. A $250 deposit when booking, the $245 rest on the bill after the signed survey is delivered.",
+    "list|none|bill": "A $495 boundary survey. Nothing is taken. Rosie texts the bill after, and the signed survey goes out once it's paid.",
+    "list|full|none": "A $150 corner re-stake, paid in full when booking.",
+    "photos|deposit|bill": "A 5-acre parcel, priced from the deed and aerial photos at $640. Sam OKs it. A $320 deposit now, the $320 rest on the bill after."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Boundary survey"
+    },
+    "list|*|*": {
+     "price": "$495",
+     "name": "Boundary survey"
+    },
+    "list|deposit|*": {
+     "price": "$495",
+     "deposit": "$250",
+     "rest": "$245",
+     "fee": "$89",
+     "name": "Boundary survey"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Corner re-stake"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "5-acre parcel survey"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$320",
+     "rest": "$320",
+     "fee": "$89",
+     "name": "5-acre parcel survey"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Elevation certificate",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$199",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Corner re-stake",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    }
+   }
+  }
+ },
+ "keep": [
+  "Trip fee",
+  "trip fee",
+  "Grace",
+  "leak",
+  "color"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28",
+   "S1-38"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-23",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where your office is, the state licenses the firm itself, and each surveyor. What's the firm's license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "EX-6097"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state licenses surveyors, a consult that reads a survey for the client needs a licensed surveyor. Its form says so."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Are your survey prices the same, whoever goes?",
+      {
+       "buttons": [
+        "Yes, the same",
+        "Some charge differently"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 The elevation certificate is 249 if I go myself"
+     ],
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Elevation certificate",
+          "You",
+          "$249"
+         ],
+         [
+          "Elevation certificate",
+          "Anyone else",
+          "$199"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Boundary survey, construction staking and records consults all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The surveyor's plug-in adds no agreement for Sam to sign with Rosie before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Surveys and records consults book a person's time, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: surveys and records consults are booked one client at a time."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A survey is never sent now: it needs a signed agreement and access set up first, so the soonest open time is offered instead."
+   },
+   {
+    "op": "words",
+    "at": "A4-01",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A records consult at Lee Survey Office is $35 at the office or by video, or $75 at the property. Where would you like it?",
+      {
+       "buttons": [
+        "At the office",
+        "At the property"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "agent",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-23",
+    "does": "Say another customer, Tess L., has a subdivision planning meeting this Sat at 2:00pm. The meeting room's big screen breaks, so each booking that needs it is offered a change, with no fee.",
+    "more": [
+     "The plug-in says what each service needs, like a room, a tool or a crew.",
+     "No reply in 24 hours: Sam is asked to call.",
+     "Bookings that don't need it aren't touched."
+    ],
+    "say": [
+     [
+      "owner",
+      "san",
+      "Meeting room screen broken until Mon"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Tess. The big screen for your Sat 2:00pm easement research is broken. Keep it, with the plans on paper, or pick a new time, with no fee.",
+      {
+       "buttons": [
+        "Keep it on paper",
+        "A new time",
+        "Cancel, no fee"
+       ],
+       "as": "Tess"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "A records consult is an one-time meeting, never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Records consults are one client at a time; a co-buyer is added as one more person."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a records consult."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "No form is signed for a records consult."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The office sells no packages."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The office sells no packages."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A records consult is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "A records consult fixes nothing, so nothing gets worse before it."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "A records consult is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "A records consult is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "A records consult is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "Nothing at a records consult stops it for a hazard."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A records consult is billed once."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a records consult."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The office never sells repair or other work after a review."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A records consult has no result that comes later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the office to pick up."
+   },
+   {
+    "op": "more",
+    "at": "A4-01",
+    "more": [
+     "By video: the code is read out at the start."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "Here: a records consult by video, for an owner who lives out of town."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "more": [
+     "No answer in 10 minutes: it goes to Sam, and Alex hears the office was asked.",
+     "At night, Alex is told it waits for the morning. Sam is texted at 8am.",
+     "A question only a surveyor may answer: 'Irene will go over it at your consult. Urgent: call (555) 010-0177.' The office sees it."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my neighbor join the consult?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. asks: Can my neighbor join the consult?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Irene says yes. Your neighbor is welcome."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A records consult books a surveyor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A records consult books a surveyor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A records consult books a surveyor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A records consult is never booked for a child: the client is an adult buyer, seller or owner."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the office: Alex stays for the meeting."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A records consult is rated."
+   },
+   {
+    "op": "words",
+    "at": "S11-40",
+    "does": "Nia K. asked to talk about the $140 subdivision planning meeting before booking. Sam taps Call, and the call goes out from the office's number.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nia K. would like to talk about the subdivision planning meeting before booking.",
+      {
+       "buttons": [
+        "Call Nia"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Hugo Moore"
+     ],
+     [
+      "Company",
+      "Lee Land Surveying"
+     ],
+     [
+      "Kinds of work",
+      "Boundary survey"
+     ],
+     [
+      "Jobs",
+      "Boundary survey, construction staking, corner re-stake"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7:30am–5:30pm"
+     ],
+     [
+      "Hugo agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the office: a parent stays."
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[6 contact cards] Dominic and Hugo lead the survey crews; Dominic does construction staking too. Irene and Vera do records consults and survey reviews at the office; Irene also goes to the property. Pat is my office manager, for prices over $500. Jules rents a desk, with their own customers."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Dominic: boundary surveys and construction staking",
+         "Hugo: boundary surveys",
+         "Irene: records consults, survey reviews, consults at the property",
+         "Vera: records consults and survey reviews at the office",
+         "Pat: office manager, OKs Lee Land Surveying prices over $500",
+         "Jules: own customers, gets a link to sign up as their own business"
+        ]
+       },
+       "buttons": [
+        "Yes, all agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S2-15",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Are your survey prices the same, whoever goes?",
+      {
+       "buttons": [
+        "Yes, the same",
+        "Some charge differently"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 The elevation certificate is 249 if I go myself"
+     ],
+     [
+      "san",
+      "owner",
+      "Got it. Customers see the price of whoever comes, before they say yes.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Who goes",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Elevation certificate",
+          "You",
+          "$249"
+         ],
+         [
+          "Elevation certificate",
+          "Anyone else",
+          "$199"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Boundary survey, construction staking and records consults all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The surveyor's plug-in adds no agreement for Sam to sign with Rosie before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Surveys and records consults book a person's time, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: surveys and records consults are booked one client at a time."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A survey is never sent now: it needs a signed agreement and access set up first, so the soonest open time is offered instead."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A survey carries no repair warranty. A missed item goes to Sam as a complaint."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A surveyor never sells more work at a home it surveyed."
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "does": "Back to Alex, later that day: the visit is done. The receipt goes out by text and email. A survey carries no repair warranty, so the receipt points to the signed survey."
+   },
+   {
+    "op": "more",
+    "at": "B10-07",
+    "more": [
+     "For a survey, the report always comes later: it's the branch 'A report is ready later'."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-13",
+    "does": "Rosie never argues or admits fault. Sam decides if Dominic's crew goes back to check. A refund goes through the portal.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "The survey missed the old fence on the east line."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. isn't happy with the Thu Oct 22 survey: \"The survey missed the old fence on the east line.\""
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-16",
+    "does": "A week later, Alex texts the same number. Rosie answers by the plug-in's rule: this business doesn't build fences, so it can't take the work.",
+    "more": [
+     "The plug-in says this business does survey work only.",
+     "Sam can keep that rule anywhere, as the business's own.",
+     "Rosie never names or sells another business.",
+     "A new survey starts a new booking, with a new code. Nothing is asked twice."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can your team build the fence on the line Dominic marked?"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Land Surveying doesn't build fences. A fence company can help. You may already know one."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "Alex asks for a corner re-stake after the fence crew moved a marker. Dominic texts NEXT, and Alex gets times to pick, since it's inside the 60 days Sam books ahead.",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the customer asks.",
+     "It's booked like the first one, with its own code.",
+     "No reply in 24 hours: the times are let go, and nothing more is sent."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: corner re-stake after the fence crew moved a marker"
+     ],
+     [
+      "san",
+      "cust",
+      "Dominic says you'd like a corner re-stake: $150, about 1 hour. Pick a time:"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-25",
+    "t": "Fri Oct 23, 9:00am",
+    "more": [
+     "Where the state's rules set a deadline, Rosie tracks it and reminds Sam the day before.",
+     "A later date needs Alex's OK in writing, where those rules require it.",
+     "Paid by the bill: the report goes out once it's paid, as Sam set."
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your signed survey will be ready Mon Oct 26. We'll text you a secure link then."
+       ]
+      ]
+     }
+    },
+    "does": "Say Alex was told at DONE that the signed survey comes Fri Oct 23, the date promised at booking. On that day, Rosie checks it's ready."
+   },
+   {
+    "op": "words",
+    "at": "B10-19",
+    "more": [
+     "Nothing from the survey goes in the text itself.",
+     "The signed survey stays with Alex's records.",
+     "Questions about it: Alex replies here, and Dominic calls back.",
+     "Where a line falls is never read out in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-26",
+    "more": [
+     "Where the state's rules set the deadline, a later date needs Alex's OK in writing first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Each survey is billed on its own. A new build's phase surveys are each their own booking."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance or warranty pays for a boundary survey."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "A landlord never pays for a survey: the client pays."
+   },
+   {
+    "op": "more",
+    "at": "B9-06",
+    "more": [
+     "Sam's setting for this service: the report goes out once the bill is paid.",
+     "Where the state's rules forbid holding a report, it goes out at once."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B9-11",
+    "more": [
+     "The report stays held until it's paid, as Sam set. Rosie never chases: Sam follows up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "A corner not found is no extra. It is listed as not found, and a return trip for the $89 trip fee needs Alex's OK."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "If Alex is there, Dominic shows Alex the flagged corners. Where a line falls is in the signed survey only; no legal opinion is given on the spot.",
+    "more": [
+     "Here: the four corners are flagged, and the old fence is a foot inside the east line.",
+     "The plug-in names what was covered: every corner found or set, with a photo.",
+     "Anything that couldn't be found or reached is listed as not found.",
+     "The signed survey, with the drawing, follows by the date promised."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "If Alex is there, Dominic shows Alex the flagged corners of the 5-acre parcel. Where a line falls is in the signed survey only; no legal opinion is given on the spot.",
+      "more": [
+       "The plug-in names what was covered: each corner found or set, and the road frontage.",
+       "Anything that couldn't be found or reached is listed as not found.",
+       "The signed survey follows by the date promised."
+      ]
+     }
+    },
+    "t": "Thu Oct 22, 11:00am"
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "A survey fixes nothing, so a problem at the house getting worse doesn't change the booking. Danger at the house goes through the danger check on every message."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "A survey is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "A survey is never a plan."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A survey is never a plan."
+   },
+   {
+    "op": "more",
+    "at": "B7-10",
+    "more": [
+     "The sale falling through is an ordinary late cancel: only the notice counts, never the reason."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-28",
+    "does": "Something a job needs is out. Here, the total station is in for repair until Monday. Each booking that needs it, like Tessa's elevation certificate, is offered new times, with no fee.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Total station in for repair until Mon"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Tessa. The total station for your elevation certificate tomorrow is in for repair. Pick a new time, with no fee."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "A survey is an one-time visit, never a plan."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "A survey is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "A survey is an one-time visit. A corner re-stake later is its own booking."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a boundary survey."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "A survey is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "The survey agreement is signed as the contract step (B4-57), not as a form."
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: the lot size, whether the corners are marked, what the survey is for, and any add-ons.",
+     "Its danger words: a gas smell or hissing, sparks, smoke, live wires, or a threat.",
+     "Its first steps: the signed survey agreement, and the utility locate.",
+     "Who can stand in for whom, and how the visit is checked in: the code at the start, or DONE with photos.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-83",
+    "does": "The plug-in, or Sam for each service, says what is booked and how its times read. It can be a person in a window or at a set start, a stay, a seat or no person. A survey starts at a set time."
+   },
+   {
+    "op": "words",
+    "at": "B5-34",
+    "does": "The plug-in needs the business's own survey agreement signed before any money is taken, for every survey. That goes for any price kind, a list price too.",
+    "more": [
+     "Sam uploaded the business's own agreement at sign-up. Rosie never writes or edits it.",
+     "It names the kind of survey, what is delivered, and the right to enter the land.",
+     "Sam can also ask for a contract on any other service, at sign-up or in the portal."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "The plug-in needs the business's own survey agreement signed before any money is taken, for every survey. The $640 large lot survey signs it too."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B5-35",
+    "does": "Alex reads and signs Lee Land Surveying's survey agreement on the secure page, before any money is taken. It says the kind of survey, what is delivered, and the right to enter the land.",
+    "more": [
+     "The time stays saved while Alex reads and signs.",
+     "A co-owner can sign on a link Alex forwards. Rosie never texts them itself.",
+     "Any cancel period comes from the state's form.",
+     "A moved survey keeps the signed agreement: one tap carries it to the new date."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your survey agreement is signed. Your copy is on the page. Finish booking there."
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your survey agreement is signed. Your copy is on the page. Finish booking there."
+       ]
+      ]
+     },
+     "booking:shop": {
+      "more": [
+       "The time stays saved while Alex reads and signs.",
+       "A co-owner can sign on a link Alex forwards. Rosie never texts them itself.",
+       "Any cancel period comes from the state's form.",
+       "A moved survey keeps the signed agreement: one tap carries it to the new date.",
+       "Its page not finished: it stays booked, with nothing taken."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B5-36",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your survey agreement is waiting for your signature. Your Thu time is saved until 6:45pm today."
+     ],
+     [
+      "san",
+      "cust",
+      "Your survey agreement wasn't signed in time, so nothing was booked or charged."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. didn't sign the survey agreement in 24 hours, so nothing was booked."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A survey is one visit, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Surveys book a surveyor's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "No contract needed",
+    "why": "Every survey needs the business's signed survey agreement before the time is booked."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "A survey is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "A survey is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A surveyor never looks after a child. An adult must be there if anyone is."
+   },
+   {
+    "op": "words",
+    "at": "B9-22",
+    "does": "A what-if: say Morgan, an investor buying two rentals, asked for one bill a month instead of a bill after each survey. Both surveys go on one bill on the 1st.",
+    "more": [
+     "Each survey still gets its own code or DONE.",
+     "Each line shows the survey's date and place.",
+     "Each survey is its own booking, so each counts for Rosfield's $2."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Land Surveying: your October surveys.",
+      {
+       "list": {
+        "head": [
+         "Date",
+         "Place",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Tue Oct 20",
+          "Rental 1",
+          "$495"
+         ],
+         [
+          "Wed Oct 21",
+          "Rental 2",
+          "$495"
+         ]
+        ]
+       },
+       "pay": {
+        "amount": "$850",
+        "what": "October's surveys",
+        "link": "rosfield.com/p/m10"
+       },
+       "as": "Morgan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Land Surveying: $640 for your 5-acre parcel survey. Pay by card, or by bank transfer.",
+      {
+       "pay": {
+        "amount": "$640",
+        "what": "the 5-acre parcel survey",
+        "link": "rosfield.com/p/h2"
+       },
+       "as": "Harper J."
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your $640 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then.",
+      {
+       "as": "Harper J."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "does": "Sam adds construction staking to Lee Land Surveying. It brings its own plug-in, and only what's new is asked.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW construction staking"
+     ],
+     [
+      "san",
+      "owner",
+      "Construction staking for Lee Land Surveying: is it the same company?"
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like boundary survey?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-26",
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "LATE report Wed Oct 28"
+       ],
+       [
+        "san",
+        "cust",
+        "Your signed survey needs a little more time. It will be ready Wed Oct 28."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-30",
+    "vary": {
+     "price:photos": {
+      "t": "Wed Oct 28, 10:00am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Hugo Moore"
+     ],
+     [
+      "Company",
+      "Lee Land Surveying"
+     ],
+     [
+      "Kinds of work",
+      "Boundary survey"
+     ],
+     [
+      "Jobs",
+      "Boundary survey, construction staking, corner re-stake"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7:30am–5:30pm"
+     ],
+     [
+      "Hugo agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after a survey, as in flow A."
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[6 contact cards] Dominic and Hugo lead the survey crews; Dominic does construction staking too. Irene and Vera do records consults and survey reviews at the office; Irene also goes to the property. Pat is my office manager, for prices over $500. Jules rents a desk, with their own customers."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Dominic: boundary surveys and construction staking",
+         "Hugo: boundary surveys",
+         "Irene: records consults, survey reviews, consults at the property",
+         "Vera: records consults and survey reviews at the office",
+         "Pat: office manager, OKs Lee Land Surveying prices over $500",
+         "Jules: own customers, gets a link to sign up as their own business"
+        ]
+       },
+       "buttons": [
+        "Yes, all agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "t": "Thu Oct 22, 6:45am"
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 11:30am"
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "line": [
+       "4.27",
+       "6.3"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "title": "Sam requests the utility locate",
+      "does": "The crew drives markers into the ground, so buried lines must be marked first. Sam gets a to-do to request the utility locate for the corners.",
+      "more": [
+       "The locate takes about 2 business days. The first open times start after it.",
+       "Sam replies when it is in. No reply: Sam is asked once more before the visit.",
+       "The marks (paint and flags) must be on the ground before the crew sets a marker.",
+       "A line marked at a corner moves that marker, with no fee to the customer."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s survey: request the utility locate for the corners today. It takes about 2 business days, so the marks are on the ground before Thu.",
+        {
+         "buttons": [
+          "The locate is in",
+          "Not in yet"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "booked",
+       "pf.first_steps"
+      ],
+      "tells": [
+       "owner"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "notes": "Kept words: 'Trip fee' (the $89 fee for a late cancel or no way in, the parent's word too), 'Grace' (the master's grace time), 'leak' and 'color' (the master's shared safety and fairness lines, S13-40 lists color among protected traits).\nNew profession on the REDESIGN 2 master (batch S1, Tue Oct 27 2026), started from the refitted inspector overlay (set 'from'): a boundary survey is a set fieldwork visit at the property with a signed document later, and the agreement is signed before booking, like an inspection. It differs on purpose: the work is outdoors, nobody needs to be there, a crew arrives in a 2-hour window (flow B), and the money is a deposit with the rest on the bill after the signed survey. The parent's lockbox, agent-access and walk-through steps are not carried; the master's own check-in (the code at the door, or DONE with photos when nobody is there) stands.\nFlow B is the usual side: Lee Land Surveying (boundary surveys of lots and large parcels, with construction staking as the second kind of work). Flow A is Lee Survey Office, Sam's office: a 30-minute records consult, plat lookups, survey reviews and a subdivision planning meeting, at the office, by video or at the property.\nPrices are the example business's own: boundary survey $495 (lot up to a quarter acre), corner re-stake $150 (paid in full), elevation certificate $199 ($249 when Sam goes), fence line location $160, a large parcel quoted from the deed, old plats and aerial photos at $640 (Sam OKs over $500), a topographic survey priced at the visit by size, trip fee $89. Flow A: records consult $35, plat lookup $20, survey review $40, second look at a survey $55, subdivision planning meeting $140, at the property $75.\nMoney, flow B: main list|deposit|bill (a $250 deposit when booking, the $245 rest on the bill after the signed survey), list|none|bill (the bill after; the signed survey goes out once it is paid), list|full|none (a corner re-stake paid in full), photos|deposit|bill (a large parcel: $320 deposit, $320 on the bill). Flow A: list|card|counter (main), list|none|counter, list|full|none, list|card|card. The deposit cap, if any, comes from the state form. The fee never depends on where the lines fall.\nWho must not be booked (pf.questions, pf.rules): anyone under 18; a neighbor or tenant for land they do not own; a request to put a line where the client wants it; legal advice on a boundary dispute (Rosie says a lawyer can help, and the booking goes on). A boundary dispute is not a threat; a threat from someone at the property pauses the booking.\nDanger words (pf.safety): a gas smell or hissing, sparks or smoke, a threat from someone at the property (no booking until safe); live wires hanging down (booking goes on, that area left out). The danger-first call (B3-11, B3-18) uses a power line down in the yard, so the two steps read as one conversation. 'A fence line', 'a neighbor' and 'a boundary question' are the everyday reasons to book and are not stop words.\nSettings: arrive a 2-hour window in flow B and a set start in flow A; cutoff 6pm the day before; booking choices B: a set time, windows. Nothing is sent now. The utility locate is a first step with a lead time (fact `firststeps`): own step B6-x01 gives Sam the to-do; the first open times start after it. The signed survey date in the examples is the next day (Fri Oct 23) like the parent's; the real turnaround is the owner's setting (the plug-in's example: 10 business days).\nRename pairs: only the inspector's pairs that match the frozen master were kept and re-worded for surveying; the arrival-window pairs ('8:30am' set starts) were dropped so flow B keeps the master's windows. Addresses and license numbers are made up (EX-1042 style). The master's 'Leak repair' sign-up row reads 'Topographic survey' (priced at the visit by size).\nFor the verifier: the deposit-first main path (about half up front) is the usual surveyor practice but is the example owner's choice; the plug-in leaves the share and cap to the owner and the state form. A boundary survey does not settle ownership: Rosie says so and points to a lawyer.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "'A trim' or 'a fade' fits",
+    "'Yes, make it a fade' goes back to the times.",
+    "Add photos of your hair,",
+    "Alex's employer for a staff cut.",
+    "My employer pays for this cut.",
+    "means the shorter cut.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "Shop's side.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Color quotes come to you first. Board prices never need one",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "like a patch test with a wait, or a screening",
+    "Panel upgrade: a free estimate, then a quote",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Lee's Barbershop will fix it for free. Pick a time:",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "May the shop show photos of your hair? Yes / No",
+    "A haircut could mean a salon or a barbershop.",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "Avery at the shop, Casey for plumbing.",
+    "Riley also does color and house calls",
+    "Takes the price from the shop's board",
+    "The cape clip ripped my shirt collar.",
+    "Haircuts at the shop work like this:",
+    "Riley: barber, color and house calls",
+    "Signature cut and hot towel shave",
+    "Do you do kids cuts? My son is 8.",
+    "like a 15-minute style consult",
+    "The cut is uneven on one side.",
+    "Does it work like haircuts?",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "Hours: the shop's hours",
+    "Priced from your photos",
+    "Haircuts work like this",
+    "Lee's Barbershop LLC",
+    "Color and cut · $90",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Groom's package ·",
+    "Lee's Barbershop",
+    "Color correction",
+    "Only at the shop",
+    "Groom's package",
+    "Book a free fix",
+    "Drain clearing",
+    "A barbershop's",
+    "signature cut",
+    "Avery: barber",
+    "1 color quote",
+    "1 At the shop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "barbershop's",
+    "at the chair",
+    "At the chair",
+    "At your shop",
+    "A barbershop",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "At the shop",
+    "at the shop",
+    "NEW massage",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "the shop's",
+    "The shop's",
+    "Shop front",
+    "At my home",
+    "88 Elm St",
+    "on Elm St",
+    "Barbering",
+    "Skin fade",
+    "skin fade",
+    "plumbing",
+    "Plumbing",
+    "Haircuts",
+    "haircuts",
+    "a barber",
+    "A barber",
+    "the shop",
+    "The shop",
+    "JP031552",
+    "MP045210",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "JE30417",
+    "EC22871",
+    "BS20981",
+    "barber",
+    "Barber",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "or can't be reached while care is due?",
+    "visit fee",
+    "Each service starts the way most barbershops set it.",
+    "A water heater job",
+    "two skin fades",
+    "a parent stays for a kids cut",
+    "Kids cut",
+    "Color and cut",
+    "color and cut",
+    "Style consult",
+    "the $89 service-call fee",
+    "The chairs",
+    "A chair, ready"
+   ],
+   "B": [
+    "Free until 7am on the visit day.",
+    "Free cancel lasts until 7am on the visit day.",
+    "1 hour's notice",
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "After that, or nobody home:",
+    "Say Kim L.'s yard drain needs nobody home.",
+    "The $179 drain needs none.",
+    "Can I run the dishwasher before you come?",
+    "says no. Please wait until the job is done.",
+    "Panel upgrade: a free estimate, then a quote",
+    "can start the sewer camera inspection at a set time",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Your $800 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Each customer gets a 4-digit check-in code, and gives it to the plumber at the door.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "With Sam's yes, electrical and the shop now show to AI assistants too.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "A job priced at the visit never takes more than the visit fee.",
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Your water heater price is with Lee Home Services.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "A haircut could mean a salon or a barbershop.",
+    "BEFORE old water stain on the cabinet floor",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also look at a dripping faucet?",
+    "couldn't price your water heater this time",
+    "HAZARD mold behind the sink wall, stopped",
+    "Alex's home in Springfield is inside it.",
+    "Casey for plumbing, Avery at the shop.",
+    "Riley also does color and house calls",
+    "Alex was told to keep the door closed",
+    "Riley: barber, color and house calls",
+    "Jordan left a mess under the sink.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Is the sink still full of water?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "LATE camera report Mon Oct 26",
+    "Texts the camera report link",
+    "Replace both shutoff valves",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "Video and Jordan's notes",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Jordan found more work.",
+    "Kitchen drain clearing",
+    "stage 2 of your repipe",
+    "Under the sink, before",
+    "Just the kitchen sink.",
+    "Tessa · Drain clearing",
+    "Lee Home Services LLC",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "leehomeservices.com",
+    "Sewer camera report",
+    "Lee Home Services'",
+    "Water heater flush",
+    "water heater flush",
+    "Every shop service",
+    "the shutoff valves",
+    "Lee Home Services",
+    "the kitchen drain",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "Service call fee",
+    "service call fee",
+    "like a roof leak",
+    "Drain clearing",
+    "drain clearing",
+    "plumbing visit",
+    "DONE 179 drain",
+    "Avery: barber",
+    "2 At the shop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "barbershop's",
+    "sewer camera",
+    "Service call",
+    "service call",
+    "at the chair",
+    "At your shop",
+    "house calls",
+    "House calls",
+    "Price board",
+    "At the shop",
+    "at the shop",
+    "At my home.",
+    "electrical",
+    "Electrical",
+    "barbershop",
+    "Barbershop",
+    "beard trim",
+    "the shop's",
+    "Shop front",
+    "At my home",
+    "88 Elm St",
+    "on Elm St",
+    "42 Oak St",
+    "a plumber",
+    "plumbing",
+    "Plumbing",
+    "a barber",
+    "the shop",
+    "The shop",
+    "JP031552",
+    "MP045210",
+    "plumber",
+    "Plumber",
+    "Haircut",
+    "JE30417",
+    "EC22871",
+    "BS20981",
+    "barber",
+    "Barber",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "$179",
+    "or can't be reached while care is due?",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "visit fee",
+    "A water heater job",
+    "two drain clearings",
+    "Water pressure check",
+    "the $89 service-call fee",
+    "$89, credited to the repair",
+    "E 25% deposit after the quote. C paid in full when they book",
+    "25% deposit",
+    "Leak repair",
+    "Labor",
+    "$120 an hour",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today",
+    "Accepted: the leak repair today",
+    "Alex M. · water heater",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Yes, it won't drain",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Drain clearings already booked keep only their saved card.",
+    "The chairs",
+    "A chair, ready",
+    "a camera inspection",
+    "can clear the drain",
+    "run a camera down my sewer line",
+    "Kitchen drain",
+    "Yard drain"
+   ]
+  },
+  "A": {
+   "S1-23": "39941a5377",
+   "S1-61": "7421d186d5",
+   "S2-15": "4a64408afc",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A7-23": "90bc4b1137",
+   "A4-28": "c8e677520c",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-96": "d540b91653",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-86": "c989a99e52",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A4-36": "f261af1660",
+   "A7-12": "05f64179a4",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "S11-40": "0f0f0a5c8f",
+   "S11-48": "03f824b27b",
+   "A8-67": "e9fd748fc5",
+   "S2-02": "b2094081ee"
+  },
+  "B": {
+   "S2-15": "4a64408afc",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-01": "814aa1fde7",
+   "B10-07": "3737f1d1c8",
+   "B10-13": "584c827fda",
+   "B10-16": "c7a47a391c",
+   "B10-18": "3d7ba16539",
+   "B10-25": "3e0bd84dd3",
+   "B10-19": "4806f6eed8",
+   "B10-26": "b5ea3157f0",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B9-11": "9525d5f9c9",
+   "B8-23": "dd780a2ec8",
+   "B8-39": "aa75251207",
+   "B7-93": "4d6f89e473",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B7-10": "b5b9295e82",
+   "B7-28": "deeed1f8a0",
+   "B5-01": "841c417586",
+   "B6-03": "dcc1eb310c",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B4-38": "9539521dc7",
+   "B4-04": "df3ea4b2f5",
+   "B4-83": "a7473a80ea",
+   "B5-34": "917f89b62f",
+   "B5-35": "1de0d2312d",
+   "B5-36": "456a1159d6",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B9-22": "f691bde396",
+   "B9-26": "d356566ab1",
+   "S11-58": "3461928783",
+   "B10-30": "5ecd3ded96",
+   "S11-48": "6fd1c7b7b9",
+   "B10-32": "7713bff255",
+   "S2-02": "b2094081ee",
+   "B8-01": "df9177b059",
+   "B8-41": "6e8e9825b2",
+   "B6-13": "ed1f412f7d"
+  }
+ }
+}

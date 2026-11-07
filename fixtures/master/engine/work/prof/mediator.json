@@ -1,0 +1,3528 @@
+{
+ "id": "mediator",
+ "name": "Mediator",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "lawyer",
+ "plugin": {
+  "pf.license": {
+   "what the business is": "Mediation: a neutral person helps two or more people reach their own agreement. A mediator does not decide, does not give legal advice and is not either person's lawyer. Some mediators are also lawyers; the mediation stays separate from legal advice.",
+   "need": "Many places set no license for mediators. Where the state's rules require training or a roster listing for court-connected or family mediation, the mediator holds that certificate. A mediator who is also a lawyer holds their own bar license.",
+   "ask": "Optional: a training certificate, a court roster listing or a bar number, only if the business wants it shown.",
+   "who holds it": "Each mediator.",
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, certificate, roster listing or insurance (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license or certificate (D96): the business goes live once set up and the owner says yes. A job the owner says needs a certificate they don't have isn't booked.",
+   "renewals": "The owner may give end dates; Rosie reminds Sam before they pass. It looks nothing up.",
+   "insurance": "Professional liability insurance is the business's own choice; Rosie shows it only as the business gives it.",
+   "background check": "None."
+  },
+  "pf.services": {
+   "pattern": "Consult: a neutral meeting for two or more people. At the mediator's office, or by video (flow A). At a place the parties pick (flow B): a library or community room, a workplace, or a home when both agree and it is safe. One person books; every other person says yes on their own link.",
+   "at the business (the example business's own prices, not standards)": [
+    {
+     "name": "Free intro call",
+     "length": "15 minutes",
+     "price": "free",
+     "before": "nothing",
+     "after": "nothing",
+     "note": "no details of the dispute; one person at a time"
+    },
+    {
+     "name": "Intake meeting",
+     "length": "45 minutes, one person",
+     "price": "$75 a person",
+     "where": "the office, or by video",
+     "before": "nothing taken",
+     "after": "paid at the front desk; by video, the bill is texted",
+     "note": "each person meets the mediator alone first"
+    },
+    {
+     "name": "Mediation session",
+     "length": "2 hours",
+     "price": "$300 for the session",
+     "where": "the office, or by video",
+     "before": "a $100 deposit when booked",
+     "after": "the $200 rest at the front desk after the session",
+     "note": "how the parties share the cost is their own agreement"
+    },
+    {
+     "name": "Half-day mediation",
+     "length": "4 hours",
+     "price": "$550",
+     "where": "the office, or by video",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Extra hour, added at a session",
+     "price": "$120",
+     "rule": "priced and OK'd by every party before it starts; paid at the front desk with the rest"
+    },
+    {
+     "name": "Follow-up session",
+     "length": "1 hour",
+     "price": "$150",
+     "before": "nothing taken",
+     "after": "paid at the front desk"
+    },
+    {
+     "name": "Separate-room mediation",
+     "price": "$300 a session",
+     "note": "the mediator moves between two rooms; offered when a party prefers not to meet the other"
+    },
+    {
+     "name": "Agreement write-up",
+     "price": "set after the session; the parties OK it first",
+     "note": "a plain summary of what the parties agreed; not legal advice, and each should have a lawyer read it if they want"
+    }
+   ],
+   "at a place the parties pick (flow B)": [
+    {
+     "name": "Mediation at your location",
+     "length": "2 hours",
+     "price": "$360: the $300 session plus a $60 travel fee",
+     "where": "a library or community room, a workplace, or a home when both agree and it is safe",
+     "before": "a $120 deposit when booked, or a card saved for the $60 fee",
+     "after": "the $240 rest on the bill texted after, or the saved card charged at DONE"
+    },
+    {
+     "name": "Half-day mediation at a workplace",
+     "length": "4 hours",
+     "price": "$660: $600 plus the $60 travel fee",
+     "where": "a workplace, with its OK",
+     "before": "paid in full when booked (often by the employer)",
+     "after": "nothing more"
+    },
+    {
+     "name": "Extra hour, added at the visit",
+     "price": "$120",
+     "rule": "priced and OK'd by every party first; on the bill with the rest"
+    }
+   ],
+   "the dispute itself": "Never decided, judged or advised on by Rosie or its AI. The agreement belongs to the parties.",
+   "travel area": "The business's setting (the example: 25 miles).",
+   "capacity": "One mediator per session; a co-mediator only by name. A joint session is booked after each party's intake meeting.",
+   "online": "Intake meetings and sessions by video count as at the office (flow A).",
+   "booking window": "Up to 6 weeks ahead; no same-day sessions."
+  },
+  "pf.questions": {
+   "before times": [
+    "What kind of dispute: family or divorce, a neighbor, a landlord and tenant, a workplace, a business, or something else. Only the kind, no details.",
+    "How many people will take part? Only the number.",
+    "In the office, by video, or at a place you pick?",
+    "Is there a court date the session must come before? The date only."
+   ],
+   "after a time is picked": [
+    "Anything that helps the session, like a step-free way in or an interpreter.",
+    "Whether each person would rather meet the other in the same room or in separate rooms."
+   ],
+   "only on the secure page": [
+    "Your full name, and the names only of the other people in the dispute (for the neutrality check)",
+    "A tick: the mediator is neutral, is not your lawyer, gives no legal advice and does not decide",
+    "A tick: you agree to mediate, and to keep what is said in it private as the agreement says",
+    "A tick: the fee, and how it is paid; how the people share it is their own agreement",
+    "Is there a protective order, or do you fear for your safety with the other person? (yes or no; you may meet the mediator alone)",
+    "Is it safe to text, email or call you? If not, how should the business reach you?",
+    "18 or older"
+   ],
+   "who may book": "An adult books for themselves. They add each other person by name and contact; each other person says yes on their own link and gives their own answers. Nobody books for an adult who hasn't agreed. A child is never a party."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "someone is hurting or threatening a person right now",
+    "a medical emergency",
+    "crisis words (the 988 line first)"
+   ],
+   "words that go on with safety steps": [
+    "abuse, or fear of the other person",
+    "a protective order",
+    "being pressured to agree to something"
+   ],
+   "what Rosie says": {
+    "in danger right now": "Call 911 now. Nothing is booked.",
+    "abuse or fear": "If you're in danger, call 911. The National Domestic Violence Hotline is 1-800-799-7233, any time. The booking goes on privately: no joint session is offered, only a meeting with the mediator alone, and Rosie asks how it's safe to reach the customer.",
+    "pressured to agree": "The mediator meets you alone first. Nobody has to agree to anything. The booking goes on."
+   },
+   "legal questions": "Never answered: whether a deal is fair, what a court would do, what the law says. A mediator who is also a lawyer keeps legal advice outside the mediation. In danger, 911 comes first."
+  },
+  "pf.first_steps": {
+   "required": [
+    "The party form, before every new matter books: every person's name only, on the secure page. The mediator checks the names against the business's own records for a conflict, and replies Clear, Conflict or Need more.",
+    "Each other person says yes on their own link, and signs the agreement to mediate and keep it private, before any joint session is held.",
+    "Each person has an intake meeting alone with the mediator before a joint session.",
+    "The time stays saved for the party form, up to 1 business day (the business's setting). No answer by then: the request ends, and nothing is owed."
+   ],
+   "prep for the reminder": [
+    "Bring any papers you want to talk about, and a photo ID.",
+    "Each person comes on their own at the start; the mediator meets you apart first if you prefer."
+   ]
+  },
+  "pf.visit": {
+   "check-in": "At the office: the code at the front desk. By video: the mediator asks for the code at the start. At a place the parties pick: the code from the person who booked, at the door.",
+   "at check-in": "Each person signs the agreement to mediate if they haven't. The mediator says again that they are neutral, give no legal advice and decide nothing.",
+   "work changes": "An extra hour is priced and OK'd by every party first. A second session is its own visit. A party who wants to stop can stop at any time.",
+   "a conflict or a safety concern found": "The mediator stops the joint session. Nothing is charged for the part not done. A private meeting with each person can come first. No reason is texted.",
+   "what proves it's done": "The code, or DONE. The written summary, if the parties asked for one, goes to each person on their own secure page.",
+   "after the session": "The parties decide what comes next: another session, a written summary, or an end. Rosie records only that the session happened."
+  },
+  "pf.money": {
+   "before": "Intake meetings and follow-ups: nothing taken (the starting answer). A mediation session: a deposit when booked (the example: $100 of $300). A half-day mediation: paid in full when booked. At a place the parties pick: a deposit, or a card saved for the travel fee. A deposit is never more than the price, and any cap comes from the state form.",
+   "after": "At the office: the rest at the front desk, the business's own way. By video or at a place the parties pick: Rosie texts the bill, or charges the saved card at DONE. An extra hour is priced and OK'd first and paid with the rest.",
+   "who pays": "The person who books pays through Rosie. Another party can be named as the payer and gets a pay link after the session. How the parties share the cost between themselves is their own agreement, outside Rosie.",
+   "fees": "A late-cancel or no-show fee: the example keeps the deposit (or the $60 travel fee on a saved card). It's shown before booking, and Sam confirms each. A fee is never more than what was paid now.",
+   "cancel": "The example: free to cancel until 2 days before the session.",
+   "tips": "None.",
+   "tax": "None by default; where the state's rules tax the service, the rate comes from the state form.",
+   "rosfield": "the $2 per confirmed booking applies, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, paid by the business, never added to the customer's price; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee."
+  },
+  "pf.messages": {
+   "never in a text": [
+    "what the dispute is about, beyond the kind picked",
+    "the other people's names",
+    "what anyone said in a session",
+    "why a conflict check didn't clear",
+    "any legal advice"
+   ],
+   "texts say": "only the business's plain name, the date, the time and the place. Each person is texted only about their own part, and never told what another person answered.",
+   "safe to text": "If a person says texts or email aren't safe, Rosie uses only the way they pick: the secure page, an email, or a call from the business. Any text then names only the business's plain name and the time.",
+   "others asking": "Rosie never confirms to anyone but the customer (or a person the customer added) that a person is a customer or has a booking, including the other party before they have said yes.",
+   "a conflict": "Never explained. No other mediator is suggested.",
+   "no nudges": "No follow-up texts about booking another session.",
+   "case notes": "The mediator's notes stay in the business's own file, never in Rosie. Rosie keeps only the time, the kind of dispute and that the session happened.",
+   "languages": "English and Spanish, plus any languages the owner adds.",
+   "minors": "A child is never a party. A teen's request goes to a parent."
+  },
+  "pf.staff": {
+   "licenses": "Any certificate or listing is shown as the business gives it; Rosie doesn't check it.",
+   "skills": [
+    "Family and divorce mediation",
+    "Workplace mediation",
+    "Neighbor and landlord-tenant disputes",
+    "Languages spoken"
+   ],
+   "supervision": "An office manager may run the desk and the neutrality check, but never mediates and never gives advice.",
+   "who OKs what": "The neutrality check: the mediator named or Sam. Sam OKs prices made for one customer. Sam's answer wins.",
+   "stand-ins": "Only another mediator at the same business, offered by the business and picked by the customer by name. Rosie never suggests one. Nobody moves on silence."
+  },
+  "pf.rules": {
+   "neutral": "The mediator is neutral. They never take a side, never decide, and never give legal advice. They are not any party's lawyer.",
+   "notice at booking": "The mediator is neutral, gives no legal advice and decides nothing. Each person may have a lawyer of their own. Before the party form clears, share only names and the kind of dispute.",
+   "voluntary": "Every party agrees on their own page. Nobody is booked into a mediation they haven't said yes to. Any party may stop at any time.",
+   "safety": "Where a party says they fear the other, no joint session is booked. The mediator meets each person alone, or the business declines. This is the business's own screening; Rosie only routes the booking privately.",
+   "confidentiality": "What is said in a session stays in the session as the signed agreement says, except what the law requires. Rosie never sees it.",
+   "named only": "Rosie books only a mediator or business the customer names. It never suggests, ranks or rates mediators, and sends no rating request.",
+   "records": "Booking records 7 years. The mediator's notes stay in the business's own system.",
+   "status": "Draft: finalized once the state forms are filled in."
+  },
+  "pf.edges": {
+   "matter most": {
+    "one party says yes, the other doesn't": "Nothing is booked for a joint session until every party has said yes on their own link; the first person's intake meeting can still go ahead.",
+    "fear of the other person": "Safety steps first. No joint session; a private meeting with the mediator, or the business declines.",
+    "a protective order": "No joint session is booked. The mediator decides what, if anything, can be offered.",
+    "a conflict": "Told without the reason; nothing owed; no other mediator suggested.",
+    "a legal question by text": "Never answered; it waits for a lawyer of their own.",
+    "texts aren't safe": "Only the way the customer picks; plain texts with no matter.",
+    "a party asks what the other said": "Never told. Each person's answers stay on their own page.",
+    "a child as a party": "Not booked. A teen's request goes to a parent.",
+    "the session can't start (a party missing)": "Nothing is charged for the part not done; the deposit goes back unless the missing party's choice is the business's fee rule.",
+    "a no-show": "The fee the business set and the customer agreed to; Sam confirms each.",
+    "thinking it over": "No follow-up nudges."
+   },
+   "the rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "forms",
+   "firststeps",
+   "documents",
+   "video",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": "2 days before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "One question cuts the most",
+    "One question comes up the most"
+   ],
+   [
+    "Rosfield takes no cut of them",
+    "Rosie keeps none of them"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are left out of the recording"
+   ],
+   [
+    "It takes no cut of card payments",
+    "It keeps none of card payments"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Necesito una reunión de mediación el sábado."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Saturday's session notes have a name spelled wrong."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you mediate between a parent and a teen? My son is 15."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "No: sessions are for adults 18 and older, but the adults can book."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Workplace mediation for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds workplace mediation to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW workplace mediation"
+   ],
+   [
+    "Health details stay on the secure page, never in a text.",
+    "Private details stay on the secure page, never in a text."
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a same-day visit"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: mediation is booked ahead."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check-in"
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "Here: the party form, for every new matter."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "Mediation work is private, so no rating is asked and the office takes the second branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a session leads to more sessions, like Dana's follow-up session."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your office, paid at the front desk, your own way"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the front desk"
+   ],
+   [
+    "pays at the chair",
+    "pays at the front desk"
+   ],
+   [
+    "code at the chair",
+    "code at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the session"
+   ],
+   [
+    "At the chair",
+    "At the session"
+   ],
+   [
+    "the chair",
+    "the front desk"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Mediation LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Mediation"
+   ],
+   [
+    "Lee Home Services",
+    "Lee On-Site Mediation"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Family"
+   ],
+   [
+    "Lee Electric",
+    "Lee Workplace"
+   ],
+   [
+    "88 Elm St",
+    "52 Grove St"
+   ],
+   [
+    "Elm St",
+    "Grove St"
+   ],
+   [
+    "1200 Main St",
+    "715 Harbor Rd"
+   ],
+   [
+    "Oak St",
+    "Birch Ln"
+   ],
+   [
+    "electrical jobs",
+    "workplace jobs"
+   ],
+   [
+    "electrical license",
+    "mediation certificate"
+   ],
+   [
+    "Electrical",
+    "Workplace mediation"
+   ],
+   [
+    "electrical",
+    "workplace mediation"
+   ],
+   [
+    "plumbing jobs",
+    "mediation jobs"
+   ],
+   [
+    "plumber",
+    "mediator"
+   ],
+   [
+    "Plumber",
+    "Mediator"
+   ],
+   [
+    "plumbing",
+    "family mediation"
+   ],
+   [
+    "Plumbing",
+    "Family mediation"
+   ],
+   [
+    "barbershops",
+    "mediation offices"
+   ],
+   [
+    "barbershop",
+    "mediation office"
+   ],
+   [
+    "Barbershop",
+    "Mediation office"
+   ],
+   [
+    "barbers",
+    "mediators"
+   ],
+   [
+    "barber",
+    "mediator"
+   ],
+   [
+    "Barber",
+    "Mediator"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Half-day mediation"
+   ],
+   [
+    "Signature cut and shave",
+    "Half-day mediation"
+   ],
+   [
+    "signature cut",
+    "half-day mediation"
+   ],
+   [
+    "Groom's package",
+    "Full-day mediation"
+   ],
+   [
+    "Color and cut",
+    "Separate-room mediation"
+   ],
+   [
+    "color and cut",
+    "separate-room mediation"
+   ],
+   [
+    "Color correction",
+    "Agreement write-up"
+   ],
+   [
+    "color correction",
+    "agreement write-up"
+   ],
+   [
+    "Skin fade",
+    "Follow-up session"
+   ],
+   [
+    "skin fade",
+    "follow-up session"
+   ],
+   [
+    "Beard trim",
+    "Extra hour"
+   ],
+   [
+    "beard trim",
+    "extra hour"
+   ],
+   [
+    "Kids cut",
+    "Intake meeting"
+   ],
+   [
+    "kids cut",
+    "intake meeting"
+   ],
+   [
+    "Haircuts",
+    "Mediation sessions"
+   ],
+   [
+    "haircuts",
+    "mediation sessions"
+   ],
+   [
+    "Haircut",
+    "Mediation session"
+   ],
+   [
+    "haircut",
+    "mediation session"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "patch test",
+    "intake meeting"
+   ],
+   [
+    "Drain clearing",
+    "Mediation at your location"
+   ],
+   [
+    "Water heater flush",
+    "Half-day mediation at a workplace"
+   ],
+   [
+    "water heaters",
+    "full-day mediations"
+   ],
+   [
+    "water heater",
+    "full-day mediation at a workplace"
+   ],
+   [
+    "Color quotes",
+    "Agreement quotes"
+   ],
+   [
+    "color quote",
+    "agreement quote"
+   ],
+   [
+    "Color",
+    "Workplace mediation"
+   ],
+   [
+    "color",
+    "workplace mediation"
+   ],
+   [
+    "cut hair",
+    "help parties"
+   ],
+   [
+    "cuts",
+    "sessions"
+   ],
+   [
+    "cut",
+    "session"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Omar"
+   ],
+   [
+    "Jordan",
+    "Noor"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "Book me a mediation session at Lee Mediation on Saturday.",
+    "Book me a mediation session with Dana Reyes at Lee Mediation on Saturday."
+   ],
+   [
+    "A mediation session could mean a salon or a mediation office.",
+    "A mediation session could mean a mediator or a tax preparer."
+   ],
+   [
+    "Lee Mediation prices a agreement write-up at the session, once Dana sees the hair.",
+    "Lee Mediation prices an agreement write-up at the session, once Dana sees the papers."
+   ],
+   [
+    "Books the groom's party together",
+    "Books both sides' sessions together"
+   ],
+   [
+    "A groom books sessions for himself and four friends on one morning. Rosie finds chairs side by side across Dana and Omar.",
+    "Two people book sessions on one morning, apart. Rosie finds separate times across Dana and Omar."
+   ],
+   [
+    "A mediation office takes no drop-offs. A repair office, a tailor or a groomer does.",
+    "A mediation office takes no drop-offs. A repair shop, a tailor or a groomer does."
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free fix to a typo in a written summary."
+   ],
+   [
+    "A mediation office's plug-in adds no danger words of its own.",
+    "A mediation office's plug-in adds danger words, like fear of the other party."
+   ],
+   [
+    "If the plug-in asks for something to bring, the desk checks it first. A mediation session needs nothing.",
+    "If the plug-in asks for something to bring, the desk checks it first. A session asks only for any papers the parties were given."
+   ],
+   [
+    "Dana finishes the work",
+    "Dana finishes the session"
+   ],
+   [
+    "Drains have a set price.",
+    "A mediation session has a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "An agreement write-up is priced at the session."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone in danger right now stops the booking."
+   ],
+   [
+    "Mediation session, fade and extra hour at the office.",
+    "Mediation sessions and extra hours at the office."
+   ],
+   [
+    "Panel upgrade",
+    "Full-day mediation"
+   ],
+   [
+    "Why: many mediators, salons and groomers are licensed to their office.",
+    "Why: some kinds of work, like salons and groomers, are licensed to one place."
+   ],
+   [
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "E nothing before. A at their home too, 75, paid after the visit"
+   ],
+   [
+    "Lee On-Site Mediation'",
+    "Lee On-Site Mediation's"
+   ],
+   [
+    "photos of your hair",
+    "a short note on the kind of dispute"
+   ],
+   [
+    "15 gloss",
+    "120 extra hour"
+   ],
+   [
+    "gloss $15",
+    "extra hour $120"
+   ],
+   [
+    "Gloss to finish",
+    "Extra hour"
+   ],
+   [
+    "No gloss today",
+    "No extra hour today"
+   ],
+   [
+    "A neighborhood mediation office on Grove St. Classic sessions, fades and hot towel shaves.",
+    "A neighborhood mediation office on Court St. Wills, trusts and mediation sessions."
+   ],
+   [
+    "The chairs",
+    "The waiting room"
+   ],
+   [
+    "A chair, ready",
+    "A meeting room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a mediator who rents a room here,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room here, with their own parties."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "A mediator's example: water near outlets gets 'shut off the main valve'.",
+    "A mediator's example: fear of someone at home gets the hotline first."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the office's list.",
+    "Alex asks for a tax return, which isn't on the office's list."
+   ],
+   [
+    "Lee Mediation doesn't do perms.",
+    "Lee Mediation doesn't do tax returns."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free entrance:"
+   ],
+   [
+    "like 'How would you like it on top?'",
+    "like 'Do you need an interpreter?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Do you need an interpreter? (optional)"
+   ],
+   [
+    "Could Dana use a toner instead of the gloss?",
+    "Could Dana add an hour?"
+   ],
+   [
+    "A.M. asks for a toner instead of the gloss. What's the new price?",
+    "A.M. asks to add a second question. What's the new price?"
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: prefers a video mediation session next time"
+   ],
+   [
+    "A chair renter asked for by name:",
+    "A room renter asked for by name:"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A chair in the waiting room ripped my coat."
+   ],
+   [
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "A.M. says a waiting room chair ripped a coat today."
+   ],
+   [
+    "May the office show a short note on the kind of dispute? Yes / No",
+    "May the office leave a voicemail? Yes / No"
+   ],
+   [
+    "BS20981",
+    "EX-3180"
+   ],
+   [
+    "BS20918",
+    "EX-3108"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "JP031552",
+    "EX-1552"
+   ],
+   [
+    "$75",
+    "$360"
+   ],
+   [
+    "$25",
+    "$75"
+   ],
+   [
+    "$35",
+    "$300"
+   ],
+   [
+    "$55",
+    "$550"
+   ],
+   [
+    "$140",
+    "$900"
+   ],
+   [
+    "$90",
+    "$300"
+   ],
+   [
+    "a home visit, $360, paid in full when booking",
+    "a mediation at their location, $360, with a $120 deposit to book"
+   ],
+   [
+    "adds the prices: $300 and $20.",
+    "adds the prices: $300 and $120."
+   ],
+   [
+    "Adding a extra hour, +$20? Say so.",
+    "Adding an extra hour, +$120? Say so."
+   ],
+   [
+    "A extra hour is on the price list: $20.",
+    "An extra hour is on the price list: $120."
+   ],
+   [
+    "It's $20. Accept it?",
+    "It's $120. Accept it?"
+   ],
+   [
+    "D.W.'s $20 payment through Rosie was charged twice.",
+    "D.W.'s $100 deposit through Rosie was charged twice."
+   ],
+   [
+    "Refund · $20",
+    "Refund · $100"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: a $100 deposit for a session; nothing for an intake meeting"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: a $100 deposit for a session; nothing for an intake meeting"
+   ],
+   [
+    "$40 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "Full-day mediation · $40 deposit",
+    "Mediation session · $100 deposit"
+   ],
+   [
+    "Late cancel or no-show: the $40, if you confirm",
+    "Late cancel or no-show: the $100 deposit, if you confirm"
+   ],
+   [
+    "Late or no-show: the $20 fee, if you confirm",
+    "Late or no-show: the $100 fee, if you confirm"
+   ],
+   [
+    "Mediation session at home · $360",
+    "Half-day mediation at a workplace · $660"
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so no fee"
+   ],
+   [
+    "The Full-day mediation can take a $40 deposit when booked. The other $100 is paid at the front desk.",
+    "The mediation session takes a $100 deposit when booked. The other $200 is paid at the front desk."
+   ],
+   [
+    "The Full-day mediation can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The mediation session takes a $100 deposit when booked. The other $200 is on the bill after the visit."
+   ],
+   [
+    "The half-day mediation, $550, is paid in full when booked. So is a home visit, $360. Nothing more is owed after.",
+    "The half-day mediation, $550, is paid in full when booked. Nothing more is owed after."
+   ],
+   [
+    "After that, or a no-show: a $20 fee ($40 for the Full-day mediation), only if a card, a deposit or the full price was taken and you say yes",
+    "After that, or a no-show: the $100 deposit, only if a deposit or the full price was taken and you say yes"
+   ],
+   [
+    "To save cards for the $20 fee, connect Stripe",
+    "To save cards for a late-cancel fee, connect Stripe"
+   ],
+   [
+    "Pat: office manager, OKs Lee On-Site Mediation prices over $500",
+    "Pat: office manager, OKs Lee On-Site Mediation prices over $400"
+   ],
+   [
+    "Pat is my office manager, for prices over $500.",
+    "Pat is my office manager, for prices over $400."
+   ],
+   [
+    "workplace mediation too, at $900 an hour",
+    "workplace mediation too, at $150 an hour"
+   ],
+   [
+    "Noor: family mediation and workplace mediation, $900 an hour",
+    "Noor: family mediation and workplace mediation, $150 an hour"
+   ],
+   [
+    "raises the mediation session to $40 for visits from Mon Nov 2",
+    "raises the mediation session to $325 for visits from Mon Nov 2"
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25",
+    "A plan goes to $325 from Wed Nov 25"
+   ],
+   [
+    "Mediation sessions already booked keep $300, even after Nov 2.",
+    "Mediation sessions already booked keep $300, even after Nov 2."
+   ],
+   [
+    "Saved: mediation session $40 for visits from Mon Nov 2.",
+    "Saved: mediation session $325 for visits from Mon Nov 2."
+   ],
+   [
+    "Mediation session plans go to $40 from Wed Nov 25",
+    "Mediation session plans go to $325 from Wed Nov 25"
+   ],
+   [
+    "Reading it back: the mediation session goes to $40 for new bookings.",
+    "Reading it back: the mediation session goes to $325 for new bookings."
+   ],
+   [
+    "$100 after the visit",
+    "$200 after the visit"
+   ],
+   [
+    "Mediation session $300 ($40 from Nov 2) · Follow-up session $40 · Extra hour $20",
+    "Mediation session $300 ($325 from Nov 2) · Follow-up session $150 · Extra hour $120"
+   ],
+   [
+    "A follow-up session at Lee Mediation is $40, not $300. Here are the open times at $40.",
+    "A mediation session at Lee Mediation is $325, not $300. Here are the open times at $325."
+   ],
+   [
+    "asks for a follow-up session at $300, an old price. Rosie answers with the real price, $40.",
+    "asks for a mediation session at $300, an old price. Rosie answers with the real price, $325."
+   ],
+   [
+    "Sam switches the mediation session from a card saved for the $20 fee to a $20 deposit.",
+    "Sam switches the mediation session from a $100 deposit to a $150 deposit."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "A $100 deposit · the rest paid after the visit"
+   ],
+   [
+    "extra 20 extra hour",
+    "extra 120 extra hour"
+   ],
+   [
+    "says Saturday's session is uneven on one side",
+    "says a note from Saturday's session has a mistake"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer's court date moves up before the session, and they ask if they can still come in."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My court date moved up. Can I still come in?"
+   ],
+   [
+    "suggests moving your visit until it clears, with no fee.",
+    "suggests moving your visit sooner, with no fee."
+   ],
+   [
+    "'A trim' or 'a fade' fits a mediation session",
+    "'We need help settling a dispute' fits a mediation session"
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times",
+    "'Yes, but make it the video one' goes back to the times"
+   ],
+   [
+    "Like a membership signed at the business.",
+    "Like an agreement signed at the business."
+   ],
+   [
+    "Say the customer signed a membership at the business today.",
+    "Say the customer signed an agreement at the office today."
+   ],
+   [
+    "What you paid for the membership is refunded the way you paid it.",
+    "What you paid for it is refunded the way you paid it."
+   ],
+   [
+    "cancelled the membership signed today",
+    "cancelled the agreement signed today"
+   ],
+   [
+    "refund for the cancelled membership",
+    "refund for the cancelled booking"
+   ],
+   [
+    "and a intake meeting for a child work the same way",
+    "and an intake meeting for the other person work the same way"
+   ],
+   [
+    "The state licenses the mediation office itself, and each mediator.",
+    "Many places set no license for mediation."
+   ],
+   [
+    "come with dry hair",
+    "bring any papers you want to talk about"
+   ],
+   [
+    "Free on your board:",
+    "Free on your price list:"
+   ],
+   [
+    "Board prices never need one",
+    "Price list prices never need one"
+   ],
+   [
+    "a extra hour",
+    "an extra hour"
+   ],
+   [
+    "a agreement",
+    "an agreement"
+   ],
+   [
+    "A agreement",
+    "An agreement"
+   ],
+   [
+    "a intake",
+    "an intake"
+   ],
+   [
+    "Style consult",
+    "Free intro call"
+   ],
+   [
+    "style consult",
+    "free intro call"
+   ],
+   [
+    "From photos",
+    "$300"
+   ],
+   [
+    "$20",
+    "$120"
+   ],
+   [
+    "$40",
+    "$150"
+   ]
+  ],
+  "B": [
+   [
+    "One question cuts the most",
+    "One question comes up the most"
+   ],
+   [
+    "Rosfield takes no cut of them",
+    "Rosie keeps none of them"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are left out of the recording"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra hour · $120"
+   ],
+   [
+    "It takes no cut of card payments",
+    "It keeps none of card payments"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Workplace mediation for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds workplace mediation to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW workplace mediation"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a follow-up session every year."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly follow-up session plan"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say a manager books mediation for 4 coworkers at one address. It's one booking with one code, given by whoever lets the mediator in."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the mediator, one line each."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan slips on the front steps and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped on the steps, need to stop"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START not everyone said yes on their own page"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Copies and Jordan's notes"
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Jordan holds the session today, $360. The $120 extra hour stays good until Thu Oct 29."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a same-day visit"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Both of us can meet tonight. Can someone come?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: mediation is booked ahead."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A large job is over the plug-in's amount, so it gets a written agreement to sign."
+   ],
+   [
+    "like a move-out day",
+    "like a court date"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said someone is hurting them. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "Someone hurting the customer now"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to get somewhere safe and call 911"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a second session Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a second session, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Second session"
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the written summary ready on time?"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE written summary Mon Oct 26"
+   ],
+   [
+    "at the shop",
+    "at the office"
+   ],
+   [
+    "At the shop",
+    "At the office"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your office, paid at the front desk, your own way"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the session"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee On-Site Mediation LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Mediation"
+   ],
+   [
+    "Lee Home Services",
+    "Lee On-Site Mediation"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Family"
+   ],
+   [
+    "Lee Electric",
+    "Lee Workplace"
+   ],
+   [
+    "88 Elm St",
+    "52 Grove St"
+   ],
+   [
+    "Elm St",
+    "Grove St"
+   ],
+   [
+    "1200 Main St",
+    "715 Harbor Rd"
+   ],
+   [
+    "42 Oak St",
+    "18 Birch Ln"
+   ],
+   [
+    "plumbing and electrical work",
+    "family mediation and workplace mediation"
+   ],
+   [
+    "electrical jobs",
+    "workplace jobs"
+   ],
+   [
+    "electrical license",
+    "mediation certificate"
+   ],
+   [
+    "Electrical license",
+    "Mediation certificate"
+   ],
+   [
+    "electrical prices",
+    "workplace prices"
+   ],
+   [
+    "Electrical",
+    "Workplace mediation"
+   ],
+   [
+    "electrical",
+    "workplace mediation"
+   ],
+   [
+    "plumbing license",
+    "registration"
+   ],
+   [
+    "Plumbing license",
+    "Registration"
+   ],
+   [
+    "plumbing jobs",
+    "family jobs"
+   ],
+   [
+    "plumber",
+    "mediator"
+   ],
+   [
+    "Plumber",
+    "Mediator"
+   ],
+   [
+    "plumbing",
+    "family mediation"
+   ],
+   [
+    "Plumbing",
+    "Family mediation"
+   ],
+   [
+    "barbershops",
+    "mediation offices"
+   ],
+   [
+    "barbershop",
+    "mediation office"
+   ],
+   [
+    "Barbershop",
+    "Mediation office"
+   ],
+   [
+    "barbers",
+    "mediators"
+   ],
+   [
+    "barber",
+    "mediator"
+   ],
+   [
+    "Barber",
+    "Mediator"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Half-day mediation"
+   ],
+   [
+    "Beard trim",
+    "Extra hour"
+   ],
+   [
+    "beard trim",
+    "extra hour"
+   ],
+   [
+    "Haircut",
+    "Mediation session"
+   ],
+   [
+    "haircut",
+    "mediation session"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Mediation at your location"
+   ],
+   [
+    "Drain clearings",
+    "Mediations at your location"
+   ],
+   [
+    "Drain clearing",
+    "Mediation at your location"
+   ],
+   [
+    "drain clearing",
+    "mediation at your location"
+   ],
+   [
+    "Water heater replacement",
+    "Full-day mediation at a workplace"
+   ],
+   [
+    "water heater replacement",
+    "full-day mediation at a workplace"
+   ],
+   [
+    "Water heater flush",
+    "Half-day mediation at a workplace"
+   ],
+   [
+    "water heater flush",
+    "half-day mediation at a workplace"
+   ],
+   [
+    "water heaters",
+    "full-day mediations"
+   ],
+   [
+    "Water heater",
+    "Full-day mediation"
+   ],
+   [
+    "water heater",
+    "full-day mediation"
+   ],
+   [
+    "Leak repair",
+    "Agreement write-up"
+   ],
+   [
+    "leak repair",
+    "agreement write-up"
+   ],
+   [
+    "service call",
+    "travel fee"
+   ],
+   [
+    "Service call",
+    "Travel fee"
+   ],
+   [
+    "color",
+    "workplace mediation"
+   ],
+   [
+    "cut hair",
+    "help parties"
+   ],
+   [
+    "cuts",
+    "sessions"
+   ],
+   [
+    "cut",
+    "session"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Omar"
+   ],
+   [
+    "Jordan",
+    "Noor"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "My kitchen drain is clogged. Can a mediator come Thursday morning? I'm in Springfield.",
+    "I'd like us to try mediation at a library room. Can Noor Khan from Lee On-Site Mediation come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Can a mediator clear a yard drain this Thursday? What does it cost?",
+    "Can Felix Brandt from Lee On-Site Mediation come to a community center this Thursday for a mediation? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Felix",
+    "BOOK Tessa mediation Thu 12-2 Felix"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the full-day mediation.",
+    "Hello, do you speak Spanish? I need a mediator for a talk with my neighbor."
+   ],
+   [
+    "For family mediation, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For family mediation, someone hurting the customer right now stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurting you or in danger, get somewhere safe and call 911 now."
+   ],
+   [
+    "Lee On-Site Mediation does family mediation and workplace mediation, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee On-Site Mediation does family mediation and workplace mediation, not legal advice or court cases. Nothing was saved. You can look for a lawyer yourself."
+   ],
+   [
+    "The request turns out to be for work Lee On-Site Mediation doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee On-Site Mediation doesn't do, like a court case."
+   ],
+   [
+    "Can you flush my full-day mediation every year, too?",
+    "Can you hold a follow-up session every year, too?"
+   ],
+   [
+    "Yes. Lee On-Site Mediation has a yearly flush plan, $150 a visit.",
+    "Yes. Lee On-Site Mediation has a yearly follow-up plan, $360 a visit."
+   ],
+   [
+    "Can Noor also look at a dripping faucet?",
+    "Can Noor also add an extra hour?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for an extra hour."
+   ],
+   [
+    "Yes. The faucet is a agreement write-up, quoted at the visit.",
+    "Yes. The extra hour is priced at the visit, and Alex OKs it first."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone hurting a party, gets the safety steps first."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Felix can come sooner, at the same price.",
+    "If it's an emergency, call 911. Felix can come sooner, at the same price."
+   ],
+   [
+    "Can Noor also run a camera down my sewer line?",
+    "Can Noor also add an extra hour?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's visit?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a follow-up session every 3 months."
+   ],
+   [
+    "Noor finds the leak and texts the price with its lines.",
+    "Noor looks over the papers and texts the price with its lines."
+   ],
+   [
+    "Noor found the leak. Here's the price to fix it today.",
+    "Noor looked over your papers. Here's the price to finish them today."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 480 session 360 extra hour 120"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Mediation session · $360"
+   ],
+   [
+    "Supply line · $80",
+    "Extra hour · $120"
+   ],
+   [
+    "Shutoff valve",
+    "Mediation session"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 120 one more hour"
+   ],
+   [
+    "Noor finds corroded shutoff valves.",
+    "Noor finds one more hour is needed."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more hour · $120"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more hour"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $120 quote is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to one more hour for $120."
+   ],
+   [
+    "Noor needs a part from the supply house.",
+    "Noor needs a page printed at the office."
+   ],
+   [
+    "Noor went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Noor went to print a page and will be back about 9:30am. The session should start by 10am."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE printing a page, back 9:30"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 360 mediation"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE session held. Summary on the secure page for each party."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Saturday's session notes have a name spelled wrong."
+   ],
+   [
+    "kitchen drain",
+    "mediation at your location"
+   ],
+   [
+    "the shutoff valves",
+    "the extra hour"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your mediation plan"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It was our miss, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "For mediation, the business fixes its own mistakes for free."
+   ],
+   [
+    "Noor left a mess under the sink.",
+    "Noor came late and rushed us."
+   ],
+   [
+    "Can Noor look at my bathroom sink next week?",
+    "Can Noor come back next week for a follow-up session?"
+   ],
+   [
+    "Sure. Here are Noor's next times for a bathroom drain.",
+    "Sure. Here are Noor's next times for a follow-up."
+   ],
+   [
+    "Sewer camera report",
+    "Written summary"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the written summary link"
+   ],
+   [
+    "Lee Mediation can session your hair at the office for $35, or at your home for $75.",
+    "Lee Mediation can meet you at the office for a $75 intake meeting, or at your location for a $360 mediation."
+   ],
+   [
+    "The office's chair is in the other flow.",
+    "The office visit is in the other flow."
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my friend sit in on the session?"
+   ],
+   [
+    "Noor says no. Please wait until the job is done.",
+    "Noor says no. Each party gives their own answers, and a friend can wait outside."
+   ],
+   [
+    "Sewer camera inspection",
+    "Mediation at your location"
+   ],
+   [
+    "sewer camera inspection",
+    "mediation at your location"
+   ],
+   [
+    "Drains have a set price.",
+    "A mediation session has a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "An agreement write-up is priced at the visit."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone in danger right now stops the booking."
+   ],
+   [
+    "Mediation session, fade and extra hour at the office.",
+    "Mediation sessions and extra hours at the office."
+   ],
+   [
+    "Panel upgrade",
+    "Full-day mediation"
+   ],
+   [
+    "$89, credited to the repair",
+    "$60, part of the $360 visit"
+   ],
+   [
+    "Why: many mediators, salons and groomers are licensed to their office.",
+    "Why: some kinds of work, like salons and groomers, are licensed to one place."
+   ],
+   [
+    "replaces full-day mediations",
+    "mediates family disputes"
+   ],
+   [
+    "Labor",
+    "Hourly rate"
+   ],
+   [
+    "after the job",
+    "after the visit"
+   ],
+   [
+    "Lee On-Site Mediation' own",
+    "Lee On-Site Mediation's own"
+   ],
+   [
+    "Lee On-Site Mediation'",
+    "Lee On-Site Mediation's"
+   ],
+   [
+    "travel fee fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee fee",
+    "Travel fee"
+   ],
+   [
+    "A neighborhood mediation office on Grove St. Classic sessions, fades and hot towel shaves.",
+    "A neighborhood mediation office on Court St. Wills, trusts and mediation sessions."
+   ],
+   [
+    "The chairs",
+    "The waiting room"
+   ],
+   [
+    "A chair, ready",
+    "A meeting room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a mediator who rents a room here,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room here, with their own parties."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "A mediator's example: water near outlets gets 'shut off the main valve'.",
+    "A mediator's example: fear of someone at home gets the hotline first."
+   ],
+   [
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Add an extra hour, priced at the visit. E a deposit after the quote. C paid after"
+   ],
+   [
+    "Warranty fix",
+    "Extra hour"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a mediation at a library room. A text back is fine."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if she's in danger, and given the National Domestic Violence Hotline."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If you're in danger, call 911. The National Domestic Violence Hotline is 1-800-799-7233, any time."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿está usted en peligro ahora?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Estoy a salvo."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si está en peligro, llame al 911. También puede llamar a la Línea Nacional de Violencia Doméstica, 1-800-799-7233."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito un mediador para hablar con mi vecino."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what kind of dispute, and how many people."
+   ],
+   [
+    "'My sink won't drain' fits a mediation at your location.",
+    "'We want help settling a dispute' fits a mediation at your location."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like booking a mediation for a person who said no."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. I'm one of the two people."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Each person says yes on their own page first. The first open times are after both have."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding an extra hour? Say so.'"
+   ],
+   [
+    "Lee On-Site Mediation asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee On-Site Mediation asks: is the session at a home, a workplace or a community room? And how many people will be there?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At a community room. Two people."
+   ],
+   [
+    "Lee On-Site Mediation can clear the drain:",
+    "Lee On-Site Mediation can come for the session:"
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is there a quiet room with a table?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a quiet room with a table?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a library room"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A written agreement is also signed first, on each person's own page."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a quiet room ready, with a table and enough chairs."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a court date has been set."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "A court date is set now. Can someone come sooner?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stain on the table"
+   ],
+   [
+    "Under the sink, before",
+    "Table, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor, before"
+   ],
+   [
+    "A.M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "A.M. OK'd the session only, $360. Leave the extra hour."
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: one more hour, $120. Sent to Alex."
+   ],
+   [
+    "Noor finds mold behind the sink wall. The plug-in says a mediator stops there, so Alex gets a written note and the photo.",
+    "Noor finds one party is afraid of the other. The plug-in says a mediator stops there, so Alex gets a written note."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD safety concern, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "A safety concern"
+   ],
+   [
+    "Noor found mold behind the wall under your sink and stopped that part of the work.",
+    "Noor found a safety concern and stopped the joint session. A private meeting can come first."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a safety concern"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the joint session"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Book a private meeting with the mediator first"
+   ],
+   [
+    "Say Noor cracks the cabinet floor and texts a photo.",
+    "Say Noor spills coffee on a rug and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE coffee spilled on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Coffee stain on the rug"
+   ],
+   [
+    "Noor cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "Noor spilled coffee on a rug at A.M.'s. The before photo shows no stain."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A question about the written summary? Call the office."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Two weeks later, Alex finds a typo in the written summary. Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M.'s written summary from Thu Oct 22 needs a fix. It's on the business."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a coffee stain on the rug this morning."
+   ],
+   [
+    "It's a leak under the sink, today, starts at 3:00pm, with Noor.",
+    "It's a mediation at your location, today, arriving 3–5pm, with Noor."
+   ],
+   [
+    "BS20981",
+    "EX-3180"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "MP045201",
+    "EX-1024"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "JE30417",
+    "EX-3041"
+   ],
+   [
+    "JP031552",
+    "EX-1552"
+   ],
+   [
+    "$150",
+    "$660"
+   ],
+   [
+    "$179",
+    "$360"
+   ],
+   [
+    "$89",
+    "$60"
+   ],
+   [
+    "$640",
+    "$360"
+   ],
+   [
+    "$160",
+    "$120"
+   ],
+   [
+    "$480",
+    "$240"
+   ],
+   [
+    "$500",
+    "$400"
+   ],
+   [
+    "Contract · Full-day mediation at a workplace · $360",
+    "Contract · Mediation at your location · $360"
+   ],
+   [
+    "Full-day mediation at a workplace · $360",
+    "Mediation at your location · $360"
+   ],
+   [
+    "Your full-day mediation contract is waiting for your signature.",
+    "Your agreement to mediate is waiting for your signature."
+   ],
+   [
+    "Your full-day mediation visit wasn't booked",
+    "Your mediation visit wasn't booked"
+   ],
+   [
+    "didn't sign the full-day mediation contract in time",
+    "didn't sign the agreement to mediate in time"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hurting a person right now, or a medical emergency."
+   ],
+   [
+    "could mean a salon or a mediation office",
+    "could mean a counselor or a mediation office"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: are you in danger right now?"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I'm safe."
+   ],
+   [
+    "raises the mediation at your location to $199 for visits from Mon Nov 2",
+    "raises the mediation at your location to $400 for visits from Mon Nov 2"
+   ],
+   [
+    "A plan goes to $199 from Wed Nov 25",
+    "A plan goes to $400 from Wed Nov 25"
+   ],
+   [
+    "Saved: mediation at your location $199 for visits from Mon Nov 2.",
+    "Saved: mediation at your location $400 for visits from Mon Nov 2."
+   ],
+   [
+    "Mediation at your location plans go to $199 from Wed Nov 25",
+    "Mediation at your location plans go to $400 from Wed Nov 25"
+   ],
+   [
+    "Reading it back: mediation at your location goes to $199 for new bookings.",
+    "Reading it back: mediation at your location goes to $400 for new bookings."
+   ],
+   [
+    "Mediation at your location $360 ($199 from Nov 2) · Half-day mediation at a workplace $660",
+    "Mediation at your location $360 ($400 from Nov 2) · Half-day mediation at a workplace $660"
+   ],
+   [
+    "asks for a mediation at your location at $660, an old price. Rosie answers with the real price, $360.",
+    "asks for a mediation at your location at $360, an old price. Rosie answers with the real price, $400."
+   ],
+   [
+    "A mediation at your location with Lee On-Site Mediation is $360, not $660. Here are the open times at $360.",
+    "A mediation at your location with Lee On-Site Mediation is $400, not $360. Here are the open times at $400."
+   ],
+   [
+    "Sam switches the mediation at your location from a card saved for the $60 fee to a $40 deposit.",
+    "Sam switches the mediation at your location from a $120 deposit to a card saved for the $60 fee."
+   ],
+   [
+    "A card saved for the $60 fee · paid after the visit",
+    "A $120 deposit · the rest on the bill after the visit"
+   ],
+   [
+    "N.S.'s $20 payment through Rosie was charged twice.",
+    "N.S.'s $120 deposit through Rosie was charged twice."
+   ],
+   [
+    "Refund · $20",
+    "Refund · $120"
+   ],
+   [
+    "Noor does workplace mediation too, at $140 an hour",
+    "Noor does workplace mediation too, at $150 an hour"
+   ],
+   [
+    "Noor: family mediation and workplace mediation, $140 an hour",
+    "Noor: family mediation and workplace mediation, $150 an hour"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: a $120 deposit, or a card saved for the $60 fee"
+   ],
+   [
+    "When they book: a card saved for the $60 service-call fee you OK",
+    "When they book: a $120 deposit, or a card saved for the $60 fee"
+   ],
+   [
+    "$120 an hour",
+    "$150 an hour"
+   ],
+   [
+    "Priced from photos",
+    "$1,200"
+   ],
+   [
+    "From photos",
+    "$1,200"
+   ],
+   [
+    "$199",
+    "$360"
+   ],
+   [
+    "Free on your list: nothing taken, nothing after",
+    "Free on your price list: nothing taken, nothing after"
+   ],
+   [
+    "Water pressure check",
+    "Free intro call"
+   ],
+   [
+    "a agreement",
+    "an agreement"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books a mediation session with Dana Reyes at Lee Mediation, Sat Oct 24 at 11:00am. Alex pays a $100 deposit to book; the other person says yes on their own link; the $200 rest is paid at the front desk after the session. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee On-Site Mediation for a session in a community room at 18 Birch Ln, and Noor Khan comes Thu Oct 22 at a set start time. Alex pays a $120 deposit to book, and Rosie texts the $240 rest after. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|full|none",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: a 2-hour mediation session, $300. Alex pays a $100 deposit to book, and the other person says yes on their own link. The $200 rest is paid at the front desk after the session.",
+    "list|full|none": "A half-day mediation (4 hours), $550, paid in full when booked. Nothing more to pay.",
+    "list|none|bill": "An intake meeting by video, $75 for one person. Nothing is taken; Rosie texts the bill when Dana texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$100",
+     "name": "Mediation session (2 hours)"
+    },
+    "list|*|*": {
+     "price": "$75",
+     "name": "Intake meeting"
+    },
+    "list|deposit|*": {
+     "price": "$300",
+     "deposit": "$100",
+     "rest": "$200",
+     "fee": "$100",
+     "name": "Mediation session (2 hours)"
+    },
+    "list|full|*": {
+     "price": "$550",
+     "paid": "$550",
+     "fee": "$100",
+     "name": "Half-day mediation (4 hours)"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Intake meeting",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$75",
+      "fee": "$25"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Half-day mediation (4 hours)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$550",
+      "paid": "$550",
+      "fee": "$100"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|bill",
+   "combos": [
+    "list|deposit|bill",
+    "list|card|card",
+    "list|full|none"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|deposit|bill": "The main story: a 2-hour mediation at a place the parties pick, $360 ($300 plus the $60 travel fee). Alex pays a $120 deposit to book; Rosie texts the $240 rest after.",
+    "list|card|card": "The same mediation with a card saved for the $60 fee the business sets for a late cancel or a no-show. The $360 is charged when Noor texts DONE.",
+    "list|full|none": "A half-day mediation at a workplace, $660 ($600 plus the $60 travel fee), paid in full when booked. Nothing more to pay."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$60",
+     "name": "Mediation at your location (2 hours)"
+    },
+    "list|*|*": {
+     "price": "$360",
+     "name": "Mediation at your location (2 hours)"
+    },
+    "list|deposit|*": {
+     "price": "$360",
+     "deposit": "$120",
+     "rest": "$240",
+     "fee": "$60",
+     "name": "Mediation at your location (2 hours)"
+    },
+    "list|full|*": {
+     "price": "$660",
+     "paid": "$660",
+     "fee": "$60",
+     "name": "Half-day mediation at a workplace"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Second intake meeting at your location",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$75",
+      "fee": "$25"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Half-day mediation at a workplace",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$660",
+      "paid": "$660",
+      "fee": "$60"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People are booked, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Mediation is booked ahead and never sent now."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Mediation is private (sensitive) and named only, so no rating request goes out."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A mediator's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A mediator's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted from photos first",
+    "why": "No photos or papers before the neutrality check clears; prices come from the list."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every new matter has the party form: a new one signs it, and the same matter has it on file."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nobody leaves anything with the office."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child is never a party, and none is left here."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "Someone in care goes missing",
+    "why": "Nobody is left in the office's care."
+   },
+   {
+    "op": "off",
+    "at": "A3-01",
+    "label": "A walk-in",
+    "why": "A mediation office takes no walk-in sessions: every new matter has the party form first."
+   },
+   {
+    "op": "off",
+    "at": "A3-29",
+    "label": "A walk-in",
+    "why": "A mediation office takes no walk-in sessions: every new matter has the party form first."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A child is never a party: mediation is for adults 18 and older."
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "A mediator's plug-in: neutral, no legal advice, every person says yes on their own link, and a safety screen."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "Example: 'Will I get to keep the house?' gets 'That is a question for your own lawyer. The mediator can't advise.'"
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-07",
+    "more": [
+     "Mediators are never ranked or suggested. Rosie books only a mediator or business the customer names."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-20",
+    "more": [
+     "Mediation is named only. A request like 'a good divorce mediator' gets that one reply: name a mediator or a business first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-22",
+    "more": [
+     "A mediation plug-in adds fear of the other person, a protective order, and being pressed to agree.",
+     "They get the safety steps. No joint session is booked, and the booking goes on privately.",
+     "Someone hurting a person right now gets 911, and no booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-12",
+    "more": [
+     "A question about what is fair, or what a court would do, is never answered by text.",
+     "The mediator can't give legal advice."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "A mediator's first step is the party form: every person's name only, on the secure page.",
+     "The mediator checks it for a conflict before it books."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-26",
+    "more": [
+     "Each other person gets their own link, says yes, and signs the agreement to mediate. Nobody sees another person's answers."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-51",
+    "more": [
+     "At a mediation, the mediator can stop the joint session for a conflict or a safety concern.",
+     "The text says only that it had to stop, never why."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "We can't advise on legal questions. Your own lawyer can help. For anything else, call Lee Mediation at (555) 010-0177. Call 911 if anyone is in danger."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "vary": {
+     "before:deposit+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "A $100 deposit, and at their location too, 360 with a $120 deposit. E paid when they book"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. For a mediation session, the customer picks the place and sees both prices first. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Mediation session at the office",
+            "$300",
+            "$100 deposit",
+            "$200 after the session"
+           ],
+           [
+            "Mediation at their location",
+            "$360",
+            "$120 deposit",
+            "$240 after the visit"
+           ],
+           [
+            "Half-day mediation",
+            "$550",
+            "Paid in full",
+            "Nothing more"
+           ],
+           [
+            "Intake meeting",
+            "$75",
+            "Nothing taken",
+            "At the front desk"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, the mediation session takes a $100 deposit; the $200 rest is paid after the session."
+      ]
+     },
+     "before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "A $100 deposit, and at their location too, 360 with a $120 deposit. E paid when they book. Video sessions have no front desk: send the bill then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. For a mediation session, the customer picks the place and sees both prices first. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Mediation session at the office",
+            "$300",
+            "$100 deposit",
+            "$200 after the session"
+           ],
+           [
+            "Mediation at their location",
+            "$360",
+            "$120 deposit",
+            "$240 after the visit"
+           ],
+           [
+            "Half-day mediation",
+            "$550",
+            "Paid in full",
+            "Nothing more"
+           ],
+           [
+            "Any video session",
+            "As above",
+            "As above",
+            "The bill I send"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, the mediation session takes a $100 deposit; the $200 rest is paid after the session.",
+       "On this path, video sessions are paid by the bill Rosie sends."
+      ]
+     },
+     "before:full": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "E paid when they book. A $100 deposit, and at their location too, 360 with a $120 deposit"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. For a mediation session, the customer picks the place and sees both prices first. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Mediation session at the office",
+            "$300",
+            "$100 deposit",
+            "$200 after the session"
+           ],
+           [
+            "Mediation at their location",
+            "$360",
+            "$120 deposit",
+            "$240 after the visit"
+           ],
+           [
+            "Half-day mediation",
+            "$550",
+            "Paid in full",
+            "Nothing more"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "D nothing before. E paid when they book. A $100 deposit. Video sessions have no front desk: send the bill then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. For an intake meeting, the customer picks the place and sees both prices first. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Intake meeting at the office",
+            "$75",
+            "Nothing taken",
+            "At the front desk"
+           ],
+           [
+            "Mediation session",
+            "$300",
+            "$100 deposit",
+            "$200 after the session"
+           ],
+           [
+            "Half-day mediation",
+            "$550",
+            "Paid in full",
+            "Nothing more"
+           ],
+           [
+            "Any video session",
+            "As above",
+            "As above",
+            "The bill I send"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, the intake meeting at the office takes nothing before: the customer's YES books it.",
+       "On this path, video sessions are paid by the bill Rosie sends."
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "People are booked, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Mediation is booked ahead and never sent now."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Mediation is private (sensitive) and named only, so no rating request goes out."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Sessions run at a set start time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A mediator's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "No",
+    "why": "Every new matter has the party form: a new one signs it, and the same matter has it on file."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Mediation is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Mediation is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never a party, and none is left with the mediator."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Every party must be there, and the mediator meets them first."
+   },
+   {
+    "op": "off",
+    "at": "B4-26",
+    "label": "3 Nobody will be home",
+    "why": "The people in the mediation must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-97",
+    "label": "Someone in care goes missing",
+    "why": "Nobody is left in the mediator's care."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "A child is never a party: mediation is for adults 18 and older."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "An extra hour is priced and OK'd at the visit; no staged job."
+   },
+   {
+    "op": "more",
+    "at": "S1-11",
+    "more": [
+     "A mediator's plug-in: neutral, no legal advice, every person says yes on their own link, and a safety screen."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "Example: 'Will I get to keep the house?' gets 'That is a question for your own lawyer. The mediator can't advise.'"
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-07",
+    "more": [
+     "Mediators are never ranked or suggested. Rosie books only a mediator or business the customer names."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-20",
+    "more": [
+     "Mediation is named only. A request like 'a good divorce mediator' gets that one reply: name a mediator or a business first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "A mediation plug-in adds fear of the other person, a protective order, and being pressed to agree.",
+     "They get the safety steps. No joint session is booked, and the booking goes on privately.",
+     "Someone hurting a person right now gets 911, and no booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-16",
+    "more": [
+     "A question about what is fair, or what a court would do, is never answered by text.",
+     "The mediator can't give legal advice."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "A mediator's first step is the party form: every person's name only, on the secure page.",
+     "The mediator checks it for a conflict before it books."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-27",
+    "more": [
+     "Each other person gets their own link, says yes, and signs the agreement to mediate. Nobody sees another person's answers."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Will a judge agree to what we decide? What does the law say?"
+     ],
+     [
+      "san",
+      "agent",
+      "We can't advise on legal questions. Your own lawyer can help. For anything else, call Lee On-Site Mediation at (555) 010-0142. Call 911 if anyone is in danger."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "vary": {
+     "price:list+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "B $120 deposit. C paid in full when they book"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Here's what changed for mediation. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "When they book",
+           "After"
+          ],
+          "rows": [
+           [
+            "Mediation at your location",
+            "$360",
+            "$120 deposit",
+            "The $240 rest on the bill"
+           ],
+           [
+            "Half-day mediation at a workplace",
+            "$660",
+            "Paid in full",
+            "Nothing more"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "B card saved for the $60 fee. C paid in full when they book. After the job: charge the saved card at DONE"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Here's what changed for mediation. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "When they book",
+           "After"
+          ],
+          "rows": [
+           [
+            "Mediation at your location",
+            "$360",
+            "Card saved for the $60 fee",
+            "Card at DONE"
+           ],
+           [
+            "Half-day mediation at a workplace",
+            "$660",
+            "Paid in full",
+            "Nothing more"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, every service paid after is charged to the saved card at DONE."
+      ]
+     },
+     "before:full": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "C paid in full when they book. B $120 deposit"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Here's what changed for mediation. The rest stays as on the card.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "When they book",
+           "After"
+          ],
+          "rows": [
+           [
+            "Mediation at your location",
+            "$360",
+            "$120 deposit",
+            "The $240 rest on the bill"
+           ],
+           [
+            "Half-day mediation at a workplace",
+            "$660",
+            "Paid in full",
+            "Nothing more"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "keep": [
+  "travel fee",
+  "Travel fee",
+  "Consult",
+  "consult",
+  "lawyer",
+  "Lawyer",
+  "law office",
+  "Law office",
+  "Grace",
+  "leak"
+ ],
+ "notes": "New work, built Tue Oct 27 2026 (REDESIGN 2 master, N3b) from the lawyer overlay (\"from\": \"lawyer\"); there is no sample, no test-drive and no old flowchart for a mediator, so every price, fee and rule below is the example business's own, not a standard. The lawyer's conflict check becomes a neutrality check on the party form (names only), the lawyer's named-only rule stays, and the lawyer's trust-account money rule is dropped (a mediator takes ordinary deposits).\nA mediation has two or more people. One books; every other person is added by name and contact, says yes on their own link, signs the agreement to mediate, and gives their own answers (the master's \"each signs their own form on their own link\"). Nobody sees another person's answers. A child is never a party (A4-24 and B4-32 \"A child\" branches off). How the people share the cost is their own agreement outside Rosie.\nSafety: danger first (911, 988, the family-violence hotline). Fear of the other person or a protective order: safety steps, the booking is made private on their word (D74), no joint session is offered, only a meeting with the mediator alone, or the business declines. Rosie only routes it; the screening is the business's own. Pressed to agree: the mediator meets you alone first.\nLicenses and certificates are optional and never checked by Rosie (D96); pf.license says so. A mediator who is also a lawyer keeps legal advice outside the mediation. Rosie never gives legal advice (S13-04 more; A3-26 / B3-21 words; A7-12 / B7-16 more).\nPrices (examples): intake meeting $75 a person; mediation session (2 hours) $300 with a $100 deposit and a $200 rest; half-day mediation (4 hours) $550 paid in full; extra hour $120; follow-up session $150. At a place the parties pick: $360 = the $300 session plus a $60 travel fee (one price, so the bill adds up); $120 deposit and $240 rest, or a card saved for the $60 fee; a half-day at a workplace $660 = $600 plus the $60, paid in full.\nMoney paths. A: list|deposit|counter (main), list|full|none, list|none|bill. B: list|deposit|bill (main), list|card|card, list|full|none. Each path has its own amounts row (price, deposit and rest or paid, fee, name); every fee is no more than what was paid now; no hold; the rest is paid at the visit or on the bill. money.A.services: Intake meeting ($75, card saved, counter), Half-day mediation ($550, paid in full); money.B.services: Second intake meeting at your location ($75, card saved, card at DONE), Half-day mediation at a workplace ($660, paid in full). The $2 applies (D97): S1-62's \"No $2\" branch is off.\nSwitch sensitive (private disputes: no matter or service name in a text, no rating). Facts: forms (the party form), firststeps (an intake meeting before a joint session), documents (the agreement to mediate, signed by every person: A5-19), video, extrawork. Settings: arrive set start (both flows), cutoff 2 days before.\nRename: the lawyer's pairs re-pointed (office Lee Mediation, 52 Grove St, mediators Dana Reyes and Omar Hassan; on-site Lee On-Site Mediation, 715 Harbor Rd, mediators Noor Khan and Felix Brandt; customer location 18 Birch Ln); master numbers mapped by role (the haircut is the mediation session, the groom's package the full-day mediation, the signature cut the half-day mediation); license numbers in the master examples shown as EX-1042 style. Pairs protect master sentences that use the word \"cut\" in other senses.\nOff: sent-now, seats, spaces, stays, classes, photo quotes, walk-ins, a drop-off, a child left or a child party, \"nobody home\", an estimate that becomes a staged job, someone in care missing, ratings. Own steps: none. Detail lines (more) for the plug-in: S1-11, S13-04, S13-07, S13-20, A3-22 / B3-17, A4-43 / B4-38, A4-26 / B4-27, A7-12 / B7-16, A8-51; words ops for the legal-question reply (A3-26, B3-21) and the sign-up money read-backs (S1-13).\nNot sure (for the verifier): the sign-up card keeps the master's nine rows, so some rows are example services (Phone check-in, Separate-room mediation, Agreement write-up, Free intro call) with example prices; the deposit amount ($100 of $300) and the 2-day cutoff are examples; where the deposit falls against the neutrality check (the master takes money at its own money step; I did not force the check before it); the master's B4-100 line \"only the person the visit is for, or their legal guardian, can book this\" reads against \"one person books for the group\".",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "One question cuts the most",
+    "Rosfield takes no cut of them",
+    "Those words are cut from the recording",
+    "It takes no cut of card payments",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "The cut is uneven on one side.",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Health details stay on the secure page, never in a text.",
+    "price board",
+    "Price board",
+    "shop's board",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "like a 15-minute style consult",
+    "A barbershop's plug-in has none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "At your shop, paid at the chair, your own way",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "code at the chair",
+    "at the chair",
+    "At the chair",
+    "the chair",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop front",
+    "Shop",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Oak St",
+    "electrical jobs",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumbing jobs",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "patch test",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Color quotes",
+    "color quote",
+    "Color",
+    "color",
+    "cut hair",
+    "cuts",
+    "cut",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Books the groom's party together",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Panel upgrade",
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "photos of your hair",
+    "15 gloss",
+    "gloss $15",
+    "Gloss to finish",
+    "No gloss today",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "We'd share only where they're working, only after a missed check.",
+    "Access, like a step-free chair:",
+    "like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "A.M. asks for a toner instead of the gloss. What's the new price?",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "A chair renter asked for by name:",
+    "The cape clip ripped my shirt collar.",
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "BS20981",
+    "BS20918",
+    "MP045210",
+    "EC22871",
+    "JE30417",
+    "JP031552",
+    "$75",
+    "$25",
+    "$35",
+    "$55",
+    "$140",
+    "$90",
+    "It's $20. Accept it?",
+    "D.W.'s $20 payment through Rosie was charged twice.",
+    "Refund · $20",
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: a card saved for the $89 service-call fee",
+    "$40 taken when they book",
+    "Late cancel or no-show: the $40, if you confirm",
+    "Late or no-show: the $20 fee, if you confirm",
+    "No card, so no $20 fee",
+    "To save cards for the $20 fee, connect Stripe",
+    "Pat is my office manager, for prices over $500.",
+    "A plan goes to $40 from Wed Nov 25",
+    "$100 after the visit",
+    "A card saved for the $20 fee · paid after the visit",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "suggests moving your visit until it clears, with no fee.",
+    "'Yes, make it a fade' goes back to the times",
+    "Like a membership signed at the business.",
+    "Say the customer signed a membership at the business today.",
+    "What you paid for the membership is refunded the way you paid it.",
+    "cancelled the membership signed today",
+    "refund for the cancelled membership",
+    "come with dry hair",
+    "Free on your board:",
+    "Board prices never need one",
+    "a agreement",
+    "Style consult",
+    "style consult",
+    "From photos",
+    "$20",
+    "$40"
+   ],
+   "B": [
+    "One question cuts the most",
+    "Rosfield takes no cut of them",
+    "Those words are cut from the recording",
+    "Sewer camera inspection · $199",
+    "It takes no cut of card payments",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "CANT START no proof Alex may have this work done",
+    "Video and Jordan's notes",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "like a burst pipe or a lockout",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "like a move-out day",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "Is the report ready on time?",
+    "LATE camera report Mon Oct 26",
+    "at the shop",
+    "At the shop",
+    "the shop's",
+    "the shop",
+    "At your shop, paid at the chair, your own way",
+    "paid at the chair",
+    "at the chair",
+    "The shop's",
+    "The shop",
+    "shop",
+    "Shop front",
+    "Lee Home Services LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "plumbing and electrical work",
+    "electrical jobs",
+    "electrical license",
+    "Electrical license",
+    "electrical prices",
+    "Electrical",
+    "electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumbing jobs",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Leak repair",
+    "leak repair",
+    "service call",
+    "Service call",
+    "color",
+    "cut hair",
+    "cuts",
+    "cut",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Say Alex also asks about a dripping faucet.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Can I skip next week's drain cleaning?",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "Shutoff valve",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "UPDATE getting a part, back 9:30",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The kitchen drain is clogged again.",
+    "kitchen drain",
+    "the shutoff valves",
+    "stage 2 of your repipe",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Book the repair",
+    "The repair price is good for 7 days.",
+    "Can I run the dishwasher before you come?",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Panel upgrade",
+    "$89, credited to the repair",
+    "Labor",
+    "after the job",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "We'd share only where they're working, only after a missed check.",
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Warranty fix",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "No. No huele a gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Like tapping a neighbor's water line without asking.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "A.M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "I found water damage under the sink this morning.",
+    "BS20981",
+    "MP045210",
+    "MP045201",
+    "EC22871",
+    "JE30417",
+    "JP031552",
+    "$150",
+    "$179",
+    "$89",
+    "$640",
+    "$160",
+    "$480",
+    "$500",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. It doesn't smell like gas.",
+    "A plan goes to $199 from Wed Nov 25",
+    "N.S.'s $20 payment through Rosie was charged twice.",
+    "Refund · $20",
+    "When they book: a card saved, for a $20 fee you OK",
+    "$120 an hour",
+    "Priced from photos",
+    "From photos",
+    "$199",
+    "Free on your list: nothing taken, nothing after",
+    "Water pressure check",
+    "a agreement"
+   ]
+  },
+  "A": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-62": "c4f497de12",
+   "A10-34": "78c2d9a6a3",
+   "A4-66": "f622d7fe12",
+   "A4-05": "8b3e838019",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A8-86": "c989a99e52",
+   "A3-01": "94ef5a2d4e",
+   "A3-29": "1e822d6758",
+   "A4-24": "0a292df05b",
+   "S1-11": "99370bb016",
+   "S13-04": "91031a684a",
+   "S13-07": "0a8193b948",
+   "S13-20": "65427ec02d",
+   "A3-22": "0057d8fc9f",
+   "A7-12": "05f64179a4",
+   "A4-26": "add3e44476",
+   "A8-51": "71142aa1fa",
+   "A3-26": "9e3630dc0b",
+   "S1-13": "eca22651fd"
+  },
+  "B": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-62": "c4f497de12",
+   "B10-32": "7713bff255",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B4-26": "912686f788",
+   "B8-97": "1e3f69ef38",
+   "B4-32": "fcfe092e37",
+   "B8-93": "c1406fd6bc",
+   "S1-11": "d11de5da2e",
+   "S13-04": "13e60b9248",
+   "S13-07": "e15883c2dc",
+   "S13-20": "52c28ee28a",
+   "B3-17": "3eb7d7f259",
+   "B7-16": "3177c3701b",
+   "B4-27": "4b45128d2c",
+   "B3-21": "ad48326ac5",
+   "S1-13": "6964bfbe60"
+  }
+ }
+}

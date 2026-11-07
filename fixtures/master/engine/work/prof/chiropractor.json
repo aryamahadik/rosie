@@ -1,0 +1,3412 @@
+{
+ "id": "chiropractor",
+ "name": "Chiropractor",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "dentist",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each chiropractor holds their own active chiropractic license (DC) from the state where the patient is seen",
+   "who": "each person; the clinic too where the state's form registers chiropractic clinics or their owners",
+   "ask": "each chiropractor's license number in their invite reply (or the owner sends it); the clinic's registration and its X-ray machine's registration, where the state's form asks",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "away": "house calls and workplace care days only where the state's rules allow chiropractic care away from the clinic (a switch)",
+   "acupuncture": "acupuncture only by a licensed acupuncturist, or by a chiropractor with the state's own acupuncture certificate where the state allows it (a switch from the state form)",
+   "xray": "X-rays only on a machine registered where the state's form asks, taken by someone the state allows (a switch)",
+   "video": "off: chiropractic care is hands-on; if a clinic turns video on, only chiropractors licensed in the state the patient is in that day",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance where the state's form asks for it"
+  },
+  "pf.services": {
+   "shape": "visit types on a treatment table, each with a set length; a new patient's first visit is a history, an exam, and a first adjustment only if the chiropractor finds it safe; X-rays only when the chiropractor orders them; a care plan's visits are booked as a series only with the patient's own yes, and each is paid when it happens; a re-exam after each block of care",
+   "examples": "the example clinic's own prices (Lee Chiropractic and Lee Mobile Chiro), not a standard; a plan pays its own fee, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "New patient visit (history, exam, and a first adjustment if it's safe)",
+     "price": "$35",
+     "kind": "one price; the plan's estimate is shown when a plan pays",
+     "length": "60 min",
+     "where": "at the clinic",
+     "before": "nothing taken (a card saved only where the clinic turns on its $20 no-show fee)",
+     "after": "at the front desk: the self-pay price, or the plan's share",
+     "note": "new-patient times are kept apart (Sam's booking rules)"
+    },
+    {
+     "name": "Adjustment (a follow-up visit)",
+     "price": "$40",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "a care plan's visits; each is paid when it happens"
+    },
+    {
+     "name": "Prenatal adjustment",
+     "price": "$40",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "only a chiropractor trained for prenatal care (Dr. Chen at the example clinic)"
+    },
+    {
+     "name": "Kinesio taping",
+     "price": "$20",
+     "kind": "one price",
+     "length": "10 min",
+     "where": "added to a visit, both places",
+     "before": "nothing taken",
+     "after": "with the visit"
+    },
+    {
+     "name": "Child's adjustment (12 and under)",
+     "price": "$25",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "a parent or guardian books, signs the consent and stays"
+    },
+    {
+     "name": "Re-exam",
+     "price": "$55",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "after each block of care, on the date the chiropractor's care plan sets"
+    },
+    {
+     "name": "Full spine X-rays",
+     "price": "$140",
+     "kind": "one price",
+     "length": "20 min, in the X-ray room",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "only if the chiropractor orders them; the price is shown first, and the patient says yes"
+    },
+    {
+     "name": "Car accident or work injury visit",
+     "price": "billed to the auto or work injury claim",
+     "kind": "set by the claim",
+     "length": "60 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "the clinic bills the claim its own way",
+     "note": "the claim number goes on the secure page first, and the desk confirms the claim before the visit"
+    },
+    {
+     "name": "First house call (history, exam, and a first adjustment if it's safe, on a portable table)",
+     "price": "$179",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the customer's place (a home)",
+     "before": "a card saved for the $89 no-show fee, or nothing taken",
+     "after": "the saved card charged when the chiropractor texts DONE, or Rosie texts the bill"
+    },
+    {
+     "name": "House-call adjustment",
+     "price": "$150",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 no-show fee",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Extended house call (a longer visit)",
+     "price": "$199",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 no-show fee, or nothing taken",
+     "after": "the saved card charged at DONE, or Rosie texts the bill",
+     "note": "also when a re-exam finds a visit needs more time; the new price is shown first, and the patient says yes"
+    },
+    {
+     "name": "Workplace care day",
+     "price": "$120 an hour, paid by the employer",
+     "kind": "per hour",
+     "length": "15-minute slots for the employer's staff",
+     "where": "at the host's place, on set days",
+     "before": "nothing taken",
+     "after": "the employer pays the business its own way",
+     "note": "only with the employer's standing OK on file"
+    },
+    {
+     "name": "Missed house call or late cancel",
+     "price": "$89 fee",
+     "kind": "a fee",
+     "where": "at the customer's place",
+     "note": "only from a saved card, and only when the owner confirms it"
+    }
+   ],
+   "capacity": "one patient per table; the X-ray room is booked with the X-ray visit; the portable table is booked like a person",
+   "nobodyHome": "never: the patient is always there",
+   "online": "off: chiropractic care is hands-on"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, your child, or someone you help",
+    "new or returning patient (a new patient gets the 60-minute new patient visit)",
+    "which visit: the clinic's own visit types only, never a symptom typed into the AI",
+    "a car accident or a work injury (then it's billed to that claim)",
+    "a health plan (its name only), Medicare, or paying yourself",
+    "mornings, midday or evenings"
+   ],
+   "afterTime": [
+    "anything that helps at the visit, like the step-free door or an interpreter",
+    "at home: who will be there, where to park, and room for the portable table"
+   ],
+   "securePage": [
+    "birth date",
+    "plan member ID and a photo of the insurance card",
+    "for a car accident or work injury: the claim number and the adjuster",
+    "health history: the problem, past injuries, medicines, conditions, pregnancy",
+    "consent to care, after the chiropractor's main risks are explained, and the privacy notice",
+    "a parent's or guardian's consent for anyone under 18"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18, who stays for the visit; a guardian or health care agent for an adult who can't consent; a minor alone only where the state's rules let minors consent to care (a switch)",
+   "neverAsked": "symptoms, the reason for the visit and results are never asked or typed in the AI chat; words typed there are checked for danger, then not kept"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, a sudden very bad headache, or sudden weakness, numbness, a drooping face or slurred speech",
+     "say": "This needs help now. Call 911. Don't wait for a chiropractor visit.",
+     "booking": "no booking"
+    },
+    {
+     "words": "numbness in the groin or inner thighs, new trouble controlling the bladder or bowels, leg weakness that's getting worse, back pain with a fever, or a head injury or trouble walking after a crash or fall",
+     "say": "This needs a doctor now. Go to an emergency room, or call 911. Don't wait for a chiropractor visit.",
+     "booking": "no booking; the same words texted before a visit get the same message, the owner is told and calls, and the visit stays unless the patient cancels, with no fee"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "an everyday back or neck strain, also after a car accident",
+     "what": "books as usual (a car accident visit is billed to the claim); Rosie only matches words and never judges how serious anything is"
+    }
+   ],
+   "owner": "the clinic's own red-flag list, set with its chiropractors at sign-up, is the stop list above; Sam can add words that go to the clinic's own line (A3-26)",
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history and consent",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+     "who": "every new patient; returning patients once a year, or when their health changes",
+     "result": "the consent is signed after the chiropractor explains the main risks, before any adjustment; not done by its due date: Sam keeps the visit (signed on the secure page at the desk or the door first), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered (the copay, visits left), some services only (like Medicare: adjustments, not the exam or X-rays), not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "The claim for a car accident or work injury",
+     "when": "on the secure page while booking; the desk confirms it before the visit",
+     "who": "every patient whose visit is billed to a claim",
+     "result": "no claim confirmed: the visit stays at the self-pay price, or a free cancel"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day (the example clinic's rule), or sooner where the rules require it; a new one when a care plan is added",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "A Medicare cost notice",
+     "when": "on the secure page before a visit Medicare may not pay for, like an upkeep adjustment; the desk explains it at check-in",
+     "who": "patients with Original Medicare",
+     "result": "signed: the patient knows that part may be self-pay; not signed: the desk explains it before any care, and the patient may cancel with no fee"
+    },
+    {
+     "name": "A re-exam before more adjustments",
+     "when": "before the adjustment",
+     "who": "a returning patient with no exam in the last 12 months",
+     "goodFor": "12 months (the example clinic's rule)",
+     "result": "the chiropractor goes on, suggests another plan, or refers the patient to a medical doctor"
+    },
+    {
+     "name": "The employer's OK for a workplace care day",
+     "when": "before any visit day there",
+     "who": "the employer hosting the care days",
+     "result": "no OK: no times at that place"
+    }
+   ],
+   "prep": "arrive 15 minutes early; bring a photo ID and the insurance card; wear loose, comfortable clothes; at home: a clear space about 7 by 4 feet for the portable table"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the check-in code at the front desk, with a photo ID; at home: the code at the door; at a workplace: the code at the care day's table",
+   "beforeWork": "the chiropractor reads the health history, takes the history and examines (posture, movement, reflexes, strength and feeling in the legs), with their own red-flag checks, before any adjustment",
+   "changes": "X-rays only if the chiropractor orders them, with the price shown first and the patient's yes; something that needs a medical doctor first means no adjustment, the visit is paid, and notes go to the doctor the patient names; a care plan is suggested in person, stays on the secure page, and is never pushed",
+   "carePlan": "a care plan's visits are booked as a series only with the patient's own yes by text; one reply stops any visit, or all that are left",
+   "done": "the check-in code or DONE; notes, X-rays and results stay in the clinic's own records, shared with the patient only in person, never in Rosie or a text",
+   "away": "a portable table; no X-rays at home (ordered at the clinic or an imaging center)"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking at the clinic; a card saved only where the clinic turns on its $20 no-show fee, never for a fee-free patient; at home: a card saved for the $89 no-show fee and charged at DONE, or nothing saved and Rosie texts the bill; a car accident or work injury: nothing taken",
+   "plans": "the plans the clinic takes (its own list); the front desk checks each by hand and records it: active or not, the chiropractic benefit (the copay, visits left, the deductible); the share is an estimate, not a promise; Medicare pays only for adjustments that correct a current problem, not the exam, X-rays or upkeep visits",
+   "claims": "a car accident or work injury is billed to that claim, the business's own way; the claim details go only on the secure page",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "packages": "none at the example clinic: each visit is paid when it happens; where a clinic sells prepaid visits, the state's rules on prepaid care apply (a switch)",
+   "fees": "the missed-visit or late-cancel fee: $20 at the clinic and $89 for a house call (the example's own), only from a saved card and only when the owner confirms it; the same fee for every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; a Medicare patient pays a fee only if every patient does; their texts say 'No fee to cancel or miss'",
+   "after": "at the clinic: the self-pay price or the plan's share at the front desk, its own way; the clinic sends the plan's claim; a balance after the plan pays is billed by the clinic, not by Rosie's text; at home: the saved card charged at DONE, or Rosie texts the bill; a claim or an employer is billed the business's own way",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form; fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)",
+   "repeatPlans": "a repeating visit plan (like an adjustment every 4 weeks) is booked only with its own yes; each visit is paid when it happens, like a single visit: at the front desk at the clinic, or at home by the saved card at DONE or Rosfield's bill; no monthly plan charge and nothing paid ahead"
+  },
+  "pf.messages": {
+   "never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the results or the chiropractor's name (on a house call the chiropractor's name stays, for the door check); X-rays and results never go through Rosie",
+   "staff": "texts to the owner and staff use the patient's initials only (A.M., never Alex M.) and never the reason for the visit",
+   "healthQuestions": "Rosie never answers a health question, like ice or heat; it goes to the clinic, which calls the patient",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the chiropractor"
+  },
+  "pf.staff": {
+   "licenses": "each chiropractor's own license, per state; an acupuncturist's own license",
+   "skills": "chiropractors: exams, adjustments, reading X-rays, kinesio taping; prenatal care only by a chiropractor trained for it (here Dr. Chen); the front desk: check-in, plan checks, estimates and payment; only people cleared for house calls go to homes and workplaces",
+   "supervision": "a chiropractic assistant (taping, hot and cold packs) works only while a chiropractor is there, as the state's rules allow (a switch)",
+   "oks": "the owner OKs same-day visits, any price made for one patient (at the clinic, every one, like a custom brace; for house calls, over $500, like a care plan's total), and anything a chiropractor flags",
+   "standIn": "a chiropractor out: another chiropractor takes their patients where there's room, and the patient chooses; the patient never hears why someone is out",
+   "away": "the house-call team: Dr. Brooks and Dr. Moore, each with a portable table"
+  },
+  "pf.rules": {
+   "records": "chiropractic records are kept by the clinic as long as the state's rules require (a child's may be kept longer); a delete request removes only Rosie's own booking details, never the clinic's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "consent": "written consent after the main risks are explained, before any care, where the state's rules require it (a switch)",
+   "prepaid": "prepaid visits and packages follow the state's rules (written terms, a cancel, a refund of unused visits): a switch; the example clinic sells none",
+   "showLicense": "the license shown where the state asks: posted at the clinic, and on a house call",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "host": "a workplace care day only under the employer's written OK and its sign-in rules (S1-58, B4-66)",
+   "ads": "no free-visit or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen, in the time left; later: the front desk may move the visit, with no fee (Rosie never moves it itself)",
+   "standIn": "a chiropractor out: another chiropractor with room, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any care), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "redFlagBefore": "red-flag words texted before a visit: the emergency room message, the owner is told and calls, and the visit stays unless the patient cancels, with no fee",
+   "referral": "something in the exam needs a medical doctor first: no adjustment, the visit is paid, and notes go to the doctor the patient names",
+   "carePlan": "a care plan's visits are booked only with the patient's own yes; one reply stops any visit or all that are left; no sales texts",
+   "twoBookings": "a patient with several care plan visits open: Rosie asks which one before any change",
+   "healthQuestion": "a question about ice, heat or exercises before the visit goes to the clinic; Rosie gives no advice",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): sudden back pain gets the soonest same-day time, with the owner's OK; the red-flag words get the emergency room or 911 message",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "plans",
+   "planbill",
+   "forms",
+   "children",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Chiropractic",
+   "staff": "Dr. Chen and Dr. Diaz (chiropractors) and the front desk",
+   "cust": "Alex M. (a new patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Mobile Chiro",
+   "staff": "Dr. Brooks and Dr. Moore (chiropractors), who bring a portable table",
+   "cust": "Alex M. (a new patient, at home) · other patients",
+   "other": "Others (a family member, a parent or guardian, an employer, a plan or a claim)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dr. Chen"
+  },
+  "B": {
+   "staff": "Dr. Brooks"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "color and cut",
+    "posture screening"
+   ],
+   [
+    "Color and cut",
+    "Posture screening"
+   ],
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "A treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a chiropractor who rents a room,"
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free treatment room:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "How would you like it on top?",
+    "Where does it hurt most?"
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter visit in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter visit."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during my visit?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please wear loose, comfy clothes on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please wear loose, comfy clothes."
+   ],
+   [
+    "the customer is already in the chair",
+    "the patient is already in the treatment room"
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped A.M.'s visit."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the visit and answers questions."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a sign to check first, stopped"
+   ],
+   [
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed",
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed"
+   ],
+   [
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each kind of work may keep its own trade name, like Lee House Calls and Lee Acupuncture."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most chiropractic clinics set it."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most chiropractic clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules chiropractic clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Adjustments, exams and kinesio taping."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "House calls and acupuncture, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "An acupuncture visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery adjust; Riley also does prenatal care and house calls."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: chiropractor, prenatal care, house calls"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: chiropractor, prenatal care and house calls"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for cupping, which isn't on the clinic's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do cupping."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: low back, re-exam in 4 weeks"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's visit first, so the times fit it."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "A booking added after the list goes to Jordan at once, in its own text.",
+    "A booking added after the list goes to Jordan at once, by text."
+   ],
+   [
+    "New times with Jordan; a free cancel stays open",
+    "New times; a free cancel stays open"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Any question about your care? Reply here. How was your visit with Jordan?"
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "First house call $179 ($199 from Nov 2) · House-call adjustment $150"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My lower back is stiff and sore."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about my neck pain."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a chiropractor come to my home this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa house call Thu 12-2 Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My back hurts' fits a first house call."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like treating someone who never said yes to care."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A house call happens only at the patient's home, so nothing is asked."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check?",
+    "A commonly paired add-on is one line on the card: 'Adding kinesio taping?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And where is the pain, and did it start after a fall or a crash?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes more than one visit, like a care plan of weekly adjustments."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a sore shoulder."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also look at my shoulder?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The shoulder is checked at the same visit, priced there."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like the posture screening."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 care plan is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it still hurts"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 house call needs none."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: Jordan does acupuncture."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also check my posture?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the pain is much worse now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The pain is much worse now, and my leg feels numb."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Don't drive yourself. If it's sudden or severe, call 911 now."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds a tight shoulder that taping would help."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 shoulder treatment and taping"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Extra for A.M.: shoulder treatment and taping, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Shoulder treatment and taping · $160"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 shoulder price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the shoulder treatment for $160."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a sign that needs a medical doctor first."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan stopped part of today's visit for your safety. The note is on your secure page."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: something to check first"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the adjustment"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your own doctor first"
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · today's visit"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's table scuffs the floor and Jordan texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's table scuffed the floor at A.M.'s."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 house call"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan was rushed and didn't explain the care plan."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the floor where the table stood."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan see me again next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a house-call adjustment."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's back pain, today,"
+   ],
+   [
+    "M.P. would like to talk about the water heater quote before booking.",
+    "M.P. would like to talk about the care plan quote before booking."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the first house call from a card saved for the $89 fee to a $40 deposit."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every clinic service, and prenatal care"
+   ],
+   [
+    "about the job",
+    "about the visit"
+   ],
+   [
+    "Keeps each job inside the license",
+    "Keeps each visit inside the license"
+   ],
+   [
+    "no jobs sent now",
+    "no visits sent now"
+   ],
+   [
+    "Any jobs already booked?",
+    "Any visits already booked?"
+   ],
+   [
+    "The jobs already on it",
+    "The visits already on it"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "next job:",
+    "next visit:"
+   ],
+   [
+    "Someone calls for a dentist",
+    "Someone calls for a pharmacy"
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Pharmacy? I need a refill."
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Pharmacy"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Physical therapy for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds physical therapy to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW physical therapy"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A visit is rated, so the clinic takes the first branch."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has an adjustment plan with Riley, every 4 weeks."
+   ],
+   [
+    "photos of your hair",
+    "photos of your posture"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Chiropractic care takes no jobs sent now, at the clinic or on house calls."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Adjustment plan · every 4 weeks"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Hot pack · $15"
+   ],
+   [
+    "gloss",
+    "a hot pack"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Chiropractic LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Chiro's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Chiropractic"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Chiro"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee House Calls and Lee Acupuncture"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile chiropractic and acupuncture"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile chiropractic and acupuncture"
+   ],
+   [
+    "1200 Main St",
+    "500 Main St"
+   ],
+   [
+    "88 Elm St",
+    "410 Park Ave"
+   ],
+   [
+    "Riley Chen",
+    "Mara Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Lucia Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Nate Brooks"
+   ],
+   [
+    "Casey Moore",
+    "Ravi Moore"
+   ],
+   [
+    "Riley",
+    "Dr. Chen"
+   ],
+   [
+    "Avery",
+    "Dr. Diaz"
+   ],
+   [
+    "Jordan",
+    "Dr. Brooks"
+   ],
+   [
+    "Casey",
+    "Dr. Moore"
+   ],
+   [
+    "electrical",
+    "acupuncture"
+   ],
+   [
+    "Electrical",
+    "Acupuncture"
+   ],
+   [
+    "plumber",
+    "chiropractor"
+   ],
+   [
+    "Plumber",
+    "Chiropractor"
+   ],
+   [
+    "plumbing",
+    "mobile chiropractic"
+   ],
+   [
+    "Plumbing",
+    "Mobile chiropractic"
+   ],
+   [
+    "barbershop",
+    "chiropractic clinic"
+   ],
+   [
+    "Barbershop",
+    "Chiropractic clinic"
+   ],
+   [
+    "barbers",
+    "chiropractors"
+   ],
+   [
+    "Barbers",
+    "Chiropractors"
+   ],
+   [
+    "barber",
+    "chiropractor"
+   ],
+   [
+    "Barber",
+    "Chiropractor"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Re-exam"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Re-exam"
+   ],
+   [
+    "Signature cut and shave",
+    "Re-exam"
+   ],
+   [
+    "Signature cut and shave",
+    "Re-exam"
+   ],
+   [
+    "hot towel shave",
+    "prenatal care"
+   ],
+   [
+    "signature cut",
+    "re-exam"
+   ],
+   [
+    "Signature cut",
+    "Re-exam"
+   ],
+   [
+    "Groom's package",
+    "Full spine X-rays"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color correction",
+    "injury visit"
+   ],
+   [
+    "Color correction",
+    "Injury visit"
+   ],
+   [
+    "kids cuts",
+    "child's adjustments"
+   ],
+   [
+    "Kids cut",
+    "Child's adjustment"
+   ],
+   [
+    "kids cut",
+    "child's adjustment"
+   ],
+   [
+    "Kids cut",
+    "Child's adjustment"
+   ],
+   [
+    "a skin fade",
+    "an adjustment"
+   ],
+   [
+    "A skin fade",
+    "An adjustment"
+   ],
+   [
+    "skin fade",
+    "adjustment"
+   ],
+   [
+    "Skin fade",
+    "Adjustment"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Dr. Chen orders X-rays"
+   ],
+   [
+    "beard trim",
+    "kinesio taping"
+   ],
+   [
+    "Beard trim",
+    "Kinesio taping"
+   ],
+   [
+    "haircuts",
+    "new patient visits"
+   ],
+   [
+    "Haircuts",
+    "New patient visits"
+   ],
+   [
+    "haircut",
+    "new patient visit"
+   ],
+   [
+    "Haircut",
+    "New patient visit"
+   ],
+   [
+    "color",
+    "prenatal care"
+   ],
+   [
+    "Color",
+    "Prenatal care"
+   ],
+   [
+    "a patch test",
+    "an exam"
+   ],
+   [
+    "patch test",
+    "exam"
+   ],
+   [
+    "a consult",
+    "an exam"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "Consult",
+    "Exam"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "set at the chair",
+    "set at the visit"
+   ],
+   [
+    "quote at the chair",
+    "quote at the visit"
+   ],
+   [
+    "is at the chair",
+    "is at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "First house call"
+   ],
+   [
+    "Water heater flush",
+    "House-call adjustment"
+   ],
+   [
+    "Water heater flush",
+    "House-call adjustment"
+   ],
+   [
+    "Panel upgrade",
+    "Acupuncture care plan"
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "home warranty",
+    "health plan"
+   ],
+   [
+    "warranty plan",
+    "health plan"
+   ],
+   [
+    "labor",
+    "care day time"
+   ],
+   [
+    "flush",
+    "adjustment"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a first visit on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books an adjustment every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for an adjustment every 4 weeks."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A parent books adjustments for three children on one morning."
+   ],
+   [
+    "staff cut",
+    "staff visit"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My back hurts more today. Can I still come in Saturday?"
+   ],
+   [
+    "like a skin-test result",
+    "like the date of the last X-rays"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una primera cita el sábado."
+   ],
+   [
+    "A step-free door on Elm St",
+    "A step-free door on Park Ave"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Park Ave"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The table's clip tore my sweater."
+   ],
+   [
+    "says the cape clip ripped",
+    "says the table's clip tore"
+   ],
+   [
+    "a clinic",
+    "an office"
+   ],
+   [
+    "A clinic",
+    "A clinic"
+   ],
+   [
+    "rents a chair",
+    "rents a room"
+   ],
+   [
+    "MP045210",
+    "DC045210"
+   ],
+   [
+    "JP031552",
+    "DC031552"
+   ],
+   [
+    "JE30417",
+    "LA30417"
+   ],
+   [
+    "BS20981",
+    "CR20981"
+   ],
+   [
+    "EC22871",
+    "AR22871"
+   ],
+   [
+    "Water heater replacement",
+    "Acupuncture session"
+   ],
+   [
+    "Sewer camera inspection",
+    "Posture screening"
+   ],
+   [
+    "sewer camera inspection",
+    "posture screening"
+   ],
+   [
+    "drain clearings",
+    "first house calls"
+   ],
+   [
+    "Drain clearings",
+    "First house calls"
+   ],
+   [
+    "drain clearing",
+    "first house call"
+   ],
+   [
+    "Drain clearing",
+    "First house call"
+   ],
+   [
+    "water heater quote",
+    "care plan quote"
+   ]
+  ],
+  "B": [
+   [
+    "color and cut",
+    "posture screening"
+   ],
+   [
+    "Color and cut",
+    "Posture screening"
+   ],
+   [
+    "The chairs",
+    "The treatment rooms"
+   ],
+   [
+    "A chair, ready",
+    "A treatment room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a chiropractor who rents a room,"
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free treatment room:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "How would you like it on top?",
+    "Where does it hurt most?"
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter visit in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter visit."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during my visit?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please wear loose, comfy clothes on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please wear loose, comfy clothes."
+   ],
+   [
+    "the customer is already in the chair",
+    "the patient is already in the treatment room"
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped A.M.'s visit."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the visit and answers questions."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a sign to check first, stopped"
+   ],
+   [
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed",
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed"
+   ],
+   [
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each kind of work may keep its own trade name, like Lee House Calls and Lee Acupuncture."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most chiropractic clinics set it."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most chiropractic clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules chiropractic clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Adjustments, exams and kinesio taping."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "House calls and acupuncture, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "An acupuncture visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery adjust; Riley also does prenatal care and house calls."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: chiropractor, prenatal care, house calls"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: chiropractor, prenatal care and house calls"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for cupping, which isn't on the clinic's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do cupping."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: low back, re-exam in 4 weeks"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's visit first, so the times fit it."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "A booking added after the list goes to Jordan at once, in its own text.",
+    "A booking added after the list goes to Jordan at once, by text."
+   ],
+   [
+    "New times with Jordan; a free cancel stays open",
+    "New times; a free cancel stays open"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Any question about your care? Reply here. How was your visit with Jordan?"
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "First house call $179 ($199 from Nov 2) · House-call adjustment $150"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My lower back is stiff and sore."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about my neck pain."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a chiropractor come to my home this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa house call Thu 12-2 Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My back hurts' fits a first house call."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like treating someone who never said yes to care."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A house call happens only at the patient's home, so nothing is asked."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check?",
+    "A commonly paired add-on is one line on the card: 'Adding kinesio taping?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And where is the pain, and did it start after a fall or a crash?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes more than one visit, like a care plan of weekly adjustments."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a sore shoulder."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also look at my shoulder?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The shoulder is checked at the same visit, priced there."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like the posture screening."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 care plan is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it still hurts"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 house call needs none."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: Jordan does acupuncture."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also check my posture?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the pain is much worse now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The pain is much worse now, and my leg feels numb."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Don't drive yourself. If it's sudden or severe, call 911 now."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds a tight shoulder that taping would help."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 shoulder treatment and taping"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Extra for A.M.: shoulder treatment and taping, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Shoulder treatment and taping · $160"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 shoulder price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the shoulder treatment for $160."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a sign that needs a medical doctor first."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan stopped part of today's visit for your safety. The note is on your secure page."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: something to check first"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the adjustment"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your own doctor first"
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · today's visit"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's table scuffs the floor and Jordan texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's table scuffed the floor at A.M.'s."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 house call"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan was rushed and didn't explain the care plan."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the floor where the table stood."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan see me again next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a house-call adjustment."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's back pain, today,"
+   ],
+   [
+    "M.P. would like to talk about the water heater quote before booking.",
+    "M.P. would like to talk about the care plan quote before booking."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the first house call from a card saved for the $89 fee to a $40 deposit."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My back hurts a lot."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me duele mucho la espalda."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Should I stop my blood thinner before the visit?"
+   ],
+   [
+    "no open times for this job",
+    "no open times for this visit"
+   ],
+   [
+    "about the job",
+    "about the visit"
+   ],
+   [
+    "Books one job for a group",
+    "Books one visit for a group"
+   ],
+   [
+    "Keeps each job inside the license",
+    "Keeps each visit inside the license"
+   ],
+   [
+    "no jobs sent now",
+    "no visits sent now"
+   ],
+   [
+    "Any jobs already booked?",
+    "Any visits already booked?"
+   ],
+   [
+    "The jobs already on it",
+    "The visits already on it"
+   ],
+   [
+    "job texts",
+    "visit texts"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "Ask Sam about your jobs.",
+    "Ask Sam about your visits."
+   ],
+   [
+    "more jobs today",
+    "more visits today"
+   ],
+   [
+    "next job:",
+    "next visit:"
+   ],
+   [
+    "Someone calls for a dentist",
+    "Someone calls for a pharmacy"
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Pharmacy? I need a refill."
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Pharmacy"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilechiro.com"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Nutrition coaching for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds nutrition coaching to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW nutrition coaching"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 X-ray stays good until Thu Oct 29."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 care plan, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your care plan"
+   ],
+   [
+    "Repipe · $2,400",
+    "Care plan · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the try-in is done, $800 at the finish"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your care plan"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "no proof Alex may have this work done",
+    "no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Chiropractic care takes no jobs sent now, at the clinic or on house calls."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "like a move-out day",
+    "like a move to another home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Chiro LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Chiro's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Chiropractic"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Chiro"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee House Calls and Lee Acupuncture"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile chiropractic and acupuncture"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile chiropractic and acupuncture"
+   ],
+   [
+    "1200 Main St",
+    "500 Main St"
+   ],
+   [
+    "88 Elm St",
+    "410 Park Ave"
+   ],
+   [
+    "42 Oak St",
+    "22 Juniper Ln"
+   ],
+   [
+    "Riley Chen",
+    "Mara Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Lucia Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Nate Brooks"
+   ],
+   [
+    "Casey Moore",
+    "Ravi Moore"
+   ],
+   [
+    "Riley",
+    "Dr. Chen"
+   ],
+   [
+    "Avery",
+    "Dr. Diaz"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Goes over the exam; offers a plan"
+   ],
+   [
+    "Jordan",
+    "Dr. Brooks"
+   ],
+   [
+    "Casey",
+    "Dr. Moore"
+   ],
+   [
+    "electrical",
+    "acupuncture"
+   ],
+   [
+    "Electrical",
+    "Acupuncture"
+   ],
+   [
+    "plumbing license",
+    "chiropractic license"
+   ],
+   [
+    "Plumbing license",
+    "Chiropractic license"
+   ],
+   [
+    "plumber",
+    "chiropractor"
+   ],
+   [
+    "Plumber",
+    "Chiropractor"
+   ],
+   [
+    "plumbing",
+    "mobile chiropractic"
+   ],
+   [
+    "Plumbing",
+    "Mobile chiropractic"
+   ],
+   [
+    "barbershop",
+    "chiropractic clinic"
+   ],
+   [
+    "Barbershop",
+    "Chiropractic clinic"
+   ],
+   [
+    "barbers",
+    "chiropractors"
+   ],
+   [
+    "Barbers",
+    "Chiropractors"
+   ],
+   [
+    "barber",
+    "chiropractor"
+   ],
+   [
+    "Barber",
+    "Chiropractor"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Re-exam"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Re-exam"
+   ],
+   [
+    "hot towel shave",
+    "prenatal care"
+   ],
+   [
+    "Signature cut",
+    "Re-exam"
+   ],
+   [
+    "beard trim",
+    "kinesio taping"
+   ],
+   [
+    "Beard trim",
+    "Kinesio taping"
+   ],
+   [
+    "haircut",
+    "new patient visit"
+   ],
+   [
+    "Haircut",
+    "New patient visit"
+   ],
+   [
+    "color",
+    "prenatal care"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "First house call"
+   ],
+   [
+    "Kitchen drain clearing",
+    "First house call"
+   ],
+   [
+    "drain clearing",
+    "first house call"
+   ],
+   [
+    "Drain clearing",
+    "First house call"
+   ],
+   [
+    "Water heater flush",
+    "House-call adjustment"
+   ],
+   [
+    "water heater flush",
+    "house-call adjustment"
+   ],
+   [
+    "Water heater flush",
+    "House-call adjustment"
+   ],
+   [
+    "leak repair",
+    "injury visit"
+   ],
+   [
+    "Leak repair",
+    "Injury visit"
+   ],
+   [
+    "service call fee",
+    "house-call fee"
+   ],
+   [
+    "service call",
+    "house-call fee"
+   ],
+   [
+    "Service call fee",
+    "House-call fee"
+   ],
+   [
+    "Service call",
+    "House-call fee"
+   ],
+   [
+    "Sewer camera inspection",
+    "Extended house call"
+   ],
+   [
+    "sewer camera inspection",
+    "extended house call"
+   ],
+   [
+    "Sewer camera inspection",
+    "Extended house call"
+   ],
+   [
+    "Panel upgrade",
+    "Acupuncture care plan"
+   ],
+   [
+    "credited to the repair",
+    "credited to the visit"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene la cara hinchada o fiebre?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face swollen, or do you have a fever?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tengo fiebre."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't have a fever."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se le hincha la cara con fiebre, vaya a urgencias o llame al 911."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a chiropractic visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like braces"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face or jaw with a fever, or trouble breathing or swallowing."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Which room are you in at Alex's home?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "home warranty",
+    "health plan"
+   ],
+   [
+    "warranty plan",
+    "health plan"
+   ],
+   [
+    "the warranty company",
+    "the plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Alex says yes before any work",
+    "Alex says yes first"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and insurance card ready."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan runs Pine Court home, with a repeat plan: adjustments for two patients every 6 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's adjustments?"
+   ],
+   [
+    "Rental 1",
+    "Resident 1"
+   ],
+   [
+    "Rental 2",
+    "Resident 2"
+   ],
+   [
+    "Kitchen drain",
+    "First house call"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "Supply line · $80",
+    "X-ray · $80"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD no safe outlet for the chair, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: no safe outlet for the chair"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the adjustment"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the home to fix the outlet first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the wall by the bed"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed wall"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 first house call"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M.: next adjustment in 6 months. Bring the X-ray unit then."
+   ],
+   [
+    "The kitchen drain",
+    "The first house call"
+   ],
+   [
+    "with the store's receipt",
+    "with the lab's receipt"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. A check within 30 days is free, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the X-ray report is ready"
+   ],
+   [
+    "Sewer camera report",
+    "X-ray report"
+   ],
+   [
+    "Drain clearings already booked",
+    "First house calls already booked"
+   ],
+   [
+    "The repair price",
+    "The treatment price"
+   ],
+   [
+    "the repair price",
+    "the treatment price"
+   ],
+   [
+    "The repair price",
+    "The treatment price"
+   ],
+   [
+    "Book the repair",
+    "Book the treatment"
+   ],
+   [
+    "to the repair",
+    "to the visit"
+   ],
+   [
+    "labor",
+    "care day time"
+   ],
+   [
+    "Labor",
+    "Care day time"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It hurts a lot. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back in my room 30 minutes late, sorry!"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 care plan"
+   ],
+   [
+    "drying fan",
+    "loaner TENS unit"
+   ],
+   [
+    "flush",
+    "adjustment"
+   ],
+   [
+    "a clinic",
+    "an office"
+   ],
+   [
+    "A clinic",
+    "A clinic"
+   ],
+   [
+    "rents a chair",
+    "rents a room"
+   ],
+   [
+    "MP045210",
+    "DC045210"
+   ],
+   [
+    "JP031552",
+    "DC031552"
+   ],
+   [
+    "JE30417",
+    "LA30417"
+   ],
+   [
+    "BS20981",
+    "CR20981"
+   ],
+   [
+    "EC22871",
+    "AR22871"
+   ],
+   [
+    "· arriving 8–10am",
+    "· starts at 8:00am"
+   ],
+   [
+    "· arriving 12–2pm",
+    "· starts at 12:00pm"
+   ],
+   [
+    "arriving 8–10am",
+    "starting at 8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starting at 12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "2–4pm",
+    "2:00pm"
+   ],
+   [
+    "the new arrival time",
+    "the new start time"
+   ],
+   [
+    "Water heater replacement",
+    "Acupuncture session"
+   ],
+   [
+    "Sewer camera inspection",
+    "Posture screening"
+   ],
+   [
+    "sewer camera inspection",
+    "posture screening"
+   ],
+   [
+    "drain clearings",
+    "first house calls"
+   ],
+   [
+    "Drain clearings",
+    "First house calls"
+   ],
+   [
+    "drain clearing",
+    "first house call"
+   ],
+   [
+    "Drain clearing",
+    "First house call"
+   ],
+   [
+    "water heater quote",
+    "care plan quote"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "house call"
+ ],
+ "story": {
+  "A": "Sam Lee, a chiropractor, signs up two companies by text. Then Alex, a new patient, books a first visit with Dr. Chen at Lee Chiropractic for Sat Oct 24 at 11:00am. The health forms and the consent are on the secure page, Dr. Chen offers a care plan without pushing it, and Alex pays at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who can't get to a clinic for now, books a first house call with Lee Mobile Chiro at home, 22 Juniper Ln. Dr. Brooks comes Thu Oct 22 at 8:00am with a portable table. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 new patient visit with Dr. Chen. Nothing is taken. Alex pays at the front desk: the self-pay price, or a plan's share.",
+    "list|card|counter": "The same visit where the clinic turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient, and Alex pays at the front desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "New patient visit"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "New patient visit"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "New patient visit"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Kinesio taping",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Re-exam",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Adjustment (care plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "list|none|own"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: a $179 first house call with Dr. Brooks. A card is saved for the $89 no-show fee, and charged $179 when Dr. Brooks texts DONE.",
+    "list|none|bill": "The same house call with nothing saved. Rosie texts the $179 bill when Dr. Brooks texts DONE.",
+    "list|none|own": "A house call after a car accident. Nothing is taken, and the office bills the auto claim its own way."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "First house call"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "First house call"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "House-call adjustment",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "House-call adjustment, paid ahead",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "House-call adjustment (care plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-37",
+    "more": [
+     "The desk also notes how often the plan pays for adjustments and X-rays, and when Alex last had them.",
+     "The share is the plan's estimate, not a promise. The clinic bills the plan after the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-42",
+    "more": [
+     "The page also asks the birth date, and a plan's member ID and card photo if a plan pays.",
+     "The health history and the consent are on it too. Alex can finish them later, and the reminder asks again.",
+     "The page also repeats the right to a written price estimate."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "The health history and the consent are signed on the secure page, never by text.",
+     "They're due the day before. A returning patient's forms stay on file for a year."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-18",
+    "more": [
+     "Dr. Diaz does new patient visits too, so Dr. Diaz sees Alex for the whole visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-35",
+    "more": [
+     "Here: Dr. Chen finds something that needs a medical doctor first, so there's no adjustment today.",
+     "The history and the exam were done, so the visit is paid. Dr. Chen sends the notes to the doctor Alex names."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-20",
+    "more": [
+     "Lee Chiropractic sends the claim itself. Alex pays the estimated share at the front desk.",
+     "A balance after the plan pays is billed by the clinic, never by Rosie's text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Chiropractic records stay with the clinic as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For a chiropractic visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever brings the patient to the clinic."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Chiropractic, the forms are the health history and the consent to care.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "Kept: the patient signs on the secure page at the front desk, before any adjustment."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "Sudden back pain gets the soonest same-day time instead, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Chiropractic care always needs a license: each chiropractor, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Chiropractic care books people, a chiropractor by name, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Chiropractic care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each chiropractor holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No chiropractic care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A chiropractic visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A chiropractic visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A chiropractic visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the clinic: the patient is at the front desk."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's chiropractic visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "For the plug-in's own danger words, like numbness in the groin or new bladder trouble, the AI shows its words instead:",
+     "'This needs a doctor now. Go to an emergency room, or call 911. Don't wait for a chiropractor visit.'",
+     "Signs of a stroke or a heart attack get 'Call 911 now'."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-43",
+    "why": "Every clinic visit is at the clinic, so no clinic service is checked for a home. House calls are Lee Mobile Chiro's, under its own plug-in."
+   },
+   {
+    "op": "more",
+    "at": "A3-22",
+    "more": [
+     "Also back pain with a fever, or a head injury or trouble walking after a crash or fall."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "The clinic books no visits at a home. House calls are Lee Mobile Chiro's, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Chiropractic care is hands-on, so no visit is booked by video or phone (the plug-in's video switch is off)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The example clinic sells no prepaid packages or memberships: each visit is paid when it happens. Where a clinic does, the state's prepaid-care rules apply."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The example clinic sells no packs or memberships, at booking or at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The example clinic sells no prepaid plans or contracts at the visit, so nothing comes with a cancel period."
+   },
+   {
+    "op": "off",
+    "at": "A10-32",
+    "label": "Signs: work at their place",
+    "why": "The clinic's care plan visits are all at the clinic."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Chiropractic care has no redo. Soreness after a visit is handled as a reaction, below."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the clinic: the patient is always there."
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "why": "The chiropractic plug-in has no safety steps that let a booking go on: its danger words stop the booking.",
+    "label": "Safety steps, then go on"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The clinic's plans are paid at the front desk after each visit, so no plan charge is ever texted (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B4-28",
+    "more": [
+     "For a self-pay patient, the notice is the right to a written price estimate. Alex pays, so the AI says it here.",
+     "Lee Mobile Chiro emails it within 1 business day, or sooner where the rules say so: here, by Tue Oct 20."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "The page also asks the birth date, and a plan's member ID and card photo if a plan pays.",
+     "The health history and the consent are on it too. Alex can finish them before the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-20",
+    "more": [
+     "Dr. Moore does first house calls too, so Dr. Moore can do the whole visit."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A chiropractic visit always needs the patient there."
+   },
+   {
+    "op": "more",
+    "at": "B9-17",
+    "more": [
+     "Here, the office bills the $179 to Alex's auto claim, from the claim details on the secure page.",
+     "Rosie sends nothing about money."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Chiropractic records stay with the business as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a chiropractic visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever meets the chiropractor at the home."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "For a house call, the forms are the health history and the consent to care.",
+     "Kept: the patient, or the person who decides, signs them on the secure page at the door before any care."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Mobile chiropractic takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for chiropractic care (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A chiropractic visit always needs the patient there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the chiropractor's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "Sudden back pain gets the soonest same-day time instead, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Chiropractic care always needs a license: each chiropractor, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Chiropractic care books people, a chiropractor by name, never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Chiropractic care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each chiropractor holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No chiropractic care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A chiropractic visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile chiropractic sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No chiropractic visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No chiropractic visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "S1-43",
+    "why": "Every clinic visit is at the clinic, so no clinic service is checked for a home. House calls are Lee Mobile Chiro's, under its own plug-in."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A house call starts at a set time, not in an arrival window.",
+    "label": "1 Arrival windows"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "Each company works in one place: house calls are Lee Mobile Chiro's, and clinic visits Lee Chiropractic's.",
+    "label": "Both places: the customer picks"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "Chiropractic care is hands-on, so no visit is booked by video or phone.",
+    "label": "A video or phone session"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "No house call is over the plug-in's amount, and the business sells no prepaid plans, so none needs a contract.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "why": "The chiropractic plug-in has no safety steps that let a booking go on: its danger words stop the booking.",
+    "label": "Safety steps, then go on"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "No house call is paid in stages: each visit is paid when it happens.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "The owner of the home never pays for a house call: nobody is asked about the owner.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "why": "Chiropractic care has no warranty or free redo. A worry after a visit comes in as a reply to the aftercare tips.",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "No X-rays or tests are taken at a house call, so no report comes later.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "No house-call bill is over $500: each visit is paid when it happens, so Sam keeps cards only (S1-57)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A house-call plan's visits are each paid when they happen, like a single visit, so no plan charge is ever texted (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "A house-call plan's visits are each billed when they happen, never on one monthly bill (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "notes": "Refit Tue Oct 27 2026 (R12) to the REDESIGN 2 master: facts plans, planbill, forms, children, extrawork; sensitive on; no $2 (S1-62 off); setstart, 24 hours before. Money A list|none|counter (main) and list|card|counter: New patient visit $35, fee $20. Money B list|card|card (main), list|none|bill, list|none|own: First house call $179, fee $89. Every old words op is gone (the record and the homes word money, contact and fees); more lines kept. Company names shortened to Lee Chiropractic and Lee Mobile Chiro (word limits). Workplace care days (host days) were cut from the master.\nFrom: dentist. A chiropractic clinic runs like the dental clinic pilot: new-patient forms and consent only on the secure page, a plan (its name only through the AI) or self-pay with the written estimate notice, a front desk that takes payment, and no Rosie $2 for a health practice. The dentist's mobile side (visits at a host's place) also fits house calls and workplace care days.\nNames: Sam Lee, a chiropractor, owns Lee Mobile Chiro (the master's main company: house calls and acupuncture, 500 Main St) and Lee Chiropractic (the second company: the clinic, 410 Park Ave). Flow A's story is at the clinic; flow B's at Alex's home, 22 Juniper Ln. Harbor Logistics is the employer that hosts workplace care days (S1-58, S1-59, B4-66).\nPeople: the clinic's chiropractors are Dr. Chen (Mara Chen, who also does prenatal care) and Dr. Diaz (Lucia Diaz); the house-call chiropractors are Dr. Brooks (Nate Brooks, also acupuncture) and Dr. Moore (Ravi Moore). Sam, Pat and Alex M. stay. Alex is never given a pronoun; staff keep theirs.\nKinds of work: plumbing became mobile chiropractic (house calls), electrical became acupuncture (it waits for its acupuncturist, S1-39), the barbershop became the clinic. New work added later in S11-58: physical therapy (flow A), nutrition coaching (flow B).\nLicenses are switches in pf.license: each chiropractor's own license from the state where the patient is seen; acupuncture, X-ray machine registration, video and work away from the clinic each only where they apply. Malpractice insurance is asked only where the state requires it (the old flow's 'Kansas, the strictest' rule is not applied everywhere).\nPrices: the master's numbers are kept as the example clinic's own, so every sum, fee and refund stays right: new patient visit $35 (60 min), adjustment $40 (15 min), kinesio taping $20, child's adjustment $25, re-exam $55 (30 min), full spine X-rays $140 (only if ordered); house calls: first house call $179 (60 min), house-call adjustment $150 (30 min), the $89 no-show fee; the clinic's no-show fee is $20. They're examples, not a standard (the old flow's own clinic charged $150, $55, $90 and a $40 fee).\nMoney A: list|none|counter is the main path (nothing taken; the desk checks the plan; the self-pay price or the plan's share at the front desk). list|card|counter is the same visit where the clinic turns on its $20 no-show fee: a card is saved only for it, never for a fee-free patient. Left out: holds, deposits and full prices (the clinic takes none), packages and memberships (none sold; prepaid visits have state rules), prices from photos or at the visit (every visit is on the list; X-rays and anything extra are priced first and said yes to, A8-33), and Rosfield's bill or card at DONE (the clinic has a front desk). A car accident or work injury is billed to that claim, the clinic's own way.\nMoney B: list|card|card is the main path (a card saved for the $89 fee, charged $179 when Dr. Brooks texts DONE). list|none|bill: nothing saved, Rosie texts the bill. list|none|own: a car accident claim (or an employer's care day), billed the business's own way. Left out: holds, deposits, full prices and prices from photos or at the visit, which house calls never use.\nNo $2: chiropractic is a health practice (pf.money), so the master's no-$2 branches run (S1-62, S1-65, S11-92) and A9-21 says so.\nPrivate texts: a patient's texts carry only the business, the day, the time and the place (flow B adds the chiropractor's name, so Alex knows who is at the door). Never the visit type's reason, a plan or a symptom. Texts to Sam and the team use initials and carry no health details; a health question or a worse symptom goes to the secure page (A7-12, A7-13). Owner texts about a price for one patient name no item (S11-08, S12-21, B10-06).\nClinic visits happen only at the clinic: A4-01's house-call and video branches and S1-43 are off. House calls are Lee Mobile Chiro's (flow B). Video is off: the care is hands-on.\nFlow B gives a set start time, not an arrival window (B4-83, B4-84). No visit is ever sent now and nobody is on call (S2-30, S2-31; the sent-now branches of B6-03 and B8-58 are off).\nCare plan: offered in A8-44 and B8-39, never pushed. Its visits are booked only with the patient's own yes by text (A8-34, A10-07, A10-32; B8-27, B8-28), each paid when it happens; one reply stops any visit or all that are left.\nTurned off: packages and plans sold ahead (A5-01), holds and day-before holds, parts or items ordered, weather, rented items, items not picked up and redo visits (A10-06, B10-07), the landlord or owner question (B4-78), parts and stages (B9), warranty and report steps, and 'Safety steps, then go on' (A3-22, B3-17): the chiropractic danger words always stop the booking.\nsplitsKept A: A4-43 (a first step: none, already on file, or the forms and a re-exam, all used service by service), A7-61 (a stand-in with the skill, or nobody: prenatal care is Dr. Chen's alone), A8-02 (photo ID and signed forms present, or missing). Flow B decides every plug-in split with offs.\nClocks: sections 3 to 10 run forward on every listed path (A: Alex asks Wed Oct 21, 7:15pm; the visit is Sat Oct 24, 11:00am. B: booked Mon Oct 19, 6:41pm; the visit starts Thu Oct 22, 8:00am, DONE 9:05am, receipt 9:10am). The jumps left are the master's own: S1-51 jumps ahead a day and S2-01 goes back to Monday, and section 11 and 12 what-ifs each restart on their own day. S11-54 moved from Thu Oct 22 to Fri Oct 23, 10:30am, the same day as A7-55's 30-day plan notice.\nSections 11 and 12 examples: a custom back brace priced for one patient ($90; $110 quoted during an emergency, held to $90) in flow A, and a $600 care plan in flow B; the adjustment goes to $45 from Mon Nov 2, plans from Sat Nov 28.\nRename: the dentist's pairs were moved to chiropractic words; its pairs that still spoke of dental work reached no visible text (our ops replace those steps), so they are dropped, and the dentist op texts on vary keys our paths never light are dropped too. Those vary keys (price:photos, deposits, holds, full prices in flow B) keep the master's own water heater example: no listed path lights them.\nUnsure: the $35 new patient visit is low for a real clinic, but it's the master's number, kept so the sums stay right. The master's generic word 'job' stays in some detail lines of the setup and side branches; titles, branch labels and every text to a patient say 'visit'.\nReview (Oct 23): the listed own path (list|none|own) now tells the car accident claim it names (B3-02, B4-05, B4-07, B4-28, B4-84, B9-17, S1-15). Plans are paid visit by visit (pf.money.repeatPlans): A7-02's and B7-05's plan-charge branches and B9-19's monthly bill are off; B9-06's bank transfer is off and S1-57 keeps cards only, since no house-call bill reaches $500. Visit notes go on the secure page, never by text (A8-45, B8-44). Dee's booking in section 11 follows the path (S11-04 to S11-86), the S11-57 preview reads right on every path, and S12-26 no longer has a house call paid when booking. New patients get the kept times first, not only (A4-04, S1-47). The extended house call ($199) is on the plug-in's list.",
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "color and cut",
+    "Color and cut",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "A chair renter asked for by name",
+    "Access, like a step-free chair:",
+    "My employer pays for this cut.",
+    "How would you like it on top?",
+    "Riley can do a shorter cut in the time left",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "the customer is already in the chair",
+    "Stopped A.M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed",
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "Every shop service, color and house calls",
+    "about the job",
+    "Keeps each job inside the license",
+    "no jobs sent now",
+    "Any jobs already booked?",
+    "The jobs already on it",
+    "3 jobs",
+    "next job:",
+    "Someone calls for a dentist",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Elm Street Dental",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "photos of your hair",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut and shave",
+    "hot towel shave",
+    "signature cut",
+    "Signature cut",
+    "Groom's package",
+    "groom's party",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Kids cut",
+    "a skin fade",
+    "A skin fade",
+    "skin fade",
+    "Skin fade",
+    "Alex adds a beard trim",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "a consult",
+    "consult",
+    "Consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "quote at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "Panel upgrade",
+    "home warranty plan",
+    "home warranty",
+    "warranty plan",
+    "labor",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "like a skin-test result",
+    "Quiero un corte el sábado.",
+    "A step-free door on Elm St",
+    "Step-free door on Elm St",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped",
+    "a clinic",
+    "A clinic",
+    "rents a chair",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "BS20981",
+    "EC22871",
+    "Drain clearing"
+   ],
+   "B": [
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "HAZARD mold behind the sink wall, stopped",
+    "An estimate is a service with its own price, $0 or a fee · only the part done is charged; the visit fee is owed",
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "A booking added after the list goes to Jordan at once, in its own text.",
+    "New times with Jordan; a free cancel stays open",
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "My kitchen drain is clogged.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Safety note · your home",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "DONE 179 drain",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "M.P. would like to talk about the water heater quote before booking.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "no open times for this job",
+    "about the job",
+    "Books one job for a group",
+    "Keeps each job inside the license",
+    "no jobs sent now",
+    "Any jobs already booked?",
+    "The jobs already on it",
+    "job texts",
+    "3 jobs",
+    "Ask Sam about your jobs.",
+    "more jobs today",
+    "next job:",
+    "Someone calls for a dentist",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Elm Street Dental",
+    "leehomeservices.com",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "stage 2 of your repipe",
+    "CANT START no proof Alex may have this work done",
+    "no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "like a move-out day",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan and Alex check the work",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "hot towel shave",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "color",
+    "consult",
+    "shops",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater flush",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera inspection",
+    "Panel upgrade",
+    "credited to the repair",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "warranty plan",
+    "the warranty company",
+    "A plan or warranty pays",
+    "Alex says yes before any work",
+    "Please clear the cabinet under the sink.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "Kitchen drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Supply line · $80",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The kitchen drain",
+    "with the store's receipt",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "Drain clearings already booked",
+    "The repair price",
+    "the repair price",
+    "The repair price",
+    "Book the repair",
+    "to the repair",
+    "labor",
+    "Labor",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "$2,400 repipe",
+    "drying fan",
+    "flush",
+    "a clinic",
+    "A clinic",
+    "rents a chair",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "BS20981",
+    "EC22871",
+    "· arriving 8–10am",
+    "· arriving 12–2pm",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "2–4pm",
+    "the new arrival time",
+    "Water heater replacement",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Drain clearings",
+    "drain clearing",
+    "Drain clearing",
+    "water heater quote"
+   ]
+  },
+  "A": {
+   "A4-37": "4ee9e74e71",
+   "A4-42": "7f259bddbf",
+   "A4-43": "c17d56f766",
+   "A7-18": "b98d7c1744",
+   "A8-35": "a67e890a5b",
+   "A9-20": "0cfe0e1776",
+   "A10-21": "08514557c8",
+   "A4-64": "b98f95b738",
+   "A7-74": "b3ec278ce4",
+   "S1-26": "776159519e",
+   "S2-31": "320ac5e4cb",
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A3-24": "78e61fd50f",
+   "S1-43": "9775f13de8",
+   "A3-22": "0057d8fc9f",
+   "A4-01": "9d65299834",
+   "A5-01": "6c5c5c2f87",
+   "A10-05": "63c3536c7a",
+   "A10-32": "9f84638bce",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A7-94": "6490d5d8e6",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "B4-28": "506d267aaf",
+   "B4-29": "9234c5ed40",
+   "B7-20": "364245afef",
+   "B8-03": "ac9d404766",
+   "B9-17": "24b5acdf89",
+   "B10-17": "b5f4aef51b",
+   "B4-74": "bae5529af9",
+   "B7-61": "342b55fd9b",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-26": "776159519e",
+   "S2-31": "320ac5e4cb",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "S1-43": "2197eac59a",
+   "B4-01": "826f4058c2",
+   "B5-34": "917f89b62f",
+   "B3-17": "3eb7d7f259",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B7-91": "7132851ec1",
+   "B10-32": "7713bff255"
+  }
+ }
+}

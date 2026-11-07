@@ -1,0 +1,3306 @@
+{
+ "id": "pool-builder",
+ "name": "Pool and hot tub builder",
+ "style": "Project",
+ "pattern": "project",
+ "from": "contractor",
+ "plugin": {
+  "pf.license": {
+   "need": "a contractor's license for pool and spa construction where the state's rules require one (a pool or spa specialty license, or a general building license); registration only where the state licenses none; electrical and plumbing hookups by people licensed for them where the rules require it; a local building permit for every in-ground pool, and for hot tub wiring",
+   "who": "the company holds the contractor license through its license holder; electricians and plumbers hold their own; subcontractors (excavation, gunite, tile, plaster) hold their own where the rules license their trade",
+   "ask": "the company's contractor license number and its license holder; workers' compensation and liability insurance; any bond the state's rules require",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "limits": "jobs only inside the license's class and any job-size limit on the state's form; a hot tub hookup that needs new wiring is done by a licensed electrician",
+   "blocks": "nothing goes live until it's set up where one is required",
+   "insurance": "liability and workers' compensation; a bond where the state's rules require it for home improvement work",
+   "renewals": "license, bond and insurance reminded 30 days before they lapse; a lapse pauses new builds",
+   "lead_safe": "default",
+   "design_studio": "A design consult at the design center needs no license in most states. The build it leads to is booked under the contractor license.",
+   "background": "Background checks only where the state's form asks",
+   "holder": "the company holds the contractor license through its license holder; electricians and plumbers hold their own; subcontractors (excavation, gunite, tile, plaster) hold their own where the rules license their trade"
+  },
+  "pf.services": {
+   "pattern": "Site visit, then project: the build is booked only after a written proposal and a signed contract",
+   "B": [
+    {
+     "name": "Site visit",
+     "price": "free (the example business's own price; nothing taken and nothing owed)",
+     "length": "about 90 minutes",
+     "where": "at the customer's place",
+     "before": "nothing taken",
+     "after": "nothing owed; the written proposal follows within 5 business days"
+    },
+    {
+     "name": "In-ground pool build (gunite)",
+     "price": "from $65,000, set in the signed contract (example); built in stages over 8 to 12 weeks",
+     "length": "8 to 12 weeks, in stages",
+     "where": "at the customer's place",
+     "before": "nothing at booking; after signing and the cancel window, a deposit (the example: 10% or $1,000, whichever is less, where the state caps home improvement deposits)",
+     "after": "each stage billed when it's done and its inspection has passed: excavation, steel and plumbing, gunite, tile and coping, decking, equipment and electrical, plaster and start-up; the last after the final inspection and walk-through"
+    },
+    {
+     "name": "Pool renovation (replaster, new tile, new equipment)",
+     "price": "quoted at the site visit (example: $14,000 for a replaster and tile)",
+     "length": "1 to 3 weeks",
+     "where": "at the customer's place",
+     "before": "the same as the build",
+     "after": "billed in two stages"
+    },
+    {
+     "name": "Hot tub install",
+     "price": "priced from photos (example: $2,800 for a pad and a 50-amp hookup); the tub itself is sold in the business's own tools",
+     "length": "1 to 2 work days",
+     "where": "at the customer's place",
+     "before": "a signed written estimate, then a 25% deposit",
+     "after": "the rest billed after start-up"
+    },
+    {
+     "name": "Pool equipment check",
+     "price": "$179, from the list (example)",
+     "length": "1 to 2 hours",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "a card saved for the fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Spring pool opening",
+     "price": "$150, from the list (example); also a yearly plan",
+     "length": "2 to 3 hours",
+     "where": "at the customer's place",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Pool safety inspection",
+     "price": "$199, with a written report (example)",
+     "length": "1 hour",
+     "where": "at the customer's place",
+     "before": "a card saved for the fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Change order",
+     "price": "priced, written and signed by the owners before the changed work; added to the next stage bill"
+    },
+    {
+     "name": "Permit, locate, inspections, and haul-away of dug soil",
+     "price": "in every proposal"
+    }
+   ],
+   "A": [
+    {
+     "name": "Design consult",
+     "price": "free, about 1 hour",
+     "where": "at the design center, or by video or phone",
+     "before": "nothing taken",
+     "after": "nothing owed"
+    },
+    {
+     "name": "3D design package",
+     "price": "$500, 2 hours; credited to the build if the contract is signed within 60 days",
+     "where": "at the design center",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Pool school (a monthly class for new pool owners)",
+     "price": "free for the builder's customers, about 90 minutes; 16 seats",
+     "where": "at the design center",
+     "before": "nothing taken",
+     "after": "nothing owed",
+     "note": "water chemistry, equipment and pool safety: fences, alarms, covers, supervision of children; a child comes with a parent"
+    }
+   ],
+   "capacity": "each build has a project lead and subcontracted crews by stage; one excavation crew and one gunite crew set how many builds start each month",
+   "skills": "Site visits and proposals: designers and project leads. Running the build: a project lead. Excavation, steel, gunite, tile, plaster and electrical: crews or licensed subcontractors.",
+   "nobody_home": "build days need nobody home once the side gate and pets are handled; the site visit, the start-up walk-through and the final walk-through need an owner home",
+   "online": "design consults by video for a first talk; no build work online",
+   "smallest_job": "A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the example takes no build under a plunge pool).",
+   "seasons": "excavation and gunite only when the ground isn't frozen or soaked (the owner's call); hot tub installs all year"
+  },
+  "pf.questions": {
+   "before_times": [
+    "what you want: a new in-ground pool, a renovation, or a hot tub install",
+    "the town or ZIP, and whether you own the home (only an owner can contract a build)",
+    "roughly the yard: size, slope, and whether a machine can get in (gate width, fences, trees)",
+    "for a hot tub: photos of the spot, the panel and the path from the street"
+   ],
+   "after_time": [
+    "who owns the home, so every owner can be at the site visit and sign",
+    "any homeowners' association, and its approval process",
+    "known buried lines, a septic system, a well, or past flooding in the yard",
+    "children or pets at home during the build"
+   ],
+   "secure_page_only": [
+    "the street address, the gate code and where machines can enter",
+    "every owner of the home, each with their own link to sign",
+    "how the build is paid: the stage bills, the business's own way, or a lender (the lender's details stay in the business's own tools)"
+   ],
+   "who_may_book": "an adult; the contract is signed only by the home's owners (all of them where the state's rules or the business ask); a renter needs the owner to contract it",
+   "studio": [
+    "Which yard, and a rough budget (on the secure page)",
+    "Photos or measurements to bring (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a child or anyone in the water and not breathing, a drowning, an electric shock near water",
+     "says": "Call 911 now. Get them out of the water only if it's safe, and start CPR if you know how.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a gas smell, a downed or sparking power line in the yard",
+     "says": "Stay away and call 911 and the utility.",
+     "booking": "no booking"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "small children or pets at home during the build",
+     "says": "the open dig and the empty shell are fenced with a temporary safety fence that stays closed; the owners keep children and pets away from the work area every day; nobody swims until the final inspection passes and the permanent barrier (fence, gates, alarms or cover the rules require) is in",
+     "booking": "goes on"
+    },
+    {
+     "words": "a leaning wall, a cracked deck or an old pool that drains badly",
+     "says": "the booking goes on; the site visit notes it",
+     "booking": "goes on"
+    },
+    {
+     "words": "buried lines, a septic tank or a well near the dig",
+     "says": "the booking goes on; the utility locate and the site plan must clear them before digging",
+     "booking": "goes on"
+    }
+   ],
+   "business_line": "Questions about soil, engineering or what a safety barrier must be go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_quote": "The site visit at the home, with every owner there",
+   "after_contract": [
+    "The cancel window ends before any permit filing, order or digging, where the state's rules give one",
+    "The owners' association's OK, where there is one (the owners ask; the business sends the plans)",
+    "The permit, pulled by the license holder in the business's name; if it is late, the start moves with no fee",
+    "The utility locate, a few business days before digging, as the locate service requires",
+    "A temporary safety fence around the dig before the first dig day"
+   ],
+   "prep": [
+    "Clear the path for machines: move cars, furniture and plants you want to keep",
+    "Keep pets inside and children away from the work area every day",
+    "Unlock the side gate",
+    "Put any gate or lockbox code on the secure page",
+    "Before plaster: water and power must be on"
+   ],
+   "studio_prep": [
+    "Bring photos and rough measurements of the yard",
+    "Bring any shapes or finishes you already like"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "site visit and walk-throughs: the check-in code from an owner at the door; build days: nobody needs to be home, so the project lead texts a start photo and DONE with photos at the end of each stage day. Design center: the code at the desk.",
+   "at_the_visit": "the designer measures, photographs the yard and the access, and sends the proposal on the secure page within 5 business days",
+   "changes": "a written change order, priced and signed by the owners, before any changed work: rock or water found when digging, a bigger deck, new features",
+   "outside_checks": "inspections between stages and at the end, as the permit requires; the next stage and its bill wait for a pass",
+   "done": "after plaster: start-up (filling and balancing the water over about 10 days), a start-up walk-through with the owners, the final inspection, then DONE",
+   "studio_done": "DONE after the consult, with the planner's notes saved for the site visit",
+   "before_photos": "before photos of the yard, the driveway and the house walls near the path, so damage claims can be checked"
+  },
+  "pf.money": {
+   "site_visit": "free; nothing taken and nothing owed",
+   "no_money_before_contract": "nothing is taken before the contract is signed by every owner and the company",
+   "deposit": "after signing only; deposit cap: from the state's form (many cap home improvement deposits)",
+   "kept_apart": "money paid before the work is kept apart or bonded where the state's rules require it",
+   "stages": "each stage is billed when it's done and its inspection has passed, never ahead of the work",
+   "stage_unpaid": "the next stage isn't scheduled until the last stage bill is paid (the example contract); the owner decides any exception",
+   "last_payment": "after the final inspection and the start-up walk-through",
+   "change_orders": "signed first, then added to the next stage bill",
+   "lender": "a build paid by the owners' lender goes the business's own way: the lender's draws are outside Rosie",
+   "big_bills": "bank transfer for stage bills over $5,000 (the example); counts as paid once it clears",
+   "tax": "as the state's form says for construction",
+   "tips": "none",
+   "studio": "The 3D design package's $500 is credited to the build if the contract is signed within 60 days; the consult and the pool school class are free"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "gate and lockbox codes, the lender's details and any account numbers never go in a text: only the secure page",
+    "The budget",
+    "Contract, change order and permit papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "never booked by a minor; a child at home is never the one who lets a crew in; a child at the pool school class comes with the parent who booked"
+  },
+  "pf.staff": {
+   "roles": "Designers and project leads: site visits and proposals. A build lead (Leif, Joss) runs each build. Planners (Pilar, Mina) at the design center. Crews and licensed subcontractors by stage.",
+   "licenses": "the company's license holder; electricians and plumbers each licensed where the rules require it; subcontractors' licenses checked before they're named on a job",
+   "lead_safe": "default",
+   "who_oks": "the owner OKs every proposal, change order over $1,000 and any stage bill that differs from the contract",
+   "stand_in": "another designer may take a site visit: the owners are told first and can pick another time instead; a build keeps its project lead unless the owner moves it; stage crews are the business's choice",
+   "subcontractors": "subcontracted crews are named to the owners before their stage, with the day they come"
+  },
+  "pf.rules": {
+   "contract": "a written contract for every build or renovation, where the state's rules require one for home improvement work, signed by every owner and the company before any money",
+   "contract_parts": "the parts the state's form lists (license number, start and finish window, price, stages, deposit, cancel notice, any lien notice, warranty)",
+   "cancel_window": "a cancel window after signing, where the state's rules give one for a contract signed at the home; no work, permit or order inside it",
+   "permits": "pulled by the license holder in the business's name, never the owners'",
+   "barrier": "the pool isn't filled for use until the safety barrier the local rules require is in and passes the final inspection",
+   "change_orders": "written and signed before the changed work",
+   "lien_papers": "lien notices and releases follow the state's rules, in the business's own paperwork",
+   "show": "the license number on the proposal, the contract and the receipts, where the state's rules require it",
+   "warranty": "structure for as long as the owners own the home, plaster 1 year, workmanship 1 year (the example's); makers' warranties on equipment",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "rock_or_water_found": "digging hits rock or groundwater: the crew stops that part, a change order is priced and signed before more digging",
+   "inspection_fails": "the crew fixes it at no cost, the re-check is booked, and the next stage and its bill wait",
+   "permit_or_hoa_late": "the start moves with no fee; the owners are told",
+   "weather": "rain or frozen ground stops digging, gunite and plaster: each stage day's forecast is checked; moved days cost nothing",
+   "stage_bill_unpaid": "the next stage waits, and the owner decides",
+   "owners_stop_the_build": "work stops; the owner settles what's owed for work done under the contract; Rosie moves no money on its own",
+   "subcontractor_late": "the stage day moves, and the owners are told the new day",
+   "nobody_home": "build days run with nobody home, with start and end photos",
+   "damage": "a cracked driveway or a damaged sprinkler line is checked against the before photos, and the owner decides how to fix it",
+   "other": "all other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "stages",
+   "photos",
+   "extrawork",
+   "firststeps",
+   "multiday",
+   "banktransfer",
+   "video",
+   "classes"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Barbering workshop",
+    "Pool school"
+   ],
+   [
+    "Adding a beard trim, +$20? Say so.",
+    "Adding a pool school seat? Say so."
+   ],
+   [
+    "a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "no fee, unless you set one and a card, a deposit or the full price was taken and you say yes"
+   ],
+   [
+    "$89 service-call fee",
+    "$89 estimate visit fee"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither pool building nor the center takes jobs sent now."
+   ],
+   [
+    "The chairs",
+    "The sample tiles"
+   ],
+   [
+    "A chair, ready",
+    "A plaster sample"
+   ],
+   [
+    "JP031552",
+    "EX-4216"
+   ],
+   [
+    "JE30417",
+    "EX-5309"
+   ],
+   [
+    "Groom's package · ",
+    "Renovation design package · "
+   ],
+   [
+    "the Groom's package",
+    "the renovation design package"
+   ],
+   [
+    "The Groom's package",
+    "The Renovation design package"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 renovation design package"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Pilar and Mina run the pool consults; Pilar also does home pool consults"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Pilar: pool planner, tile color, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Pilar: pool planner, tile color and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every center service, tile color and home pool consults"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the center, and home pool consults"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A tile color' or 'a plaster sample' fits a pool consult."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a builder: 'We'd like pool consults for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A pool consult's example: 'A big yard needs a quick measure check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which tile or finish do you like?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sample tile next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the surface"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a septic company first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "cracks a sprinkler head and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a sprinkler head"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "cracked a sprinkler head at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked sprinkler head"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the center and for home pool consults"
+   ],
+   [
+    "see your hair before pricing it",
+    "see photos of your yard before pricing it"
+   ],
+   [
+    "come with dry hair",
+    "bring photos of your yard and rough measurements"
+   ],
+   [
+    "It's my kitchen",
+    "It's my home"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute yard review"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, except a package paid in full"
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Pool school: a monthly class, 16 seats"
+   ],
+   [
+    "To save cards for the $20 fee, connect Stripe",
+    "To take payments, connect Stripe"
+   ],
+   [
+    "Haircut at home · $75",
+    "Credited to the build if the contract is signed within 60 days"
+   ],
+   [
+    "So is a house call, $75. Nothing more is owed after.",
+    "It is credited to the build if the contract is signed within 60 days. Nothing more is owed after."
+   ],
+   [
+    "Late or no-show: the $20 fee, if you confirm",
+    "Late or no-show: no fee, unless you set one"
+   ],
+   [
+    "The rest is refunded",
+    "Anything not kept is refunded"
+   ],
+   [
+    "15-minute style consult",
+    "1-hour pool consult"
+   ],
+   [
+    "Style consult · 15 min",
+    "Pool consult · 1 hour"
+   ],
+   [
+    "Style consult",
+    "Pool consult"
+   ],
+   [
+    "style consult",
+    "pool consult"
+   ],
+   [
+    "$55",
+    "$500"
+   ],
+   [
+    "two skin fades on",
+    "two pool consults on"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a roof repair, which isn't on the center's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Pool Center doesn't do roof repairs."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A sample tile fell and chipped my phone."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a sample tile fell and chipped their phone today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "likes a kidney shape, dark plaster, a tanning ledge"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a pool consult for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pool design centers set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A pool design center on Marina Way. Shapes, tile, plaster and 3D design, plus a monthly pool school."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pool design centers start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pool design centers often set."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds spa design to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Spa design for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW spa design"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a storm washout"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a tile pick is $25"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una consulta de piscina el sábado."
+   ],
+   [
+    "Gloss to finish",
+    "Plaster sample"
+   ],
+   [
+    "gloss",
+    "plaster sample"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a storm washout"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pools's"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A pool builder's example: an old pool with children nearby gets 'keep children and pets away from the water'."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Pool equipment checks and spring openings have a set price. A new pool is quoted after a site visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Drain clearing",
+    "Pool equipment check"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Tile and finish picks at Lee Pool Center are $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for tile and finish picks at $35"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Pilar sees the yard photos"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do tile picks? We're redoing the pool."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Pool consults, picks and sample tile at the design center. A consult by video or at home too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A pool consult could mean a pool design center or a builder's office."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "EC22871",
+    "EX-2087"
+   ],
+   [
+    "BS20981",
+    "EX-3150"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's yards together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books pool consults for three yards on one morning. Rosie finds times side by side with Pilar and Mina."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A pool consult and a tile pick work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your yard"
+   ],
+   [
+    "patch test",
+    "measure check"
+   ],
+   [
+    "skin-test result",
+    "measure check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the center during my pool consult?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The crack in my old pool got worse. Can I still come in?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the hot tub."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the hot tub"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Marina Way"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pools"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Pool Center LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pool Center"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Pools"
+   ],
+   [
+    "Lee Electric",
+    "Lee Spas"
+   ],
+   [
+    "1200 Main St",
+    "520 Lake Rd"
+   ],
+   [
+    "88 Elm St",
+    "12 Marina Way"
+   ],
+   [
+    "Riley",
+    "Pilar"
+   ],
+   [
+    "Avery",
+    "Mina"
+   ],
+   [
+    "Jordan",
+    "Leif"
+   ],
+   [
+    "Casey",
+    "Joss"
+   ],
+   [
+    "plumbing and electrical",
+    "pools and hot tubs"
+   ],
+   [
+    "Plumbing and electrical",
+    "Pools and hot tubs"
+   ],
+   [
+    "electrical",
+    "hot tub installs"
+   ],
+   [
+    "Electrical",
+    "Hot tub installs"
+   ],
+   [
+    "Panel upgrade",
+    "Hot tub install"
+   ],
+   [
+    "Plumber",
+    "Pool builder"
+   ],
+   [
+    "plumber",
+    "build lead"
+   ],
+   [
+    "plumbing",
+    "pool building"
+   ],
+   [
+    "Plumbing",
+    "Pool building"
+   ],
+   [
+    "barbershop",
+    "pool design center"
+   ],
+   [
+    "Barbershop",
+    "Pool design center"
+   ],
+   [
+    "barbers",
+    "pool planners"
+   ],
+   [
+    "barber",
+    "pool planner"
+   ],
+   [
+    "Barber",
+    "Pool planner"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "3D design package"
+   ],
+   [
+    "Signature cut and shave",
+    "3D design package"
+   ],
+   [
+    "signature cut",
+    "3D design package"
+   ],
+   [
+    "Groom's package",
+    "Renovation design package"
+   ],
+   [
+    "Color and cut",
+    "Custom pool layout"
+   ],
+   [
+    "color and cut",
+    "custom pool layout"
+   ],
+   [
+    "Color correction",
+    "Deck redesign"
+   ],
+   [
+    "color correction",
+    "deck redesign"
+   ],
+   [
+    "color quote",
+    "design quote"
+   ],
+   [
+    "Kids cut",
+    "Tile pick"
+   ],
+   [
+    "kids cut",
+    "tile pick"
+   ],
+   [
+    "Skin fade",
+    "Tile and finish picks"
+   ],
+   [
+    "skin fade",
+    "tile and finish picks"
+   ],
+   [
+    "Beard trim",
+    "Sample tile"
+   ],
+   [
+    "beard trim",
+    "sample tile"
+   ],
+   [
+    "Haircuts",
+    "Pool consults"
+   ],
+   [
+    "haircuts",
+    "pool consults"
+   ],
+   [
+    "Haircut",
+    "Pool consult"
+   ],
+   [
+    "haircut",
+    "pool consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the center"
+   ],
+   [
+    "water heaters",
+    "hot tub installs"
+   ],
+   [
+    "water heater",
+    "hot tub install"
+   ],
+   [
+    "shops",
+    "centers"
+   ],
+   [
+    "shop",
+    "center"
+   ],
+   [
+    "Shop",
+    "Center"
+   ],
+   [
+    "Elm St",
+    "Marina Way"
+   ],
+   [
+    "house calls",
+    "home pool consults"
+   ],
+   [
+    "house call",
+    "home pool consult"
+   ],
+   [
+    "House calls",
+    "Home pool consults"
+   ],
+   [
+    "House call",
+    "Home pool consult"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "a office",
+    "an office"
+   ],
+   [
+    "A excavation",
+    "An excavation"
+   ],
+   [
+    "a excavation",
+    "an excavation"
+   ],
+   [
+    "A edge",
+    "An edge"
+   ],
+   [
+    "a edge",
+    "an edge"
+   ]
+  ],
+  "B": [
+   [
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "When they book: nothing taken at the free site visit"
+   ],
+   [
+    "Alex is told before the yes: the {{fee}} service call is owed, even after a no to the price.",
+    "Alex is told before the yes: the site visit is free, even after a no to the price."
+   ],
+   [
+    "The {{fee}} counts toward the work's price.",
+    "The site visit is free, so nothing counts toward the price."
+   ],
+   [
+    "$89 service-call fee",
+    "$89 estimate visit fee"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither pool building nor the center takes jobs sent now."
+   ],
+   [
+    "The chairs",
+    "The sample tiles"
+   ],
+   [
+    "A chair, ready",
+    "A plaster sample"
+   ],
+   [
+    "JP031552",
+    "EX-4216"
+   ],
+   [
+    "JE30417",
+    "EX-5309"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Water pressure check",
+    "Pool check"
+   ],
+   [
+    "Alex books on the shop's booking page",
+    "Alex books on the company's booking page"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Tells Alex it's with the shop",
+    "Tells Alex it's with the company"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Pilar and Mina run the pool consults; Pilar also does home pool consults"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Pilar: pool planner, tile color, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Pilar: pool planner, tile color and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every center service, tile color and home pool consults"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the center, and home pool consults"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A tile color' or 'a plaster sample' fits a pool consult."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a builder: 'We'd like pool consults for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A pool consult's example: 'A big yard needs a quick measure check first. Had one with us in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which tile or finish do you like?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sample tile next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the surface"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a septic company first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "cracks a sprinkler head and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a sprinkler head"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "cracked a sprinkler head at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked sprinkler head"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the center and for home pool consults"
+   ],
+   [
+    "see your hair before pricing it",
+    "see photos of your yard before pricing it"
+   ],
+   [
+    "come with dry hair",
+    "bring photos of your yard and rough measurements"
+   ],
+   [
+    "It's my kitchen",
+    "It's my home"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, about two feet"
+   ],
+   [
+    "Leak repair · $245",
+    "Pool build · $68,000"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 pool equipment check needs none."
+   ],
+   [
+    "Kim L.'s yard drain needs nobody home.",
+    "Kim L.'s pool equipment check needs nobody home."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s pool, started Mon Dec 7, has a loose tile at the waterline."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT",
+    "Leif scrapes a hand and texts HURT"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "like a $620 repair",
+    "like a $68,000 pool"
+   ],
+   [
+    "$620",
+    "$68,000"
+   ],
+   [
+    "$640",
+    "$2,800"
+   ],
+   [
+    "Mon Nov 2 to Wed Nov 4 ·",
+    "Mon Dec 7 to Wed Dec 9 ·"
+   ],
+   [
+    "Mon Nov 9 to Wed Nov 11 ·",
+    "Mon Dec 14 to Wed Dec 16 ·"
+   ],
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 7am on the visit day. After that, or nobody home: no fee, since the site visit is free"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A pool build is quoted after the free site visit: only the visit was promised."
+   ],
+   [
+    "The $89 service call is included",
+    "The site visit was free"
+   ],
+   [
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "Today's site visit owes nothing, because it was free."
+   ],
+   [
+    "A late cancel or a no-show: only the policy's fee may be kept, up to the $89 service call. The rest is refunded.",
+    "A late cancel or a no-show at the free site visit costs nothing."
+   ],
+   [
+    "A late-cancel or nobody-home fee, up to the $89 service call, is charged only after Sam confirms it.",
+    "The site visit is free, so no late-cancel or nobody-home fee is charged."
+   ],
+   [
+    "No problem. Today's visit is the $89 service call. The repair price is good for 7 days.",
+    "No problem. Today's visit was the free site visit. The price is good for 30 days."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And what do you want built, and about how big is the yard?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Pools can come:"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about building a pool in my back yard. A text back is fine."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like digging without the permit the work needs."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I want a pool in my back yard' fits a pool build."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a spa? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the yard."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a pool's dig days and its gunite day."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please move patio furniture and anything else off the yard."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack in the pool shell this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an estimate visit, today,"
+   ],
+   [
+    "The service call is $89.",
+    "The estimate visit is $89."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Leif measures the yard and texts the quote with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 68000 excavation, steel and gunite 34000 tile, decking, equipment and plaster 34000"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Excavation, steel and gunite · $34,000"
+   ],
+   [
+    "Supply line · $80",
+    "Tile, decking, equipment and plaster · $34,000"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Leif measured the yard. Here's the written quote."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Excavation, steel and gunite · $34,000"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the excavation, steel and gunite only, $34,000. Leave the tile, decking, equipment and plaster."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Leif does the excavation, steel and gunite, $34,000. The $34,000 tile, decking, equipment and plaster stays good until Thu Oct 29."
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Leif's estimate visit at Harper J.'s is for a $68,000 pool build."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 68000 pool, 7 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Pools's quote for your pool build."
+   ],
+   [
+    "Repipe · $2,400",
+    "Pool build · $68,000"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$1,000 to start, $60,000 in six stage bills as each stage passes, $7,000 at the finish"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · pool build"
+   ],
+   [
+    "The $800 start payment",
+    "The $1,000 start payment"
+   ],
+   [
+    "Your $800 start payment",
+    "Your $1,000 start payment"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Say Harper J.'s $68,000 pool is billed in seven stages"
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 3 of 7 is done: the gunite shell passed its inspection."
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 3 of your pool"
+   ],
+   [
+    "$800",
+    "$18,000"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pool design centers set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A pool design center on Marina Way. Shapes, tile, plaster and 3D design, plus a monthly pool school."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pool design centers start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pool design centers often set."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds hot tub installs to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hot tub installs for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW hot tub installs"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I leave the sprinklers on before you come?"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a storm washout"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Leif's notes"
+   ],
+   [
+    "sewer camera report",
+    "pool safety inspection report"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$68,000 pool build"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like adding a spa Leif noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to add a spa, from Leif's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Add a spa"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a storm washout"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Our old pool is leaking into the yard. Can someone come tonight?"
+   ],
+   [
+    "LATE camera report",
+    "LATE pool safety inspection report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A pool build happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Pools doesn't do, like a roof repair."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Pools does pools and hot tubs, not roofing. Nothing was saved. You can look for a roofer near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pools's"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what you want built, the yard's size, when it should be done, and who owns the home."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, a downed power line, or someone in the water not breathing."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE cracked patio edge, sprinkler line by the fence"
+   ],
+   [
+    "Under the sink, before",
+    "Back yard, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Driveway, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A pool build is quoted after the estimate visit: only the $89 visit was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Leif finds an unmarked septic tank near the dig. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "an unmarked septic tank near the dig"
+   ],
+   [
+    "Mold behind the sink wall",
+    "An unmarked septic tank near the dig"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Leif found an unmarked septic tank near the dig and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the digging near the tank"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left mud on the street.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left mud on the street."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Leif look at my hot tub pad next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Leif's next times for a hot tub estimate."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the hot tub estimate for today"
+   ],
+   [
+    "$245",
+    "$7,000"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hay una piscina vieja en el patio y los niños juegan cerca."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? There is an old pool in the yard, and the children play near it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A pool builder's example: an old pool with children nearby gets 'keep children and pets away from the water'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep children and pets away from the water, and call 911 if anyone falls in."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantenga a los niños y a las mascotas lejos del agua. Si alguien cae al agua, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep children and pets away from the water. If anyone falls in, call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can you build the pool where my old shed stands?"
+   ],
+   [
+    "a dripping faucet",
+    "a pool light"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The pool light is a small repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone come for a site visit this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Estimate visit"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa estimate Thu 12-2 Joss"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a pool equipment check at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's pool equipment check?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I want a pool in my back yard. Can someone come for a site visit Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the old pool."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there water in the old pool now?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the old pool water is now spilling into the yard."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The old pool water is spilling into the yard now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep children and pets away from the water, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you open my pool every spring, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Pools has a yearly pool opening plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a pool opening every spring."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 7000 pool build"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE no swimming until the final inspection passes. Water care in 10 days."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A tile comes loose 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A tile came loose at the waterline."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your pool is under warranty"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Leif finds rock in the deep end of the dig."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 break the rock in the deep end"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Break the rock"
+   ],
+   [
+    "both shutoff valves",
+    "the rock"
+   ],
+   [
+    "the shutoff valves",
+    "the rock"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 rock quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 rock work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Leif also check the hot tub pad?"
+   ],
+   [
+    "Sewer camera report",
+    "Pool safety inspection report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the pool safety inspection report link"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Pool equipment checks and spring openings have a set price. A new pool is quoted after a site visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Pool equipment check"
+   ],
+   [
+    "Drain clearings",
+    "Pool equipment checks"
+   ],
+   [
+    "drain clearings",
+    "pool equipment checks"
+   ],
+   [
+    "Drain clearing",
+    "Pool equipment check"
+   ],
+   [
+    "drain clearing",
+    "pool equipment check"
+   ],
+   [
+    "Kitchen drain",
+    "Yard"
+   ],
+   [
+    "kitchen drain",
+    "yard"
+   ],
+   [
+    "Water heater flush",
+    "Spring pool opening"
+   ],
+   [
+    "water heater flush",
+    "spring pool opening"
+   ],
+   [
+    "drain",
+    "pool check"
+   ],
+   [
+    "leehomeservices.com",
+    "leepools.com"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Pool consults, picks and sample tile at the design center. A consult by video or at home too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A pool consult could mean a pool design center or a builder's office."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "EC22871",
+    "EX-2087"
+   ],
+   [
+    "BS20981",
+    "EX-3150"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The center is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Pool Center can do your pool consult at the center for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Pools LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pools"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pool Center"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Pools"
+   ],
+   [
+    "Lee Electric",
+    "Lee Spas"
+   ],
+   [
+    "1200 Main St",
+    "520 Lake Rd"
+   ],
+   [
+    "88 Elm St",
+    "12 Marina Way"
+   ],
+   [
+    "42 Oak St",
+    "9 Shoreline Dr"
+   ],
+   [
+    "Riley",
+    "Pilar"
+   ],
+   [
+    "Avery",
+    "Mina"
+   ],
+   [
+    "Jordan",
+    "Leif"
+   ],
+   [
+    "Casey",
+    "Joss"
+   ],
+   [
+    "plumbing and electrical",
+    "pools and hot tubs"
+   ],
+   [
+    "Plumbing and electrical",
+    "Pools and hot tubs"
+   ],
+   [
+    "electrical",
+    "hot tub installs"
+   ],
+   [
+    "Electrical",
+    "Hot tub installs"
+   ],
+   [
+    "Panel upgrade",
+    "Hot tub install"
+   ],
+   [
+    "Plumber",
+    "Pool builder"
+   ],
+   [
+    "plumber",
+    "build lead"
+   ],
+   [
+    "plumbing",
+    "pool building"
+   ],
+   [
+    "Plumbing",
+    "Pool building"
+   ],
+   [
+    "barbershop",
+    "pool design center"
+   ],
+   [
+    "Barbershop",
+    "Pool design center"
+   ],
+   [
+    "barbers",
+    "pool planners"
+   ],
+   [
+    "barber",
+    "pool planner"
+   ],
+   [
+    "Barber",
+    "Pool planner"
+   ],
+   [
+    "haircut",
+    "pool consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the center"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "service call",
+    "estimate visit"
+   ],
+   [
+    "Service call",
+    "Estimate visit"
+   ],
+   [
+    "Water heater replacement",
+    "Hot tub install"
+   ],
+   [
+    "water heater replacement",
+    "hot tub install"
+   ],
+   [
+    "Leak repair",
+    "Pool build"
+   ],
+   [
+    "leak repair",
+    "pool build"
+   ],
+   [
+    "Sewer camera inspection",
+    "Pool safety inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "pool safety inspection"
+   ],
+   [
+    "water heaters",
+    "hot tub installs"
+   ],
+   [
+    "Water heater",
+    "Hot tub install"
+   ],
+   [
+    "water heater",
+    "hot tub install"
+   ],
+   [
+    "shop",
+    "center"
+   ],
+   [
+    "Shop",
+    "Center"
+   ],
+   [
+    "Elm St",
+    "Marina Way"
+   ],
+   [
+    "house calls",
+    "home pool consults"
+   ],
+   [
+    "house call",
+    "home pool consult"
+   ],
+   [
+    "House calls",
+    "Home pool consults"
+   ],
+   [
+    "House call",
+    "Home pool consult"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "a office",
+    "an office"
+   ],
+   [
+    "A excavation",
+    "An excavation"
+   ],
+   [
+    "a excavation",
+    "an excavation"
+   ],
+   [
+    "A edge",
+    "An edge"
+   ],
+   [
+    "a edge",
+    "an edge"
+   ]
+  ]
+ },
+ "keep": [
+  "color",
+  "estimate visit",
+  "Estimate visit",
+  "leak",
+  "valve",
+  "roofing",
+  "Roofing"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Pool Center, Sam's pool design center, for a pool consult with Pilar on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Pools to build a pool at 9 Shoreline Dr. Leif comes for the site visit Thu Oct 22 between 8 and 10am, sends a written proposal, and runs the build once the contract is signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|none",
+   "combos": [
+    "list|none|none",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|none|none": "The main story: a free pool consult at the design center, or a seat in the free pool school class. Nothing is taken and nothing is owed.",
+    "list|full|none": "The 3D design package, $500, paid in full when booking and credited to the build if the contract is signed within 60 days."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$0",
+     "name": "Pool consult"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Pool consult"
+    },
+    "list|full|*": {
+     "price": "$500",
+     "paid": "$500",
+     "fee": "$0",
+     "name": "3D design package"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "The main story: a free site visit; a $68,000 pool in a signed contract; a $1,000 deposit after the cancel window; a bill for each stage when it is done and inspected, the last $7,000 after the final inspection.",
+    "visit|none|own": "The same pool paid by the owners' lender: the stage draws go the business's own way, and Rosie sends no bills.",
+    "photos|deposit|bill": "A hot tub install priced from photos at $2,800; the written estimate signed, a 25% deposit of $700, the rest billed after start-up."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "free",
+     "name": "Pool build"
+    },
+    "visit|*|*": {
+     "fee": "free",
+     "price": "$7,000",
+     "name": "Pool build"
+    },
+    "photos|*|*": {
+     "price": "$2,800",
+     "name": "Hot tub install"
+    },
+    "photos|deposit|*": {
+     "deposit": "$700",
+     "rest": "$2,100",
+     "name": "Hot tub install"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "S1-82"
+  ],
+  "B": [
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "S1-82"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A5-16",
+    "more": [
+     "Sam's setting: a 3D design package is credited to the build if the contract with Lee Pools is signed within 60 days."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the estimate visit at home",
+      "does": "Pilar saves Alex's picks for the estimate. If Alex wants the pool priced, Pilar books Leif's estimate visit at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Pools, Sam's other company. It runs in the other flow.",
+       "The picks and photos go with it, so Leif's quote uses them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: estimate visit at home for the pool. Picks saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Pilar saved your picks. Want Lee Pools to come measure for a quote?",
+        {
+         "buttons": [
+          "Book the estimate",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Pool work is licensed or registered as a contractor where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The company and its center both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and pool planners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Design center planners and the hot tub subcontractor hold their own licenses where the state's form asks; the company holds the contractor license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "The work is booked ahead; nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The center books a pool planner's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The center books a pool planner's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A consult has no form to sign first; the job's contract comes after the quote, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the center."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "The center requires nothing brought: photos and measurements are optional (pf.questions, pf.first_steps studio_prep), and a consult has no form, ID or permit to check."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the center."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most pool design centers set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your center, free or paid at the center, your own way",
+         "When they book: nothing taken, except a package paid in full",
+         "Free on your board: nothing taken, nothing after"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Pool consult",
+          "Free"
+         ],
+         [
+          "3D design package",
+          "$500"
+         ],
+         [
+          "Pool school class",
+          "Free"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:none+after:none": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pool design centers set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your center, free or paid at the center, your own way",
+           "When they book: nothing taken, except a package paid in full",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Pool consult",
+            "Free"
+           ],
+           [
+            "3D design package",
+            "$500"
+           ],
+           [
+            "Pool school class",
+            "Free"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "B paid when they book"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Every service stays as on the card, and the customer sees the price first.",
+        {
+         "card": {
+          "title": "As set",
+          "lines": [
+           "Pool consult · Free · Nothing taken",
+           "3D design package · $500 · Paid in full when booked",
+           "Pool school class · Free · Nothing taken"
+          ]
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addSay": [],
+      "more": [
+       "One card lists each service as read, with its price, where, what's taken when they book, and how it's paid after.",
+       "Only the choices the plug-in's money rules allow are offered.",
+       "Where money paid before can't go through Rosie, no deposit or full price is offered.",
+       "Where: at the business, at the customer's place, both, a listed meeting spot or video, as S1-43 allows.",
+       "Sam sets the places for each service on this card.",
+       "A meeting spot says where it ends.",
+       "A service in two places has two prices and two money rows. The customer sees both.",
+       "Before, one way per service: nothing, a card saved for fees, a deposit, or the full price.",
+       "One late-cancel and no-show fee per booking: with several services, the largest of their fees.",
+       "When money was paid now, the fee is never more than what was paid now.",
+       "The full price needs a price set before the visit. A deposit is never more than the price known then.",
+       "After: Rosie sends the bill, the saved card is charged at DONE, it's paid at the counter, or the business's own way.",
+       "A deposit is taken at booking. The rest is paid at the visit, or on the bill after.",
+       "Nothing is charged later on its own.",
+       "A free service: nothing taken, nothing after.",
+       "'No money through Rosie' is one answer here.",
+       "Then every service takes nothing when they book, and is paid the business's own way after. Stripe isn't asked (S1-27).",
+       "A plan-billed service reads back: 'Your share is billed after the plan pays.' The saved card at DONE isn't offered for it.",
+       "A deposit or fee cap the plug-in knows is shown as a suggested rule (S1-21). It's the owner's own rule.",
+       "One read-back shows what the reply changed; the rest stays as the card showed. Nothing is read back twice.",
+       "These are the service's settings. What each booking takes is set when it's booked, and can be less.",
+       "Never: offer a money choice the rules will take back.",
+       "Safe default: the plug-in's starting answer, saved, with one reminder.",
+       "Nothing goes live until the money card is confirmed."
+      ],
+      "addMore": [
+       "On this path, the free pool consult takes nothing before and nothing after."
+      ]
+     },
+     "after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pool design centers set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your center, free or paid at the center, your own way",
+           "When they book: nothing taken, except a package paid in full",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Pool consult",
+            "Free"
+           ],
+           [
+            "3D design package",
+            "$500"
+           ],
+           [
+            "Pool school class",
+            "Free"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "B paid when they book"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Every service stays as on the card, and the customer sees the price first.",
+        {
+         "card": {
+          "title": "As set",
+          "lines": [
+           "Pool consult · Free · Nothing taken",
+           "3D design package · $500 · Paid in full when booked",
+           "Pool school class · Free · Nothing taken"
+          ]
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addSay": []
+     },
+     "before:deposit+after:counter": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pool design centers set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your center, free or paid at the center, your own way",
+           "When they book: nothing taken, except a package paid in full",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Pool consult",
+            "Free"
+           ],
+           [
+            "3D design package",
+            "$500"
+           ],
+           [
+            "Pool school class",
+            "Free"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "B paid when they book"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Every service stays as on the card, and the customer sees the price first.",
+        {
+         "card": {
+          "title": "As set",
+          "lines": [
+           "Pool consult · Free · Nothing taken",
+           "3D design package · $500 · Paid in full when booked",
+           "Pool school class · Free · Nothing taken"
+          ]
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addSay": [],
+      "more": [
+       "One card lists each service as read, with its price, where, what's taken when they book, and how it's paid after.",
+       "Only the choices the plug-in's money rules allow are offered.",
+       "Where money paid before can't go through Rosie, no deposit or full price is offered.",
+       "Where: at the business, at the customer's place, both, a listed meeting spot or video, as S1-43 allows.",
+       "Sam sets the places for each service on this card.",
+       "A meeting spot says where it ends.",
+       "A service in two places has two prices and two money rows. The customer sees both.",
+       "Before, one way per service: nothing, a card saved for fees, a deposit, or the full price.",
+       "One late-cancel and no-show fee per booking: with several services, the largest of their fees.",
+       "When money was paid now, the fee is never more than what was paid now.",
+       "The full price needs a price set before the visit. A deposit is never more than the price known then.",
+       "After: Rosie sends the bill, the saved card is charged at DONE, it's paid at the counter, or the business's own way.",
+       "A deposit is taken at booking. The rest is paid at the visit, or on the bill after.",
+       "Nothing is charged later on its own.",
+       "A free service: nothing taken, nothing after.",
+       "'No money through Rosie' is one answer here.",
+       "Then every service takes nothing when they book, and is paid the business's own way after. Stripe isn't asked (S1-27).",
+       "A plan-billed service reads back: 'Your share is billed after the plan pays.' The saved card at DONE isn't offered for it.",
+       "A deposit or fee cap the plug-in knows is shown as a suggested rule (S1-21). It's the owner's own rule.",
+       "One read-back shows what the reply changed; the rest stays as the card showed. Nothing is read back twice.",
+       "These are the service's settings. What each booking takes is set when it's booked, and can be less.",
+       "Never: offer a money choice the rules will take back.",
+       "Safe default: the plug-in's starting answer, saved, with one reminder.",
+       "Nothing goes live until the money card is confirmed."
+      ],
+      "addMore": [
+       "On this path, a second service is added to the booking, and each is paid its own way."
+      ]
+     },
+     "before:full": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Now money. When customers book, do you take anything? Each service starts the way most pool design centers set it. Send only what's different, by letter.",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your center, free or paid at the center, your own way",
+           "When they book: nothing taken, except a package paid in full",
+           "Free on your board: nothing taken, nothing after"
+          ]
+         },
+         "list": {
+          "head": [
+           "Service",
+           "Price"
+          ],
+          "rows": [
+           [
+            "Pool consult",
+            "Free"
+           ],
+           [
+            "3D design package",
+            "$500"
+           ],
+           [
+            "Pool school class",
+            "Free"
+           ]
+          ]
+         },
+         "buttons": [
+          "Right for all of them",
+          "No money through us"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "B paid when they book"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Every service stays as on the card, and the customer sees the price first.",
+        {
+         "card": {
+          "title": "As set",
+          "lines": [
+           "Pool consult · Free · Nothing taken",
+           "3D design package · $500 · Paid in full when booked",
+           "Pool school class · Free · Nothing taken"
+          ]
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addSay": []
+     }
+    }
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A job this size never starts at the estimate visit: Alex signs a written contract first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A quote is signed whole, as one contract. A smaller job is a new written quote from Leif, after the call Alex can ask for."
+   },
+   {
+    "op": "after",
+    "at": "B8-63",
+    "steps": [
+     {
+      "id": "B8-x06",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Wed Oct 28, 8:00am",
+      "title": "Association OK, permit and locate go first",
+      "q": "Is it all ready by the start?",
+      "does": "The window ends with no cancel. The owners ask their association for its OK. Sam files the permit, and the crew asks for the utility locate.",
+      "more": [
+       "The license holder always pulls the permit, never Alex.",
+       "Sam gets a to-do with each due date, and replies when it's in.",
+       "The business sends the plans to the association; the OK is the owners' to ask for.",
+       "The locate marks (paint and flags) must be on the ground before anyone digs. Alex leaves them in place.",
+       "A temporary safety fence goes up before the first dig day."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s pool: send the plans for the association's OK, file the permit and request the utility locate. All are due before the first dig day, Mon Dec 7.",
+        {
+         "buttons": [
+          "All are in",
+          "Not in yet"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner"
+      ],
+      "branches": [
+       {
+        "label": "1 Ready by the start",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 The permit is late",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "7.16",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Thu Dec 3, 10:00am",
+          "title": "Moves the start, with no fee",
+          "does": "The permit is still in review on Thu Dec 3. The business caused the move, so it's free. Alex picks a new start date.",
+          "more": [
+           "Only dates after the permit's new expected date are offered.",
+           "The stage dates move with the start."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your permit is still in review, so Lee Pools needs to move your start date. There's no fee.",
+            {
+             "times": [
+              "Mon Dec 14 · start · Leif",
+              "Mon Dec 21 · start · Leif"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "A marked line is in the way",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x08",
+          "line": [
+           "7.16",
+           "8.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Fri Dec 4, 10:00am",
+          "title": "Re-plans the dig around the line",
+          "does": "The locate marks a buried line where the shell goes. The crew moves the dig layout around it, and Alex's start moves a day or two.",
+          "more": [
+           "The crew never digs over a marked line.",
+           "If the new layout changes the price, it's a change order first.",
+           "Alex gets the new start date once the plan is set."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The utility locate marked a buried line near the dig. Leif will plan the dig around it, and your start may move a day or two.",
+            {
+             "card": {
+              "title": "Utility locate · the dig",
+              "lines": [
+               "A buried line is marked",
+               "The crew plans around it",
+               "Your start date may move"
+              ]
+             }
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Tue Dec 8, 11:30am",
+      "title": "Leif finds rock: a change order first",
+      "q": "Does Alex sign the change order?",
+      "does": "In the deep end of the dig, Leif hits rock. The crew stops that part. The contract can't change by text alone, so Alex and Sam sign a change order before more digging.",
+      "more": [
+       "It's over Sam's $500, so Sam OKs the price first.",
+       "It gives the price and any days added. It goes on the next stage payment.",
+       "It's signed on the secure page, like the contract.",
+       "Other work goes on while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 4500 break the rock in the deep end. Adds 2 days",
+        {
+         "photos": [
+          "Rock in the deep end of the dig"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Leif hit rock in the deep end of the dig. It must be broken out before the digging goes on.",
+        {
+         "card": {
+          "title": "Change order 1 · $4,500",
+          "lines": [
+           "Break the rock in the deep end",
+           "Adds 2 work days",
+           "Added to the next stage bill"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/r4c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Call me first"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Call first, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x12",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "title": "Asks Sam to call Alex",
+          "does": "Alex wants a call first, or doesn't answer in 4 hours. Sam gets a to-do to call. Nothing is done about the rock until the change order is signed.",
+          "more": [
+           "Other work goes on while it waits.",
+           "If Alex says no, Sam and Alex decide what's next. Rosie moves no money on its own."
+          ],
+          "say": [
+           [
+            "san",
+            "owner",
+            "Alex M. wants a call about change order 1: $4,500 for breaking the rock. Please call today.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me at 4pm"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Contractor work is licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The company and its center both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and pool planners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Design center planners and the hot tub subcontractor hold their own licenses where the state's form asks; the company holds the contractor license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "The work is booked ahead; nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An estimate visit has no form to sign first; the contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Estimate visits and work days are booked in 2-hour arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "This work books visits and work days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "This work books a crew lead's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking lets the crew in (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A job is rated, like any job."
+   }
+  ]
+ },
+ "notes": "Started from contractor (pattern: project; refitted that morning, not edited) and merged with the held-back test-drive plug-in (work/testdrive/pool-builder.md, work/gaps/pool-builder.json): its services, prices, questions, stop and go-on words, first steps, rules and edges are kept: an estimate visit, a written quote, then a contract and stage bills. Facts: documents, stages, photos, extrawork, firststeps, multiday, banktransfer, video, classes; switch cancelright in flow B only (work sold at the customer's place); arrive A a set start, B a 2-hour window; cutoff 24 hours before.\nFlow B main path visit|none|bill: the site visit is FREE (movers' way: fee 'free' on visit|*|*, and the master's $89 sentences re-worded by pairs); Leif's written proposal; the contract signed by every owner; $1,000 to start, then stage bills, the last $7,000 after the final inspection (a $68,000 pool). B money paths: visit|none|bill, visit|none|own (a lender-paid build), photos|deposit|bill (a hot tub install, $2,800, 25% deposit $700). List paths are left out: the master's booking cards name one list service (MASTER).\nFlow A is Sam's second company, Lee Pool Center, a pool design center (the master's Lee's Barbershop). Main path list|none|none: a FREE pool consult with Pilar (nothing taken, nothing owed); the other path list|full|none is the 3D design package, $500, paid in full and credited to the build if the contract is signed within 60 days. The free pool school class (16 seats, monthly) is a seat in a session (S1-82 kept both ways, A4-66's seat branch on). The sign-up money card S1-13 has a words op with the center's real rows, and pairs re-word S1-14, S1-21 and S1-27 so no $35 consult, $55 session or $20 fee is shown.\nFlow A can be a video or phone pool consult (fact `video`, from the test-drive plug-in: design consults by video for a first talk; no build work online).\nOwn steps: A8-x01 (the pool consult offers the free site visit at home), B8-x06 to B8-x08 (the owners' association's OK, the permit and the utility locate go first; a late permit moves the start with no fee; a marked line near the dig means a new dig layout) and B8-x11 / B8-x12 (rock hit in the deep end of the dig: a change order first, signed by both).\nA pool is built in stages over 8 to 12 weeks, each stage billed when it is done and its inspection has passed, and the next stage waits for the last stage bill (master B9-21; pf.money stage_unpaid). The example contract is $68,000: a $1,000 deposit after the cancel window, then seven stage bills (excavation, steel and plumbing, gunite, tile and coping, decking, equipment and electrical, plaster and start-up; the example shows stage 3, the gunite shell, at $18,000, and the last $7,000 after the final inspection); in the rename text the quote reads '$1,000 to start, $60,000 in six stage bills as each stage passes, $7,000 at the finish'. Nobody swims until the final inspection passes and the permanent barrier is in. Stop words: a child or anyone in the water and not breathing, a drowning, an electric shock near water; a gas smell, a downed or sparking power line in the yard. Children and pets near an open dig or an old pool are a go-on ('keep them away from the water').\nDates run forward: cancel window ends Tue Oct 27; the association, permit and locate to-do Wed Oct 28 'due before the first dig day, Mon Dec 7'; a late permit Thu Dec 3 with new starts Mon Dec 14 / Mon Dec 21; the locate re-plan Fri Dec 4; rock found Tue Dec 8 (work days Mon Dec 7 to Wed Dec 9, or Mon Dec 14 to Wed Dec 16).\nBooking choices: B timing settime, times window; A times setstart. Nothing is sent now (S2-30 'Yes' branch off, no `sentnow` fact), so nobody is on call. After turning it off, the joined text was searched for the opposite claim: S2-30's 'Neither pool building nor the center takes jobs sent now' and S1-21's 'Jobs sent now: None: every job is booked ahead' are re-worded; the other 'sent now' lines are the master's general rules for work that does send.\nPlug-in splits kept whole (splitsKept): A7-15 and S1-82; B5-34, B7-55, B8-58, B8-69 and S1-82 (as the parent).\nSelf-checks: (1) the opposite-claim search above; (2) every example message was searched for this work's stop words (they appear only in the danger-words line and the plug-in); (3) B3-11 and B3-18 read as one Spanish conversation: the caller describes a go-on case, is asked about injury and gas, answers no, and gets the safety steps.\nNames: Leif and Joss are the crew leads (the master's Jordan and Casey), Pilar and Mina the pool planners (Riley and Avery). None of them is a master customer's name. Addresses: 520 Lake Rd (the company), 12 Marina Way (the center), 9 Shoreline Dr (Alex). License numbers use an obviously fake format (EX-1042, EX-2087, EX-3150, EX-4216, EX-5309), also in place of the master's S2-21 person licenses.\nEvery state rule is a switch from the state's form: the license and its job-size limit, the written contract and its parts, the deposit cap, money kept apart, the cancel window, permits, lien waivers, what must be shown. No state, city or number from one.\nkeep: color, estimate visit, Estimate visit, leak, valve, roofing, Roofing.\nRename: the contractor's pairs re-worded for this work (master sentences first, then phrases, then single words), plus the Oct 27 fixes found in the pilot's check (S2-30 and S1-21 sent-now lines, the barbershop photo labels, 'service-call fee', real-looking person licenses, 'the shop' in flow B titles, lower-case service names at line starts).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Barbering workshop",
+    "Adding a beard trim, +$20? Say so.",
+    "a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "$89 service-call fee",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "JP031552",
+    "JE30417",
+    "Groom's package · ",
+    "the Groom's package",
+    "The Groom's package",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "'A trim' or 'a fade' fits a haircut.",
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "How would you like it on top?",
+    "like the cut in the mirror",
+    "like a mark on an item or the skin",
+    "like a skin reading",
+    "at the shop and for house calls",
+    "see your hair before pricing it",
+    "come with dry hair",
+    "like a 15-minute style consult",
+    "When they book: a card saved, for a $20 fee you OK",
+    "House calls: allowed where you are, for those cleared",
+    "To save cards for the $20 fee, connect Stripe",
+    "Haircut at home · $75",
+    "So is a house call, $75. Nothing more is owed after.",
+    "Late or no-show: the $20 fee, if you confirm",
+    "The rest is refunded",
+    "15-minute style consult",
+    "Style consult · 15 min",
+    "Style consult",
+    "style consult",
+    "$55",
+    "two skin fades on",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "a Kids cut (12 and under) is $25",
+    "Quiero un corte el sábado.",
+    "Gloss to finish",
+    "gloss",
+    "takes jobs sent now, like a burst pipe",
+    "A repair shop, a tailor or a groomer does.",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Drain clearing",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "water heaters",
+    "water heater",
+    "shops",
+    "shop",
+    "Shop",
+    "Elm St",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call"
+   ],
+   "B": [
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "Alex is told before the yes: the {{fee}} service call is owed, even after a no to the price.",
+    "The {{fee}} counts toward the work's price.",
+    "$89 service-call fee",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "JP031552",
+    "JE30417",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Water pressure check",
+    "Alex books on the shop's booking page",
+    "Gives the shop's own line",
+    "Tells Alex it's with the shop",
+    "shop-added",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "At the shop, and house calls",
+    "Call a mold cleanup company first",
+    "cracks the cabinet floor and texts a photo",
+    "DAMAGE cracked the cabinet floor",
+    "cracked the cabinet floor at",
+    "Cracked cabinet floor",
+    "at the shop and for house calls",
+    "It's my kitchen",
+    "Yes, it won't drain",
+    "Leak repair · $245",
+    "The $179 drain needs none.",
+    "Kim L.'s yard drain needs nobody home.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Jordan cuts a hand and texts HURT",
+    "HURT cut my hand, need to stop",
+    "like a $620 repair",
+    "$620",
+    "$640",
+    "Mon Nov 2 to Wed Nov 4 ·",
+    "Mon Nov 9 to Wed Nov 11 ·",
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "The $89 service call is included",
+    "Today's estimate visit owes only what was promised for it, like the $89 service call.",
+    "A late cancel or a no-show: only the policy's fee may be kept, up to the $89 service call. The rest is refunded.",
+    "A late-cancel or nobody-home fee, up to the $89 service call, is charged only after Sam confirms it.",
+    "No problem. Today's visit is the $89 service call. The repair price is good for 7 days.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Like tapping a neighbor's water line without asking.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "The service call is $89.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Right to cancel · repipe",
+    "The $800 start payment",
+    "Your $800 start payment",
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of your repipe",
+    "$800",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "$245",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "drain",
+    "leehomeservices.com",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "shop",
+    "Shop",
+    "Elm St",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call"
+   ]
+  },
+  "A": {
+   "A5-16": "8045a6b80c",
+   "A8-44": "4410a4860c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "S1-13": "eca22651fd"
+  },
+  "B": {
+   "B8-93": "c1406fd6bc",
+   "B8-63": "c0d957be82",
+   "B8-37": "3ce85cf051",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

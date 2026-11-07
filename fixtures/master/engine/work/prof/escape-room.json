@@ -1,0 +1,3751 @@
+{
+ "id": "escape-room",
+ "name": "Escape room",
+ "style": "Table",
+ "pattern": "table",
+ "from": "gym",
+ "cast": {
+  "A": {
+   "staff": "Dana and the front desk",
+   "cust": "Alex M. (a first-timer) · other players and guests"
+  },
+  "B": {
+   "staff": "Marcus and Priya (game masters who go out)",
+   "cust": "Alex M. (books for the office) · coworkers",
+   "other": "Others (an office, a school, a host)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dana"
+  },
+  "B": {
+   "staff": "Marcus"
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "none for the venue itself: the business registration and the owner's ID are on file; nothing is looked up",
+   "rooms": "where the local fire code requires it: each room's occupancy or fire inspection papers, kept with their end dates as the room's papers (S1-81); a room past its date isn't offered",
+   "staff": "no state license for game masters; the business's own training",
+   "insurance": "the business's own liability cover",
+   "job limits": "each room's most players (the owner's own, within its papers)"
+  },
+  "pf.services": {
+   "A": [
+    {
+     "name": "Private escape room",
+     "price": "list, the example venue's $32 a player, 4 players at least ($128)",
+     "length": "60-minute game, plus a 10-minute briefing; 15 minutes to reset the room",
+     "booked as": "a space: one room for one group, 2 to 8 players; a game master must be free to run it",
+     "place": "at the venue",
+     "money": "paid in full when booked"
+    },
+    {
+     "name": "Team building",
+     "price": "list, $35 a player, 10 to 30 players across 2 to 4 rooms at once, with a 20-minute debrief",
+     "booked as": "several rooms at the same start, for one group",
+     "place": "at the venue",
+     "money": "half as a deposit when booked; the rest on the bill Rosie sends after"
+    },
+    {
+     "name": "Birthday party",
+     "price": "list, $260 for up to 8 players: a room plus 45 minutes in the party room",
+     "booked as": "a room and the party room",
+     "place": "at the venue",
+     "money": "a $100 deposit when booked; the $160 rest at the counter on the day"
+    }
+   ],
+   "B": [
+    {
+     "name": "Mobile escape game",
+     "price": "list, $450 for up to 12 players; $25 each extra, up to 30",
+     "length": "90 minutes, plus 30 minutes to set up",
+     "booked as": "a game master and the game kit, at a set start",
+     "place": "at the customer's place: an office, a school, a home or a hall, with a room and tables for the teams",
+     "money": "a $150 deposit when booked; the $300 rest on the bill Rosie sends after"
+    },
+    {
+     "name": "Home party escape game",
+     "price": "list, $300 for up to 8 players",
+     "length": "60 minutes",
+     "booked as": "a game master and the game kit",
+     "place": "at the customer's home",
+     "money": "paid in full when booked"
+    }
+   ]
+  },
+  "pf.questions": {
+   "before times": [
+    "How many players? (sets the room size, the price and how many rooms)",
+    "Is anyone under 14? (an adult must play in the room with them)",
+    "Which room or theme, if they have one in mind"
+   ],
+   "after a time": [
+    "The team's name for the leaderboard (optional)",
+    "Anything the game master should know? (optional)"
+   ],
+   "secure page only": [
+    "each player's waiver: a health condition the player chooses to tell (seizures with flashing lights, trouble with stairs or crawling, pregnancy), an emergency contact",
+    "a child's name, and the adult playing with them"
+   ],
+   "who may book": "an adult books for the group; a parent or guardian books for children; players under 14 play only with an adult in the room; 14 to 17 may play without an adult only with a parent's signed waiver; a teen never books alone (a parent books)"
+  },
+  "pf.safety": {
+   "stop words": [
+    "someone is hurt, can't breathe, chest pain, a seizure now: the 911 safety message, no booking",
+    "drunk or high players: not today (turned away at the door)"
+   ],
+   "tell the customer": "The door is never locked: anyone can walk out at any time. Some rooms are dark or have flashing lights, stairs or crawling: the room page says which. A game master watches every room on camera for safety and hints.",
+   "staff stops": "a player in panic or unwell: the game master opens the door and stops the game; a fire alarm: everyone out at once",
+   "booking continues": "yes, after the safety steps, for anything but an emergency",
+   "B": "the game is set up indoors; nothing hazardous is brought"
+  },
+  "pf.first_steps": [
+   {
+    "what": "Player waiver",
+    "when": "signed on the secure page before the game, or at the door on the day; on file for 12 months",
+    "who": "each player for themselves on their own link; a parent or guardian for each child",
+    "late": "not signed by the start: signs at the door, or doesn't play"
+   }
+  ],
+  "pf.visit": {
+   "check-in": "the code at the counter, 15 minutes before the start, for the briefing; the group has one code; names ticked as each player's waiver is checked",
+   "phones": "players' phones go in a locker during the game (the business's own rule)",
+   "changes at the visit": "an extra player at the door at $32, if the room has space, OK'd by the person who booked; nothing else is sold in the room",
+   "done": "the game master marks DONE when the game ends; the group photo is shared only with the players' yes",
+   "late": "the game ends at its set end; more than 15 minutes late, the owner may cancel the game (the owner's rule)",
+   "children": "a child plays only with an adult from their group in the room; no child is left at the venue"
+  },
+  "pf.money": {
+   "ways": "private rooms: paid in full when booked; team building: half as a deposit, rest on the bill; parties: $100 deposit, rest at the counter; B mobile game: $150 deposit, rest on the bill; B home party: paid in full",
+   "price": "per player, with a minimum per room; fewer players on the day pay the same (the owner's rule); an extra player at the door pays $32",
+   "fees": "the owner's own: free cancel or move until 24 hours before; after that or a no-show, the price paid or the deposit is kept, asked of the owner each time",
+   "two dollars": "yes, $2 a booking (one per booking, however many players)",
+   "tips": "no tip line",
+   "discounts": "the business's own discount codes on the booking page; gift cards stay the business's own",
+   "reserved time": "a room's game is reserved time, charged in full: a group that stops early or leaves early gets nothing back for time not used (S13-55; any refund is the owner's call); a game the venue stops (a broken prop, a fire alarm) is the venue's side for the part not given"
+  },
+  "pf.messages": {
+   "never in a text": "a player's health condition, a seizure warning answer, a child's name or age, waiver answers, anything seen on the room cameras",
+   "languages": "English and Spanish",
+   "minors": "a child's details stay on the secure page; texts go to the adult who booked"
+  },
+  "pf.staff": {
+   "skills": "game master (trained on each room), host for parties and team events, the B travelling game master",
+   "ratios": "one game master watches up to 2 rooms at once; a team event has one host per 3 rooms",
+   "stand-ins": "any game master trained on the room may run it; nobody is named",
+   "who OKs": "the owner OKs prices, refunds and fees"
+  },
+  "pf.rules": {
+   "switches": [
+    "minimum ages: the owner's own",
+    "a waiver before play",
+    "where the local fire code requires it: each room's occupancy or fire inspection on file",
+    "the most players per room: the owner's own, within its papers"
+   ],
+   "cancel": "the owner's own rule; suggested: free until 24 hours before"
+  },
+  "pf.edges": {
+   "fewer players": "the price stays as booked unless the owner says otherwise",
+   "late": "the game ends at its set end; over 15 minutes late, the owner decides",
+   "panic or illness": "the door opens at once; the game master helps; the owner is told; nothing about it in texts",
+   "capacity": "each room is one group at a time; Rosie books only the room times the owner gives it, or reads the venue's own connected booking system"
+  },
+  "pf.facts": [
+   "groups",
+   "spaces",
+   "forms",
+   "children",
+   "discounts",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "2 days before"
+   }
+  }
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|deposit|bill",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|full|none": "A private room for 4 players: $128, paid in full when booked.",
+    "list|deposit|bill": "Team building for 16 players in 2 rooms: $560. A $280 deposit now; the rest on the bill after.",
+    "list|deposit|counter": "A birthday party for 8: $260. A $100 deposit now, and $160 at the counter on the day."
+   },
+   "amounts": {
+    "*": {
+     "name": "Private escape room"
+    },
+    "list|full|*": {
+     "price": "$128",
+     "paid": "$128",
+     "fee": "$128",
+     "name": "Private escape room"
+    },
+    "list|deposit|bill": {
+     "price": "$560",
+     "deposit": "$280",
+     "rest": "$280",
+     "fee": "$280",
+     "name": "Team building"
+    },
+    "list|deposit|counter": {
+     "price": "$260",
+     "deposit": "$100",
+     "rest": "$160",
+     "fee": "$100",
+     "name": "Birthday party"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Second room, same time",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$128",
+      "fee": "$128"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Second room, same time",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$128",
+      "paid": "$128",
+      "fee": "$128"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|bill",
+   "combos": [
+    "list|deposit|bill",
+    "list|full|none"
+   ],
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|deposit|bill": "The mobile escape game at an office, 12 players: $450. A $150 deposit now; the $300 rest on the bill after.",
+    "list|full|none": "A home party escape game for 8: $300, paid in full when booked."
+   },
+   "amounts": {
+    "*": {
+     "name": "Mobile escape game"
+    },
+    "list|deposit|*": {
+     "price": "$450",
+     "deposit": "$150",
+     "rest": "$300",
+     "fee": "$150",
+     "name": "Mobile escape game"
+    },
+    "list|full|*": {
+     "price": "$300",
+     "paid": "$300",
+     "fee": "$300",
+     "name": "Home party escape game"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra 30 minutes of play",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$100",
+      "fee": "$150"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Home party escape game",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$300",
+      "paid": "$300",
+      "fee": "$300"
+     }
+    }
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "the price of Owen's plan on Mon Oct 26: $40 a visit",
+    "the price of Owen's team on Mon Oct 26: $35 a player"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Ben's AI asks for a team booking at $30 a player, an old price."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A team building at Lee's Barbershop is $35 a player, not $30."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $560 team quote."
+   ],
+   [
+    "and the plan ends after your last $35 visit.",
+    "and the booking ends after your last game."
+   ],
+   [
+    "The plan ends after its last visit at $35.",
+    "The booking ends after its last game at $35."
+   ],
+   [
+    "Rosie answers with the real price, $40.",
+    "Rosie answers with the real price, $35."
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A hint pack is on the price list: free."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Private escape room · $128"
+   ],
+   [
+    "The signature cut, $55, is paid in full",
+    "The private room, $128, is paid in full"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a birthday party for 8 is $260."
+   ],
+   [
+    "Haircut plans go to $40 from Wed Nov",
+    "Team building goes to $35 a player from Wed Nov"
+   ],
+   [
+    "Reply 1 to keep it at $40 a visit",
+    "Reply 1 to keep it at $35 a player"
+   ],
+   [
+    "Haircuts already booked keep $35",
+    "Extra players already booked keep $32"
+   ],
+   [
+    "Color and cut · $90, from photos",
+    "Team building · $35 a player"
+   ],
+   [
+    "A plan goes to $40 from Wed Nov",
+    "A booking goes to $35 a player from Wed Nov"
+   ],
+   [
+    "a house call, $75, paid in full",
+    "a second room at the same time, $128, paid in full"
+   ],
+   [
+    "charges $35 to your saved card",
+    "charges $35 a player to your saved card"
+   ],
+   [
+    "Color correction · $25 deposit",
+    "Team building · $280 deposit"
+   ],
+   [
+    "Booked for 8 people · $25 each",
+    "Booked for 8 people · $32 each"
+   ],
+   [
+    "Sam raises the haircut to $40",
+    "Sam raises the extra player to $35"
+   ],
+   [
+    "at $35 a visit, every 4 weeks",
+    "at $35 a player"
+   ],
+   [
+    "adds the prices: $35 and $20.",
+    "adds the prices: $32 and free."
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Birthday party · $100 deposit"
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2)",
+    "Extra player $32 ($35 from Nov 2)"
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Birthday party · $100 deposit"
+   ],
+   [
+    "$40 for the Groom's package",
+    "$100 for the birthday party"
+   ],
+   [
+    "Adding a beard trim, +$20?",
+    "Adding a second room, +$128?"
+   ],
+   [
+    "$40 taken when they book",
+    "$100 taken when they book"
+   ],
+   [
+    "So is a house call, $75.",
+    "So is a second room at the same time, $128."
+   ],
+   [
+    "The $70 rest is refunded",
+    "The $96 rest is refunded"
+   ],
+   [
+    "the haircut goes to $40",
+    "the extra player goes to $35"
+   ],
+   [
+    "the $40, if you confirm",
+    "the $100, if you confirm"
+   ],
+   [
+    "the $25, if you confirm",
+    "the $32, if you confirm"
+   ],
+   [
+    "the $20, if you confirm",
+    "the $32, if you confirm"
+   ],
+   [
+    "the open times at $40.",
+    "the open times at $35."
+   ],
+   [
+    "Haircut at home · $75",
+    "Second room at the same time · $128"
+   ],
+   [
+    "$40 a visit (now $35)",
+    "$35 a player (now $32)"
+   ],
+   [
+    "From $110, set at the",
+    "From $35 a player, set at the"
+   ],
+   [
+    "the $20 fee, if you c",
+    "the $32 fee, if you c"
+   ],
+   [
+    "$89 service-call fee",
+    "$32 fee"
+   ],
+   [
+    "It's $20. Accept it?",
+    "It's $32. Accept it?"
+   ],
+   [
+    "From $89, set at the",
+    "From $128, set at the"
+   ],
+   [
+    "A $35 haircut can w",
+    "A $32 extra player can w"
+   ],
+   [
+    "$20 payment through",
+    "$32 payment through"
+   ],
+   [
+    "Saved: haircut $40",
+    "Saved: extra player $35"
+   ],
+   [
+    "$100 after the vis",
+    "$160 after the vis"
+   ],
+   [
+    "$160, charged when",
+    "$128, charged when"
+   ],
+   [
+    "Plan charge · $35",
+    "Team building · $35 a player"
+   ],
+   [
+    "Beard trim · $20",
+    "Hint pack · free"
+   ],
+   [
+    "like $20 of $90.",
+    "like $280 of $560."
+   ],
+   [
+    "Pack of 5 visits",
+    "Pack of 5 games"
+   ],
+   [
+    "Skin fade · $40",
+    "Team building · $35 a player"
+   ],
+   [
+    "Beard trim $20",
+    "Hint pack free"
+   ],
+   [
+    "$20 taken when",
+    "$100 taken when"
+   ],
+   [
+    "Haircut · $35",
+    "Extra player · $32"
+   ],
+   [
+    "Skin fade $40",
+    "Team building $35 a player"
+   ],
+   [
+    "the $100 rest",
+    "the $160 rest"
+   ],
+   [
+    "other $100 is",
+    "other $160 is"
+   ],
+   [
+    "A $35 haircut",
+    "A $32 extra player"
+   ],
+   [
+    "$140 an hour",
+    "a set price per game"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $32"
+   ],
+   [
+    "$40 a visit",
+    "$35 a player"
+   ],
+   [
+    "$40 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$20 deposit",
+    "$100 deposit"
+   ],
+   [
+    "$25 deposit",
+    "$280 deposit"
+   ],
+   [
+    "$25 each",
+    "$32 each"
+   ],
+   [
+    "$20 fee",
+    "$32 fee"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some gyms and studios are registered as a place."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Intro escape room, game checks and kids' escape room."
+   ],
+   [
+    "The chairs",
+    "The rooms"
+   ],
+   [
+    "A chair, ready",
+    "A spot, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a coach who rents space,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents space, with their own clients."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Dana and Sol coach classes; Dana also runs team building."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Dana: coach, team building, kids' escape room"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Dana: coach, team building and kids' escape room"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every escape room class, team building and kids' escape room"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'class' could mean a gym or a school."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Mobile escape games and party rooms, within 25 miles."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "J: a game check in the first 2 weeks, done at the desk, free."
+   ],
+   [
+    "a color touch-up checked from photos is free",
+    "a game check done at the desk is free"
+   ],
+   [
+    "Color touch-up",
+    "Game check"
+   ],
+   [
+    "color touch-up",
+    "game check"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Private room quotes come to you first."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A gym's example: 'A first class needs the waiver first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Team building always stays with Dana."
+   ],
+   [
+    "A chair renter asked for by name",
+    "A space renter asked for by name"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A top rope' or 'a boulder' fits a private room."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a swim lesson, which isn't on the gym's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Escape Room doesn't do swim lessons."
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free entrance:"
+   ],
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's employer for a staff class."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this class."
+   ],
+   [
+    "How would you like it on top?",
+    "Any injury the coach should know about?"
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a 10-visit card at the gym."
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, make it a private room' goes back to the times."
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter class."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Dana can do a shorter class in the time left"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the lobby during my class?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring water and a towel on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring water and a towel."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the gym, the customer is already there, so there's no door check."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Dana stopped Alex M.'s class."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Dana goes over the next class."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Lee's Escape Room: you now have two classes on Sat Nov 7."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. No photo ID that matches the waiver."
+   ],
+   [
+    "Sat Oct 24 · 2:00pm · Riley",
+    "Sat Oct 24 · 1:00pm · Dana"
+   ],
+   [
+    "2 At my home",
+    "2 At my office"
+   ],
+   [
+    "A barbershop's services need none.",
+    "Classes need none. A membership needs one where the state's rules ask."
+   ],
+   [
+    "A barbershop sells its packages only at the shop.",
+    "Some businesses sell packages only at their own desk."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds team building to Lee's Escape Room."
+   ],
+   [
+    "NEW massage",
+    "NEW team building"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Team building for Lee's Escape Room: is it the same company?"
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: 9:00am, Dana"
+   ],
+   [
+    "so Quinn S.'s license isn't checked yet",
+    "so Quinn S.'s coaching papers aren't on file yet"
+   ],
+   [
+    "Gemini hears right away that 2:00pm was just taken, and gets the next times.",
+    "Gemini hears right away that the last spot was just taken, and gets the next classes."
+   ],
+   [
+    "Dee can ask to be next for 2:00pm.",
+    "Dee can ask to be next for that spot."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A gym books a seat in a class, and a day pass is a seat in the day's open hours."
+   ],
+   [
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Oct 24 · 11:00am · Private escape room · Dana · 4 spots left"
+   ],
+   [
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "Sat Nov 21 · 11:00am · Private escape room · Dana · 8 spots left"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute game check"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a player who feels faint gets 'stop, sit down, and call 911 if it's serious'."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $32 extra player; priced at the desk"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A class is rated, so the gym takes the first branch."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a weekly escape room plan with Dana."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Dana sees how you move"
+   ],
+   [
+    "Barbering workshop",
+    "Private escape room"
+   ],
+   [
+    "Riley's color plan after a consult",
+    "Dana's team building plan after an assessment"
+   ],
+   [
+    "sent you a proposal: Riley's color plan.",
+    "sent you a proposal: Dana's team building plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Team building plan"
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a time for your first team slot:"
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration EX-1042"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Escape room takes no jobs sent now, at the gym or away."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the gym show photos of you in class?"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Escape room plan · every week"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Hint card · free"
+   ],
+   [
+    "gloss",
+    "rental gear"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "First aid EX-2087"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Escape Crew'"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Escape Room LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Escape Room"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Escape Crew"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Office Teams"
+   ],
+   [
+    "Lee Electric",
+    "Lee Team Rooms"
+   ],
+   [
+    "plumbing and electrical",
+    "escape room and parties"
+   ],
+   [
+    "Plumbing and electrical",
+    "Escape room and parties"
+   ],
+   [
+    "Electrical",
+    "Parties"
+   ],
+   [
+    "electrical",
+    "parties"
+   ],
+   [
+    "Plumbing",
+    "Escape room"
+   ],
+   [
+    "plumbing",
+    "escape room"
+   ],
+   [
+    "plumber",
+    "coach"
+   ],
+   [
+    "Plumber",
+    "Coach"
+   ],
+   [
+    "Riley Chen",
+    "Dana Chen"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery Diaz",
+    "Sol Diaz"
+   ],
+   [
+    "Avery",
+    "Sol"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Price"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey Moore",
+    "Priya Moore"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "88 Elm St",
+    "24 Quarry Rd"
+   ],
+   [
+    "Elm St",
+    "Quarry Rd"
+   ],
+   [
+    "1200 Main St",
+    "310 Cedar Ave"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "Oak St",
+    "Willow Rd"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Private escape room"
+   ],
+   [
+    "Signature cut and shave",
+    "Private escape room"
+   ],
+   [
+    "Signature cut",
+    "Private escape room"
+   ],
+   [
+    "signature cut",
+    "private escape room"
+   ],
+   [
+    "Groom's package",
+    "Birthday party"
+   ],
+   [
+    "Skin fade",
+    "Team building"
+   ],
+   [
+    "skin fade",
+    "team building"
+   ],
+   [
+    "A beard trim",
+    "A game check"
+   ],
+   [
+    "a beard trim",
+    "a game check"
+   ],
+   [
+    "Beard trim",
+    "Game check"
+   ],
+   [
+    "beard trim",
+    "game check"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' party (ages 6 to 12)"
+   ],
+   [
+    "kids cuts",
+    "kids' games"
+   ],
+   [
+    "Kids cut",
+    "Kids' party"
+   ],
+   [
+    "kids cut",
+    "kids' party"
+   ],
+   [
+    "a color and cut",
+    "a team building hour"
+   ],
+   [
+    "Color and cut",
+    "Team building hour"
+   ],
+   [
+    "color and cut",
+    "team building hour"
+   ],
+   [
+    "A color correction",
+    "A team slot"
+   ],
+   [
+    "a color correction",
+    "a team slot"
+   ],
+   [
+    "Color correction",
+    "Team slot"
+   ],
+   [
+    "color correction",
+    "team slot"
+   ],
+   [
+    "color quote",
+    "team building quote"
+   ],
+   [
+    "a consult",
+    "a first-visit check"
+   ],
+   [
+    "consult",
+    "first-visit check"
+   ],
+   [
+    "Consult",
+    "First-visit check"
+   ],
+   [
+    "Haircuts",
+    "Private rooms"
+   ],
+   [
+    "haircuts",
+    "private rooms"
+   ],
+   [
+    "Haircut",
+    "Private room"
+   ],
+   [
+    "haircut",
+    "private room"
+   ],
+   [
+    "house calls",
+    "events"
+   ],
+   [
+    "House calls",
+    "Events"
+   ],
+   [
+    "house call",
+    "event"
+   ],
+   [
+    "House call",
+    "Event"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "priced at the chair",
+    "priced at the session"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the session"
+   ],
+   [
+    "set at the chair",
+    "set at the session"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "chairs side by side",
+    "mats side by side"
+   ],
+   [
+    "Barbershop",
+    "Gym"
+   ],
+   [
+    "barbershops",
+    "fitness gyms"
+   ],
+   [
+    "barbershop",
+    "gym"
+   ],
+   [
+    "Barbers",
+    "Coaches"
+   ],
+   [
+    "barbers",
+    "coaches"
+   ],
+   [
+    "Barber",
+    "Coach"
+   ],
+   [
+    "barber",
+    "coach"
+   ],
+   [
+    "shops",
+    "gyms"
+   ],
+   [
+    "Shop",
+    "Gym"
+   ],
+   [
+    "shop",
+    "gym"
+   ],
+   [
+    "Drain clearing",
+    "Mobile escape game"
+   ],
+   [
+    "Water heater flush",
+    "Private escape room"
+   ],
+   [
+    "Panel upgrade",
+    "Party room upgrade"
+   ],
+   [
+    "landlord",
+    "employer"
+   ],
+   [
+    "After the job",
+    "After the session"
+   ],
+   [
+    "Drains have a set price.",
+    "Classes have a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Each person who joins signs their own waiver."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone unwell right now stops the booking."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "BS20981",
+    "EX-2087"
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The coach's first-aid card has expired."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a private room on Saturday."
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books the same class every week"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for the same Saturday escape room class every week."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group of friends together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "Five friends book one intro class together for a birthday."
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for an intake"
+   ],
+   [
+    "The rash on my scalp got worse.",
+    "My knee got worse since I booked. Can I still come?"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M. 15 minutes into class."
+   ],
+   [
+    "I put a note and a photo on the page.",
+    "I put a note on the page."
+   ],
+   [
+    "The note and photo are on the secure page.",
+    "The note is on the secure page."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: first game, room check done, wants to try the hard level"
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free make-up class."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "My harness felt loose, so I couldn't finish."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the harness felt loose in Saturday's class."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una clase de escalada el sábado."
+   ],
+   [
+    "License renewal",
+    "Certificate renewal"
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like a game check result."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The harness strap ripped my shirt collar."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the harness strap ripped a shirt today."
+   ],
+   [
+    "Add photos",
+    "Tell us about the group"
+   ],
+   [
+    "water heater",
+    "home party"
+   ],
+   [
+    "teacher",
+    "coach"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up class, if Sam says so"
+   ],
+   [
+    "patch test with a wait",
+    "waiver check with a wait"
+   ],
+   [
+    "the $25 assessment",
+    "the $32 extra player"
+   ],
+   [
+    "Springfield",
+    "Riverton"
+   ]
+  ],
+  "B": [
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a mobile game at $400, an old price."
+   ],
+   [
+    "Lee Home Services: $160 for today's extra work.",
+    "Lee Escape Crew: $100 for today's extra time."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2)",
+    "Mobile escape game $450 ($475 from Nov 2)"
+   ],
+   [
+    "your plan renews on Tue Dec 1 at $179 a visit",
+    "your plan renews on Tue Dec 1 at $450 a game"
+   ],
+   [
+    "Send {{alex.staff}} $600 for the water heater",
+    "Send {{alex.staff}} $450 for the mobile game"
+   ],
+   [
+    "Drain clearing plans go to $199 from Wed Nov",
+    "Mobile escape games go to $475 from Wed Nov"
+   ],
+   [
+    "Reading it back: drain clearing goes to $199",
+    "Reading it back: the mobile escape game goes to $475"
+   ],
+   [
+    "The plan ends after its last visit at $179.",
+    "The booking ends after its last game at $450."
+   ],
+   [
+    "Rosie answers with the real price, $179.",
+    "Rosie answers with the real price, $450."
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · Home party escape game · $300"
+   ],
+   [
+    "Morgan's plan on Mon Oct 26: $199 a visit",
+    "Morgan's plan on Mon Oct 26: $450 a game"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Mobile escape games already booked keep $450"
+   ],
+   [
+    "Done: the $160 valve work is cancelled,",
+    "Done: the $100 extra time is cancelled,"
+   ],
+   [
+    "Sam raises the drain clearing to $199",
+    "Sam raises the mobile escape game to $475"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Extra 30 minutes · $100"
+   ],
+   [
+    "A plan goes to $199 from Wed Nov",
+    "A booking goes to $475 from Wed Nov"
+   ],
+   [
+    "Water heater replacement · $640",
+    "Home party escape game · $300"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra 30 minutes · $100"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Office 1 · Tue Oct 20 · $450"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Office 2 · Wed Oct 21 · $450"
+   ],
+   [
+    "Saved: drain clearing $199",
+    "Saved: mobile escape game $475"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $450 game needs none."
+   ],
+   [
+    "only the $89 service call",
+    "only the $150 fee"
+   ],
+   [
+    "$179, paid after the job",
+    "$450, paid after the game"
+   ],
+   [
+    "for $160. You can cancel",
+    "for $100. You can cancel"
+   ],
+   [
+    "The service call is $89.",
+    "The mobile game deposit is $150."
+   ],
+   [
+    "Water heater flush $150",
+    "Extra 30 minutes $100"
+   ],
+   [
+    "$199 a visit (now $179)",
+    "$450 a game (now $300)"
+   ],
+   [
+    "the open times at $179.",
+    "the open times at $450."
+   ],
+   [
+    "keep it at $199 a visit",
+    "keep it at $450 a game"
+   ],
+   [
+    "your plan charges $358",
+    "your plan charges $450"
+   ],
+   [
+    "Drain clearing · $179",
+    "Mobile escape game · $450"
+   ],
+   [
+    "your last $179 visit",
+    "your last $450 game"
+   ],
+   [
+    "for $160. It's added",
+    "for $100. It's added"
+   ],
+   [
+    "From $89, set at the",
+    "From $450, set at the"
+   ],
+   [
+    "the $89 service call",
+    "the $150 fee"
+   ],
+   [
+    "$89 service-call fee",
+    "$150 fee"
+   ],
+   [
+    "for a $20 fee you OK",
+    "for a $150 fee you OK"
+   ],
+   [
+    "never more than $89.",
+    "never more than $150."
+   ],
+   [
+    "the $160 valve work",
+    "the $100 extra time"
+   ],
+   [
+    "The $110 rest after",
+    "The $300 rest after"
+   ],
+   [
+    "$20 payment through",
+    "$150 payment through"
+   ],
+   [
+    "Plan charge · $358",
+    "Plan charge · $450"
+   ],
+   [
+    "is $179, not $150.",
+    "is $450, not $400."
+   ],
+   [
+    "$700, charged when",
+    "$450, charged when"
+   ],
+   [
+    "Each visit: $150",
+    "Each game: $450"
+   ],
+   [
+    "$89 service call",
+    "$150 fee"
+   ],
+   [
+    "Pack of 5 visits",
+    "Pack of 5 games"
+   ],
+   [
+    "your $640 price",
+    "your $300 price"
+   ],
+   [
+    "the $640 quote",
+    "the $300 quote"
+   ],
+   [
+    "now, for $160.",
+    "now, for $100."
+   ],
+   [
+    "$89, credited",
+    "$150, credited"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $150"
+   ],
+   [
+    "$140 an hour",
+    "a set price per game"
+   ],
+   [
+    "$40 deposit",
+    "$150 deposit"
+   ],
+   [
+    "$89 deposit",
+    "$150 deposit"
+   ],
+   [
+    "the $89 fee",
+    "the $150 fee"
+   ],
+   [
+    "$89 fee",
+    "$150 fee"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some gyms and studios are registered as a place."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Mobile escape games and party rooms."
+   ],
+   [
+    "The chairs",
+    "The rooms"
+   ],
+   [
+    "A chair, ready",
+    "A room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a coach who rents space,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents space, with their own clients."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Marcus and Priya run the rooms; Marcus also leads the warm-up."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Marcus: operator, warm-ups, party rooms"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Marcus: operator, warm-ups and party rooms"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every mobile room, home party and warm-up"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'class' could mean a gym or a school."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Mobile rooms and backyard parties, within 25 miles."
+   ],
+   [
+    "can clear the drain:",
+    "can run a mobile game:"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "Our school fair wants a mobile game."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a mobile game for our school fair."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a player who feels faint gets 'stop, sit down, and call 911 if it's serious'."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can you run a mobile game at our school this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa mobile game Thu 12pm Priya"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'A mobile game day for our team' fits a mobile game."
+   ],
+   [
+    "like a roof leak.",
+    "like a swim lesson."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a park class with no permit."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The gym's own sessions are in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Escape Crew brings a mobile game to your event for $450, or a home party game for $300."
+   ],
+   [
+    "'Adding a faucet check?",
+    "'Adding an extra 30 minutes?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many players, and is there room for the game?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 10 players."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some groups want the room more than one day, like a school week."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a room at the school every month."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "has a yearly flush plan, $150 a visit.",
+    "has a monthly team plan."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Monthly team plan"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a team slot after the game."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Marcus also add a team slot after the game?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The extra 30 minutes is quoted before the yes."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there room for the game?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a flat gym floor"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The game's papers are kept on file."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Marcus also add an extra 30 minutes?"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Marcus's group asks for an extra 30 minutes."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to an extra 30 minutes for $100."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Marcus finds a wet, slippery floor under the room."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says the room stops there, so Alex gets a written note."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Marcus found a slippery floor and stopped the room for safety."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say a hold comes loose on the room, and Marcus texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "A hold came loose on the room at Alex M.'s event."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Marcus left mats and cones in the room."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the venue wall this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marcus come back next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Marcus's next times for a mobile game."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a mobile game, today,"
+   ],
+   [
+    "At my home",
+    "At my school"
+   ],
+   [
+    "so Reese K.'s license isn't checked yet",
+    "so the room's papers aren't on file yet"
+   ],
+   [
+    "Nobody was home for",
+    "Nobody showed up for"
+   ],
+   [
+    "nobody was home for any of them",
+    "they missed them all"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 8:50am"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 7:50am"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 7:35am"
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no front desk at a school."
+   ],
+   [
+    "you're home",
+    "you're here"
+   ],
+   [
+    "like nobody home",
+    "like a no-show"
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Alex's school in Riverton is inside it."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI described an emergency. They got the 911 message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "An emergency described in the chat"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Every 12 months",
+    "Every month"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Alex is home",
+    "Alex is here"
+   ],
+   [
+    "they're home",
+    "they're here"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "for today's work",
+    "for today's game"
+   ],
+   [
+    "someone in the home",
+    "Hint card · free"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both schools' events go on one bill on the 1st."
+   ],
+   [
+    "Only a teen is home",
+    "Only a teen is at the door"
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every month?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Monthly office strength class plan"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds a home party to Lee Escape Crew."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Party rooms for Lee Escape Crew: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW home party"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should players eat before the event?"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Can a coach come tonight for a team game?"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "does the extra 30 minutes today, $100. The $450 game quote stays good until Thu Oct 29."
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $450 game quote stays good until Thu Oct 29."
+   ],
+   [
+    "a home-repair class",
+    "a park escape room day"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $450 room gets a rental agreement to sign."
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "The room books a set start time."
+   ],
+   [
+    "home-repair class",
+    "park escape room day"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 450 game, 3 hours"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your game"
+   ],
+   [
+    "Repipe · $2,400",
+    "Mobile game · $450"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$150 deposit to book, $300 on the bill after"
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $450 game"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a set of rooms Marcus suggested"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a quote for a room, from Marcus's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Quote · School fair game"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration EX-3091"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Escape games take no jobs sent now, at the venue or away."
+   ],
+   [
+    "Your water heater contract",
+    "Your game rental agreement"
+   ],
+   [
+    "like a move-out day",
+    "like a school field day"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the extra 30 minutes only, $100. The rest stays as booked."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no clear space for the room"
+   ],
+   [
+    "no proof Alex may have this work done",
+    "no signed waiver"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE room papers Mon Oct 26"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Room papers EX-2087"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Escape Crew'"
+   ],
+   [
+    "water heater quote",
+    "game quote"
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "The game has a set start time, as Sam set at sign-up. The crew comes 30 minutes early to set up."
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Escape Room"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Escape Crew LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Escape Crew"
+   ],
+   [
+    "leehomeservices.com",
+    "leeescapecrew.example"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Team Rooms"
+   ],
+   [
+    "Lee Electric",
+    "Lee Office Teams"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile rooms and parties"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile rooms and parties"
+   ],
+   [
+    "Electrical",
+    "Parties"
+   ],
+   [
+    "electrical",
+    "parties"
+   ],
+   [
+    "Plumbing",
+    "Mobile rooms"
+   ],
+   [
+    "plumbing",
+    "mobile rooms"
+   ],
+   [
+    "plumber",
+    "coach"
+   ],
+   [
+    "Plumber",
+    "Coach"
+   ],
+   [
+    "Riley Chen",
+    "Dana Chen"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery Diaz",
+    "Sol Diaz"
+   ],
+   [
+    "Avery",
+    "Sol"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Price"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey Moore",
+    "Priya Moore"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "88 Elm St",
+    "24 Quarry Rd"
+   ],
+   [
+    "Elm St",
+    "Quarry Rd"
+   ],
+   [
+    "1200 Main St",
+    "310 Cedar Ave"
+   ],
+   [
+    "Main St",
+    "Pine St"
+   ],
+   [
+    "42 Oak St",
+    "5 Summit Plaza"
+   ],
+   [
+    "Oak St",
+    "Willow Rd"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Home party escape game"
+   ],
+   [
+    "Signature cut",
+    "Home party escape game"
+   ],
+   [
+    "Beard trim",
+    "Game check"
+   ],
+   [
+    "beard trim",
+    "game check"
+   ],
+   [
+    "consult",
+    "first-visit check"
+   ],
+   [
+    "Haircut",
+    "Mobile room"
+   ],
+   [
+    "haircut",
+    "mobile room"
+   ],
+   [
+    "house calls",
+    "events"
+   ],
+   [
+    "House calls",
+    "Events"
+   ],
+   [
+    "house call",
+    "event"
+   ],
+   [
+    "House call",
+    "Event"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the session"
+   ],
+   [
+    "at the chair",
+    "at the room"
+   ],
+   [
+    "Barbershop",
+    "Gym"
+   ],
+   [
+    "barbershops",
+    "fitness gyms"
+   ],
+   [
+    "barbershop",
+    "gym"
+   ],
+   [
+    "Barbers",
+    "Coaches"
+   ],
+   [
+    "barbers",
+    "coaches"
+   ],
+   [
+    "Barber",
+    "Coach"
+   ],
+   [
+    "barber",
+    "coach"
+   ],
+   [
+    "shops",
+    "gyms"
+   ],
+   [
+    "Shop",
+    "Gym"
+   ],
+   [
+    "shop",
+    "gym"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Mobile room event"
+   ],
+   [
+    "Drain clearings",
+    "Mobile room events"
+   ],
+   [
+    "drain clearings",
+    "mobile room events"
+   ],
+   [
+    "Drain clearing",
+    "Mobile room event"
+   ],
+   [
+    "drain clearing",
+    "mobile room event"
+   ],
+   [
+    "a water heater replacement",
+    "a home party escape game"
+   ],
+   [
+    "Water heater replacement",
+    "Home party escape game"
+   ],
+   [
+    "water heater replacement",
+    "home party escape game"
+   ],
+   [
+    "a water heater flush",
+    "a private escape room"
+   ],
+   [
+    "Water heater flush",
+    "Private escape room"
+   ],
+   [
+    "water heater flush",
+    "private escape room"
+   ],
+   [
+    "replaces water heaters",
+    "runs mobile games at events"
+   ],
+   [
+    "A leak repair",
+    "A game check"
+   ],
+   [
+    "a leak repair",
+    "a game check"
+   ],
+   [
+    "Leak repair",
+    "Game check"
+   ],
+   [
+    "leak repair",
+    "game check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Room papers"
+   ],
+   [
+    "sewer camera inspection",
+    "room papers"
+   ],
+   [
+    "Sewer camera report",
+    "Room papers report"
+   ],
+   [
+    "sewer camera report",
+    "room papers report"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "credited to the repair",
+    "counted toward the session"
+   ],
+   [
+    "Panel upgrade",
+    "Party room upgrade"
+   ],
+   [
+    "landlord",
+    "employer"
+   ],
+   [
+    "after the job",
+    "after the session"
+   ],
+   [
+    "After the job",
+    "After the session"
+   ],
+   [
+    "Drains have a set price.",
+    "Rooms have a set price."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Each person who joins signs their own waiver."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone unwell right now stops the booking."
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "BS20981",
+    "EX-2087"
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The room's inspection papers show as expired."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "The game has a set start time, as Sam set at sign-up. The crew comes 30 minutes early to set up."
+   ],
+   [
+    "Arrival windows",
+    "Set start time"
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "arriving 8–10am",
+    "8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "2–4pm",
+    "2:00pm"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero un muro para la feria de la escuela."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "I'd like a room for the school fair next month."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told her health answers go on the secure page, and to call 911 if anyone feels unwell."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien se siente mal ahora mismo?"
+   ],
+   [
+    "Do you smell gas?",
+    "Does anyone feel unwell right now?"
+   ],
+   [
+    "No huele a gas.",
+    "Nadie."
+   ],
+   [
+    "It doesn't smell like gas.",
+    "Nobody."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Sus respuestas de salud van en la página segura, solo para el entrenador. Si alguien se siente mal, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Your health answers go on the secure page, only for the coach."
+   ],
+   [
+    "If you smell gas, get out and call 911.",
+    "If anyone feels unwell, call 911."
+   ],
+   [
+    "If you smell gas, leave the house now.",
+    "If someone has chest pain or fainted, call 911 now."
+   ],
+   [
+    "Then call 911 and the gas company.",
+    "Stay with them until help comes."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "I had a fall last month. Can I still play?"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is it safe for me to play?"
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for an escape room near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the game goes, how many players, and the space."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone unwell right now, like chest pain or fainting."
+   ],
+   [
+    "Just the kitchen sink.",
+    "About 10 players, mixed levels."
+   ],
+   [
+    "Electric.",
+    "About 10, mostly new to it."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a game is a set price for its hours, so Rosie's first text asks for the event's time and place."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every month, too?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a school books the room for 2 events at one address."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a team slot after the game."
+   ],
+   [
+    "Both jobs go in one booking, with one arrival window and one code.",
+    "Both go in one booking, with one start time and one code."
+   ],
+   [
+    "Both fit in the same arrival window.",
+    "Both fit in the same morning."
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which school fund should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "The school's activity fund, through its office."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a clear space about 30 by 20 feet?"
+   ],
+   [
+    "Drive time from the jobs before and after is checked again.",
+    "Drive time from the events before and after is checked again."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a space 30 by 20 feet. Everyone joining signs their own waiver first."
+   ],
+   [
+    "Please wait until the job is done.",
+    "Please keep kids off the room until the crew says so."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the gym was given to another team."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone unwell right now, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Our event moved to Thursday morning. Can you come sooner?"
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Thanks for telling us."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a room at two schools every term."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's room?"
+   ],
+   [
+    "Kitchen drain",
+    "School room"
+   ],
+   [
+    "Yard drain",
+    "Park room"
+   ],
+   [
+    "Answers, photos and gate codes",
+    "Answers, notes and gate codes"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Saved with Alex M.'s job.",
+    "Saved with Alex M.'s session."
+   ],
+   [
+    "Most jobs have a price before the visit.",
+    "Most sessions have a price before the visit."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 450 game 100 extra 30 minutes"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Extra 30 minutes · $100"
+   ],
+   [
+    "Supply line · $80",
+    "Rental agreement · no charge"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "Book the repair",
+    "Book the room"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 100 30 more minutes"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: an extra 30 minutes, $100."
+   ],
+   [
+    "Replace both shutoff valves",
+    "An extra 30 minutes"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $100 quote is good for 7 days."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wet floor at the room, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wet floor by the room"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wet patch by the room"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the mobile game"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE setting up, start 8:05"
+   ],
+   [
+    "The job should be done by 10am.",
+    "The event still ends by 10am."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT twisted my ankle, need to stop"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 450 game"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE 11 players, mixed levels."
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Next time: bring 4 more mats."
+   ],
+   [
+    "the shutoff valves",
+    "the second rope"
+   ],
+   [
+    "the kitchen drain",
+    "the school room"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your event"
+   ],
+   [
+    "Rental 1",
+    "School 1"
+   ],
+   [
+    "Rental 2",
+    "School 2"
+   ],
+   [
+    "Alex's home warranty covers part of the repair.",
+    "Alex's school fund covers part of the room."
+   ],
+   [
+    "Sam bills the warranty company the business's own way.",
+    "Sam bills the school fund the business's own way."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "Your school fund covers the rest."
+   ],
+   [
+    "Each rejoins: the job stays on Alex's record.",
+    "Each rejoins: the session stays on Alex's record."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Alex says the class ended 20 minutes early."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what the business promises."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Our room ended 20 minutes early."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M. says the Thu Oct 22 room ended 20 minutes early."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Sam OK'd a free make-up event for your team."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the gym floor"
+   ],
+   [
+    "Cabinet floor, before",
+    "Gym floor, before"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the school to dry the floor first"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratch on the gym floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratch on the floor"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the room papers link"
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Nora can ask to be next for that time."
+   ],
+   [
+    "A plan or warranty pays",
+    "A school fund pays"
+   ],
+   [
+    "Books one job for a group",
+    "Books one event for a group"
+   ],
+   [
+    "water heater",
+    "home party"
+   ],
+   [
+    "the shutoff valve",
+    "the extra 30 minutes"
+   ],
+   [
+    "teacher",
+    "coach"
+   ],
+   [
+    "The $640 party wall",
+    "The $300 home party"
+   ],
+   [
+    "$160",
+    "$100"
+   ],
+   [
+    "replace both shutoff valves",
+    "30 more minutes"
+   ],
+   [
+    "shutoff valve",
+    "extra time"
+   ],
+   [
+    "Lee Climbing Walls",
+    "Lee Escape Crew"
+   ],
+   [
+    "water heater",
+    "home party"
+   ],
+   [
+    "party wall",
+    "home party"
+   ],
+   [
+    "yard drain",
+    "home party"
+   ],
+   [
+    "The $640 home party",
+    "The $300 home party"
+   ],
+   [
+    "private class",
+    "private room"
+   ],
+   [
+    "that window",
+    "that time"
+   ],
+   [
+    "Tonight 6-9pm: 12 booked. How many more tables can you take?",
+    "Saturday 10am: 12 booked. How many more spots can you take?"
+   ],
+   [
+    "Springfield",
+    "Riverton"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "color",
+  "gym",
+  "Gym",
+  "coach",
+  "Coach",
+  "late-cancel fee",
+  "Late-cancel fee",
+  "game master"
+ ],
+ "story": {
+  "A": "Alex books a private room for 4 friends on Saturday, pays the $128 in full on the page, forwards the waiver links, and the group checks in at the counter with one code 15 minutes before the game.",
+  "B": "Alex books the mobile escape game for 12 coworkers at the office: a $150 deposit, each player's waiver on their own link, the game master sets up in a meeting room, and the rest comes on the bill."
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-26",
+    "more": [
+     "In a game, each player gets their own link and their own code. A parent signs for a child's waiver on a link Alex forwards."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-02",
+    "more": [
+     "A health yes on the waiver doesn't hold the booking: the game master reads it before the game (A6-15)."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-12",
+    "more": [
+     "A health question, like 'Can I play with a sore knee?', gets no advice from Rosie. It goes to the venue privately."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-15",
+    "more": [
+     "For a game, Alex picks a time from the schedule, and its game master comes with it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here it's the venue's waiver and the health questions.",
+     "Alex is new, so they're done now, before the money step.",
+     "They stay on file for 1 year.",
+     "The health questions are a short yes or no check, like a past injury, a heart condition or fainting.",
+     "Any yes stays on the page for the game master.",
+     "A parent or guardian signs for anyone under 18.",
+     "Where the state's rules limit what a waiver can say, the state's form sets the words."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A same-day game books any room left until it starts, unless Sam set it to ask first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No state license for an escape room: registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "An escape room pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "No: people",
+    "why": "The venue books its rooms (spaces), and in flow B its mobile game (a thing)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The venue sells rooms and games by the slot, not classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No state license for game masters."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "Anyone may book; no members-only booking."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "An escape room bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with the venue."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "The venue runs no childcare: a parent or adult stays with a child in the room."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "An escape room bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the venue."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The venue sells rooms and games from its list: it sends no proposals."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing from a game comes back later."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "A set start time is the game's start at the event, with the game master there 30 minutes early to set up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-34",
+    "more": [
+     "A game master can stop anyone who looks unwell, follows the business's first-aid steps, and calls 911 if it's serious.",
+     "Rosie plays no part in care. Notes go on the secure page, never in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-45",
+    "more": [
+     "Marcus's roster shows who has signed."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No state license for an escape room: registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "An escape room pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "No: people",
+    "why": "The venue books its rooms (spaces) and its mobile game (a thing)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The venue sells games by the slot, not classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No state license for game masters."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Set start time",
+    "why": "An event game starts at a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "The game is booked whole, not by the seat, in flow B."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for the game."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the game master's care: an adult on the booking is there."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or benefit pays part of a game."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A game is a deposit and a bill, not stages."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing from a game comes back later."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ]
+ },
+ "notes": "Test-drive on the REDESIGN 2 master (Tue Oct 27 2026, 1:47am), kept as the verified base: plug-in facts, services, prices, rules and the decided fixes (reserved time charged in full, capacity from the rooms the owner gives Rosie, a safety stop partway: the venue's side for the part not given).\nBuilt on the gym parent (gym.json, refitted) for the rename pairs (indexed overrides with escape-room words), the first steps and the check-in words; the gym's own ops rewritten for escape rooms.\nFlow A: a private room for a group (paid in full, $128 for 4), a team building (2 to 4 rooms, $35 a player, half as a deposit, rest on the bill), a birthday party ($260 for 8, $100 deposit, $160 at the counter). Flow B: a mobile escape game at an office ($450 for 12, $150 deposit, $300 on the bill) and a home party game ($300 paid in full).\nMoney: amounts rows per path (price, paid, deposit, rest, fee, name). Free cancel: flow A uses the master's own cutoff (no setting), flow B 2 days before.\nNo $2 off op (S1-62) is kept as the test-drive decided: D97 keeps the $2 on for every profession (the op removes the no-$2 choice; it does not turn anything on).\nNo license lookup and no 'checked' wording (D96): the licence line says nothing is looked up.\nCapacity: Rosie books only the rooms the owner gives it per slot, or reads the venue's own connected system (D88); D87 check-in is on (fact capacitycheck).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "the price of Owen's plan on Mon Oct 26: $40 a visit",
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "and the plan ends after your last $35 visit.",
+    "The plan ends after its last visit at $35.",
+    "Rosie answers with the real price, $40.",
+    "A beard trim is on the price board: $20.",
+    "Signature cut and hot towel shave · $55",
+    "The signature cut, $55, is paid in full",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Haircut plans go to $40 from Wed Nov",
+    "Reply 1 to keep it at $40 a visit",
+    "Haircuts already booked keep $35",
+    "Color and cut · $90, from photos",
+    "A plan goes to $40 from Wed Nov",
+    "a house call, $75, paid in full",
+    "charges $35 to your saved card",
+    "Color correction · $25 deposit",
+    "Booked for 8 people · $25 each",
+    "Sam raises the haircut to $40",
+    "at $35 a visit, every 4 weeks",
+    "adds the prices: $35 and $20.",
+    "Groom's package · $40 deposit",
+    "Haircut $35 ($40 from Nov 2)",
+    "Color and cut · $20 deposit",
+    "$40 for the Groom's package",
+    "Adding a beard trim, +$20?",
+    "$40 taken when they book",
+    "So is a house call, $75.",
+    "The $70 rest is refunded",
+    "the haircut goes to $40",
+    "the $40, if you confirm",
+    "the $25, if you confirm",
+    "the $20, if you confirm",
+    "the open times at $40.",
+    "Haircut at home · $75",
+    "$40 a visit (now $35)",
+    "From $110, set at the",
+    "the $20 fee, if you c",
+    "$89 service-call fee",
+    "It's $20. Accept it?",
+    "A $35 haircut can w",
+    "$20 payment through",
+    "Saved: haircut $40",
+    "$100 after the vis",
+    "$160, charged when",
+    "Plan charge · $35",
+    "Beard trim · $20",
+    "like $20 of $90.",
+    "Pack of 5 visits",
+    "Skin fade · $40",
+    "Beard trim $20",
+    "$20 taken when",
+    "Haircut · $35",
+    "Skin fade $40",
+    "the $100 rest",
+    "other $100 is",
+    "A $35 haircut",
+    "$140 an hour",
+    "Refund · $20",
+    "$40 a visit",
+    "$40 deposit",
+    "$20 deposit",
+    "$25 deposit",
+    "$25 each",
+    "$20 fee",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "A haircut could mean a salon or a barbershop.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "a color touch-up checked from photos is free",
+    "Color touch-up",
+    "color touch-up",
+    "Color quotes come to you first.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Color always stays with Riley.",
+    "A chair renter asked for by name",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Access, like a step-free chair:",
+    "like Alex's employer for a staff cut.",
+    "My employer pays for this cut.",
+    "How would you like it on top?",
+    "Alex bought a package of cuts at the shop.",
+    "'Yes, make it a fade' goes back to the times.",
+    "No reply by 11:00am means the shorter cut.",
+    "Riley can do a shorter cut in the time left",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Riley stopped Alex M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "Sat Oct 24 · 2:00pm · Riley",
+    "2 At my home",
+    "A barbershop's services need none.",
+    "A barbershop sells its packages only at the shop.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "first tomorrow: 10:00am, Riley",
+    "so Quinn S.'s license isn't checked yet",
+    "Gemini hears right away that 2:00pm was just taken, and gets the next times.",
+    "Dee can ask to be next for 2:00pm.",
+    "A barbershop books a person's time.",
+    "Sat Oct 24 · 9:00am · Barbering workshop · 4 seats left",
+    "Sat Nov 14 · 9:00am · Barbering workshop · 8 seats left",
+    "15-minute style consult",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "like a burst pipe or a lockout",
+    "Promises the $25 consult; priced at the chair",
+    "A cut is rated, so the shop takes the first branch.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "once Riley sees the hair",
+    "Barbering workshop",
+    "Riley's color plan after a consult",
+    "sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "Pick a time for your first color plan visit:",
+    "Registration 2020-1187",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "May the shop show photos of your hair?",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Plumbing JP031552 · electrical JE30417",
+    "Lee Home Services'",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Main St",
+    "Oak St",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "Groom's package",
+    "Skin fade",
+    "skin fade",
+    "A beard trim",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "a color and cut",
+    "Color and cut",
+    "color and cut",
+    "A color correction",
+    "a color correction",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "a consult",
+    "consult",
+    "Consult",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "price board",
+    "Price board",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "at the chair",
+    "At the chair",
+    "chairs side by side",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "Drain clearing",
+    "Panel upgrade",
+    "After the job",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "MP045210",
+    "BS20981",
+    "The lookup shows the license as expired.",
+    "I'd like a cut on Saturday.",
+    "Priced from your photos",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning.",
+    "Asks Alex for photos",
+    "The rash on my scalp got worse.",
+    "Stopped Alex M.'s cut.",
+    "I put a note and a photo on the page.",
+    "The note and photo are on the secure page.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Quiero un corte el sábado.",
+    "License renewal",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Add photos",
+    "water heater",
+    "teacher",
+    "Books a free fix, if Sam says so",
+    "patch test with a wait",
+    "Springfield"
+   ],
+   "B": [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Lee Home Services: $160 for today's extra work.",
+    "Kitchen drain clearing $179 ($199 from Nov 2)",
+    "your plan renews on Tue Dec 1 at $179 a visit",
+    "Drain clearing plans go to $199 from Wed Nov",
+    "Reading it back: drain clearing goes to $199",
+    "The plan ends after its last visit at $179.",
+    "Rosie answers with the real price, $179.",
+    "Contract · Water heater replacement · $640",
+    "Morgan's plan on Mon Oct 26: $199 a visit",
+    "Drain clearings already booked keep $179",
+    "Done: the $160 valve work is cancelled,",
+    "Sam raises the drain clearing to $199",
+    "Replace both shutoff valves · $160",
+    "A plan goes to $199 from Wed Nov",
+    "Water heater replacement · $640",
+    "Sewer camera inspection · $199",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "Saved: drain clearing $199",
+    "The $179 drain needs none.",
+    "only the $89 service call",
+    "$179, paid after the job",
+    "for $160. You can cancel",
+    "The service call is $89.",
+    "Water heater flush $150",
+    "$199 a visit (now $179)",
+    "the open times at $179.",
+    "keep it at $199 a visit",
+    "your plan charges $358",
+    "Drain clearing · $179",
+    "your last $179 visit",
+    "for $160. It's added",
+    "From $89, set at the",
+    "the $89 service call",
+    "$89 service-call fee",
+    "for a $20 fee you OK",
+    "never more than $89.",
+    "the $160 valve work",
+    "The $110 rest after",
+    "$20 payment through",
+    "Plan charge · $358",
+    "is $179, not $150.",
+    "$700, charged when",
+    "Each visit: $150",
+    "$89 service call",
+    "Pack of 5 visits",
+    "your $640 price",
+    "the $640 quote",
+    "now, for $160.",
+    "$89, credited",
+    "Refund · $20",
+    "$140 an hour",
+    "$40 deposit",
+    "$89 deposit",
+    "the $89 fee",
+    "$89 fee",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "A haircut could mean a salon or a barbershop.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "can clear the drain:",
+    "My kitchen drain is clogged.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "like a roof leak.",
+    "Like tapping a neighbor's water line without asking.",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "'Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "has a yearly flush plan, $150 a visit.",
+    "Yearly water heater flush plan",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Jordan finds corroded shutoff valves.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "At my home",
+    "so Reese K.'s license isn't checked yet",
+    "Nobody was home for",
+    "nobody was home for any of them",
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:05am",
+    "There's no counter at a home.",
+    "you're home",
+    "like nobody home",
+    "Alex's home in Springfield is inside it.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Every 12 months",
+    "I'm home",
+    "Alex is home",
+    "they're home",
+    "wasn't home",
+    "for today's work",
+    "someone in the home",
+    "Both rentals' visits go on one bill on the 1st.",
+    "Only a teen is home",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Yearly water heater flush plan",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "It's overflowing. Can someone come tonight?",
+    "like a burst pipe or a lockout",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "a home-repair class",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Plumbing books a 2-hour window.",
+    "home-repair class",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Harper J.'s $2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "Registration 2019-0451",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Your water heater contract",
+    "like a move-out day",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "CANT START no proof Alex may have this work done",
+    "no proof Alex may have this work done",
+    "LATE camera report Mon Oct 26",
+    "Plumbing JP031552 · electrical JE30417",
+    "Lee Home Services'",
+    "water heater quote",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Main St",
+    "42 Oak St",
+    "Oak St",
+    "beard trim",
+    "consult",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "Price board",
+    "at the chair",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "a water heater replacement",
+    "Water heater replacement",
+    "water heater replacement",
+    "a water heater flush",
+    "Water heater flush",
+    "water heater flush",
+    "replaces water heaters",
+    "A leak repair",
+    "a leak repair",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "Service call fee",
+    "service call fee",
+    "Service call",
+    "service call",
+    "credited to the repair",
+    "Panel upgrade",
+    "after the job",
+    "After the job",
+    "Drains have a set price.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "MP045210",
+    "BS20981",
+    "The lookup shows the license as expired.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Arrival windows",
+    "Arrival times:",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "12–2pm",
+    "2–4pm",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Do you smell gas?",
+    "No huele a gas.",
+    "It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater.",
+    "If you smell gas, get out and call 911.",
+    "If you smell gas, leave the house now.",
+    "Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood.",
+    "Is it safe to turn back on?",
+    "You can look for a roofer near you.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Electric.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Can you flush my water heater every year, too?",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say Alex also asks about a dripping faucet.",
+    "Both jobs go in one booking, with one arrival window and one code.",
+    "Both fit in the same arrival window.",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "Is the sink still full of water?",
+    "Drive time from the jobs before and after is checked again.",
+    "Please clear the cabinet under the sink.",
+    "Please wait until the job is done.",
+    "Alex texts that the sink is now overflowing.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Kitchen drain",
+    "Yard drain",
+    "Answers, photos and gate codes",
+    "Under the sink, before",
+    "Saved with Alex M.'s job.",
+    "Most jobs have a price before the visit.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "The repair price is good for 7 days.",
+    "Book the repair",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves",
+    "The $160 valve quote is good for 7 days.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "UPDATE getting a part, back 9:30",
+    "The job should be done by 10am.",
+    "HURT cut my hand, need to stop",
+    "The before photo shows no crack.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in.",
+    "Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "the kitchen drain",
+    "stage 2 of your repipe",
+    "Rental 1",
+    "Rental 2",
+    "Alex's home warranty covers part of the repair.",
+    "Sam bills the warranty company the business's own way.",
+    "Your home warranty covers the rest.",
+    "Each rejoins: the job stays on Alex's record.",
+    "The drain clogs again 2 weeks later.",
+    "The plug-in says how long the warranty lasts.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty, so this visit is free.",
+    "BEFORE old water stain on the cabinet floor",
+    "Cabinet floor, before",
+    "Call a mold cleanup company first",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Texts the camera report link",
+    "Nora can ask to be next for that window.",
+    "A plan or warranty pays",
+    "Books one job for a group",
+    "water heater",
+    "the shutoff valve",
+    "teacher",
+    "$160",
+    "replace both shutoff valves",
+    "shutoff valve",
+    "water heater",
+    "yard drain",
+    "private class",
+    "that window",
+    "Tonight 6-9pm: 12 booked. How many more tables can you take?",
+    "Springfield"
+   ]
+  },
+  "A": {
+   "A4-26": "add3e44476",
+   "A6-02": "d7d5a3ecf5",
+   "A7-12": "05f64179a4",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "S2-31": "320ac5e4cb",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-28": "c8e677520c",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a"
+  },
+  "B": {
+   "B4-15": "f13240b9c6",
+   "B8-34": "643812e26f",
+   "B8-45": "09e62897a6",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255",
+   "B10-38": "867fe1ab7c"
+  }
+ }
+}

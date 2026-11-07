@@ -1,0 +1,4402 @@
+{
+ "id": "cpa",
+ "name": "CPA and accountant",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "lawyer",
+ "plugin": {
+  "pf.license": {
+   "need": "A license where the state's rules require one: each CPA's own license to use the title 'CPA' and to sign the work only a CPA may sign; the CPA firm's permit or registration where the state's rules require one. Bookkeeping and payroll work: no license, a business registration only.",
+   "ask": "Each CPA's license number and state at sign-up or in their invite reply. The firm's permit number where the state form asks for one. Each paid preparer's federal preparer number, where the state form or the firm asks for it.",
+   "who holds it": "Each CPA; the CPA firm where the state's rules require a firm permit. Staff accountants and bookkeepers hold none.",
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "titles": "Only a person whose CPA license is on file as given is shown as 'CPA'. Everyone else is shown as 'accountant', 'staff accountant' or 'bookkeeper', never 'CPA'.",
+   "who may sign a return": "A switch from the state's form: who may sign a return or a report for a fee (a CPA, or another paid preparer the rules allow). Rosie never offers a person for work their title doesn't allow.",
+   "blocks going live": "A CPA firm with no active CPA license on file in that state stays offline there for CPA work. A CPA whose license isn't active is never shown as 'CPA' and isn't offered for CPA-only work.",
+   "renewals": "Checked on each renewal date from the state form; a lapsed license pauses that person's CPA-only bookings, and Sam is told.",
+   "insurance": "Professional liability insurance on file where the state's rules require it; the amount comes from the state form.",
+   "background check": "None beyond the license check."
+  },
+  "pf.services": {
+   "pattern": "Consult: a first meeting with a named CPA, at the firm's office or by video (flow A), then the firm's own work. At the client's business: a books setup, an inventory count or a books cleanup day (flow B). A new client waits for the owner's OK and a conflict check before it books.",
+   "at the office or by video (the example firm's own prices)": [
+    {
+     "name": "First meeting (30 minutes, a new client)",
+     "price": "$35, credited to the first year's fees if the client hires the firm",
+     "where": "the office, or by video",
+     "before": "a card saved for the $20 late-cancel or no-show fee",
+     "after": "the saved card charged when the CPA texts DONE"
+    },
+    {
+     "name": "Free first meeting (some firms)",
+     "price": "free",
+     "before": "nothing",
+     "after": "nothing"
+    },
+    {
+     "name": "Advice call (existing clients)",
+     "price": "$35 a half hour (the firm's $70 hourly rate)",
+     "where": "by video or phone",
+     "before": "nothing taken",
+     "after": "Rosie texts the bill when the CPA texts DONE"
+    },
+    {
+     "name": "Tax question meeting",
+     "price": "$40",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Quick question call (15 minutes)",
+     "price": "$25"
+    },
+    {
+     "name": "Extra document review, added at a meeting",
+     "price": "$20",
+     "rule": "priced and OK'd before it's done"
+    },
+    {
+     "name": "Tax planning session (60 minutes)",
+     "price": "$55",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Books catch-up session (2½ hours)",
+     "price": "$140",
+     "before": "a card saved for the $40 fee",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Personal tax return",
+     "price": "a flat fee quoted after the CPA sees the documents (the example: $90)",
+     "before": "a card saved for the $20 fee",
+     "after": "the saved card charged when the return is reviewed and signed",
+     "rule": "never a share of the refund or of tax saved"
+    },
+    {
+     "name": "Help with a letter from the IRS or the state",
+     "price": "priced at the meeting, after a $25 review",
+     "rule": "the owner OKs it first"
+    },
+    {
+     "name": "Monthly books review plan",
+     "price": "$35 a month, a 30-minute review call each month",
+     "before": "a card saved",
+     "after": "the saved card charged after each call",
+     "rule": "the plan's terms get their own yes; cancel by one reply or link; a reminder every year"
+    },
+    {
+     "name": "Monthly bookkeeping and the yearly return (the engagement)",
+     "price": "fixed fees set in the signed engagement letter after the first meeting (the example: $350 a month, and the return's flat fee quoted after the documents are seen)",
+     "rule": "billed under the engagement letter's own yes; never a share of a refund"
+    }
+   ],
+   "at the client's business (the example firm's own prices)": [
+    {
+     "name": "Books setup visit (about 2 hours)",
+     "price": "$179",
+     "before": "nothing taken",
+     "after": "Rosie texts the bill, or the firm bills its own way for a monthly client"
+    },
+    {
+     "name": "Payroll setup visit",
+     "price": "$150",
+     "before": "nothing taken",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Inventory count help (up to 3 hours)",
+     "price": "$199",
+     "before": "nothing taken",
+     "after": "Rosie texts the bill, or the monthly invoice"
+    },
+    {
+     "name": "Books cleanup",
+     "price": "priced from the client's documents (the example: $640, over Sam's $500 OK limit)",
+     "before": "a 25% retainer, taken as the deposit",
+     "after": "the rest on the bill Rosie texts"
+    },
+    {
+     "name": "Records check",
+     "price": "priced at the visit; only the $89 trip fee is promised"
+    },
+    {
+     "name": "Trip fee",
+     "price": "$89, credited to the work"
+    },
+    {
+     "name": "Extra time",
+     "price": "$120 an hour, 1-hour minimum"
+    }
+   ],
+   "travel area": "The firm's setting (the example: 25 miles).",
+   "capacity": "One person per booking: a CPA for a first meeting with a new business client; a staff accountant or bookkeeper for work at the client's business.",
+   "online": "Video and phone meetings count as at the office. Where the state's rules tie CPA work to a license in the client's state, only a CPA licensed there is offered.",
+   "booking window": "Up to 4 weeks ahead.",
+   "busy season": "A switch the firm sets by date: in the weeks before the filing deadline, new clients wait for the owner's OK and first meetings are 30 minutes."
+  },
+  "pf.questions": {
+   "before times": [
+    "Which firm or CPA? The customer or their AI names one, or Rosie shows firms that fit.",
+    "Is it for you, or for a business? A business: its kind, and how long it has run.",
+    "In the office, or by video?",
+    "A visit at your business: a books setup, an inventory count or a cleanup day?"
+   ],
+   "after a time is picked": [
+    "Any payroll? How many people?",
+    "What are the books kept in now: a spreadsheet, accounting software, paper, or nothing yet?",
+    "Anything that helps the meeting, like an interpreter or a step-free way in."
+   ],
+   "only on the secure page": [
+    "The business's full legal name, any other owners, and related businesses (names only, for the conflict check)",
+    "Any letter from the IRS or the state: yes or no, then an upload",
+    "Tax ID numbers, bank details and income figures: only inside uploaded documents, never typed into the chat",
+    "Email for the video link",
+    "18 or older",
+    "A tick: Rosie gives no tax advice; the firm isn't hired until both sign an engagement letter",
+    "A tick: the meeting fee, the $20 fee, and how they're charged"
+   ],
+   "who may book": "An adult books for themselves or for a business they own or run. Another adult may book for them, but the client gives their own names and yes on the secure page."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "someone in danger right now",
+    "a medical emergency",
+    "crisis words (the 988 line first)"
+   ],
+   "words that go on with safety steps": [
+    "a call or text from someone claiming to be the IRS, demanding payment by gift card or threatening arrest"
+   ],
+   "what Rosie says": {
+    "in danger right now": "Call 911 now. Nothing is booked.",
+    "a tax scam call": "The real IRS doesn't phone to threaten arrest or ask for gift cards. Don't pay or share details with the caller. You can report it to the Treasury's inspector general. The booking can go on."
+   },
+   "tax questions": "Never answered by Rosie or the AI: they wait for the CPA at the meeting. In danger, 911 comes first."
+  },
+  "pf.first_steps": {
+   "required": [
+    "A new client: the conflict form on the secure page (the business's legal name, other owners, related businesses; names only), while the time is saved.",
+    "Then Sam's OK to take a new client: Sam checks the names against the firm's clients for a conflict, and OKs or declines. The reason is never texted.",
+    "No answer by the firm's deadline (9am the next business day): the request ends, and nothing is owed.",
+    "A returning client: the form on file covers it, so it books right away.",
+    "Work at the client's business for a new client: an engagement letter signed by the client and by Sam on the secure page before the visit."
+   ],
+   "prep for the reminder": [
+    "Upload last year's tax return, this year's bank statements and any payroll reports on the secure page by the firm's deadline (the example: Thursday 6pm for a Saturday meeting).",
+    "Have the books file or the spreadsheet open, and your questions ready."
+   ],
+   "documents": "Uploaded only on the secure page, for the firm alone. A tax document or a tax ID number sent by text is deleted, not passed on, and the customer is pointed to the secure page."
+  },
+  "pf.visit": {
+   "check-in": "At the office: the code at the front desk, or given to the CPA. By video: the CPA asks for the code at the start. At the client's business: the code at the door.",
+   "work changes": "Extra work, like an extra document review, is priced and OK'd before it's done. Advice is the CPA's alone. Taking on the books and the taxes is set in the firm's engagement letter, never decided in a chat.",
+   "a conflict found at the meeting": "The CPA stops, charges nothing, and the firm records the name. The customer is told the firm can't take it, with no reason.",
+   "what proves it's done": "The code, or DONE.",
+   "after the first meeting": "The firm sends its engagement letter on the secure page: the scope (monthly books, payroll, the yearly return), how fees are set (fixed fees, never a share of a refund), and the client's document deadline. Both sign it. Then the client uploads the year's documents, the CPA quotes the return's flat fee after seeing them, and the monthly work starts.",
+   "originals": "Original papers taken to the office are signed out with a receipt and given back."
+  },
+  "pf.money": {
+   "before": "Flow A: a card saved for the $20 late-cancel or no-show fee; an advice call takes nothing. Flow B: nothing taken; a big job like a books cleanup takes a 25% retainer (the deposit) once its quote is OK'd.",
+   "after": "Flow A: the saved card charged when the CPA texts DONE, or the bill Rosie texts for an advice call. Flow B: the bill Rosie texts, or the firm's own monthly invoice for a monthly client.",
+   "fees": "Late-cancel or no-show fee: $20 ($40 for the books catch-up session), for a cancel less than 24 hours before, only after Sam says yes.",
+   "how fees are set": "Fixed or hourly. Never a share of a refund or of tax saved, and never set by what the return shows.",
+   "first meeting credit": "A paid first meeting is credited to the first year's fees if the client hires the firm.",
+   "prices shown": "A price shown stays good for 30 days after it was last shown, where the firm's rules or the state's rules require it.",
+   "monthly plans": "Their own yes on the secure page, cancel by one reply or link, a reminder every year, and a notice 30 days before a price change. A monthly fee with no visit, like monthly bookkeeping, is charged on the 1st to the saved card under the engagement letter's own yes: each charge is texted the day before, a declined card gets one pay link, and cancelling stops the next charge.",
+   "deposit cap": "From the state form.",
+   "tips": "None.",
+   "tax": "None by default; the rate comes from the state form where accounting work is taxed.",
+   "rosfield": "Pays Rosfield's $2 per confirmed booking, never more than $49 a person a month; a plan counts once a month. Switch: where the state's rules for CPAs bar or limit paying for referrals, the $2 is off for CPA work until Rosfield's lawyer confirms it (on the lawyer list)."
+  },
+  "pf.messages": {
+   "never in a text": [
+    "tax ID numbers (Social Security numbers, employer numbers)",
+    "bank or card details, income, what's owed or refunded",
+    "what a letter from the IRS or the state says",
+    "any tax or accounting advice"
+   ],
+   "to the owner and staff": "Texts to Sam and the team carry only the client's first name and initial, the business name, the service and the time. Everything else is on the signed-in page.",
+   "a document by text": "Rosie doesn't keep or pass it on, deletes it from the text service, and points the client to the secure page.",
+   "no nudges": "No follow-up texts pushing anyone to hire the firm. A quote or engagement letter gets one reminder 2 days before it ends, and no other.",
+   "work notes": "The CPA's work notes and the client's books stay in the firm's own files. Rosie keeps only the time, the service and the outcome.",
+   "languages": "English and Spanish.",
+   "minors": "Adults only."
+  },
+  "pf.staff": {
+   "titles and licenses": "Each CPA's active license in each state they're offered in. A video meeting with a CPA is offered only where the state's rules let that CPA serve a client there.",
+   "skills": [
+    "Business tax returns",
+    "Personal tax returns",
+    "Bookkeeping",
+    "Payroll",
+    "Letters from the IRS or the state",
+    "Inventory counts"
+   ],
+   "supervision": "Staff accountants and bookkeepers work under a CPA's review. They may prepare the work, but only a person the state's rules allow signs a return or a report.",
+   "who OKs what": "Sam OKs every new client after the conflict check, and every price made for one client over his limit ($500 at Lee Accounting). Pat sees the same requests. Sam's answer wins.",
+   "stand-ins": "Another CPA at the same firm, offered by name, and only if the client picks them. Nobody is moved to another CPA on silence: Sam calls instead. One exception: on a date that can't move, like a lender's deadline, Sam's default is a trusted stand-in CPA, and the client can still cancel with no fee."
+  },
+  "pf.rules": {
+   "engagement letter": "Before any work beyond the first meeting: the scope, the fees and the client's document deadline, signed by both on the secure page, where the firm's rules or the state's rules require it.",
+   "no tax advice from Rosie": "Rosie and the customer's AI never give tax or accounting advice. Questions wait for the CPA.",
+   "tax return information": "Tax return information is used only to book and to pass to the firm. Rosie never uses it for anything else, under the firm's data-security agreement and where the federal rules for return information apply.",
+   "data-security agreement": "The firm signs Rosie's data-security agreement before going live: how client files are kept, who opens them and how they're deleted.",
+   "deadlines": "The filing deadline and any extension come from the client's engagement; Rosie never names a deadline of its own.",
+   "titles": "The title 'CPA' only for licensed CPAs, as the business gives it (shown as given, not checked).",
+   "who may sign a return": "A switch from the state's form.",
+   "referral fees": "A switch from the state's form: where paying for a client sent to a CPA is barred or must be told to the client, the $2 follows that rule (on the lawyer list).",
+   "records": "Booking records 7 years. Client files stay in the firm's own files, and uploads are kept or deleted as the firm sets in the portal.",
+   "right to cancel": "Work sold at the client's home comes with a written right to cancel where the state's rules require it; a business's own premises usually don't.",
+   "status": "Draft: finalized once the state forms are filled in."
+  },
+  "pf.edges": {
+   "matter most": {
+    "a tax document or tax ID number texted": "Deleted, not passed on; the client is pointed to the secure page.",
+    "a tax question in the chat": "Never answered; it waits for the CPA.",
+    "a conflict": "Told without the reason; nothing owed.",
+    "need more for the check": "One question on the secure page, with a deadline; no answer: the request ends, nothing owed.",
+    "documents not uploaded in time": "The meeting stays; the client brings what they can.",
+    "a scam call claiming to be the IRS": "The scam warning, then the booking goes on.",
+    "busy season": "New clients wait for Sam's OK; meetings may be shorter.",
+    "the CPA is out": "Another CPA by name, new times, or a free cancel; nobody moved on silence.",
+    "a meeting before the filing deadline that can't move": "Another CPA by name, or the money back; an extension is the firm's call, never Rosie's.",
+    "thinking it over": "No follow-up nudges; the quote holds 30 days.",
+    "a client who leaves": "Their documents are handed back or deleted as the firm sets."
+   },
+   "the rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "forms",
+   "firststeps",
+   "documents",
+   "video"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for a monthly books review call. The firm offers a plan, so Rosie books the first call and saves the next ones on the same day and time."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Two business partners book back-to-back meetings on one morning. Rosie finds times across Nadia and Felix."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Nadia can meet in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A meeting for Alex and an extra document review work the same way. Both are asked before the times."
+   ],
+   [
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute style consult.",
+    "A what-if: the plug-in lets this work be done by video or phone, like a first meeting by video."
+   ],
+   [
+    "If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "If the plug-in asks for something to bring, the desk checks it first. A first meeting needs nothing in hand: the documents are on the secure page."
+   ],
+   [
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Sam set this line at sign-up: the number clients call for what only a CPA should answer."
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "Nadia suggests a longer meeting on another day, with no fee. Pick a new time:"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks. What would you like?",
+    "Your books review is part of a monthly plan with Nadia. What would you like?"
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Nadia, so Nadia's next times show. Personal returns always stay with Nadia."
+   ],
+   [
+    "This is Lee's Barbershop's booking line, so I can't reach Elm Street Dental.",
+    "This is Lee CPA Group's booking line, so I can't reach Market Street Dental."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A CPA firm takes no drop-offs. A repair store, a tailor or a groomer does."
+   ],
+   [
+    "Can Lee's Barbershop do a haircut on Saturday morning? What does it cost?",
+    "Can Lee CPA Group meet a new business client on Saturday morning? What does it cost?"
+   ],
+   [
+    "A clinic or a vet often names a nurse line or an emergency clinic here.",
+    "A CPA firm names its own office line here, for tax questions."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A CPA firm's example: a scam caller claiming to be the IRS."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Nadia stopped part of Alex M.'s meeting. The note is on the secure page."
+   ],
+   [
+    "Hi, it's Alex. I'd like to book for Saturday morning. A text is fine.",
+    "Hi, it's Alex. I'd like a first meeting about my store's books on Saturday morning. A text is fine."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At the office, clients are adults, so nothing more happens."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Upload your tax documents, and a CPA will quote a flat fee for your personal tax return."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "Work notes and the books stay in the firm's own files; Rosie keeps only a short note like this."
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped part of Alex M.'s meeting. I put a note on the page."
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a monthly books review plan with Nadia."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A CPA firm's plug-in adds a scam caller claiming to be the IRS."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the office door broke Alex's laptop bag strap today."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Market Street Dental? I need to move my cleaning."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Business valuations for Lee CPA Group: is it the same company?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "I got another letter from the state. Will 30 minutes be enough?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "Accounting work is rated, so the office takes the first branch."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a Quick question call (15 min) is $25. Want a time?"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book me a first meeting with Nadia Shah, CPA, at Lee CPA Group on Saturday."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the notes from Saturday spell the store's name wrong."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una cita con una contadora el sábado."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "wants monthly books and payroll; send the engagement letter"
+   ],
+   [
+    "From the price list or photos, the price is set.",
+    "From the price list or documents, the price is set."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's words have no danger, so nothing is sent here."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 return quote."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Tax help could mean a CPA firm or a tax preparer."
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's for my brother's new business. Can I pay for it?"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my business partner join the meeting by phone?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, personal returns and visits"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show your documents?"
+   ],
+   [
+    "Haircut · Sat Oct 31 · 10:00am · Riley",
+    "Books review · Sat Oct 31 · 10:00am · Nadia"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "My laptop bag strap broke on your office door."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Nadia also does personal returns and visits"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds business valuations to Lee CPA Group."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nadia: CPA, personal returns and visits"
+   ],
+   [
+    "A barbershop's services need none.",
+    "The first meeting needs none: the engagement letter comes after it."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do quick calls? I have one payroll question."
+   ],
+   [
+    "priced from the customer's photos",
+    "priced from the customer's documents"
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "Here: a letter from the IRS or the state, read by the CPA who'd handle it."
+   ],
+   [
+    "Books the groom's party together",
+    "Books two partners together"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a meeting and a document review"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The meeting notes you sent spell my store's name wrong."
+   ],
+   [
+    "Haircut every 4 weeks · Riley",
+    "Books review every month · Nadia"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Books review plan · every month"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a monthly books review"
+   ],
+   [
+    "Quoted from photos first",
+    "Quoted from documents first"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your documents"
+   ],
+   [
+    "A barbershop has none.",
+    "A CPA firm's notice: Rosie gives no tax advice."
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex adds an extra document review"
+   ],
+   [
+    "the customer's photos",
+    "the customer's documents"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the documents"
+   ],
+   [
+    "priced from photos",
+    "priced from documents"
+   ],
+   [
+    "from Alex's photos",
+    "from Alex's documents"
+   ],
+   [
+    "photos and answers",
+    "documents and answers"
+   ],
+   [
+    "from your photos",
+    "from your documents"
+   ],
+   [
+    "2 At my home",
+    "2 At my business"
+   ],
+   [
+    "From photos",
+    "From documents"
+   ],
+   [
+    "from photos",
+    "from documents"
+   ],
+   [
+    "NEW massage",
+    "NEW business valuations"
+   ],
+   [
+    "Add photos",
+    "Upload documents"
+   ],
+   [
+    "add photos",
+    "upload documents"
+   ],
+   [
+    "Riley Chen",
+    "Nadia Shah"
+   ],
+   [
+    "Avery Diaz",
+    "Felix Diaz"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Accounting's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Accounting"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee CPA Group PC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee CPA Group"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Bookkeeping"
+   ],
+   [
+    "Lee Electric",
+    "Lee Payroll"
+   ],
+   [
+    "1200 Main St, Springfield",
+    "750 Main St, Suite 200"
+   ],
+   [
+    "88 Elm St, Springfield",
+    "220 Market St, Suite 4"
+   ],
+   [
+    "Springfield",
+    "the same town"
+   ],
+   [
+    "Elm St",
+    "Market St"
+   ],
+   [
+    "Oak St",
+    "River Rd"
+   ],
+   [
+    "Riley's",
+    "Nadia's"
+   ],
+   [
+    "Riley",
+    "Nadia"
+   ],
+   [
+    "Avery's",
+    "Felix's"
+   ],
+   [
+    "Avery",
+    "Felix"
+   ],
+   [
+    "Jordan",
+    "Eli"
+   ],
+   [
+    "Casey",
+    "Milo"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Tax planning meeting"
+   ],
+   [
+    "Signature cut and shave",
+    "Tax planning meeting"
+   ],
+   [
+    "signature cut",
+    "tax planning meeting"
+   ],
+   [
+    "Groom's package",
+    "Books catch-up session"
+   ],
+   [
+    "Color and cut",
+    "Personal tax return"
+   ],
+   [
+    "color and cut",
+    "personal tax return"
+   ],
+   [
+    "Color correction",
+    "Tax letter help"
+   ],
+   [
+    "color correction",
+    "tax letter help"
+   ],
+   [
+    "Skin fade",
+    "Tax question meeting"
+   ],
+   [
+    "skin fade",
+    "tax question meeting"
+   ],
+   [
+    "a beard trim",
+    "an extra document review"
+   ],
+   [
+    "A beard trim",
+    "An extra document review"
+   ],
+   [
+    "Beard trim",
+    "Extra document review"
+   ],
+   [
+    "beard trim",
+    "extra document review"
+   ],
+   [
+    "Kids cut",
+    "Quick question call"
+   ],
+   [
+    "kids cut",
+    "quick question call"
+   ],
+   [
+    "Haircuts",
+    "First meetings"
+   ],
+   [
+    "haircuts",
+    "first meetings"
+   ],
+   [
+    "Haircut",
+    "First meeting"
+   ],
+   [
+    "haircut",
+    "first meeting"
+   ],
+   [
+    "house calls",
+    "visits at the client's business"
+   ],
+   [
+    "House calls",
+    "Visits at the client's business"
+   ],
+   [
+    "house call",
+    "visit at the client's business"
+   ],
+   [
+    "Color quotes",
+    "Return quotes"
+   ],
+   [
+    "color quote",
+    "return quote"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "office's price list"
+   ],
+   [
+    "Drain clearing",
+    "Books setup"
+   ],
+   [
+    "a travel fee",
+    "a trip fee"
+   ],
+   [
+    "$25 consult",
+    "$25 review"
+   ],
+   [
+    "plumbing and electrical",
+    "bookkeeping and payroll"
+   ],
+   [
+    "Plumbing and electrical",
+    "Bookkeeping and payroll"
+   ],
+   [
+    "electrical license",
+    "payroll registration"
+   ],
+   [
+    "Electrical",
+    "Payroll"
+   ],
+   [
+    "electrical",
+    "payroll"
+   ],
+   [
+    "plumbing jobs",
+    "bookkeeping jobs"
+   ],
+   [
+    "plumber",
+    "accountant"
+   ],
+   [
+    "Plumber",
+    "Accountant"
+   ],
+   [
+    "plumbing",
+    "bookkeeping"
+   ],
+   [
+    "Plumbing",
+    "Bookkeeping"
+   ],
+   [
+    "barbershops",
+    "CPA firms"
+   ],
+   [
+    "barbershop",
+    "CPA firm"
+   ],
+   [
+    "Barbershop",
+    "CPA firm"
+   ],
+   [
+    "Barbering",
+    "Tax and accounting work"
+   ],
+   [
+    "barbers",
+    "CPAs"
+   ],
+   [
+    "barber",
+    "CPA"
+   ],
+   [
+    "Barber",
+    "CPA"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the front desk"
+   ],
+   [
+    "pays at the chair",
+    "pays at the front desk"
+   ],
+   [
+    "code at the chair",
+    "code at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the office"
+   ],
+   [
+    "At the chair",
+    "At the office"
+   ],
+   [
+    "in the chair",
+    "at the meeting"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "A shop",
+    "An office"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "the color",
+    "the personal return"
+   ],
+   [
+    "a color",
+    "a personal return"
+   ],
+   [
+    "color",
+    "personal return"
+   ],
+   [
+    "Color",
+    "Personal return"
+   ],
+   [
+    "Bookkeeping takes jobs sent now. The office takes none.",
+    "No accounting work is sent now: every meeting and visit is booked ahead."
+   ],
+   [
+    "Bookkeeping MP045210",
+    "CPA license, as given, not checked"
+   ],
+   [
+    "Bookkeeping JP031552 · payroll JE30417",
+    "Staff accountant · no license needed"
+   ],
+   [
+    "Bookkeeping, checked",
+    "Bookkeeper · no license needed"
+   ],
+   [
+    "like a tax letter help done in two steps",
+    "like tax letter help done in two meetings"
+   ],
+   [
+    "Health details stay on the secure page, never in a text.",
+    "Tax details stay on the secure page, never in a text."
+   ],
+   [
+    "Alex picked a quick question call for a son before the times, so the times fit it.",
+    "Alex picked a call for a son first, so the times fit it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "First meetings, tax returns and tax planning, at the office or by video."
+   ],
+   [
+    "The chairs",
+    "The meeting rooms"
+   ],
+   [
+    "A chair, ready",
+    "A meeting room, ready"
+   ],
+   [
+    "Nadia and Felix cut hair;",
+    "Nadia and Felix are CPAs;"
+   ],
+   [
+    "Jules rents a chair",
+    "Jules rents a desk"
+   ],
+   [
+    "like a chair renter",
+    "like a desk renter"
+   ],
+   [
+    "A chair renter asked for",
+    "A desk renter asked for"
+   ],
+   [
+    "'A trim' or 'a fade' fits a first meeting.",
+    "'A tax chat' or 'a look at my books' fits a first meeting."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the office's list.",
+    "Alex asks for a will, which isn't on the office's list."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't write wills."
+   ],
+   [
+    "would like to see your hair before pricing it.",
+    "would like to see your documents before pricing it."
+   ],
+   [
+    "once Nadia sees the hair.",
+    "once Nadia sees the documents."
+   ],
+   [
+    "'Yes, make it a fade' goes back to the times.",
+    "'Yes, make it a planning meeting' goes back to the times."
+   ],
+   [
+    "please come with dry hair on Saturday.",
+    "please bring last year's return on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring last year's return."
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7.",
+    "you now have two first meetings on Sat Nov 7."
+   ]
+  ],
+  "B": [
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for a books check-in at the store every 3 months. Lee Accounting offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one."
+   ],
+   [
+    "This is Rosie, the automated booking assistant for Lee Home Services. Add photos of your water heater, and a plumber will price the job.",
+    "This is Rosie, the automated booking assistant for Lee Accounting. Upload your bank statements and the books you have, and an accountant will price the cleanup."
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Accounting has a books check-in plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 3 months?"
+   ],
+   [
+    "Every way in reaches the same booking desk, with the same rules. The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "Every way in reaches the same booking desk, with the same rules. The main story: Alex asks an AI for an accountant on Mon Oct 19, 6:40pm."
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Accounting books up to 60 days ahead. We'll text you times for the year-end books check you asked Eli about in late Aug 2027."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Rosie gives no tax advice: bring the notice to the visit, or upload it on your page. Milo can come sooner, at the same price."
+   ],
+   [
+    "Say the work starts at a set time, like a private class at home or an event. The times read 'starts at 8:00am', not a window.",
+    "Say the work starts at a set time, like a visit before a store opens. The times read 'starts at 8:00am', not a window."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Eli finds papers that look like a legal dispute with a supplier. The plug-in says an accountant stops there, so Alex gets a written note."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Accounting does bookkeeping and payroll, not audits. Nothing was saved. You can look for a CPA firm that does audits."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee CPA Group for a first meeting instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "One number booked 3 jobs at Lee Home Services this week under different names, and nobody was home for any of them.",
+    "One number booked 3 visits at Lee Accounting this week under different names, and nobody was there for any of them."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about setting up payroll. Both jobs go in one booking, with one start time and one code."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee CPA Group can meet you at the office for $35, or at your business for $75. Where would you like it?"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said someone is in danger. They got the safety message, and nothing was booked."
+   ],
+   [
+    "Lee Home Services doesn't go to Riverton. It's outside the 25 miles it covers, so nothing was saved.",
+    "Lee Accounting doesn't go that far. It's outside the 25 miles it covers, so nothing was saved."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a books cleanup is priced from documents, so Rosie's first text asks for them."
+   ],
+   [
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "One of the firm's CPAs does visits at a client's business. Sam set each place's price and money at sign-up."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the business does, how many accounts it has, and what the books are kept in now."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s books, set up Thu Oct 22, show card sales twice. It's inside the 30-day promise."
+   ],
+   [
+    "Lee Home Services goes 25 miles from 1200 Main St. Alex's home in Springfield is inside it.",
+    "Lee Accounting goes 25 miles from 750 Main St. Alex's store in the same town is inside it."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The payroll setup is $150 from the list. Both fit in the same visit."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Eli's phone, you said yes to closing out two old accounts for $160."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Eli is waiting on a paper from your bank. The visit should be done by 10:30am."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the documents path, only Eli's times show: he's the one who does books cleanups."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I need the books for my bike store set up. Can an accountant come Thursday morning, before we open? I'm in the same town."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Accounting doesn't do, like an audit."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Eli found papers about a dispute with a supplier and stopped that part of the work."
+   ],
+   [
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Eli moved my receipts box and I can't find it.\""
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like someone threatening Alex, gets the safety steps first."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Eli broke a bike light at Alex M.'s store. The before notes show it was fine."
+   ],
+   [
+    "Lee Home Services doesn't go to Riverton: it's outside the 25 miles it covers.",
+    "Lee Accounting doesn't go that far: it's outside the 25 miles it covers."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at the client's business goes on in this flow. The office is in the other flow."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A books setup happens only at the client's business, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a books check-in at two stores every 3 months."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Accounting sent you a proposal for monthly bookkeeping and payroll, from Eli's notes."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the books cleanup quote before booking."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An accounting firm's example: a scam caller claiming to be the IRS gets the scam warning."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It's inside the firm's 30-day promise, so this visit is free."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Someone called me saying they're from the IRS."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "An AI asks for times in Riverton, a town 40 miles from 1200 Main St.",
+    "An AI asks for times in a town 40 miles from 750 Main St."
+   ],
+   [
+    "Say another customer's AI asks for a job in Riverton, 40 miles away.",
+    "Say another customer's AI asks for a visit 40 miles away."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can I write off my new delivery van this year?"
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam set this for every visit at a client's business."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: close out two old accounts, $160. Sent to Alex."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a scam caller claiming to be the IRS."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE books set up; Alex logs receipts weekly. Offer payroll setup next."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the books setup visit to $199 for visits from Mon Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Books setups already booked keep $179, even after Nov 2."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A books setup visit with Lee Accounting is $179, not $150."
+   ],
+   [
+    "Your water heater contract is waiting for your signature.",
+    "Your engagement letter is waiting for your signature."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for a books setup visit at $150, an old price."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Eli's next times for a payroll setup visit."
+   ],
+   [
+    "Alex M. asks: Can I run the dishwasher before you come?",
+    "Alex M. asks: Can my staff use the back office while you work?"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 quote is good for 7 days."
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to get to safety and call 911"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Eli also help count my stock while Eli is here?"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START Alex can't open the store's bank account"
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: year-end books check, 12 months"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me llamó un hombre que dice que es del IRS."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 close out two old accounts in the books"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every 3 months to check the books, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Eli come back next week to set up payroll?"
+   ],
+   [
+    "Your 25-mile area reaches into a second state.",
+    "Your 25-mile area reaches into a second state."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free-fix promise lasts."
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "Bookkeeping and payroll visits there"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The state just sent a notice about my sales tax. It's due next week."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE about 300 receipts, Jan to Sep; no books file yet"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The bank needs my books by Monday. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Eli also set up payroll for my two workers?"
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Accounting · Books setup visit"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Engagement letter · Books cleanup · $640"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD supplier dispute papers, stopped that part"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my staff use the back office while you work?"
+   ],
+   [
+    "Prices it: the list, photos or the visit",
+    "Prices it: the list, documents or the visit"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's books check-in?"
+   ],
+   [
+    "Thanks. We've told Jordan you're home.",
+    "Thanks. We've told Eli you're there."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Nadia also does personal returns and visits"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be at the store 30 minutes late, sorry!"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nadia: CPA, personal returns and visits"
+   ],
+   [
+    "Say Alex books for a parent's home.",
+    "Say Alex books a visit at a parent's store."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My card sales are showing up twice in the books."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Close out two old accounts · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the supplier's account"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Eli moved my receipts box and I can't find it."
+   ],
+   [
+    "Lee Home Services · Drain clearing",
+    "Lee Accounting · Books setup visit"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Eli slips on the store's steps and texts HURT."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Talk to an attorney about it first"
+   ],
+   [
+    "priced from the customer's photos",
+    "priced from the customer's documents"
+   ],
+   [
+    "Is the sink still full of water?",
+    "What are the store's books kept in now?"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · Books setup visit"
+   ],
+   [
+    "Only a teen is home at Alex M.'s",
+    "Only a teen worker is at Alex M.'s store"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a dispute that needs an attorney"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE waiting on the bank, done 10:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE broke a bike light on the display"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Monthly bookkeeping and payroll"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa books setup Thu 12pm Milo"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "A visit at a client's business starts at a set time."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Books check-in plan · every 3 months"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped on the steps, need to stop"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE count report Mon Oct 26"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the count report link"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Close out two old accounts"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise books setup visit to 199"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Supplier dispute papers"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Count sheets and Eli's notes"
+   ],
+   [
+    "Photos and answers added",
+    "Documents and answers added"
+   ],
+   [
+    "Quoted from photos first",
+    "Quoted from documents first"
+   ],
+   [
+    "A gas smell at the home",
+    "Someone in danger at the business"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your documents"
+   ],
+   [
+    "Just the kitchen sink.",
+    "One bank account and one card."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Books setup visit"
+   ],
+   [
+    "Under the sink, before",
+    "Receipts box, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your catch-up"
+   ],
+   [
+    "Plumbing never pauses.",
+    "Bookkeeping never pauses."
+   ],
+   [
+    "Cabinet floor, before",
+    "Spreadsheet, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken bike light"
+   ],
+   [
+    "Drain clearing · $179",
+    "Books setup visit · $179"
+   ],
+   [
+    "the customer's photos",
+    "the customer's documents"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the documents"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 extra work"
+   ],
+   [
+    "Sewer camera report",
+    "Inventory count report"
+   ],
+   [
+    "the on-call plumber",
+    "the on-call accountant"
+   ],
+   [
+    "Nobody was home for",
+    "Nobody was there for"
+   ],
+   [
+    "A dog, kept inside",
+    "None"
+   ],
+   [
+    "Priced from photos",
+    "Priced from documents"
+   ],
+   [
+    "priced from photos",
+    "priced from documents"
+   ],
+   [
+    "from Alex's photos",
+    "from Alex's documents"
+   ],
+   [
+    "photos and answers",
+    "documents and answers"
+   ],
+   [
+    "the kitchen drain",
+    "the books setup visit"
+   ],
+   [
+    "from your photos",
+    "from your documents"
+   ],
+   [
+    "In the driveway",
+    "In front of the store"
+   ],
+   [
+    "Every 12 months",
+    "Every 3 months"
+   ],
+   [
+    "arriving 8–10am",
+    "8:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "12:00pm"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 books setup"
+   ],
+   [
+    "plumbing visit",
+    "accounting visit"
+   ],
+   [
+    "arrival window",
+    "start time"
+   ],
+   [
+    "Kitchen drain",
+    "Books setup"
+   ],
+   [
+    "after the job",
+    "after the visit"
+   ],
+   [
+    "1 At my home",
+    "1 At my business"
+   ],
+   [
+    "they're home",
+    "they're there"
+   ],
+   [
+    "Alex is home",
+    "Alex is there"
+   ],
+   [
+    "At my home.",
+    "At my store."
+   ],
+   [
+    "Nobody home",
+    "Nobody there"
+   ],
+   [
+    "nobody home",
+    "nobody there"
+   ],
+   [
+    "Alex's home",
+    "Alex's store"
+   ],
+   [
+    "at the home",
+    "at the business"
+   ],
+   [
+    "in the home",
+    "at the business"
+   ],
+   [
+    "From photos",
+    "From documents"
+   ],
+   [
+    "from photos",
+    "from documents"
+   ],
+   [
+    "At my home",
+    "At my business"
+   ],
+   [
+    "Yard drain",
+    "Inventory count"
+   ],
+   [
+    "Add photos",
+    "Upload documents"
+   ],
+   [
+    "Riley Chen",
+    "Nadia Shah"
+   ],
+   [
+    "Avery Diaz",
+    "Felix Diaz"
+   ],
+   [
+    "a plumber",
+    "an accountant"
+   ],
+   [
+    "Rental 1",
+    "Store 1"
+   ],
+   [
+    "Rental 2",
+    "Store 2"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "be home",
+    "be there"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Accounting LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Accounting's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Accounting"
+   ],
+   [
+    "leehomeservices.com",
+    "leeaccounting.com"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee CPA Group"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Bookkeeping"
+   ],
+   [
+    "Lee Electric",
+    "Lee Payroll"
+   ],
+   [
+    "1200 Main St, Springfield",
+    "750 Main St, Suite 200"
+   ],
+   [
+    "88 Elm St, Springfield",
+    "220 Market St, Suite 4"
+   ],
+   [
+    "Springfield",
+    "the same town"
+   ],
+   [
+    "1200 Main St",
+    "750 Main St"
+   ],
+   [
+    "Elm St",
+    "Market St"
+   ],
+   [
+    "42 Oak St",
+    "58 River Rd"
+   ],
+   [
+    "Riley",
+    "Nadia"
+   ],
+   [
+    "Avery",
+    "Felix"
+   ],
+   [
+    "Jordan's",
+    "Eli's"
+   ],
+   [
+    "Jordan",
+    "Eli"
+   ],
+   [
+    "Casey's",
+    "Milo's"
+   ],
+   [
+    "Casey",
+    "Milo"
+   ],
+   [
+    "beard trim",
+    "extra document review"
+   ],
+   [
+    "Haircut",
+    "First meeting"
+   ],
+   [
+    "haircut",
+    "first meeting"
+   ],
+   [
+    "house calls",
+    "visits at the client's business"
+   ],
+   [
+    "House calls",
+    "Visits at the client's business"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Drain clearings",
+    "Books setups"
+   ],
+   [
+    "drain clearings",
+    "books setups"
+   ],
+   [
+    "Drain clearing",
+    "Books setup"
+   ],
+   [
+    "drain clearing",
+    "books setup"
+   ],
+   [
+    "Water heater replacement",
+    "Books cleanup"
+   ],
+   [
+    "water heater replacement",
+    "books cleanup"
+   ],
+   [
+    "Water heater flush",
+    "Payroll setup visit"
+   ],
+   [
+    "water heater flush",
+    "payroll setup visit"
+   ],
+   [
+    "Leak repair",
+    "Records check"
+   ],
+   [
+    "leak repair",
+    "records check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Inventory count help"
+   ],
+   [
+    "sewer camera inspection",
+    "inventory count help"
+   ],
+   [
+    "camera inspection",
+    "inventory count"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "a travel fee",
+    "a trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, credited to the work"
+   ],
+   [
+    "plumbing and electrical",
+    "bookkeeping and payroll"
+   ],
+   [
+    "Plumbing and electrical",
+    "Bookkeeping and payroll"
+   ],
+   [
+    "electrical license",
+    "payroll registration"
+   ],
+   [
+    "Electrical license",
+    "Payroll registration"
+   ],
+   [
+    "electrical jobs",
+    "payroll jobs"
+   ],
+   [
+    "electrical prices",
+    "payroll prices"
+   ],
+   [
+    "Electrical",
+    "Payroll"
+   ],
+   [
+    "electrical",
+    "payroll"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "plumbing jobs",
+    "bookkeeping jobs"
+   ],
+   [
+    "plumber",
+    "accountant"
+   ],
+   [
+    "Plumber",
+    "Accountant"
+   ],
+   [
+    "plumbing",
+    "bookkeeping"
+   ],
+   [
+    "Plumbing",
+    "Bookkeeping"
+   ],
+   [
+    "barbershops",
+    "CPA firms"
+   ],
+   [
+    "barbershop",
+    "CPA firm"
+   ],
+   [
+    "Barbershop",
+    "CPA firm"
+   ],
+   [
+    "barbers",
+    "CPAs"
+   ],
+   [
+    "barber",
+    "CPA"
+   ],
+   [
+    "Barber",
+    "CPA"
+   ],
+   [
+    "heating and cooling",
+    "business valuations"
+   ],
+   [
+    "Heating and cooling",
+    "Business valuations"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the office"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "A shop",
+    "An office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop front",
+    "Office front"
+   ],
+   [
+    "color",
+    "personal return"
+   ],
+   [
+    "25% deposit",
+    "25% retainer"
+   ],
+   [
+    "written estimate",
+    "engagement letter"
+   ],
+   [
+    "water heater contract",
+    "engagement letter"
+   ],
+   [
+    "water heater job",
+    "books cleanup"
+   ],
+   [
+    "water heater",
+    "books cleanup"
+   ],
+   [
+    "Water heater",
+    "Books cleanup"
+   ],
+   [
+    "drain",
+    "books setup"
+   ],
+   [
+    "Bookkeeping takes jobs sent now. The office takes none.",
+    "No accounting work is sent now: every meeting and visit is booked ahead."
+   ],
+   [
+    "Bookkeeping MP045210",
+    "CPA license, as given, not checked"
+   ],
+   [
+    "Bookkeeping JP031552 · payroll JE30417",
+    "Staff accountant · no license needed"
+   ],
+   [
+    "Bookkeeping, checked",
+    "Bookkeeper · no license needed"
+   ],
+   [
+    "Milo · license not found",
+    "Felix · license not found"
+   ],
+   [
+    "Milo stays on the team",
+    "Felix stays on the team"
+   ],
+   [
+    "Milo · license expired",
+    "Felix · license expired"
+   ],
+   [
+    "so Lee Accounting can't book you until it shows renewed",
+    "so Lee CPA Group can't book you until it shows renewed"
+   ],
+   [
+    "Milo's license is checked again",
+    "Felix's license stays as given"
+   ],
+   [
+    "so Milo's license isn't checked yet",
+    "so Felix's license isn't checked yet"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 3 months"
+   ],
+   [
+    "a engagement letter",
+    "an engagement letter"
+   ],
+   [
+    "Both rentals' visits go on one bill",
+    "Both stores' visits go on one bill"
+   ],
+   [
+    "Your Thu time is saved until 7:45pm today.",
+    "Your Thu time is saved until 6:45pm today."
+   ],
+   [
+    "Sam adds an accountant",
+    "Sam adds a CPA"
+   ],
+   [
+    "Sam adds Reese K. to Lee Accounting.",
+    "Sam adds Reese K., a CPA who reviews the books, to Lee Accounting."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "First meetings, tax returns and tax planning, at the office or by video."
+   ],
+   [
+    "Books setup and water heaters, within 25 miles.",
+    "Books setup, payroll and inventory counts, within 25 miles."
+   ],
+   [
+    "Nadia and Felix cut hair;",
+    "Nadia and Felix are CPAs;"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about setting up my store's books."
+   ],
+   [
+    "'My sink won't books setup' fits a books setup.",
+    "'My books are a mess' fits a books setup."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like keeping a second set of books to hide sales."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a payroll check-up? Say so.'"
+   ],
+   [
+    "And which books setup is clogged, and is water backing up anywhere else?",
+    "And what are the books kept in now, and how many bank accounts are there?"
+   ],
+   [
+    "like new pipes put in one day and finished another.",
+    "like a books cleanup started one day and finished another."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the last 3 months of bank statements ready."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a tax notice with a deadline this week just came."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 payroll forms 165 sales tax 80"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Payroll forms and sales tax filings"
+   ],
+   [
+    "Eli finds corroded shutoff valves.",
+    "Eli finds a year of unfiled payroll forms."
+   ],
+   [
+    "OK'd the shutoff valve only",
+    "OK'd the payroll forms only"
+   ],
+   [
+    "Eli fixes the shutoff valve today",
+    "Eli catches up the payroll forms today"
+   ],
+   [
+    "Shutoff valve",
+    "Payroll forms catch-up"
+   ],
+   [
+    "the shutoff valves",
+    "the payroll forms"
+   ],
+   [
+    "water is off on Main St after 2pm, so afternoon jobs may run late.",
+    "the power is off on Main St after 2pm, so afternoon visits may run late."
+   ],
+   [
+    "clogs again 2 weeks later. It's inside the 1-year labor warranty",
+    "shows the same error again 2 weeks later. It's inside the firm's 90-day fix promise"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found two sales days missing from the books this morning."
+   ],
+   [
+    "like replacing the old pipes Eli noted.",
+    "like the monthly bookkeeping Eli suggested."
+   ],
+   [
+    "It's a leak under the sink, today, starts at 3:00pm, with Eli.",
+    "It's a records check, today, starts at 3:00pm, with Eli."
+   ],
+   [
+    "Say Eli cracks the cabinet floor and texts a photo.",
+    "Say Eli knocks over the store's display shelf and texts a photo."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This visit needs the engagement letter signed first. It takes about a day, so the first open times are after that."
+   ],
+   [
+    "It's my kitchen.",
+    "It's my store."
+   ],
+   [
+    "Yes, it won't books setup",
+    "A spreadsheet"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "If anything in the books setup looks wrong, reply here."
+   ],
+   [
+    "The trip fee is $89.",
+    "It's priced at the visit."
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee, CPA, signs up two companies by text. Then Alex M., who runs a bike store, asks an AI to book a first meeting with Nadia Shah, CPA, at Lee CPA Group, Sat Oct 24 at 11:00am, to take over his books and taxes. Sam checks for conflicts and OKs a new client, Alex uploads his documents on the secure page, and after the meeting the firm's engagement letter, the return's quote and monthly books follow. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee, CPA, signs up two companies by text. Then Alex M. books Lee Accounting to set up his bike store's books at 58 River Rd. Alex and Sam sign the engagement letter on the secure page, and Eli, a staff accountant, comes Thu Oct 22 at 8:00am, before the store opens. Rosie texts the bill after. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|none|bill",
+    "photos|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $35 first meeting with Nadia Shah, CPA. A card is saved for the $20 late-cancel or no-show fee, and the $35 is charged when Nadia texts DONE. It's credited to the first year's fees if Alex hires the firm. A monthly books review plan is charged the same way.",
+    "list|none|bill": "The same $35 first meeting at a firm that saves no card, or an advice call for a client billed by the half hour: nothing taken, and Rosie texts the bill when Nadia texts DONE.",
+    "photos|card|card": "Alex's personal tax return, priced at a flat $90 once Nadia sees Alex's documents on the secure page. Sam OKs it. A card is saved for the $20 fee, and the $90 is charged when the return is reviewed and signed."
+   },
+   "labels": {
+    "price": {
+     "photos": "Priced from your documents first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "First meeting"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "First meeting"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Personal tax return"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|bill",
+   "combos": [
+    "list|none|bill",
+    "list|none|own",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|none|bill": "The main story: a $179 books setup visit at Alex's store, after the engagement letter is signed. Nothing is taken, and Rosie texts the bill when Eli texts DONE.",
+    "list|none|own": "The same visit, or an inventory count, for a client the firm already bills each month: nothing is taken, and it goes on the firm's own invoice.",
+    "photos|deposit|bill": "A books cleanup, priced from Alex's documents at $640, over Sam's $500 limit, so Sam OKs it. A 25% retainer, $160, is taken as the deposit, and the $480 rest is on the bill after."
+   },
+   "labels": {
+    "price": {
+     "photos": "Priced from your documents first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Books setup visit"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Books setup visit"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Books cleanup"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Books cleanup"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "A personal return is priced for each client from documents first. A tax letter is priced at a meeting, after a $25 review.",
+     "The long services show how much time they take, so the CPA is saved for all of it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the firm's price list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "First meeting (new client)",
+          "$35 · 30 min"
+         ],
+         [
+          "Tax question meeting",
+          "$40"
+         ],
+         [
+          "Extra document review",
+          "$20"
+         ],
+         [
+          "Quick question call",
+          "$25 · 15 min"
+         ],
+         [
+          "Tax planning meeting",
+          "$55 · 60 min"
+         ],
+         [
+          "Books catch-up session",
+          "$140 · 2½ hours"
+         ],
+         [
+          "Personal tax return",
+          "Priced from documents"
+         ],
+         [
+          "Tax letter help",
+          "Priced at the meeting · $25 review"
+         ],
+         [
+          "Advice call (clients)",
+          "$35 a half hour"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The payroll plug-in loads the same way, with its own services and license form.",
+     "A payroll cleanup gets a free look first, then a quote.",
+     "AI assistants find Lee Accounting under bookkeeping and under payroll."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Payroll next. Send a photo of your payroll prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Payroll prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Payroll price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trip fee",
+          "$89, credited to the work"
+         ],
+         [
+          "Payroll setup for a new employer",
+          "$149"
+         ],
+         [
+          "Quarterly payroll filings",
+          "$189"
+         ],
+         [
+          "Extra time",
+          "$120 an hour, 1-hour minimum"
+         ],
+         [
+          "Payroll cleanup",
+          "A free look, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like bookkeeping. Send only what's different.",
+      {
+       "card": {
+        "title": "Payroll, set like bookkeeping",
+        "lines": [
+         "At the client's business",
+         "Nothing taken before",
+         "Paid after the visit, the way you picked for bookkeeping",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "A CPA firm's example: 'Should I be an S corp?' gets 'That's a question for your CPA at the meeting.'"
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "For accounting work, tax ID numbers, bank details and income go only inside documents on the secure page.",
+     "A tax form texted by mistake is deleted from the text service and never passed on. The client is pointed to the page."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Accounting work pays Rosfield's $2 per confirmed booking by default."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Accounting work books people by name, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Accounting work runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Accounting work is never sent now: every meeting and visit is booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A meeting books a CPA's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A meeting books a CPA's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at a CPA firm is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every client has a check: a new one signs the conflict form, and a returning one has it on file."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A meeting has no minimum headcount."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Accounting clients are adults; no child is left at the office."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "The client is at the meeting; documents go on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A CPA firm's clients are asked how it went, like most work."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for accounting work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for accounting work."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the office: documents go on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The engagement letter after the first meeting is drawn on the main line (A10-x01 to A10-x06)."
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "more": [
+     "The example follows the money choice at the top. Here, it's a $35 first meeting with Nadia Shah, CPA.",
+     "Alex runs a bike store and wants a firm to take over its books and taxes."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Book me a first meeting with Nadia Shah, CPA, at Lee CPA Group on Saturday. I want a firm to take over my store's books and taxes."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-22",
+    "more": [
+     "That gets the scam warning first, then the booking goes on."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on.",
+    "more": [
+     "A CPA firm's example: a call from someone claiming to be the IRS, demanding gift cards. It's a common scam.",
+     "Alex's words have no danger, so nothing is sent here."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "The real IRS doesn't phone to threaten arrest or ask for gift cards. Don't pay or share details with the caller. Your booking can go on."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-01",
+    "does": "No danger, so the booking goes on. Each service is set at sign-up: at the office, at the client's business, or both. A first meeting is offered in both, so Alex picks.",
+    "more": [
+     "At the office, no address or travel check is needed. The office's address goes in the confirmation.",
+     "A visit at the client's business follows the other flow: the business goes to the customer.",
+     "A first meeting at Alex's store is $75: Nadia comes to the store, and the saved card is charged after.",
+     "The plug-in lets a first meeting be by video too. Then that's a third place to pick (A4-36)."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A first meeting at Lee CPA Group is $35 at the office or by video, or $75 at your business. Where would you like it?",
+      {
+       "buttons": [
+        "At the office",
+        "At my business"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "agent",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "A CPA firm's example: a first meeting by video, with a CPA licensed for the client's state where the rules require it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-03",
+    "does": "A plug-in holds what one kind of work needs. The steps around it stay the same. Here, the CPA firm's parts load, and every later step uses them.",
+    "more": [
+     "Its questions: for you or a business, payroll, and how the books are kept now.",
+     "Its danger words: a scam caller claiming to be the IRS.",
+     "Its first step: the conflict form for every new client, then Sam's OK.",
+     "Its titles: only a licensed CPA is called 'CPA'. Others are 'accountant' or 'bookkeeper'.",
+     "No profile yet for that kind of work? Then safe defaults apply."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "does": "Before any times, the AI asks the plug-in's questions that change the price or the length. Each answer gets the danger check.",
+    "more": [
+     "Here: is it for Alex, or for a business? A business owner meets a CPA who does business returns.",
+     "Questions that only add detail come later, once a time is saved.",
+     "No income figures or tax ID numbers are asked in the chat, ever."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee CPA Group asks: is this for you, or for a business?",
+      {
+       "buttons": [
+        "For me",
+        "For my business"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "agent",
+      "2. My bike store."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Any payroll? And what are the books kept in now? Please don't type income figures or tax ID numbers here."
+     ],
+     [
+      "cust",
+      "agent",
+      "Two part-time workers. The books are in a spreadsheet."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-65",
+    "more": [
+     "Questions that set the price or time came earlier, before the times.",
+     "Private answers go only on the secure page, never through the AI.",
+     "The AI asks Alex not to type income figures, bank details or tax ID numbers here."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-23",
+    "more": [
+     "A CPA firm's rule: no tax ID number, bank detail or income figure passes through the AI either."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-41",
+    "does": "Where the plug-in says a notice is due when booking, the AI says it before Alex's yes. The secure page and the confirmation repeat it.",
+    "more": [
+     "A CPA firm's notice: Rosie gives no tax advice.",
+     "The firm isn't hired until both sign its engagement letter.",
+     "Tax ID numbers, bank details and income go only in documents on the secure page.",
+     "The booking records that the notice was said."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Before you book: Rosie gives no tax advice. The firm isn't hired until you both sign its engagement letter. Share documents only on the secure page, never in a chat or a text."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Sam reads it before the booking is OK'd (A6-02).",
+     "A returning client has it on file, so nothing is asked again."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "A CPA firm's form: the business's full legal name, any other owners, and related businesses. Names only, no figures.",
+     "It also asks if a letter from the IRS or the state came. A letter is uploaded, never typed or texted.",
+     "It's due now, within the 10 minutes the time is saved. It stays on file for the next booking."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-02",
+    "more": [
+     "A new client: Sam checks the names on the conflict form against the firm's clients before the OK. The names stay on the signed-in page.",
+     "A conflict is a decline. Its reason is never texted."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-05",
+    "more": [
+     "For a conflict, the text never says why, and no other firm is named."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "A paid first meeting is credited to the first year's fees if the client hires the firm.",
+     "The secure page holds the document checklist: due by Thu Oct 22, 6pm, so Nadia can read them first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-15",
+    "more": [
+     "Texts to Nadia carry no tax ID number, bank detail or income figure: only the name, the service and the time."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "type": "split",
+      "line": [
+       "7.16",
+       "13.5"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "t": "Thu Oct 22, 6:00pm",
+      "title": "Alex uploads the documents",
+      "q": "Are the documents in by 6pm Thursday?",
+      "does": "As the confirmation asked, Alex uploads the plug-in's documents on the secure page by Thursday 6pm. They go to the firm alone, so Nadia can read them first.",
+      "more": [
+       "The checklist: last year's return, this year's bank statements, the payroll reports and the books.",
+       "Tax ID numbers stay inside the documents, never in a text or the chat.",
+       "Nadia sees the checklist on her signed-in page, with each item ticked as it comes in.",
+       "A missing item never moves or cancels the meeting. Alex brings what's at hand."
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.messages"
+      ],
+      "gives": [],
+      "form": [
+       [
+        "Last year's tax return",
+        "Uploaded (PDF)"
+       ],
+       [
+        "This year's bank statements and tax forms",
+        "Uploaded"
+       ],
+       [
+        "Payroll reports or W-2s",
+        "Uploaded"
+       ],
+       [
+        "The books, for a business",
+        "Uploaded (a spreadsheet)"
+       ]
+      ],
+      "vary": {
+       "price:photos": {
+        "does": "Nadia prepares the return from the documents Alex uploaded for the quote. If one form is still missing, Alex gets one text. They go to the firm alone.",
+        "more": [
+         "Tax ID numbers stay inside the documents, never in a text or the chat.",
+         "A missing form never moves or cancels the meeting. Nadia finishes once it's in."
+        ]
+       }
+      },
+      "branches": [
+       {
+        "label": "All in",
+        "end": "merge",
+        "steps": []
+       },
+       {
+        "label": "One item missing",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A7-x02",
+          "line": [
+           "7.16"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Thu Oct 22, 6:05pm",
+          "title": "Tells Alex what's still missing",
+          "does": "One item isn't in. Rosie texts Alex once, by the item's name only. Nadia sees the same item still open.",
+          "more": [
+           "The meeting stays as booked.",
+           "No more texts about it: one reminder only."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Lee CPA Group hasn't received your payroll reports yet. You can still add them before your meeting.",
+            {
+             "card": {
+              "title": "One item missing",
+              "lines": [
+               "Payroll reports",
+               "Your meeting stays booked"
+              ],
+              "button": "Add them",
+              "link": "rosfield.com/c/r2"
+             }
+            }
+           ]
+          ],
+          "vary": {
+           "price:photos": {
+            "does": "One form for the return isn't in. Rosie texts Alex once, by the form's name only. Nadia sees it still open.",
+            "say": [
+             [
+              "san",
+              "cust",
+              "Lee CPA Group still needs one form for your return. You can add it before your meeting.",
+              {
+               "card": {
+                "title": "One item missing",
+                "lines": [
+                 "Your bank's interest form",
+                 "Your meeting stays booked"
+                ],
+                "button": "Add it",
+                "link": "rosfield.com/c/r2"
+               }
+              }
+             ]
+            ]
+           }
+          },
+          "needs": [],
+          "gives": [],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Nothing uploaded",
+        "end": "merge",
+        "when": {
+         "price": [
+          "list"
+         ]
+        },
+        "steps": [
+         {
+          "id": "A7-x03",
+          "line": [
+           "7.16"
+          ],
+          "who": "san",
+          "to": "staff",
+          "via": "msg",
+          "t": "Thu Oct 22, 6:05pm",
+          "title": "Tells Nadia; the meeting stays",
+          "does": "Nothing came in by 6pm. Nadia is told, and Alex gets one text: bring what you can. The meeting stays as booked.",
+          "more": [
+           "No fee, and nothing moves.",
+           "Alex can still upload before the meeting."
+          ],
+          "say": [
+           [
+            "san",
+            "staff",
+            "Alex M. (Sat 11:00am) hasn't uploaded any documents. The meeting stays as booked."
+           ],
+           [
+            "san",
+            "cust",
+            "No documents have come in yet. Your meeting stays booked. Bring what you can, or upload them before it."
+           ]
+          ],
+          "needs": [],
+          "gives": [],
+          "tells": [
+           "staff",
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-05",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "type": "split",
+      "line": [
+       "10.8",
+       "10.10"
+      ],
+      "who": "san",
+      "via": "auto",
+      "t": "Thu Oct 29, 10:00am",
+      "title": "Nadia's next step with Alex",
+      "q": "What did Alex and Nadia agree?",
+      "does": "At the meeting, Nadia and Alex agreed on a next step. Hiring the firm is never decided in a chat: it's the firm's engagement letter, signed by both.",
+      "more": [
+       "Rosie records only the outcome: hired, thinking it over, or not a fit.",
+       "Rosie and the AI give no tax advice about the choice."
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.rules"
+      ],
+      "gives": [],
+      "branches": [
+       {
+        "label": "Alex hires the firm",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A10-x02",
+          "line": [
+           "10.8",
+           "8.7"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Thu Oct 29, 10:00am",
+          "title": "Sends the engagement letter",
+          "does": "Nadia drafts the firm's engagement letter, and Rosie texts Alex the link. It says the work, how fees are set, and Alex's part. It's good for 30 days.",
+          "more": [
+           "The work: monthly books and payroll, and the yearly business return.",
+           "The fees: $350 a month, and the return's flat fee, quoted once Nadia sees the year's documents.",
+           "Fees are fixed, never a share of a refund or of tax saved.",
+           "Alex's part: the year's documents by the date in the letter, well before the filing deadline.",
+           "The $35 first meeting is credited to the first year's fees.",
+           "One reminder 2 days before it ends, and no other nudges."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Lee CPA Group sent your engagement letter. Read it, then sign or decline on the secure page.",
+            {
+             "card": {
+              "title": "Engagement letter · Lee CPA Group",
+              "lines": [
+               "Monthly books and payroll · $350 a month",
+               "Yearly business return · quoted after your documents",
+               "Good for 30 days"
+              ],
+              "button": "Read and sign",
+              "link": "rosfield.com/p/a15"
+             }
+            }
+           ]
+          ],
+          "needs": [],
+          "gives": [],
+          "tells": [
+           "cust"
+          ]
+         },
+         {
+          "id": "A10-x03",
+          "line": [
+           "10.10",
+           "5.8"
+          ],
+          "who": "cust",
+          "to": "san",
+          "via": "page",
+          "t": "Thu Oct 29, 6:00pm",
+          "title": "Alex and Sam sign the letter",
+          "does": "Alex signs on the secure page, and gives the monthly fee its own yes. Sam signs too, and each gets a copy.",
+          "more": [
+           "Alex saves a card on the page for the monthly fee. It's charged on the 1st, under that yes.",
+           "Each charge is texted the day before, with the amount and how to cancel.",
+           "A declined card gets one pay link, and Sam is told. Rosie never retries on its own.",
+           "Alex can cancel by one reply or on the page. It stops the next charge, and Alex gets a yearly reminder.",
+           "A price change comes 30 days ahead, in writing. The signed letter stays with the firm's records."
+          ],
+          "form": [
+           [
+            "Engagement letter",
+            "Signed by Alex M. and Sam Lee, CPA"
+           ],
+           [
+            "$350 on the 1st of each month, to this card",
+            "Yes (its own box)"
+           ],
+           [
+            "Cancel any time by one reply or on this page",
+            "Shown"
+           ],
+           [
+            "The year's documents due",
+            "By the date in the letter"
+           ]
+          ],
+          "needs": [],
+          "gives": [],
+          "tells": [
+           "cust",
+           "owner"
+          ]
+         },
+         {
+          "id": "A10-x04",
+          "line": [
+           "13.5",
+           "7.16"
+          ],
+          "who": "cust",
+          "to": "san",
+          "via": "page",
+          "t": "Mon Nov 2, 7:30pm",
+          "title": "Alex uploads the year's documents",
+          "does": "Alex uploads the year's checklist on the secure page: bank and card statements, payroll reports and last year's return. Nadia sees each item come in.",
+          "more": [
+           "Tax ID numbers and income stay inside the documents, never in a text or the chat.",
+           "A document texted by mistake is deleted and not passed on. Alex is pointed to the page.",
+           "Anything missing gets one text by item name, never what's in it."
+          ],
+          "form": [
+           [
+            "Bank and card statements, January to October",
+            "Uploaded"
+           ],
+           [
+            "Payroll reports",
+            "Uploaded"
+           ],
+           [
+            "Last year's business return",
+            "Uploaded"
+           ],
+           [
+            "Receipts for the year",
+            "Uploaded (photos)"
+           ]
+          ],
+          "needs": [],
+          "gives": []
+         },
+         {
+          "id": "A10-x05",
+          "line": [
+           "8.7",
+           "1.6"
+          ],
+          "who": "staff",
+          "to": "san",
+          "via": "page",
+          "t": "Wed Nov 4, 10:00am",
+          "title": "Nadia quotes the return from the documents",
+          "does": "Now that Nadia has seen the documents, Nadia sets the return's flat fee on the secure page: $600. Sam OKs it, as Sam set for every return quote, and Alex gets it.",
+          "more": [
+           "The quote stays good for 30 days.",
+           "It's a flat fee for the work, never set by the refund.",
+           "Alex OKs it on the page. A question goes to Nadia, never to Rosie."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Nadia quoted your business return from your documents.",
+            {
+             "card": {
+              "title": "Business return · $600 flat",
+              "lines": [
+               "Priced by Nadia, OK'd by Sam",
+               "Good for 30 days"
+              ],
+              "button": "See it and OK it",
+              "link": "rosfield.com/p/a16"
+             }
+            }
+           ]
+          ],
+          "needs": [],
+          "gives": [],
+          "tells": [
+           "cust"
+          ]
+         },
+         {
+          "id": "A10-x06",
+          "line": [
+           "10.10",
+           "7.15"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Wed Nov 4, 2:00pm",
+          "title": "Monthly books start; the return gets its date",
+          "does": "Alex OKs the quote. The monthly books start on the saved card, and a short review call with Nadia is booked each month as a plan.",
+          "more": [
+           "Each month's review call gets its own code and reminder, like any plan visit.",
+           "The return review meeting is booked once the return is ready, before the filing deadline. It's paid as the quote says.",
+           "Rosfield's $2 for a plan counts once a month.",
+           "The firm's work notes and the books stay in its own files."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "You're all set with Lee CPA Group.",
+            {
+             "card": {
+              "title": "Monthly books with Nadia",
+              "lines": [
+               "$350 on the 1st, to your saved card",
+               "A review call each month · first one Mon Nov 30, 10:00am",
+               "Business return · $600, booked when it's ready"
+              ]
+             },
+             "buttons": [
+              "See my plan"
+             ]
+            }
+           ]
+          ],
+          "needs": [],
+          "gives": [],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Alex wants to think",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A10-x07",
+          "line": [
+           "10.8",
+           "13.2"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Leaves the next step to Alex",
+          "does": "Alex wants to think it over. The letter stays good for 30 days. Rosie sends one reminder 2 days before it ends, and no other nudges.",
+          "more": [
+           "Booking texts never sell. Alex can sign, ask Nadia a question, or book again any time.",
+           "Not signed by then: nothing more happens, and Sam is told."
+          ],
+          "needs": [],
+          "gives": []
+         }
+        ]
+       },
+       {
+        "label": "Not a fit",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A10-x08",
+          "line": [
+           "10.8",
+           "10.9"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "visit",
+          "title": "Nadia says so; nothing more is owed",
+          "does": "Nadia told Alex at the meeting that the firm isn't the right fit. The meeting was paid, and nothing more is owed. Rosie sends no offers.",
+          "more": [
+           "Alex's uploads are handed back or deleted, as the firm set in the portal.",
+           "No other firm is named."
+          ],
+          "needs": [],
+          "gives": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-01",
+    "more": [
+     "A paid first meeting is credited to the first year's fees if the client hires the firm."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Before the meeting: Alex uploaded 4 of 4 checklist items."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam raises the books catch-up session's late-cancel fee from $40 to $50, for new bookings only. Each change is read back first.",
+    "more": [
+     "Sessions already booked keep the $40 fee.",
+     "A fee is shown before booking, and charged only after Sam says yes.",
+     "The price-OK limit changes the same way: from now on, and read back first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW business valuations"
+     ],
+     [
+      "san",
+      "owner",
+      "Business valuations for Lee CPA Group: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like first meetings?",
+      {
+       "card": {
+        "title": "First meetings work like this",
+        "lines": [
+         "Clients come to you, or meet by video",
+         "A card saved for the $20 fee",
+         "Paid after, by card or the bill we text"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A CPA firm runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "A CPA firm takes no drop-offs; documents go on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "CPA work is licensed: each CPA, and the firm where the state's rules require a firm permit."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-38",
+    "more": [
+     "A paid first meeting is credited to the first year's fees if the client hires the firm."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-04",
+    "more": [
+     "A CPA firm's example: 'Should I be an S corp?' gets 'That's a question for your CPA at the meeting.'"
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "For accounting work, tax ID numbers, bank details and income go only inside documents on the secure page.",
+     "A tax form texted by mistake is deleted from the text service and never passed on. The client is pointed to the page."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Bookkeeping and payroll need no license: Lee Accounting gives its business registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Accounting work pays Rosfield's $2 per confirmed booking by default."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Accounting work books people by name, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Accounting work runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Accounting work is never sent now: every meeting and visit is booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Accounting work is never sent now, so the button never shows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A visit at a client's business starts at a set time, often before the store opens."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in accounting work is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Each visit names its person."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Accounting work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Accounting work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "No child is left in the accountant's care."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be there",
+    "why": "Someone from the business must be there: the owner or a manager."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Accounting work is never sent now, so nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for accounting work."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "Each business books its own visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for accounting work."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Own or rent is never asked (B4-78), so no landlord is in the booking."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "No",
+    "why": "Every client has a check: a new one signs the conflict form, and a returning one has it on file."
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "An accounting firm's example: a scam caller claiming to be the IRS, who wants gift cards or threatens arrest.",
+     "Rosa gets the scam warning: don't pay, don't share details. Then she can book."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿le pidieron pagar con tarjetas de regalo?",
+      {
+       "lang": "es",
+       "en": "First: did they ask you to pay with gift cards?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "Sí. Dijeron que me arrestan hoy.",
+      {
+       "lang": "es",
+       "en": "Yes. They said I'd be arrested today.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "El IRS de verdad no llama para amenazar ni pide tarjetas de regalo. No pague ni dé sus datos. Puede reservar una cita.",
+      {
+       "lang": "es",
+       "en": "The real IRS doesn't call to threaten you or ask for gift cards. Don't pay or share your details. You can book a visit.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "An accounting firm's plug-in adds a scam: a caller claiming to be the IRS. That gets the scam warning, then the booking goes on."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "does": "A plug-in holds what one kind of work needs. The steps around it stay the same. Here, Rosie uses the bookkeeping plug-in's booking parts.",
+    "more": [
+     "Its questions: what the business does, how many accounts it has, and what the books are kept in now.",
+     "Its danger words: a scam caller claiming to be the IRS.",
+     "Its first steps: the conflict form and the engagement letter for a new client. A books cleanup is quoted from documents.",
+     "Who can stand in: only someone with the skill, picked by name. Check-in: the code at the door.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Accounting work: a new client signs the conflict form, names only. A returning client has it on file."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "A new client fills in the conflict form on the secure page that comes next. It asks for the business's legal name, any other owners and related businesses. Names only.",
+    "form": [
+     [
+      "Form",
+      "Conflict form: names only"
+     ],
+     [
+      "Business",
+      "Two Wheels Bikes, owned by Alex M."
+     ],
+     [
+      "Other owners or related businesses",
+      "None"
+     ],
+     [
+      "Due",
+      "Now, while the time is saved"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Sam reads it before signing the engagement letter.",
+     "It stays on file, so a later booking skips it.",
+     "Tax ID numbers, bank details and income never go on this form or in a text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "more": [
+     "Here, the plug-in's notice: Rosie gives no tax advice, and the firm isn't hired until both sign its engagement letter.",
+     "Tax ID numbers, bank details and income go only in documents on the secure page.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Before you book: Rosie gives no tax advice. Lee Accounting isn't hired until you both sign its engagement letter, next on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-34",
+    "does": "Where the plug-in or Sam needs a written contract, it's signed before any money is taken. For accounting work, that's the engagement letter: every new client signs it, and Sam signs too.",
+    "more": [
+     "It says the work, how fees are set, and what the client does, like having the bank sign-in ready.",
+     "Fees are fixed or hourly, never a share of a refund.",
+     "A returning client is covered by the letter on file, so nothing is signed again."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-35",
+    "does": "Sam signs, and Alex gets a copy. Alex goes back to the secure page to finish booking.",
+    "form": [
+     [
+      "Engagement letter",
+      "The work, how fees are set, and your part"
+     ],
+     [
+      "Alex M.",
+      "Signed"
+     ],
+     [
+      "Lee Accounting",
+      "Sam signs next, after the conflict check"
+     ]
+    ],
+    "t": "Mon Oct 19, 6:46pm",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Accounting signed your engagement letter. Your copy is on the page. Finish booking there.",
+      {
+       "card": {
+        "title": "Letter signed by both",
+        "lines": [
+         "Thu Oct 22 · 8:00am · Eli"
+        ],
+        "button": "Finish booking",
+        "link": "rosfield.com/c/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B5-35",
+    "more": [
+     "It says the work, how fees are set, and Alex's part, like having the bank sign-in ready.",
+     "A co-owner can sign on a link Alex forwards. Rosie never texts them itself.",
+     "Extra work at the visit is added the same way."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "Texts to Eli never carry tax ID numbers, bank details or income: only the name, service, time and place."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-13",
+    "more": [
+     "Lee Accounting: the engagement letter both signed is on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-44",
+    "more": [
+     "Eli's work notes and the books stay in the firm's own files. Rosie keeps only a short note like this."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-69",
+    "why": "An accounting firm shows no clients' photos, so the page asks nothing about photos."
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "No income figures, bank details or tax ID numbers are asked in the chat."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "t": "Thu Oct 22, 7:40am"
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "t": "Thu Oct 22, 8:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "t": "Thu Oct 22, 8:00am"
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:00am"
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 10:02am"
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 10:15am"
+   },
+   {
+    "op": "words",
+    "at": "B10-25",
+    "t": "Thu Oct 22, 10:00am"
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam raises the books cleanup's retainer from 25% to 30%, for new bookings only. Each change is read back first.",
+    "more": [
+     "Cleanups already booked keep their 25% retainer.",
+     "A retainer is taken when the client books, and comes off the price.",
+     "It stays within the state's limits, from the plug-in, and never more than the quoted price.",
+     "The price-OK limit changes the same way: from now on, and read back first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-05",
+    "say": [
+     [
+      "agent",
+      "san",
+      "Hi, I'm an automated assistant from Google, calling for a customer, Kim. Can someone help count her store's stock this Thursday? What does it cost?"
+     ],
+     [
+      "san",
+      "agent",
+      "Lee Accounting has open times this Thursday, Oct 22. Inventory count help is $199. I can't book on this call. I'll text Kim a secure link to pick a time and book. Which mobile should I text?"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Accounting. Google's assistant asked about a booking for you. Nothing is booked until you pick a time and confirm.",
+      {
+       "card": {
+        "title": "Lee Accounting · Inventory count help",
+        "lines": [
+         "Open times this Thursday, Oct 22",
+         "$199 after the visit · nothing taken now"
+        ],
+        "button": "Pick a time and book",
+        "link": "rosfield.com/c/g7"
+       },
+       "stop": true,
+       "as": "Kim"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed: staff accountant"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-36",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your engagement letter is waiting for your signature. Your Thu time is saved until 6:45pm today.",
+      {
+       "card": {
+        "title": "Engagement letter · Your Thu visit",
+        "lines": [
+         "Not signed yet"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/r3"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your engagement letter wasn't signed in time, so nothing was booked or charged."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. didn't sign the engagement letter in 24 hours, so nothing was booked."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A client is asked how the visit went, like most work."
+   }
+  ]
+ },
+ "keep": [
+  "lawyer",
+  "Lawyer",
+  "leak",
+  "Grace",
+  "law office",
+  "Law office",
+  "consult",
+  "Consult"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "S2-28"
+  ],
+  "B": [
+   "B5-34",
+   "S2-28"
+  ]
+ },
+ "notes": "Pilot: from lawyer. A CPA firm runs like a consult: a first meeting with a named professional, a check before taking a client (here the owner's OK plus a conflict check), an engagement letter before the work, and documents only on the secure page. The lawyer's structure carried over (the conflict form on the secure page, the firm's own next steps after the meeting, privacy in texts). The lawyer's money choices were reversed, like the coach's: a CPA firm pays Rosfield's $2 and may take money before the work (a retainer on a big job), so the $2 splits take their yes branches and no deposit branch is turned off for that reason. The rename pairs were rebuilt from the master, so no lawyer words or pairs remain.\nCast: Sam Lee, CPA, owns Lee Accounting LLC (the master's main company, 750 Main St: bookkeeping, with payroll as its second kind of work; trade names Lee Bookkeeping and Lee Payroll) and Lee CPA Group PC (the master's second company, 220 Market St, Suite 4: CPA meetings at the office or by video). CPAs Nadia Shah and Felix Diaz (the master's Riley and Avery); Eli Price, staff accountant, and Milo Moore, bookkeeper (Jordan and Casey). Only licensed CPAs are called 'CPA'. Pat stays the office manager; Alex M. stays the customer and runs a bike store, Two Wheels Bikes, at 58 River Rd.\nFlow A, the usual side: Alex names Nadia and books a 30-minute first meeting at the office, Sat Oct 24 at 11:00am (Lee CPA Group meets clients on Saturday mornings too; a video meeting is the A4-36 what-if). New client: the conflict form on the secure page (A4-43, A4-72), then Sam's OK, which is the master's A6-02 with Sam checking the names for a conflict and OKing a new client. A letter from the IRS or the state is read first by Felix (A6-16). Documents go on the secure page by Thu 6pm (own split A7-x01 to A7-x03; a missing item never moves the meeting). After the meeting: the engagement letter, the year's documents, the return's quote after the documents are seen, then monthly books and the yearly return (own steps A10-x01 to A10-x08, after A10-05 so the clock runs forward).\nFlow B, the less usual side: Lee Accounting sends Eli to set up the books at Alex's store, Thu Oct 22 at 8:00am, before it opens. The engagement letter is the master's signed contract (B4-57 'Yes: a signed contract first', B4-61, B4-58, B4-59): Alex signs, then Sam checks the conflict form's names and signs, and his signature is his OK to take Alex on, so B6-03 books right away. The conflict form is B4-86. Visits read as set start times (B4-83 '2 A set start time'); the master's 8-10am window words are renamed to 8:00am.\nPrices are the example firms' own, keeping the master's numbers so sums stay right. A: first meeting $35 (30 min, credited if hired), tax question meeting $40, extra document review $20, quick question call $25, tax planning meeting $55, books catch-up session $140 (2.5 hours, $40 fee), personal tax return priced from documents ($90 example), tax letter help priced at a meeting after a $25 review, advice call $35 a half hour. B: books setup visit $179, payroll setup visit $150, inventory count help $199, books cleanup priced from documents ($640, over Sam's $500 OK), records check priced at the visit, $89 trip fee (the master's service call), extra time $120 an hour. The engagement's own fees ($350 a month, a $600 business return) live only in the own steps A10-x02 to A10-x06.\nMoney paths. A: list|card|card (main: the first meeting, card saved for the $20 fee, charged at DONE; also the monthly books review plan), list|none|bill (the same meeting at a firm that saves no card, and advice calls billed by the half hour), photos|card|card (a flat fee per return quoted after the documents; the price label reads 'Priced from your documents first'). B: list|none|bill (main), list|none|own (a monthly client's visit or inventory count on the firm's own invoice), photos|deposit|bill (a retainer before a big job: the books cleanup). CPA firms don't hold money on cards, take full price before a meeting, or take payment at a front desk, so no other path is listed; A7-02's day-before hold branch is off. A free first meeting has no money path of its own (nothing before, nothing after).\nSign-up words (S1-13, S1-14, S1-16, S1-18, S1-38, S1-41, S1-42, S1-45, S1-46, S11-56, S11-58) are rewritten so Sam never sets a hold, a full price or a counter payment: Lee Accounting starts from nothing taken, with a 25% retainer on the books cleanup; Lee CPA Group saves a card for the $20 fee and charges it at DONE, with advice calls on the bill. The firm takes no payments at its front desk (it still checks people in there), which replaces the master's Saturday-morning no-front-desk story.\nRosfield's $2: a CPA firm pays it by default, since the no-$2 default covers human health practices and law firms only. The old flowchart's template said 'Referral fees: none: Rosfield pays none and takes none', and some states' rules for CPAs limit paying for referrals or require telling the client. So pf.money and pf.rules carry it as a switch from the state form, and it goes on the lawyer list.\nLicenses: S1-60 takes 'No license: registration only' (bookkeeping and payroll); S1-63 takes the CPA firm's license or permit; S2-28 keeps both branches (splitsKept): CPAs are checked, the staff accountant and bookkeeper hold none and are never shown as 'CPA'. Who may sign a return is a switch from the state form (pf.license, pf.rules). S1-29 takes 'Yes: signed before going live': a data-security agreement, since the firm handles tax return information.\nPrivacy: tax ID numbers, bank details and income go only inside documents on the secure page; texts to Alex, Sam and the staff carry only names, the service and the time (A4-22, A4-23, A4-41, A6-02, A6-15, B4-24, B4-28, B6-14, A7-x01, A10-x04). A document texted by mistake is deleted and not passed on. Rosie and the AI never give tax advice (A3-26, A4-41, B3-21, B4-28, B7-17).\nSafety: the plug-in's own danger words are a scam caller claiming to be the IRS, who wants gift cards or threatens arrest: the scam warning, then the booking goes on (A3-22, A3-23, B3-17, B3-18 with Rosa's Spanish call). Emergencies and crisis words follow the master.\nPlug-in splits: A7-63 kept (a meeting the day before a client's lender deadline can't move: Theo B.); A8-02 kept (a conflict found at the meeting stops it, A8-51); B4-57 kept (new clients sign the letter, returning ones have it on file); B7-56 keeps 'One person, by name' and 'A date that can't move'; B8-72 kept (a receipts box can go to the office to be scanned, signed out and brought back). A7-61's 'Someone has it' is off: nobody is moved to another CPA on silence, Sam calls.\nOff beyond the plug-in splits: walk-ins, seats, spaces, drop-offs, stays, crews, minimums, damage holds, plans or insurance that pay, items held, rentals, aftercare, items not picked up, the master's proposal branch in A (the engagement letter is drawn on the main line), the day-before hold, a class roster, sent-now jobs, live lines, landlords, deliveries, outside checks, permits, parts, tips, pay over time, photo permission (B4-69), and B's weather, late part, first-step and form branches (the letter and the form are signed before the booking).\nClocks. A: ask Wed Oct 21 7:15pm, link 7:18pm, confirmed 7:22pm, documents Thu Oct 22 6:00pm, reminder Fri 10:00am, meeting Sat 11:00am, rating 4:00pm, engagement letter Thu Oct 29 10:00am, signed 6:00pm, documents Mon Nov 2 7:30pm, quote Wed Nov 4 10:00am, plan set 2:00pm. Photos path: quote Thu Oct 22 9:40am, booked 9:49am. B: ask Mon Oct 19 6:40pm, link 6:44pm, Sam signs the letter 6:45pm, both signed 6:46pm, booked 6:48pm, reminder Wed 10:00am, day list Thu 7:00am, on the way 7:40am, checked in 8:00am, DONE 10:00am, bill 10:02am, receipt 10:15am, rating 11:00am. Photos path: quote 7:40pm, Sam signs 7:48pm, both 7:55pm, booked 7:58pm.\nFlow B what-ifs mapped: Rosa's Spanish call is a scam call; the voicemail is help with books; Kim's request is an inventory count at her store; more work at the visit is closing out two old accounts ($160); a bigger job is the books cleanup ($640) or fixing last year's payroll filings ($900); the hazard is papers about a supplier dispute that need an attorney; a part to the shop is the receipts box taken to the office to scan; the warranty is the firm's 30-day free-fix promise; the late report is the inventory count report; the proposal is monthly bookkeeping and payroll.\nOutdated: the old flowchart's outside software (Microsoft Bookings, Calendly, Teams, Zoom, Karbon, TaxDome, Canopy, Financial Cents, QuickBooks export, the tax software), its one state and city (Ohio, Columbus, the Columbus return) and the federal and state rule citations it named (now switches or plain rules in the plug-in).\nNot sure (for the reviewer): the master's low example prices for a CPA ($35 first meeting, a $90 personal return); Saturday meetings at a CPA firm (the master's date); the monthly bookkeeping fee charged to a card through Rosie (drawn in A10-x03 and A10-x06; a monthly fee with no visit is a gap); the engagement letter signed after the first meeting in A but before the visit in B; the firm 'takes no payments at its front desk' yet checks clients in there; the $2 and paying for referrals (lawyer list); A7-63's lender deadline as the date that can't move.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A what-if: the plug-in lets this work be done by video or phone, like a 15-minute style consult.",
+    "If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Riley suggests moving your visit until it clears, with no fee. Pick a new time:",
+    "Your haircut is part of a plan with Riley, every 4 weeks. What would you like?",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "This is Lee's Barbershop's booking line, so I can't reach Elm Street Dental.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Can Lee's Barbershop do a haircut on Saturday morning? What does it cost?",
+    "A clinic or a vet often names a nurse line or an emergency clinic here.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Hi, it's Alex. I'd like to book for Saturday morning. A text is fine.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "#2 on the sides, scissors on top, low beard line",
+    "From the price list or photos, the price is set.",
+    "A barbershop has none, so nothing is sent here.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "A haircut could mean a salon or a barbershop.",
+    "It's a gift for my brother. Can I pay for it?",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "May the shop show photos of your hair?",
+    "Haircut · Sat Oct 31 · 10:00am · Riley",
+    "The cape clip ripped my shirt collar.",
+    "Riley also does color and house calls",
+    "Sam adds massage to Lee's Barbershop.",
+    "Riley: barber, color and house calls",
+    "A barbershop's services need none.",
+    "Do you do kids cuts? My son is 8.",
+    "priced from the customer's photos",
+    "A barbershop's plug-in has none.",
+    "Books the groom's party together",
+    "Books a haircut and a beard trim",
+    "The cut is uneven on one side.",
+    "Haircut every 4 weeks · Riley",
+    "Haircut plan · every 4 weeks",
+    "Books a cut every 4 weeks",
+    "Quoted from photos first",
+    "Priced from your photos",
+    "A barbershop has none.",
+    "Alex adds a beard trim",
+    "the customer's photos",
+    "Asks Alex for photos",
+    "priced from photos",
+    "from Alex's photos",
+    "photos and answers",
+    "from your photos",
+    "2 At my home",
+    "From photos",
+    "from photos",
+    "NEW massage",
+    "Add photos",
+    "add photos",
+    "Riley Chen",
+    "Avery Diaz",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St, Springfield",
+    "88 Elm St, Springfield",
+    "Springfield",
+    "Elm St",
+    "Oak St",
+    "Riley's",
+    "Riley",
+    "Avery's",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Skin fade",
+    "skin fade",
+    "a beard trim",
+    "A beard trim",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "Color quotes",
+    "color quote",
+    "price board",
+    "Price board",
+    "shop's board",
+    "Drain clearing",
+    "a travel fee",
+    "$25 consult",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumbing jobs",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "barber",
+    "Barber",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "code at the chair",
+    "at the chair",
+    "At the chair",
+    "in the chair",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "A shop",
+    "shops",
+    "shop",
+    "Shop front",
+    "Shop",
+    "the color",
+    "a color",
+    "color",
+    "Color",
+    "Health details stay on the secure page, never in a text.",
+    "Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "Jules rents a chair",
+    "like a chair renter",
+    "A chair renter asked for",
+    "doesn't do perms.",
+    "would like to see your hair before pricing it.",
+    "'Yes, make it a fade' goes back to the times.",
+    "please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "you now have two skin fades on Sat Nov 7."
+   ],
+   "B": [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "This is Rosie, the automated booking assistant for Lee Home Services. Add photos of your water heater, and a plumber will price the job.",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Every way in reaches the same booking desk, with the same rules. The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Say the work starts at a set time, like a private class at home or an event. The times read 'starts at 8:00am', not a window.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "One number booked 3 jobs at Lee Home Services this week under different names, and nobody was home for any of them.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Lee Home Services doesn't go to Riverton. It's outside the 25 miles it covers, so nothing was saved.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "One of the shop's barbers does house calls. Sam set each place's price and money at sign-up.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Lee Home Services goes 25 miles from 1200 Main St. Alex's home in Springfield is inside it.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Lee Home Services doesn't go to Riverton: it's outside the 25 miles it covers.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "An AI asks for times in Riverton, a town 40 miles from 1200 Main St.",
+    "Say another customer's AI asks for a job in Riverton, 40 miles away.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Your water heater contract is waiting for your signature.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Alex M. asks: Can I run the dishwasher before you come?",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Told to leave, then call 911 and the gas company",
+    "Can Jordan also run a camera down my sewer line?",
+    "CANT START no proof Alex may have this work done",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "Your 25-mile area reaches into a second state.",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan only, until others are licensed there",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also look at a dripping faucet?",
+    "Lee Home Services · Kitchen drain clearing",
+    "Contract · Water heater replacement · $640",
+    "HAZARD mold behind the sink wall, stopped",
+    "Can I run the dishwasher before you come?",
+    "Prices it: the list, photos or the visit",
+    "Can I skip next week's drain cleaning?",
+    "Thanks. We've told Jordan you're home.",
+    "Riley also does color and house calls",
+    "I'll be home 30 minutes late, sorry!",
+    "Riley: barber, color and house calls",
+    "Say Alex books for a parent's home.",
+    "The kitchen drain is clogged again.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Lee Home Services · Drain clearing",
+    "Jordan cuts a hand and texts HURT.",
+    "Call a mold cleanup company first",
+    "priced from the customer's photos",
+    "Is the sink still full of water?",
+    "Alex M. · Kitchen drain clearing",
+    "Only a teen is home at Alex M.'s",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Proposal · Replace the old pipes",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Plumbing books a 2-hour window.",
+    "Yearly water heater flush plan",
+    "HURT cut my hand, need to stop",
+    "LATE camera report Mon Oct 26",
+    "Texts the camera report link",
+    "Replace both shutoff valves",
+    "raise drain clearing to 199",
+    "Mold behind the sink wall",
+    "Video and Jordan's notes",
+    "Photos and answers added",
+    "Quoted from photos first",
+    "A gas smell at the home",
+    "Priced from your photos",
+    "Just the kitchen sink.",
+    "Kitchen drain clearing",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "Plumbing never pauses.",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "Drain clearing · $179",
+    "the customer's photos",
+    "Asks Alex for photos",
+    "the $160 valve work",
+    "Sewer camera report",
+    "the on-call plumber",
+    "Nobody was home for",
+    "A dog, kept inside",
+    "Priced from photos",
+    "priced from photos",
+    "from Alex's photos",
+    "photos and answers",
+    "the kitchen drain",
+    "from your photos",
+    "In the driveway",
+    "Every 12 months",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "DONE 179 drain",
+    "plumbing visit",
+    "arrival window",
+    "Kitchen drain",
+    "after the job",
+    "1 At my home",
+    "they're home",
+    "Alex is home",
+    "At my home.",
+    "Nobody home",
+    "nobody home",
+    "Alex's home",
+    "at the home",
+    "in the home",
+    "From photos",
+    "from photos",
+    "At my home",
+    "Yard drain",
+    "Add photos",
+    "Riley Chen",
+    "Avery Diaz",
+    "a plumber",
+    "Rental 1",
+    "Rental 2",
+    "I'm home",
+    "be home",
+    "8–10am",
+    "12–2pm",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St, Springfield",
+    "88 Elm St, Springfield",
+    "Springfield",
+    "1200 Main St",
+    "Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan's",
+    "Jordan",
+    "Casey's",
+    "Casey",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "Price board",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "camera inspection",
+    "Labor",
+    "service call fee",
+    "Service call fee",
+    "a travel fee",
+    "Service call",
+    "service call",
+    "$89, credited to the repair",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "Electrical license",
+    "electrical jobs",
+    "electrical prices",
+    "Electrical",
+    "electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumbing jobs",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "heating and cooling",
+    "Heating and cooling",
+    "paid at the chair",
+    "at the chair",
+    "the shop's",
+    "the shop",
+    "The shop",
+    "A shop",
+    "shop",
+    "Shop front",
+    "color",
+    "25% deposit",
+    "written estimate",
+    "water heater contract",
+    "water heater job",
+    "water heater",
+    "Water heater",
+    "drain",
+    "Yes, every year",
+    "Both rentals' visits go on one bill",
+    "Your Thu time is saved until 7:45pm today.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "like new pipes put in one day and finished another.",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe",
+    "OK'd the shutoff valve only",
+    "Shutoff valve",
+    "the shutoff valves",
+    "water is off on Main St after 2pm, so afternoon jobs may run late.",
+    "clogs again 2 weeks later. It's inside the 1-year labor warranty",
+    "I found water damage under the sink this morning.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "It's my kitchen.",
+    "1-year labor warranty: if there's a problem with the work, reply here."
+   ]
+  },
+  "A": {
+   "S1-12": "41b86c1e72",
+   "S1-38": "b50b0bd4e8",
+   "S13-04": "91031a684a",
+   "S13-05": "ffcae1a1b0",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A7-93": "46cca94e45",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A10-45": "855be6050a",
+   "A3-02": "223044a79d",
+   "A3-22": "0057d8fc9f",
+   "A3-23": "4a8b7c72a2",
+   "A4-01": "7e7a61082c",
+   "A4-36": "f261af1660",
+   "A4-03": "c24298dc38",
+   "A4-50": "6f43775326",
+   "A4-65": "fa7ec0389d",
+   "A4-23": "9f76d7b6f5",
+   "A4-41": "15813954ee",
+   "A6-02": "d7d5a3ecf5",
+   "A6-05": "0e69163f75",
+   "A6-14": "b17b52115e",
+   "A6-15": "1e6395c2f5",
+   "A7-01": "afb51b5e1b",
+   "A10-05": "63c3536c7a",
+   "A10-01": "77ff9c7550",
+   "A8-23": "e3a35f7f9e",
+   "S11-56": "bd841a4732",
+   "S11-58": "87f7492a91",
+   "A8-03": "7accda6f86",
+   "S1-60": "235c90a3c3"
+  },
+  "B": {
+   "S1-38": "6301c86637",
+   "S13-04": "13e60b9248",
+   "S13-05": "164ce06368",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B6-03": "dcc1eb310c",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B4-38": "9539521dc7",
+   "B3-18": "a4b81ea9b3",
+   "B3-17": "3eb7d7f259",
+   "B4-04": "df3ea4b2f5",
+   "B4-28": "506d267aaf",
+   "B5-34": "917f89b62f",
+   "B5-35": "1de0d2312d",
+   "B6-14": "dfd03ee673",
+   "B6-13": "ed1f412f7d",
+   "B8-44": "3847104a93",
+   "B4-69": "350fbaf90a",
+   "B4-34": "74ff52d83d",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-45": "09e62897a6",
+   "B8-41": "6e8e9825b2",
+   "B10-01": "814aa1fde7",
+   "B10-25": "3e0bd84dd3",
+   "S11-56": "8b6c6c101f",
+   "B3-05": "c2996f5c4f",
+   "S2-06": "b78d25d6e2",
+   "B5-36": "456a1159d6",
+   "B10-32": "7713bff255"
+  }
+ }
+}

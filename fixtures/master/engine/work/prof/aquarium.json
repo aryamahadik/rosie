@@ -1,0 +1,2174 @@
+{
+ "id": "aquarium",
+ "name": "Aquarium Care",
+ "style": "Service",
+ "pattern": "service",
+ "from": "pool",
+ "plugin": {
+  "pf.license": {
+   "need": "None for aquarium care in most places: a business registration, the business's own word. Where the state's rules require a pet or animal dealer license to sell live fish, corals or other animals, the business says it holds one (a generic switch) before livestock is sold at a visit.",
+   "who": "the business",
+   "ask": [
+    "the business registration (the business's own word)",
+    "a pet or animal dealer license, only where the state's rules require one to sell livestock (the business's own word)",
+    "liability insurance, as the business says"
+   ],
+   "check": "None: Rosie doesn't look up or check any registration, dealer license or insurance (D96). The business says what it holds.",
+   "blocks": "A required dealer license the business says it doesn't hold keeps livestock sales off (care visits stay on).",
+   "renewals": "The business's own record of renewal dates. A lapse the owner reports stops the work it covers.",
+   "insurance": "Liability insurance for water damage in the customer's home, as the business says.",
+   "limits": "No electrical or plumbing work: a new outlet, a dedicated circuit or a plumbed water line is an electrician's or plumber's job and is never booked; tanks on a stand or floor the tech judges unsafe are not filled",
+   "otherwise": "identity: the code the customer gets on their own phone (D66); customers see no license claim"
+  },
+  "pf.services": {
+   "shape": "visits to homes and offices to care for aquariums (a water change, glass and decor cleaning, filter care, a water test, a livestock check), one time or on a repeat plan; trouble visits priced at the visit; tank moves and new setups quoted from photos first; at the shop: water tests and fish holding",
+   "examples": "the example business's own prices, not a standard",
+   "list": [
+    {
+     "name": "Tank care visit, freshwater, up to 75 gallons",
+     "price": "$95 (example)",
+     "kind": "one price from the list",
+     "length": "60 to 90 minutes",
+     "where": "at the customer's home or office",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Tank care visit, saltwater or reef, up to 75 gallons",
+     "price": "$125 (example)",
+     "kind": "one price from the list",
+     "length": "90 minutes",
+     "where": "at the customer's place",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Bigger tanks",
+     "price": "$1.50 a gallon over 75 gallons (example)",
+     "kind": "one price from the list, by tank size"
+    },
+    {
+     "name": "Repeat care plan",
+     "price": "the visit's own price each time (example)",
+     "kind": "every 2 weeks or every month, same day and window",
+     "before": "a card saved",
+     "after": "the saved card charged at each DONE",
+     "note": "the plan's own yes first; nothing charged between visits"
+    },
+    {
+     "name": "Office or restaurant account",
+     "price": "the visit prices, on one bill a month (example)",
+     "after": "Rosie sends one bill a month for the visits"
+    },
+    {
+     "name": "Tank trouble visit (cloudy water, a heater or pump that stopped, a small leak, fish dying)",
+     "price": "$85 trip and check (example); the fix priced at the visit",
+     "kind": "quoted at the visit",
+     "before": "a card saved",
+     "after": "the saved card charged at DONE"
+    },
+    {
+     "name": "Tank move, or a new tank set up",
+     "price": "quoted from photos and the tank size (example: a 90-gallon reef moved and set up, $1,200)",
+     "kind": "quoted from photos first",
+     "before": "a 50% deposit",
+     "after": "the rest on the bill when it's set up",
+     "note": "two techs for tanks over 75 gallons; a new tank runs 4 to 6 weeks before fish are added: that is its own booking"
+    },
+    {
+     "name": "Water test and fish check at the shop",
+     "price": "$15 (example); a basic water test is free",
+     "kind": "one price from the list",
+     "length": "20 minutes",
+     "where": "at the shop",
+     "before": "nothing taken",
+     "after": "paid at the counter, or nothing for the free test"
+    },
+    {
+     "name": "Fish holding at the shop during a move or a tank rebuild",
+     "price": "$35 for up to a week (example)",
+     "where": "left at the shop",
+     "before": "a card saved",
+     "after": "paid at the counter at pick-up"
+    }
+   ],
+   "capacity": "one tech per care visit; two techs for a move or a tank over 75 gallons",
+   "nobody_home": "yes for care visits on a plan: a key, lockbox or doorman, set on the secure page; never for a first visit, a move or a setup",
+   "online": "no"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "at the shop or at your place",
+    "the tank size in gallons",
+    "freshwater, saltwater or reef",
+    "how many tanks",
+    "one visit or a repeat plan",
+    "for trouble: what's wrong (cloudy water, a leak, equipment stopped, fish dying)",
+    "the town"
+   ],
+   "afterTime": [
+    "where the tank is (the floor, stairs)",
+    "a sink or tub near the tank for water",
+    "the filter or sump kind",
+    "the fish and corals in it",
+    "pets at home"
+   ],
+   "securePage": [
+    "the street address",
+    "the way in when nobody is home (a key, lockbox, alarm or gate code, doorman)",
+    "the card"
+   ],
+   "whoMayBook": "an adult: the tank's owner or someone they authorize (an office manager for an office tank)"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "water leaking near outlets, a power strip or cords",
+    "a shock from the tank water or equipment",
+    "sparks, smoke or a burning smell from a heater, light or pump",
+    "the glass cracked or the tank burst and water spreading",
+    "a sting from a lionfish or another venomous animal",
+    "coral toxin in the eyes or mouth, or trouble breathing after handling coral rock"
+   ],
+   "stop_action": "water and power: don't touch the water or the equipment; switch off the tank's circuit at the breaker only if it can be reached without standing in water; a shock, a sting with trouble breathing, coral toxin in the eyes or mouth, or trouble breathing: call 911 now (Rosie never places the call); fire: leave and call 911. A mild splash of coral juice or a mild sting with no trouble breathing: rinse with clean water and see a doctor if it doesn't ease.",
+   "continue": "yes, after the safety steps, when nobody is hurt: a trouble visit sent now where the business takes them, or the next time"
+  },
+  "pf.first_steps": [
+   {
+    "name": "Livestock-loss release for a tank move",
+    "when": "signed on the secure page before the move day",
+    "why": "fish and corals can die in a move even with good care"
+   },
+   {
+    "name": "Prep for a move or setup",
+    "when": "in the reminder",
+    "what": "stop feeding 24 hours before; clear 3 feet around the tank; buckets and towels not needed (the techs bring them)"
+   }
+  ],
+  "pf.visit": {
+   "checkin": "the code at the door; on a plan with nobody home, the agreed way in, and DONE with a photo of the tank",
+   "changes": "extra work, livestock or a replacement part (a heater, a pump) is priced and OK'd by the customer before it's done; a leak or a cracked tank found at the visit stops the work with a written note",
+   "done": "DONE with the water test numbers and a photo of the tank",
+   "dropoff": "fish holding: fish bagged and checked in at the counter with the code; READY when they can go home; picked up with the code"
+  },
+  "pf.money": {
+   "main": "care visits: the saved card charged at DONE; office accounts: one bill a month",
+   "deposit": "50% of a move or setup quote, the rest on the bill when it's set up",
+   "fees": "A late-cancel or no-show fee, inside 24 hours: $25 at the shop (the card saved for the fish holding and water test), $45 for a care visit, $85 for a trouble visit (its trip and check: one fee per booking, so it's also the visit's late fee), $150 on a tank move with its deposit. The owner's own numbers: the example business's.",
+   "extras": "livestock and parts priced and OK'd by the customer before they're added",
+   "tips": "no tip line",
+   "tax": "sales tax on livestock and parts where the state's rules tax goods (a generic switch)",
+   "two": "$2 per confirmed booking applies (D97): a flat fee for each booking Rosie makes."
+  },
+  "pf.messages": {
+   "never": [
+    "door, alarm, gate or lockbox codes",
+    "where a key is kept",
+    "the card"
+   ],
+   "languages": "English and Spanish"
+  },
+  "pf.staff": {
+   "skills": [
+    "freshwater",
+    "saltwater and reef",
+    "big or custom systems over 150 gallons",
+    "moves and setups"
+   ],
+   "supervision": "a new tech works reef systems with a senior tech until the owner OKs them",
+   "okWhat": "the owner OKs move and setup quotes and any extra over $150",
+   "twoPeople": "moves and tanks over 75 gallons need two techs: offered only when two are free",
+   "standin": "another tech with the same skill may stand in for a care visit; a customer who named a tech is never moved on silence"
+  },
+  "pf.rules": {
+   "switches": [
+    "a pet or animal dealer license to sell livestock, where the state's rules require it",
+    "sales tax on goods, where the state's rules tax them"
+   ],
+   "records": "water test numbers and livestock notes kept with the customer's record"
+  },
+  "pf.edges": {
+   "apply": [
+    "nobody home on a plan visit",
+    "a leak found at the visit",
+    "fish die after a visit (the business's own livestock guarantee, a claim after the visit)",
+    "a pet loose at home",
+    "the power is out at the home",
+    "the move day can't go ahead"
+   ],
+   "handling": "the generic way; the livestock guarantee is the business's own rule, set in its suggested rules"
+  },
+  "pf.facts": [
+   "plans",
+   "monthlybill",
+   "sentnow",
+   "animals",
+   "extrawork",
+   "photos",
+   "forms",
+   "dropoff"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "B": "24 hours before"
+   }
+  },
+  "pf.switches": {}
+ },
+ "rename": {
+  "A": [
+   [
+    "Lee Plumbing",
+    "Lee Tank Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Filters"
+   ],
+   [
+    "Can you flush my clinic every year, too?",
+    "Can you do my tank every year, too?"
+   ],
+   [
+    "yearly flush plan",
+    "yearly water change plan"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a new filter set up one day and finished another."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE algae in the filter. Bring the pump next time."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a prescription for someone never seen."
+   ],
+   [
+    "supply line",
+    "air line"
+   ],
+   [
+    "Supply line",
+    "Air line"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The net clip ripped my shirt collar."
+   ],
+   [
+    "the cape clip ripped a shirt collar today.",
+    "the net clip ripped a shirt collar today."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: the tank is 75 gallons, pump is loud, check the heater."
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Aquarium Shop LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Aquarium Shop"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Reef Care LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Reef Care"
+   ],
+   [
+    "Groom's Package",
+    "Tank move and setup"
+   ],
+   [
+    "Groom's package",
+    "tank move and setup"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Reef tank care visit"
+   ],
+   [
+    "Signature cut and shave",
+    "Reef tank care visit"
+   ],
+   [
+    "signature cut and shave",
+    "reef tank care visit"
+   ],
+   [
+    "Skin fades",
+    "Freshwater care visit"
+   ],
+   [
+    "Skin fade",
+    "Freshwater care visit"
+   ],
+   [
+    "skin fades",
+    "freshwater care visits"
+   ],
+   [
+    "skin fade",
+    "freshwater care visit"
+   ],
+   [
+    "Beard trims",
+    "Water tests"
+   ],
+   [
+    "Beard trim",
+    "Water test"
+   ],
+   [
+    "beard trims",
+    "water tests"
+   ],
+   [
+    "beard trim",
+    "water test"
+   ],
+   [
+    "Kids cuts",
+    "Filter checks"
+   ],
+   [
+    "Kids cut",
+    "Filter check"
+   ],
+   [
+    "kids cuts",
+    "filter checks"
+   ],
+   [
+    "kids cut",
+    "filter check"
+   ],
+   [
+    "Color and cut",
+    "Tank move and setup"
+   ],
+   [
+    "color and cut",
+    "tank move and setup"
+   ],
+   [
+    "Color correction",
+    "Trouble visit"
+   ],
+   [
+    "color correction",
+    "trouble visit"
+   ],
+   [
+    "hot towel",
+    "water change"
+   ],
+   [
+    "Hot towel",
+    "Water change"
+   ],
+   [
+    "Haircuts",
+    "Water tests"
+   ],
+   [
+    "haircuts",
+    "water tests"
+   ],
+   [
+    "Haircut",
+    "Water test"
+   ],
+   [
+    "haircut",
+    "water test"
+   ],
+   [
+    "barbershops",
+    "shops"
+   ],
+   [
+    "barbershop",
+    "shop"
+   ],
+   [
+    "Barbershop",
+    "Shop"
+   ],
+   [
+    "barbers",
+    "techs"
+   ],
+   [
+    "barber",
+    "tech"
+   ],
+   [
+    "Barber",
+    "Tech"
+   ],
+   [
+    "clinicians",
+    "vets"
+   ],
+   [
+    "clinician",
+    "vet"
+   ],
+   [
+    "Clinician",
+    "Vet"
+   ],
+   [
+    "Riley",
+    "Oscar"
+   ],
+   [
+    "Avery",
+    "Mina"
+   ],
+   [
+    "Jordan",
+    "Nell"
+   ],
+   [
+    "Casey",
+    "Ivo"
+   ],
+   [
+    "Jules",
+    "Noor"
+   ],
+   [
+    "Tessa",
+    "Ellen"
+   ],
+   [
+    "Kim",
+    "Ana"
+   ],
+   [
+    "Nia",
+    "Rosa"
+   ],
+   [
+    "Hugo",
+    "Felix"
+   ],
+   [
+    "Lena",
+    "Greta"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "house calls",
+    "tank visits"
+   ],
+   [
+    "House calls",
+    "Tank visits"
+   ],
+   [
+    "house call",
+    "tank visit"
+   ],
+   [
+    "House call",
+    "Tank visit"
+   ],
+   [
+    "plumbing and electrical",
+    "tank care and filters"
+   ],
+   [
+    "Plumbing and electrical",
+    "Tank care and filters"
+   ],
+   [
+    "plumbing",
+    "tank care"
+   ],
+   [
+    "Plumbing",
+    "Tank care"
+   ],
+   [
+    "plumber",
+    "tech"
+   ],
+   [
+    "Plumber",
+    "Tech"
+   ],
+   [
+    "electrician",
+    "assistant tech"
+   ],
+   [
+    "electrical",
+    "filters"
+   ],
+   [
+    "Electrical",
+    "Filters"
+   ],
+   [
+    "water heater flush",
+    "water change"
+   ],
+   [
+    "Water heater flush",
+    "Water change"
+   ],
+   [
+    "water heater replacement",
+    "tank move"
+   ],
+   [
+    "Water heater replacement",
+    "Tank move"
+   ],
+   [
+    "water heater fix",
+    "pump fix"
+   ],
+   [
+    "Water heater fix",
+    "Pump fix"
+   ],
+   [
+    "water heaters",
+    "pumps"
+   ],
+   [
+    "Water heaters",
+    "Pumps"
+   ],
+   [
+    "water heater",
+    "tank heater"
+   ],
+   [
+    "Water heater",
+    "Tank heater"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "Drain clearings",
+    "Water changes"
+   ],
+   [
+    "drain clearings",
+    "water changes"
+   ],
+   [
+    "drain clearing",
+    "water change"
+   ],
+   [
+    "Drain clearing",
+    "Water change"
+   ],
+   [
+    "perms",
+    "treatments"
+   ],
+   [
+    "Perms",
+    "Treatments"
+   ],
+   [
+    "perm",
+    "treatment"
+   ],
+   [
+    "Perm",
+    "Treatment"
+   ],
+   [
+    "massage",
+    "filter check"
+   ],
+   [
+    "Massage",
+    "Filter check"
+   ],
+   [
+    "heating and cooling",
+    "lighting"
+   ],
+   [
+    "Heating and cooling",
+    "Lighting"
+   ],
+   [
+    "cabinet",
+    "stand"
+   ],
+   [
+    "Cabinet",
+    "Stand"
+   ],
+   [
+    "dishwasher",
+    "sump pump"
+   ],
+   [
+    "Dishwasher",
+    "Sump pump"
+   ],
+   [
+    "sink",
+    "tank"
+   ],
+   [
+    "Sink",
+    "Tank"
+   ],
+   [
+    "pipe",
+    "hose"
+   ],
+   [
+    "Pipe",
+    "Hose"
+   ],
+   [
+    "faucet",
+    "pump"
+   ],
+   [
+    "Faucet",
+    "Pump"
+   ],
+   [
+    "sewer",
+    "sump"
+   ],
+   [
+    "Sewer",
+    "Sump"
+   ],
+   [
+    "toilet",
+    "sump"
+   ],
+   [
+    "Toilet",
+    "Sump"
+   ],
+   [
+    "drain",
+    "siphon"
+   ],
+   [
+    "Drain",
+    "Siphon"
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Switch off the tank's breaker if you can reach it dry. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas",
+    "My"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay humo o una descarga?"
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si puede llegar al disyuntor sin pisar agua, apague el circuito del tanque. Si hay humo o una descarga, salga y llame al 911."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay humo ni descarga."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If there's smoke or a shock, leave the room now. Then call 911."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said there's a shock from the tank."
+   ],
+   [
+    "A gas smell at the home",
+    "A shock from the tank"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to leave, then call 911"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell,",
+    "Real danger, like water near outlets or a shock,"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to switch off the tank's breaker if she can, and to call 911 if there's a shock."
+   ],
+   [
+    "Shut the cold-water valve, above the orthotic. If you smell gas, get out and call 911.",
+    "Switch off the breaker if you can reach it dry. If there's a shock, get out and call 911."
+   ],
+   [
+    "A podiatrist's example: water near outlets gets 'shut off the main valve'.",
+    "A tank tech's example: water near outlets gets 'switch off the breaker'."
+   ],
+   [
+    "Lee Aquarium Shop can clear the drain",
+    "Lee Aquarium Shop can come to you"
+   ],
+   [
+    "Lee Reef Care can clear the drain",
+    "Lee Reef Care can come to you"
+   ],
+   [
+    "Lee Reef Care can clear the drain:",
+    "Lee Reef Care can come to you:"
+   ],
+   [
+    "Hi, it's about a leaking hose under my tank. A text back is fine.",
+    "Hi, it's about algae in my tank. A text back is fine."
+   ],
+   [
+    "On the photos path, only Nell's times show: he's the one who replaces pumps.",
+    "On the photos path, only Nell's times show: Nell replaces pumps."
+   ],
+   [
+    "like a roof leak.",
+    "like a roof repair."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the leak is, if water is still coming, and if the pump is off."
+   ],
+   [
+    "shaves",
+    "tests"
+   ],
+   [
+    "shave",
+    "test"
+   ],
+   [
+    "beard",
+    "tank"
+   ],
+   [
+    "Beard",
+    "Tank"
+   ],
+   [
+    "flush",
+    "water change"
+   ],
+   [
+    "Flush",
+    "Water change"
+   ],
+   [
+    "Nell does filters too, at $140 an hour.",
+    "Nell does filters too."
+   ],
+   [
+    "tank care and filters, $140 an hour",
+    "tank care and filters"
+   ],
+   [
+    "Oscar also does color and tank visits.",
+    "Oscar also does tank visits."
+   ],
+   [
+    "Ruth lets himself in the agreed way",
+    "Ruth goes in the agreed way"
+   ],
+   [
+    "Nell lets himself in",
+    "Nell goes in"
+   ],
+   [
+    "Sam can set this for one service",
+    "Sam can set this for one service"
+   ],
+   [
+    "Freshwater care visit $40",
+    "Freshwater care visit $125"
+   ],
+   [
+    "Freshwater care visit · $40",
+    "Freshwater care visit · $125"
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75.",
+    "can check your tank at the shop for $15, or at your home for $125."
+   ],
+   [
+    "Send Alex M. $600 for the tank move, not $640?",
+    "Send Alex M. the $600 deposit now?"
+   ],
+   [
+    "$640 tank heater",
+    "$1,200 tank move"
+   ],
+   [
+    "$640 price",
+    "$1,200 price"
+   ],
+   [
+    "Sump camera inspection · $199",
+    "Water test · $15"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "$358",
+    "$250"
+   ],
+   [
+    "$640",
+    "$1,200"
+   ],
+   [
+    "$20 fee ($40 for the tank move and setup)",
+    "@@FEE@@"
+   ],
+   [
+    "$20 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 service-call fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89, credited to the repair",
+    "$85, credited to the repair"
+   ],
+   [
+    "up to the $89 visit",
+    "up to the $85 visit"
+   ],
+   [
+    "The visit is $89. Accept it?",
+    "The visit is $85. Accept it?"
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 visit was promised.",
+    "A leak repair is priced at the visit: only the $85 visit was promised."
+   ],
+   [
+    "Today's visit is the $89 visit.",
+    "Today's visit is the $85 visit."
+   ],
+   [
+    "The $89 visit is included",
+    "The $85 visit is included"
+   ],
+   [
+    "$120 an hour",
+    "$120"
+   ],
+   [
+    "Labor",
+    "Tank cleaning"
+   ],
+   [
+    "$20",
+    "$25"
+   ],
+   [
+    "$40",
+    "$20"
+   ],
+   [
+    "$35",
+    "$15"
+   ],
+   [
+    "$55",
+    "$35"
+   ],
+   [
+    "$75",
+    "$125"
+   ],
+   [
+    "$140",
+    "$125"
+   ],
+   [
+    "$89",
+    "$85"
+   ],
+   [
+    "$150",
+    "$125"
+   ],
+   [
+    "$179",
+    "$125"
+   ],
+   [
+    "$199",
+    "$140"
+   ],
+   [
+    "@@FEE@@",
+    "$25 fee"
+   ]
+  ],
+  "B": [
+   [
+    "Lee Plumbing",
+    "Lee Tank Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Filters"
+   ],
+   [
+    "Can you flush my clinic every year, too?",
+    "Can you do my tank every year, too?"
+   ],
+   [
+    "yearly flush plan",
+    "yearly water change plan"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a new filter set up one day and finished another."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE algae in the filter. Bring the pump next time."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a prescription for someone never seen."
+   ],
+   [
+    "supply line",
+    "air line"
+   ],
+   [
+    "Supply line",
+    "Air line"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The net clip ripped my shirt collar."
+   ],
+   [
+    "the cape clip ripped a shirt collar today.",
+    "the net clip ripped a shirt collar today."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: the tank is 75 gallons, pump is loud, check the heater."
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Aquarium Shop LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Aquarium Shop"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Reef Care LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Reef Care"
+   ],
+   [
+    "Groom's Package",
+    "Tank move and setup"
+   ],
+   [
+    "Groom's package",
+    "tank move and setup"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Reef tank care visit"
+   ],
+   [
+    "Signature cut and shave",
+    "Reef tank care visit"
+   ],
+   [
+    "signature cut and shave",
+    "reef tank care visit"
+   ],
+   [
+    "Skin fades",
+    "Freshwater care visit"
+   ],
+   [
+    "Skin fade",
+    "Freshwater care visit"
+   ],
+   [
+    "skin fades",
+    "freshwater care visits"
+   ],
+   [
+    "skin fade",
+    "freshwater care visit"
+   ],
+   [
+    "Beard trims",
+    "Water tests"
+   ],
+   [
+    "Beard trim",
+    "Water test"
+   ],
+   [
+    "beard trims",
+    "water tests"
+   ],
+   [
+    "beard trim",
+    "water test"
+   ],
+   [
+    "Kids cuts",
+    "Filter checks"
+   ],
+   [
+    "Kids cut",
+    "Filter check"
+   ],
+   [
+    "kids cuts",
+    "filter checks"
+   ],
+   [
+    "kids cut",
+    "filter check"
+   ],
+   [
+    "Color and cut",
+    "Tank move and setup"
+   ],
+   [
+    "color and cut",
+    "tank move and setup"
+   ],
+   [
+    "Color correction",
+    "Trouble visit"
+   ],
+   [
+    "color correction",
+    "trouble visit"
+   ],
+   [
+    "hot towel",
+    "water change"
+   ],
+   [
+    "Hot towel",
+    "Water change"
+   ],
+   [
+    "Haircuts",
+    "Water tests"
+   ],
+   [
+    "haircuts",
+    "water tests"
+   ],
+   [
+    "Haircut",
+    "Water test"
+   ],
+   [
+    "haircut",
+    "water test"
+   ],
+   [
+    "barbershops",
+    "shops"
+   ],
+   [
+    "barbershop",
+    "shop"
+   ],
+   [
+    "Barbershop",
+    "Shop"
+   ],
+   [
+    "barbers",
+    "techs"
+   ],
+   [
+    "barber",
+    "tech"
+   ],
+   [
+    "Barber",
+    "Tech"
+   ],
+   [
+    "clinicians",
+    "vets"
+   ],
+   [
+    "clinician",
+    "vet"
+   ],
+   [
+    "Clinician",
+    "Vet"
+   ],
+   [
+    "Riley",
+    "Oscar"
+   ],
+   [
+    "Avery",
+    "Mina"
+   ],
+   [
+    "Jordan",
+    "Nell"
+   ],
+   [
+    "Casey",
+    "Ivo"
+   ],
+   [
+    "Jules",
+    "Noor"
+   ],
+   [
+    "Tessa",
+    "Ellen"
+   ],
+   [
+    "Kim",
+    "Ana"
+   ],
+   [
+    "Nia",
+    "Rosa"
+   ],
+   [
+    "Hugo",
+    "Felix"
+   ],
+   [
+    "Lena",
+    "Greta"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "house calls",
+    "tank visits"
+   ],
+   [
+    "House calls",
+    "Tank visits"
+   ],
+   [
+    "house call",
+    "tank visit"
+   ],
+   [
+    "House call",
+    "Tank visit"
+   ],
+   [
+    "plumbing and electrical",
+    "tank care and filters"
+   ],
+   [
+    "Plumbing and electrical",
+    "Tank care and filters"
+   ],
+   [
+    "plumbing",
+    "tank care"
+   ],
+   [
+    "Plumbing",
+    "Tank care"
+   ],
+   [
+    "plumber",
+    "tech"
+   ],
+   [
+    "Plumber",
+    "Tech"
+   ],
+   [
+    "electrician",
+    "assistant tech"
+   ],
+   [
+    "electrical",
+    "filters"
+   ],
+   [
+    "Electrical",
+    "Filters"
+   ],
+   [
+    "water heater flush",
+    "water change"
+   ],
+   [
+    "Water heater flush",
+    "Water change"
+   ],
+   [
+    "water heater replacement",
+    "tank move"
+   ],
+   [
+    "Water heater replacement",
+    "Tank move"
+   ],
+   [
+    "water heater fix",
+    "pump fix"
+   ],
+   [
+    "Water heater fix",
+    "Pump fix"
+   ],
+   [
+    "water heaters",
+    "pumps"
+   ],
+   [
+    "Water heaters",
+    "Pumps"
+   ],
+   [
+    "water heater",
+    "tank heater"
+   ],
+   [
+    "Water heater",
+    "Tank heater"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "Drain clearings",
+    "Water changes"
+   ],
+   [
+    "drain clearings",
+    "water changes"
+   ],
+   [
+    "drain clearing",
+    "water change"
+   ],
+   [
+    "Drain clearing",
+    "Water change"
+   ],
+   [
+    "perms",
+    "treatments"
+   ],
+   [
+    "Perms",
+    "Treatments"
+   ],
+   [
+    "perm",
+    "treatment"
+   ],
+   [
+    "Perm",
+    "Treatment"
+   ],
+   [
+    "massage",
+    "filter check"
+   ],
+   [
+    "Massage",
+    "Filter check"
+   ],
+   [
+    "heating and cooling",
+    "lighting"
+   ],
+   [
+    "Heating and cooling",
+    "Lighting"
+   ],
+   [
+    "cabinet",
+    "stand"
+   ],
+   [
+    "Cabinet",
+    "Stand"
+   ],
+   [
+    "dishwasher",
+    "sump pump"
+   ],
+   [
+    "Dishwasher",
+    "Sump pump"
+   ],
+   [
+    "sink",
+    "tank"
+   ],
+   [
+    "Sink",
+    "Tank"
+   ],
+   [
+    "pipe",
+    "hose"
+   ],
+   [
+    "Pipe",
+    "Hose"
+   ],
+   [
+    "faucet",
+    "pump"
+   ],
+   [
+    "Faucet",
+    "Pump"
+   ],
+   [
+    "sewer",
+    "sump"
+   ],
+   [
+    "Sewer",
+    "Sump"
+   ],
+   [
+    "toilet",
+    "sump"
+   ],
+   [
+    "Toilet",
+    "Sump"
+   ],
+   [
+    "drain",
+    "siphon"
+   ],
+   [
+    "Drain",
+    "Siphon"
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Switch off the tank's breaker if you can reach it dry. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas",
+    "My"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay humo o una descarga?"
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si puede llegar al disyuntor sin pisar agua, apague el circuito del tanque. Si hay humo o una descarga, salga y llame al 911."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay humo ni descarga."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If there's smoke or a shock, leave the room now. Then call 911."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said there's a shock from the tank."
+   ],
+   [
+    "A gas smell at the home",
+    "A shock from the tank"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to leave, then call 911"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell,",
+    "Real danger, like water near outlets or a shock,"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to switch off the tank's breaker if she can, and to call 911 if there's a shock."
+   ],
+   [
+    "Shut the cold-water valve, above the orthotic. If you smell gas, get out and call 911.",
+    "Switch off the breaker if you can reach it dry. If there's a shock, get out and call 911."
+   ],
+   [
+    "A podiatrist's example: water near outlets gets 'shut off the main valve'.",
+    "A tank tech's example: water near outlets gets 'switch off the breaker'."
+   ],
+   [
+    "Lee Aquarium Shop can clear the drain",
+    "Lee Aquarium Shop can come to you"
+   ],
+   [
+    "Lee Reef Care can clear the drain",
+    "Lee Reef Care can come to you"
+   ],
+   [
+    "Lee Reef Care can clear the drain:",
+    "Lee Reef Care can come to you:"
+   ],
+   [
+    "Hi, it's about a leaking hose under my tank. A text back is fine.",
+    "Hi, it's about algae in my tank. A text back is fine."
+   ],
+   [
+    "On the photos path, only Nell's times show: he's the one who replaces pumps.",
+    "On the photos path, only Nell's times show: Nell replaces pumps."
+   ],
+   [
+    "like a roof leak.",
+    "like a roof repair."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the leak is, if water is still coming, and if the pump is off."
+   ],
+   [
+    "shaves",
+    "tests"
+   ],
+   [
+    "shave",
+    "test"
+   ],
+   [
+    "beard",
+    "tank"
+   ],
+   [
+    "Beard",
+    "Tank"
+   ],
+   [
+    "flush",
+    "water change"
+   ],
+   [
+    "Flush",
+    "Water change"
+   ],
+   [
+    "Nell does filters too, at $140 an hour.",
+    "Nell does filters too."
+   ],
+   [
+    "tank care and filters, $140 an hour",
+    "tank care and filters"
+   ],
+   [
+    "Oscar also does color and tank visits.",
+    "Oscar also does tank visits."
+   ],
+   [
+    "Ruth lets himself in the agreed way",
+    "Ruth goes in the agreed way"
+   ],
+   [
+    "Nell lets himself in",
+    "Nell goes in"
+   ],
+   [
+    "Sam can set this for one service",
+    "Sam can set this for one service"
+   ],
+   [
+    "Freshwater care visit $40",
+    "Freshwater care visit $125"
+   ],
+   [
+    "Freshwater care visit · $40",
+    "Freshwater care visit · $125"
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75.",
+    "can check your tank at the shop for $15, or at your home for $125."
+   ],
+   [
+    "Send Alex M. $600 for the tank move, not $640?",
+    "Send Alex M. the $600 deposit now?"
+   ],
+   [
+    "$640 tank heater",
+    "$1,200 tank move"
+   ],
+   [
+    "$640 price",
+    "$1,200 price"
+   ],
+   [
+    "Sump camera inspection · $199",
+    "Water test · $15"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "$358",
+    "$250"
+   ],
+   [
+    "$640",
+    "$1,200"
+   ],
+   [
+    "$20 fee ($40 for the tank move and setup)",
+    "@@FEE@@"
+   ],
+   [
+    "$20 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 service-call fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89, credited to the repair",
+    "$85, credited to the repair"
+   ],
+   [
+    "up to the $89 visit",
+    "up to the $85 visit"
+   ],
+   [
+    "The visit is $89. Accept it?",
+    "The visit is $85. Accept it?"
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 visit was promised.",
+    "A leak repair is priced at the visit: only the $85 visit was promised."
+   ],
+   [
+    "Today's visit is the $89 visit.",
+    "Today's visit is the $85 visit."
+   ],
+   [
+    "The $89 visit is included",
+    "The $85 visit is included"
+   ],
+   [
+    "$120 an hour",
+    "$120"
+   ],
+   [
+    "Labor",
+    "Tank cleaning"
+   ],
+   [
+    "$20",
+    "$25"
+   ],
+   [
+    "$40",
+    "$20"
+   ],
+   [
+    "$35",
+    "$15"
+   ],
+   [
+    "$55",
+    "$35"
+   ],
+   [
+    "$75",
+    "$125"
+   ],
+   [
+    "$140",
+    "$125"
+   ],
+   [
+    "$89",
+    "$85"
+   ],
+   [
+    "$150",
+    "$125"
+   ],
+   [
+    "$179",
+    "$125"
+   ],
+   [
+    "$199",
+    "$140"
+   ],
+   [
+    "@@FEE@@",
+    "$25 fee"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "heater",
+  "clog",
+  "valve",
+  "shutoff",
+  "outlet",
+  "overflowing",
+  "air line",
+  "siphon",
+  "pump"
+ ],
+ "story": {
+  "A": "Alex brings a water sample and a phone photo of a sick fish to the shop for a water test and fish check, and pays at the counter.",
+  "B": "Alex's 75-gallon reef tank gets a care visit every 2 weeks; the saved card is charged when the tech texts DONE."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|none|none",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $15 water test and fish check at the shop, paid at the counter.",
+    "list|none|none": "A free basic water test at the shop.",
+    "list|card|counter": "Fish held at the shop for a week during a tank move, $35, a card saved for the no-pick-up fee, paid at pick-up."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$25",
+     "name": "Water test and fish check"
+    },
+    "list|*|*": {
+     "price": "$15",
+     "name": "Water test and fish check"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Basic water test"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$25",
+     "name": "Fish holding, up to a week"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "visit|card|card",
+    "photos|deposit|bill",
+    "list|card|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $125 reef tank care visit; a card is saved; it's charged when the tech texts DONE.",
+    "visit|card|card": "A tank trouble visit: the $85 trip and check is promised; the fix is priced at the tank; the saved card is charged at DONE.",
+    "photos|deposit|bill": "A 90-gallon reef tank moved and set up, quoted at $1,200 from photos: $600 now, $600 on the bill when it's set up.",
+    "list|card|bill": "An office lobby tank on the office's account: each visit goes on one bill a month."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$45",
+     "name": "Reef tank care visit"
+    },
+    "list|*|*": {
+     "price": "$125",
+     "name": "Reef tank care visit"
+    },
+    "visit|*|*": {
+     "fee": "$85",
+     "name": "Tank trouble visit"
+    },
+    "photos|*|*": {
+     "price": "$1,200",
+     "name": "Tank move and setup"
+    },
+    "photos|deposit|*": {
+     "price": "$1,200",
+     "deposit": "$600",
+     "rest": "$600",
+     "fee": "$150",
+     "name": "Tank move and setup"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The work books a tech's time, never a space or a thing."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies to every profession (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No license for each tech."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "A leak or failed equipment can be sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "No spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Fish holding is a drop-off time, not a stay booked by the hour."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Children are never left at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The work books a tech's time, never a space or a thing."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies to every profession (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No license for each tech."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "A leak or failed equipment can be sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Home visits use arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A tech never works in a home with only a child there."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "A4-43",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-60",
+   "B7-55",
+   "B8-58"
+  ]
+ },
+ "notes": "H1 build, Tue Oct 27 2026 (professions pass P3). From pool (refitted); the test-drive plug-in (work/testdrive/aquarium.md) is the base: services, prices, safety words, splits and off ops kept.\nMoney: shop water test $15 (basic test free; fish holding $35 for a week, $25 fee); home care visit $125 (card at DONE); trouble visit: the $85 trip and check (the visit's fee, read by B4-14 and B7-10: one fee per booking); tank move $1,200, $600 deposit, rest on the bill; office account on one bill a month. The $2 applies (D97).\nTest-drive finding 5 (phase 4 plug-in fix) applied: the trip fee moved from the visit's price to the visit path's fee ($85). The $45 care-visit fee is unchanged; the trouble visit's late/no-show fee is now the trip fee (one fee per booking).\nD96: no dealer-license or registration lookup; every license line is the business's own word. The master's lookup wording is a MASTER line (log).\nSafety: the poison control line (test-drive finding 4) can't be given (S13-10 lists only Rosie's hotlines): the plug-in gives 911 for danger and 'rinse, see a doctor' for a mild splash. MASTER line in the log.\nPoints for the verifier: (1) the trouble visit's fee ($85) is also its late-cancel fee; (2) 'Sam decides' on a no-show with no fee (A8-14, the master's words) is a MASTER line; (3) placeholder pairs give two 'chain' info lines.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Lee Plumbing",
+    "Lee Electric",
+    "The cape clip ripped my shirt collar.",
+    "the cape clip ripped a shirt collar today.",
+    "at the chair",
+    "At the chair",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Skin fade",
+    "skin fades",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cuts",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "hot towel",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "clinician",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Jules",
+    "Nia",
+    "Hugo",
+    "Lena",
+    "88 Elm St",
+    "1200 Main St",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "water heaters",
+    "water heater",
+    "Drain clearing",
+    "perms",
+    "perm",
+    "massage",
+    "Massage",
+    "pipe",
+    "Drain",
+    "shaves",
+    "shave",
+    "beard",
+    "Beard",
+    "$20 fee",
+    "$89 service-call fee",
+    "$20",
+    "$40",
+    "$35",
+    "$55",
+    "$75",
+    "$140",
+    "$89"
+   ],
+   "B": [
+    "Lee Plumbing",
+    "Lee Electric",
+    "yearly flush plan",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Like tapping a neighbor's water line without asking.",
+    "supply line",
+    "Supply line",
+    "at the chair",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "beard trim",
+    "hot towel",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "clinician",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Jules",
+    "Tessa",
+    "Kim",
+    "42 Oak St",
+    "88 Elm St",
+    "1200 Main St",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "Water heater fix",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "service call fee",
+    "service call",
+    "Service call",
+    "Drain clearings",
+    "drain clearings",
+    "drain clearing",
+    "Drain clearing",
+    "perm",
+    "heating and cooling",
+    "Heating and cooling",
+    "cabinet",
+    "Cabinet",
+    "dishwasher",
+    "sink",
+    "pipe",
+    "faucet",
+    "sewer",
+    "Sewer",
+    "drain",
+    "Drain",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No. No huele a gas.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Real danger, like water near outlets or a gas smell,",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "like a roof leak.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "shaves",
+    "shave",
+    "beard",
+    "flush",
+    "Sam can set this for one service",
+    "can cut your hair at the shop for $35, or at your home for $75.",
+    "$640 price",
+    "Rental 1",
+    "Rental 2",
+    "$358",
+    "$640",
+    "$20 fee",
+    "$89 service-call fee",
+    "$89 fee",
+    "$89, credited to the repair",
+    "$120 an hour",
+    "Labor",
+    "$20",
+    "$40",
+    "$35",
+    "$75",
+    "$140",
+    "$89",
+    "$150",
+    "$179",
+    "$199"
+   ]
+  },
+  "A": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

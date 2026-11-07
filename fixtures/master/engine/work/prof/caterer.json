@@ -1,0 +1,3607 @@
+{
+ "id": "caterer",
+ "name": "Caterer",
+ "style": "Event",
+ "pattern": "event",
+ "from": "photographer",
+ "plugin": {
+  "pf.license": {
+   "need": "Always for food: a food service permit for the kitchen the food is made in, from the health department. Bar service: a liquor license, or a caterer's permit, where the state's rules require one. All from the state form.",
+   "per event": "Where the state's rules require it, a permit for each event with a bar, or for food served at a temporary event. Filed by the business before the date the rules set.",
+   "who holds it": "The business holds the kitchen's food permit, any liquor license and any event permits. Each person holds their own card: a food handler card for cooks, a server training card for bartenders, where the state's rules require one.",
+   "manager on site": "A certified food protection manager is in charge at every event and at the kitchen, where the state's rules require one.",
+   "what to ask": [
+    "The kitchen's food service permit number",
+    "The liquor license number, if the business pours drinks",
+    "Each cook's food handler card and each bartender's server card, in their invite reply",
+    "The food protection manager certificate, and who holds it"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "No food service permit on file: catering stays offline. No liquor license: the bar services stay hidden. A bartender without a current card is never offered for a bar.",
+   "renewals": "A reminder 30 days before a permit, card or certificate runs out. Once one lapses, the services it covers pause.",
+   "insurance or bond": "Liability insurance, and liquor liability insurance for a bar, on file with end dates. Many venues ask for a certificate naming them.",
+   "background checks": "Only where the state's form asks."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Lee Event Catering's own list)": [
+    {
+     "service": "Office breakfast for 20, delivered and set up",
+     "price kind": "quoted from the plan first (the guest count, the menu, photos of the room)",
+     "price": "the quote (the example: $640)",
+     "length": "a 2-hour setup window",
+     "place": "at the customer's office or venue",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest on the bill after the event"
+    },
+    {
+     "service": "Hot breakfast for 10, delivered and set up",
+     "price kind": "one price",
+     "price": "$179",
+     "length": "a 2-hour setup window",
+     "place": "at the customer's office or home",
+     "before": "the $89 delivery fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Boxed lunch for 10, delivered",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "a 2-hour delivery window",
+     "place": "at the customer's office",
+     "before": "the full price, or a $40 deposit",
+     "after": "nothing more"
+    },
+    {
+     "service": "Wedding or party dinner (50 guests or more)",
+     "price kind": "quoted from the plan first, per guest",
+     "price": "the quote (the example's family style: $95 a guest)",
+     "length": "a set start time, with setup hours before",
+     "place": "at the venue",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest on the bill after the event, set by the final count",
+     "note": "The owner OKs every wedding. A tasting comes first. The final count is due 14 days before (the example's setting)."
+    },
+    {
+     "service": "Beer and wine bar, 4 hours (up to 20 guests)",
+     "price kind": "one price",
+     "price": "$189",
+     "length": "4 hours",
+     "place": "at the venue",
+     "before": "the $89 delivery fee held",
+     "after": "Rosie texts the bill",
+     "note": "Only under the business's liquor license, and an event permit where the state's rules require one. Only bartenders with a current card."
+    },
+    {
+     "service": "Bartender, 3 hours (the hosts buy the drinks)",
+     "price kind": "one price",
+     "price": "$149",
+     "length": "3 hours",
+     "place": "at the venue, where it allows",
+     "before": "the $89 delivery fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Wedding bar",
+     "price kind": "quoted after a venue walk-through",
+     "price": "the quote (the example: $25 a guest 21 and over)",
+     "length": "the event's hours",
+     "place": "at the venue",
+     "before": "with the wedding's contract and deposit",
+     "after": "with the wedding's rest"
+    },
+    {
+     "service": "Taco bar",
+     "price kind": "priced at the event, by the plates served",
+     "price": "only the $89 delivery fee is promised",
+     "length": "a 2-hour setup window",
+     "place": "at the customer's office or home",
+     "before": "the $89 delivery fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Carving station (add-on)",
+     "price kind": "by person",
+     "price": "$199 with Rowan, $249 with Sam",
+     "length": "the event's hours",
+     "place": "at the event",
+     "before": "with the main booking",
+     "after": "with the main booking"
+    },
+    {
+     "service": "Extra service time on the day",
+     "price kind": "per hour, by person",
+     "price": "$140 an hour with Rowan, $120 with anyone else (the example)",
+     "length": "1 hour",
+     "place": "at the event",
+     "before": "nothing: asked at the event",
+     "after": "one pay link after",
+     "note": "Only with the customer's written yes, at the rate shown before booking"
+    },
+    {
+     "service": "Delivery",
+     "price kind": "delivery fee",
+     "price": "the example's $89 within 25 miles; farther, quoted",
+     "length": "",
+     "place": "at the customer's place",
+     "before": "held or added to the quote",
+     "after": "with the rest"
+    }
+   ],
+   "at the business (the example: Lee's Kitchen's own list)": [
+    {
+     "service": "Tasting for 4 (the full event menu)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours",
+     "place": "at the kitchen's tasting table",
+     "before": "a $40 deposit",
+     "after": "the $100 rest at the kitchen",
+     "note": "Credited to a catering order booked within 30 days (the example's own rule)"
+    },
+    {
+     "service": "Tasting for 2",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the kitchen",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Fruit tray (serves 10), picked up",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "a pickup slot",
+     "place": "at the kitchen's counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Salad tray (serves 10), picked up",
+     "price kind": "one price",
+     "price": "$40",
+     "length": "a pickup slot",
+     "place": "at the kitchen's counter",
+     "before": "a card saved",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Cookie box (a dozen)",
+     "price kind": "one price",
+     "price": "$20",
+     "length": "an add-on",
+     "place": "at the kitchen's counter",
+     "before": "with the order",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Kids' snack box",
+     "price kind": "one price",
+     "price": "$25",
+     "length": "a pickup slot",
+     "place": "at the kitchen's counter",
+     "before": "a card saved",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Custom grazing board",
+     "price kind": "quoted from photos first (the table and the guest count)",
+     "price": "the quote (the example: $90)",
+     "length": "a pickup slot, 2 days' notice",
+     "place": "at the kitchen's counter",
+     "before": "a card saved",
+     "after": "paid at pickup"
+    },
+    {
+     "service": "Event menu",
+     "price kind": "quoted at a menu consult",
+     "price": "only the $25 consult is promised",
+     "length": "30 min",
+     "place": "at the kitchen",
+     "before": "a card saved",
+     "after": "paid at the kitchen"
+    },
+    {
+     "service": "Fruit tray delivered and set out",
+     "price kind": "one price",
+     "price": "$75",
+     "length": "a delivery window",
+     "place": "at the customer's home",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "The same tray, booked in flow B"
+    }
+   ],
+   "capacity": "The kitchen's own limit of events a day (the example: 2 off-site events on a Saturday) and a guest minimum for full-service events (the example: 50). Pickups by slots, set by how many orders the kitchen makes in a day. A big event books its lead chef, cooks, servers and bartenders together.",
+   "nobody needs to be there": "Never: food is handed to a person, who checks it.",
+   "online": "None: tastings and pickups are at the kitchen."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What it's for: a meeting, a party, a wedding or a pickup order",
+    "The date, and the place's name and town (for the delivery fee and the travel area)",
+    "About how many guests, and how many are 21 or over if there's a bar",
+    "The style: drop-off, buffet, family style, plated or stations",
+    "A bar? Full bar, beer and wine, bartending only, or none",
+    "Does the place have a kitchen, power and water for the food?"
+   ],
+   "after a time is picked": [
+    "Where the food goes, and what time guests eat",
+    "Tables and chairs: from the venue, or rented",
+    "A planner or day-of contact, and their mobile, if they'll be there",
+    "Parking and the way in for the van, like a loading dock"
+   ],
+   "only on the secure page": [
+    "Allergies and diets, by table or seat, with their own yes",
+    "The venue's gate or door codes",
+    "Access needs of a guest",
+    "The card"
+   ],
+   "who may book": "An adult. For an event, the host or the couple: either may book, and both may sign. A company's booking can name the company as the payer."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A fire, a gas smell, or someone hurt at the venue right now",
+     "says": "If there's a fire or a gas smell, get everyone out. If anyone is hurt or in danger, call 911 now.",
+     "booking": "No booking until it's safe; the customer can come back."
+    },
+    {
+     "words": "Someone has a bad allergic reaction now (trouble breathing, swelling)",
+     "says": "Call 911 now. Use an epinephrine pen if the person has one.",
+     "booking": "No booking now."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "A food allergy question",
+     "says": "Rosie never says a food is safe. The chef answers allergy questions from the secure page.",
+     "booking": "Goes on."
+    }
+   ],
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The signed contract",
+     "for": "Every event quoted from the plan",
+     "timing": "Before any money is taken, on the secure page"
+    },
+    {
+     "step": "A tasting at the kitchen, booked as its own visit",
+     "for": "Weddings and dinners of 50 or more; party orders of 50 or more at the kitchen",
+     "timing": "2 to 4 months before for a wedding; at least 2 days before for a party order"
+    },
+    {
+     "step": "The event form: the final count, the timeline, the seating, vendor meals, and allergies with their own yes",
+     "for": "Events of 20 or more",
+     "timing": "The final count is due 14 days before (the example's setting). Booked closer: at booking."
+    },
+    {
+     "step": "A venue walk-through",
+     "for": "A venue new to the crew, and weddings",
+     "timing": "About 2 months before; a to-do for the owner"
+    },
+    {
+     "step": "An event permit for a bar, or a temporary food permit",
+     "for": "Where the state's rules require one",
+     "timing": "A to-do for the owner, before the lead time the rules set"
+    },
+    {
+     "step": "An insurance certificate naming the venue",
+     "for": "Venues and buildings that ask",
+     "timing": "Before the date the venue sets"
+    }
+   ],
+   "prep for the reminder": [
+    "Clear a table for the buffet, near an outlet for the coffee",
+    "Tell the building the van is coming, and where it parks",
+    "Pickups: bring a cooler bag for cold trays in warm weather"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code, given to the lead chef on arrival. A planner or a day-of contact can get the code instead, when a mobile is given for them.",
+   "check-in at the kitchen": "The code at the counter for a pickup or a tasting, or the chef types it.",
+   "delivery and setup": "Every order is delivered and set up. The customer checks it and signs for it, with a photo of the setup and the food labels.",
+   "food safety on the day": "Hot food stays hot and cold food stays cold. Food out of temperature control is marked with its time limit (the federal model food code says 4 hours) and is served or thrown away by then.",
+   "bar": "Guests 21 and over only, with ID. A guest with no ID gets a mocktail. A guest who is visibly drunk is not served, and the lead chef tells the host.",
+   "allergies": "Allergy plates go out first, labeled by seat, checked by the food protection manager against the secure page.",
+   "work changes at the event": "More guests, extra food or extra service time only with the customer's written yes by text, at the rate shown before booking. No yes in 10 minutes: service ends on time.",
+   "proof it's done": "The lead chef texts DONE once the food is set up and checked, or served and cleared for a full-service event."
+  },
+  "pf.money": {
+   "starting answers": [
+    "Events quoted from the plan: a signed contract, a deposit when booking, and the rest on the saved card when the event is done, or on the bill after",
+    "The final count is due before the event, on the day the owner sets (the example: 14 days before); it sets the rest paid on the bill after the event",
+    "Drop-off and hot breakfasts: a card saved for the delivery fee, and Rosie texts the bill. Office orders: the saved card charged at DONE",
+    "At the kitchen: tastings with a deposit or paid in full; pickups with a card saved, paid at the counter"
+   ],
+   "limits": [
+    "Deposit cap: from the state form",
+    "The final count is billed even if fewer come, when the contract says so",
+    "A cancel keeps only what the contract's dated schedule says, never the whole price, and the owner confirms it. No answer, nothing kept",
+    "The business cancels, or the customer says no to a stand-in: a full refund"
+   ],
+   "service charge": "Any service or administrative charge is inside the first price shown, and it's never called a tip. Where the state's rules require it, the bill says it isn't paid to staff as tips.",
+   "tips": "Off by default. If on, every tip goes to the staff.",
+   "tax": "A tax line where the state taxes catering, at the rate from the state form.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Allergies, diets and any health detail stay on the secure page, with their own yes. Only the lead chef and the manager see them, for that event. They're deleted the day after.",
+   "languages": "English and Spanish.",
+   "minors": "Never booked by a minor. Alcohol is never served to anyone under 21."
+  },
+  "pf.staff": {
+   "roles": [
+    "Lead chef",
+    "Cook",
+    "Server or captain",
+    "Bartender (a current card where the state requires one)",
+    "Food protection manager",
+    "Delivery driver"
+   ],
+   "skills": [
+    "Quoted events and weddings (leads only)",
+    "Hot breakfasts and drop-offs",
+    "Bar service",
+    "Carving station",
+    "Tastings",
+    "Grazing boards"
+   ],
+   "supervision": "A certified food protection manager is in charge at each event and at the kitchen, where the state's rules require one.",
+   "who OKs what": "The owner OKs every wedding, every quote over the limit, every guest count change over 10%, and any stand-in lead.",
+   "stand-ins": "A lead chef the owner trusts, even from outside the team, only if the customer agrees. A bartender only with a current card.",
+   "who does what (the example)": "Remy makes grazing boards and prices event menus at the menu consult; Sasha does every other kitchen service. Rowan leads quoted events; Emery does hot breakfasts and boxed lunches."
+  },
+  "pf.rules": {
+   "written contract": "The business's own contract, filled in from the booking, signed by every customer named and the business before money is taken, for every quoted event. Any parts the state's rules add come from the state form.",
+   "date hold": "An event date stays saved while the contract is signed: up to 24 hours here, and longer for a wedding (the owner's setting).",
+   "events a day": "The kitchen's own limit of events a day (the owner's setting).",
+   "final count": "Due before the event, on the day the owner sets. It sets the rest paid on the bill after the event. Over 10% more needs the owner's OK.",
+   "cancel schedule": "Free to cancel for a set time after signing. After that, a dated schedule from the contract. One free date change, if the kitchen has room (the owner's setting).",
+   "alcohol": "Only under the business's liquor license and any event permit the state's rules require. No outside alcohol where the license forbids it.",
+   "records": "Contracts, permits and payments kept 7 years, as for every kind of work. Allergy notes deleted the day after the event."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for catering:",
+   "catering": [
+    "The guest count changes: a new price to sign; over 10% needs the owner's OK",
+    "The final count isn't in by its day: the contract's count is billed, and the owner calls about allergies",
+    "Rain or heat on an outdoor event: the weather plan in the contract",
+    "A bar permit isn't issued in time: the bar comes off, and the owner calls",
+    "The lead chef can't come: a trusted stand-in if the customer agrees, or a full refund",
+    "The customer moves the date: one free move, if the kitchen has room",
+    "The customer cancels: only what the dated schedule says is kept, with the owner's OK",
+    "A guest with no ID, or visibly drunk: no alcohol for them",
+    "An allergy plate: made apart, labeled, and checked against the secure page",
+    "The van runs late: the customer hears only if the serving time changes",
+    "Food out too long: thrown away at its time limit"
+   ]
+  },
+  "pf.facts": [
+   "firststeps",
+   "forms",
+   "documents",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Remy and Sasha (chefs at the kitchen)"
+  },
+  "B": {
+   "staff": "Rowan and Emery (event chefs)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Remy"
+  },
+  "B": {
+   "staff": "Rowan"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds meal prep to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Meal prep for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW meal prep"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A tailor, a groomer or a phone repair counter does."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A hot tray left a burn mark on my bag."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a hot tray left a burn mark on a bag today."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The kitchen's plug-in adds a bad allergic reaction to the danger words."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "Lee's Kitchen books a chef's time for a tasting, and a pickup slot for an order."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Lee's Kitchen prices an event menu at a consult, once Remy hears the plan."
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration 2020-1187"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A tasting is rated, so the kitchen takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Remy's event menu after a consult"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Kitchen sent you a proposal: Remy's event menu."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Event menu"
+   ],
+   [
+    "your first color plan visit",
+    "your first event menu order"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the kitchen show photos of your trays? Yes / No"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Remy can do a shorter tasting in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee's Kitchen can book you from now on, for tastings and for home deliveries."
+   ],
+   [
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet.",
+    "The state's lookup is down, so Quinn S.'s card isn't checked yet."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A food service permit for the company's kitchen, and a card for each cook where the state asks."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A caterer's example: a grease fire that's out still gets 'wait for the fire department'."
+   ],
+   [
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "The plug-in sets the status words, like in, being made, ready."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Add photos of your table and your guest count, and a chef will price your grazing board."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: a kitchen's food permit covers that kitchen, and some chefs' cards are tied to it too."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the dishes Alex liked."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A bride books tastings for her family and her fiancé's on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: liked the short rib and the lemon tart, no cilantro"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds back-to-back tastings across Remy and Sasha."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your fruit tray is part of a plan with Remy, every 4 weeks."
+   ],
+   [
+    "Avery's license is checked again when the lookup answers.",
+    "Sasha's card is checked again when the lookup answers."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Deliveries only where the kitchen's permit covers them."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says one of Saturday's tasting dishes was cold."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 grazing board quote."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A tasting could mean a caterer or a winery."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A food service permit for the kitchen, and a card for each cook."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a pack of tastings at the kitchen."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait at the kitchen during my tasting?"
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Fruit trays, salad trays and cookie boxes at the kitchen."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every kitchen service, grazing boards and deliveries"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kids' snack box is $25."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Food handler FH031552 · bartender SC30417"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Remy also makes grazing boards and does deliveries"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Remy: chef, grazing boards and deliveries"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a fruit tray every 4 weeks."
+   ],
+   [
+    "A barbershop takes no drop-offs.",
+    "A kitchen takes no drop-offs."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Grazing boards and event menus always stay with Remy."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The soup was cold at the tasting."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Taco bars are priced at the event."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "A fire or gas smell at the venue stops the booking."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Remy stopped one dish of Alex M.'s tasting."
+   ],
+   [
+    "plumbing and electrical jobs",
+    "catering and bar jobs"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a tasting on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una degustación el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a fruit tray every 4 weeks"
+   ],
+   [
+    "Avery · license not found",
+    "Sasha · card not found"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A tasting needs nothing."
+   ],
+   [
+    "Drains have a set price.",
+    "Hot lunches have a set price."
+   ],
+   [
+    "Avery · license expired",
+    "Sasha · card expired"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped one dish of Alex M.'s tasting."
+   ],
+   [
+    "License renewal",
+    "Card renewal"
+   ],
+   [
+    "1 color quote",
+    "1 grazing board quote"
+   ],
+   [
+    "Panel upgrade",
+    "Wedding bar"
+   ],
+   [
+    "Avery: barber",
+    "Sasha: chef"
+   ],
+   [
+    "$140 an hour",
+    "$140 an hour"
+   ],
+   [
+    "At the chair",
+    "At the kitchen"
+   ],
+   [
+    "EC22871",
+    "LQ22871"
+   ],
+   [
+    "BS20981",
+    "FP020981"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Event Catering's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Event Catering"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Catering"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bar Service"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Kitchen LLC"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Kitchen's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Kitchen"
+   ],
+   [
+    "Jordan Price",
+    "Rowan Price"
+   ],
+   [
+    "Casey Moore",
+    "Emery Moore"
+   ],
+   [
+    "Riley Chen",
+    "Remy Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Sasha Diaz"
+   ],
+   [
+    "Jordan",
+    "Rowan"
+   ],
+   [
+    "Casey",
+    "Emery"
+   ],
+   [
+    "Riley",
+    "Remy"
+   ],
+   [
+    "Avery",
+    "Sasha"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill St"
+   ],
+   [
+    "88 Elm St",
+    "19 Pine St"
+   ],
+   [
+    "Elm St",
+    "Pine St"
+   ],
+   [
+    "plumbing and electrical",
+    "catering and bar service"
+   ],
+   [
+    "Plumbing and electrical",
+    "Catering and bar service"
+   ],
+   [
+    "electrical license",
+    "liquor license"
+   ],
+   [
+    "Electrical",
+    "Bar service"
+   ],
+   [
+    "electrical",
+    "bar service"
+   ],
+   [
+    "Plumbing",
+    "Catering"
+   ],
+   [
+    "plumbing",
+    "catering"
+   ],
+   [
+    "plumber",
+    "chef"
+   ],
+   [
+    "Plumber",
+    "Chef"
+   ],
+   [
+    "Barbershop",
+    "Kitchen"
+   ],
+   [
+    "barbershop",
+    "kitchen"
+   ],
+   [
+    "barbers",
+    "chefs"
+   ],
+   [
+    "a barber",
+    "a chef"
+   ],
+   [
+    "barber",
+    "chef"
+   ],
+   [
+    "Barber",
+    "Chef"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Tasting for 2"
+   ],
+   [
+    "Signature cut and shave",
+    "Tasting for 2"
+   ],
+   [
+    "signature cut",
+    "tasting for 2"
+   ],
+   [
+    "the Groom's package",
+    "the tasting for 4"
+   ],
+   [
+    "The Groom's package",
+    "The tasting for 4"
+   ],
+   [
+    "Groom's package",
+    "Tasting for 4"
+   ],
+   [
+    "groom's party",
+    "two families"
+   ],
+   [
+    "kids cuts",
+    "kids' snack boxes"
+   ],
+   [
+    "Kids cut",
+    "Kids' snack box"
+   ],
+   [
+    "kids cut",
+    "kids' snack box"
+   ],
+   [
+    "a skin fade",
+    "a salad tray"
+   ],
+   [
+    "A skin fade",
+    "A salad tray"
+   ],
+   [
+    "Skin fade",
+    "Salad tray"
+   ],
+   [
+    "A beard trim is",
+    "A cookie box is"
+   ],
+   [
+    "a beard trim",
+    "a cookie box"
+   ],
+   [
+    "Beard trim",
+    "Cookie box"
+   ],
+   [
+    "beard trim",
+    "cookie box"
+   ],
+   [
+    "Haircuts",
+    "Fruit trays"
+   ],
+   [
+    "haircuts",
+    "fruit trays"
+   ],
+   [
+    "Haircut",
+    "Fruit tray"
+   ],
+   [
+    "haircut",
+    "fruit tray"
+   ],
+   [
+    "Color and cut",
+    "Grazing board"
+   ],
+   [
+    "color and cut",
+    "grazing board"
+   ],
+   [
+    "a color correction",
+    "an event menu"
+   ],
+   [
+    "A color correction",
+    "An event menu"
+   ],
+   [
+    "Color correction",
+    "Event menu"
+   ],
+   [
+    "color correction",
+    "event menu"
+   ],
+   [
+    "house calls",
+    "home deliveries"
+   ],
+   [
+    "House calls",
+    "Home deliveries"
+   ],
+   [
+    "house call",
+    "home delivery"
+   ],
+   [
+    "price board",
+    "menu"
+   ],
+   [
+    "Price board",
+    "Menu"
+   ],
+   [
+    "the shop's board",
+    "the kitchen's menu"
+   ],
+   [
+    "at the chair",
+    "at the kitchen"
+   ],
+   [
+    "shops",
+    "kitchens"
+   ],
+   [
+    "shop",
+    "kitchen"
+   ],
+   [
+    "Shop",
+    "Kitchen"
+   ],
+   [
+    "Drain clearing",
+    "Hot lunch"
+   ],
+   [
+    "Water heater flush",
+    "Boxed lunch for 10"
+   ],
+   [
+    "patch test",
+    "tasting"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a flooded basement or a lockout"
+   ],
+   [
+    "travel fee",
+    "delivery fee"
+   ],
+   [
+    "Gloss to finish",
+    "Dessert to finish"
+   ],
+   [
+    "gloss",
+    "dessert"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most caterers set it."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free. E paid when they book. A at their home too, 75, paid when they book",
+    "J: a tasting redo in the first 2 weeks, checked from photos, free. E paid when they book. A delivered too, 75, paid when they book"
+   ],
+   [
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "On this path, a tasting redo checked from photos is free: nothing before, nothing after."
+   ],
+   [
+    "Once Remy checks the photos, the customer's YES books the color touch-up.",
+    "Once Remy checks the photos, the customer's YES books the tasting redo."
+   ],
+   [
+    "Color touch-up · checked from photos",
+    "Tasting redo · checked from photos"
+   ],
+   [
+    "Color touch-up",
+    "Tasting redo"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Event quotes come to you first. Menu prices never need one"
+   ],
+   [
+    "A neighborhood kitchen on Pine St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood kitchen on Pine St. Carry-out trays, grazing boards and tastings."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Catering for homes in Springfield. Hot lunch and water heaters, within 25 miles.",
+    "Catering for offices and events in Springfield. Hot lunches and breakfasts, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "An event quoted from the plan"
+   ],
+   [
+    "[6 contact cards] Rowan and Emery do catering; Rowan does bar service too, at $140 an hour. Remy and Sasha cut hair; Remy also makes grazing boards and does deliveries. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Rowan and Emery do catering; Rowan does bar service too, at $140 an hour. Remy and Sasha cook at the kitchen; Remy also makes grazing boards and does deliveries. Pat is my office manager, for prices over $500. Jules rents a kitchen station, with their own customers."
+   ],
+   [
+    "Remy: chef, color, home deliveries",
+    "Remy: chef, grazing boards, deliveries"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the kitchen's list.",
+    "Alex asks for a wedding cake, which isn't on the kitchen's list."
+   ],
+   [
+    "Lee's Kitchen doesn't do perms.",
+    "Lee's Kitchen doesn't make wedding cakes."
+   ],
+   [
+    "A color's example: 'Color here needs a quick tasting first. Had one at Lee's in the last 3 months?'",
+    "A party order's example: 'An order for 50 or more needs a tasting first. Had one at Lee's in the last 3 months?'"
+   ],
+   [
+    "Please use the side door on Oak St.",
+    "Please use the side door on Cedar St."
+   ],
+   [
+    "Lee's Kitchen: you now have two skin fades on Sat Nov 7.",
+    "Lee's Kitchen: you now have two fruit tray pickups on Sat Nov 7."
+   ],
+   [
+    "Alex picked a kids' snack box for a son before the times, so the times fit it.",
+    "Alex picked a kids' snack box before the times, so the times fit it."
+   ],
+   [
+    "The chairs",
+    "The counter"
+   ],
+   [
+    "A chair, ready",
+    "A tray, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a kitchen station renter,"
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free counter:"
+   ],
+   [
+    "A chair renter asked for by name:",
+    "A station renter asked for by name:"
+   ],
+   [
+    "the customer is already in the chair, so there's no door check.",
+    "the customer is already at the counter, so there's no door check."
+   ],
+   [
+    "like 'How would you like it on top?'",
+    "like 'Pickup name, if someone else picks up?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Pickup name, if someone else picks up? (optional)"
+   ],
+   [
+    "studio",
+    "kitchen"
+   ],
+   [
+    "Studio",
+    "Kitchen"
+   ]
+  ],
+  "B": [
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds party rentals to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Party rentals for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW party rentals"
+   ],
+   [
+    "Rental 1",
+    "Office 1"
+   ],
+   [
+    "Rental 2",
+    "Office 2"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a boxed lunch for 10 every week."
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every week?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every week"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Weekly office lunch plan"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Every day, 7am–10pm"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can we put the food in our own bowls?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Rowan says no. The food stays in its own warmers, so it stays hot."
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Rowan's walk-through at Harper J.'s office is for $2,400 of conference lunches."
+   ],
+   [
+    "Today's estimate visit",
+    "Today's walk-through"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 conference lunches, 3 days"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your conference lunches"
+   ],
+   [
+    "Repipe · $2,400",
+    "Conference lunches · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 after day 2, $800 after day 3"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration 2019-0451"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Our party is tonight. Can you cater it?"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Catering books a 2-hour setup window."
+   ],
+   [
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "Your conference lunch runs two days: today, and Fri Oct 23, set up 8–10am, for day 2."
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 conference lunch order"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your conference lunch order"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a holiday party menu Rowan suggested"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for your holiday party, from Rowan's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Holiday party"
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "Remy, a chef at the kitchen, does home deliveries."
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Alex's office in Springfield is inside it."
+   ],
+   [
+    "At my home.",
+    "At my office."
+   ],
+   [
+    "Is the report ready on time?",
+    "Are the photos ready on time?"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE event photos Mon Oct 26"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the tacos only, $165. Leave the dessert table."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Rowan serves the tacos today, $165. The $80 dessert table stays good until Thu Oct 29."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If there's a fire or a gas smell, get everyone out now. Then call 911."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says an office breakfast is quoted from the plan, so Rosie's first text asks for it."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone out of the kitchen, and to call 911 if there's smoke or a gas smell."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the date, the place, the hours, and how many guests."
+   ],
+   [
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Before setting up, Rowan photographs the room and notes anything already damaged."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Saque a todos de la cocina. Si hay humo u olor a gas, llame al 911."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee's Kitchen can book you from now on, for tastings and for home deliveries."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Rowan's phone, you said yes to 10 more breakfasts for $160."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the quote path, only Rowan's times show: he leads quoted events here."
+   ],
+   [
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Rowan can set up 30 minutes later if the next job allows, or you can pick another time."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Get everyone out of the kitchen. If there's smoke or a gas smell, call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Event Catering doesn't do, like a wedding cake."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Rowan found the office outlet too weak for the coffee urns and stopped that part."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a chef stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For catering, a fire, a gas smell or someone hurt at the venue stops the booking."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Kitchen can make your fruit tray for pickup at $35, or deliver it to your home for $75."
+   ],
+   [
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "Rowan tries the door again and checks in with the code, so it's a normal visit."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A taco bar is priced at the event: only the $89 delivery fee was promised."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "We couldn't find food service permit FP045210 for Sam Lee on the state's lookup."
+   ],
+   [
+    "The state's license lookup is down, so Reese K.'s license isn't checked yet.",
+    "The state's lookup is down, so Reese K.'s card isn't checked yet."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A food service permit for the company's kitchen, and a card for each cook where the state asks."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A hot breakfast happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a lunch at two offices every week."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A caterer's example: a grease fire that's out still gets 'wait for the fire department'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? There was a small fire in the kitchen where my party is tonight."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a fire, a gas smell, or someone hurt at the venue."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add your plan and a few photos of the room, and a caterer will price it."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: a kitchen's food permit covers that kitchen, and some chefs' cards are tied to it too."
+   ],
+   [
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "A gate or door code shows to Rowan only on the day of the visit."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Event Catering does catering and bar service work, not cakes."
+   ],
+   [
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Rowan is at your door for your 8–10am setup and can't reach you."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Hot breakfasts already booked keep $179, even after Nov 2."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Rowan counts the plates served and texts the price with its lines."
+   ],
+   [
+    "Casey's license is checked again when the lookup answers.",
+    "Emery's card is checked again when the lookup answers."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Event Catering has a weekly office lunch plan, $150 a visit."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Rowan went to the van for more cups and will be back about 9:30am."
+   ],
+   [
+    "Sam bills the warranty company the business's own way.",
+    "Sam bills the company the business's own way."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s hot breakfast from Thu Oct 22 was short two plates."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: 10 more breakfasts, $160."
+   ],
+   [
+    "Jordan priced a water heater replacement for Alex M.",
+    "Rowan priced an office breakfast for 20 for Alex M."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "The missing plates were in your order, so this delivery is free."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Deliveries only where the kitchen's permit covers them."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Setup windows are 2 hours, as Sam set at sign-up."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your office breakfast price is with Lee Event Catering."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Rowan's next times for a team lunch."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "A taco bar is priced at the event."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Rowan also run a carving station?"
+   ],
+   [
+    "Lee Home Services: your share of today's repair.",
+    "Lee Event Catering: your share of today's event."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hubo un pequeño incendio en la cocina donde es mi fiesta esta noche."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a caterer bring a drop-off lunch this Thursday?"
+   ],
+   [
+    "Try the door again, and check in with the code.",
+    "Try the door again, and check in with the code."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 10 more breakfasts, late sign-ups"
+   ],
+   [
+    "Alex's home warranty covers part of the repair.",
+    "Alex's company account covers part of the bill."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you bring us lunch every week, too?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Rowan scorched the venue's table at Alex M.'s event."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Rowan bring lunch for my team next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what a make-good covers."
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "Rowan only, until others are cleared there"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿El fuego está apagado?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about lunch for another day."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stain on the carpet by the window"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A food service permit for the kitchen, and a card for each cook."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Rowan also bring lunch on Friday?"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · Office breakfast for 20 · $640"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Rowan needs more cups from the van."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD outlet too weak for the urns, stopped"
+   ],
+   [
+    "Drain clearings already booked keep $179.",
+    "Hot breakfasts already booked keep $179."
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Fruit trays, salad trays and cookie boxes at the kitchen."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the fire out?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a table for the buffet."
+   ],
+   [
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "Cancel your catering (Thu 8–10am)?"
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Is this food safe if someone has a nut allergy?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "The outlet trips when Rowan plugs in the urns."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The kitchen's pickup is in the other flow."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's lunch?"
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "The room is small: bring the narrow table next time."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Food handler FH031552 · bartender SC30417"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Bayside Design, our company account."
+   ],
+   [
+    "Nobody home needed: DONE with a photo",
+    "Nobody needs to meet it: DONE with a photo"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "More guests came than the order said."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It was in the order."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Remy also makes grazing boards and does deliveries"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which company account should pay?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "We'll be 30 minutes late, sorry!"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Two days later, Alex says the lunch was short two plates."
+   ],
+   [
+    "Give this code to Casey at the door.",
+    "Give this code to Emery at the door."
+   ],
+   [
+    "Give your check-in code at the door.",
+    "Give your check-in code at the door."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Remy: chef, grazing boards and deliveries"
+   ],
+   [
+    "Say Alex books for a parent's home.",
+    "Say Alex books a parent's anniversary party."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a bakery near you."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "Your company account covers the rest."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Our lunch was short two plates."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 tacos 165 desserts 80"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "10 more breakfasts · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the coffee urns"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Rowan cuts a hand and texts HURT."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Rowan left a mess by the buffet table."
+   ],
+   [
+    "Here's the price to fix it today.",
+    "Here's the price for today's taco bar."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "The coffee comes off your bill"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is breakfast in a meeting room?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the outlet trips with the urns"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE more cups from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE chafing dish scorched the table"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no mark."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa hot breakfast Thu 12-2 Emery"
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code at the door"
+   ],
+   [
+    "The job should be done by 10am.",
+    "Setup should be done by 10am."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It's out."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT cut my hand, need to stop"
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "Taco bars are priced at the event."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "A fire or gas smell at the venue stops the booking."
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no counter at an office."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "Our team has a breakfast meeting."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the event photos link"
+   ],
+   [
+    "plumbing and electrical jobs",
+    "catering and bar jobs"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is the food still safe to eat?"
+   ],
+   [
+    "The quote stays open 7 days",
+    "The quote stays open 7 days"
+   ],
+   [
+    "Replace both shutoff valves",
+    "10 more breakfasts"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89, credited to the order"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE two guests asked for decaf."
+   ],
+   [
+    "Mold behind the sink wall",
+    "Outlet by the window"
+   ],
+   [
+    "Casey · license not found",
+    "Emery · card not found"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos of the setup"
+   ],
+   [
+    "The service call is $89.",
+    "The delivery fee is $89."
+   ],
+   [
+    "Drains have a set price.",
+    "Hot breakfasts have a set price."
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or account pays"
+   ],
+   [
+    "Priced from your photos",
+    "Quoted from your plan"
+   ],
+   [
+    "Jordan found more work.",
+    "Alex asked for more."
+   ],
+   [
+    "Casey · license expired",
+    "Emery · card expired"
+   ],
+   [
+    "Under the sink, before",
+    "Meeting room, before"
+   ],
+   [
+    "Jordan found the leak.",
+    "Rowan counted the plates."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Hot breakfast for 10"
+   ],
+   [
+    "Cabinet floor, before",
+    "Carpet by the window, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scorched table"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Tacos · $165"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Ya está apagado."
+   ],
+   [
+    "Insurance pays part",
+    "Insurance pays part"
+   ],
+   [
+    "Sewer camera report",
+    "Event photos"
+   ],
+   [
+    "the shutoff valves",
+    "the 10 more breakfasts"
+   ],
+   [
+    "Supply line · $80",
+    "Dessert table · $80"
+   ],
+   [
+    "the kitchen drain",
+    "the hot breakfast"
+   ],
+   [
+    "Book the repair",
+    "Book the taco bar"
+   ],
+   [
+    "Book a free fix",
+    "Book a free make-good"
+   ],
+   [
+    "Arrival windows",
+    "Setup windows"
+   ],
+   [
+    "License renewal",
+    "Card renewal"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 hot breakfast"
+   ],
+   [
+    "Kitchen drain",
+    "Hot breakfast"
+   ],
+   [
+    "Panel upgrade",
+    "Wedding bar"
+   ],
+   [
+    "Avery: barber",
+    "Sasha: chef"
+   ],
+   [
+    "$140 an hour",
+    "$140 an hour"
+   ],
+   [
+    "Add photos",
+    "Add your plan"
+   ],
+   [
+    "Yard drain",
+    "Drop-off lunch"
+   ],
+   [
+    "EC22871",
+    "LQ22871"
+   ],
+   [
+    "BS20981",
+    "FP020981"
+   ],
+   [
+    "leehomeservices.com",
+    "leeeventcatering.com"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Event Catering LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Event Catering's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Event Catering"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Catering"
+   ],
+   [
+    "Lee Electric",
+    "Lee Bar Service"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Kitchen"
+   ],
+   [
+    "Jordan Price",
+    "Rowan Price"
+   ],
+   [
+    "Casey Moore",
+    "Emery Moore"
+   ],
+   [
+    "Riley Chen",
+    "Remy Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Sasha Diaz"
+   ],
+   [
+    "Jordan",
+    "Rowan"
+   ],
+   [
+    "Casey",
+    "Emery"
+   ],
+   [
+    "Riley",
+    "Remy"
+   ],
+   [
+    "Avery",
+    "Sasha"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill St"
+   ],
+   [
+    "88 Elm St",
+    "19 Pine St"
+   ],
+   [
+    "Elm St",
+    "Pine St"
+   ],
+   [
+    "42 Oak St",
+    "300 Bay St"
+   ],
+   [
+    "plumbing and electrical",
+    "catering and bar service"
+   ],
+   [
+    "Plumbing and electrical",
+    "Catering and bar service"
+   ],
+   [
+    "electrical license",
+    "liquor license"
+   ],
+   [
+    "electrical prices",
+    "bar prices"
+   ],
+   [
+    "electrical jobs",
+    "bar jobs"
+   ],
+   [
+    "Electrical",
+    "Bar service"
+   ],
+   [
+    "electrical",
+    "bar service"
+   ],
+   [
+    "Plumbing license",
+    "Food service permit"
+   ],
+   [
+    "Plumbing",
+    "Catering"
+   ],
+   [
+    "plumbing",
+    "catering"
+   ],
+   [
+    "a plumber",
+    "a caterer"
+   ],
+   [
+    "plumber",
+    "chef"
+   ],
+   [
+    "Plumber",
+    "Chef"
+   ],
+   [
+    "Barbershop",
+    "Kitchen"
+   ],
+   [
+    "a barbershop",
+    "a catering kitchen"
+   ],
+   [
+    "barbershop",
+    "kitchen"
+   ],
+   [
+    "a barber",
+    "a chef"
+   ],
+   [
+    "barber",
+    "chef"
+   ],
+   [
+    "Barber",
+    "Chef"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Tasting for 2"
+   ],
+   [
+    "Beard trim",
+    "Cookie box"
+   ],
+   [
+    "Haircut",
+    "Fruit tray"
+   ],
+   [
+    "haircut",
+    "fruit tray"
+   ],
+   [
+    "house calls",
+    "home deliveries"
+   ],
+   [
+    "Price board",
+    "Menu"
+   ],
+   [
+    "at the chair",
+    "at the kitchen"
+   ],
+   [
+    "shop",
+    "kitchen"
+   ],
+   [
+    "Shop",
+    "Kitchen"
+   ],
+   [
+    "A drain clearing with",
+    "A hot breakfast for 10 with"
+   ],
+   [
+    "a drain clearing",
+    "a hot breakfast"
+   ],
+   [
+    "Drain clearing",
+    "Hot breakfast"
+   ],
+   [
+    "drain clearing",
+    "hot breakfast"
+   ],
+   [
+    "Water heater replacement",
+    "Office breakfast for 20"
+   ],
+   [
+    "water heater replacement",
+    "office breakfast for 20"
+   ],
+   [
+    "Water heater flush",
+    "Boxed lunch for 10"
+   ],
+   [
+    "water heater flush",
+    "boxed lunch for 10"
+   ],
+   [
+    "Leak repair",
+    "Taco bar"
+   ],
+   [
+    "leak repair",
+    "taco bar"
+   ],
+   [
+    "Sewer camera inspection",
+    "Carving station"
+   ],
+   [
+    "sewer camera inspection",
+    "carving station"
+   ],
+   [
+    "service call fee",
+    "delivery fee"
+   ],
+   [
+    "Service call fee",
+    "Delivery fee"
+   ],
+   [
+    "service call",
+    "delivery fee"
+   ],
+   [
+    "Service call",
+    "Delivery fee"
+   ],
+   [
+    "Labor",
+    "Extra service"
+   ],
+   [
+    "arriving 8–10am",
+    "set up 8–10am"
+   ],
+   [
+    "arriving 10am–12pm",
+    "set up 10am–12pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "set up 12–2pm"
+   ],
+   [
+    "arriving 2–4pm",
+    "set up 2–4pm"
+   ],
+   [
+    "new arrival time",
+    "new setup time"
+   ],
+   [
+    "Water heater",
+    "Office breakfast"
+   ],
+   [
+    "water heater",
+    "office breakfast"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Alex is home",
+    "Alex is there"
+   ],
+   [
+    "they're home",
+    "they're there"
+   ],
+   [
+    "you're home",
+    "you're there"
+   ],
+   [
+    "late-cancel or nobody-home fee",
+    "late-cancel or no-show fee"
+   ],
+   [
+    "Nobody home",
+    "Nobody there"
+   ],
+   [
+    "nobody home",
+    "nobody there"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "was home",
+    "was there"
+   ],
+   [
+    "landlord",
+    "company"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a flooded basement or a lockout"
+   ],
+   [
+    "travel fee",
+    "delivery fee"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 quote"
+   ],
+   [
+    "A neighborhood kitchen on Pine St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood kitchen on Pine St. Carry-out trays, grazing boards and tastings."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "[6 contact cards] Rowan and Emery do catering; Rowan does bar service too, at $140 an hour. Remy and Sasha cut hair; Remy also makes grazing boards and does deliveries. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Rowan and Emery do catering; Rowan does bar service too, at $140 an hour. Remy and Sasha cook at the kitchen; Remy also makes grazing boards and does deliveries. Pat is my office manager, for prices over $500. Jules rents a kitchen station, with their own customers."
+   ],
+   [
+    "Remy: chef, color, home deliveries",
+    "Remy: chef, grazing boards, deliveries"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most caterers start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules caterers often set."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a lunch for my office next week. A text back is fine."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like serving alcohol to guests under 21."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a dessert tray? Say so.'"
+   ],
+   [
+    "Lee Event Catering asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Event Catering asks: is the event at a home, an office or somewhere else? And how many guests, and is there a kitchen on site?"
+   ],
+   [
+    "Lee Event Catering can clear the drain:",
+    "Lee Event Catering can cater it:"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, a break room"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 hot breakfast needs none."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Hot breakfast for 30 instead of 10 · $540"
+   ],
+   [
+    "Say Rowan cracks the cabinet floor and texts a photo.",
+    "Say Rowan scratches the conference table and texts a photo."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a stain on the carpet this morning."
+   ],
+   [
+    "It's a leak under the sink, today, arriving 3–5pm, with Rowan.",
+    "It's a hot breakfast for 10, today, arriving 3–5pm, with Rowan."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Lunches already booked keep only their saved card."
+   ],
+   [
+    "Lee Event Catering: you have two drain clearings on Mon Nov 9.",
+    "Lee Event Catering: you have two hot breakfasts on Mon Nov 9."
+   ],
+   [
+    "Just the kitchen sink.",
+    "A breakfast meeting for 10."
+   ],
+   [
+    "The chairs",
+    "The counter"
+   ],
+   [
+    "A chair, ready",
+    "A tray, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a kitchen station renter,"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A problem with the food? Reply here within 2 days."
+   ],
+   [
+    "It's inside the 1-year labor warranty,",
+    "It's inside the kitchen's 2-day food promise,"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's for my team at the office."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "An office breakfast needs no permit, so the first open times are this week."
+   ],
+   [
+    "Catering for homes in Springfield. Hot breakfast and water heaters, within 25 miles.",
+    "Catering for offices and events in Springfield. Hot breakfasts and lunches, within 25 miles."
+   ],
+   [
+    "'My sink won't drain' fits a hot breakfast.",
+    "'Food for 10 at our meeting' fits a hot breakfast."
+   ],
+   [
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Add a free menu change, checked from the plan, free. E 25% deposit after the quote. C paid in full when they book"
+   ],
+   [
+    "Warranty fix",
+    "Free menu change"
+   ],
+   [
+    "studio",
+    "kitchen"
+   ],
+   [
+    "Studio",
+    "Kitchen"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "color",
+  "wedding",
+  "running late",
+  "backup",
+  "session"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex orders a fruit tray at Lee's Kitchen, Sam's own carry-out kitchen, for pickup with Chef Remy on Sat Oct 24 at 11:00am. A card is saved for the kitchen's $20 fee, and Alex pays at the counter. A tasting books the same way, with a deposit. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Event Catering for a hot breakfast for 10 at the office at 300 Bay St, and Rowan sets it up Thu Oct 22 between 8 and 10am. A card is saved for the $89 delivery fee, and Rosie texts the $179 bill after. A bigger event is quoted from the plan, with a contract and a deposit."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|card|counter",
+    "list|none|counter",
+    "list|deposit|card",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|deposit|counter": "A $140 tasting for 4 (2½ hours). A $40 deposit now, and the $100 rest at the kitchen.",
+    "list|card|counter": "The main story: a $35 fruit tray picked up at the counter with Chef Remy. A card is saved for the kitchen's $20 fee. Alex pays at pickup.",
+    "list|none|counter": "A $35 fruit tray for a returning customer. Nothing is taken: a YES books it.",
+    "list|deposit|card": "The $140 tasting for 4. A $40 deposit now, and the $100 rest charged to the saved card when Remy marks it done.",
+    "list|full|none": "A $55 tasting for 2, paid in full when booking.",
+    "photos|card|counter": "A custom grazing board, priced from photos of the table at $90. Booked once Sam OKs it, and paid at pickup.",
+    "visit|card|counter": "An event menu at a $25 menu consult: Remy prices the menu there, and Alex pays at the kitchen. A card is saved for the $20 fee."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Fruit tray"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Fruit tray"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Tasting for 4"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Tasting for 2"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Custom grazing board"
+    },
+    "visit|*|*": {
+     "name": "Event menu"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "photos|deposit|card",
+    "photos|deposit|bill",
+    "list|card|bill",
+    "list|card|card",
+    "list|full|none",
+    "list|deposit|card",
+    "visit|card|bill"
+   ],
+   "examples": {
+    "photos|deposit|card": "An office breakfast for 20, quoted from Alex's plan at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit now, and the $480 rest charged to the saved card when Rowan marks it done.",
+    "photos|deposit|bill": "The same breakfast, with the rest on the bill after the event, so extras on the day are added.",
+    "list|card|bill": "The main story: a $179 hot breakfast for 10 at Alex's office. A card is saved for the $89 delivery fee if it's cancelled late. Rosie texts the bill after.",
+    "list|card|card": "A $179 hot breakfast for 10 for a weekly office order. A card is saved, and $179 is charged when Rowan texts DONE.",
+    "list|full|none": "A $150 boxed lunch for 10, paid in full when booking.",
+    "list|deposit|card": "The $150 boxed lunch. A $40 deposit now, and the $110 rest charged to the saved card when Rowan marks it done.",
+    "visit|card|bill": "A taco bar for about 30, priced at the event by the plates served. Only the $89 delivery fee is promised; a card is saved for it."
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from the plan first",
+     "visit": "Priced at the event"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Hot breakfast for 10"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Hot breakfast for 10"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Boxed lunch for 10"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Boxed lunch for 10"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Office breakfast for 20"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Office breakfast for 20"
+    },
+    "visit|*|*": {
+     "name": "Taco bar for about 30"
+    },
+    "list|deposit|card": {
+     "fee": "$40"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-59",
+   "A7-15",
+   "S11-87",
+   "S11-90",
+   "A8-02"
+  ],
+  "B": [
+   "S11-87",
+   "S11-90",
+   "B5-34"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Catering needs the kitchen's food service permit, and bar service a liquor license, so Sam gives them (S1-23)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The caterer's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Caterers book people and pickup slots, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: tastings, pickups and events."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Cooks send a food handler card, and bartenders a server card, where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Food is shopped for and cooked ahead, so nothing is sent now and nobody is on call (S2-31)."
+   },
+   {
+    "op": "more",
+    "at": "S1-23",
+    "more": [
+     "Here it's food service permit FP045210 for the company's kitchen. Bar service adds the liquor license, and each bartender's card."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Tastings and pickups happen at the kitchen."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The kitchen books a chef's time for tastings, and pickup slots for orders."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The kitchen books a chef's time for tastings, and pickup slots for orders."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The kitchen books a chef's time for tastings, and pickup slots for orders."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "No form to sign: allergies go on the secure page as answers, with their own yes."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the kitchen."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the kitchen: a pickup is checked in with its code at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "Food orders have no problem that gets worse; a change goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for food."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for food."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Everything is handed over at the tasting or the pickup; nothing comes later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Food isn't stored: an order not picked up by closing is a no-show (A8-14)."
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here: no first step for a tasting or a tray. A party order for 50 or more has a tasting first, at least 2 days before."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-65",
+    "more": [
+     "Allergies and diets are never asked through the AI. They go only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-03",
+    "more": [
+     "A pickup checks in the same way: Alex gives the code at the counter."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-44",
+    "more": [
+     "At a pickup, Alex opens the trays at the counter and checks them against the order before paying."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-70",
+    "more": [
+     "A late pickup isn't moved: the order waits, chilled, at the counter until closing."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-42",
+    "more": [
+     "A reaction to a dish goes to Sam at once. Trouble breathing gets 'call 911' first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Catering is rated."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Catering needs the kitchen's food service permit, and bar service a liquor license, so Sam gives them (S1-23)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The caterer's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Caterers book people and pickup slots, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: tastings, pickups and events."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Cooks send a food handler card, and bartenders a server card, where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Food is shopped for and cooked ahead, so nothing is sent now and nobody is on call (S2-31)."
+   },
+   {
+    "op": "more",
+    "at": "S1-23",
+    "more": [
+     "Here it's food service permit FP045210 for the company's kitchen. Bar service adds the liquor license, and each bartender's card."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Catering is never sent now (B4-81), so 'Send someone now' is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Catering is never sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Catering is never sent now, so every booking gets its reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Catering is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Catering books a setup window, or a set start for a served event."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Catering books a setup window, or a set start for a served event."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A caterer never looks after a child; an adult on the booking is there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Food is always handed to a person, who checks it and signs for it."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Everything is handed over at the event; nothing comes later."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "Catering has no problem that gets worse; a changed plan goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or account pays",
+    "why": "No plan or warranty pays for food; a company that pays is asked at B4-35."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for food."
+   },
+   {
+    "op": "more",
+    "at": "B4-04",
+    "more": [
+     "Its private answers: allergies and diets, only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Here: a tasting first for weddings and dinners of 50 or more. The office breakfast needs none."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Here: the event form, with the final count, the timeline, the seating and vendor meals.",
+     "Allergies and diets go on it with their own yes. Only the lead chef and the manager see them."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "Allergies and diets are never asked here. They go only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-03",
+    "more": [
+     "Sam's rule: every wedding waits for his OK. This breakfast's quote was OK'd already, so it books now."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-07",
+    "more": [
+     "Sam's rule for events: one free date move, if the kitchen has room that day."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-18",
+    "more": [
+     "A van stuck in traffic: Alex hears only if the food won't be out by the start."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "A bar permit not issued in time: the bar comes off the bill, and Sam calls Alex."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-01",
+    "more": [
+     "For an event, the day list shows the timeline, the guest count and how many allergy plates. The allergies stay on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "The lead chef also checks the allergy plates against the secure page. No text ever says what they are."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-39",
+    "more": [
+     "Food left out is served or thrown away by the time limit the state's food code sets."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "More guests, food or service time needs Alex's written yes, at the rate shown before booking. No yes in 10 minutes: nothing extra."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "Any service charge is its own line on the receipt, and it's never called a tip."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "The final count is due",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.14",
+        "7.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "as": "Morgan P.",
+       "t": "Fri Nov 27, 10:00am",
+       "type": "split",
+       "q": "Is the final count in by its day?",
+       "title": "Asks for the final count by its day",
+       "does": "A what-if: Morgan P. booked a holiday party for 60 on Fri Dec 11, at $70 a guest. The plug-in sets when the final count is due: here, 14 days before.",
+       "more": [
+        "The count Morgan sends is what's billed, even if fewer come, as the contract says.",
+        "Allergies and diets go on the same secure page, with their own yes. They never go in a text.",
+        "One reminder goes out 2 days before the due day, inside text hours."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Your final count for the holiday party on Fri Dec 11 is due today by 6pm.",
+         {
+          "card": {
+           "title": "Final count · due Fri Nov 27, 6pm",
+           "lines": [
+            "Guests, and how many are 21 or over",
+            "Seating, timeline and vendor meals",
+            "Allergies and diets, with your own yes"
+           ],
+           "button": "Send the count",
+           "link": "rosfield.com/f/m11"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.rules",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust"
+       ],
+       "branches": [
+        {
+         "label": "In by its day",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x02",
+           "line": [
+            "7.14",
+            "7.10"
+           ],
+           "who": "san",
+           "to": "cust",
+           "via": "msg",
+           "as": "Morgan P.",
+           "t": "Fri Nov 27, 4:10pm",
+           "title": "Reads back the new total",
+           "does": "Morgan sends 64 guests. The new total is read back, and the rest due changes to match.",
+           "more": [
+            "Up to 10% more books at the same price a guest. More than that goes to Sam first.",
+            "Fewer guests than the contract's count are billed at the contract's count, as the contract says.",
+            "Sam and the lead chef get the count and how many allergy plates, never what they are."
+           ],
+           "say": [
+            [
+             "san",
+             "cust",
+             "Thanks, Morgan. Your count is in.",
+             {
+              "card": {
+               "title": "Holiday party · 64 guests",
+               "lines": [
+                "Was 60 · now $4,480",
+                "The rest is due when the party is done, as your contract says"
+               ]
+              }
+             }
+            ]
+           ],
+           "needs": [
+            "pf.rules"
+           ],
+           "tells": [
+            "cust"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "Not in by its day",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x03",
+           "line": [
+            "7.14",
+            "7.16"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "t": "Fri Nov 27, 6:05pm",
+           "title": "No count: the contract's count is billed",
+           "does": "The count isn't in by 6pm. The contract's 60 guests stay billed, and Sam is asked to call Morgan about allergies, so the kitchen gets them right.",
+           "more": [
+            "Morgan is told the same by text, inside text hours.",
+            "Nothing is cancelled for a late count. A count sent later is Sam's call."
+           ],
+           "say": [
+            [
+             "san",
+             "owner",
+             "Morgan P. didn't send the final count for Fri Dec 11. The contract's 60 guests stay billed. Please call Morgan about allergies today."
+            ],
+            [
+             "san",
+             "cust",
+             "We didn't get your final count, so your contract's 60 guests are billed. Sam will call you about allergies and diets.",
+             {
+              "as": "Morgan P."
+             }
+            ]
+           ],
+           "needs": [
+            "pf.rules",
+            "pf.messages"
+           ],
+           "tells": [
+            "owner",
+            "cust"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A bar guest: no ID, or drunk",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.19",
+        "8.6"
+       ],
+       "who": "staff",
+       "via": "visit",
+       "title": "Pours nothing more for that guest",
+       "does": "A what-if at an event with a bar: a guest has no ID, or is visibly drunk. The bartender pours them nothing more and tells the lead chef.",
+       "more": [
+        "Only guests 21 and over with ID are served. A guest with no ID gets a mocktail, however old they look.",
+        "A guest who is visibly drunk isn't served again. The lead chef tells the host in person.",
+        "Nothing changes on the bill, and Rosie texts nobody about it."
+       ],
+       "needs": [
+        "pf.visit"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Catering has no video or phone sessions: food is delivered and set up, or picked up at the kitchen."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Catering is rated."
+   },
+   {
+    "op": "off",
+    "at": "B8-68",
+    "why": "No child or person in care is in the caterer's care."
+   }
+  ]
+ },
+ "notes": "Refit Oct 27 (REDESIGN 2 master): old words ops and ops on removed steps dropped; trade `more` lines kept (permits, allergies only on the secure page, pickups, food safety, the bar); facts firststeps, forms, documents, extrawork; settings arrive A setstart, B window, cutoff A 24 hours before, B 2 days before; amounts per path with name; main paths follow the master's story (A list|card|counter: a fruit tray pickup; B list|card|bill: a hot breakfast for 10); D66: the rest of a deposit is on the saved card at the end or on the bill, never charged on a set day before the event; rename pairs re-pointed to today's words.\nPilot: started from the photographer (pattern event), as the brief suggests. Catering runs the same way on its usual side: an event quoted from the customer's plan, a contract both sign, a deposit and the rest on a set day, and a date that can't move, with a trusted stand-in or a full refund. What the photographer lacked and this overlay adds: food (allergies only on the secure page, food left out thrown away by the food code's time limit, every order delivered and set up and signed for), a bar (IDs, no alcohol for a drunk guest), the final count (B7-x01 to B7-x03), and pickups at the kitchen.\nNames: Sam Lee's main company is Lee Event Catering LLC (75 Mill St), with catering and bar service as its two kinds of work (trade names Lee Catering and Lee Bar Service). His second company is Lee's Kitchen LLC (19 Pine St), a carry-out kitchen with a pickup counter and a tasting table: the master's barbershop. Flow A's story is at the kitchen, flow B's at the main company, as in the master.\nPeople: Remy Chen and Sasha Diaz are the kitchen's chefs (the master's Riley and Avery); Rowan Price (lead chef, also a bartender) and Emery Moore go out to events (Jordan and Casey). Gia Russo is a lead chef Sam trusts from outside the team (B7-54). Theo B. becomes Wren B., since Theo is a photographer pilot word. Customer Alex M. and owner Sam are kept.\nFlow A: the main story is a tasting for 4 with Chef Remy, Sat Oct 24 at 11:00am (2½ hours, $140: a $40 deposit, the $100 rest at the kitchen). Pickup orders (a fruit tray, a grazing board) use pickup slots: A4-66 keeps 'A person's time' (tastings) and 'A drop-off slot' (pickups, A4-67's words), and A7-59 keeps both branches (A7-60's words: Sam names who covers the counter).\nPickups are bookings: a catering pickup order is made ahead for a set day and time, with a count and money, so it's a visit at the kitchen with its code at the counter. Takeout off the shelf isn't booked (A3-32 'No walk-ins').\nFlow B: the main story is an office breakfast for 20 at Alex's office, 300 Bay St, Thu Oct 22, set up 8 to 10am: quoted from Alex's plan at $640 (over Sam's $500, so Sam OKs it), both sign, a $160 deposit, and the $480 rest charged on the set day. The master's dates and times are kept, so the 8 to 10am window is a setup window before a 10am meeting.\nTimes: B4-83 keeps '1 Arrival windows' (renamed 'Setup windows': drop-off and setup orders) and '2 A set start time' (served events, like a wedding dinner); the stay, seat and no-person branches are off.\nMoney paths: A list|deposit|counter (main), list|card|counter, list|none|counter, list|deposit|none, list|full|none, photos|card|counter. B photos|deposit|none (main), photos|deposit|bill, list|hold|bill, list|card|card, list|full|none, list|deposit|none, visit|hold|bill. Left out: A's bill or card after (the kitchen has a counter), B's own way and every hold on a quoted event (events are paid before).\nPriced at the event: B keeps the master's 'Quoted at the visit' path for a taco bar billed by the plates served; only the $89 delivery fee is promised and held (visit|hold|bill). Its lines are tacos $165 and a dessert table $80.\nPrices are the example's own, not a standard, and keep the master's numbers so the fee math stays true: fruit tray $35 (or $75 delivered), salad tray $40, cookie box $20, kids' snack box $25, tasting for 2 $55, tasting for 4 $140, grazing board from photos $90, event menu after a $25 consult; hot lunch for 10 $179 with the $89 delivery fee, boxed lunch for 10 $150, office breakfast from the plan $640, carving station $199 ($249 when Sam carves), extra service $140 an hour with Rowan and $120 with anyone else, bartender 3 hours $149, beer and wine bar 4 hours $189. The old flowchart's per-guest wedding prices are kept as the plug-in's example only.\nLicenses: the master's company license becomes the kitchen's food service permit (FP045210, FP020981); electrical becomes bar service under the company's liquor license (LQ22871); each person's license becomes a food handler card or a bartender's server card where the state's rules require one. No single state's rule is written: the old flow's California, Minnesota, New York and Washington rules became switches 'where the state's rules require it'.\nSign-up flavor: Sam keeps Saturdays for weddings instead of same-day windows, notice is 2 days, and bookings go up to 18 months ahead (S1-21 renames).\nOff in both flows: no-license and no-$2 branches, the agreement before going live, house calls not allowed, spaces, classes, sent now (S2-30), and the 'no person license' branch (cooks and bartenders send their cards where required).\nOff in flow A: walk-in lines, seats, tables and drop-offs; video sessions; children booked with a parent; a paper from someone else and a form to sign; a damage hold; a crew, a date that can't move, a minimum; late rules other than 'shorter'; a child left; items left; named-only work; plans or insurance; a problem that gets worse; results later, an item left behind, rented items.\nOff in flow B: sent now everywhere; stays, seats and no person; nobody asks about the venue; a damage hold when booked (chafing dishes left after an event get theirs at B10-21); a crew running longer and no person; group minimums; a child in the pro's care; nobody needs to be there (food is always handed to a person); no delivery (every order is delivered and set up); an outside check; an item to the shop and its storage fee; a permit inspection; a report ready later; plans or warranties; a problem that gets worse; a part that's late; '2 New time with Rowan' on a date that can't move.\nsplitsKept: A7-59 and A7-61 (tastings are booked by name, pickups aren't; only Remy makes grazing boards), S11-87 and S11-90 (the same in both flows), A8-02 (most tastings need nothing; a tasting with wine needs an ID), B4-57 (list orders need no contract, quoted events do).\nOwn steps: B7-x01 to B7-x03 (the final count, also a gap) and B8-x01 (no alcohol for a guest with no ID or visibly drunk). Changed words: A4-67 (pickup slots), A7-60 (the pickup counter), B7-54 (Gia Russo or a full refund). Detail lines carry the rest: allergies on the secure page (A4-22, B4-04, B4-24, B4-86, B8-01, B8-18, S13-05), the tasting first (A4-43, B4-38), the bar permit (B4-42, B7-33), weddings wait for Sam (B6-03), date holds and moves (B4-23, B7-07), the dated cancel schedule (B7-10), the set day (B7-24), weather (B7-35), a late van (B7-18), food left out (B8-39), written yes for extras (B8-23), a service charge never called a tip (B10-01).\nkeep: none. No master or pilot word is left in either flow.\nUnsure: the 'From photos' price kind still reads 'From photos' in the sign-up tables of flow B (a list cell can't be renamed for one service without changing the kitchen's grazing board too); the quoted-from-plan label is set on the picker.\nReview (Oct 22): added the A money path visit|card|counter (the plug-in's event menu, priced at a $25 menu consult, card saved, paid at the kitchen), with its words (A4-50; Remy does grazing boards and event menus). Fixed leftover master words: A4-38 perm, A8-39 cape clip, A4-22 brassy, S12 color quote; B4-14/B4-29/B5-11/B6-13 'repair', B4-51 garbage disposal, B4-44/B5-21 a yearly plan for a weekly lunch, B7-30 lead-safe notice, B7-37/B7-38 a count of 30 for $60 more, B7-45 'Van in the kitchen', B7-52/B9-22 rentals, B7-61 consent form, B10-22 drip tips, 'signed estimate'. B4-01's video branch is off. Contracts follow the plug-in: every event quoted from the plan, not an amount. Also fixed: A4-22/A6-15 \"Short on the sides.\" on the tasting-for-2 path, and B4-24's answer on the taco bar path. \nMoney fix Oct 27 2026 (D65/D66): the rest of a deposit is paid at the visit, on the bill after, or on the saved card at DONE, never charged on a date of its own; the final count is still due on a day the owner sets, and it sets the amount of the rest. Any older wording above about a date or free-cancel moment for the rest is from the earlier pass and no longer applies.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "A repair shop, a tailor or a groomer does.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Registration 2020-1187",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "May the shop show photos of your hair? Yes / No",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Avery's license is checked again when the lookup answers.",
+    "House calls only where the state's rules allow them.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "A haircut could mean a salon or a barbershop.",
+    "A license for the shop and for each barber.",
+    "Alex bought a package of cuts at the shop.",
+    "Can my son wait in the shop during my cut?",
+    "Haircut, fade and beard trim at the shop.",
+    "Every shop service, color and house calls",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a cut every 4 weeks.",
+    "A barbershop takes no drop-offs.",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Riley stopped Alex M.'s cut.",
+    "plumbing and electrical jobs",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "Avery · license not found",
+    "A haircut needs nothing.",
+    "Drains have a set price.",
+    "Avery · license expired",
+    "Stopped Alex M.'s cut.",
+    "License renewal",
+    "1 color quote",
+    "Panel upgrade",
+    "Avery: barber",
+    "$140 an hour",
+    "At the chair",
+    "EC22871",
+    "BS20981",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop's",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "groom's party",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "A beard trim is",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Color and cut",
+    "color and cut",
+    "a color correction",
+    "A color correction",
+    "Color correction",
+    "color correction",
+    "house calls",
+    "House calls",
+    "house call",
+    "price board",
+    "Price board",
+    "the shop's board",
+    "at the chair",
+    "shops",
+    "shop",
+    "Shop",
+    "Drain clearing",
+    "patch test",
+    "like a burst pipe or a lockout",
+    "travel fee",
+    "Gloss to finish",
+    "gloss",
+    "Each service starts the way most barbershops set it.",
+    "J: a color touch-up in the first 2 weeks, checked from photos, free. E paid when they book. A at their home too, 75, paid when they book",
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "Color touch-up · checked from photos",
+    "Color touch-up",
+    "Color quotes come to you first. Board prices never need one",
+    "We'd share only where they're working, only after a missed check.",
+    "A water heater job",
+    "Please use the side door on Oak St.",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Access, like a step-free chair:",
+    "A chair renter asked for by name:",
+    "the customer is already in the chair, so there's no door check.",
+    "like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "studio"
+   ],
+   "B": [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Rental 1",
+    "Rental 2",
+    "Say Alex asks for a water heater flush every year.",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Yearly water heater flush plan",
+    "Mon–Fri 7:30am–5:30pm",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Today's estimate visit",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Registration 2019-0451",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing books a 2-hour window.",
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "One of the shop's barbers does house calls.",
+    "Alex's home in Springfield is inside it.",
+    "At my home.",
+    "Is the report ready on time?",
+    "LATE camera report Mon Oct 26",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "The state's license lookup is down, so Reese K.'s license isn't checked yet.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Casey's license is checked again when the lookup answers.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Sam bills the warranty company the business's own way.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Jordan priced a water heater replacement for Alex M.",
+    "Your drain is under warranty, so this visit is free.",
+    "House calls only where the state's rules allow them.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Your water heater price is with Lee Home Services.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Lee Home Services: your share of today's repair.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Try the door again, and check in with the code.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Alex's home warranty covers part of the repair.",
+    "Can you flush my water heater every year, too?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan only, until others are licensed there",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "BEFORE old water stain on the cabinet floor",
+    "A license for the shop and for each barber.",
+    "Can Jordan also look at a dripping faucet?",
+    "Contract · Water heater replacement · $640",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Drain clearings already booked keep $179.",
+    "Haircut, fade and beard trim at the shop.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "My gas water heater got wet in a flood.",
+    "Jordan finds mold behind the sink wall.",
+    "The shop's chair is in the other flow.",
+    "Can I skip next week's drain cleaning?",
+    "Old pipes: bring the camera next time.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Willow Home Warranty, the basic plan.",
+    "Nobody home needed: DONE with a photo",
+    "Jordan finds corroded shutoff valves.",
+    "It's under the 1-year labor warranty.",
+    "Riley also does color and house calls",
+    "Which home warranty plan should pay?",
+    "I'll be home 30 minutes late, sorry!",
+    "The repair price is good for 7 days.",
+    "The drain clogs again 2 weeks later.",
+    "Give this code to Casey at the door.",
+    "Give your check-in code at the door.",
+    "Riley: barber, color and house calls",
+    "Say Alex books for a parent's home.",
+    "You can look for a roofer near you.",
+    "Your home warranty covers the rest.",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan left a mess under the sink.",
+    "Here's the price to fix it today.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Alex gives the code at the door",
+    "The job should be done by 10am.",
+    "No. It doesn't smell like gas.",
+    "HURT cut my hand, need to stop",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "There's no counter at a home.",
+    "My kitchen drain is clogged.",
+    "Texts the camera report link",
+    "plumbing and electrical jobs",
+    "Is it safe to turn back on?",
+    "The quote stays open 7 days",
+    "Replace both shutoff valves",
+    "$89, credited to the repair",
+    "NOTE grease clog 12 ft in.",
+    "Mold behind the sink wall",
+    "Casey · license not found",
+    "Video and Jordan's notes",
+    "The service call is $89.",
+    "Drains have a set price.",
+    "A plan or warranty pays",
+    "Priced from your photos",
+    "Jordan found more work.",
+    "Casey · license expired",
+    "Under the sink, before",
+    "Jordan found the leak.",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "Shutoff valve · $165",
+    "No. No huele a gas.",
+    "Insurance pays part",
+    "Sewer camera report",
+    "the shutoff valves",
+    "Supply line · $80",
+    "the kitchen drain",
+    "Book the repair",
+    "Book a free fix",
+    "Arrival windows",
+    "License renewal",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "Panel upgrade",
+    "Avery: barber",
+    "$140 an hour",
+    "Add photos",
+    "Yard drain",
+    "EC22871",
+    "BS20981",
+    "leehomeservices.com",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical license",
+    "electrical prices",
+    "electrical jobs",
+    "Electrical",
+    "electrical",
+    "Plumbing license",
+    "Plumbing",
+    "plumbing",
+    "a plumber",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "a barbershop",
+    "barbershop",
+    "a barber",
+    "barber",
+    "Barber",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "Price board",
+    "at the chair",
+    "shop",
+    "Shop",
+    "A drain clearing with",
+    "a drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "service call",
+    "Service call",
+    "Labor",
+    "arriving 8–10am",
+    "arriving 10am–12pm",
+    "arriving 12–2pm",
+    "arriving 2–4pm",
+    "new arrival time",
+    "Water heater",
+    "water heater",
+    "I'm home",
+    "Alex is home",
+    "they're home",
+    "you're home",
+    "late-cancel or nobody-home fee",
+    "Nobody home",
+    "nobody home",
+    "wasn't home",
+    "was home",
+    "like a burst pipe or a lockout",
+    "travel fee",
+    "The $160 valve quote",
+    "We'd share only where they're working, only after a missed check.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Shutoff valve and wall pipe · $540",
+    "I found water damage under the sink this morning.",
+    "Drain clearings already booked keep only their saved card.",
+    "Just the kitchen sink.",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "It's inside the 1-year labor warranty,",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Add a warranty fix, checked from photos and free under the warranty. E 25% deposit after the quote. C paid in full when they book",
+    "Warranty fix",
+    "studio"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-23": "39941a5377",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A7-96": "d540b91653",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A4-65": "fa7ec0389d",
+   "A8-03": "7accda6f86",
+   "A8-44": "4410a4860c",
+   "A7-70": "da4cede3e2",
+   "A10-42": "4f28189298",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-23": "5b2324d920",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B10-38": "867fe1ab7c",
+   "B7-93": "4d6f89e473",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B4-04": "df3ea4b2f5",
+   "B4-38": "9539521dc7",
+   "B4-34": "74ff52d83d",
+   "B7-07": "954270db4b",
+   "B7-18": "d53cef58f7",
+   "B7-61": "342b55fd9b",
+   "B8-01": "df9177b059",
+   "B8-18": "530038d2b8",
+   "B8-39": "aa75251207",
+   "B8-23": "dd780a2ec8",
+   "B10-01": "814aa1fde7",
+   "B7-05": "e28a131872",
+   "B8-22": "50d78f1af0",
+   "B4-01": "15f683e6cb",
+   "B10-32": "7713bff255",
+   "B8-68": "8ede790b60"
+  }
+ }
+}

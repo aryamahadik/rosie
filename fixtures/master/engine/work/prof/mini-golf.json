@@ -1,0 +1,3408 @@
+{
+ "id": "mini-golf",
+ "name": "Mini golf, go-karts and laser tag",
+ "style": "Table",
+ "pattern": "table",
+ "from": "restaurant",
+ "plugin": {
+  "pf.license": {
+   "need": "where the state's rules require it: the business's registration, and a permit for the go-karts or the course where the state requires one; a portable course follows the same rules where they cover it",
+   "who": "the business",
+   "ask": "the business registration, and any state permit for the karts or the course with its last inspection date; the liability insurance certificate",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "goes live on identity and the registration; where the state requires a permit, only once it's on file",
+   "renewals": "permits and insurance reminded 30 and 7 days before; a lapse pauses new bookings",
+   "insurance": "liability insurance for the course, the karts and events at a customer's place, as the state or the venue asks",
+   "staff": "course hosts and kart marshals trained by the venue, with first-aid and CPR cards (certificates, not state licenses)",
+   "background": "background checks for hosts who work with children, where the venue or the rules require them"
+  },
+  "pf.services": {
+   "shape": "table: a course round is a space for an hour (up to 4 players); a party is a set time with a set number of players; go-karts and laser tag are added to a booking",
+   "examples": "the example venue's own prices (Lee Mini Golf, and Lee Party Greens for a portable course at a customer's place), not a standard",
+   "list": [
+    {
+     "name": "Mini golf round for 4 (18 holes)",
+     "price": "$48 for 4 ($12 a player)",
+     "kind": "one price per group of 4",
+     "length": "about 1 hour",
+     "where": "at the course",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "a round starts every 15 minutes, up to 8 courses"
+    },
+    {
+     "name": "Open round for 4, pay at the counter",
+     "price": "$48 for 4",
+     "kind": "one price per group",
+     "length": "about 1 hour",
+     "where": "at the course",
+     "before": "nothing: a YES books it",
+     "after": "the bill at the counter"
+    },
+    {
+     "name": "Birthday party package, 12 kids, 2 hours",
+     "price": "$180 for 12 kids; each extra kid $12, up to 20",
+     "kind": "one price per party, with a minimum",
+     "length": "2 hours: a round for everyone, then 30 minutes in the party room",
+     "where": "at the course",
+     "before": "a $40 deposit when booking",
+     "after": "the $140 rest paid at the counter on the day, for the final count"
+    },
+    {
+     "name": "Go-kart race, added to a booking",
+     "price": "$20 a driver",
+     "kind": "an extra on a booking",
+     "where": "at the course",
+     "before": "a card saved for it",
+     "after": "the counter"
+    },
+    {
+     "name": "Portable 9-hole course, 3-hour party for 12",
+     "price": "$300",
+     "kind": "one price per party",
+     "length": "3 hours",
+     "where": "at the customer's place",
+     "before": "a $60 deposit once the booking is confirmed",
+     "after": "the $240 rest charged to the saved card when the crew texts DONE"
+    },
+    {
+     "name": "School carnival course, 2 hours (up to 20 kids)",
+     "price": "$180",
+     "kind": "one price per event",
+     "length": "2 hours",
+     "where": "at the customer's place",
+     "before": "a card saved for the $40 late-cancel fee",
+     "after": "the bill texted after the event"
+    },
+    {
+     "name": "Portable course, 1 hour at home (up to 6 players)",
+     "price": "$90",
+     "kind": "one price per course",
+     "length": "60 min",
+     "where": "at the customer's place",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Extra hour on a portable course",
+     "price": "$60",
+     "kind": "an extra on a booking",
+     "where": "at the customer's place",
+     "before": "a card saved for it",
+     "after": "the bill"
+    }
+   ],
+   "capacity": "courses per start time, set by the number of courses and the venue's safety limit; a party room is a space for the party's time",
+   "times": "every 15 minutes inside the course's hours; same-day bookings until 1 hour before; up to 30 days ahead",
+   "notBookings": "walk-ins are the open rounds at the counter; food, arcade games and the snack bar are outside Rosie"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which round, party or portable course, and the date and time",
+    "how many players, and each one's age group (under 7, 7 to 17, or adult)",
+    "for a party: the expected number of guests",
+    "for a portable course: the kind of place (a yard, a school, a park) and the town"
+   ],
+   "afterTime": [
+    "the birthday child's first name, if the booker wants it used",
+    "anything staff should know to help (answers about health stay on the secure page)"
+   ],
+   "securePage": [
+    "a waiver for every player: an adult signs their own; a parent or legal guardian signs for each child",
+    "the waiver's health check: a heart condition, a recent surgery, or a back or neck problem (the answer stays on the secure page; kart drivers answer it too)",
+    "the party's guest list (first names only), and an emergency contact",
+    "for a portable course: the street address and a flat area about 40 by 60 feet"
+   ],
+   "whoMayBook": "an adult (18 or over) books for a group; a parent or guardian books for a child; a child under 7 plays only with a paying adult on the course",
+   "told": "players stay on the course paths and off the other courses; kart drivers meet the track's posted age and height limits; arrive 15 minutes early to check in"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone hit by a kart, or a crash with someone hurt or bleeding, or someone choking or not breathing right now",
+     "say": "Call 911 now. Don't move someone with a head, neck or back injury.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a child missing from the course or the party",
+     "say": "Call 911 now if the child can't be found at once. The host calls the parent and the manager.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a heart condition, a recent surgery, or a back or neck problem",
+     "what": "the booking can go on for the others; the waiver says who shouldn't drive a kart; the person decides, and Rosie gives no health advice"
+    }
+   ],
+   "atTheCourse": "a player hurt on the course or a track: the host stops play, gives first aid, calls 911 when needed, and calls the parent at once if the parent isn't with them; an incident report goes on the secure page the same day; the owner is told",
+   "turnAway": "anyone who seems drunk or high doesn't drive a kart or play that day; a player who ignores the track rules after a warning is asked to leave",
+   "weather": "indoors: no weather limit; a portable course outdoors stops in lightning or high wind, as the crew decides"
+  },
+  "pf.first_steps": {
+   "steps": [
+    "a waiver for every player, signed on the secure page before the visit and good for 12 months; a parent signs for each child",
+    "the party's final headcount 3 days before (it sets the rest due)",
+    "a portable course: the customer confirms the flat area, any outlet the crew needs, and any permission the place needs, 3 days before"
+   ],
+   "prep": "comfortable shoes; a jacket for an evening round; arrive 15 minutes early"
+  },
+  "pf.visit": {
+   "checkIn": "at the front desk: the booker's code for the group; the desk sees which players have a waiver on file, and each one gets a scorecard and a ball and putter set; the host checks the party in",
+   "lateEntry": "a round is timed by the course; a late group joins the next round if one is free, or gets the time left",
+   "missing": "a player without a waiver signs on the desk tablet (a parent for a child) before playing; only that player waits",
+   "changes": "extra players on the day are added at the per-player price if a course is free; the booker says yes first",
+   "children": "a child under 7 plays only with a paying adult on the course; a 7 to 17 year old's parent signs the waiver",
+   "done": "the desk's check-in confirms the visit; the host texts DONE at the end of the party; the crew texts DONE after takedown"
+  },
+  "pf.money": {
+   "before": "rounds paid in full when booking; a party's $40 deposit; open rounds nothing before; a portable course's $60 deposit for a party",
+   "after": "a party's $140 rest at the counter for the final count; open rounds at the counter; a portable party's $240 rest charged to the saved card when the crew texts DONE; a school course's bill texted after",
+   "cancel": "a round: a full refund if moved or cancelled 2 hours or more before; a late cancel or no-show keeps $12. A party: free to cancel up to 7 days before; later the $40 deposit may be kept, only with the owner's yes. A portable party keeps its $60 deposit on a late cancel, with the owner's yes",
+   "membership": "none: no monthly membership is sold through Rosie",
+   "caps": "the state's general limits",
+   "tips": "a tip for the host on the venue's own reader, the business's own way; Rosie never asks",
+   "tax": "where the state taxes admissions",
+   "fee2": "Rosfield's $2 per confirmed booking applies: one $2 per booking, however many players",
+   "noSale": "food, snacks, arcade games and merchandise are outside Rosie"
+  },
+  "pf.messages": {
+   "never": "children's names, ages and health answers, and injury details: only on the secure page",
+   "staffTexts": "the host's day list shows the booker's name and the number of players; the guest list opens on the secure page",
+   "languages": "English and Spanish",
+   "minors": "texts go to the parent who booked, never to a child"
+  },
+  "pf.staff": {
+   "licenses": "none from the state; first-aid and CPR cards for hosts and marshals, tracked by the venue",
+   "skills": "course host, kart marshal, party host, portable course crew",
+   "ratio": "one host per 6 players at a time, as the venue's safety plan sets; a portable course always has 2 crew",
+   "standIn": "any trained host or crew member; nobody is booked by name",
+   "oks": "the owner OKs refunds, party changes and anything over $500"
+  },
+  "pf.rules": {
+   "waiver": "no player on a course or a kart without a signed waiver; a child's waiver signed only by a parent or legal guardian",
+   "courses": "one group per hole at a time; players stay on the paths; the course's own rules as the venue posts them",
+   "ages": "a child under 7 plays with a paying adult on the course; kart drivers meet the track's posted age and height limits, checked by the staff at the track (never by Rosie)",
+   "alcohol": "no kart driving after drinks: anyone who has been drinking doesn't drive or play that day; any drink service follows the venue's own rule and is never a Rosie step",
+   "inspections": "the venue's daily course and kart checks, and the state's inspections where its rules require them",
+   "records": "waivers kept as long as the insurer requires, and with the booking for 7 years; incident reports kept with the booking",
+   "cancelRight": "no cancel period for course time already given",
+   "reviews": "a rating once after the visit, never after an injury"
+  },
+  "pf.edges": {
+   "headcount": "the party's final headcount 3 days before sets the rest; more on the day are added if a course has room; fewer than 10 on a party still pay for 10",
+   "injury": "a player hurt: first aid, 911 if needed, the parent called at once, an incident report the same day; no rating asked after it",
+   "noWaiver": "a player without a waiver signs at the desk before playing; only that player waits",
+   "impaired": "a player who seems drunk or high doesn't play or drive; the rest of the group plays; no refund for that person",
+   "closed": "a power cut or a course problem closes the venue: new times or a full refund",
+   "wind": "a portable course: the crew stops in lightning or high wind; time lost to weather comes back as a partial refund or a new date",
+   "membership": "none: no membership is sold",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "groups",
+   "children",
+   "forms",
+   "spaces",
+   "capacitycheck",
+   "extrawork"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each host where the state asks. Courses have a set price. Parties are priced at the booking. A fire stops the booking."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: the round price changes for visits from Mon Nov 2. Rounds already booked keep their price. Round plans go up from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a round at its old price. Rosie answers with the real price. That's the price Ben sees before saying yes."
+   ],
+   [
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the round price changes for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the round for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Riley stops the visit if it isn't safe to go on: a person, smoke, a gas smell, or weather that turns unsafe.",
+    "Gus stops the visit if it isn't safe to go on: a person, smoke, a fire, or weather that turns unsafe."
+   ],
+   [
+    "Never: start before a gas, water or power line is confirmed off, or buried lines are marked before digging.",
+    "Never: start before a power line is confirmed off, or buried lines are marked before setup."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now, and not to move a child hurt in the head, neck or back."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Llame al 911 ahora. No mueva a la persona si se golpeó la cabeza, el cuello o la espalda."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay clear of the course, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Call 911 now. Don't move the person if they hit their head, neck or back."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A job over the plug-in's amount gets a written estimate to sign, if the owner turns that on."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a kart crash with someone hurt, gets the safety steps first."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For courses, a kart crash with someone hurt, bleeding badly, or not breathing stops the booking."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A round at Lee Mini Golf is shown at its real price. Here are the open times at that price."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit.",
+    "Sam switches the round from a card saved for the fee to a deposit."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A host's example: a kart crash with someone hurt gets 'Call 911 now'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A child fell off a kart and is bleeding."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Our course got wet in a flood. Is it safe to open?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a kart crash with someone hurt, bleeding badly, or not breathing."
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Round, price changes from Nov 2 · Mini golf round · Go-kart race"
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Rounds already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Un niño se cayó de un kart y sangra."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the party quote."
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: karts and laser tag"
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour.",
+    "Jordan does laser tag too."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Sangra mucho?"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Mini golf round for 4"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is anything still spilling?"
+   ],
+   [
+    "Booked for 8 people · $25 each",
+    "Booked for 8 people · the group rate"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly league plan"
+   ],
+   [
+    "Water heater replacement",
+    "Portable course"
+   ],
+   [
+    "water heater replacement",
+    "portable course"
+   ],
+   [
+    "Signature cut and shave",
+    "Mini golf round"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids round (under 12, with an adult)"
+   ],
+   [
+    "Plumbing and electrical",
+    "Karts and laser tag"
+   ],
+   [
+    "plumbing and electrical",
+    "karts and laser tag"
+   ],
+   [
+    "sewer camera inspection",
+    "course check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Course check"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Kitchen course reset"
+   ],
+   [
+    "kitchen drain clearing",
+    "kitchen course reset"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Mini Golf LLC"
+   ],
+   [
+    "No. No huele a gas.",
+    "Sí. Sangra mucho."
+   ],
+   [
+    "Plumbing price list",
+    "Course price list"
+   ],
+   [
+    "plumbing price list",
+    "course price list"
+   ],
+   [
+    "heating and cooling",
+    "party rooms"
+   ],
+   [
+    "Heating and cooling",
+    "Party rooms"
+   ],
+   [
+    "SPRING10 · $10 off",
+    "SPRING10 · 10% off"
+   ],
+   [
+    "a Extra 30 minutes",
+    "an Extra go-kart race"
+   ],
+   [
+    "a extra 30 minutes",
+    "an extra go-kart race"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Party Greens"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Mini Golf"
+   ],
+   [
+    "Color correction",
+    "Party room"
+   ],
+   [
+    "color correction",
+    "party room"
+   ],
+   [
+    "Skin fade · $40",
+    "Round"
+   ],
+   [
+    "Groom's package",
+    "Birthday party package"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Color touch-up",
+    "Extra round time"
+   ],
+   [
+    "color touch-up",
+    "extra round time"
+   ],
+   [
+    "Drain clearing",
+    "Course reset"
+   ],
+   [
+    "drain clearing",
+    "course reset"
+   ],
+   [
+    "shutoff valves",
+    "power switches"
+   ],
+   [
+    "signature cut",
+    "round"
+   ],
+   [
+    "Color and cut",
+    "Birthday party package"
+   ],
+   [
+    "color and cut",
+    "birthday party package"
+   ],
+   [
+    "water heaters",
+    "karts"
+   ],
+   [
+    "Kitchen drain",
+    "Kitchen course"
+   ],
+   [
+    "kitchen drain",
+    "kitchen course"
+   ],
+   [
+    "shutoff valve",
+    "power switch"
+   ],
+   [
+    "Shutoff valve",
+    "Power switch"
+   ],
+   [
+    "cabinet floor",
+    "wall floor"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Karts"
+   ],
+   [
+    "Lee Electric",
+    "Lee Laser Arena"
+   ],
+   [
+    "Jordan Price",
+    "Tess Price"
+   ],
+   [
+    "1200 Main St",
+    "300 Cedar Ave"
+   ],
+   [
+    "color quotes",
+    "party quotes"
+   ],
+   [
+    "a beard trim",
+    "an extra go-kart race"
+   ],
+   [
+    "A beard trim",
+    "An extra go-kart race"
+   ],
+   [
+    "a Beard trim",
+    "an Extra go-kart race"
+   ],
+   [
+    "barber chair",
+    "hole"
+   ],
+   [
+    "at the chair",
+    "at the hole"
+   ],
+   [
+    "in the chair",
+    "at a hole"
+   ],
+   [
+    "water heater",
+    "kart"
+   ],
+   [
+    "Water heater",
+    "Kart"
+   ],
+   [
+    "Haircut plan",
+    "Round plan"
+   ],
+   [
+    "haircut plan",
+    "round plan"
+   ],
+   [
+    "Service call",
+    "Course setup"
+   ],
+   [
+    "service call",
+    "course setup"
+   ],
+   [
+    "water heater",
+    "generator"
+   ],
+   [
+    "Water heater",
+    "Generator"
+   ],
+   [
+    "Casey Moore",
+    "Ray Moore"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "color quote",
+    "party quote"
+   ],
+   [
+    "Color quote",
+    "Party quote"
+   ],
+   [
+    "a skin fade",
+    "a go-kart race"
+   ],
+   [
+    "a Skin fade",
+    "A go-kart race"
+   ],
+   [
+    "barbershops",
+    "courses"
+   ],
+   [
+    "house calls",
+    "portable courses"
+   ],
+   [
+    "House calls",
+    "Portable courses"
+   ],
+   [
+    "Leak repair",
+    "Course repair"
+   ],
+   [
+    "leak repair",
+    "course repair"
+   ],
+   [
+    "overflowing",
+    "spilling"
+   ],
+   [
+    "patch test",
+    "safety check"
+   ],
+   [
+    "Riley Chen",
+    "Gus Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Mo Diaz"
+   ],
+   [
+    "color plan",
+    "league plan"
+   ],
+   [
+    "Color plan",
+    "League plan"
+   ],
+   [
+    "Skin fades",
+    "Go-kart races"
+   ],
+   [
+    "skin fades",
+    "go-kart races"
+   ],
+   [
+    "Beard trim",
+    "Extra go-kart race"
+   ],
+   [
+    "beard trim",
+    "extra go-kart race"
+   ],
+   [
+    "beard line",
+    "kart line"
+   ],
+   [
+    "barbershop",
+    "course"
+   ],
+   [
+    "Barbershop",
+    "Course"
+   ],
+   [
+    "the shop's",
+    "the course's"
+   ],
+   [
+    "The shop's",
+    "The course's"
+   ],
+   [
+    "Electrical",
+    "Laser tag"
+   ],
+   [
+    "electrical",
+    "laser tag"
+   ],
+   [
+    "house call",
+    "portable course"
+   ],
+   [
+    "House call",
+    "Portable course"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "sewer line",
+    "course"
+   ],
+   [
+    "Yard drain",
+    "Yard course"
+   ],
+   [
+    "yard drain",
+    "yard course"
+   ],
+   [
+    "dishwasher",
+    "speaker"
+   ],
+   [
+    "Dishwasher",
+    "Speaker"
+   ],
+   [
+    "water line",
+    "power line"
+   ],
+   [
+    "Water line",
+    "Power line"
+   ],
+   [
+    "42 Oak St",
+    "270 Harbor Rd"
+   ],
+   [
+    "88 Elm St",
+    "14 Cedar Ln"
+   ],
+   [
+    "kids cuts",
+    "kids rounds"
+   ],
+   [
+    "Kids cuts",
+    "Kids rounds"
+   ],
+   [
+    "Skin fade",
+    "Go-kart race"
+   ],
+   [
+    "skin fade",
+    "go-kart race"
+   ],
+   [
+    "a haircut",
+    "a round"
+   ],
+   [
+    "a Haircut",
+    "A round"
+   ],
+   [
+    "the chair",
+    "the hole"
+   ],
+   [
+    "The chair",
+    "The hole"
+   ],
+   [
+    "cape clip",
+    "scorecard"
+   ],
+   [
+    "hot towel",
+    "round"
+   ],
+   [
+    "Hot towel",
+    "Round"
+   ],
+   [
+    "2020-1187",
+    "EX-1047"
+   ],
+   [
+    "cut hair",
+    "run the course"
+   ],
+   [
+    "Kids cut",
+    "Kids round"
+   ],
+   [
+    "kids cut",
+    "kids round"
+   ],
+   [
+    "Haircuts",
+    "Rounds"
+   ],
+   [
+    "haircuts",
+    "rounds"
+   ],
+   [
+    "the shop",
+    "the course"
+   ],
+   [
+    "The shop",
+    "The course"
+   ],
+   [
+    "Plumbing",
+    "Karts"
+   ],
+   [
+    "plumbing",
+    "karts"
+   ],
+   [
+    "catering",
+    "portable courses"
+   ],
+   [
+    "Catering",
+    "Portable courses"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "JP031552",
+    "EX-1045"
+   ],
+   [
+    "Haircut",
+    "Round"
+   ],
+   [
+    "haircut",
+    "round"
+   ],
+   [
+    "barbers",
+    "hosts"
+   ],
+   [
+    "plumber",
+    "host"
+   ],
+   [
+    "Plumber",
+    "Host"
+   ],
+   [
+    "massage",
+    "party room"
+   ],
+   [
+    "Massage",
+    "Party room"
+   ],
+   [
+    "EC22871",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "shutoff",
+    "power"
+   ],
+   [
+    "Shutoff",
+    "Power"
+   ],
+   [
+    "cabinet",
+    "back wall"
+   ],
+   [
+    "Cabinet",
+    "Back wall"
+   ],
+   [
+    "clogged",
+    "jammed"
+   ],
+   [
+    "Jordan",
+    "Tess"
+   ],
+   [
+    "barber",
+    "host"
+   ],
+   [
+    "Barber",
+    "Host"
+   ],
+   [
+    "chairs",
+    "holes"
+   ],
+   [
+    "shop's",
+    "course's"
+   ],
+   [
+    "shaves",
+    "rounds"
+   ],
+   [
+    "drains",
+    "courses"
+   ],
+   [
+    "Drains",
+    "Courses"
+   ],
+   [
+    "valves",
+    "switches"
+   ],
+   [
+    "faucet",
+    "target"
+   ],
+   [
+    "Faucet",
+    "Target"
+   ],
+   [
+    "heater",
+    "generator"
+   ],
+   [
+    "Heater",
+    "Generator"
+   ],
+   [
+    "Riley",
+    "Gus"
+   ],
+   [
+    "Avery",
+    "Mo"
+   ],
+   [
+    "Casey",
+    "Ray"
+   ],
+   [
+    "beard",
+    "kart"
+   ],
+   [
+    "chair",
+    "hole"
+   ],
+   [
+    "shops",
+    "courses"
+   ],
+   [
+    "perms",
+    "rounds"
+   ],
+   [
+    "shave",
+    "round"
+   ],
+   [
+    "color",
+    "party"
+   ],
+   [
+    "Color",
+    "Party"
+   ],
+   [
+    "Sewer",
+    "Course"
+   ],
+   [
+    "sewer",
+    "course"
+   ],
+   [
+    "Leaks",
+    "Spills"
+   ],
+   [
+    "leaks",
+    "spills"
+   ],
+   [
+    "drain",
+    "course"
+   ],
+   [
+    "Drain",
+    "Course"
+   ],
+   [
+    "valve",
+    "switch"
+   ],
+   [
+    "Valve",
+    "Switch"
+   ],
+   [
+    "pipes",
+    "cables"
+   ],
+   [
+    "Pipes",
+    "Cables"
+   ],
+   [
+    "flush",
+    "reset"
+   ],
+   [
+    "Flush",
+    "Reset"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "shop",
+    "course"
+   ],
+   [
+    "Shop",
+    "Course"
+   ],
+   [
+    "perm",
+    "round"
+   ],
+   [
+    "cape",
+    "scorecard"
+   ],
+   [
+    "Leak",
+    "Spill"
+   ],
+   [
+    "leak",
+    "spill"
+   ],
+   [
+    "sink",
+    "course"
+   ],
+   [
+    "Sink",
+    "Course"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "$20",
+    "@@extra@@"
+   ],
+   [
+    "$40",
+    "@@dep@@"
+   ],
+   [
+    "$55",
+    "@@round@@"
+   ],
+   [
+    "$35",
+    "@@round@@"
+   ],
+   [
+    "$25",
+    "@@extra@@"
+   ],
+   [
+    "$90",
+    "@@round@@"
+   ],
+   [
+    "$70",
+    "@@rest@@"
+   ],
+   [
+    "$100",
+    "@@rest@@"
+   ],
+   [
+    "$75",
+    "@@round@@"
+   ],
+   [
+    "$80",
+    "@@fee@@"
+   ],
+   [
+    "$140",
+    "@@party@@"
+   ],
+   [
+    "$125",
+    "@@party@@"
+   ],
+   [
+    "$110",
+    "@@round@@"
+   ],
+   [
+    "$15",
+    "@@fee@@"
+   ],
+   [
+    "$89",
+    "@@fee@@"
+   ],
+   [
+    "$150",
+    "@@party@@"
+   ],
+   [
+    "$130",
+    "@@round@@"
+   ],
+   [
+    "$85",
+    "@@round@@"
+   ],
+   [
+    "$120",
+    "@@round@@"
+   ],
+   [
+    "$10",
+    "@@fee@@"
+   ],
+   [
+    "$160",
+    "@@rest@@"
+   ],
+   [
+    "$640",
+    "@@party@@"
+   ],
+   [
+    "$179",
+    "@@party@@"
+   ],
+   [
+    "$245",
+    "@@party@@"
+   ],
+   [
+    "$480",
+    "@@rest@@"
+   ],
+   [
+    "$156",
+    "@@round@@"
+   ],
+   [
+    "$199",
+    "@@party@@"
+   ],
+   [
+    "$165",
+    "@@round@@"
+   ],
+   [
+    "$2,400",
+    "@@party@@"
+   ],
+   [
+    "$800",
+    "@@party@@"
+   ],
+   [
+    "$358",
+    "@@party@@"
+   ],
+   [
+    "$620",
+    "@@party@@"
+   ],
+   [
+    "$540",
+    "@@rest@@"
+   ],
+   [
+    "$700",
+    "@@party@@"
+   ],
+   [
+    "$600",
+    "@@party@@"
+   ],
+   [
+    "$1,200",
+    "@@party@@"
+   ],
+   [
+    "@@fee@@",
+    "$12"
+   ],
+   [
+    "@@dep@@",
+    "$40"
+   ],
+   [
+    "@@rest@@",
+    "$140"
+   ],
+   [
+    "@@party@@",
+    "$180"
+   ],
+   [
+    "@@round@@",
+    "$48"
+   ],
+   [
+    "@@extra@@",
+    "$20"
+   ]
+  ],
+  "B": [
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: the portable course price changes for visits from Mon Nov 2. Portable courses already booked keep their price. Portable course plans go up from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each host where the state asks. Courses have a set price. Parties are priced at the booking. A fire stops the booking."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: the round price changes for visits from Mon Nov 2. Rounds already booked keep their price. Round plans go up from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for a portable course at its old price. Rosie answers with the real price. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a round at its old price. Rosie answers with the real price. That's the price Ben sees before saying yes."
+   ],
+   [
+    "Reading it back: drain clearing goes to $199 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the portable course price changes for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the round price changes for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the round for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Riley stops the visit if it isn't safe to go on: a person, smoke, a gas smell, or weather that turns unsafe.",
+    "Gus stops the visit if it isn't safe to go on: a person, smoke, a fire, or weather that turns unsafe."
+   ],
+   [
+    "Never: start before a gas, water or power line is confirmed off, or buried lines are marked before digging.",
+    "Never: start before a power line is confirmed off, or buried lines are marked before setup."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now, and not to move a child hurt in the head, neck or back."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Llame al 911 ahora. No mueva a la persona si se golpeó la cabeza, el cuello o la espalda."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A portable course with Lee Party Greens is shown at its real price. Here are the open times at that price."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Tess's phone, you said yes to adding an extra hour for @@bextra@@."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay clear of the course, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Call 911 now. Don't move the person if they hit their head, neck or back."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A job over the plug-in's amount gets a written estimate to sign, if the owner turns that on."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the portable course from a card saved for the fee to a deposit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a kart crash with someone hurt, gets the safety steps first."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For courses, a kart crash with someone hurt, bleeding badly, or not breathing stops the booking."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A round at Lee Mini Golf is shown at its real price. Here are the open times at that price."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit."
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit.",
+    "Sam switches the round from a card saved for the fee to a deposit."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A host's example: a kart crash with someone hurt gets 'Call 911 now'."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Portable course, price changes from Nov 2 · Extra hour on a portable course"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A child fell off a kart and is bleeding."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Our course got wet in a flood. Is it safe to open?"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: extra hour on the course, @@bextra@@. Sent to Alex."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a kart crash with someone hurt, bleeding badly, or not breathing."
+   ],
+   [
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes up from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the portable course for visits from Mon Nov 2."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Round, price changes from Nov 2 · Mini golf round · Go-kart race"
+   ],
+   [
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Send Alex M. @@bevent@@ for the portable course party?"
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Portable courses already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Rounds already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Un niño se cayó de un kart y sangra."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the party quote."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA @@bextra@@ extra hour on the course, added"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: karts and laser tag"
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote.",
+    "Morgan P. asked to talk about the party quote."
+   ],
+   [
+    "Jordan does electrical too, at $140 an hour.",
+    "Jordan does laser tag too."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Sangra mucho?"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The @@bextra@@ extra time is good for 7 days."
+   ],
+   [
+    "replacing both shutoff valves for $160.",
+    "adding an extra hour for @@bextra@@."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Tess finds more time is needed."
+   ],
+   [
+    "A lane repair is priced at the visit",
+    "Extra work is priced at the visit"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Extra hour on a portable course · @@bextra@@"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "add an extra hour, @@bextra@@"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Mini golf round for 4"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is anything still spilling?"
+   ],
+   [
+    "Booked for 8 people · $25 each",
+    "Booked for 8 people · the group rate"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra hour on a portable course · @@bextra@@"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly league plan"
+   ],
+   [
+    "the extra work now, for $160.",
+    "the extra time now, for @@bextra@@."
+   ],
+   [
+    "$160 for today's extra work.",
+    "@@bextra@@ for today's extra time."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Extra hour on a portable course"
+   ],
+   [
+    "replace both shutoff valves",
+    "add an extra hour"
+   ],
+   [
+    "Water pressure check · Free",
+    "Course check · Free"
+   ],
+   [
+    "service call was promised",
+    "call-out fee was promised"
+   ],
+   [
+    "Water heater replacement",
+    "Portable course, 3-hour party"
+   ],
+   [
+    "water heater replacement",
+    "portable course party"
+   ],
+   [
+    "Water heater replacement",
+    "Portable course"
+   ],
+   [
+    "water heater replacement",
+    "portable course"
+   ],
+   [
+    "Sewer camera inspection",
+    "Extra hour on a portable course"
+   ],
+   [
+    "Signature cut and shave",
+    "Mini golf round"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids round (under 12, with an adult)"
+   ],
+   [
+    "Plumbing and electrical",
+    "Karts and laser tag"
+   ],
+   [
+    "plumbing and electrical",
+    "karts and laser tag"
+   ],
+   [
+    "sewer camera inspection",
+    "course check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Course check"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Portable course, 1 hour at home"
+   ],
+   [
+    "kitchen drain clearing",
+    "portable course"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Kitchen course reset"
+   ],
+   [
+    "kitchen drain clearing",
+    "kitchen course reset"
+   ],
+   [
+    "Labor · $120 an hour",
+    "Crew time · $60 an hour"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Mini Golf LLC"
+   ],
+   [
+    "No. No huele a gas.",
+    "Sí. Sangra mucho."
+   ],
+   [
+    "Plumbing price list",
+    "Course price list"
+   ],
+   [
+    "plumbing price list",
+    "course price list"
+   ],
+   [
+    "heating and cooling",
+    "party rooms"
+   ],
+   [
+    "Heating and cooling",
+    "Party rooms"
+   ],
+   [
+    "SPRING10 · $10 off",
+    "SPRING10 · 10% off"
+   ],
+   [
+    "the shutoff valves",
+    "the extra time"
+   ],
+   [
+    "Water heater flush",
+    "Extra hour on a portable course"
+   ],
+   [
+    "a Extra 30 minutes",
+    "an Extra go-kart race"
+   ],
+   [
+    "a extra 30 minutes",
+    "an extra go-kart race"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Party Greens"
+   ],
+   [
+    "service-call fee",
+    "late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Mini Golf"
+   ],
+   [
+    "Color correction",
+    "Party room"
+   ],
+   [
+    "color correction",
+    "party room"
+   ],
+   [
+    "Skin fade · $40",
+    "Round"
+   ],
+   [
+    "Groom's package",
+    "Birthday party package"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Drain clearing",
+    "Portable course"
+   ],
+   [
+    "drain clearing",
+    "portable course"
+   ],
+   [
+    "Color touch-up",
+    "Extra round time"
+   ],
+   [
+    "color touch-up",
+    "extra round time"
+   ],
+   [
+    "Drain clearing",
+    "Course reset"
+   ],
+   [
+    "drain clearing",
+    "course reset"
+   ],
+   [
+    "shutoff valves",
+    "power switches"
+   ],
+   [
+    "A lane repair",
+    "Extra work"
+   ],
+   [
+    "signature cut",
+    "round"
+   ],
+   [
+    "Color and cut",
+    "Birthday party package"
+   ],
+   [
+    "color and cut",
+    "birthday party package"
+   ],
+   [
+    "water heaters",
+    "karts"
+   ],
+   [
+    "Kitchen drain",
+    "Kitchen course"
+   ],
+   [
+    "kitchen drain",
+    "kitchen course"
+   ],
+   [
+    "shutoff valve",
+    "power switch"
+   ],
+   [
+    "Shutoff valve",
+    "Power switch"
+   ],
+   [
+    "cabinet floor",
+    "wall floor"
+   ],
+   [
+    "Service call",
+    "Portable course, 1 hour at home"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Karts"
+   ],
+   [
+    "Lee Electric",
+    "Lee Laser Arena"
+   ],
+   [
+    "Jordan Price",
+    "Tess Price"
+   ],
+   [
+    "1200 Main St",
+    "300 Cedar Ave"
+   ],
+   [
+    "color quotes",
+    "party quotes"
+   ],
+   [
+    "a beard trim",
+    "an extra go-kart race"
+   ],
+   [
+    "A beard trim",
+    "An extra go-kart race"
+   ],
+   [
+    "a Beard trim",
+    "an Extra go-kart race"
+   ],
+   [
+    "barber chair",
+    "hole"
+   ],
+   [
+    "at the chair",
+    "at the hole"
+   ],
+   [
+    "in the chair",
+    "at a hole"
+   ],
+   [
+    "water heater",
+    "kart"
+   ],
+   [
+    "Water heater",
+    "Kart"
+   ],
+   [
+    "Haircut plan",
+    "Round plan"
+   ],
+   [
+    "haircut plan",
+    "round plan"
+   ],
+   [
+    "Service call",
+    "Course setup"
+   ],
+   [
+    "service call",
+    "course setup"
+   ],
+   [
+    "water heater",
+    "generator"
+   ],
+   [
+    "Water heater",
+    "Generator"
+   ],
+   [
+    "Leak repair",
+    "School carnival course"
+   ],
+   [
+    "leak repair",
+    "school carnival course"
+   ],
+   [
+    "lane repair",
+    "extra work"
+   ],
+   [
+    "Lane repair",
+    "Extra work"
+   ],
+   [
+    "Casey Moore",
+    "Ray Moore"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "color quote",
+    "party quote"
+   ],
+   [
+    "Color quote",
+    "Party quote"
+   ],
+   [
+    "a skin fade",
+    "a go-kart race"
+   ],
+   [
+    "a Skin fade",
+    "A go-kart race"
+   ],
+   [
+    "barbershops",
+    "courses"
+   ],
+   [
+    "house calls",
+    "portable courses"
+   ],
+   [
+    "House calls",
+    "Portable courses"
+   ],
+   [
+    "Leak repair",
+    "Course repair"
+   ],
+   [
+    "leak repair",
+    "course repair"
+   ],
+   [
+    "overflowing",
+    "spilling"
+   ],
+   [
+    "patch test",
+    "safety check"
+   ],
+   [
+    "Riley Chen",
+    "Gus Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Mo Diaz"
+   ],
+   [
+    "color plan",
+    "league plan"
+   ],
+   [
+    "Color plan",
+    "League plan"
+   ],
+   [
+    "Skin fades",
+    "Go-kart races"
+   ],
+   [
+    "skin fades",
+    "go-kart races"
+   ],
+   [
+    "Beard trim",
+    "Extra go-kart race"
+   ],
+   [
+    "beard trim",
+    "extra go-kart race"
+   ],
+   [
+    "beard line",
+    "kart line"
+   ],
+   [
+    "barbershop",
+    "course"
+   ],
+   [
+    "Barbershop",
+    "Course"
+   ],
+   [
+    "the shop's",
+    "the course's"
+   ],
+   [
+    "The shop's",
+    "The course's"
+   ],
+   [
+    "Electrical",
+    "Laser tag"
+   ],
+   [
+    "electrical",
+    "laser tag"
+   ],
+   [
+    "house call",
+    "portable course"
+   ],
+   [
+    "House call",
+    "Portable course"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "sewer line",
+    "course"
+   ],
+   [
+    "Yard drain",
+    "Yard course"
+   ],
+   [
+    "yard drain",
+    "yard course"
+   ],
+   [
+    "dishwasher",
+    "speaker"
+   ],
+   [
+    "Dishwasher",
+    "Speaker"
+   ],
+   [
+    "water line",
+    "power line"
+   ],
+   [
+    "Water line",
+    "Power line"
+   ],
+   [
+    "42 Oak St",
+    "270 Harbor Rd"
+   ],
+   [
+    "88 Elm St",
+    "14 Cedar Ln"
+   ],
+   [
+    "kids cuts",
+    "kids rounds"
+   ],
+   [
+    "Kids cuts",
+    "Kids rounds"
+   ],
+   [
+    "Skin fade",
+    "Go-kart race"
+   ],
+   [
+    "skin fade",
+    "go-kart race"
+   ],
+   [
+    "a haircut",
+    "a round"
+   ],
+   [
+    "a Haircut",
+    "A round"
+   ],
+   [
+    "the chair",
+    "the hole"
+   ],
+   [
+    "The chair",
+    "The hole"
+   ],
+   [
+    "cape clip",
+    "scorecard"
+   ],
+   [
+    "hot towel",
+    "round"
+   ],
+   [
+    "Hot towel",
+    "Round"
+   ],
+   [
+    "2020-1187",
+    "EX-1047"
+   ],
+   [
+    "cut hair",
+    "run the course"
+   ],
+   [
+    "Kids cut",
+    "Kids round"
+   ],
+   [
+    "kids cut",
+    "kids round"
+   ],
+   [
+    "Haircuts",
+    "Rounds"
+   ],
+   [
+    "haircuts",
+    "rounds"
+   ],
+   [
+    "the shop",
+    "the course"
+   ],
+   [
+    "The shop",
+    "The course"
+   ],
+   [
+    "Plumbing",
+    "Karts"
+   ],
+   [
+    "plumbing",
+    "karts"
+   ],
+   [
+    "catering",
+    "portable courses"
+   ],
+   [
+    "Catering",
+    "Portable courses"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "JP031552",
+    "EX-1045"
+   ],
+   [
+    "Haircut",
+    "Round"
+   ],
+   [
+    "haircut",
+    "round"
+   ],
+   [
+    "barbers",
+    "hosts"
+   ],
+   [
+    "plumber",
+    "host"
+   ],
+   [
+    "Plumber",
+    "Host"
+   ],
+   [
+    "massage",
+    "party room"
+   ],
+   [
+    "Massage",
+    "Party room"
+   ],
+   [
+    "EC22871",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "shutoff",
+    "power"
+   ],
+   [
+    "Shutoff",
+    "Power"
+   ],
+   [
+    "cabinet",
+    "back wall"
+   ],
+   [
+    "Cabinet",
+    "Back wall"
+   ],
+   [
+    "clogged",
+    "jammed"
+   ],
+   [
+    "Jordan",
+    "Tess"
+   ],
+   [
+    "barber",
+    "host"
+   ],
+   [
+    "Barber",
+    "Host"
+   ],
+   [
+    "chairs",
+    "holes"
+   ],
+   [
+    "shop's",
+    "course's"
+   ],
+   [
+    "shaves",
+    "rounds"
+   ],
+   [
+    "drains",
+    "courses"
+   ],
+   [
+    "Drains",
+    "Courses"
+   ],
+   [
+    "valves",
+    "switches"
+   ],
+   [
+    "faucet",
+    "target"
+   ],
+   [
+    "Faucet",
+    "Target"
+   ],
+   [
+    "heater",
+    "generator"
+   ],
+   [
+    "Heater",
+    "Generator"
+   ],
+   [
+    "Riley",
+    "Gus"
+   ],
+   [
+    "Avery",
+    "Mo"
+   ],
+   [
+    "Casey",
+    "Ray"
+   ],
+   [
+    "beard",
+    "kart"
+   ],
+   [
+    "chair",
+    "hole"
+   ],
+   [
+    "shops",
+    "courses"
+   ],
+   [
+    "perms",
+    "rounds"
+   ],
+   [
+    "shave",
+    "round"
+   ],
+   [
+    "color",
+    "party"
+   ],
+   [
+    "Color",
+    "Party"
+   ],
+   [
+    "Sewer",
+    "Course"
+   ],
+   [
+    "sewer",
+    "course"
+   ],
+   [
+    "Leaks",
+    "Spills"
+   ],
+   [
+    "leaks",
+    "spills"
+   ],
+   [
+    "drain",
+    "course"
+   ],
+   [
+    "Drain",
+    "Course"
+   ],
+   [
+    "valve",
+    "switch"
+   ],
+   [
+    "Valve",
+    "Switch"
+   ],
+   [
+    "pipes",
+    "cables"
+   ],
+   [
+    "Pipes",
+    "Cables"
+   ],
+   [
+    "flush",
+    "reset"
+   ],
+   [
+    "Flush",
+    "Reset"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "shop",
+    "course"
+   ],
+   [
+    "Shop",
+    "Course"
+   ],
+   [
+    "perm",
+    "round"
+   ],
+   [
+    "cape",
+    "scorecard"
+   ],
+   [
+    "Leak",
+    "Spill"
+   ],
+   [
+    "leak",
+    "spill"
+   ],
+   [
+    "sink",
+    "course"
+   ],
+   [
+    "Sink",
+    "Course"
+   ],
+   [
+    "pipe",
+    "cable"
+   ],
+   [
+    "Pipe",
+    "Cable"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "$150",
+    "@@bevent@@"
+   ],
+   [
+    "$89",
+    "@@bfee@@"
+   ],
+   [
+    "$40",
+    "@@bdep@@"
+   ],
+   [
+    "$640",
+    "@@bevent@@"
+   ],
+   [
+    "$179",
+    "@@bback@@"
+   ],
+   [
+    "$160",
+    "@@bextra@@"
+   ],
+   [
+    "$245",
+    "@@bback@@"
+   ],
+   [
+    "$110",
+    "@@brest@@"
+   ],
+   [
+    "$480",
+    "@@brest@@"
+   ],
+   [
+    "$156",
+    "@@bhome@@"
+   ],
+   [
+    "$199",
+    "@@bback@@"
+   ],
+   [
+    "$165",
+    "@@bhome@@"
+   ],
+   [
+    "$2,400",
+    "@@bevent@@"
+   ],
+   [
+    "$800",
+    "@@bevent@@"
+   ],
+   [
+    "$358",
+    "@@bback@@"
+   ],
+   [
+    "$620",
+    "@@bevent@@"
+   ],
+   [
+    "$540",
+    "@@brest@@"
+   ],
+   [
+    "$700",
+    "@@bevent@@"
+   ],
+   [
+    "$600",
+    "@@bevent@@"
+   ],
+   [
+    "$1,200",
+    "@@bevent@@"
+   ],
+   [
+    "$55",
+    "@@bhome@@"
+   ],
+   [
+    "$80",
+    "@@bfee@@"
+   ],
+   [
+    "$20",
+    "@@bextra@@"
+   ],
+   [
+    "$35",
+    "@@bhome@@"
+   ],
+   [
+    "$25",
+    "@@bextra@@"
+   ],
+   [
+    "$90",
+    "@@bhome@@"
+   ],
+   [
+    "$75",
+    "@@bhome@@"
+   ],
+   [
+    "$125",
+    "@@bback@@"
+   ],
+   [
+    "$70",
+    "@@bhome@@"
+   ],
+   [
+    "$100",
+    "@@bdep@@"
+   ],
+   [
+    "$15",
+    "@@bextra@@"
+   ],
+   [
+    "$130",
+    "@@bhome@@"
+   ],
+   [
+    "$85",
+    "@@bfee@@"
+   ],
+   [
+    "$120",
+    "@@bhome@@"
+   ],
+   [
+    "$10",
+    "@@bextra@@"
+   ],
+   [
+    "$169",
+    "@@bback@@"
+   ],
+   [
+    "@@bdep@@",
+    "$60"
+   ],
+   [
+    "@@brest@@",
+    "$240"
+   ],
+   [
+    "@@bevent@@",
+    "$300"
+   ],
+   [
+    "@@bfee@@",
+    "$40"
+   ],
+   [
+    "@@bback@@",
+    "$180"
+   ],
+   [
+    "@@bhome@@",
+    "$90"
+   ],
+   [
+    "@@bextra@@",
+    "$60"
+   ]
+  ]
+ },
+ "keep": [
+  "host",
+  "Host",
+  "travel fee",
+  "Travel fee"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books a round for 4 at Lee Mini Golf, Sat Oct 24 at 11:00am, for a sister's birthday. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Party Greens for a backyard party at 14 Cedar Ln: a portable 9-hole course for 3 hours, for 12 kids. Tess and Ray set up Thu Oct 22 at 2:00pm and pack up after the party."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|deposit|counter",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a round for 4 on the course, $48 paid in full when booking. A late cancel or no-show keeps $12.",
+    "list|deposit|counter": "A birthday party for 12 kids: a $40 deposit when booking, the $140 rest paid at the counter on the day.",
+    "list|none|counter": "An open round for 4: nothing taken, the bill paid at the counter."
+   },
+   "amounts": {
+    "list|full|*": {
+     "price": "$48",
+     "paid": "$48",
+     "fee": "$12",
+     "name": "Mini golf round for 4"
+    },
+    "list|deposit|*": {
+     "price": "$180",
+     "deposit": "$40",
+     "rest": "$140",
+     "fee": "$40",
+     "name": "Birthday party package, 12 kids"
+    },
+    "list|none|*": {
+     "price": "$48",
+     "name": "Open round for 4, pay at the counter"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Go-kart race, added to a booking",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Mini golf round for 4",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$48",
+      "paid": "$48",
+      "fee": "$12"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|card|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: a portable 9-hole course for a 3-hour party for 12, $300. A $60 deposit now, the $240 rest charged to the saved card when the crew texts DONE.",
+    "list|card|bill": "A school carnival course for up to 20 kids, 2 hours: $180, a card saved for the $40 late-cancel fee; the crew sends the bill after.",
+    "list|full|none": "A 1-hour portable course at home for up to 6, paid in full when booking: $90."
+   },
+   "amounts": {
+    "list|deposit|*": {
+     "price": "$300",
+     "deposit": "$60",
+     "rest": "$240",
+     "fee": "$60",
+     "name": "Portable 9-hole course, 3-hour party for 12"
+    },
+    "list|card|*": {
+     "price": "$180",
+     "fee": "$40",
+     "name": "School carnival course, 2 hours"
+    },
+    "list|full|*": {
+     "price": "$90",
+     "paid": "$90",
+     "fee": "$20",
+     "name": "Portable course, 1 hour at home"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra hour on a portable course",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$60",
+      "fee": "$60"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Portable course, 1 hour at home",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$90",
+      "paid": "$90",
+      "fee": "$20"
+     }
+    }
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Gus and Mo (hosts)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a school, a party's parents)"
+  },
+  "B": {
+   "staff": "Tess and Ray (crew)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a school, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Gus"
+  },
+  "B": {
+   "staff": "Tess"
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted from photos first",
+    "why": "A round is never quoted: the price list shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A4-05",
+    "label": "Quoted at the visit",
+    "why": "A round is never quoted: the price list shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A8-24",
+    "label": "Priced at the visit",
+    "why": "A round is never quoted: the price list shows its prices."
+   },
+   {
+    "op": "off",
+    "at": "A9-01",
+    "label": "Rosie sends the bill",
+    "why": "Courses are paid in full, at the counter, or on a card at the course; Rosie sends no bill for a round."
+   },
+   {
+    "op": "off",
+    "at": "A9-01",
+    "label": "Saved card charged",
+    "why": "No money is charged later on a card for a round: the rest is paid at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A round is not paid in stages (the stages fact is not listed)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "A round is never billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a round."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a round."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "A group checks in with one code for the whole group, not a class roster."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at a round."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A round has no results that come later."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked round and party pays the $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable: courses are booked by the hour."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Courses are never sent now: a round is booked ahead or walked in."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A round is never played by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A person's time",
+    "why": "The course books a round or a party room, never a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A round is a space, not a seat in a session (the space branch is kept)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A round is booked for a set time, never as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at a round: the group is at the round."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A round is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No plan charge goes on a saved card: a round is paid in full, at the counter, or in the deposit and rest."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No one is left at a round: a 12 to 17 year old throws with a parent on site."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for a course (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for hosts (D96): the course's own first-aid cards only."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B4-06",
+    "label": "Quoted at the visit",
+    "why": "A mobile round is priced before the visit: the price list, or the quote for the event."
+   },
+   {
+    "op": "off",
+    "at": "B8-19",
+    "label": "Priced at the visit",
+    "why": "A mobile round is priced before the visit: the price list, or the quote for the event."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a round."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a round."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A mobile round is not paid in stages (the stages fact is not listed)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No event is billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Bank transfer is for big jobs this course never takes (no bank-transfer fact)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A round has no report that comes later."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Mobile courses start at a set time the booker picks (the booking setting), not a window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Courses are booked for a set time, never as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A round is a space, not a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Mobile courses are never sent now: the crew sets up at a set start time, so B4-19 shows the soonest times."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "No crew is on call for a sent-now job: courses are booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Mobile courses are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Mobile courses are never sent now, so the day list and the crew's OMW come first."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A round is never played by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booked round and party pays the $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable: courses are booked by the hour."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No mobile round is sent now: the crew sets up at a booked start time."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for a course (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for crew (D96)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No plans: no plan charge goes on a saved card."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "No child is left in the crew's care: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-68",
+    "why": "No child is left in the crew's care."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A round is rated like any visit."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-29",
+   "S1-80",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "S1-29",
+   "S1-80"
+  ]
+ },
+ "notes": "Mini golf, go-karts and laser tag (T1, Oct 27, 2026): a course venue (table style), from restaurant (copied; trampoline-park used as reference). Flow A (the group comes to Lee Mini Golf): a round for 4 on the course, $48 paid in full when booking, $12 kept on a late cancel or no-show (main); a birthday party for 12 kids, $180: $40 deposit when booking, $140 rest paid at the counter for the final count, $40 kept; an open round for 4, nothing taken, the bill at the counter. Flow B (Lee Party Greens comes to the customer): a portable 9-hole course for a 3-hour party for 12, $300: $60 deposit, $240 rest charged to the saved card when the crew texts DONE, $60 kept (main); a school carnival course for up to 20 kids, 2 hours, $180: a card saved for the $40 late-cancel fee, the bill texted after; a 1-hour portable course at home for up to 6, $90 paid in full, $20 kept. Services (two per flow): A a-add 'Go-kart race, added to a booking' $20 (card, counter), a-full 'Mini golf round for 4' $48 paid in full; B b-add 'Extra hour on a portable course' $60 (card, bill), b-full 'Portable course, 1 hour at home' $90 paid in full. Who may book: an adult (18 or over) books for a group; a child under 7 plays only with a paying adult on the course; kart drivers meet the track's posted age and height limits, checked by the staff at the track (never by Rosie). No kart driving after drinks. Safety: a kart crash with someone hurt, bleeding badly, choking or not breathing = 911, no booking; a child missing from the course or the party = 911 if not found at once. The danger examples in B3-11, B3-18, B3-19 and the flood example are rewritten for a course. Licenses: D96 (the lookup branches off in S1-60 and S2-28; registration and insurance shown as given, never checked). $2 on every booking (D97). Settings: set start times in both flows; cutoff 24 hours before (A), 2 days before (B). Money B limited to set-start times (money.B.booking). Names: Lee Mini Golf (flow A, 270 Harbor Rd), Lee Party Greens (flow B), hosts Gus and Mo (A), crew Tess and Ray (B); customer Alex M. The master's price-change, discount and rate examples are number-free or use this venue's own rows (the discount example is a percentage). Plans, classes, stages, bank transfer, sent-now and drop-off are off; the plan-only branches stay hidden by the plans fact.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Riley stops the visit if it isn't safe to go on: a person, smoke, a gas smell, or weather that turns unsafe.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan does electrical too, at $140 an hour.",
+    "Signature cut and hot towel shave",
+    "Booked for 8 people · $25 each",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Lee's Barbershop LLC",
+    "Plumbing price list",
+    "SPRING10 · $10 off",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Skin fade · $40",
+    "Groom's package",
+    "Color touch-up",
+    "color touch-up",
+    "Drain clearing",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "water heaters",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "a beard trim",
+    "A beard trim",
+    "at the chair",
+    "in the chair",
+    "water heater",
+    "Haircut plan",
+    "haircut plan",
+    "water heater",
+    "Casey Moore",
+    "Springfield",
+    "color quote",
+    "Color quote",
+    "a skin fade",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "patch test",
+    "Riley Chen",
+    "Avery Diaz",
+    "color plan",
+    "Color plan",
+    "skin fades",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "barbershop",
+    "Barbershop",
+    "the shop's",
+    "The shop's",
+    "Electrical",
+    "electrical",
+    "house call",
+    "House call",
+    "travel fee",
+    "88 Elm St",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "a haircut",
+    "the chair",
+    "The chair",
+    "cape clip",
+    "hot towel",
+    "2020-1187",
+    "cut hair",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "the shop",
+    "The shop",
+    "Plumbing",
+    "plumbing",
+    "catering",
+    "MP045210",
+    "JP031552",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "plumber",
+    "Plumber",
+    "massage",
+    "Massage",
+    "EC22871",
+    "BS20981",
+    "JE30417",
+    "Jordan",
+    "barber",
+    "Barber",
+    "chairs",
+    "shop's",
+    "shaves",
+    "Drains",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "chair",
+    "shops",
+    "perms",
+    "shave",
+    "color",
+    "Color",
+    "Leaks",
+    "Drain",
+    "valve",
+    "shop",
+    "Shop",
+    "perm",
+    "cape",
+    "Leak",
+    "leak",
+    "pipe",
+    "$20",
+    "$40",
+    "$55",
+    "$35",
+    "$25",
+    "$90",
+    "$70",
+    "$100",
+    "$75",
+    "$80",
+    "$140",
+    "$125",
+    "$110",
+    "$15",
+    "$89",
+    "$130",
+    "$85",
+    "$10",
+    "$160"
+   ],
+   "B": [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Reading it back: drain clearing goes to $199 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Never: start before a gas, water or power line is confirmed off, or buried lines are marked before digging.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Morgan P. asked to talk about the $640 quote.",
+    "Jordan does electrical too, at $140 an hour.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The $160 valve quote is good for 7 days.",
+    "replacing both shutoff valves for $160.",
+    "Jordan finds corroded shutoff valves.",
+    "Replace both shutoff valves · $160",
+    "replace both shutoff valves, $160",
+    "Is the sink still full of water?",
+    "Sewer camera inspection · $199",
+    "Yearly water heater flush plan",
+    "the extra work now, for $160.",
+    "$160 for today's extra work.",
+    "Replace both shutoff valves",
+    "replace both shutoff valves",
+    "service call was promised",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater replacement",
+    "Sewer camera inspection",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "sewer camera inspection",
+    "Sewer camera inspection",
+    "Kitchen drain clearing",
+    "Kitchen drain clearing",
+    "No. No huele a gas.",
+    "Plumbing price list",
+    "heating and cooling",
+    "Heating and cooling",
+    "SPRING10 · $10 off",
+    "the shutoff valves",
+    "Water heater flush",
+    "Lee Home Services",
+    "service-call fee",
+    "service call fee",
+    "Lee's Barbershop",
+    "Yes, every year",
+    "Drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "shutoff valves",
+    "water heaters",
+    "Kitchen drain",
+    "kitchen drain",
+    "shutoff valve",
+    "Shutoff valve",
+    "cabinet floor",
+    "Service call",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "at the chair",
+    "water heater",
+    "Water heater",
+    "Service call",
+    "service call",
+    "water heater",
+    "Water heater",
+    "Leak repair",
+    "leak repair",
+    "Casey Moore",
+    "Springfield",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "Leak repair",
+    "leak repair",
+    "overflowing",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "barbershop",
+    "Barbershop",
+    "the shop's",
+    "The shop's",
+    "Electrical",
+    "electrical",
+    "house call",
+    "House call",
+    "travel fee",
+    "sewer line",
+    "Yard drain",
+    "yard drain",
+    "dishwasher",
+    "water line",
+    "42 Oak St",
+    "88 Elm St",
+    "a haircut",
+    "the chair",
+    "The chair",
+    "hot towel",
+    "cut hair",
+    "the shop",
+    "The shop",
+    "Plumbing",
+    "plumbing",
+    "catering",
+    "MP045210",
+    "JP031552",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "plumber",
+    "Plumber",
+    "EC22871",
+    "BS20981",
+    "JE30417",
+    "shutoff",
+    "Shutoff",
+    "cabinet",
+    "Cabinet",
+    "clogged",
+    "Jordan",
+    "barber",
+    "Barber",
+    "chairs",
+    "shop's",
+    "shaves",
+    "Drains",
+    "valves",
+    "faucet",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "chair",
+    "shops",
+    "shave",
+    "color",
+    "Sewer",
+    "sewer",
+    "Leaks",
+    "drain",
+    "Drain",
+    "valve",
+    "pipes",
+    "flush",
+    "clogs",
+    "shop",
+    "Shop",
+    "perm",
+    "Leak",
+    "leak",
+    "sink",
+    "pipe",
+    "clog",
+    "$150",
+    "$89",
+    "$40",
+    "$640",
+    "$179",
+    "$160",
+    "$245",
+    "$110",
+    "$480",
+    "$156",
+    "$199",
+    "$165",
+    "$2,400",
+    "$800",
+    "$358",
+    "$620",
+    "$540",
+    "$700",
+    "$600",
+    "$80",
+    "$20",
+    "$35",
+    "$90",
+    "$75",
+    "$70",
+    "$100",
+    "$15",
+    "$120",
+    "$10",
+    "$169"
+   ]
+  },
+  "A": {
+   "A4-05": "8b3e838019",
+   "A8-24": "c802ca35ab",
+   "A9-01": "bad55310a4",
+   "A9-15": "bd2a17c3c5",
+   "A4-28": "c8e677520c",
+   "A8-03": "7fe61cccf5",
+   "A10-45": "855be6050a",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "9d65299834",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7"
+  },
+  "B": {
+   "B4-06": "223e119ea0",
+   "B8-19": "11e79a26d8",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-38": "867fe1ab7c",
+   "B4-83": "93095f28e5",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-01": "826f4058c2",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "B7-91": "7132851ec1",
+   "B8-67": "b66ffbd04d",
+   "B8-68": "8ede790b60",
+   "B10-32": "7713bff255"
+  }
+ }
+}

@@ -1,0 +1,1720 @@
+{
+ "id": "plumber",
+ "name": "Plumber",
+ "style": "Home visit",
+ "pattern": "fix",
+ "plugin": {
+  "pf.license": {
+   "need": "Plumbing work in a home needs a license where the state or city licenses plumbers. Gas line work can need its own license or endorsement.",
+   "who holds it": "Both: the company (a plumbing contractor license, where the state asks) and each plumber (apprentice, journeyman or master).",
+   "what to ask": [
+    "The company's license number and class",
+    "Each plumber's own number and level, in their invite reply",
+    "A gas-line endorsement, where the state has one"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "The company's plumbing listing goes live once it's set up. Each plumber is offered only once the owner says yes.",
+   "renewals": "Reminders before each expiry, on the dates the owner picks (the example: 5 weeks and 1 week before). A lapsed license pauses new bookings for that person.",
+   "insurance or bond": "Liability insurance, and a bond where the state's form asks for one: from the state form.",
+   "background checks": "Only where the state's form asks.",
+   "at the counter": "Work done at the shop counter: the state's form says if it needs a license. Safe default: the company's license on file, shown on the listing.",
+   "local rules": "Some cities and counties license plumbers or need a permit of their own: the form for that place applies, by the customer's address."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Brightwater Plumbing's own list)": [
+    {
+     "service": "Service call (find any problem)",
+     "price kind": "one price",
+     "price": "$89, taken off the repair",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89",
+     "after": "Rosie texts the bill",
+     "note": "Goes on the jobs below; not booked alone"
+    },
+    {
+     "service": "Clogged drain (sink, tub, shower)",
+     "price kind": "one price",
+     "price": "$179, the $89 call included",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Toilet repair or clog",
+     "price kind": "one price",
+     "price": "$169, the $89 call included",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Leak repair (pipe, valve, faucet)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "60 to 90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Water heater repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Water heater flush",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Water heater replacement",
+     "price kind": "quoted from photos, or after a free estimate visit",
+     "price": "the quote (the example: $640)",
+     "length": "half a day",
+     "place": "at the customer's place",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill",
+     "note": "The business pulls the permit, where the local rules require one"
+    },
+    {
+     "service": "Gas line work",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 service call is promised",
+     "length": "set by the owner",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill",
+     "note": "The owner OKs each booking first. Only plumbers with the gas-line skill."
+    },
+    {
+     "service": "Sewer camera inspection",
+     "price kind": "by person",
+     "price": "journeyman $199, master $249",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 service call",
+     "after": "Rosie texts the bill",
+     "note": "The report link comes later"
+    },
+    {
+     "service": "After-hours emergency call",
+     "price kind": "one price",
+     "price": "$149, taken off the repair; flat-price jobs $60 more",
+     "length": "sent now: an arrival estimate, not a window",
+     "place": "at the customer's place",
+     "before": "a card saved for the $149",
+     "after": "Rosie texts the bill",
+     "note": "Sent now to the plumber on call, then the backup. Free to cancel until the plumber texts OMW."
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum",
+     "place": "at the customer's place",
+     "note": "Goes on quoted jobs; not booked alone"
+    }
+   ],
+   "at the business (the example: Brightwater Supply's counter board)": [
+    {
+     "service": "Faucet rebuild (bring the faucet or its cartridge)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "both: at the shop, or at the customer's home as a $75 home visit paid in full",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Pipe threading",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Supply lines, fitted",
+     "price kind": "one price",
+     "price": "$20",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Spigot rebuild",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Shower valve rebuild",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the shop",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Pump rebuild (sump or well pump)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours, or a drop-off",
+     "place": "at the shop",
+     "before": "a $40 deposit (over 2 hours)",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Faucet restore (an old or special faucet)",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $90)",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "The owner OKs each quote"
+    },
+    {
+     "service": "Fixture repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $25 consult is promised",
+     "place": "at the shop",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Video check of a leak or a part",
+     "price kind": "the owner's own price",
+     "place": "at the business (a video session)",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Only where the owner offers it"
+    }
+   ],
+   "capacity": "One plumber per booking. Bigger jobs can need a crew of two; the counter's restores need its one test bench.",
+   "skills each needs": "Gas line work needs the gas-line skill. Sewer camera needs the camera. Restores and fixture repairs at the counter need the restore skill.",
+   "nobody home": "An outdoor spigot or a crawlspace with its own access: nobody needs to be home. DONE comes with a photo.",
+   "online": "A video check only, where the owner offers it. No repair is done by video.",
+   "extras": "Travel inside the service area only (the example: 25 miles). Parts at cost or at list, the owner's pick. No tax line unless the owner sets a rate."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What's wrong: a leak, a clog, no hot water, a toilet, a gas smell, or something else",
+    "Where in the home",
+    "Is water still coming? Is the valve shut off?",
+    "For a water heater: gas or electric, tank or tankless, and is it leaking",
+    "After hours: is it an emergency right now",
+    "At the counter: which part or fixture, and its brand if known"
+   ],
+   "after a time is picked": [
+    "Who will be there: the customer, or someone else (their name and mobile go on the secure page)",
+    "Access, parking and pets",
+    "Own or rent, and who pays: the customer, or the landlord or manager",
+    "A home warranty or an insurance claim: the customer pays, and gets the receipt and photos for the claim",
+    "The year the home was built: only for jobs that may open a wall",
+    "HOA or building rules: only for digging outside or shared pipes"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "Gate or lock codes",
+    "The landlord's or manager's name and mobile",
+    "Photos inside the home",
+    "The card"
+   ],
+   "who may book": "An adult. A renter books, and the landlord or manager OKs it where they pay. A person the owner of the home names may book for them."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A gas smell, hissing, or a carbon monoxide alarm",
+     "says": "Leave the house now. Then call 911 and the gas company.",
+     "booking": "No booking. A new request must say the gas company cleared the house."
+    },
+    {
+     "words": "Someone hurt, sparks, or water on wiring or a panel",
+     "says": "Get away from the water and call 911.",
+     "booking": "No booking until it's safe; the customer can come back."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "Water spraying, flooding, or water near outlets",
+     "says": "Shut the main water valve. Stay away from outlets and anything plugged in."
+    },
+    {
+     "words": "Sewage coming up into the home",
+     "says": "Keep people and pets away, and don't run any water or drains."
+    },
+    {
+     "words": "No heat from a gas water heater, with no smell",
+     "says": "Don't relight it if you smell gas. If there's no smell, the plumber checks it."
+    }
+   ],
+   "at the counter": "A gas part, gas valve or gas appliance control isn't worked on at the counter. The customer is offered a home visit by a plumber with the gas-line skill.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "An estimate visit (free), or photos first",
+     "for": "Water heater replacement and other big jobs",
+     "timing": "Before the quote; the owner picks which"
+    },
+    {
+     "step": "A permit",
+     "for": "Water heater replacement, gas line work, and jobs the local rules name",
+     "timing": "Pulled by the business before the work, where the local rules require one (a to-do for the owner)"
+    },
+    {
+     "step": "A utility locate (call 811) before any digging",
+     "for": "Yard lines and sewer lines",
+     "timing": "Done by the business, with the lead time the locate service sets"
+    },
+    {
+     "step": "A lead-safe work notice",
+     "for": "Work that opens painted walls in an older home",
+     "timing": "Signed on the secure page before the visit, where the rules require it"
+    },
+    {
+     "step": "The owner's OK",
+     "for": "Gas line work, and same-day jobs",
+     "timing": "Before the booking is confirmed"
+    },
+    {
+     "step": "A part check (the old part brought in)",
+     "for": "A special-order part at the counter",
+     "timing": "At least 2 days before; stays good 3 months"
+    }
+   ],
+   "prep for the reminder": [
+    "Clear the area under the sink, or around the water heater",
+    "Know where the main water valve is",
+    "Put pets in another room",
+    "At the counter: bring the faucet or part with all its pieces; drain a pump before a drop-off"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code at the door. The on-my-way text names the plumber, with a photo.",
+   "check-in at the counter": "The code at the counter (the plumber or the desk types it). A drop-off gets its code when the item is left, and READY when it's tested.",
+   "quotes at the visit": "The plumber texts the quote with its lines before any work. The customer may OK part of it. The quote stays good 7 days.",
+   "extra work": "Quoted by text up to the owner's limit (the example: $500). Above it, the owner OKs it first. A bigger job found gets its own quote.",
+   "work sold at the home": "A written right to cancel, where the rules require it. The work starts at once only if the customer asks for that in writing, where the rules allow it.",
+   "before work": "Photos of the area before work; the year the home was built before opening a wall.",
+   "proof it's done": "The plumber texts DONE with the bill's lines, and photos after. Nobody home needed: DONE with a photo.",
+   "permits": "Where a permit was pulled, the inspector's visit is set up after the work, and the result is kept with the job."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's place: a card saved for the $89 service call, and Rosie texts the bill after the job",
+    "An owner may take nothing up front",
+    "At the counter: a card saved for the $20 fee; paid at the counter. Over 2 hours: a $40 deposit",
+    "After hours: a card saved for the $149 call, taken off the repair"
+   ],
+   "limits": [
+    "Work quoted at the visit: nothing more than the service call is taken before",
+    "Deposits only on quoted big jobs (the example: 25% on a water heater replacement). Deposit cap: from the state form",
+    "Late cancel or nobody home: the $89 fee (after hours, the $149 call once the plumber has headed out). The owner confirms each one; no answer, no fee",
+    "Emergency prices: where the state's rules limit prices in a declared emergency, those limits apply"
+   ],
+   "insurance and plans": "A home warranty plan pays only once the owner checks it. Insurance: the customer pays, and gets the receipt and photos for the claim.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "parts": "Parts at cost or at list, the owner's pick; parts billed after go on the bill.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Gate or lock codes, card details, and photos from inside the home: these stay on the secure page.",
+   "languages": "English and Spanish.",
+   "danger words": "Gas words always get the safety message first, before anything else."
+  },
+  "pf.staff": {
+   "levels": "Apprentice, journeyman and master; each person's own license per state, where the state licenses plumbers.",
+   "skills": [
+    "Drains and clogs",
+    "Leaks",
+    "Toilets",
+    "Water heaters",
+    "Gas lines",
+    "Sewer and camera",
+    "Counter rebuilds and restores"
+   ],
+   "supervision": "An apprentice works only with a journeyman or master on the job, where the state's rules require it. An apprentice is never sent alone by default.",
+   "special work": "Gas line work only by people with the gas-line skill, and its license where the state requires one. Lead-safe work only by people with the lead-safe card, where the rules require it.",
+   "who OKs what": "The owner OKs fees, quotes over the limit, gas line jobs and same-day jobs. After hours, a job sent now goes to the plumber on call, then the backup set at sign-up. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "Another plumber with the same skill and level, at the same window and price."
+  },
+  "pf.rules": {
+   "written estimate": "A written estimate before work above an amount: from the state form.",
+   "right to cancel": "A written right to cancel for work sold at the home: where the rules require it.",
+   "permits": "Pulled by the business where the local rules require one; the inspection follows.",
+   "lead-safe work": "Lead-safe work rules for older homes: where the rules require it.",
+   "license on papers": "The license number on quotes and bills: from the state form.",
+   "digging": "A utility locate before any digging: always.",
+   "declared emergency": "Price limits in a declared emergency: where the state's rules require it.",
+   "warranty": "The owner's own (the example: 1 year on labor), shown on the receipt.",
+   "state notices": "A state's own notices for home repairs, like a right-to-repair notice: from the state form, sent before the work or with the quote.",
+   "records": "7 years, as for every kind of work."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for plumbing:",
+   "plumbing": [
+    "The leak gets worse before the visit: the safety steps again, then urgent",
+    "A gas smell at any point: stop, get out, call 911 and the gas company",
+    "After hours: sent now to the plumber on call, then the backup; nobody takes it means no visit tonight and nothing charged",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "A renter whose landlord pays: the landlord's OK first, or the renter pays instead; work over the landlord's top amount goes to the landlord first",
+    "A bigger job found (a cracked drain in the wall): its own quote, OK'd by the owner over the limit",
+    "Mold, lead paint or a hazard behind a wall: stop, and a written note",
+    "A storm brings many calls: PAUSE, and a declared emergency's price limits",
+    "At the counter: a part that can't be rebuilt, a gas part, or a drop-off nobody picks up"
+   ]
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "forms",
+   "sentnow",
+   "planbill",
+   "dropoff",
+   "extrawork",
+   "photos",
+   "video"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most plumbing supply counters set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Faucet, pump and valve rebuilds."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a gas valve rebuild, which isn't on the counter's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Brightwater Supply doesn't rebuild gas parts."
+   ],
+   [
+    "skin fades",
+    "faucet rebuilds"
+   ],
+   [
+    "for Lee's Barbershop. Sam named you",
+    "for Brightwater. Sam named you"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds water testing to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Water testing for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW water testing"
+   ],
+   [
+    "Gloss to finish",
+    "New handle"
+   ],
+   [
+    "gloss",
+    "new handle"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench vise scratched my faucet's handle."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the bench vise scratched a faucet handle today."
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "New supply lines are on the price list: $20."
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "Some pieces of the part are missing."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a leak"
+   ],
+   [
+    "Color and cut",
+    "Faucet restore"
+   ],
+   [
+    "color and cut",
+    "faucet restore"
+   ],
+   [
+    "Color correction",
+    "Fixture repair"
+   ],
+   [
+    "color correction",
+    "fixture repair"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A water heater could mean a plumber or a heating tech"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plumbing plug-in adds its own: a gas smell, hissing, or water near outlets."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for a leak at home: shut the valve under the sink before bringing the part in."
+   ],
+   [
+    "A haircut needs nothing.",
+    "A faucet rebuild needs the faucet or its cartridge, with all its parts."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A pump rebuild can be a drop-off: Alex leaves the pump, and picks it up when it's ready."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two faucets from one kitchen work the same way. Both are asked before the times."
+   ],
+   [
+    "like a skin-test result",
+    "like a part number"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The faucet still drips a little."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's faucet still drips a little"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you rebuild outdoor spigots too?"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a spigot rebuild is $25"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop the faucet off and come back later?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a rebuild slot every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks",
+    "Alex rents out homes, and asks for a rebuild slot every 4 weeks"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero arreglar un grifo el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a faucet fixed on Saturday."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley can still fit the rebuild if you're here by 11:20, or you can move to a later time."
+   ],
+   [
+    "Shorter is fine",
+    "I'll be there"
+   ],
+   [
+    "sees the hair",
+    "sees the fixture"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s rebuild"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "single-handle cartridge, new O-rings, hot side seat worn"
+   ],
+   [
+    "Color always stays with Riley",
+    "Restores always stay with Riley"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "does color",
+    "does restores"
+   ],
+   [
+    "color and house calls",
+    "restores and house calls"
+   ],
+   [
+    "color, house calls",
+    "restores, house calls"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "A cut",
+    "A rebuild"
+   ],
+   [
+    "Lee Home Services'",
+    "Brightwater Plumbing's"
+   ],
+   [
+    "Lee Home Services",
+    "Brightwater Plumbing"
+   ],
+   [
+    "Lee Plumbing",
+    "Brightwater Plumbing"
+   ],
+   [
+    "Lee Electric",
+    "Brightwater Heating"
+   ],
+   [
+    "Lee's Barbershop",
+    "Brightwater Supply"
+   ],
+   [
+    "Barbershop",
+    "Plumbing counter"
+   ],
+   [
+    "barbershop",
+    "plumbing counter"
+   ],
+   [
+    "Electrical",
+    "Heating"
+   ],
+   [
+    "electrical",
+    "heating"
+   ],
+   [
+    "Panel upgrade",
+    "Furnace replacement"
+   ],
+   [
+    "EC22871",
+    "HC22871"
+   ],
+   [
+    "Groom's package ·",
+    "Pump rebuild ·"
+   ],
+   [
+    "Groom's package",
+    "pump rebuild"
+   ],
+   [
+    "JE30417",
+    "HT30417"
+   ],
+   [
+    "BS20981",
+    "PC20981"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Hill"
+   ],
+   [
+    "Casey Moore",
+    "Dre Watts"
+   ],
+   [
+    "Riley Chen",
+    "Kenny Ross"
+   ],
+   [
+    "Avery Diaz",
+    "Ray Dixon"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey",
+    "Dre"
+   ],
+   [
+    "Riley",
+    "Kenny"
+   ],
+   [
+    "Avery",
+    "Ray"
+   ],
+   [
+    "1200 Main St",
+    "5 Mill Rd"
+   ],
+   [
+    "88 Elm St",
+    "214 Ponce St"
+   ],
+   [
+    "Elm St",
+    "Ponce St"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Shower valve rebuild"
+   ],
+   [
+    "Signature cut and shave",
+    "Shower valve rebuild"
+   ],
+   [
+    "signature cut",
+    "shower valve rebuild"
+   ],
+   [
+    "groom's party",
+    "landlord's faucets"
+   ],
+   [
+    "Kids cut",
+    "Spigot rebuild"
+   ],
+   [
+    "kids cut",
+    "spigot rebuild"
+   ],
+   [
+    "a skin fade",
+    "pipe threading"
+   ],
+   [
+    "A skin fade",
+    "Pipe threading"
+   ],
+   [
+    "Skin fade",
+    "Pipe threading"
+   ],
+   [
+    "a beard trim",
+    "new supply lines"
+   ],
+   [
+    "Beard trim",
+    "Supply lines"
+   ],
+   [
+    "beard trim",
+    "new supply lines"
+   ],
+   [
+    "photos of your hair",
+    "photos of your faucet"
+   ],
+   [
+    "patch test",
+    "part check"
+   ],
+   [
+    "Haircuts",
+    "Faucet rebuilds"
+   ],
+   [
+    "haircuts",
+    "faucet rebuilds"
+   ],
+   [
+    "Haircut",
+    "Faucet rebuild"
+   ],
+   [
+    "haircut",
+    "faucet rebuild"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "barbers",
+    "plumbers"
+   ],
+   [
+    "barber",
+    "plumber"
+   ],
+   [
+    "Barber",
+    "Plumber"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "the cut",
+    "the rebuild"
+   ],
+   [
+    "cuts",
+    "rebuilds"
+   ],
+   [
+    "color plan",
+    "restore plan"
+   ],
+   [
+    "Color plan",
+    "Restore plan"
+   ]
+  ],
+  "B": [
+   [
+    "Thanks for visiting Lee Home Services.",
+    "Thanks for visiting Brightwater."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most plumbing supply counters start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules plumbing supply counters often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Faucet, pump and valve rebuilds."
+   ],
+   [
+    "for Lee Home Services. Sam named you",
+    "for Brightwater. Sam named you"
+   ],
+   [
+    "can cut your hair at the shop",
+    "can rebuild your faucet at the counter"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "A water heater could mean a plumber or a heating tech"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "does color",
+    "does restores"
+   ],
+   [
+    "color and house calls",
+    "restores and house calls"
+   ],
+   [
+    "color, house calls",
+    "restores, house calls"
+   ],
+   [
+    "leehomeservices.com",
+    "brightwaterplumbing.com"
+   ],
+   [
+    "Lee Home Services'",
+    "Brightwater Plumbing's"
+   ],
+   [
+    "Lee Home Services",
+    "Brightwater Plumbing"
+   ],
+   [
+    "Lee Plumbing",
+    "Brightwater Plumbing"
+   ],
+   [
+    "Lee Electric",
+    "Brightwater Heating"
+   ],
+   [
+    "Lee's Barbershop",
+    "Brightwater Supply"
+   ],
+   [
+    "barbershop",
+    "plumbing counter"
+   ],
+   [
+    "Electrical",
+    "Heating"
+   ],
+   [
+    "electrical",
+    "heating"
+   ],
+   [
+    "Panel upgrade",
+    "Furnace replacement"
+   ],
+   [
+    "EC22871",
+    "HC22871"
+   ],
+   [
+    "JE30417",
+    "HT30417"
+   ],
+   [
+    "BS20981",
+    "PC20981"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Hill"
+   ],
+   [
+    "Casey Moore",
+    "Dre Watts"
+   ],
+   [
+    "Riley Chen",
+    "Kenny Ross"
+   ],
+   [
+    "Avery Diaz",
+    "Ray Dixon"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey",
+    "Dre"
+   ],
+   [
+    "Riley",
+    "Kenny"
+   ],
+   [
+    "Avery",
+    "Ray"
+   ],
+   [
+    "1200 Main St",
+    "5 Mill Rd"
+   ],
+   [
+    "88 Elm St",
+    "214 Ponce St"
+   ],
+   [
+    "Elm St",
+    "Ponce St"
+   ],
+   [
+    "42 Oak St",
+    "17 Maple Ave"
+   ],
+   [
+    "haircut",
+    "faucet rebuild"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "barbers",
+    "plumbers"
+   ],
+   [
+    "barber",
+    "plumber"
+   ],
+   [
+    "Barber",
+    "Plumber"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "cuts",
+    "rebuilds"
+   ]
+  ]
+ },
+ "cast": {
+  "A": {
+   "staff": "Kenny and Ray (plumbers at the counter)"
+  },
+  "B": {
+   "staff": "Marcus and Dre (plumbers)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Kenny"
+  },
+  "B": {
+   "staff": "Marcus"
+  }
+ },
+ "keep": [
+  "plumber",
+  "plumbing",
+  "drain",
+  "water heater",
+  "flush",
+  "faucet",
+  "leak",
+  "valve",
+  "sink",
+  "pipe",
+  "toilet",
+  "sewer",
+  "clog",
+  "service call",
+  "supply line",
+  "shutoff",
+  "repipe",
+  "water line",
+  "overflowing",
+  "garbage disposal",
+  "dishwasher",
+  "heating and cooling",
+  "heater",
+  "drips",
+  "cabinet"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings a dripping kitchen faucet to the counter at Brightwater Supply, Sam's parts and repair shop, and Kenny rebuilds it on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Brightwater Plumbing at 17 Maple Ave, and Marcus comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: a drain, a leak, a flush or a water heater."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 faucet rebuild at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+    "list|none|counter": "A $35 faucet rebuild. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|deposit|counter": "The $140 pump rebuild. A $40 deposit now, and $100 at the counter.",
+    "list|full|none": "The $55 shower valve rebuild, paid in full when booking.",
+    "photos|card|counter": "A faucet restore, priced from Alex's photos at $90. Booked once Sam OKs it.",
+    "visit|card|counter": "A fixture repair, priced at the counter. Only the $25 consult is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Faucet rebuild"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Faucet rebuild"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Pump rebuild"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Shower valve rebuild"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Faucet restore"
+    },
+    "visit|*|*": {
+     "fee": "$25",
+     "name": "Fixture repair"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "visit|card|bill",
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 drain clearing. A card is saved for the $89 fee, only for a late cancel or nobody home, and only if Sam confirms. Rosie texts the bill after the job.",
+    "list|none|bill": "A $179 drain clearing. Nothing is taken. Rosie texts the bill after the job.",
+    "list|card|card": "A $179 drain clearing. A card is saved and charged $179 when Marcus texts DONE.",
+    "visit|card|bill": "A leak repair, priced at the visit. Only a card is saved. Marcus quotes it, and Rosie texts the bill.",
+    "photos|deposit|bill": "A water heater replacement, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+    "list|full|none": "A $150 water heater flush, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Kitchen drain clearing"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Kitchen drain clearing"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Water heater flush"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Water heater replacement"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Water heater replacement"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Leak repair"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-59",
+   "A7-15",
+   "A8-02",
+   "A8-53",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B4-81",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69",
+   "B8-71",
+   "B8-65",
+   "B8-72",
+   "B10-29"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "A4-32",
+    "does": "A landlord brings in five faucets from one building, on one morning. Rosie finds counter spots side by side across Kenny and Ray."
+   },
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "A plumber's video check shows a leak or a part on the call. Kenny says what to bring, or if a plumber should come to the home."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say the leak at Alex's home gets worse before the visit. The plug-in's danger words are checked first. Then Kenny is asked if the visit can go ahead.",
+    "more": [
+     "A sign of danger gets the safety message first, like 'shut the main water valve' or 'call 911'.",
+     "A leak that keeps going needs a plumber at the home. That's a new booking with Brightwater Plumbing.",
+     "Kenny asked for the move, so there's no fee.",
+     "A question only a pro should answer gets the shop's line, (555) 010-0177, and the visit stays booked."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The leak under my sink got worse. I shut the valve. Can I still come in Saturday?"
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. (Sat 11:00am) sent an update before the visit. It's on the secure page. Can the visit go ahead?",
+      {
+       "card": {
+        "title": "Alex M.'s update",
+        "lines": [
+         "On the secure page"
+        ]
+       },
+       "buttons": [
+        "Yes, come in",
+        "Better to move it",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Kenny suggests getting the leak fixed at home first. Keep the valve shut. Your visit here can move, with no fee. Pick a new time:",
+      {
+       "times": [
+        "Sat Oct 31 · 11:00am · Kenny",
+        "Tue Nov 3 · 11:00am · Kenny"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "It can't be rebuilt",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.19",
+        "8.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Sat Oct 24, 11:15am",
+       "title": "Offers a new part, or a plumber at home",
+       "does": "Kenny finds the faucet can't be rebuilt. Nothing is charged for the rebuild. Alex picks a new faucet at the counter, or a plumber at home.",
+       "more": [
+        "A new faucet is sold at the shop's own price, once Alex says yes.",
+        "A plumber at home is a new booking with Brightwater Plumbing, at the customer's place.",
+        "Sam sets any price for the time spent, as with a visit stopped early.",
+        "No answer: nothing more is done, and Alex takes the old faucet home."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "Alex M.'s faucet body is cracked. It can't be rebuilt."
+        ],
+        [
+         "san",
+         "cust",
+         "Kenny found a crack in the faucet body, so it can't be rebuilt. Nothing is charged for the rebuild. What would you like?",
+         {
+          "buttons": [
+           "A new faucet here",
+           "A plumber at home",
+           "Take it back"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.services"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Plumbing and counter work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Plumbing books plumbers, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Plumbing runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Plumbing takes urgent jobs sent now, like a burst pipe after hours."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The counter books a plumber's time, or a drop-off slot for a pump. No class seats."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The counter books a plumber's time, or a drop-off slot for a pump. No spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at a plumbing counter is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The counter's plug-in names no form to sign. Its first steps are a part check, or a paper the shop gets, like a warranty claim number."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Counter work is rated, like every rebuild."
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "The owner sets the daily number at sign-up. A full day isn't shown.",
+     "Pick-up comes once it's READY, in the pick-up hours.",
+     "At the counter, a pump left for a rebuild is a drop-off: the shop takes a few a day."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the supply counter."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A counter visit is an adult's own plumbing repair; a child is never the one served."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "B4-91",
+    "does": "Say the drain is overflowing at 6:40pm. The plug-in marks it urgent, and Sam has a plumber on call tonight. So the AI offers to send someone now, with an arrival estimate, not a window.",
+    "more": [
+     "After hours, the service call is $149, not $89. A card is saved for it the same way, and it comes off the repair.",
+     "Flat-price jobs cost $60 more after hours. Alex sees the after-hours price before booking.",
+     "The plumber on call takes it once Alex books. If nobody does, nothing is charged, and Alex is told.",
+     "Sam set who's on call with the team: open hours too, plus nights, weekends and holidays, with a backup.",
+     "Nobody on call right now: the soonest times show first, as for work that's never sent now.",
+     "A job sent now gets no reminder or day list. Free cancel ends when the pro texts OMW.",
+     "Where the state's rules limit prices in a declared emergency, those limits apply."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "It's overflowing. Can someone come tonight?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Brightwater Plumbing has a plumber on call tonight. Sent now, they'd arrive in about 60 to 90 minutes. After hours, the service call is $149, with a card saved for it, taken off the repair.",
+      {
+       "buttons": [
+        "Send someone now",
+        "See the soonest times"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-16",
+    "more": [
+     "Alex also gets the safety steps again: if water is spreading, shut the main water valve."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-30",
+    "more": [
+     "A gas smell at the visit: Marcus stops, gets everyone out, and calls 911 and the gas company. Nothing more is done that day."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Plumbing and counter work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Plumbing books plumbers, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Plumbing runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Plumbing takes urgent jobs sent now, like a burst pipe after hours."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Plumbing books a plumber in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in plumbing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Plumbing at the home books a plumber in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "Plumbing work is never with a child: the plumber waits for an adult on the booking."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after every plumbing visit."
+   }
+  ]
+ },
+ "notes": "Flow B is the plumber's usual side. The master's flow B example is already plumbing, so B is mostly the plug-in, the rename (Lee Home Services to Brightwater Plumbing, the old flowcharts' business; Jordan and Casey to Marcus and Dre) and four plumber-only changes: the after-hours price on the sent-now offer (B4-19), the water safety line when nobody on call can come (B6-18), a gas smell at the visit (B8-30), and which jobs need a permit (B10-24).\nFlow A is the less usual side: the customer brings a part or a fixture to the shop counter. Sam's second company (the master's Lee's Barbershop) becomes Brightwater Supply, his plumbing parts and repair counter, with its own tax number. It loads the same plumbing plug-in, at the business.\nThe second kind of work in sign-up (the master's electrical) becomes heating, a common pair with plumbing: Brightwater Heating as its trade name, the electrician becomes a heating tech.\nThe counter's price board keeps the master's own amounts, as Brightwater Supply's example prices: faucet rebuild $35, pipe threading $40, supply lines $20, spigot rebuild $25, shower valve rebuild $55 (paid in full), pump rebuild $140 (2½ hours, the $40 fee held or a $40 deposit), faucet restore from photos ($90), fixture repair at the counter after a $25 consult. These are examples, not facts about plumbing prices.\nThe barbershop's color work (only Riley did it) becomes the counter's restores (only Kenny does them); the patch test becomes a part check (the old part brought in so the right one is ordered).\nSentence-sized renames: where a barbershop sentence sits in every money variant of a step (the reminder's prep line, the customer's answers, the notes), it's swapped by a phrase pair so every variant changes at once. Steps with one wording use words ops.\nFlow A ops: a rush (A4-29), a landlord's five faucets (A4-32), a video check (A4-36), a leak that gets worse before the counter visit (A7-13), and a part that can't be rebuilt (A8-x01: a new part, or a plumber at home, which is flow B).\nTurned off in A: the reaction-last-time first step and the child pick-up branch. A child booking reaches the master's plug-in split A4-70, which says adults only (its 'Yes, with a parent' branch is off). Nothing at a plumbing counter is booked for a child or held for a reaction.\nkeep: plumber, plumbing, drain, water heater and flush are the plumber's own words.\nMoney: B's main path is the plug-in's starting answer (the $89 service call held, Rosie texts the bill). The old example owner saved a card only, so list|card|bill and visit|card|bill are listed too. A's main path is the master's (a card saved for the $20 fee, paid at the counter).\nThe after-hours line (the old flowcharts' $149 call) is Brightwater's own price, said on the master's sent-now offer (B4-19). Master v1.1 now draws the rest itself: the plumber on call and the backup (S2-27, B6-16 to B6-18), no reminder and free cancel until OMW (B7-48 to B7-50), a quote OK'd in part (B8-48), the landlord's top amount and the renter paying instead (B4-37, B4-75, B8-57), a dropped call (B3-25) and the permit inspection (B10-24). The old flowcharts had the owner as the on-call backup; the master's backup is set at sign-up (S2-27: Marcus and Dre back each other up).\nMoney: no visit+deposit path. Brightwater holds the $89 service call for work priced at the visit; it never takes it as a deposit, so visit|deposit|bill isn't listed.\nNo state is named anywhere: licenses, permits, lead-safe work, deposit caps, the right to cancel and emergency prices are switches filled from each state's or city's form.\nOutdated from the old flowcharts: Rosie Calendar and Book as separate tools (Rosie is the software now), and Georgia's own rules and lookups (a state's rule becomes a switch).\nMaster v1.2 (D24): at every plug-in split the plumber keeps its own branch and turns the others off. Both flows: the $2, no added agreement, people not spaces, no classes, work sent now. The license splits (S1-60, S1-63, S2-28) keep both branches: plumbers are licensed where the state or city licenses them, so it's state by state. Flow A (the counter): walk-ins wait in a line or a drop-off is checked in at once; a plumber's time or a pump's drop-off slot; adults only; no form, no damage hold, no crew, no date that can't move, no minimum; late means a shorter visit or the next open time; the item stays or is left; it's rated. Flow B (the home): sent now or soonest first; arrival windows; own or rent asked; a contract over the plug-in's amount; no damage hold; one plumber by name or a crew of two; no group minimum; an outside check and a permit inspection only where the job has one; a first step can be a form (the lead-safe notice).\nDrop-offs at the counter name no plumber, so the 'No name' branches at A7-59, S11-87 and S11-90 stay on in flow A (A7-60 gets one line for the pump). In flow B every visit names a plumber, so those branches are off there.\nMaster v1.2 final (round 4): B4-83's new '4 A seat in a session' and '5 No person named' are off (every home visit names a plumber). The new section 8 plug-in splits: an adult must be there when a child answers (B8-67, the pro's-care branch off); B8-69 and B8-70 keep both branches (an outdoor spigot or a crawlspace may be done with nobody home, the rest may not); B8-71 keeps both (a water heater is delivered and set up, other work isn't); B8-72 keeps both (a faucet may go to the counter to be rebuilt). A8-32's child branch stays off, so the new A8-67 split is never reached.\nPlug-in splits kept whole (splitsKept, check-prof's D24 check), since the plumber uses every branch: the license splits S1-60, S1-63, S2-28 in both flows (licensed where the state or city licenses plumbers); in A, A7-59, S11-87, S11-90 (a pump drop-off names no plumber), A7-61 (restores are Kenny's alone), A8-02 (a faucet rebuild needs the faucet), A8-53 (the counter or a pump drop-off); in B, B4-81, B7-55, B8-58 (an after-hours call is sent now, a water heater never), B4-57 (a written estimate over the state form's amount), B8-69, B8-70 (a spigot or a crawlspace with nobody home), B8-71 (a water heater set up), B8-65 (a repipe's rough-in inspection), B10-29 (the inspection after, only for permit work), B8-72 (a faucet to the counter).\nReview (Oct 22): 'keep' also holds faucet, leak, valve, sink, pipe, toilet, sewer, clog and service call: they're plumbing's own words, in the plug-in's services and flow B's story. The master's barbershop leftovers in flow A got their counter version: the perm (A4-38) is a dishwasher repair the shop doesn't do; the $15 gloss on a quote (A8-25 to A8-48) is a new handle; Alex is at the counter, not in the chair (A8-07); the cape clip (A8-39) is the bench vise; new supply lines are on the list (A8-33, A8-36); the missing item at check-in (A8-51 to A8-60) is pieces of the part left at home, not a signed form. A4-67 (words) says a pump rebuild can be a drop-off; A7-60 (words) covers a drop-off pump, not a class.\nKeep (Oct 22, check-prof's longer word list): supply line, shutoff, repipe, water line, overflowing, garbage disposal and dishwasher are plumbing's own words: the counter's supply lines and the shutoff valve Marcus replaces, a repipe that runs several days, a main water line, an overflowing drain sent now, a garbage disposal put in from stock, a dishwasher on the kitchen drain (and the dishwasher repair the counter turns away at A4-38). S11-58's massage was renamed to water testing.\ntouch-up 4 (Oct 23): keep 'heater', 'drips' and 'cabinet': the plumber is the master's own example business; the water heater, a drip and the cabinet under the sink are its own trade words.\nRefit (Tue Oct 27, REDESIGN 2 master): pf.facts firststeps, documents, forms, sentnow, planbill, dropoff, extrawork, photos (from the plug-in: estimate visits and part checks, written estimates, the lead-safe notice, on-call jobs, home warranty plans, counter drop-offs, extra work, photo quotes); cancelright on in B only (work sold at the home), off in A; arrive A set start, B window; cutoff left at the master's. Paths unchanged (the hold paths were moved to card paths by migrate). Amounts carry names and dollars (A: the $25 consult is the visit path's fee, owed even after a no, as A4-14 says; B: the master's own plumber dollars). Ops on removed steps deleted (A4-29, A7-60, B10-24 words and 24 off ops); A4-24 [A child] off. 278 rename pairs that match nothing on the new master deleted. Earlier notes naming holds, S1-63, S1-65, A3-32, A7-62, A7-63, B4-78, B5-26 or B7-56 are history.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "skin fades",
+    "for Lee's Barbershop. Sam named you",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Gloss to finish",
+    "gloss",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "A beard trim is on the price board: $20.",
+    "The signed form this service needs is missing.",
+    "like a 15-minute style consult",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "A haircut could mean a salon or a barbershop",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop has none, so nothing is sent here.",
+    "A haircut needs nothing.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "like a skin-test result",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Do you do kids cuts? My son is 8.",
+    "a Kids cut (12 and under) is $25",
+    "Can my son wait in the shop during my cut?",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks",
+    "Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Shorter is fine",
+    "sees the hair",
+    "Alex M.'s cut",
+    "rents a chair",
+    "#2 on the sides, scissors on top, low beard line",
+    "Color always stays with Riley",
+    "color quote",
+    "does color",
+    "color and house calls",
+    "color, house calls",
+    "the shop's board",
+    "A cut",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Barbershop",
+    "barbershop",
+    "Electrical",
+    "electrical",
+    "Panel upgrade",
+    "EC22871",
+    "Groom's package ·",
+    "Groom's package",
+    "JE30417",
+    "BS20981",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "groom's party",
+    "Kids cut",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "photos of your hair",
+    "patch test",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "price board",
+    "Price board",
+    "cut hair",
+    "barbers",
+    "barber",
+    "Barber",
+    "chairs",
+    "chair",
+    "the cut",
+    "cuts",
+    "color plan",
+    "Color plan"
+   ],
+   "B": [
+    "Thanks for visiting Lee Home Services.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "for Lee Home Services. Sam named you",
+    "can cut your hair at the shop",
+    "A haircut could mean a salon or a barbershop",
+    "many barbers, salons and groomers are licensed to their shop",
+    "rents a chair",
+    "does color",
+    "color and house calls",
+    "color, house calls",
+    "leehomeservices.com",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "barbershop",
+    "Electrical",
+    "electrical",
+    "Panel upgrade",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "haircut",
+    "house calls",
+    "Price board",
+    "cut hair",
+    "barbers",
+    "barber",
+    "Barber",
+    "chairs",
+    "chair",
+    "cuts"
+   ]
+  },
+  "A": {
+   "A4-32": "d5a284a416",
+   "A4-36": "fac5c0fb22",
+   "A7-13": "e41528a397",
+   "A8-32": "632f2b5b40",
+   "S1-62": "b5b0310865",
+   "S1-29": "fb61245096",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3",
+   "A4-14": "e8360fe491",
+   "A8-67": "e9fd748fc5",
+   "A4-24": "0a292df05b"
+  },
+  "B": {
+   "B4-91": "eb948968a8",
+   "B6-16": "d428d8c29e",
+   "B8-30": "a1ef4983e4",
+   "S1-62": "b5b0310865",
+   "S1-29": "592bd8f1a2",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

@@ -1,0 +1,3798 @@
+{
+ "id": "music",
+ "name": "Music lessons",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "hair",
+ "plugin": {
+  "pf.license": {
+   "need": "none found for private music lessons or piano tuning: identity is checked, the business gives its registration, and a person on Rosie's team checks the state's site within 1 business day",
+   "who": "the business (its registration); no person license for teachers",
+   "background": "a background check for anyone who teaches students under 18 where the state's rules require it, or where the owner turns it on; Rosie shows only what the owner states (who ran it, what it covered, the date), never just 'background checked'",
+   "blocks": "nothing blocks going live but the ID check; a teacher who needs a background check (by the state's rules or the owner's) is offered for students under 18 only once the owner marks it on file",
+   "renewals": "a background check's renew-by date is reminded 30 days before; a lapsed one stops new bookings with students under 18 for that teacher",
+   "insurance": "liability insurance where the state's form asks for it, or a host's place asks for proof",
+   "teachers": "a teacher who runs their own studio is their own business: their own prices and Stripe"
+  },
+  "pf.services": {
+   "shape": "private lessons with a chosen teacher; the instrument picks who can teach it, and the length (30 or 45 minutes, 60 for audition prep) sets the price",
+   "examples": "the example studio's own prices (Lee Music Studio and Lee Music Lessons), not a standard",
+   "list": [
+    {
+     "name": "Piano lesson, 30 min",
+     "price": "$35",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the studio, or online by video",
+     "before": "a card saved for the $20 fee",
+     "after": "charged to the saved card after the lesson (or at the front desk, where Sam sets it)"
+    },
+    {
+     "name": "Piano lesson, 45 min",
+     "price": "$55",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the studio, or online",
+     "before": "a card saved",
+     "after": "the saved card"
+    },
+    {
+     "name": "Voice lesson, 30 min",
+     "price": "$40",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the studio, or online",
+     "before": "a card saved",
+     "after": "the saved card"
+    },
+    {
+     "name": "Violin lesson, 30 min",
+     "price": "$40",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "the saved card",
+     "note": "only Elena teaches violin"
+    },
+    {
+     "name": "Trial lesson (a new student or a new instrument)",
+     "price": "$25",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the studio",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "a late cancel or no-show: the $25 may be kept, with Sam's OK"
+    },
+    {
+     "name": "Extra 15 minutes",
+     "price": "$20",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "added to a lesson",
+     "before": "nothing",
+     "after": "with the lesson"
+    },
+    {
+     "name": "Weekly lessons (a plan)",
+     "price": "the lesson's price, each week",
+     "kind": "a repeat plan",
+     "length": "same day and time each week",
+     "where": "any place the lesson is offered",
+     "before": "the plan's own yes on the secure page; a card saved",
+     "after": "each lesson charged on its own, after it"
+    },
+    {
+     "name": "Monthly plan",
+     "price": "$140 a month (4 weekly 30-minute lessons)",
+     "kind": "a membership",
+     "length": "every week",
+     "where": "at the studio",
+     "before": "its own yes to the repeat charge; the first month paid on the page",
+     "after": "nothing more for each lesson",
+     "note": "billed on the 1st; pause or end by text"
+    },
+    {
+     "name": "Fall term",
+     "price": "$420 (12 weekly 30-minute lessons)",
+     "kind": "a pack, paid up front",
+     "length": "12 weeks",
+     "where": "at the studio",
+     "before": "paid in full on the page",
+     "after": "nothing more for each lesson"
+    },
+    {
+     "name": "Audition prep, 60 min",
+     "price": "$70",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "at the front desk (the saved card on Saturday mornings)",
+     "note": "booked only when the family asks; never offered in a booking text"
+    },
+    {
+     "name": "Lesson at the student's home",
+     "price": "$55 for 30 min, $75 for 45 min (travel included)",
+     "kind": "one price",
+     "length": "30 or 45 min",
+     "where": "at the customer's home, within 15 miles",
+     "before": "a card saved for the $40 fee",
+     "after": "charged to the saved card after the lesson"
+    },
+    {
+     "name": "Trial lesson at home",
+     "price": "$45",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the customer's home",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Recital spot",
+     "price": "$25 recital fee a performer (the owner can set none)",
+     "kind": "one price",
+     "length": "one piece",
+     "where": "the studio or a hall Sam names",
+     "before": "paid on the sign-up page",
+     "after": "nothing more",
+     "note": "guests come free"
+    },
+    {
+     "name": "Piano tuning (the second kind of work)",
+     "price": "$150",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the customer's home",
+     "before": "a card saved",
+     "after": "the saved card"
+    }
+   ],
+   "rooms": "each studio lesson needs a lesson room with the instrument; the example studio has 2 piano rooms",
+   "hours": "the example studio: Mon–Fri 10:00am–8:00pm and Sat 9:00am–5:00pm; home lessons Mon–Fri 3:00–8:00pm and Sat mornings",
+   "online": "lessons by video at the studio's price; the teacher's video link goes in the confirmation and reminder",
+   "capacity": "one student per lesson; siblings book back to back"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new or returning",
+    "the instrument (or voice), and the length: 30 or 45 minutes (60 for audition prep)",
+    "the level: never played, beginner, or plays already",
+    "at the studio, at home or online",
+    "a trial lesson, a single lesson, or weekly lessons"
+   ],
+   "afterTime": [
+    "anything the teacher should know that isn't private (a piece the student is working on, an instrument at home or not)",
+    "for a home lesson: the address, parking, and where the piano or a quiet room is"
+   ],
+   "securePage": [
+    "the student's first name and age",
+    "18 or older, and the parent or guardian of a student under 18",
+    "any learning, health or hearing notes the teacher should know (optional)",
+    "who may pick up a student 10 or older (the pick-up list)",
+    "photos or video at lessons and recitals: yes or no",
+    "the first name to print in a recital program, only with the parent's yes"
+   ],
+   "whoMayBook": "an adult for themselves or another adult; a parent or guardian for a student under 18, from age 5; a teen who books is asked to send the link to a parent"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a student hurt or very unwell at a lesson: hard to breathe, a fall, an allergy reaction",
+     "say": "Call 911 now. The teacher stays with the student.",
+     "booking": "the lesson stops; the parent and Sam are told at once"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a student who's sick or has a fever before a lesson",
+     "what": "the lesson moves free, or goes online, as the studio's rules say"
+    },
+    {
+     "words": "words that a child may be unsafe",
+     "what": "sent to Sam at once, privately, and to the authorities where the state's rules require it; never answered by the AI"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": "none: a trial lesson is booked as its own lesson, never as a step before another",
+   "prep": "for the reminder: bring the instrument (violin, voice music) and the lesson book; for a trial, the teacher brings a loaner violin and checks the size; a student under 10 comes with a parent, who stays in the building; for a home lesson, a quiet room with the piano"
+  },
+  "pf.visit": {
+   "checkIn": "at the studio: the check-in code at the front desk or the lesson room door; at home: the code from the adult who answers the door; online: the code read out at the start of the video call",
+   "minors": "under 10: a parent or guardian stays in the building; 10 and older may wait alone and go home only with an adult on the pick-up list; at home: an adult stays home for the whole lesson; lesson room doors have windows",
+   "beforeWork": "the teacher checks what the student practiced and the piece in the notes from last time",
+   "changes": "more time (an extra 15 minutes) only if the teacher is free next, priced and OK'd first; a late student gets the time left, and the lesson ends on time",
+   "done": "the check-in code, or DONE from the teacher; the teacher's practice notes go to the parent on a private page"
+  },
+  "pf.money": {
+   "before": "a card saved for the $20 fee (the studio) or the $40 fee (home lessons); a trial paid in full; a term or the first month of a monthly plan paid in full on the page",
+   "after": "each lesson charged to the saved card after it, or paid at the front desk where Sam sets it",
+   "caps": "deposit and prepay caps: from the state form",
+   "cancel": "free to cancel or skip until 24 hours before (the owner's setting)",
+   "fees": "a late cancel or no-show: $20 at the studio, $40 for a home lesson, a trial's $25; the owner confirms each one, and no answer means no fee",
+   "makeups": "a lesson missed with 24 hours' notice, a teacher out or the studio closed: a make-up within 30 days, or a refund for a prepaid lesson; a late cancel or no-show: no make-up unless Sam offers one; never a fee when the studio changes the plan",
+   "plans": "weekly lessons and the monthly plan need their own yes; 30 days' notice of a price change; stopped by one reply or on the page; a yearly reminder of the terms where the state's rules require it",
+   "tips": "none: the studio takes no tips, and Rosie never asks for one",
+   "tax": "a tax line only for books or strings sold, where the state's rules require it",
+   "fee2": "Rosfield's $2 applies: once a month for a plan, once for a recital spot"
+  },
+  "pf.messages": {
+   "never": "a student's age, school, learning, health or hearing notes never go in a text or through the AI: only the secure page; texts name a student by first name only",
+   "minors": "a student under 18 gets no texts: they go to the parent or guardian who booked",
+   "selling": "no instrument rentals, sales or offers in booking texts; renting an instrument is between the family and a shop",
+   "languages": "English and Spanish"
+  },
+  "pf.staff": {
+   "licenses": "none for teachers",
+   "skills": "each teacher's instruments and the ages they teach; only teachers of an instrument are offered for it (only Elena teaches violin at the example studio)",
+   "checks": "a background check on file before teaching students under 18, where the state's rules or the owner require it",
+   "supervision": "a student teacher or assistant teaches only while a teacher is in the building, where the owner sets it",
+   "oks": "Sam OKs home lessons from the studio, a new student's first lesson at the studio, same-day lessons, and any make-up past 30 days",
+   "standIn": "a stand-in teaches the same instrument, with the last lesson's notes"
+  },
+  "pf.rules": {
+   "plans": "repeat plans: the price, how often and how to stop sit next to their own yes; reminders and notice periods where the state's rules require them",
+   "minors": "who must stay with a minor, and background checks for people who teach minors, where the state's rules require them",
+   "photos": "a minor's photo, video or name in a recital program only with the parent's yes",
+   "records": "lesson notes and the booking kept 7 years, or as the state's rules say",
+   "receipt": "what a receipt must show, where the state's rules require it"
+  },
+  "pf.edges": {
+   "lateArrival": "the lesson ends on time; no make-up for lost minutes",
+   "teacherLate": "a teacher running late gives the full lesson, or a new time with no fee",
+   "missed": "a late skip or no-show: Sam decides the fee and any make-up; no answer, no fee",
+   "makeup": "make-ups are offered by text with times to pick; Sam is asked before one runs past 30 days",
+   "closure": "snow or a teacher out: every family gets a new time or a refund, never a fee",
+   "recital": "a recital is set on a date that can't move: families sign up on a page, get the order and call time, and check in at the door; a teacher out that day gets a stand-in accompanist",
+   "pickUp": "a student 10 or older goes home only with an adult on the pick-up list",
+   "other": "all other edge cases the generic way",
+   "leftEarly": "the example studio's own rule: a student who leaves early is charged the lesson as booked; Sam can lower it with PART"
+  },
+  "pf.facts": [
+   "children",
+   "plans",
+   "packs",
+   "video"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Piano, voice and violin lessons."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Lessons at home and piano tuning, within 15 miles."
+   ],
+   [
+    "A water heater job",
+    "A piano tuning"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a lesson for a child, so the times fit it."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a guitar lesson, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Music Studio doesn't teach guitar."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "Some bookings take several visits, like 12 weekly lessons in a term."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: Lily practices scales 10 minutes a day. Next: the C major piece."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you teach children? My son is 8."
+   ],
+   [
+    "skin fades",
+    "voice lessons"
+   ],
+   [
+    "skin fade",
+    "voice lesson"
+   ],
+   [
+    "It's for me, and yes, I'm over 18.",
+    "It's for my daughter Lily. I'm the parent, and I'm over 18."
+   ],
+   [
+    "1 color quote",
+    "1 fee question"
+   ],
+   [
+    "No bill is texted, so there's no tip line. A tip at the chair is the shop's own.",
+    "No bill is texted, so there's no tip line, and the studio takes no tips."
+   ],
+   [
+    "A tip at the chair is the shop's own way too.",
+    "The studio takes no tips."
+   ],
+   [
+    "A tip goes the shop's own way.",
+    "The studio takes no tips."
+   ],
+   [
+    "Tue Oct 27 · 11:00am · Riley",
+    "Tue Oct 27 · 4:00pm · Riley"
+   ],
+   [
+    "Sun Oct 25 · 11:00am · Riley",
+    "Mon Oct 26 · 4:00pm · Riley"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds instrument repair to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW instrument repair"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Instrument repair for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work is licensed to one place, and may not go to a home."
+   ],
+   [
+    "plumbing's",
+    "music lessons'"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Piano, violin, voice and home lessons"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No lesson or tuning is ever sent now."
+   ],
+   [
+    "Plumbing MP045210",
+    "Background check on file"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Background check on file"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and home lessons"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: piano, violin and tuning"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: piano and guitar"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: piano, violin, voice, home lessons"
+   ],
+   [
+    "Avery: barber",
+    "Avery: piano and voice"
+   ],
+   [
+    "Each person hears they can be booked for their own work: Avery at the shop, Casey for plumbing.",
+    "Each person hears they can be booked for their own work: Avery at the studio, Casey for home lessons."
+   ],
+   [
+    "at the shop and for house calls",
+    "at the studio and for home lessons"
+   ],
+   [
+    "can book you for plumbing and electrical from now on",
+    "can book you for home lessons and piano tuning from now on"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your audition list"
+   ],
+   [
+    "priced from photos",
+    "priced from the audition list"
+   ],
+   [
+    "color quote",
+    "audition-prep quote"
+   ],
+   [
+    "Color and cut",
+    "Audition prep"
+   ],
+   [
+    "color and cut",
+    "audition prep"
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "It's a voice lesson today at 2:00pm with Avery, for a new customer. It's $40. Accept it?"
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery.",
+    "Reading it back: accept the voice lesson today at 2:00pm with Avery."
+   ],
+   [
+    "3 jobs",
+    "3 lessons"
+   ],
+   [
+    "Plumbing · within 25 miles of 1200 Main St",
+    "Music lessons at home · within 15 miles of 1200 Main St"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Another kind of work's example: a gas smell gets 'leave now, then call'."
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "House calls",
+    "Home lessons"
+   ],
+   [
+    "house call",
+    "home lesson"
+   ],
+   [
+    "House call",
+    "Home lesson"
+   ],
+   [
+    "Just this visit",
+    "Just this lesson"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una clase de piano el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday",
+    "I'd like a piano lesson on Saturday"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book my daughter a piano lesson at Lee's Barbershop on Saturday."
+   ],
+   [
+    "Sam, a barber or the desk can book for a customer by text or on the portal.",
+    "Sam, a teacher or the desk can book for a family by text or on the portal."
+   ],
+   [
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Sam set this line at sign-up: the number customers call for what only a teacher should answer."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A music studio's plug-in adds no danger words of its own."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A music studio has none, so nothing is sent here."
+   ],
+   [
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "Rosie is the studio's booking software. Its only outside links are the teachers' phone calendars and Stripe."
+   ],
+   [
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "That's a question for the teachers themselves. Riley can go over it at the lesson."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants Saturday morning, with Riley, for a daughter"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a lesson every week"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books two children back to back"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Lessons could mean music lessons or swim lessons."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Riley, so Riley's next times show. Violin always stays with Riley."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the studio share photos or video of lessons and recitals? Yes / No"
+   ],
+   [
+    "A barbershop has none.",
+    "A music studio has none."
+   ],
+   [
+    "A barbershop sells its packages only at the shop.",
+    "The studio sells its fall term and monthly plan here, on the page."
+   ],
+   [
+    "A barbershop's services need none.",
+    "A music studio's lessons need none."
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code to your teacher when you arrive."
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code to your teacher."
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel Lily's Sat 11:00am lesson with Riley? It's free."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can Lily's little brother wait in the studio during her lesson?"
+   ],
+   [
+    "Done. Your Sat 11:00am visit is now with Avery.",
+    "Done. Lily's Sat 11:00am lesson is now with Avery."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair.",
+    "It's 11:00am, and Alex brings Lily to the lesson room."
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex adds 15 more minutes"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A music stand fell and cracked Lily's metronome."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a music stand cracked Lily's metronome today."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Under 10, a parent stays in the building, so nothing more happens. A student 10 or older may be left."
+   ],
+   [
+    "Say the plug-in lets a child be left, for a class or a camp.",
+    "Say Lily's brother, 11, is left for a lesson, as the plug-in allows from age 10."
+   ],
+   [
+    "Riley finishes the work",
+    "Riley finishes the lesson"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A lesson is rated, so the studio takes the first branch."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was Lily's lesson with Riley?"
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next lesson at checkout"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Weekly lessons · every Saturday"
+   ],
+   [
+    "$35 a visit",
+    "$35 a lesson"
+   ],
+   [
+    "Skip, pause or end any time, by text",
+    "Skip with 24 hours' notice, pause or end any time, by text"
+   ],
+   [
+    "paid at the chair",
+    "paid at the front desk"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the front desk"
+   ],
+   [
+    "pays at the chair",
+    "pays at the front desk"
+   ],
+   [
+    "Move my visit",
+    "Move my lesson"
+   ],
+   [
+    "Your visit",
+    "Your lesson"
+   ],
+   [
+    "your visit",
+    "your lesson"
+   ],
+   [
+    "this visit",
+    "this lesson"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Music Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Music Studio"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Music Lessons"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Music Lessons"
+   ],
+   [
+    "Lee Electric",
+    "Lee Piano Tuning"
+   ],
+   [
+    "Riley Chen",
+    "Elena Ruiz"
+   ],
+   [
+    "Riley",
+    "Elena"
+   ],
+   [
+    "Avery Diaz",
+    "Marcus Hill"
+   ],
+   [
+    "Avery",
+    "Marcus"
+   ],
+   [
+    "Jordan Price",
+    "Daniel Novak"
+   ],
+   [
+    "Jordan",
+    "Daniel"
+   ],
+   [
+    "Casey Moore",
+    "Felix Ward"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "88 Elm St",
+    "250 Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "15 Harbor Rd"
+   ],
+   [
+    "Elm St",
+    "Cedar Ave"
+   ],
+   [
+    "Oak St",
+    "Aspen Ct"
+   ],
+   [
+    "Electrical",
+    "Piano tuning"
+   ],
+   [
+    "electrical",
+    "piano tuning"
+   ],
+   [
+    "Plumbing",
+    "Music lessons"
+   ],
+   [
+    "plumbing",
+    "music lessons"
+   ],
+   [
+    "plumber",
+    "teacher"
+   ],
+   [
+    "Plumber",
+    "Teacher"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Trial lesson"
+   ],
+   [
+    "Signature cut and shave",
+    "Trial lesson"
+   ],
+   [
+    "Signature cut",
+    "Trial lesson"
+   ],
+   [
+    "signature cut",
+    "trial lesson"
+   ],
+   [
+    "hot towel shave",
+    "trial lesson"
+   ],
+   [
+    "Groom's package",
+    "Monthly plan"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Piano, violin and guitar lessons"
+   ],
+   [
+    "Skin fade",
+    "Voice lesson"
+   ],
+   [
+    "skin fade",
+    "voice lesson"
+   ],
+   [
+    "a beard trim",
+    "15 more minutes"
+   ],
+   [
+    "Beard trim",
+    "Extra 15 minutes"
+   ],
+   [
+    "beard trim",
+    "extra 15 minutes"
+   ],
+   [
+    "kids cut",
+    "child's lesson"
+   ],
+   [
+    "Kids cut",
+    "Child's lesson"
+   ],
+   [
+    "Haircuts",
+    "Piano lessons"
+   ],
+   [
+    "haircuts",
+    "piano lessons"
+   ],
+   [
+    "Haircut",
+    "Piano lesson"
+   ],
+   [
+    "haircut",
+    "piano lesson"
+   ],
+   [
+    "barbershops",
+    "music studios"
+   ],
+   [
+    "Barbershop",
+    "Music studio"
+   ],
+   [
+    "barbershop",
+    "music studio"
+   ],
+   [
+    "Barbers",
+    "Teachers"
+   ],
+   [
+    "barbers",
+    "teachers"
+   ],
+   [
+    "Barber",
+    "Teacher"
+   ],
+   [
+    "barber",
+    "teacher"
+   ],
+   [
+    "Barbering",
+    "Music teaching"
+   ],
+   [
+    "at the chair",
+    "at the lesson"
+   ],
+   [
+    "At the chair",
+    "At the lesson"
+   ],
+   [
+    "$55",
+    "$25"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "A trim",
+    "A lesson"
+   ],
+   [
+    "a trim",
+    "a lesson"
+   ]
+  ],
+  "B": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Piano, voice and violin lessons."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Lessons at home and piano tuning, within 15 miles."
+   ],
+   [
+    "A water heater job",
+    "A piano tuning"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "It's for my son Noah. I'm the parent."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A lesson needs nothing first, so the first open times are this week."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about piano lessons at home. A text back is fine."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lesson could mean a music teacher or a tutor."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My son wants to learn piano' fits a lesson at home."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a lesson in a neighbor's home."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a piano tuning? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Music Lessons asks: is it at your home? And which instrument, and 30 or 45 minutes?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Piano, 45 minutes."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some bookings take more than one visit, like weekly lessons."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every week, too?"
+   ],
+   [
+    "A job quoted at the visit promises only the service call now.",
+    "A job quoted at the visit promises only the late-cancel fee now."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like the piano tuning."
+   ],
+   [
+    "Lee Home Services can start the sewer camera inspection at a set time.",
+    "Lee Music Lessons can start the piano tuning at a set time."
+   ],
+   [
+    "Lee Home Services · Sewer camera inspection:",
+    "Lee Music Lessons · Piano tuning:"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 term is over the plug-in's amount, so it gets its terms to sign."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, an upright piano"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 lesson needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the piano clear and the music book ready."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can Noah's sister listen in?"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks Jordan for 15 more minutes."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 20 15 more minutes"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: 15 more minutes, $20."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "15 more minutes · $20"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $20 price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to 15 more minutes for $20."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan scratches the piano bench and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the piano bench"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched piano bench"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a lesson at home, today,"
+   ],
+   [
+    "accept the leak repair for today",
+    "accept the lesson at home for today"
+   ],
+   [
+    "Accepted: the leak repair today",
+    "Accepted: the lesson at home today"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on the piano bench this morning."
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9.",
+    "you have two lessons at home on Mon Nov 9."
+   ],
+   [
+    "water heater replacement",
+    "recital prep at home"
+   ],
+   [
+    "up to the $89 service call",
+    "up to the $89 late-cancel fee"
+   ],
+   [
+    "Charge or keep the service call fee?",
+    "Charge the late-cancel fee?"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "The service call is $89.",
+    "The late-cancel fee is $89."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Practice notes come next."
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Mon–Fri 3:00–8:00pm"
+   ],
+   [
+    "I'm running about 30 minutes late for my 1 o'clock.",
+    "I'm running about 30 minutes late for my 4:30."
+   ],
+   [
+    "Nora can ask to be next for that window. If Ivy's saved time runs out, it's saved for Nora at once.",
+    "Nora can ask to be next for that time. If Ivy's saved time runs out, it's saved for Nora at once."
+   ],
+   [
+    "Water heater replacement · $640",
+    "Summer lessons, 8 at home · $640"
+   ],
+   [
+    "Water heater replacement",
+    "Recital prep at home"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds instrument repair to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW instrument repair"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Instrument repair for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work is licensed to one place, and may not go to a home."
+   ],
+   [
+    "plumbing's",
+    "music lessons'"
+   ],
+   [
+    "license MP045210",
+    "registration 2019-0451"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Every plumbing job, and electrical",
+    "Every home lesson, and piano tuning"
+   ],
+   [
+    "Every plumbing job",
+    "Every home lesson"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "No lesson or tuning is ever sent now."
+   ],
+   [
+    "Plumbing MP045210",
+    "Background check on file"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Background check on file"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and home lessons"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: piano, violin and tuning"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: piano and guitar"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: piano, violin, voice, home lessons"
+   ],
+   [
+    "Avery: barber",
+    "Avery: piano and voice"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the studio and for home lessons"
+   ],
+   [
+    "can book you for plumbing and electrical from now on",
+    "can book you for home lessons and piano tuning from now on"
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your audition list"
+   ],
+   [
+    "priced from photos",
+    "priced from the audition list"
+   ],
+   [
+    "3 jobs",
+    "3 lessons"
+   ],
+   [
+    "Plumbing · within 25 miles of 1200 Main St",
+    "Music lessons at home · within 15 miles of 1200 Main St"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Another kind of work's example: a gas smell gets 'leave now, then call'."
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "House calls",
+    "Home lessons"
+   ],
+   [
+    "house call",
+    "home lesson"
+   ],
+   [
+    "House call",
+    "Home lesson"
+   ],
+   [
+    "Just this visit",
+    "Just this lesson"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My son wants piano lessons at home. Can a teacher come Thursday at 8am, before school? We're in Springfield."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero clases de piano para mi hija."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "I'd like piano lessons for my daughter."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a teacher give my daughter a piano lesson at home this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa guitar Thu 5:30pm Casey"
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Guitar lesson at home"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My son hurt a wrist. Is it OK to play?"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A home lesson happens only at the student's home, so nothing is asked."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can teach a 30-minute piano lesson at the studio for $35, or at your home for $55."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A lesson at the studio is in the other flow."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like drum lessons."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services teaches piano, violin and guitar, and tunes pianos. It doesn't teach drums. Nothing was saved. You can look for a drum teacher near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the instrument, the length, the level, and if there's a piano at home."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a student hurt or very unwell, and words that a child may be unsafe."
+   ],
+   [
+    "Lee Home Services goes 25 miles from 1200 Main St.",
+    "Lee Home Services goes 15 miles from 1200 Main St."
+   ],
+   [
+    "It's outside the 25 miles it covers, so nothing was saved.",
+    "It's outside the 15 miles it covers, so nothing was saved."
+   ],
+   [
+    "inside Sam's 25 miles",
+    "inside Sam's 15 miles"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Piano, 45 minutes. We have a piano."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Can a teacher come tonight?"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a lesson every Thursday."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can my son have a lesson every Thursday?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Home Services has weekly lessons, $75 a lesson. Each lesson is booked and paid like a single one. Want it every Thursday?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every week"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex's daughter wants a lesson too, right after Noah's. Both go in one booking, back to back, with one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also teach my daughter, right after?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. Jordan is free right after. The 30-minute lesson is $55, in the same booking."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Anything Jordan should know?"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Weekly piano lessons at home"
+   ],
+   [
+    "Every 12 months",
+    "Every Thursday, 4:00pm"
+   ],
+   [
+    "Each visit is booked and paid like this one",
+    "Each lesson is booked and paid like this one"
+   ],
+   [
+    "Each visit, like a single booking",
+    "After each lesson, like a single booking"
+   ],
+   [
+    "Skip, pause or end any time, by text",
+    "Skip with 24 hours' notice, pause or end any time, by text"
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Only Jordan teaches violin, so a violin lesson shows only Jordan's times."
+   ],
+   [
+    "The customer's language shows too, so Sam can send someone who speaks it.",
+    "The student's first name shows too. Any private notes are on the secure page."
+   ],
+   [
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Jordan can start 30 minutes later if the next lesson allows, or you can pick another time."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can my son's lesson be an hour on Thursday?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra 15 minutes · $20"
+   ],
+   [
+    "Sewer camera inspection",
+    "Piano tuning"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has weekly lessons at home for her two children, every Tuesday."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next Tuesday's lessons?"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Ella's lesson · Tue Oct 27 · $75"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Jack's lesson · Tue Oct 27 · $75"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE middle C key sticks, and a scratch on the lid"
+   ],
+   [
+    "Under the sink, before",
+    "The piano, before"
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "No lesson is priced at the visit."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 75 lesson"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE Noah: C major scale, both hands. New piece, bars 1 to 8. 20 minutes a day."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The lesson started 15 minutes late."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan teach my daughter too, next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a 30-minute lesson."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: same time next Thursday"
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Jordan has Thu Oct 29 at 4:00pm open for your son, the same as today. Book it?"
+   ],
+   [
+    "water heater quote",
+    "summer lessons quote"
+   ],
+   [
+    "BLOCK Thu 12-5",
+    "BLOCK Thu 4-7"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise the 45-minute lesson to 80"
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the 45-minute home lesson to $80 for lessons from Mon Nov 2."
+   ],
+   [
+    "Morgan P.'s refund for the cancelled extra work was due yesterday.",
+    "Morgan P.'s refund for the unused lessons was due yesterday."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "Ivy's AI asks for a piano lesson at home at $70, an old price. Rosie answers with the real price, $75."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A piano lesson at home with Lee Home Services is $75, not $70. Here are the open times at $75."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Piano lesson at home"
+   ],
+   [
+    "Drain clearings",
+    "Piano lessons at home"
+   ],
+   [
+    "Drain clearing",
+    "Piano lesson at home"
+   ],
+   [
+    "drain clearing",
+    "piano lesson at home"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 3:35pm"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 4:00pm"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 4:45pm"
+   ],
+   [
+    "Fri 8am",
+    "Fri 4pm"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Music lessons start at a set time."
+   ],
+   [
+    "Your Lee Home Services visit",
+    "Your lesson with Lee Home Services"
+   ],
+   [
+    "can't make your visit tomorrow",
+    "can't make your son's lesson tomorrow"
+   ],
+   [
+    "MOVE Alex to Thu 12pm",
+    "MOVE Alex to Thu 5:30pm"
+   ],
+   [
+    "Only a teen is home at Alex M.'s",
+    "Only Noah is home at Alex M.'s"
+   ],
+   [
+    "Cabinet floor, before",
+    "The lid, before"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the piano lid"
+   ],
+   [
+    "Cracked cabinet floor",
+    "New scratch on the lid"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan's music stand scratched the piano lid at Alex M.'s. The before photo shows only one old scratch."
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Jordan and Alex go over the lesson"
+   ],
+   [
+    "The work is done. Jordan texts DONE",
+    "The lesson is done. Jordan texts DONE"
+   ],
+   [
+    "for today's work",
+    "for today's lesson"
+   ],
+   [
+    "How was your visit with Jordan?",
+    "How was your son's lesson with Jordan?"
+   ],
+   [
+    "Rate your visit",
+    "Rate the lesson"
+   ],
+   [
+    "May Lee Home Services show photos of the work?",
+    "May Lee Home Services share photos or video of lessons and recitals?"
+   ],
+   [
+    "May Lee Home Services show photos of this job?",
+    "May Lee Home Services share photos or video of lessons?"
+   ],
+   [
+    "Thursday morning",
+    "Thursday afternoon"
+   ],
+   [
+    "Wed morning",
+    "Wed afternoon"
+   ],
+   [
+    "arriving 8–10am",
+    "starts 4:00pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts 5:30pm"
+   ],
+   [
+    "8–10am",
+    "4:00pm"
+   ],
+   [
+    "8–10",
+    "4:00"
+   ],
+   [
+    "7am Thu",
+    "4pm Wed"
+   ],
+   [
+    "Water heater flush",
+    "Trial lesson at home"
+   ],
+   [
+    "water heater flush",
+    "trial lesson at home"
+   ],
+   [
+    "Kitchen drain",
+    "Piano lesson"
+   ],
+   [
+    "Yard drain",
+    "Guitar lesson"
+   ],
+   [
+    "after the job",
+    "after the lesson"
+   ],
+   [
+    "plumbing visit",
+    "music lesson"
+   ],
+   [
+    "an $89",
+    "a $40"
+   ],
+   [
+    "$179",
+    "$75"
+   ],
+   [
+    "$89",
+    "$40"
+   ],
+   [
+    "$150",
+    "$45"
+   ],
+   [
+    "Move my visit",
+    "Move my lesson"
+   ],
+   [
+    "Your visit",
+    "Your lesson"
+   ],
+   [
+    "your visit",
+    "your lesson"
+   ],
+   [
+    "this visit",
+    "this lesson"
+   ],
+   [
+    "the missed visit",
+    "the missed lesson"
+   ],
+   [
+    "today's work",
+    "today's lesson"
+   ],
+   [
+    "Thu Oct 22 visit",
+    "Thu Oct 22 lesson"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Music Studio"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Music Lessons LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Music Lessons"
+   ],
+   [
+    "leehomeservices.com",
+    "leemusiclessons.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Music Lessons"
+   ],
+   [
+    "Lee Electric",
+    "Lee Piano Tuning"
+   ],
+   [
+    "Riley Chen",
+    "Elena Ruiz"
+   ],
+   [
+    "Riley",
+    "Elena"
+   ],
+   [
+    "Avery Diaz",
+    "Marcus Hill"
+   ],
+   [
+    "Avery",
+    "Marcus"
+   ],
+   [
+    "Jordan Price",
+    "Daniel Novak"
+   ],
+   [
+    "Jordan",
+    "Daniel"
+   ],
+   [
+    "Casey Moore",
+    "Felix Ward"
+   ],
+   [
+    "Casey",
+    "Felix"
+   ],
+   [
+    "88 Elm St",
+    "250 Cedar Ave"
+   ],
+   [
+    "1200 Main St",
+    "15 Harbor Rd"
+   ],
+   [
+    "42 Oak St",
+    "9 Aspen Ct"
+   ],
+   [
+    "Elm St",
+    "Cedar Ave"
+   ],
+   [
+    "Oak St",
+    "Aspen Ct"
+   ],
+   [
+    "electrical work",
+    "piano tuning"
+   ],
+   [
+    "Electrical",
+    "Piano tuning"
+   ],
+   [
+    "electrical",
+    "piano tuning"
+   ],
+   [
+    "Plumbing",
+    "Music lessons"
+   ],
+   [
+    "plumbing",
+    "music lessons"
+   ],
+   [
+    "plumber",
+    "teacher"
+   ],
+   [
+    "Plumber",
+    "Teacher"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Trial lesson"
+   ],
+   [
+    "Signature cut",
+    "Trial lesson"
+   ],
+   [
+    "hot towel shave",
+    "trial lesson"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Piano, violin and guitar lessons"
+   ],
+   [
+    "Beard trim",
+    "Extra 15 minutes"
+   ],
+   [
+    "beard trim",
+    "extra 15 minutes"
+   ],
+   [
+    "Haircut",
+    "Piano lesson"
+   ],
+   [
+    "haircut",
+    "piano lesson"
+   ],
+   [
+    "barbershops",
+    "music studios"
+   ],
+   [
+    "Barbershop",
+    "Music studio"
+   ],
+   [
+    "barbershop",
+    "music studio"
+   ],
+   [
+    "Barbers",
+    "Teachers"
+   ],
+   [
+    "barbers",
+    "teachers"
+   ],
+   [
+    "Barber",
+    "Teacher"
+   ],
+   [
+    "barber",
+    "teacher"
+   ],
+   [
+    "at the chair",
+    "at the lesson"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "25 miles",
+    "15 miles"
+   ],
+   [
+    "25-mile",
+    "15-mile"
+   ]
+  ]
+ },
+ "money": {
+  "A": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $35 30-minute piano lesson for Lily with Elena. A card is saved for the studio's $20 late-cancel and no-show fee, and charged $35 when Elena texts DONE.",
+    "list|full|none": "A $25 trial violin lesson with Elena, 30 minutes, paid in full when booking. A late cancel or a no-show: the $25 may be kept, with Sam's OK.",
+    "list|card|counter": "A $35 piano lesson on a day with someone at the front desk. A card is saved for the $20 fee, and Alex pays at the desk after the lesson."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Piano lesson, 30 min"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Piano lesson, 30 min"
+    },
+    "list|full|*": {
+     "price": "$25",
+     "paid": "$25",
+     "fee": "$25",
+     "name": "Trial lesson"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra 15 minutes",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Trial lesson",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$25",
+      "paid": "$25",
+      "fee": "$25"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Piano lesson (fall term)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|card|card": "The main story: a $75 45-minute piano lesson at home for Noah with Daniel. A card is saved for the $40 late-cancel and no-show fee, and charged $75 when Daniel texts DONE.",
+    "list|full|none": "A $45 trial lesson at home, 30 minutes, paid in full when booking. A late cancel or nobody home: the $45 may be kept, with Sam's OK."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Piano lesson at home, 45 min"
+    },
+    "list|*|*": {
+     "price": "$75",
+     "name": "Piano lesson at home, 45 min"
+    },
+    "list|full|*": {
+     "price": "$45",
+     "paid": "$45",
+     "fee": "$45",
+     "name": "Trial lesson at home"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Piano tuning",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$150",
+      "fee": "$40"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Trial lesson at home",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$45",
+      "paid": "$45",
+      "fee": "$45"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Piano lesson at home (weekly plan)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Private music lessons and piano tuning need no state license; the business gives its registration."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Music lessons pay Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The music plug-in adds no agreement to sign."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Lessons book a teacher; a lesson room is saved with the teacher."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The example studio teaches private lessons only."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Teachers hold no state license; any background check is the plug-in's own step."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Lessons are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "A3-22",
+    "label": "Safety steps, then go on",
+    "why": "Music lessons have no safety steps to send first."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Private lessons book a teacher's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Private lessons book a teacher's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Private lessons book a teacher's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The studio's terms are ticked with the booking; no form."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A forgotten instrument or book never stops a lesson."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked after a lesson."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "Private lessons; siblings book back to back (several services)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for lessons."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "Lessons need no signed contract."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "Nothing gets worse before a lesson."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "Private lessons have no roster."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "Nothing like it stops a lesson."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A lesson is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for lessons."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Lessons have no contract."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The next lessons are booked at checkout."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "A lesson has nothing to fix."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing is sent later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "more",
+    "at": "S2-29",
+    "more": [
+     "Here, Sam states each teacher's background check for students under 18: who ran it, what it covered, the date.",
+     "Rosie repeats only what Sam stated, never just 'background checked'."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-24",
+    "more": [
+     "Here, the lesson is for Alex's daughter, so it's the child branch."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "Under 10, a parent stays in the building, as the secure page and the reminder say."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A7-02",
+    "branch": {
+     "label": "A missed lesson gets a make-up",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A7-x01",
+       "line": [
+        "7.15",
+        "7.3"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Fri Oct 30, 9:00am",
+       "title": "Offers a make-up for a skipped lesson",
+       "type": "split",
+       "q": "Does June pick a make-up time?",
+       "does": "Say June P. has the fall term, and skips Sat Oct 31 with 24 hours' notice. The lesson was paid ahead, so it becomes a make-up within 30 days.",
+       "more": [
+        "A make-up comes from a lesson missed with 24 hours' notice, a teacher out, or the studio closed.",
+        "A late cancel or a no-show gets no make-up, unless Sam offers one.",
+        "A make-up is with the same teacher, or another who teaches that instrument.",
+        "It's part of the same booking, so Rosfield's $2 isn't counted again.",
+        "A family who pays lesson by lesson just isn't charged for a skip. No make-up is needed."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "Can we skip Saturday? June is away.",
+         {
+          "as": "June"
+         }
+        ],
+        [
+         "san",
+         "cust",
+         "Done: Sat Oct 31 is skipped, with no charge. It's paid in your fall term, so pick a make-up with Elena:",
+         {
+          "as": "June",
+          "times": [
+           "Tue Nov 3 · 4:00pm · Elena",
+           "Sat Nov 7 · 12:30pm · Elena"
+          ]
+         }
+        ]
+       ],
+       "branches": [
+        {
+         "label": "A or B: a make-up time",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "A7-x02",
+           "line": [
+            "7.15",
+            "6.3"
+           ],
+           "who": "san",
+           "to": "cust",
+           "via": "msg",
+           "title": "Books the make-up; tells Elena",
+           "does": "June's family picks A. Rosie books the make-up like any lesson, with its own code, and Elena is told.",
+           "more": [
+            "The make-up keeps the term's terms. Nothing is charged.",
+            "A make-up missed late is used up, as the terms say."
+           ],
+           "say": [
+            [
+             "cust",
+             "san",
+             "A",
+             {
+              "as": "June"
+             }
+            ],
+            [
+             "san",
+             "cust",
+             "Booked: June's make-up lesson. Give this code to Elena when you arrive.",
+             {
+              "as": "June",
+              "card": {
+               "title": "Lee Music Studio · make-up",
+               "lines": [
+                "Tue Nov 3 · 4:00pm · Elena",
+                "Paid in the fall term"
+               ]
+              },
+              "code": "7715"
+             }
+            ],
+            [
+             "san",
+             "staff",
+             "Make-up added: June P., Tue Nov 3 at 4:00pm, for the skipped Sat Oct 31."
+            ]
+           ]
+          }
+         ]
+        },
+        {
+         "label": "No pick in 30 days",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "A7-x03",
+           "line": [
+            "7.15",
+            "11.4"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "t": "Mon Nov 30, 9:00am",
+           "title": "Asks Sam: refund it, or more time?",
+           "type": "split",
+           "q": "What does Sam pick?",
+           "does": "June's family didn't pick a make-up in 30 days. Sam picks: refund the lesson, or 30 more days. A paid lesson is never just lost.",
+           "more": [
+            "Silence never costs the family. No answer in 24 hours: the lesson is refunded.",
+            "Where the state's rules set how long a prepaid lesson stays good, that wins."
+           ],
+           "say": [
+            [
+             "san",
+             "owner",
+             "June P. hasn't used a make-up for the Sat Oct 31 lesson. It was paid in the fall term.",
+             {
+              "card": {
+               "title": "Make-up not used",
+               "lines": [
+                "$35 lesson · fall term",
+                "Skipped with notice"
+               ]
+              },
+              "buttons": [
+               "Refund the lesson",
+               "30 more days"
+              ]
+             }
+            ]
+           ],
+           "branches": [
+            {
+             "label": "1 Refund the lesson",
+             "end": "end",
+             "endText": "The $35 lesson goes back to June's family. No fee."
+            },
+            {
+             "label": "2 30 more days",
+             "end": "merge"
+            },
+            {
+             "label": "No reply in 24 hours",
+             "end": "end",
+             "endText": "The $35 lesson is refunded, since silence never costs the family."
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "A10-06",
+    "branch": {
+     "label": "The studio's recital",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A10-x01",
+       "line": [
+        "11.10",
+        "4.21"
+       ],
+       "who": "owner",
+       "to": "san",
+       "via": "portal",
+       "t": "Mon Nov 2, 10:00am",
+       "title": "Sam sets the winter recital on the portal",
+       "does": "Sam sets the studio's winter recital: Sat Dec 12 at 2:00pm, at the studio. Each student plays one piece, and the recital fee is $25 a performer.",
+       "more": [
+        "The date can't move once families sign up.",
+        "Sam can set no fee. Guests come free.",
+        "Sam picks who's invited: here, every student with a lesson since September.",
+        "Rosie reads it back before any family is texted."
+       ],
+       "form": [
+        [
+         "Recital",
+         "Winter recital"
+        ],
+        [
+         "When",
+         "Sat Dec 12 · 2:00pm · call time 1:30pm"
+        ],
+        [
+         "Where",
+         "Lee Music Studio, 250 Cedar Ave"
+        ],
+        [
+         "Fee",
+         "$25 a performer"
+        ],
+        [
+         "Sign up by",
+         "Mon Nov 30"
+        ]
+       ]
+      },
+      {
+       "id": "A10-x02",
+       "line": [
+        "4.21",
+        "4.11",
+        "5.5"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Mon Nov 2, 10:30am",
+       "title": "Invites each student's family",
+       "type": "split",
+       "q": "Does Alex sign Lily up by Nov 30?",
+       "does": "Each student's family gets one invite with a link. Sign-up, the fee and the parent's yes to photos are all on the secure page.",
+       "more": [
+        "It goes only to families who said yes to studio news on the secure page. Others hear about it at the lesson.",
+        "The page asks the first name to print in the program, only with the parent's yes.",
+        "Photos or video of a child at the recital only with the parent's yes, on the page.",
+        "The fee is paid on the page, into the studio's own Stripe.",
+        "One reminder on Wed Nov 25 if there's no answer. Then nothing more is sent."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Lee Music Studio's winter recital is Sat Dec 12 at 2:00pm. Lily can play one piece.",
+         {
+          "card": {
+           "title": "Winter recital · Sat Dec 12",
+           "lines": [
+            "2:00pm at the studio · arrive 1:30pm",
+            "$25 recital fee · guests free",
+            "Sign up by Mon Nov 30"
+           ],
+           "button": "Sign up",
+           "link": "rosfield.com/rc/l1"
+          }
+         }
+        ]
+       ],
+       "form": [
+        [
+         "Performer (private)",
+         "First name"
+        ],
+        [
+         "Print the first name in the program",
+         "Yes / No"
+        ],
+        [
+         "Photos or video of my child",
+         "Yes / No"
+        ],
+        [
+         "Recital fee",
+         "$25"
+        ]
+       ],
+       "branches": [
+        {
+         "label": "Signs up and pays $25",
+         "end": "merge"
+        },
+        {
+         "label": "Not this time",
+         "end": "end",
+         "endText": "No spot and nothing charged. Lily's lessons go on as booked."
+        },
+        {
+         "label": "No answer by Nov 30",
+         "end": "end",
+         "endText": "One reminder went out. No spot is saved, and nothing is charged."
+        }
+       ]
+      },
+      {
+       "id": "A10-x03",
+       "line": [
+        "7.1"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Thu Dec 10, 10:00am",
+       "title": "Sends the order and the call time",
+       "does": "Two days before, Alex gets the program order and the call time, with a check-in code for the door.",
+       "more": [
+        "A change of mind before the day: Sam decides about the fee. No answer in 24 hours: it's refunded.",
+        "If the studio calls the recital off, every fee comes back in full.",
+        "If Elena is out that day, Sam names a stand-in to accompany. The date never moves."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Lily plays 4th at Saturday's recital. Please arrive by 1:30pm, with her music.",
+         {
+          "card": {
+           "title": "Winter recital · Sat Dec 12",
+           "lines": [
+            "2:00pm · Lee Music Studio",
+            "Lily plays 4th",
+            "Under 10: a parent stays for the recital"
+           ]
+          },
+          "code": "6203"
+         }
+        ]
+       ]
+      },
+      {
+       "id": "A10-x04",
+       "line": [
+        "8.3",
+        "8.23"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "visit",
+       "t": "Sat Dec 12, 1:35pm",
+       "title": "Checks performers in at the door",
+       "does": "Elena checks each performer in with the code, on the door list. Lily plays, and after the recital Lily goes home with Alex.",
+       "more": [
+        "A child goes home only with the parent, or an adult on the pick-up list.",
+        "The check-in counts the recital spot for Rosfield's $2, once.",
+        "A no-show keeps the fee only if Sam says so."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "6203"
+        ],
+        [
+         "san",
+         "staff",
+         "Checked in: Lily, plays 4th."
+        ]
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "A7-14",
+    "more": [
+     "A teacher running late still gives the full lesson."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-17",
+    "more": [
+     "A stand-in gets the notes from Lily's last lesson."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-23",
+    "more": [
+     "A lesson from a term or a monthly plan becomes a make-up, or is refunded. Never a fee."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most music studios set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every lesson, to start",
+        "lines": [
+         "At your studio, a card saved, for a $20 fee you OK",
+         "After each lesson: the saved card is charged"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Piano lesson, 30 min",
+          "$35"
+         ],
+         [
+          "Piano lesson, 45 min",
+          "$55"
+         ],
+         [
+          "Voice lesson, 30 min",
+          "$40"
+         ],
+         [
+          "Violin lesson, 30 min",
+          "$40"
+         ],
+         [
+          "Trial lesson",
+          "$25"
+         ],
+         [
+          "Audition prep, 60 min",
+          "$70"
+         ],
+         [
+          "Monthly plan, 4 lessons",
+          "$140 a month"
+         ],
+         [
+          "Fall term, 12 lessons",
+          "$420"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "E paid in full when they book. G and H paid on the page"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Here's what changed. The rest stays as on the card.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Trial lesson",
+          "$25",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "Monthly plan",
+          "$140 a month",
+          "Its own yes, paid on the page",
+          "Nothing more a lesson"
+         ],
+         [
+          "Fall term",
+          "$420",
+          "Paid on the page",
+          "Nothing more a lesson"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:card": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:full": {
+      "addSay": []
+     },
+     "after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Days with someone at the front desk: paid at the desk"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. On front-desk days, any lesson is paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Private music lessons and piano tuning need no state license; the business gives its registration."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Music lessons pay Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The music plug-in adds no agreement to sign."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Lessons book a teacher; a lesson room is saved with the teacher."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The example studio teaches private lessons only."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Teachers hold no state license; any background check is the plug-in's own step."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Lessons are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A lesson starts at a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A lesson starts at a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A lesson starts at a set time."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "Lessons need no signed contract."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Lessons are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Lessons are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "An adult stays home for a child's lesson."
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "label": "Safety steps, then go on",
+    "why": "Music lessons have no safety steps to send first."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Lessons are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Lessons are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "Siblings book back to back (several services)."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or insurance pays for lessons."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "The lesson's terms are ticked with the booking; no form."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "Nothing gets worse before a lesson."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "An adult is always home for a lesson."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "An adult is always home for a lesson."
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "label": "Something required is missing",
+    "why": "A home lesson needs nothing brought; the teacher brings what's needed."
+   },
+   {
+    "op": "off",
+    "at": "B8-97",
+    "label": "A finding stops the work",
+    "why": "A home that isn't safe is the teacher-feels-unsafe branch."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "The parent is home for the lesson."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A lesson is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A lesson has no warranty."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing is sent later; practice notes go the same day."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "The next lessons are booked at checkout."
+   },
+   {
+    "op": "more",
+    "at": "S2-29",
+    "more": [
+     "Here, Sam states each teacher's background check for students under 18: who ran it, what it covered, the date.",
+     "Rosie repeats only what Sam stated, never just 'background checked'."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-03",
+    "label": "Yes: one pay link",
+    "why": "No extra work is sold at a home lesson."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at a home lesson."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at a home lesson."
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "A missed lesson gets a make-up",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.8",
+        "7.15"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Wed Oct 21, 2:30pm",
+       "title": "Offers a make-up after a teacher is out",
+       "type": "split",
+       "q": "Does Morgan pick a make-up time?",
+       "does": "Say Daniel is out next Tuesday, and Morgan's children have weekly lessons with Daniel. A lesson the business misses is never lost: a make-up, or no charge.",
+       "more": [
+        "Weekly lessons charged after each lesson: a missed one is just not charged.",
+        "A lesson paid ahead becomes a make-up within 30 days, or is refunded.",
+        "A make-up is with the same teacher, or another who teaches that instrument.",
+        "It's part of the same plan, so Rosfield's $2 isn't counted again.",
+        "A family's late cancel or no-show gets no make-up, unless Sam offers one."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Daniel is out Tue Oct 27, so Ella's and Jack's lessons that day won't happen. Nothing is charged for them. Pick make-ups with Daniel:",
+         {
+          "as": "Morgan",
+          "times": [
+           "Thu Oct 29 · starts 5:00pm · Daniel",
+           "Sat Oct 31 · starts 10:00am · Daniel"
+          ]
+         }
+        ]
+       ],
+       "branches": [
+        {
+         "label": "A or B: a make-up time",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x02",
+           "line": [
+            "7.15",
+            "6.3"
+           ],
+           "who": "san",
+           "to": "cust",
+           "via": "msg",
+           "title": "Books the make-ups; tells Daniel",
+           "does": "Morgan picks A. Rosie books both make-ups back to back, each with its own code, and Daniel is told.",
+           "more": [
+            "Each make-up is charged after it, like any weekly lesson.",
+            "A make-up missed late follows the usual late-cancel rules."
+           ],
+           "say": [
+            [
+             "cust",
+             "san",
+             "A",
+             {
+              "as": "Morgan"
+             }
+            ],
+            [
+             "san",
+             "cust",
+             "Booked: Ella's and Jack's make-ups, Thu Oct 29 from 5:00pm, with Daniel.",
+             {
+              "as": "Morgan",
+              "card": {
+               "title": "Lee Music Lessons · make-ups",
+               "lines": [
+                "Thu Oct 29 · starts 5:00pm · Daniel",
+                "Ella, then Jack, back to back"
+               ]
+              },
+              "code": "8442"
+             }
+            ],
+            [
+             "san",
+             "staff",
+             "Make-ups added: Morgan's children, Thu Oct 29 from 5:00pm."
+            ]
+           ]
+          }
+         ]
+        },
+        {
+         "label": "No pick in 30 days",
+         "end": "end",
+         "endText": "No make-up is booked. Nothing was charged for the missed lessons, and Sam is told."
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B10-07",
+    "branch": {
+     "label": "The recital",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B10-x01",
+       "line": [
+        "11.10",
+        "4.21"
+       ],
+       "who": "owner",
+       "to": "san",
+       "via": "portal",
+       "t": "Mon Nov 2, 10:00am",
+       "title": "Sam sets the winter recital at a hall",
+       "does": "Sam sets a winter recital for every student: Sun Dec 13 at 3:00pm, at Harbor Community Hall. The fee is $25 a performer.",
+       "more": [
+        "The date can't move once families sign up.",
+        "The hall is the host's place. Sam has its OK on file.",
+        "Guests come free. Sam can set no fee.",
+        "Rosie reads it back before any family is texted."
+       ],
+       "form": [
+        [
+         "Recital",
+         "Winter recital"
+        ],
+        [
+         "When",
+         "Sun Dec 13 · 3:00pm · call time 2:30pm"
+        ],
+        [
+         "Where",
+         "Harbor Community Hall"
+        ],
+        [
+         "Fee",
+         "$25 a performer"
+        ],
+        [
+         "Sign up by",
+         "Mon Nov 30"
+        ]
+       ]
+      },
+      {
+       "id": "B10-x02",
+       "line": [
+        "4.21",
+        "4.11",
+        "5.5"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Mon Nov 2, 10:30am",
+       "title": "Invites each student's family",
+       "type": "split",
+       "q": "Does Alex sign Noah up by Nov 30?",
+       "does": "Each family gets one invite with a link. The sign-up, the fee and the parent's yes to photos are all on the secure page.",
+       "more": [
+        "It goes only to families who said yes to news by text on the secure page. Others hear about it at a lesson.",
+        "The first name to print in the program, only with the parent's yes.",
+        "Photos or video of a child only with the parent's yes, on the page.",
+        "The fee is paid on the page, into the business's own Stripe.",
+        "One reminder on Wed Nov 25 if there's no answer. Then nothing more is sent."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Lee Music Lessons' winter recital is Sun Dec 13 at 3:00pm. Noah can play one piece.",
+         {
+          "card": {
+           "title": "Winter recital · Sun Dec 13",
+           "lines": [
+            "3:00pm at Harbor Community Hall · arrive 2:30pm",
+            "$25 recital fee · guests free",
+            "Sign up by Mon Nov 30"
+           ],
+           "button": "Sign up",
+           "link": "rosfield.com/rc/n1"
+          }
+         }
+        ]
+       ],
+       "form": [
+        [
+         "Performer (private)",
+         "First name"
+        ],
+        [
+         "Print the first name in the program",
+         "Yes / No"
+        ],
+        [
+         "Photos or video of my child",
+         "Yes / No"
+        ],
+        [
+         "Recital fee",
+         "$25"
+        ]
+       ],
+       "branches": [
+        {
+         "label": "Signs up and pays $25",
+         "end": "merge"
+        },
+        {
+         "label": "Not this time",
+         "end": "end",
+         "endText": "No spot and nothing charged. Noah's lessons go on as booked."
+        },
+        {
+         "label": "No answer by Nov 30",
+         "end": "end",
+         "endText": "One reminder went out. No spot is saved, and nothing is charged."
+        }
+       ]
+      },
+      {
+       "id": "B10-x03",
+       "line": [
+        "7.1",
+        "8.3",
+        "8.23"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Fri Dec 11, 10:00am",
+       "title": "Sends the order, the call time and a code",
+       "does": "Two days before, Alex gets the program order, the call time and a code for the door. A child goes home only with the parent, or an adult on the pick-up list.",
+       "more": [
+        "Daniel checks each performer in at the door with the code. That counts the spot for Rosfield's $2, once.",
+        "If Daniel is out that day, Sam names a stand-in to accompany. The date never moves.",
+        "If the recital is called off, every fee comes back in full."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Noah plays 6th at Sunday's recital. Please arrive by 2:30pm, with the music.",
+         {
+          "card": {
+           "title": "Winter recital · Sun Dec 13",
+           "lines": [
+            "3:00pm · Harbor Community Hall",
+            "Noah plays 6th",
+            "An adult stays, or picks the child up"
+           ]
+          },
+          "code": "5831"
+         }
+        ]
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "after",
+    "at": "B4-25",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "line": [
+       "4.9",
+       "4.10"
+      ],
+      "who": "cust",
+      "to": "agent",
+      "via": "chat",
+      "title": "A parent books for a child at home",
+      "does": "The lesson is for Alex's son, Noah, 11. Alex books as Noah's parent, pays and gets every text. Noah's name and age go only on the secure page.",
+      "more": [
+       "An adult stays home for the whole lesson. A teacher never teaches a child alone in a home.",
+       "Texts go only to Alex's phone. Rosie keeps no number for Noah.",
+       "Texts name Noah by first name only. Any learning or health note stays on the page.",
+       "A teen who books is asked to send the link to a parent."
+      ],
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Is the lesson for your child? Are you the parent or guardian?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Yes, for my son. I'm Noah's parent."
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-32",
+    "more": [
+     "A student under 18 needs an adult home for the whole lesson. The page asks for that yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-28",
+    "more": [
+     "A lesson paid ahead becomes a make-up, or is refunded. Never a fee."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Lee Music Lessons asks for a rating after a lesson."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When customers book, do you take anything? Each service starts the way most home music teachers set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every lesson at home, to start",
+        "lines": [
+         "Where: at the student's home, within 15 miles",
+         "When they book: a card saved for the $40 late-cancel and no-show fee you OK",
+         "After the lesson: the saved card is charged"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Lesson at home, 30 min",
+          "$55"
+         ],
+         [
+          "Lesson at home, 45 min",
+          "$75"
+         ],
+         [
+          "Trial lesson at home",
+          "$45"
+         ],
+         [
+          "Piano tuning",
+          "$150"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "C paid in full when they book"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Here's what changed. The rest stays as on the card.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Trial lesson at home",
+          "$45",
+          "Paid in full",
+          "Nothing more"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:card": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:full": {
+      "addSay": []
+     },
+     "after:bill": {
+      "addSay": []
+     },
+     "price:list+before:none+after:none": {
+      "addSay": []
+     }
+    }
+   }
+  ]
+ },
+ "notes": "From: hair. Music lessons run like the hair pilot: one-to-one lessons booked with a named teacher, the length setting the price. Yoga's term-and-seat model doesn't fit private lessons; its packs and plans are master branches (A5-01, A5-22, A5-21) that this overlay fills with the fall term and the monthly plan.\nWhich side is usual: the old flowchart's studio (Larkspur) books lessons at the studio; home lessons cost more and ask the owner first. So flow A, the studio, is the usual side, and online lessons by video count as a third place in flow A (A4-01, A4-36). Flow B draws lessons at the student's home in full.\nNames: Sam Lee's main company is Lee Music Lessons LLC (teachers go to students' homes, with piano tuning as its second kind of work, 15 Harbor Rd); the second company is Lee Music Studio LLC (the studio, 250 Cedar Ave). Teachers: Elena (piano, violin, voice) and Marcus (piano, voice) at the studio; Daniel (piano, violin, tuning) and Felix (piano, guitar) at homes. Alex's home: 9 Aspen Ct. Students: Lily, 8 (flow A) and Noah, 11 (flow B).\nDaniel and Felix are men and Elena's pronouns are never used, so the master's 'he' for its home pro stays right.\nPrices are the example studio's own, not a standard: piano 30 min $35, 45 min $55, voice and violin $40, extra 15 minutes $20, trial $25, monthly plan $140 (4 weekly lessons), fall term $420 (12 lessons), audition prep $70 for 60 minutes; at home 30 min $55, 45 min $75, trial $45, fee $40; piano tuning $150. The master's $35, $20 and $40 are kept; the master's $55 becomes the $25 trial, $179 the $75 home lesson, $89 the $40 fee, $150 the $45 home trial.\nMoney paths, from how lessons are really paid: a lesson charged to the saved card after it (both flows; also weekly lessons, the old flowchart's plan), a trial paid in full when booking (both), and a lesson paid at the studio's front desk with a card saved for the fee (flow A). A fall term or the first month of a monthly plan is paid in full on the page (the full path's A5-22 branch), and a lesson from it uses a credit (A5-03). No holds, deposits, photo quotes or prices set at the visit: lessons never take them.\nSign-up words changed to how music lessons are paid (S1-12 to S1-17, S1-21, S1-41, S1-42, S1-45, S1-47): the main company saves a card for the $40 fee and charges it after each lesson; the studio saves a card for the $20 fee; the trial and the term are paid in full. In flow B's full path S1-15 still shows Sam's answer 1, as the master's picker sets it there.\nThe trial's terms: a late cancel or a no-show may keep the whole trial price ($25 studio, $45 home), with Sam's OK; no answer in 24 hours means a full refund. All the master's '$20 fee kept, $35 refunded' full-path lines are reworded so the sums stay right.\nFree cancel: 24 hours before (the owner's setting). Flow B moves from 7am-the-same-day to 4pm the day before, and its main lesson from an 8-10am window to a 4:00pm set start after school (B4-83 keeps only 'A set start time'). Every Thursday clock on the main path is moved to match: OMW 3:35pm, check-in 4:00pm, DONE 4:45pm (4:30pm for the 30-minute trial), receipt 4:50pm, rating 7:00pm.\nA parent books for a minor: flow A's main lesson is for Lily, so A4-24 points to the child branch (A4-70, A4-25 reworded); flow B adds its own step B4-x01 on the main path. The student's name, age and any learning or health notes go only on the secure page (A4-42 and B4-29 screens); texts go only to the parent and name the student by first name.\nUnder 10 a parent stays in the building; 10 and older may be left and goes home only with an adult on the pick-up list (A8-67 keeps both branches, A8-42 reworded). At home an adult stays for the whole lesson (B8-67 keeps 'An adult must be there').\nMissed lessons and make-ups: own branch A7-x01..x03 (a prepaid lesson skipped with notice becomes a make-up within 30 days; no pick: Sam picks refund or 30 more days; silence refunds) and B7-x01..x02 (the teacher out: make-ups, never a charge). A late cancel or no-show keeps the master's fee steps; a used prepaid lesson is a fee Sam confirms (A5-03).\nThe recital as an event: own branch A10-x01..x04 (studio recital, sign-up page with the $25 fee, program order and call time, check-in at the door) and B10-x01..x03 (a hall recital for home students). Only families who said yes to studio news get the invite (a new row on the secure page), since S13-09 keeps booking texts to the booking.\nRecital $2: a recital spot is its own booking, so Rosfield's $2 counts once, at the door check-in. Make-ups are part of the same booking or plan: no new $2.\nOff in both flows: licenses (lessons and tuning need none; registration only), sent now, classes, spaces, first steps, damage holds, a crew, a minimum, the plan-or-insurance branches, weather, parts and ordered items, notices for sales at home, permits, drop-offs, rentals, items left. Off in A: the audition-prep quote (S11-08: every studio price is on the board), walk-ins except 'no walk-ins', the date that can't move (the recital carries its own), the forgotten-item stop, the skin problem, several-day visits, the proposal, the free fix, results later. Off in B: the live line, safety steps first, the more-work, bigger-job, landlord, hazard, update, delivery, several-days and part-to-shop branches, extras and the right to cancel them, the warranty claim, the report, the faucet and the fan, the proposal.\nTeachers hold no state license; a background check for teaching students under 18 is a plug-in switch (the state's rules or the owner's), shown only as the owner stated it (S2-29 more, S11-50, S11-51, S2-21 table).\nLate students get the time left and the lesson ends on time (A7-70 'Shorter'); a teacher running late still gives the full lesson. A student leaving early is charged as booked (A8-37), the example studio's rule.\nSection 11 what-ifs use only real lesson money: S11-56 switches voice lessons to the saved card (A) and the home trial to a card saved (B); S11-09 in B is an 8-lesson summer plan with a card saved, not a deposit; S11-58 adds instrument repair in both flows.\nDanger: the plug-in adds no words that stop a booking beyond the general check; words that a child may be unsafe go to Sam privately (pf.safety). The 'safety steps, then go on' branch is off in both flows.\nInstrument rental stays outside Rosie and out of booking texts (pf.messages), as the old flowchart's rule says.\nReview, Oct 23: audition prep is a board price ($70, 60 minutes), not a quote from the student's answers: lessons are list-priced, and no photos path is listed. S1-47 asks instead whether a new student's first lesson comes to Sam (its rules card already said so). S12-20's higher-price branches are off in both flows; flow B keeps the summer-lessons quote over $500 (S11-08).\nReview, Oct 23: the example studio is open Mon–Fri 10:00am–8:00pm and Sat 9:00am–5:00pm, so section 11's Friday lessons fit; Lily's offered times move off Sunday and school hours (Mon Oct 26 and Tue Oct 27, 4:00pm).\nReview, Oct 23: texts name a student by first name only (Lily, Noah), also in staff texts; a student who needs help is told to Sam with no health detail (A8-38). Practice notes go on a private page in both flows (B10-22).\nReview, Oct 23: the trial's whole $25 (A) or $45 (B) may be kept, so no card says 'Refund' when it is kept (A7-08, A8-20, A8-62).",
+ "cast": {
+  "A": {
+   "staff": "Elena and Marcus (teachers)",
+   "cust": "Alex M. (a parent) · other families"
+  },
+  "B": {
+   "staff": "Daniel and Felix (teachers who come to the home)",
+   "cust": "Alex M. (a parent) · other families",
+   "other": "Others (a bank, a host school, a grandparent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Elena"
+  },
+  "B": {
+   "staff": "Daniel"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a 30-minute piano lesson for Alex's daughter Lily, 8, with Elena at Lee Music Studio, Sat Oct 24 at 11:00am. Lily's name and age go only on the secure page, a parent stays in the building for a child under 10, and Elena's practice notes come after. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a 45-minute piano lesson at home, 9 Aspen Ct, for Alex's son Noah, 11. Daniel comes Thu Oct 22 at 8:00am, before school, and an adult stays home for the whole lesson. Pick a money choice at the top to follow its path."
+ },
+ "keep": [
+  "visit fee",
+  "Visit fee",
+  "leak",
+  "salon"
+ ],
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A8-67"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Some jobs take several visits, like a color correction done in two steps.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "skin fades",
+    "skin fade",
+    "It's for me, and yes, I'm over 18.",
+    "1 color quote",
+    "No bill is texted, so there's no tip line. A tip at the chair is the shop's own.",
+    "A tip at the chair is the shop's own way too.",
+    "A tip goes the shop's own way.",
+    "Tue Oct 27 · 11:00am · Riley",
+    "Sun Oct 25 · 11:00am · Riley",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "plumbing's",
+    "Every shop service, color and house calls",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing MP045210",
+    "Plumbing JP031552 · electrical JE30417",
+    "At the shop, and house calls",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Each person hears they can be booked for their own work: Avery at the shop, Casey for plumbing.",
+    "at the shop and for house calls",
+    "can book you for plumbing and electrical from now on",
+    "Priced from your photos",
+    "priced from photos",
+    "color quote",
+    "Color and cut",
+    "color and cut",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery.",
+    "3 jobs",
+    "Plumbing · within 25 miles of 1200 Main St",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "Just this visit",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "I'd like a cut on Saturday",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Sam, a barber or the desk can book for a customer by text or on the portal.",
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop has none, so nothing is sent here.",
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "Wants Saturday morning, with Riley",
+    "Books a cut every 4 weeks",
+    "Books a haircut and a beard trim",
+    "A haircut could mean a salon or a barbershop.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "May the shop show photos of your hair? Yes / No",
+    "A barbershop has none.",
+    "A barbershop sells its packages only at the shop.",
+    "A barbershop's services need none.",
+    "Give this code at the chair when you arrive.",
+    "Give this code at the chair.",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Can my son wait in the shop during my cut?",
+    "Done. Your Sat 11:00am visit is now with Avery.",
+    "It's 11:00am, and Alex is at the chair.",
+    "Alex adds a beard trim",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Say the plug-in lets a child be left, for a class or a camp.",
+    "Riley finishes the work",
+    "A cut is rated, so the shop takes the first branch.",
+    "How was your visit with Riley?",
+    "Books the next visit at the chair",
+    "Haircut plan · every 4 weeks",
+    "$35 a visit",
+    "Skip, pause or end any time, by text",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "Move my visit",
+    "Your visit",
+    "your visit",
+    "this visit",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "hot towel shave",
+    "Groom's package",
+    "Haircut, fade and beard trim",
+    "Skin fade",
+    "skin fade",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "kids cut",
+    "Kids cut",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "Barbershop",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "Barbering",
+    "at the chair",
+    "At the chair",
+    "$55",
+    "shops",
+    "Shop",
+    "shop",
+    "A trim"
+   ],
+   "B": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "A job quoted at the visit promises only the service call now.",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Lee Home Services can start the sewer camera inspection at a set time.",
+    "Lee Home Services · Sewer camera inspection:",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Can I run the dishwasher before you come?",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today",
+    "Accepted: the leak repair today",
+    "I found water damage under the sink this morning.",
+    "you have two drain clearings on Mon Nov 9.",
+    "water heater replacement",
+    "up to the $89 service call",
+    "Charge or keep the service call fee?",
+    "service call fee",
+    "Service call fee",
+    "The service call is $89.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Mon–Fri 7:30am–5:30pm",
+    "I'm running about 30 minutes late for my 1 o'clock.",
+    "Nora can ask to be next for that window. If Ivy's saved time runs out, it's saved for Nora at once.",
+    "Water heater replacement · $640",
+    "Water heater replacement",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "plumbing's",
+    "license MP045210",
+    "Plumbing license",
+    "Every plumbing job, and electrical",
+    "Every plumbing job",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing MP045210",
+    "Plumbing JP031552 · electrical JE30417",
+    "At the shop, and house calls",
+    "Jordan: plumbing and electrical",
+    "Casey: plumbing",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "at the shop and for house calls",
+    "can book you for plumbing and electrical from now on",
+    "Priced from your photos",
+    "priced from photos",
+    "3 jobs",
+    "Plumbing · within 25 miles of 1200 Main St",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "Just this visit",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Tessa · Drain clearing",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Lee Home Services goes 25 miles from 1200 Main St.",
+    "It's outside the 25 miles it covers, so nothing was saved.",
+    "inside Sam's 25 miles",
+    "Just the kitchen sink.",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes, every year",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Is the sink still full of water?",
+    "Yearly water heater flush plan",
+    "Every 12 months",
+    "Each visit is booked and paid like this one",
+    "Each visit, like a single booking",
+    "Skip, pause or end any time, by text",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "The customer's language shows too, so Sam can send someone who speaks it.",
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Sewer camera inspection",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "water heater quote",
+    "BLOCK Thu 12-5",
+    "raise drain clearing to 199",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Morgan P.'s refund for the cancelled extra work was due yesterday.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 9:10am",
+    "Fri 8am",
+    "Plumbing books a 2-hour window.",
+    "Your Lee Home Services visit",
+    "can't make your visit tomorrow",
+    "MOVE Alex to Thu 12pm",
+    "Only a teen is home at Alex M.'s",
+    "Cabinet floor, before",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan and Alex check the work",
+    "The work is done. Jordan texts DONE",
+    "for today's work",
+    "How was your visit with Jordan?",
+    "Rate your visit",
+    "May Lee Home Services show photos of the work?",
+    "May Lee Home Services show photos of this job?",
+    "Thursday morning",
+    "Wed morning",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "8–10",
+    "Water heater flush",
+    "water heater flush",
+    "Kitchen drain",
+    "Yard drain",
+    "after the job",
+    "plumbing visit",
+    "an $89",
+    "$179",
+    "$89",
+    "$150",
+    "Move my visit",
+    "Your visit",
+    "your visit",
+    "this visit",
+    "the missed visit",
+    "today's work",
+    "Thu Oct 22 visit",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "electrical work",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "hot towel shave",
+    "Haircut, fade and beard trim",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "Barbershop",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "at the chair",
+    "shops",
+    "Shop",
+    "shop",
+    "25 miles",
+    "25-mile"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A3-22": "0057d8fc9f",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-02": "15f418fec4",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A5-19": "5d5db6f3c1",
+   "A7-96": "d540b91653",
+   "A8-03": "7accda6f86",
+   "A8-86": "c989a99e52",
+   "A9-15": "bd2a17c3c5",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "S2-29": "974ca3a481",
+   "A4-24": "0a292df05b",
+   "A6-14": "b17b52115e",
+   "A7-02": "987e1a14cd",
+   "A7-14": "6a57738a17",
+   "A7-17": "37186ae0aa",
+   "A7-23": "90bc4b1137",
+   "S1-13": "eca22651fd"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B5-34": "917f89b62f",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B3-17": "3eb7d7f259",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B4-43": "fc9855955a",
+   "B4-38": "9539521dc7",
+   "B7-93": "4d6f89e473",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-45": "09e62897a6",
+   "B8-97": "1e3f69ef38",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "S2-29": "974ca3a481",
+   "B9-03": "df9548d13f",
+   "B10-05": "a326ea3c0b",
+   "B7-05": "e28a131872",
+   "B10-07": "3737f1d1c8",
+   "B4-25": "004f66a272",
+   "B4-32": "fcfe092e37",
+   "B7-28": "deeed1f8a0",
+   "B10-32": "7713bff255",
+   "S1-13": "6964bfbe60"
+  }
+ }
+}

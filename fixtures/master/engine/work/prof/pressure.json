@@ -1,0 +1,4601 @@
+{
+ "id": "pressure",
+ "name": "Pressure washer",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "cleaner",
+ "plugin": {
+  "pf.license": {
+   "need": "Depends on the state. Many states license nobody to pressure wash. Some ask for a contractor registration or license, some only above a job-size amount, and some counties license it. The state's form says which.",
+   "moss_and_algae": "A moss or algae treatment is pesticide work. Where the state's rules require it, the business holds a pesticide business license and each person who sprays holds an applicator license.",
+   "lead_safe": "Washing painted surfaces on a home built before 1978: a lead-safe firm certificate and a certified renovator on the crew, where the rules require them.",
+   "ask": "The registration or license number the state's form names for pressure washing; for moss treatment, the business's pesticide license and each applicator's number.",
+   "who_holds": "Pressure washing: the business, where a state asks. Moss treatment: the business and each applicator. Lead-safe work: the firm and one certified renovator on the crew.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "job_size_line": "Where a license is needed only above a job-size amount, Rosie checks each job's total, an add-on too, against it.",
+   "insurance_bond": "Liability insurance or a bond is shown as given by the business, not checked by Rosie. Where the state's rules require a bond, it's asked at sign-up.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "not_this_work": "Paint stripping, roof repairs and sealing work that needs a contractor's license are not pressure washing."
+  },
+  "pf.services": {
+   "pattern": "Set service: a crew at the customer's place, priced by the surface and its size, often outside with nobody home.",
+   "list": [
+    {
+     "name": "Driveway wash",
+     "price_kind": "set by the customer's answers (the surface and its size)",
+     "example": "a 2-car driveway and the front walk: $179; bigger concrete is $0.25 a sq ft (the example business's own prices)",
+     "length": "about 2 hours, one person",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "a card saved for the $89 trip fee; Rosie texts the bill at DONE"
+    },
+    {
+     "name": "Patio wash",
+     "price_kind": "set by the customer's answers",
+     "example": "a back patio and walk, up to 700 sq ft: $179",
+     "length": "about 2 hours",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "as the driveway"
+    },
+    {
+     "name": "Deck or fence wash",
+     "price_kind": "set by the customer's answers",
+     "example": "a deck up to 200 sq ft: $150; bigger decks $0.75 a sq ft",
+     "length": "about 2 hours",
+     "where": "at the customer's place",
+     "money": "as the driveway"
+    },
+    {
+     "name": "House soft wash",
+     "price_kind": "from the list for 1 story; quoted from the customer's photos for 2 stories or more",
+     "example": "1 story from $375; a 2-story home from photos, like $640",
+     "length": "about 4 hours for a crew of two, for 2 stories",
+     "where": "at the customer's place; low pressure with a cleaning mix",
+     "money": "over $500: Sam OKs the price; a 25% deposit where the state's caps allow; the rest on the bill"
+    },
+    {
+     "name": "Stain treatment (oil, rust)",
+     "price_kind": "quoted at the visit, after a test spot",
+     "example": "only the $89 trip fee is promised; like $165 for oil stains and $80 for rust",
+     "where": "at the customer's place",
+     "money": "a card saved for the $89 trip fee; the rest on the bill"
+    },
+    {
+     "name": "Gutter brightening (outside face)",
+     "price_kind": "one price, added when the customer asks",
+     "example": "$199"
+    },
+    {
+     "name": "Roof moss treatment (the second kind of work)",
+     "price_kind": "from the list, by roof size; steep or tile roofs get a free estimate visit",
+     "example": "garage or shed roof $149; house roof $189; hand moss removal $120 an hour, 1-hour minimum",
+     "where": "at the customer's place; nobody needs to be home",
+     "money": "a card saved for the $89 trip fee; the bill after",
+     "who": "only a licensed applicator sprays",
+     "weather": "a dry day before and after, and no gusty wind, as the product's label says"
+    },
+    {
+     "name": "Lead-safe setup",
+     "price_kind": "one price, added to any wash of painted surfaces on a home built before 1978",
+     "example": "+$150: sheeting, signs, and the water and paint chips collected"
+    },
+    {
+     "name": "Trip fee",
+     "price_kind": "one price",
+     "example": "$89: a card saved for it; charged only for a late cancel or a wasted trip Sam confirms, like no water or no way in",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Drop-off washing at the wash bay (the second company)",
+     "price_kind": "one price per item, from photos, or at the counter",
+     "example": "the example wash bay's own board (the old flowchart has no wash bay; this side is the example's own): patio set (a table and 4 chairs) $35, trailer $40, trash bin $20, kayak $25, grill deep clean $55, boat up to 20 ft $140 (2½ hours), teak set restore from photos, equipment degrease priced at the counter after a $25 inspection",
+     "where": "dropped off at the wash bay; a patio set can also be washed at the customer's home ($75, billed after)",
+     "money": "nothing taken and no card saved, so no fee; paid at the counter at pick-up"
+    }
+   ],
+   "capacity": "One person for a driveway, patio or deck. A crew of two (a lead and a helper) for a house wash or a roof. A drop-off needs one person at the counter.",
+   "minimum": "The business's own minimum job (the example: $150).",
+   "nobody_home": "Yes, for outside work: the crew needs the side gate (or its code) and a working outside spigot. DONE with after photos confirms it. Someone must be home for a painted home built before 1978 (windows closed, the lead pamphlet's receipt signed).",
+   "water": "A working outside spigot, or the crew's own water tank where Sam set one.",
+   "online": "No.",
+   "not_offered": "Pressure-blasting a roof, paint stripping, and any roof that may not hold weight.",
+   "drop_off_slots": "Items are booked into drop-off slots by the wash bay's daily number, with no wash tech named; the item goes to a tech with the skill once it's in."
+  },
+  "pf.questions": {
+   "before_times": [
+    "Which surfaces: driveway, patio, deck, fence, house siding, roof",
+    "About how big: square feet, or how many cars and stories",
+    "The year the home was built, and whether the siding or trim is painted (before 1978 adds the lead-safe setup)",
+    "Roof: what it's made of (composition, cedar, metal, tile) and how steep",
+    "Plants, a pond or pets near the work",
+    "For a drop-off: what the item is, and its size"
+   ],
+   "after_a_time": [
+    "Is there a working outside spigot? (or the crew brings its tank)",
+    "Is there a storm drain near the work?",
+    "Will the cars be off the driveway?",
+    "Where the crew can park the trailer",
+    "Will someone be home?"
+   ],
+   "secure_page_only": [
+    "The gate code, and where the outside spigot is",
+    "Photos: needed for a roof, a home over 1 story, and any job over $500",
+    "Own or rent, on a pre-1978 painted job (the lead pamphlet goes to the home's owner too)"
+   ],
+   "who_may_book": "An adult who owns or lives in the home, or a landlord or property manager they name."
+  },
+  "pf.safety": {
+   "words": [
+    "a roof that sags, leaks or may not hold weight",
+    "a cleaning mix or moss treatment swallowed, or in someone's eyes",
+    "power lines near the work",
+    "a gas smell",
+    "a leaking propane tank (a grill brought to the wash bay)"
+   ],
+   "what_happens": [
+    "A sagging or leaking roof: a roofer looks first, and nobody stays in rooms under a sagging spot. The roof part isn't booked; the driveway or house wash can be.",
+    "A mix swallowed or in the eyes: call Poison Control now at 1-800-222-1222, or 911 if they have trouble breathing. No booking from that message.",
+    "Power lines over the work: that part is left for the power company to make safe first.",
+    "A gas smell or a leaking propane tank: leave and call 911. No booking until it's safe."
+   ],
+   "questions_on_treatments": "Questions about whether a mix or a moss treatment is safe for pets, plants or a pond go to the licensed applicator. Rosie never answers them itself.",
+   "booking_goes_on": "Yes, with the roof part left out. No, for a swallowed mix, a gas smell or a propane leak."
+  },
+  "pf.first_steps": {
+   "photos": "A roof, a home over 1 story, and any job over $500 are priced from the customer's photos first, and Sam OKs prices over $500.",
+   "lead_pamphlet": "A painted home built before 1978: the lead pamphlet goes to the owner before the work, with a receipt signed on the secure page. Nothing painted is washed until it's signed.",
+   "prep_for_reminder": [
+    "Move the cars off the driveway",
+    "Move pots, cushions and grills away from the house",
+    "Close the windows, and keep pets inside",
+    "Leave the side gate open, or its code on the secure page",
+    "For the wash bay: take the propane tank off a grill, and empty the trash bins"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Someone home: the code at the door, entered by the crew lead. Nobody home: no code; the lead texts DONE with after photos.",
+   "ready_to_start": "A working outside spigot (or the crew's tank), the cars moved, and the side gate open. Missing: the crew waits 15 minutes, then Sam decides about the trip fee.",
+   "before_photos": "Before photos of each surface, its cracks and old stains, the plants and anything nearby.",
+   "water_and_drains": "Wash water is kept out of storm drains: the drain is covered and the water is recovered, where local rules require it.",
+   "plants_and_pets": "Plants are wet down and covered before any mix, and rinsed after. Pets stay inside until the surfaces dry.",
+   "lead_safe": "On a painted pre-1978 home: sheeting on the ground, windows near the work closed, warning signs, low pressure only, and the water and chips collected.",
+   "wind": "No spraying a mix or a treatment in gusty wind. The sprayed part moves free; the rest goes on.",
+   "drop_off": "At the wash bay: the code is given at the counter when the item is left. READY comes with a photo. Pick-up only by the customer or someone they name.",
+   "changes_at_visit": "Extra work only when the customer says yes to its price first. Work sold at the home comes with a right to cancel where the state's rules give one.",
+   "proof_done": "After photos from the same angles as the before photos. DONE with after photos when nobody's home.",
+   "aftercare": "Keep cars off a washed driveway for 1 hour. After a moss treatment, the moss dies off over a few weeks and rain washes it away: never pressure wash the roof."
+  },
+  "pf.money": {
+   "start": "At the home: a card saved for the $89 trip fee; Rosie texts the bill at DONE. At the wash bay: nothing taken and no card saved, so no fee; paid at the counter at pick-up. A patio set washed at home takes nothing either: Rosie texts the bill after.",
+   "deposits": "None by default. Sam can set a deposit per service (the example: 25% on a house soft wash priced from photos). Deposit cap: from the state form.",
+   "fees": "Late cancel or a wasted trip (no water, no way in, cars on the driveway): the business's own fee, the example $89, never more than the visit's price, or the deposit on a deposit job. A deposit job keeps what was agreed, never more than the deposit. Sam confirms each one; no answer, no fee.",
+   "weather": "A move for weather never costs the customer.",
+   "plans": "A yearly wash plan is charged visit by visit. Rosfield's $2 counts once a month for a plan.",
+   "tips": "Optional. A tip line only if the owner turns it on.",
+   "tax": "A sales tax line only where the state taxes this work, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking.",
+   "paid_ahead": "Nothing is paid in full ahead. Only a house wash priced from photos takes a deposit, after the estimate is signed."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate and alarm codes",
+    "Where a key or a spigot handle is kept",
+    "A health reason behind a question about a mix"
+   ],
+   "photos": "Photos of the home go only to the customer and the business, unless the customer says yes to showing them.",
+   "languages": "English and Spanish. The crew's language shows on the job.",
+   "minors": "Nobody under 18 books. A teen at home isn't the booking's adult."
+  },
+  "pf.staff": {
+   "skills": [
+    "Flat surfaces: driveways, patios, walks",
+    "Soft washing: siding and roofs",
+    "Decks and fences",
+    "Moss treatment (a licensed applicator only)",
+    "Lead-safe setup (a certified renovator on the crew)",
+    "Wash bay: patio sets, trailers, boats, teak, equipment"
+   ],
+   "crews": "One person for flat surfaces. Two for a house or a roof: a lead, who enters the code and texts DONE, and a helper.",
+   "licenses": "An applicator license for each person who sprays moss treatments, where the state's rules require it. None for pressure washing unless the state's form says so.",
+   "who_may_go": "A job with a moss treatment needs a licensed applicator on the crew. A painted pre-1978 home needs a certified renovator. A crew without them isn't offered for that job.",
+   "new_person_ok": "A crew member the customer hasn't booked is offered by text first. No answer: the rest of the crew comes and the job takes longer, or it moves with no fee.",
+   "who_oks": "The owner OKs prices over the limit (the example: $500). The office manager may too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "written_contract": "Above an amount, where the state's rules require a written contract: the business's name, address and registration or license number, the price, the dates and the right to cancel.",
+   "add_on_at_home": "A right to cancel where the state's rules give one for work sold at the home, with its written notice.",
+   "lead_safe": "Pre-1978 painted surfaces: the lead pamphlet before work, a signed receipt, and lead-safe records, kept as long as the rules require.",
+   "treatments": "Moss and algae treatments: sprayed only as the product's label allows, by a licensed applicator, with a record of the product, who sprayed, where, and the wind.",
+   "stormwater": "Wash water kept out of storm drains, and any city permit for mobile washing, where local rules require it.",
+   "records": "7 years, with the before and after photos."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "Weather: heavy rain, freezing, or wind over the limit Sam sets. Rosie checks the forecast the day before; a move for weather is free.",
+    "Wind at the house on the day: the sprayed part moves free, and the rest goes on.",
+    "A treatment needs a dry day after: rain due within the label's dry time moves it, free.",
+    "No water or no way in: the crew waits 15 minutes, then Sam decides about the trip fee.",
+    "Plants or a car hurt by a mix: photos on the secure page; the owner decides. Rosie never admits fault or offers money.",
+    "Streaks or missed spots: tell the business within 7 days for a free touch-up.",
+    "A crew member is out: a new person is offered first; no answer, the rest of the crew comes for longer.",
+    "An item at the wash bay not picked up: reminders; after the free days, a storage fee only if the owner starts it, after written notice."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "dropoff",
+   "photos",
+   "tips",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Parker and Hayden (wash techs)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Dakota and Logan (crew leads)",
+   "cust": "Alex M. (customer) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Parker"
+  },
+  "B": {
+   "staff": "Dakota"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "No card, so no $20 fee",
+    "No card, so no fee"
+   ],
+   [
+    "The Groom's package",
+    "The boat wash"
+   ],
+   [
+    "the Groom's package",
+    "the boat wash"
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "6 bookings · Riley 3, Avery 3",
+    "6 drop-offs"
+   ],
+   [
+    "Not bookable until it shows renewed",
+    "No moss treatment until it shows renewed"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Parker suggests moving your visit until the nest is gone, with no fee."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The grill's propane tank is still on."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kayak wash is $25."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Tue to Sun, 9am to 6pm"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the shop show photos of your item?"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "One of my chairs came back scratched."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says a chair came back scratched today"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "Wasps built a nest under the table. Can I still bring it?"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you wash kayaks too?"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24 · 11:00am drop-off · patio set wash"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything the wash tech should know?"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. patio set wash Sat 11am"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds slots side by side, within the day's drop-off number."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Both go in one drop-off slot, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds RV washing to Lee Wash Bay."
+   ],
+   [
+    "NEW massage",
+    "NEW RV washing"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "RV washing for Lee Wash Bay: is it the same company?"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A wash bay books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no wash tech. A day shows only if a tech with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Wash Bay · drop-off"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a spill to clean up"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 inspection; priced at the counter"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A patio set wash is rated, so the wash bay takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Parker's teak plan after an inspection"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Wash Bay sent you a proposal: Parker's teak plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Teak plan"
+   ],
+   [
+    "your first color plan visit",
+    "your first teak plan visit"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of the teak set"
+   ],
+   [
+    "Gloss to finish",
+    "Rust guard to finish"
+   ],
+   [
+    "gloss",
+    "rust guard"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A registration where the state asks one. Flat surfaces are priced by size. Stains are priced at the visit. A sagging roof is left out."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Patio sets, trailers, boats and bins are dropped off at the wash bay and picked up when ready. A patio set can also be washed at home."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Parker can still take it in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Lee Wash Bay's visits are drop-offs. A repair shop, a tailor or a groomer works the same way."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A pressure washer's example: a sagging roof gets 'keep everyone out of the rooms under it'."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A property manager drops off trash bins from five rentals on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: metal patio set, low pressure on the powder coat, one chair foot loose"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your trash bin wash is part of a plan, every 4 weeks."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like a leaking propane tank."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says a chair still has mildew after Saturday's wash."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "For a grill: the propane tank comes off before drop-off."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop off a trash bin at the same time?"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Applicator AP30417"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a car wash or a wash bay"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for the trash bins washed every 4 weeks."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Grill deep clean"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group drop-off together"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "A chair still has mildew on one arm."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Parker stopped Alex M.'s patio set wash."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a patio set washed on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero lavar mis muebles de patio el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a trash bin wash every 4 weeks"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Parker sees the item"
+   ],
+   [
+    "plumbing and electrical",
+    "pressure washing and moss treatment"
+   ],
+   [
+    "Signature cut and shave",
+    "Grill deep clean"
+   ],
+   [
+    "like a skin-test result",
+    "like a test-spot result"
+   ],
+   [
+    "A barbershop has none.",
+    "A wash bay has none."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s patio set wash."
+   ],
+   [
+    "Haircut every 4 weeks",
+    "Trash bin wash every 4 weeks"
+   ],
+   [
+    "also does color and",
+    "also does teak and"
+   ],
+   [
+    "Water heater flush",
+    "Deck wash"
+   ],
+   [
+    "A color correction",
+    "An equipment degrease"
+   ],
+   [
+    "a color correction",
+    "an equipment degrease"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pressure Washing's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pressure Washing"
+   ],
+   [
+    "barber, color and",
+    "wash bay, teak and"
+   ],
+   [
+    "a package of cuts",
+    "a package of washes"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Wash Bay"
+   ],
+   [
+    "Color correction",
+    "Equipment degrease"
+   ],
+   [
+    "color correction",
+    "equipment degrease"
+   ],
+   [
+    "Only the consult",
+    "Only the inspection"
+   ],
+   [
+    "Groom's package",
+    "Boat wash"
+   ],
+   [
+    "Drain clearing",
+    "Driveway wash"
+   ],
+   [
+    "2 Consult only",
+    "2 Inspection only"
+   ],
+   [
+    "service, color",
+    "service, teak"
+   ],
+   [
+    "Panel upgrade",
+    "Steep or tile roof"
+   ],
+   [
+    "signature cut",
+    "grill deep clean"
+   ],
+   [
+    "Color and cut",
+    "Teak set restore"
+   ],
+   [
+    "color and cut",
+    "teak set restore"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Power Wash"
+   ],
+   [
+    "Lee Electric",
+    "Lee Moss Control"
+   ],
+   [
+    "1200 Main St",
+    "910 Harbor Rd"
+   ],
+   [
+    "water heater",
+    "house wash"
+   ],
+   [
+    "Consult only",
+    "Inspection only"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "$25 consult",
+    "$25 inspection"
+   ],
+   [
+    "the consult",
+    "the inspection"
+   ],
+   [
+    "color quote",
+    "teak quote"
+   ],
+   [
+    "Electrical",
+    "Moss treatment"
+   ],
+   [
+    "electrical",
+    "moss treatment"
+   ],
+   [
+    "Barbershop",
+    "Wash bay"
+   ],
+   [
+    "barbershop",
+    "wash bay"
+   ],
+   [
+    "Beard trim",
+    "Trash bin wash"
+   ],
+   [
+    "beard trim",
+    "trash bin wash"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "patch test",
+    "test spot"
+   ],
+   [
+    "88 Elm St",
+    "15 Depot St"
+   ],
+   [
+    "on Elm St",
+    "on Depot St"
+   ],
+   [
+    "Skin fade",
+    "Trailer wash"
+   ],
+   [
+    "skin fade",
+    "trailer wash"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "MP045210",
+    "LLC 2019-0451"
+   ],
+   [
+    "Plumbing",
+    "Pressure washing"
+   ],
+   [
+    "plumbing",
+    "pressure washing"
+   ],
+   [
+    "Kids cut",
+    "Kayak wash"
+   ],
+   [
+    "kids cut",
+    "kayak wash"
+   ],
+   [
+    "Haircuts",
+    "Patio set washes"
+   ],
+   [
+    "haircuts",
+    "patio set washes"
+   ],
+   [
+    "cut hair",
+    "wash gear"
+   ],
+   [
+    "the visit fee",
+    "the trip fee"
+   ],
+   [
+    "each plumber",
+    "each crew lead"
+   ],
+   [
+    "Plumber",
+    "Pressure washer"
+   ],
+   [
+    "plumber",
+    "pressure washer"
+   ],
+   [
+    "barbers",
+    "wash techs"
+   ],
+   [
+    "Haircut",
+    "Patio set wash"
+   ],
+   [
+    "haircut",
+    "patio set wash"
+   ],
+   [
+    "Jordan",
+    "Dakota"
+   ],
+   [
+    "Barber",
+    "Wash tech"
+   ],
+   [
+    "barber",
+    "wash tech"
+   ],
+   [
+    "Casey",
+    "Logan"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Riley",
+    "Parker"
+   ],
+   [
+    "Avery",
+    "Hayden"
+   ],
+   [
+    "like a burst pipe",
+    "like a spill to clean up"
+   ],
+   [
+    "barbershops set it",
+    "wash shops set it"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Patio sets, trailers and boats, dropped off here."
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do boat motors"
+   ],
+   [
+    "skin fades",
+    "patio washes"
+   ],
+   [
+    "skin fade",
+    "patio wash"
+   ],
+   [
+    "a perm, which isn't on the shop's list",
+    "a boat motor install, which isn't on the shop's list"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ]
+  ],
+  "B": [
+   [
+    "quote. C paid in full when they book",
+    "quote"
+   ],
+   [
+    "Nobody was home for Lin W.'s",
+    "The crew couldn't get to the work at Lin W.'s"
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "Moss treatment: Dakota only, for now"
+   ],
+   [
+    "so Reese K.'s license isn't checked yet. Nobody new is offered until it is.",
+    "so Reese K.'s applicator license isn't checked yet. Reese isn't offered for moss treatment until it is."
+   ],
+   [
+    "Casey · license not found",
+    "Dakota · license not found"
+   ],
+   [
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "The lookup shows the license as expired. Dakota stays on the team for pressure washing, and gets moss treatment back once it shows renewed."
+   ],
+   [
+    "Casey's license",
+    "Dakota's license"
+   ],
+   [
+    "Casey · license expired",
+    "Dakota · license expired"
+   ],
+   [
+    "Not bookable until it shows renewed",
+    "No moss treatment until it shows renewed"
+   ],
+   [
+    "so Lee Home Services can't book you until it shows renewed.",
+    "so you can't be booked for moss treatment until it shows renewed."
+   ],
+   [
+    "license MP045210",
+    "registration LLC 2019-0451"
+   ],
+   [
+    "After that, or nobody home",
+    "After that, or no way in"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a sagging roof or a mix in someone's eyes, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Stripes show on the driveway 3 days later."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Dakota's next times for a fence wash."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a pest control company first"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows the paint was whole."
+   ],
+   [
+    "The job should be done by 10am.",
+    "The job should be done by about 10:15am."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START cars on the driveway, no water at the spigot"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for the driveway washed every year."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you wash my driveway every year, too?"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly driveway wash plan"
+   ],
+   [
+    "yearly flush plan",
+    "yearly driveway plan"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I run the sprinklers before you come?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone pressure wash a back patio this Thursday? What does it cost?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds window cleaning to Lee Pressure Washing."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW window cleaning"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Window cleaning for Lee Pressure Washing: is it the same company?"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a spill to clean up"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration LLC 2019-0451"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 apartment wash"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your apartment wash"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the house soft wash Dakota noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for a house soft wash, from Dakota's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · House soft wash"
+   ],
+   [
+    "like an overflowing drain",
+    "like a spill to clean up"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "We have a party tomorrow. Can someone come tonight?"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Driveway before a party"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the oil stains only, $165. Leave the rust stains."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "treats the oil stains today, $165. The $80 rust stains stay good until Thu Oct 29."
+   ],
+   [
+    "Thu Oct 22, 10:20am",
+    "Thu Oct 22, 11:05am"
+   ],
+   [
+    "Thu Oct 22, 10:05am",
+    "Thu Oct 22, 10:50am"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A registration where the state asks one. Flat surfaces are priced by size. Stains are priced at the visit. A sagging roof is left out."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Patio sets, trailers, boats and bins are dropped off at the wash bay and picked up when ready. A patio set can also be washed at home."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Pressure Washing washes and treats roofs, but doesn't repair them. Nothing was saved. You can look for a roofer near you."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone out of the rooms under the sag. The roof waits for a roofer; the driveway can be booked."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which surfaces and how big, the year built and any paint, plants and pets, and the outside spigot."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Que nadie entre a los cuartos debajo de la parte hundida. Un techador debe revisarlo primero."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Blot it with cat litter, and keep it out of the street drain."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Can someone pressure wash my driveway Thursday morning? It has oil stains. I'm in Springfield."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Dakota found a wasp nest under the eaves and left that wall out."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep everyone out of the rooms under the sag. If the ceiling cracks or drips, get out and call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Pressure Washing doesn't do, like a roof repair."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For pressure washing, a mix swallowed or in the eyes stops the booking. A sagging roof is left out."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Dakota finds a wasp nest under the eaves. The plug-in says the crew leaves that wall"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A pressure washer's example: a sagging roof gets 'keep everyone out of the rooms under it'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My roof has moss and sags in one spot."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is the soft wash mix safe for my cat and the garden beds?"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of each side of the house, and the crew will price the job."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a sagging roof, a mix swallowed, or power lines."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE oil stain by the garage lightened, not gone. Bring the degreaser next time."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how big is the driveway, and is there a front walk too?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Dakota tests a spot and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Dakota tested your stains. Here's the price to treat them today."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Dakota went to get more degreaser and will be back about 9:30am."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s driveway, washed Thu Oct 22, shows stripes."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. Gutter brightening is $199, from the list."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "That's under our touch-up promise, so this visit is free."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Dakota also brighten my gutters?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 back patio, 640 sq ft, green with algae"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi techo tiene musgo y se hunde."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a walk wash at two rentals every 3 months"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Dakota wash my fence next week?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Dakota's spray lifted paint on Alex M.'s garage door trim."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the promise lasts: tell within 7 days."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE crack across the driveway, oil stain by the garage"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about the gutters."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Se está cayendo el techo?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "A car leaked a lot of oil on the driveway."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Dakota also brighten my gutters?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Dakota runs low on degreaser."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wasp nest under the eaves, wall left out"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please move the cars off the driveway."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the roof falling in?"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with the roof left out."
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "Dakota is the one who does house washes"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Applicator AP30417"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Dakota finds the back patio green with algae."
+   ],
+   [
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Thu Nov 5 · arriving 8–10am · Dakota"
+   ],
+   [
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Dakota"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The driveway shows stripes."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Dakota left wet leaves on the walk."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 oil stains 165 rust stains 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the wall under the nest"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Dakota slips on the wet deck and texts HURT."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Grill deep clean"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Will the cars be off the driveway?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wasp nest under the eaves"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE paint lifted on the garage door trim"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting more degreaser, back 9:30"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Dakota's spray lifts paint on the trim"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped on the wet deck, need to stop"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. The ceiling inside is dry."
+   ],
+   [
+    "replacing both shutoff valves",
+    "washing the back patio"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the gutter report link"
+   ],
+   [
+    "replace both shutoff valves",
+    "wash the back patio"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Back patio wash"
+   ],
+   [
+    "the sink is now overflowing",
+    "a car leaked a lot of oil on the driveway"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's walk wash"
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the job"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wasp nest under the eaves"
+   ],
+   [
+    "Water heater replacement",
+    "House soft wash"
+   ],
+   [
+    "water heater replacement",
+    "house soft wash"
+   ],
+   [
+    "The repair price is good",
+    "The treatment price is good"
+   ],
+   [
+    "plumbing and electrical",
+    "pressure washing and moss treatment"
+   ],
+   [
+    "Sewer camera inspection",
+    "Gutter brightening"
+   ],
+   [
+    "sewer camera inspection",
+    "gutter brightening"
+   ],
+   [
+    "Jordan found more work.",
+    "Dakota found more to wash."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Driveway wash"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "Just the kitchen sink.",
+    "A 2-car driveway and the front walk."
+   ],
+   [
+    "Under the sink, before",
+    "Driveway, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Paint lifted on the trim"
+   ],
+   [
+    "Cabinet floor, before",
+    "Garage apron, before"
+   ],
+   [
+    "your new pipes are in",
+    "building 2 is washed"
+   ],
+   [
+    "1-year labor warranty",
+    "7-day touch-up promise"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Oil stains · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 back patio quote"
+   ],
+   [
+    "leehomeservices.com",
+    "leepressurewashing.com"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 back patio"
+   ],
+   [
+    "Sewer camera report",
+    "Gutter report"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. El techo de adentro está seco."
+   ],
+   [
+    "also does color and",
+    "also does teak and"
+   ],
+   [
+    "Water heater flush",
+    "Deck wash"
+   ],
+   [
+    "water heater flush",
+    "deck wash"
+   ],
+   [
+    "the shutoff valves",
+    "the back patio"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Pressure Washing's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Pressure Washing"
+   ],
+   [
+    "camera inspection",
+    "gutter brightening"
+   ],
+   [
+    "the kitchen drain",
+    "the driveway"
+   ],
+   [
+    "Supply line · $80",
+    "Rust stains · $80"
+   ],
+   [
+    "barber, color and",
+    "wash bay, teak and"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Wash Bay"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa driveway"
+   ],
+   [
+    "Drain clearings",
+    "Driveway washes"
+   ],
+   [
+    "Book the repair",
+    "Book the treatment"
+   ],
+   [
+    "Drain clearing",
+    "Driveway wash"
+   ],
+   [
+    "drain clearing",
+    "driveway wash"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 driveway"
+   ],
+   [
+    "today's repair",
+    "today's job"
+   ],
+   [
+    "Panel upgrade",
+    "Steep or tile roof"
+   ],
+   [
+    "water heaters",
+    "house washes"
+   ],
+   [
+    "Kitchen drain",
+    "Driveway"
+   ],
+   [
+    "cut your hair",
+    "wash your patio set"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Power Wash"
+   ],
+   [
+    "Lee Electric",
+    "Lee Moss Control"
+   ],
+   [
+    "1200 Main St",
+    "910 Harbor Rd"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Water heater",
+    "House wash"
+   ],
+   [
+    "water heater",
+    "house wash"
+   ],
+   [
+    "shop's chair",
+    "wash bay's counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Leak repair",
+    "Stain treatment"
+   ],
+   [
+    "leak repair",
+    "stain treatment"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "Electrical",
+    "Moss treatment"
+   ],
+   [
+    "electrical",
+    "moss treatment"
+   ],
+   [
+    "Barbershop",
+    "Wash bay"
+   ],
+   [
+    "barbershop",
+    "wash bay"
+   ],
+   [
+    "Yard drain",
+    "Back patio"
+   ],
+   [
+    "yard drain",
+    "back patio"
+   ],
+   [
+    "Beard trim",
+    "Trash bin wash"
+   ],
+   [
+    "42 Oak St",
+    "27 Hillside Dr"
+   ],
+   [
+    "88 Elm St",
+    "15 Depot St"
+   ],
+   [
+    "MP045210",
+    "LLC 2019-0451"
+   ],
+   [
+    "Plumbing",
+    "Pressure washing"
+   ],
+   [
+    "plumbing",
+    "pressure washing"
+   ],
+   [
+    "cut hair",
+    "wash gear"
+   ],
+   [
+    "the visit fee",
+    "the trip fee"
+   ],
+   [
+    "the plumber",
+    "the crew"
+   ],
+   [
+    "your plumber",
+    "your crew"
+   ],
+   [
+    "each plumber",
+    "each crew lead"
+   ],
+   [
+    "Plumber",
+    "Pressure washer"
+   ],
+   [
+    "plumber",
+    "pressure washer"
+   ],
+   [
+    "barbers",
+    "wash techs"
+   ],
+   [
+    "Haircut",
+    "Patio set wash"
+   ],
+   [
+    "haircut",
+    "patio set wash"
+   ],
+   [
+    "Jordan",
+    "Dakota"
+   ],
+   [
+    "Barber",
+    "Wash tech"
+   ],
+   [
+    "barber",
+    "wash tech"
+   ],
+   [
+    "Casey",
+    "Logan"
+   ],
+   [
+    "Riley",
+    "Parker"
+   ],
+   [
+    "Avery",
+    "Hayden"
+   ],
+   [
+    "Labor",
+    "Hourly work"
+   ],
+   [
+    "like a burst pipe",
+    "like a spill to clean up"
+   ],
+   [
+    "sewer camera report",
+    "gutter report"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "a leaking hose on the wash pump"
+   ],
+   [
+    "My sink won't drain",
+    "My patio won't rinse"
+   ],
+   [
+    "won't drain",
+    "won't start"
+   ],
+   [
+    "kitchen sink",
+    "back patio"
+   ],
+   [
+    "the sink still full of water",
+    "the water still running"
+   ],
+   [
+    "under the sink",
+    "by the back patio"
+   ],
+   [
+    "a faucet check",
+    "a nozzle check"
+   ],
+   [
+    "dripping faucet",
+    "clogged nozzle"
+   ],
+   [
+    "faucet",
+    "nozzle"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "spraying a neighbor's fence without asking"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Pump and hose set"
+   ],
+   [
+    "drain clearings",
+    "wash clean-ups"
+   ],
+   [
+    "drain clearing",
+    "wash clean-up"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Pressure Washing. Sam named you their emergency contact.",
+    "This is Rosie. Sam named you their emergency contact."
+   ],
+   [
+    "Your receipt is on your secure page, with what was paid and how. Think this is wrong? Reply here, and it goes to Sam.",
+    "Your receipt is on your secure page. Think this is wrong? Reply here."
+   ],
+   [
+    "new pipes put in",
+    "new hoses put in"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off slot at Lee Wash Bay, Sat Oct 24, unloads a metal patio set at the counter, and picks it up clean the same afternoon. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Pressure Washing for 27 Hillside Dr: a 2-car driveway and the front walk, priced by size, Thu Oct 22, arriving 8–10am, with Dakota. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 patio set wash (a table and 4 chairs). Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+    "photos|none|counter": "A teak set restore, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+    "visit|none|counter": "A riding mower degrease, priced at the counter. Only the $25 inspection is promised."
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "$35",
+     "name": "Patio set wash"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Teak set restore"
+    },
+    "visit|*|*": {
+     "name": "Riding mower degrease"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Trailer wash",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$40"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "photos|deposit|bill",
+    "visit|card|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a 2-car driveway and the front walk, $179. A card is saved for the $89 trip fee. Dakota texts DONE with the lines, and Rosie texts the bill.",
+    "list|none|bill": "The same $179 driveway. Nothing is taken. Rosie texts the bill after the job.",
+    "list|card|card": "The same $179 driveway. A card is saved and charged $179 when Dakota texts DONE.",
+    "photos|deposit|bill": "A 2-story house soft wash, priced from photos at $640. Sam OKs it, and Alex signs the estimate. A $160 deposit now; the rest on the bill.",
+    "visit|card|bill": "Oil and rust stains, priced at the visit after a test spot. Only the $89 trip fee is promised, and a card is saved for it."
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "$179",
+     "name": "Driveway wash"
+    },
+    "list|card|*": {
+     "fee": "$89"
+    },
+    "list|none|*": {},
+    "photos|*|*": {
+     "price": "$640",
+     "name": "House soft wash"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89"
+    },
+    "visit|*|*": {
+     "name": "Stain treatment"
+    },
+    "visit|card|*": {
+     "fee": "$89"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Roof moss treatment",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$149",
+      "fee": "$89"
+     }
+    }
+   }
+  }
+ },
+ "keep": [
+  "drain",
+  "drips",
+  "leak"
+ ],
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state's form asks for a license or a contractor registration to pressure wash, it's asked here.",
+     "Some states ask only above a job-size amount. Rosie then checks each job's total against it.",
+     "Where only a county licenses this work, Sam gives that license the same way.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state's pesticide form asks for the company's pest control license, and each applicator's own. What's the company's?"
+     ],
+     [
+      "owner",
+      "san",
+      "PB22871"
+     ],
+     [
+      "san",
+      "owner",
+      "Moss treatment is set up, under the company's license. AI assistants can book it now. You'll add your people at the end. Next, Lee Wash Bay: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "more": [
+     "Sam doesn't spray moss treatments himself, so moss treatment waits for the person on the team who does.",
+     "Moss and algae treatments are pesticide work. Where the state's rules require it, the company and each person who sprays hold a license.",
+     "Whose license counts comes from the state's form: the company's, each person's, or both."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Washing a patio set needs no license where Sam works, so it can be done at a home too.",
+     "Where a state's or city's rules limit washing at a home, like wash water rules, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city licenses a wash bay, its form asks for it here instead.",
+     "A city permit for the bay's wash water is asked the same way.",
+     "Each wash tech can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pressure Washing. Sam Lee added you to the team. Reply YES to join and get your jobs here by text. If you spray moss treatments, add your license number. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Dakota"
+      }
+     ]
+    ],
+    "more": [
+     "Logan gets the same invite. Parker and Hayden get theirs from Lee Wash Bay.",
+     "Pat gets one too, to OK prices for Lee Pressure Washing.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Dakota replies YES with an applicator license number, then checks what Sam set. One reply covers every kind of work Dakota does.",
+    "more": [
+     "Only moss treatment needs a person's license here. Logan, Parker and Hayden reply a plain YES.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES AP30417",
+      {
+       "as": "Dakota"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Pressure Washing! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Dakota Price · Lee Pressure Washing",
+        "lines": [
+         "Every pressure washing job, and moss treatment",
+         "Applicator license AP30417",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Dakota"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Dakota"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Only Dakota has a license to add for moss treatment, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Dakota's applicator license is on file as given. The others need none. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Dakota: pressure washing and moss treatment",
+         "Logan: pressure washing",
+         "Parker: wash bay, teak and home visits",
+         "Hayden: wash bay"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Reese K. to Lee Pressure Washing. Reese gets one invite and replies YES. Pressure washing licenses nobody where Sam works, so nothing is checked.",
+    "more": [
+     "Reese can be booked once Sam says yes.",
+     "To spray moss treatments, Reese would send an applicator license number. It's optional and shown as given, not checked by Rosie.",
+     "No reply in 48 hours: one reminder, then Sam is told."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pressure Washing. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no license; the owner says when one lapses. Here, Sam says Dakota's applicator license is suspended, so Dakota's new moss treatments pause at once.",
+    "more": [
+     "Every 30 days by default, and again before each expiry.",
+     "Expired, suspended or revoked all pause new bookings for that work.",
+     "Dakota's pressure washing jobs go on: that work needs no license where Sam works.",
+     "Rosie's team reviews the bookings already made within 1 business day.",
+     "Dakota's customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Dakota's applicator license is suspended.",
+      {
+       "card": {
+        "title": "Dakota · new moss treatments paused",
+        "lines": [
+         "Pressure washing jobs go on",
+         "Bookings already made: Rosie's team reviews them",
+         "Dakota's customers aren't told why"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam says your applicator license is suspended, so your new moss treatments are paused. Tell Sam if that's wrong.",
+      {
+       "as": "Dakota"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Pressure washing and the wash bay need no license where Sam works; S1-61 takes the registration. Moss treatment's license is S1-39."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Pressure washing pays Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pressure washer's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and wash techs are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: washing jobs and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Pressure washing is booked ahead, around the weather. It's never sent now."
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: what the item is, and its size. A bigger item takes longer to wash and dry.",
+     "Heavy mildew or rust is asked here too, since it changes the price.",
+     "Questions that only add detail come later, once a time is saved."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "What are you bringing in, and how big is it?"
+     ],
+     [
+      "cust",
+      "agent",
+      "A metal patio table and 4 chairs."
+     ]
+    ],
+    "vary": {
+     "price:list+before:full": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What are you bringing in, and how big is it?"
+       ],
+       [
+        "cust",
+        "agent",
+        "A gas grill, 3 burners. The propane tank is off."
+       ]
+      ]
+     },
+     "price:list+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What are you bringing in, and how big is it? A bigger boat takes longer."
+       ],
+       [
+        "cust",
+        "agent",
+        "An 18-foot boat, on its trailer."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What are you bringing in, and what shape is it in?"
+       ],
+       [
+        "cust",
+        "agent",
+        "A teak table and 4 chairs. Gray and dry."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "What are you bringing in, and how dirty is it?"
+       ],
+       [
+        "cust",
+        "agent",
+        "A riding mower. Thick grease under the deck."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "For a drop-off, the times are drop-off slots, set by how many items the wash bay takes in a day. No wash tech's hours show: once the item is in, it goes to a tech with the skill.",
+    "more": [
+     "Sam set the daily number at sign-up. A full day isn't shown.",
+     "The AI passes on what the item is and its size. No name or street address yet.",
+     "Nobody can pay to be shown higher.",
+     "A day shows only if a tech with the skill is in. Teak work shows only the days Parker works.",
+     "Pick-up comes once it's READY, in the pick-up hours."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A patio set wash at Lee Wash Bay is $35, paid at the counter. A card is saved for a $20 fee, for a no-show or a late cancel. Drop-off times:",
+      {
+       "times": [
+        "Sat Oct 24 · 11:00am drop-off",
+        "Sat Oct 24 · 2:00pm drop-off",
+        "Tue Oct 27 · 9:00am drop-off"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:list+before:none+after:counter": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "A patio set wash at Lee Wash Bay is $35, paid at the counter. Nothing is taken to book. Drop-off times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Tue Oct 27 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:full+after:none": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "A grill deep clean at Lee Wash Bay is $55, paid in full when you book. Drop-off times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Tue Oct 27 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos": {
+      "does": "The drop-off times come by text, right after Parker's price. They are slots by the wash bay's daily number, not a tech's hours.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Here are drop-off times for your teak set restore, at the $90 Parker set.",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Tue Oct 27 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "does": "The drop-off times come by text, right after Parker's price. They are slots by the wash bay's daily number, not a tech's hours.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Here are drop-off times for your teak set restore. It's $90, paid at the counter. Nothing is taken to book.",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Tue Oct 27 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "An equipment degrease at Lee Wash Bay is priced at the counter. Only the $25 inspection is owed, even if you say no. Drop-off times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Tue Oct 27 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:counter": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "An equipment degrease at Lee Wash Bay is priced at the counter. Only the $25 inspection is owed, even if you say no. You pay at the counter. Nothing is taken to book. Drop-off times:",
+        {
+         "times": [
+          "Sat Oct 24 · 11:00am drop-off",
+          "Sat Oct 24 · 2:00pm drop-off",
+          "Tue Oct 27 · 9:00am drop-off"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No wash tech is named: once the item is in, the wash bay gives it to a tech with the skill.",
+    "more": [
+     "A wish for one wash tech goes in the notes, and the wash bay follows it where it can."
+    ],
+    "vary": {
+     "price:photos": {
+      "does": "The times came by text on this path, so Alex replies to Rosie's text with a drop-off time.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "A"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex unloads the patio set at the counter. Alex reads the code from the confirmation or the reminder, and Parker texts it in.",
+    "more": [
+     "At Lee Wash Bay, the visit is a drop-off: the code is given when the item is left.",
+     "The desk can type the code on the portal's Today page instead.",
+     "The code also confirms the visit for Rosfield's $2."
+    ],
+    "vary": {
+     "price:list+before:full": {
+      "does": "It's 11:00am, and Alex wheels the grill to the counter. Alex reads the code from the confirmation or the reminder, and Parker texts it in."
+     },
+     "price:list+before:card": {
+      "does": "It's 11:00am, and Alex tows the boat into the yard. Alex reads the code from the confirmation or the reminder, and Parker texts it in."
+     },
+     "price:photos": {
+      "does": "It's 11:00am, and Alex unloads the teak set at the counter. Alex reads the code from the confirmation or the reminder, and Parker texts it in."
+     },
+     "price:visit": {
+      "does": "It's 11:00am, and Alex rolls the riding mower into the bay. Alex reads the code from the confirmation or the reminder, and Parker texts it in."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M., Sat 11:00am. A metal patio table and 4 chairs."
+     ],
+     [
+      "san",
+      "cust",
+      "Your patio set is checked in at Lee Wash Bay with Parker. We'll text you when it's ready. Thanks, Alex!"
+     ]
+    ],
+    "vary": {
+     "price:list+before:full": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "Checked in: Alex M., Sat 11:00am. A gas grill, tank off."
+       ],
+       [
+        "san",
+        "cust",
+        "Your grill is checked in at Lee Wash Bay with Parker. We'll text you when it's ready. Thanks, Alex!"
+       ]
+      ]
+     },
+     "price:list+before:card": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "Checked in: Alex M., Sat 11:00am. An 18-foot boat, on its trailer."
+       ],
+       [
+        "san",
+        "cust",
+        "Your boat is checked in at Lee Wash Bay with Parker. We'll text you when it's ready."
+       ]
+      ]
+     },
+     "price:photos+before:none": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "Checked in: Alex M., Sat 11:00am. A teak table and 4 chairs."
+       ],
+       [
+        "san",
+        "cust",
+        "Your teak set is checked in at Lee Wash Bay with Parker. We'll text you when it's ready. Thanks, Alex!"
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "Checked in: Alex M., Sat 11:00am. A riding mower, fuel tank empty."
+       ],
+       [
+        "san",
+        "cust",
+        "Your mower is checked in at Lee Wash Bay with Parker. Parker will text you the price before any work. Thanks, Alex!"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex at the counter, Sat 11:00am. If the plug-in asks for it, Parker notes what's already there before any work: chips, rust, cracks and loose parts.",
+    "vary": {
+     "price:list+before:full": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "Before the wash: rust on the grates, and a cracked knob.",
+        {
+         "photos": [
+          "Grill, before the wash"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s visit as the before record."
+       ]
+      ]
+     },
+     "price:list+before:card": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "Before the wash: a scrape on the hull, and a loose rub rail.",
+        {
+         "photos": [
+          "Hull, before the wash"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s visit as the before record."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "Before the wash: gray wood, and one cracked chair slat.",
+        {
+         "photos": [
+          "Teak set, before the wash"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s visit as the before record."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "Before the wash: a dent in the mower deck, and a worn belt.",
+        {
+         "photos": [
+          "Mower deck, before the wash"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s visit as the before record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "Before Alex pays, Parker shows the clean patio set at the counter. A fix Alex asks for now is done before paying.",
+    "vary": {
+     "price:list+before:full": {
+      "does": "Before Alex takes it, Parker shows the clean grill at the counter. A fix Alex asks for now is done first."
+     },
+     "price:list+before:card": {
+      "does": "Before Alex pays, Parker walks Alex around the clean boat in the yard. A fix Alex asks for now is done before paying."
+     },
+     "price:photos+before:none": {
+      "does": "Before Alex pays, Parker shows the oiled teak set at the counter. A fix Alex asks for now is done before paying."
+     },
+     "price:visit+before:none": {
+      "does": "Before Alex pays, Parker shows the degreased mower in the bay. A fix Alex asks for now is done before paying."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "vary": {
+     "price:list+before:full": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE Alex M.: 3-burner gas grill, grates rusty, degrease the firebox next time"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private notes."
+       ]
+      ]
+     },
+     "price:list+before:card": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE Alex M.: 18-foot boat, scrape on the hull, rub rail loose. Drain plug out"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private notes."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE Alex M.: teak set, oiled, no stain. Oil again in 12 months"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private notes."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE Alex M.: riding mower, heavy grease under the deck, worn belt"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private notes."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "Lee Wash Bay's main path above is the drop-off at the counter. This branch is an after-hours drop-off: a trailer left in the yard has no code, so DONE comes when it's checked in.",
+    "more": [
+     "At pick-up, the item goes only to the customer or someone they name.",
+     "Next come the before notes, the price or the OK, and the wash. READY and the pick-up come after the work."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-23",
+    "more": [
+     "Wash water at the bay drains to its own recovery system, never a storm drain, where local rules require it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Parker washes the patio set at low pressure and lets it dry: what was booked, and anything Alex said yes to.",
+    "more": [
+     "Parker texts IN, DRYING and READY as it goes.",
+     "Next, Alex hears it's ready, picks it up and pays at the counter."
+    ],
+    "vary": {
+     "after:bill": {
+      "more": [
+       "Parker texts IN, DRYING and READY as it goes.",
+       "Next, Parker texts DONE with the lines, and Rosie texts the bill."
+      ]
+     },
+     "after:card": {
+      "more": [
+       "Parker texts IN, DRYING and READY as it goes.",
+       "Next, Parker texts DONE, and the saved card is charged."
+      ]
+     },
+     "after:none": {
+      "more": [
+       "Parker texts IN, DRYING and READY as it goes.",
+       "Nothing more is paid through Rosie."
+      ]
+     },
+     "price:list+before:full": {
+      "does": "Parker degreases and washes the grill: what was booked, and anything Alex said yes to.",
+      "more": [
+       "Parker texts IN, DRYING and READY as it goes.",
+       "Nothing more is paid through Rosie."
+      ]
+     },
+     "price:list+before:card": {
+      "does": "Parker washes the boat and its trailer, about 2½ hours: what was booked, and anything Alex said yes to."
+     },
+     "price:photos+before:none": {
+      "does": "Parker cleans the teak set, lets it dry and oils it: what was booked, and anything Alex said yes to."
+     },
+     "price:visit+before:none": {
+      "does": "Parker degreases the mower at the price Alex OK'd, and anything else Alex said yes to."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "t": "Sat Oct 24, 2:00pm",
+    "does": "The patio set is clean and dry. Parker texts READY with a photo. Rosie tells Alex in the wash bay's name: what was done, the pick-up times and anything due.",
+    "more": [
+     "Only Alex, or someone Alex names, can pick it up.",
+     "Anything still due is paid at the counter at pick-up.",
+     "Alex can reply within 24 hours if something's wrong, and Sam is told.",
+     "Sent inside text hours. A late READY waits for 9am."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "READY Alex M.",
+      {
+       "photos": [
+        "Patio set, clean"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your patio set is clean and ready at Lee Wash Bay.",
+      {
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "What was done: on your page, with a photo",
+         "Pick-up: today until 6pm, or Tue to Sun, 9am to 6pm",
+         "Bring the code you used to drop it off",
+         "Anything due: paid at the counter",
+         "Something wrong? Reply within 24 hours"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/r/a7"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "after:none": {
+      "does": "The grill is degreased and clean. Parker texts READY with a photo. Rosie tells Alex in the wash bay's name: what was done and the pick-up times. It's paid in full.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "READY Alex M.",
+        {
+         "photos": [
+          "Grill, clean"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your grill is clean and ready at Lee Wash Bay.",
+        {
+         "card": {
+          "title": "Ready for pick-up",
+          "lines": [
+           "What was done: on your page, with a photo",
+           "Pick-up: today until 6pm, or Tue to Sun, 9am to 6pm",
+           "Bring the code you used to drop it off",
+           "Paid in full when you booked",
+           "Something wrong? Reply within 24 hours"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/a7"
+         }
+        }
+       ]
+      ]
+     },
+     "price:list+before:card": {
+      "does": "The boat is clean, and the trailer rinsed. Parker texts READY with a photo. Rosie tells Alex in the wash bay's name: what was done, the pick-up times and anything due.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "READY Alex M.",
+        {
+         "photos": [
+          "Boat, clean"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your boat is clean and ready at Lee Wash Bay.",
+        {
+         "card": {
+          "title": "Ready for pick-up",
+          "lines": [
+           "What was done: on your page, with a photo",
+           "Pick-up: today until 6pm, or Tue to Sun, 9am to 6pm",
+           "Bring the code you used to drop it off",
+           "$140, paid at the counter",
+           "Something wrong? Reply within 24 hours"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/a7"
+         }
+        }
+       ]
+      ]
+     },
+     "price:photos+before:none": {
+      "t": "Sat Oct 24, 4:00pm",
+      "does": "The teak set is clean, dry and oiled. Parker texts READY with a photo. Rosie tells Alex in the wash bay's name: what was done, the pick-up times and anything due.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "READY Alex M.",
+        {
+         "photos": [
+          "Teak set, oiled"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your teak set is clean, oiled and ready at Lee Wash Bay.",
+        {
+         "card": {
+          "title": "Ready for pick-up",
+          "lines": [
+           "What was done: on your page, with a photo",
+           "Pick-up: today until 6pm, or Tue to Sun, 9am to 6pm",
+           "Bring the code you used to drop it off",
+           "$90, paid at the counter",
+           "Something wrong? Reply within 24 hours"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/a7"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "does": "The mower is degreased and dry. Parker texts READY with a photo. Rosie tells Alex in the wash bay's name: what was done, the pick-up times and anything due.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "READY Alex M.",
+        {
+         "photos": [
+          "Mower deck, clean"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your mower is clean and ready at Lee Wash Bay.",
+        {
+         "card": {
+          "title": "Ready for pick-up",
+          "lines": [
+           "What was done: on your page, with a photo",
+           "Pick-up: today until 6pm, or Tue to Sun, 9am to 6pm",
+           "Bring the code you used to drop it off",
+           "The price you OK'd, paid at the counter",
+           "Something wrong? Reply within 24 hours"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/a7"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "does": "Alex comes back at 3:30pm and gives the drop-off code, or the person Alex named shows an ID. The patio set is shown at the counter, and loaded once anything due is paid.",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: the item stays, and they're asked to come back with Alex's code.",
+     "Anything due is paid at the counter, the wash bay's own way.",
+     "Not picked up by the end of the pick-up hours: it goes as 'An item isn't picked up', after the visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Show Alex the patio set, and load it once anything due is paid."
+     ]
+    ],
+    "vary": {
+     "price:list+before:full": {
+      "does": "Alex comes back at 3:30pm and gives the drop-off code, or the person Alex named shows an ID. The grill is shown at the counter and handed over. It's paid in full.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "That's Alex M.'s code. Show Alex the grill, and hand it over. It's paid in full."
+       ]
+      ]
+     },
+     "price:list+before:card": {
+      "does": "Alex comes back at 3:30pm and gives the drop-off code, or the person Alex named shows an ID. The boat is shown in the yard, and hitched up once it's paid.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "That's Alex M.'s code. Show Alex the boat, and hitch it up once it's paid."
+       ]
+      ]
+     },
+     "price:photos+before:none": {
+      "does": "Alex comes back at 4:30pm and gives the drop-off code, or the person Alex named shows an ID. The teak set is shown at the counter, and loaded once it's paid.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "That's Alex M.'s code. Show Alex the teak set, and load it once it's paid."
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "does": "Alex comes back at 3:30pm and gives the drop-off code, or the person Alex named shows an ID. The mower is shown in the bay, and rolled out once it's paid.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "5160"
+       ],
+       [
+        "san",
+        "staff",
+        "That's Alex M.'s code. Show Alex the mower, and roll it out once it's paid."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "vary": {
+     "price:photos": {
+      "t": "Sat Oct 24, 6:00pm"
+     }
+    }
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "At Lee Wash Bay, Alex pays when picking up the item."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "An item is washed at the bay or at the home, never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A drop-off at the wash bay is never booked for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The wash bay sells no repeating plan: each item is its own drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for washing at the bay."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee Wash Bay books drop-off slots, set by how many items it takes in a day."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee Wash Bay books drop-off slots, set by how many items it takes in a day."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee Wash Bay books drop-off slots, set by how many items it takes in a day."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no wash tech. A wish for one goes in the notes."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The plug-in names no form to sign at the wash bay."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The wash bay sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The wash bay sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The wash bay sells no repeating plan."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A drop-off at the wash bay needs no written contract."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "An item waits in its drop-off slot, so a wash tech running late moves no customer."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The wash bay sells no repeating plan."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes at the wash bay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The patio set is left at the bay: READY and the pick-up follow the wash."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for washing at the bay."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A wash at the bay is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A wash has no result that comes later: READY is the result."
+   },
+   {
+    "op": "words",
+    "at": "A6-03",
+    "does": "Dee is booked, and the wash bay is told. Dee's text goes out at 9:00am, when her text hours start. Nothing was taken, and no card is saved."
+   },
+   {
+    "op": "words",
+    "at": "A6-05",
+    "does": "Politely, with no reason given. Nothing was taken, so there's nothing to release."
+   },
+   {
+    "op": "words",
+    "at": "A6-07",
+    "does": "Still no answer at 12:00pm, so the request is declined politely, with no reason given. Nothing was taken, so nothing was charged."
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW RV washing"
+     ],
+     [
+      "san",
+      "owner",
+      "RV washing for Lee Wash Bay: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like patio set washes?",
+      {
+       "card": {
+        "title": "Patio set washes work like this",
+        "lines": [
+         "Customers come to you",
+         "Nothing taken",
+         "Paid at the counter"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "A patio set wash at the bay has no cancel period. The wash bay signs no contracts and sells nothing the state's cancel rules cover."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The wash bay signs no contracts and sells no plans; nothing it sells comes with a cancel period."
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "more": [
+     "Patio set washes already booked keep $35, even after Nov 2.",
+     "A time being saved right now keeps the price on the customer's screen.",
+     "The wash bay sells no plans, so no plan notice goes out.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: patio set wash $40 for visits from Mon Nov 2. Patio set washes already booked keep $35."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-70",
+    "does": "Morgan P. cancelled extra work with Lee Pressure Washing inside the cancel window. Where the state's rules require it, the refund has a date. Sam was reminded each day, and the date passed.",
+    "more": [
+     "Morgan was told the date at the cancel.",
+     "A person on Rosie's team calls Sam the same day."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Morgan P.'s refund for the cancelled extra work was due yesterday. A person from Rosie's team will call you today.",
+      {
+       "buttons": [
+        "It's done",
+        "Call me now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The wash bay sends no proposals or plans: each item is priced from the board, from photos, or at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "the wash bay and the crew never leave a child in the booking"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state's form asks for a license or a contractor registration to pressure wash, it's asked here.",
+     "Some states ask only above a job-size amount. Rosie then checks each job's total against it.",
+     "Where only a county licenses this work, Sam gives that license the same way.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state's pesticide form asks for the company's pest control license, and each applicator's own. What's the company's?"
+     ],
+     [
+      "owner",
+      "san",
+      "PB22871"
+     ],
+     [
+      "san",
+      "owner",
+      "Moss treatment is set up, under the company's license. AI assistants can book it now. You'll add your people at the end. Next, Lee Wash Bay: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "more": [
+     "Sam doesn't spray moss treatments himself, so moss treatment waits for the person on the team who does.",
+     "Moss and algae treatments are pesticide work. Where the state's rules require it, the company and each person who sprays hold a license.",
+     "Whose license counts comes from the state's form: the company's, each person's, or both."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Washing a patio set needs no license where Sam works, so it can be done at a home too.",
+     "Where a state's or city's rules limit washing at a home, like wash water rules, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-38",
+    "more": [
+     "Where a state or city licenses a wash bay, its form asks for it here instead.",
+     "A city permit for the bay's wash water is asked the same way.",
+     "Each wash tech can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pressure Washing. Sam Lee added you to the team. Reply YES to join and get your jobs here by text. If you spray moss treatments, add your license number. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Dakota"
+      }
+     ]
+    ],
+    "more": [
+     "Logan gets the same invite. Parker and Hayden get theirs from Lee Wash Bay.",
+     "Pat gets one too, to OK prices for Lee Pressure Washing.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Dakota replies YES with an applicator license number, then checks what Sam set. One reply covers every kind of work Dakota does.",
+    "more": [
+     "Only moss treatment needs a person's license here. Logan, Parker and Hayden reply a plain YES.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES AP30417",
+      {
+       "as": "Dakota"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Pressure Washing! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Dakota Price · Lee Pressure Washing",
+        "lines": [
+         "Every pressure washing job, and moss treatment",
+         "Applicator license AP30417",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Dakota"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Dakota"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. Only Dakota has a license to add for moss treatment, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Dakota's applicator license is on file as given. The others need none. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Dakota: pressure washing and moss treatment",
+         "Logan: pressure washing",
+         "Parker: wash bay, teak and home visits",
+         "Hayden: wash bay"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Reese K. to Lee Pressure Washing. Reese gets one invite and replies YES. Pressure washing licenses nobody where Sam works, so nothing is checked.",
+    "more": [
+     "Reese can be booked once Sam says yes.",
+     "To spray moss treatments, Reese would send an applicator license number. It's optional and shown as given, not checked by Rosie.",
+     "No reply in 48 hours: one reminder, then Sam is told."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Pressure Washing. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Rosie checks no license; the owner says when one lapses. Here, Sam says Dakota's applicator license is suspended, so Dakota's new moss treatments pause at once.",
+    "more": [
+     "Every 30 days by default, and again before each expiry.",
+     "Expired, suspended or revoked all pause new bookings for that work.",
+     "Dakota's pressure washing jobs go on: that work needs no license where Sam works.",
+     "Rosie's team reviews the bookings already made within 1 business day.",
+     "Dakota's customers aren't told why."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Sam says Dakota's applicator license is suspended.",
+      {
+       "card": {
+        "title": "Dakota · new moss treatments paused",
+        "lines": [
+         "Pressure washing jobs go on",
+         "Bookings already made: Rosie's team reviews them",
+         "Dakota's customers aren't told why"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam says your applicator license is suspended, so your new moss treatments are paused. Tell Sam if that's wrong.",
+      {
+       "as": "Dakota"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Pressure washing and the wash bay need no license where Sam works; S1-61 takes the registration. Moss treatment's license is S1-39."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Pressure washing pays Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The pressure washer's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and wash techs are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: washing jobs and drop-offs."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Pressure washing is booked ahead, around the weather. It's never sent now."
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If someone swallowed a cleaning mix or got it in their eyes, call Poison Control now at 1-800-222-1222. If they can't breathe, call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said a child got cleaning mix in the eyes. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "Cleaning mix in a child's eyes",
+         "Told to call Poison Control, or 911",
+         "Nothing booked"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-05",
+    "more": [
+     "The plug-in's other questions before times: which surfaces, and the year built and any paint.",
+     "For a roof, what it's made of. For any job, plants, a pond or pets near the work.",
+     "A painted home built before 1978 adds the lead-safe setup, so it's asked before the price."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "A 2-car driveway and the front walk is $179. Bigger concrete is $0.25 a square foot, with a $150 minimum. They're Sam's own prices.",
+     "The price comes from the surface and its size, from the answers above."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "With no working spigot, the crew brings its water tank, where Sam set one.",
+     "Pets stay inside until the surfaces dry."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-17",
+    "more": [
+     "The crew uses the outside spigot. With no water and no tank, it counts as no way in."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "does": "Back to Alex's driveway, 8:20am. Dakota checks what the plug-in asked Alex to have ready: a working outside spigot, and the cars moved. Both are ready, so no fee applies.",
+    "more": [
+     "Had no code been entered, no fee would be charged at DONE.",
+     "Other examples: the side gate open, or the lead pamphlet's receipt signed for an older painted home.",
+     "Missing, but the plug-in lets the work go on: Dakota notes it, and starts.",
+     "No water and no tank, or cars left on the driveway: it goes as 'Can't go ahead'."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "For pressure washing: before photos of each surface, its cracks and old stains, and anything nearby.",
+     "Then the storm drain at the curb is covered, so the wash water stays out of it, where local rules require it.",
+     "Plants near the work are wet down and covered before any cleaning mix."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Extra work is done only when Alex says yes to its price. Rosie never offers it in its texts."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Wind over the limit at the house",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.19"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "title": "Dakota stops the spraying for the wind",
+       "does": "A what-if: say Alex had also booked the $375 house soft wash. Gusts go over Sam's limit for spraying a mix, so Dakota stops that part.",
+       "more": [
+        "The mix would drift onto plants, cars and the neighbors' homes.",
+        "Work with no mix in the air, like the driveway, goes on today.",
+        "A moss treatment's wind limit comes from the product's label. Sam sets it for a soft wash.",
+        "The crew on site decides about the wind. Rosie never does."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "WIND too gusty to spray the siding at Alex M.'s. Driveway going ahead."
+        ]
+       ],
+       "needs": [
+        "pf.edges",
+        "pf.visit"
+       ],
+       "tells": []
+      },
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.19",
+        "7.12"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "title": "Moves the house wash, at no cost",
+       "does": "Alex gets new times for the house wash, at no cost. The driveway is still washed today.",
+       "more": [
+        "It stays one booking, with one $2 for Rosie.",
+        "The house wash is billed when it's done.",
+        "No reply by 8pm: the first new time stays, and Alex can still change it."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "It's too gusty to spray your siding safely today. The driveway is still washed as planned. Pick a new day for the house wash, at no cost:",
+         {
+          "times": [
+           "Fri Oct 23 · arriving 8–10am · Dakota",
+           "Mon Oct 26 · arriving 8–10am · Dakota"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "booked",
+        "pf.edges"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:15am",
+    "vary": {
+     "price:photos+after:bill": {
+      "t": "Thu Oct 22, 12:20pm"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 10:17am",
+    "vary": {
+     "price:photos+before:deposit": {
+      "t": "Thu Oct 22, 12:22pm"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 10:20am",
+    "vary": {
+     "price:photos+before:deposit+after:bill": {
+      "t": "Thu Oct 22, 12:25pm",
+      "does": "Back to Alex, Thu 12:25pm: the money is in. The receipt goes out by text and email, with the plug-in's touch-up promise."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "vary": {
+     "price:photos": {
+      "t": "Thu Oct 22, 2:00pm"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-45",
+    "vary": {
+     "before:none": {
+      "does": "Back to Alex's driveway, 8:20am. Dakota checks what the plug-in asked Alex to have ready: a working outside spigot, and the cars moved. Both are ready, so the work starts."
+     },
+     "before:card": {
+      "does": "Back to Alex's driveway, 8:20am. Dakota checks what the plug-in asked Alex to have ready: a working outside spigot, and the cars moved. Both are ready, so the work starts."
+     },
+     "before:deposit": {
+      "does": "Back to Alex's house, 8:20am. Dakota checks what the plug-in asked Alex to have ready: a working outside spigot, and pots and grills moved. Both are ready, so the work starts."
+     },
+     "before:full": {
+      "does": "Back to Alex's deck, 8:20am. Dakota checks what the plug-in asked Alex to have ready: a working outside spigot, and the deck cleared. Both are ready, so the work starts."
+     }
+    }
+   },
+   {
+    "op": "more",
+    "at": "B8-10",
+    "more": [
+     "For outside work, Dakota goes ahead when the surface and the water can be reached. It's a no-show only when they can't."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "vary": {
+     "price:list+before:full": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "BEFORE gray boards by the steps, one loose board",
+        {
+         "photos": [
+          "Deck, before",
+          "Steps, before"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s job."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "vary": {
+     "price:list+before:full": {
+      "does": "Before DONE, Dakota and Alex walk the deck together. Anything wrong is fixed before Dakota texts DONE.",
+      "more": [
+       "The plug-in names what's checked. Here: the boards are even, with no streaks or raised fuzz.",
+       "After photos are taken from the same angles as the before photos."
+      ]
+     }
+    }
+   },
+   {
+    "op": "more",
+    "at": "B10-08",
+    "more": [
+     "It's a touch-up of the missed spots, never money from Rosie."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Washing happens at the place, never by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Pressure washing is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Pressure washing is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Pressure washing is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Pressure washing is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or home warranty pays for pressure washing."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Washing jobs are booked in arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Washing jobs are visits, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Washing jobs book a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A washing crew never looks after a child; an adult on the booking is there, or nobody needs to be home."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "Stains are priced and treated at the same visit, after a test spot."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for pressure washing."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A washing job has no report that comes later: the after photos come with DONE."
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "At the wash bay, every service is paid at the counter at pick-up, and nothing is taken when booking.",
+     "That's the plug-in's start for drop-offs: no wash tech is named, so a missed drop-off costs nobody's time.",
+     "A patio set wash at home is a home visit: $75. Nothing is taken when booking there either.",
+     "There's no counter at a home, so Rosie texts the bill after, with a pay link."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any paid when they book, or done at a customer's home? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your wash bay, paid at the counter at pick-up",
+         "Nothing taken when they book",
+         "No card saved, so no fee can be charged"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Keep it. A at their home too, 75, bill them after"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. For a patio set wash, the customer picks the place and sees both prices first.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Patio set wash at the shop",
+          "$35",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Patio set wash at their home",
+          "$75",
+          "Nothing taken",
+          "Rosie texts the bill"
+         ],
+         [
+          "Trailer wash, trash bin wash, kayak wash",
+          "$40, $20, $25",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Grill deep clean",
+          "$55",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Boat wash",
+          "$140",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Teak set restore",
+          "From photos",
+          "Nothing taken",
+          "At the counter"
+         ],
+         [
+          "Equipment degrease",
+          "At the counter",
+          "Nothing taken",
+          "At the counter"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 patio set wash works this way.",
+    "more": [
+     "Sam picked this for every wash bay service.",
+     "Without a card, a no-show can't be charged.",
+     "A patio set wash at home takes nothing either: its bill is texted after."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "With nothing taken, it works like this:",
+      {
+       "card": {
+        "title": "Nothing taken",
+        "lines": [
+         "Patio set wash · $35",
+         "The customer's YES books it",
+         "No card, so no fee",
+         "Paid at the counter at pick-up"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Parking",
+      "On the street, in front of the house"
+     ],
+     [
+      "Pets",
+      "A cat, kept inside"
+     ],
+     [
+      "Gate or door code",
+      "No gate"
+     ],
+     [
+      "Outside spigot",
+      "By the front steps"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "form": [
+     [
+      "Form",
+      "Lead pamphlet receipt: I got the lead pamphlet before the work"
+     ],
+     [
+      "Due",
+      "Before the visit"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ],
+    "more": [
+     "Other forms: a consent, an entry statement for a lockout, a conflict form, or an event's planning form.",
+     "It stays on file for the plug-in's time, so a later booking skips it.",
+     "Not done by its due date: one reminder, then Sam decides to keep it, move it, or cancel with no fee.",
+     "Here: a painted home built before 1978 gets the lead pamphlet, with a receipt signed on this page.",
+     "Nothing painted is washed until the receipt is signed."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "Other forms: a consent, an entry statement for a lockout, a conflict form, or an event's planning form.",
+       "It stays on file for the plug-in's time, so a later booking skips it.",
+       "Not done by its due date: one reminder, then Sam decides to keep it, move it, or cancel with no fee.",
+       "Here: a painted home built before 1978 gets the lead pamphlet, with a receipt signed on this page.",
+       "Nothing painted is washed until the receipt is signed."
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "pressure work is never named-only: a rating is asked for every job"
+   },
+   {
+    "op": "words",
+    "at": "B4-14",
+    "does": "The work is priced at the visit, like a stain treatment. Only the {{fee:$89}} trip fee is promised now. Dakota quotes it there, and Alex says yes before any work.",
+    "more": [
+     "At booking: {{pay.asks}}.",
+     "The price: {{pay.price}}.",
+     "The {{fee:$89}} counts toward the work's price.",
+     "Alex is told before the yes: the {{fee:$89}} trip fee is owed, even after a no to the price.",
+     "No full price can be taken, since the price isn't known yet."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-22",
+    "does": "Say Morgan's plan is billed once a month. Both visits go on one bill on the 1st. This is that path's one bill.",
+    "more": [
+     "Each visit still gets its own code or DONE, and each line shows its date and work.",
+     "After it, the same rules as any bill: card or link, a decline, unpaid after 4 days.",
+     "Hours billed against a quoted range: each visit's hours add to a running total the payer can see.",
+     "Before a visit would pass the top, the customer's own yes first."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Pressure Washing: your October visits. Think this is wrong? Reply here, and it goes to Sam.",
+      {
+       "list": {
+        "head": [
+         "Date",
+         "Visit",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Tue Oct 20",
+          "Wash 1",
+          "$179"
+         ],
+         [
+          "Wed Oct 21",
+          "Wash 2",
+          "$179"
+         ]
+        ]
+       },
+       "pay": {
+        "amount": "$358",
+        "what": "October's visits",
+        "link": "rosfield.com/p/m10"
+       },
+       "as": "Morgan",
+       "stop": "first"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-52",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Tomorrow, Sun Nov 1, your plan charges $358 to your saved card for October's two visits. Think this is wrong? Reply here, and it goes to Sam.",
+      {
+       "card": {
+        "title": "Plan charge · $358",
+        "lines": [
+         "Wash 1 · Tue Oct 20 · $179",
+         "Wash 2 · Wed Oct 21 · $179"
+        ],
+        "button": "See your plan",
+        "link": "rosfield.com/c/m10"
+       },
+       "as": "Morgan",
+       "stop": "first"
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "Pilot: started from the cleaner (Set service), \"from\" set to cleaner. Pressure washing runs the same way: a crew at the customer's place, priced by the surface and its size, outside work with nobody home, and a drop-off shop for flow A. The cleaner's drop-off ops carried over; every rename pair and own word was rewritten for this work, and the cleaner's plan, lockbox and rug words are gone.\nFlow B, the usual side: Lee Pressure Washing LLC (pressure washing, plus roof moss treatment as its second kind of work). Flow A, the less usual side: Lee Wash Bay LLC, Sam's second company, where patio sets, trailers, boats, grills, kayaks and trash bins are dropped off, washed and picked up. The old flowchart is all flow B; flow A has no old nodes and uses the plug-in's safe defaults.\nNames: Jordan and Casey became crew leads Dakota and Logan (Dakota holds the applicator license); Riley and Avery became wash techs Parker and Hayden; the master's partner Jamie is Taylor. Addresses: Alex at 27 Hillside Dr, the company at 910 Harbor Rd, the wash bay at 15 Depot St. Neutral names, so the master's pronouns still fit.\nPrices are the example business's own, and every master number is kept so sums still add up: $179 driveway wash (a 2-car driveway and the front walk; bigger concrete $0.25 a sq ft, $150 minimum), $150 deck wash, $640 2-story house soft wash from photos (25% deposit $160, rest $480), $245 stain treatment priced at the visit ($165 oil + $80 rust), $89 trip fee, $199 gutter brightening, $160 back patio and $95 front steps found at the visit, $900 roof moss treatment as its own job. Moss treatment: $149 shed roof, $189 house roof, $120 an hour hourly work. Wash bay: $35 patio set, $40 trailer, $20 trash bin, $25 kayak, $55 grill deep clean, $140 boat wash (2½ hours), $90 teak set restore from photos, $25 inspection for an equipment degrease, $75 patio set at home, $20 fee ($40 for the boat).\nThe old flowchart's $100 roof deposit \"never over 10% or $1,000\" and its written agreement \"over $200, everywhere\" were one state's rules: here they are switches (deposit cap from the state form; a written contract above an amount where the state's rules require it, B4-57). The $89 trip fee replaces \"late cancel or no access\", and is charged only when Sam confirms it.\nMoney B: list|hold|bill is the main story (the $89 trip fee held, Rosie texts the bill). Also used: list|none|bill (nothing up front, the old flowchart's pay link), list|card|card (a card saved and charged at DONE), photos|deposit|bill (the old flowchart's photo price, Sam's OK, signed estimate and deposit, here a 2-story house wash) and visit|hold|bill (oil and rust stains priced after a test spot). Paid on the crew's phone, by link or by check are all branches of B9-06. Review (Oct 22): list|full|none (the deck wash paid in full) was listed only because the master's sign-up set it; washing is paid after the job, so it is dropped and the deck wash follows the $89 hold (S1-13, S1-16, S1-17, and the photos path's $40 deck deposit too). The photos path's deposit what-ifs (S11-29 to S11-34, S12-26) are the $160 house wash deposit.\nMoney A: list|none|counter is the main story (nothing taken, paid at the counter at pick-up), with photos|none|counter (a teak set restore) and visit|none|counter (a riding mower degrease priced at the counter). Review (Oct 22): list|card|counter (a card saved for a $20 fee), list|hold|counter (the boat wash's $40 hold) and list|full|none (the grill paid in full) were listed only because the master's sign-up sets a barbershop that way; a drop-off names no wash tech, so a missed drop-off costs nobody's time, and the wash bay takes nothing ahead. They are dropped, and the sign-up (S1-42, S1-45, S1-47, S1-49, S1-51) says nothing is taken. The patio set wash at home takes nothing either: Rosie texts the bill after, on the other flow's list|none|bill path. A7-02's day-before hold, A10-05's contract branch and A10-06's proposal branch are off (no holds, contracts or plans at the bay).\nTiming: Alex's driveway takes one person about 2 hours, so DONE, the bill and the receipt moved to 10:15am, 10:17am and 10:20am (words ops with t); a job that runs long reaches Kim about 11:15am, and Kim's gate code fails at 10:50am (renamed times). On the photos path the 2-story house wash takes a crew of two about 4 hours: the day list shows it with Logan, and DONE, the bill, the receipt and the rating are 12:20pm, 12:22pm, 12:25pm and 2:00pm. Flow A: drop-off Sat 11:00am, READY 2:00pm, pick-up 3:30pm, rating 4:00pm; the teak set is oiled and ready at 4:00pm, picked up at 4:30pm, and rated at 6:00pm.\nLicenses: pressure washing and the wash bay need none where Sam works, so S1-60 and S1-63 take registration only (more lines say where a state or county licenses washing, or only above a job-size amount). Moss treatment is pesticide work: S1-39's words ask for the company's pest control license, and Dakota joins with an applicator license (S2-05, S2-06, S2-22 words). S2-28 keeps both branches (splitsKept): moss treatment licenses each applicator, washing licenses nobody. S11-48 and S11-51 words: a new washer joins with a plain YES; a suspended applicator license pauses only Dakota's moss treatments.\nOld flowchart features, where they went: the sagging roof is Rosa's call (B3-18 renames: the roof waits for a roofer, the driveway books on); a mix in someone's eyes is B3-19's own words (Poison Control, then 911); questions about a mix go to the crew (B3-21, B7-16); the lead pamphlet is B4-38's form branch (B4-86 more) and B7-30's lead-safe notice; ready to start (spigot, cars moved, gate) is B8-45's words; before photos, the storm drain and plants are B8-18's more lines; wind on the day is the own branch B8-22 'Wind over the limit at the house' (B8-x01, B8-x02); the deck added at the home is B8-23 (the back patio, $160) with its right to cancel; burned plants are B10-13.\nOff in flow B: the live line, video sessions, sent now (B4-81, B4-16, B6-03, B7-55, B8-58, S2-30), an expert reading answers, classes, a plan or warranty that pays (B4-43, B4-63, B7-05, B9-19), set start times, stays, seats and no-person bookings, a damage hold, a date that can't move, a smallest group, a child in the pro's care, an estimate becoming its own job, an outside check partway, deliveries, items taken to the shop (B8-72), and B10-07's permit inspection, report later, rented fan and item not taken back. B4-38's form branch and B7-05's 'A form isn't signed in time' stay on for the lead pamphlet's receipt.\nOff in flow A: plans, packages, memberships, insurance and first steps at the wash bay; contracts; child customers; person's-time, seat, space and stay bookings (drop-off slots name no wash tech); by-name stand-ins, crews, fixed dates and minimums; running-late options that don't fit a drop-off; classes; visits over several days; weather limits (the bay is indoors); damage holds; results later and rented items. A7-02's 'A day-before hold fails' stays on for the boat wash's $40 hold.\nPlug-in splits kept whole: B4-57 (a written contract only over the plug-in's amount), B4-78 (own or rent: a renter's house wash needs the owner's OK, and the lead pamphlet goes to the owner too), B8-69 and B8-70 (outside work needs nobody home; a lead-safe job needs an adult), S2-28 (see licenses), A8-02 (items may need something brought, like a grill's propane tank taken off).\nKeep: \"drain\", because the storm drain is this work's own word (covering it, keeping wash water out of it). Every master \"drain\" sentence is renamed; the only visible \"drain\" words are the storm drain's.\nRename notes: \"outside spigot\" is used instead of \"faucet\" (a plumbing word on the check list). The master's \"if nobody's home\" fee wording became \"if the crew can't get in\", since outside work goes on with nobody home. Kim's yard drain is a back patio wash; Lin's missed visit is cars left on the driveway or a locked gate.\nS11-56: both flows switch the patio wash from the $89 hold to nothing taken (both used). S11-54 in flow A sends no plan notice: the wash bay sells no plans. S11-72 in flow A is Lee Pressure Washing's cancelled extra work (the bay sells no memberships).\nNot sure: whether a wash bay's patio-set drop-off is common enough to be the main A story (wash bays more often take trailers and boats); the boat wash is the hold path. The $189 house-roof moss treatment and $0.25 a sq ft are example prices, not facts. Pick-up hours (Tue to Sun) are the example's.\nReview (Oct 22): flow A's wash bay is the example's own (the old flowchart has no wash bay); its prices are the example bay's. B4-34's screen matches the story (a cat inside, parked on the street, the spigot by the front steps); B4-86's screen is the lead pamphlet's receipt.\ntouch-up 4 (Oct 23): keep 'drips': blotting new oil drips on a driveway is real pressure washing; B3-18's 'if the ceiling cracks or drips' is the sagging roof danger example.\nRefit Q06 (Oct 27, 2026): money A list|none|counter (main), photos|none|counter, visit|none|counter; B list|card|bill (main), list|none|bill, list|card|card, photos|deposit|bill, visit|card|bill. Amounts: A $35 patio set wash, $90 teak set restore, visit = mower degrease; B $179 driveway (card paths: $89 trip fee), $640 soft wash with $160 deposit, $480 rest and the $89 fee, $149 roof moss (card before, bill after) as the added service. Facts plans, dropoff, photos, tips, extrawork; no switches. Sign-up money ops removed; \"held\" wording replaced with a saved card; plan bill and charge set to $179 a visit ($358 for two).",
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "S2-28"
+  ],
+  "B": [
+   "B5-34",
+   "B4-78",
+   "B8-69",
+   "S2-28"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "No card, so no $20 fee",
+    "The Groom's package",
+    "the Groom's package",
+    "Today · 3:00pm · Avery",
+    "6 bookings · Riley 3, Avery 3",
+    "Not bookable until it shows renewed",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "May the shop show photos of your hair?",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Do you do kids cuts? My son is 8.",
+    "Wants Saturday morning, with Riley",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Anything Riley should know?",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "takes jobs sent now, like a burst pipe",
+    "Promises the $25 consult; priced at the chair",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "Add photos of your hair",
+    "Gloss to finish",
+    "gloss",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "A barbershop has none, so nothing is sent here.",
+    "Can my son wait in the shop during my cut?",
+    "Plumbing JP031552 · electrical JE30417",
+    "could mean a salon or a barbershop",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Riley stopped Alex M.'s cut.",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "once Riley sees the hair",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "like a skin-test result",
+    "A barbershop has none.",
+    "Stopped Alex M.'s cut.",
+    "Haircut every 4 weeks",
+    "also does color and",
+    "A color correction",
+    "a color correction",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "barber, color and",
+    "a package of cuts",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Only the consult",
+    "Groom's package",
+    "Drain clearing",
+    "2 Consult only",
+    "service, color",
+    "Panel upgrade",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "water heater",
+    "Consult only",
+    "at the chair",
+    "At the chair",
+    "house calls",
+    "House calls",
+    "$25 consult",
+    "the consult",
+    "color quote",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "patch test",
+    "88 Elm St",
+    "on Elm St",
+    "Skin fade",
+    "skin fade",
+    "the chair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "the visit fee",
+    "each plumber",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Riley",
+    "Avery",
+    "like a burst pipe",
+    "barbershops set it",
+    "Classic cuts, fades and hot towel shaves.",
+    "doesn't do perms",
+    "skin fades",
+    "skin fade",
+    "a perm, which isn't on the shop's list",
+    "visit fee"
+   ],
+   "B": [
+    "quote. C paid in full when they book",
+    "Nobody was home for Lin W.'s",
+    "Jordan only, until others are licensed there",
+    "so Reese K.'s license isn't checked yet. Nobody new is offered until it is.",
+    "Casey · license not found",
+    "The lookup shows the license as expired. Casey stays on the team, and can be booked again once it shows renewed.",
+    "Casey's license",
+    "Casey · license expired",
+    "Not bookable until it shows renewed",
+    "so Lee Home Services can't book you until it shows renewed.",
+    "license MP045210",
+    "After that, or nobody home",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Call a mold cleanup company first",
+    "The before photo shows no crack.",
+    "The job should be done by 10am.",
+    "CANT START no proof Alex may have this work done",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "Yearly water heater flush plan",
+    "yearly flush plan",
+    "Can I run the dishwasher before you come?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "takes jobs sent now, like a burst pipe",
+    "Registration 2019-0451",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "like an overflowing drain",
+    "It's overflowing. Can someone come tonight?",
+    "Overflowing kitchen drain",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Thu Oct 22, 10:20am",
+    "Thu Oct 22, 10:05am",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Your drain is under warranty, so this visit is free.",
+    "Can Jordan also run a camera down my sewer line?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "The plug-in says how long the warranty lasts.",
+    "BEFORE old water stain on the cabinet floor",
+    "Say Alex also asks about a dripping faucet.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "Can Jordan also look at a dripping faucet?",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Then the booking goes on, marked urgent.",
+    "he's the one who replaces water heaters",
+    "Plumbing JP031552 · electrical JE30417",
+    "Jordan finds corroded shutoff valves.",
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "UPDATE getting a part, back 9:30",
+    "Jordan cracks the cabinet floor",
+    "HURT cut my hand, need to stop",
+    "No. It doesn't smell like gas.",
+    "replacing both shutoff valves",
+    "Texts the camera report link",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "the sink is now overflowing",
+    "next week's drain cleaning",
+    "covers part of the repair",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "The repair price is good",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Jordan found more work.",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Cracked cabinet floor",
+    "Cabinet floor, before",
+    "your new pipes are in",
+    "1-year labor warranty",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "leehomeservices.com",
+    "the $160 valve work",
+    "Sewer camera report",
+    "No. No huele a gas.",
+    "also does color and",
+    "Water heater flush",
+    "water heater flush",
+    "the shutoff valves",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "camera inspection",
+    "the kitchen drain",
+    "Supply line · $80",
+    "barber, color and",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "BOOK Tessa drain",
+    "Drain clearings",
+    "Book the repair",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "today's repair",
+    "Panel upgrade",
+    "water heaters",
+    "Kitchen drain",
+    "cut your hair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Water heater",
+    "water heater",
+    "shop's chair",
+    "at the chair",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Yard drain",
+    "yard drain",
+    "42 Oak St",
+    "88 Elm St",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "the visit fee",
+    "the plumber",
+    "your plumber",
+    "each plumber",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "Labor",
+    "like a burst pipe",
+    "sewer camera report",
+    "visit fee",
+    "a leaking pipe under my sink",
+    "My sink won't drain",
+    "won't drain",
+    "kitchen sink",
+    "the sink still full of water",
+    "under the sink",
+    "a faucet check",
+    "dripping faucet",
+    "faucet",
+    "tapping a neighbor's water line without asking",
+    "Shutoff valve and wall pipe",
+    "drain clearings",
+    "drain clearing",
+    "Your receipt is on your secure page, with what was paid and how. Think this is wrong? Reply here, and it goes to Sam.",
+    "new pipes put in"
+   ]
+  },
+  "A": {
+   "S1-61": "7421d186d5",
+   "S1-38": "b50b0bd4e8",
+   "S1-43": "e16d5048f3",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-50": "6f43775326",
+   "A4-14": "95c7ffcfab",
+   "A4-15": "db5792db95",
+   "A8-03": "7accda6f86",
+   "A8-04": "8caf7636f3",
+   "A8-23": "e3a35f7f9e",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A8-10": "6409a62763",
+   "A8-43": "7b0f73c701",
+   "A8-50": "0f26abfc87",
+   "A8-54": "bc2f9467fd",
+   "A10-02": "c9223be948",
+   "A9-03": "219c966588",
+   "A4-01": "7e7a61082c",
+   "A4-24": "0a292df05b",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A6-03": "7171a00636",
+   "A6-05": "0e69163f75",
+   "A6-07": "6b130b9afb",
+   "S11-58": "87f7492a91",
+   "A10-05": "63c3536c7a",
+   "S11-54": "ce20fc799b",
+   "S11-70": "d2b2cf0360",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S1-61": "e30e71f65d",
+   "S1-38": "6301c86637",
+   "S1-43": "dd3ae2a1a9",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B3-19": "2f53161fb2",
+   "B4-05": "fb3a9061c8",
+   "B4-07": "9d0dbc90ad",
+   "B4-34": "74ff52d83d",
+   "B8-17": "dcff722a6d",
+   "B8-45": "09e62897a6",
+   "B8-18": "530038d2b8",
+   "B8-23": "dd780a2ec8",
+   "B8-22": "50d78f1af0",
+   "B8-41": "6e8e9825b2",
+   "B9-06": "f091432f2d",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B8-10": "5c9d4b937f",
+   "B8-39": "aa75251207",
+   "B10-08": "01bac94fd8",
+   "B4-01": "15f683e6cb",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B4-38": "9539521dc7",
+   "B10-32": "7713bff255",
+   "B4-14": "bea6443957",
+   "B9-22": "f691bde396",
+   "B7-52": "62f5c3d1b4"
+  }
+ }
+}

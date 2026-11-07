@@ -1,0 +1,2808 @@
+{
+ "id": "architect",
+ "name": "Architect",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "interior",
+ "plugin": {
+  "pf.license": {
+   "need": "An architect's state license, where the state requires one for the drawings. Each architect's own license, and the firm's registration where the state asks: the owner's own papers, shown as given, never checked by Rosie (D96).",
+   "who holds it": "Each architect, as the owner says. The firm holds its registration where the state asks for one.",
+   "how it's checked": "Not checked by Rosie. The owner keeps the papers.",
+   "insurance or bond": "Professional liability insurance: the owner's own certificate, shown as given, never checked.",
+   "blocks going live": "Nothing: Rosie shows no license claim for any architect.",
+   "renewals": "The owner's own list; Rosie sends no reminder for a license it never checked.",
+   "background checks": "None."
+  },
+  "pf.services": {
+   "shape": "a design consult and review at the studio (flow A), and site visits and design work at the customer's place (flow B); a video or photo review counts as flow A",
+   "price kind": "one price per visit or per phase, from the owner's own list; a travel fee on a site visit is part of the price shown; a design phase over $500 is OK'd by the owner first",
+   "examples": "the example firm's own prices (Lee Design Studio, Lee Architects), not a standard",
+   "list": [
+    {
+     "name": "Design consult at the studio, one room",
+     "price": "$35",
+     "kind": "one price",
+     "length": "about 45 minutes",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the front desk after the consult"
+    },
+    {
+     "name": "Video design review, one room",
+     "price": "$55, paid in full",
+     "kind": "one price",
+     "length": "about 30 minutes, by video, from photos of the room",
+     "where": "by video (flow A)",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Schematic design review at the studio",
+     "price": "$140",
+     "kind": "one price per phase",
+     "length": "1 to 2 hours",
+     "where": "at the studio",
+     "before": "a $40 deposit when booking",
+     "after": "the $100 rest paid at the desk when the drawings are picked up"
+    },
+    {
+     "name": "Design quoted from photos",
+     "price": "quoted from photos first, e.g. $90",
+     "kind": "quoted from photos",
+     "where": "by photos and a call (flow A)",
+     "before": "a $20 deposit once the quote is OK'd",
+     "after": "the rest billed when the drawings are sent"
+    },
+    {
+     "name": "Room look, one small room",
+     "price": "$25",
+     "kind": "one price",
+     "where": "at the studio",
+     "before": "paid at the desk",
+     "after": "nothing more"
+    },
+    {
+     "name": "Site survey (add-on, at a home visit)",
+     "price": "$199",
+     "kind": "one price",
+     "where": "at the customer's place (flow B)",
+     "before": "a card saved",
+     "after": "the bill, with the rest of the visit"
+    },
+    {
+     "name": "Home site visit and measure",
+     "price": "$179, with the $89 travel fee",
+     "kind": "one price",
+     "where": "at the customer's place (flow B)",
+     "before": "a card saved for the $89 fee",
+     "after": "the bill texted after the visit"
+    },
+    {
+     "name": "Design phase at home",
+     "price": "$150",
+     "where": "at the customer's place",
+     "before": "a $40 deposit when booking",
+     "after": "the $110 rest charged to the saved card when the architect texts DONE"
+    },
+    {
+     "name": "Permit-drawing review at home",
+     "price": "$75, paid in full",
+     "where": "at the customer's place",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Whole-house design, quoted from photos",
+     "price": "$640 quoted (over $500, so the owner OKs it)",
+     "kind": "quoted from photos",
+     "where": "at the customer's place",
+     "before": "a $160 deposit once the proposal is signed",
+     "after": "the $480 rest billed as the drawings are delivered"
+    }
+   ],
+   "never designed": "No stamped drawings the architect is not licensed to stamp; no construction supervision the license doesn't cover; no legal advice on contracts.",
+   "capacity": "one architect per visit; a second person from the team only when the owner books one",
+   "online": "video and photo reviews only, where the owner allows them; Rosie never records a call or a video."
+  },
+  "pf.questions": {
+   "before times": [
+    "What kind of work: a room, a kitchen, an addition, a whole house, or a permit set?",
+    "Is there a site plan, photos or a survey already? Yes, no or not sure.",
+    "What's the goal: a new room, a sale, a permit, or repairs?",
+    "At the studio, at the customer's place, or by video?"
+   ],
+   "after a time is picked": [
+    "Where the work is and the rooms to see",
+    "Parking or the building's sign-in"
+   ],
+   "only on the secure page": [
+    "The street address and any gate code",
+    "Who owns the property, and any HOA or landlord rules",
+    "The budget range, if the customer wants to share it",
+    "Permit and survey papers already on file"
+   ],
+   "who may book": "An adult who owns the property, or who has the owner's written permission. A design for a property the booker doesn't own needs that owner's yes."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "someone hurt, or a fire or smoke at the place (call 911)",
+    "a structure that looks unsafe to stand in (call 911 if someone is in it)"
+   ],
+   "words that go on with safety steps": [
+    "a site that needs a structural engineer before anyone goes in"
+   ],
+   "what Rosie says": {
+    "in danger right now": "Call 911 now. Nothing is booked.",
+    "unsafe structure": "The architect doesn't go into an unsafe site, and says so. A structural engineer is needed first."
+   },
+   "legal questions": "Never answered: an architect's advice on contracts or disputes is the owner's own."
+  },
+  "pf.first_steps": {
+   "required": "None.",
+   "prep for the reminder": [
+    "Send the site plan, survey or photos before the visit, if there are any",
+    "Clear the rooms to be measured",
+    "Have the current permit papers or the HOA rules ready",
+    "Note the rooms and the wish list"
+   ]
+  },
+  "pf.visit": {
+   "check-in": "At the studio: the code at the front desk. At a home: the code from whoever meets the architect.",
+   "before measuring": "The architect measures each room and checks the site plan against the place, then notes what's needed for the design. Nothing is quoted in a text.",
+   "work changes": "A change found on site is priced at the list price and OK'd by the owner before it's done.",
+   "stops": "A structure that looks unsafe: the architect stops, leaves the site and says so.",
+   "report": "Drawings and notes go to the owner on the secure page, with the next step."
+  },
+  "pf.money": {
+   "before": "a card saved for the late-cancel fee at the studio; paid in full for video and one-room reviews; a deposit for each design phase",
+   "after": "paid at the desk, the bill texted after a site visit, or the saved card charged at DONE",
+   "cancel": "a cancel in time gets a full refund; a late cancel or no-show keeps the fee shown on the booking",
+   "caps": "the owner's own limit: any design phase over $500 is OK'd by the owner first",
+   "tips": "none: architects take no tips"
+  },
+  "pf.messages": "Texts go to the owner who booked. Design details and budgets are never in a text: the secure page only.",
+  "pf.staff": {
+   "skills": "architect (residential), designer, desk",
+   "licenses": "the owner's own state license where the state requires one, shown as given",
+   "ratio": "one architect per visit",
+   "standIn": "any licensed architect on the team; nobody is booked by name",
+   "oks": "Sam OKs any phase over $500 and any change to a signed design"
+  },
+  "pf.rules": {
+   "no stamping": "The architect stamps only what the architect's own license covers.",
+   "budgets": "A budget is in the design notes on the secure page, never in a text.",
+   "limits": "A design phase over $500 needs the owner's yes first."
+  },
+  "pf.edges": {
+   "walkins": "A walk-in takes a consult when there's a free slot; else the next free day.",
+   "photos": "A photo quote needs clear photos of each room first; without them the architect asks for more."
+  },
+  "pf.facts": [
+   "documents",
+   "photos",
+   "video",
+   "extrawork",
+   "firststeps"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Riley may price a range, like $80 to $100, set at the visit inside it.",
+    "Vera may give a price range, set at the visit inside it."
+   ],
+   [
+    "Send Alex M. the color and cut at $85, not $90?",
+    "Send Alex M. the design quote at $90?"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Kids cut",
+    "Room look"
+   ],
+   [
+    "kids cut",
+    "room look"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home site visit"
+   ],
+   [
+    "kitchen drain clearing",
+    "home site visit"
+   ],
+   [
+    "cabinet",
+    "storage unit"
+   ],
+   [
+    "Cabinet",
+    "Storage unit"
+   ],
+   [
+    "Shop's",
+    "Studio's"
+   ],
+   [
+    "Color quotes",
+    "Design quotes"
+   ],
+   [
+    "Color quote",
+    "Design quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Color correction",
+    "Measured survey"
+   ],
+   [
+    "color correction",
+    "measured survey"
+   ],
+   [
+    "Color and cut",
+    "Design phase"
+   ],
+   [
+    "color and cut",
+    "design phase"
+   ],
+   [
+    "Color touch-up",
+    "Extra room"
+   ],
+   [
+    "color touch-up",
+    "extra room"
+   ],
+   [
+    "color plan",
+    "design plan"
+   ],
+   [
+    "Color plan",
+    "Design plan"
+   ],
+   [
+    "valves",
+    "garages"
+   ],
+   [
+    "Valves",
+    "Garages"
+   ],
+   [
+    "clogs",
+    "stalls"
+   ],
+   [
+    "Clogs",
+    "Stalls"
+   ],
+   [
+    "water heaters",
+    "kitchens"
+   ],
+   [
+    "Water heaters",
+    "Kitchens"
+   ],
+   [
+    "heaters",
+    "frames"
+   ],
+   [
+    "Heaters",
+    "Frames"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Design Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Design Studio"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Architects"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Interior Plans"
+   ],
+   [
+    "Lee Electric",
+    "Lee Permit Drawings"
+   ],
+   [
+    "Riley Chen",
+    "Vera Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Hugo Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Luis Price"
+   ],
+   [
+    "Casey Moore",
+    "Iris Moore"
+   ],
+   [
+    "Riley",
+    "Vera"
+   ],
+   [
+    "Avery",
+    "Hugo"
+   ],
+   [
+    "Jordan",
+    "Luis"
+   ],
+   [
+    "Casey",
+    "Iris"
+   ],
+   [
+    "barbershops",
+    "design studios"
+   ],
+   [
+    "barbershop",
+    "design studio"
+   ],
+   [
+    "Barbershop",
+    "Design studio"
+   ],
+   [
+    "barbers",
+    "architects"
+   ],
+   [
+    "barber chair",
+    "drafting table"
+   ],
+   [
+    "barber",
+    "architect"
+   ],
+   [
+    "Barber",
+    "Architect"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "shop's",
+    "studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Haircuts",
+    "Design reviews"
+   ],
+   [
+    "haircuts",
+    "design reviews"
+   ],
+   [
+    "Haircut",
+    "Design review"
+   ],
+   [
+    "haircut",
+    "design review"
+   ],
+   [
+    "Beard trim",
+    "Extra room"
+   ],
+   [
+    "beard trim",
+    "extra room"
+   ],
+   [
+    "beard line",
+    "room line"
+   ],
+   [
+    "beard",
+    "room"
+   ],
+   [
+    "Skin fades",
+    "Site visits"
+   ],
+   [
+    "skin fades",
+    "site visits"
+   ],
+   [
+    "Skin fade",
+    "Site visit"
+   ],
+   [
+    "skin fade",
+    "site visit"
+   ],
+   [
+    "Kids cuts",
+    "Room looks"
+   ],
+   [
+    "kids cuts",
+    "room looks"
+   ],
+   [
+    "Groom's package",
+    "Design package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Design phase"
+   ],
+   [
+    "Signature cut and shave",
+    "Design phase"
+   ],
+   [
+    "hot towel shaves",
+    "site visits"
+   ],
+   [
+    "hot towel",
+    "site"
+   ],
+   [
+    "shaves",
+    "visits"
+   ],
+   [
+    "shave",
+    "visit"
+   ],
+   [
+    "perms",
+    "permit reviews"
+   ],
+   [
+    "perm",
+    "permit review"
+   ],
+   [
+    "cape clip",
+    "tape measure"
+   ],
+   [
+    "cape",
+    "tape"
+   ],
+   [
+    "massage",
+    "site visit"
+   ],
+   [
+    "Massage",
+    "Site visit"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "finish"
+   ],
+   [
+    "house calls",
+    "site visits"
+   ],
+   [
+    "house call",
+    "site visit"
+   ],
+   [
+    "House calls",
+    "Site visits"
+   ],
+   [
+    "House call",
+    "Site visit"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Plumbing and electrical",
+    "Design and permit drawings"
+   ],
+   [
+    "plumbing and electrical",
+    "design and permit drawings"
+   ],
+   [
+    "plumber",
+    "architect"
+   ],
+   [
+    "Plumber",
+    "Architect"
+   ],
+   [
+    "plumbing",
+    "design"
+   ],
+   [
+    "Plumbing",
+    "Design"
+   ],
+   [
+    "electrician",
+    "architect"
+   ],
+   [
+    "electrical",
+    "design"
+   ],
+   [
+    "Electrical",
+    "Design"
+   ],
+   [
+    "Drain clearing",
+    "Site visit"
+   ],
+   [
+    "drain clearing",
+    "site visit"
+   ],
+   [
+    "clogged drain",
+    "stuck drawer"
+   ],
+   [
+    "drain",
+    "drawing"
+   ],
+   [
+    "Drain",
+    "Drawing"
+   ],
+   [
+    "water heater flush",
+    "design phase"
+   ],
+   [
+    "Water heater flush",
+    "Design phase"
+   ],
+   [
+    "water heater replacement",
+    "design quote"
+   ],
+   [
+    "Water heater replacement",
+    "Design quote"
+   ],
+   [
+    "water heater",
+    "kitchen"
+   ],
+   [
+    "Water heater",
+    "Kitchen"
+   ],
+   [
+    "heater",
+    "frame"
+   ],
+   [
+    "flush",
+    "visit"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "faucet",
+    "frame"
+   ],
+   [
+    "dishwasher",
+    "display case"
+   ],
+   [
+    "garbage disposal",
+    "storage unit"
+   ],
+   [
+    "sewer",
+    "storage unit"
+   ],
+   [
+    "toilet",
+    "storage unit"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "pipes",
+    "frames"
+   ],
+   [
+    "pipe",
+    "frame"
+   ],
+   [
+    "valve",
+    "lock"
+   ],
+   [
+    "shutoff",
+    "lock"
+   ],
+   [
+    "repipe",
+    "rebuild"
+   ],
+   [
+    "supply line",
+    "wiring line"
+   ],
+   [
+    "water line",
+    "wiring line"
+   ],
+   [
+    "heating and cooling",
+    "mechanical plan"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "crack"
+   ],
+   [
+    "leaks",
+    "cracks"
+   ],
+   [
+    "Short on the sides",
+    "Short on the frame"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "520 Grove Ave"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "Elm St",
+    "Grove Ave"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "Estate collection",
+    "Design phase"
+   ],
+   [
+    "estate collection",
+    "design phase"
+   ],
+   [
+    "Estate visit",
+    "Site visit"
+   ],
+   [
+    "estate visit",
+    "site visit"
+   ],
+   [
+    "Estate appraisal",
+    "Design review"
+   ],
+   [
+    "estate appraisal",
+    "design review"
+   ],
+   [
+    "Single-item look",
+    "Room look"
+   ],
+   [
+    "single-item look",
+    "room look"
+   ],
+   [
+    "Home appraisal",
+    "Site visit"
+   ],
+   [
+    "home appraisal",
+    "site visit"
+   ],
+   [
+    "Extra item",
+    "Extra room"
+   ],
+   [
+    "extra item",
+    "extra room"
+   ],
+   [
+    "Storage unit camera inspection",
+    "Site survey"
+   ],
+   [
+    "Estate inspection",
+    "Survey"
+   ],
+   [
+    "estate inspection",
+    "survey"
+   ],
+   [
+    "Condition check",
+    "Measured survey"
+   ],
+   [
+    "condition check",
+    "measured survey"
+   ],
+   [
+    "Collection quote from photos",
+    "Design quote from photos"
+   ],
+   [
+    "Collection quote",
+    "Design quote"
+   ],
+   [
+    "collection quote",
+    "design quote"
+   ],
+   [
+    "Video appraisal",
+    "Video design review"
+   ],
+   [
+    "video appraisal",
+    "video design review"
+   ],
+   [
+    "Studio appraisal",
+    "Studio consult"
+   ],
+   [
+    "studio appraisal",
+    "studio consult"
+   ],
+   [
+    "appraisal studio",
+    "design studio"
+   ],
+   [
+    "appraisers",
+    "architects"
+   ],
+   [
+    "appraiser",
+    "architect"
+   ],
+   [
+    "Appraiser",
+    "Architect"
+   ],
+   [
+    "appraisals",
+    "design reviews"
+   ],
+   [
+    "Appraisals",
+    "Design reviews"
+   ],
+   [
+    "appraisal",
+    "design review"
+   ],
+   [
+    "Appraisal",
+    "Design review"
+   ],
+   [
+    "Lee Appraisals LLC",
+    "Lee Design Studio LLC"
+   ],
+   [
+    "Lee Appraisals",
+    "Lee Design Studio"
+   ],
+   [
+    "Lee Home Appraisals",
+    "Lee Architects"
+   ],
+   [
+    "Lee Estate Appraisals",
+    "Lee Interior Plans"
+   ],
+   [
+    "Lee Insurance Appraisals",
+    "Lee Permit Drawings"
+   ],
+   [
+    "Lee Art Appraisals",
+    "Lee Design Studio"
+   ],
+   [
+    "Barbershops",
+    "Design studios"
+   ],
+   [
+    "Barbers",
+    "Architects"
+   ],
+   [
+    "Barber chair",
+    "Drafting table"
+   ],
+   [
+    "Shops",
+    "Studios"
+   ],
+   [
+    "Beard line",
+    "Room line"
+   ],
+   [
+    "Beard",
+    "Room"
+   ],
+   [
+    "Hot towel shaves",
+    "Site visits"
+   ],
+   [
+    "Hot towel",
+    "Site"
+   ],
+   [
+    "Shaves",
+    "Visits"
+   ],
+   [
+    "Shave",
+    "Visit"
+   ],
+   [
+    "Perms",
+    "Permit reviews"
+   ],
+   [
+    "Perm",
+    "Permit review"
+   ],
+   [
+    "Cape clip",
+    "Tape measure"
+   ],
+   [
+    "Cape",
+    "Tape"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Finish"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Architect"
+   ],
+   [
+    "Clogged drain",
+    "Stuck drawer"
+   ],
+   [
+    "Heater",
+    "Frame"
+   ],
+   [
+    "Flush",
+    "Visit"
+   ],
+   [
+    "Faucet",
+    "Frame"
+   ],
+   [
+    "Dishwasher",
+    "Display case"
+   ],
+   [
+    "Garbage disposal",
+    "Storage unit"
+   ],
+   [
+    "Sewer",
+    "Storage unit"
+   ],
+   [
+    "Toilet",
+    "Storage unit"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "Pipes",
+    "Frames"
+   ],
+   [
+    "Pipe",
+    "Frame"
+   ],
+   [
+    "Valve",
+    "Lock"
+   ],
+   [
+    "Shutoff",
+    "Lock"
+   ],
+   [
+    "Repipe",
+    "Rebuild"
+   ],
+   [
+    "Supply line",
+    "Wiring line"
+   ],
+   [
+    "Water line",
+    "Wiring line"
+   ],
+   [
+    "Heating and cooling",
+    "Mechanical plan"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Crack"
+   ],
+   [
+    "Leaks",
+    "Cracks"
+   ],
+   [
+    "Appraisal studio",
+    "Design studio"
+   ],
+   [
+    "Appraisers",
+    "Architects"
+   ]
+  ],
+  "B": [
+   [
+    "Sewer camera inspection",
+    "Site survey"
+   ],
+   [
+    "sewer camera inspection",
+    "site survey"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like drawing a neighbor's lot without asking."
+   ],
+   [
+    "Kids cut",
+    "Room look"
+   ],
+   [
+    "kids cut",
+    "room look"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home site visit"
+   ],
+   [
+    "kitchen drain clearing",
+    "home site visit"
+   ],
+   [
+    "cabinet",
+    "storage unit"
+   ],
+   [
+    "Cabinet",
+    "Storage unit"
+   ],
+   [
+    "Shop's",
+    "Studio's"
+   ],
+   [
+    "Color quotes",
+    "Design quotes"
+   ],
+   [
+    "Color quote",
+    "Design quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Color correction",
+    "Measured survey"
+   ],
+   [
+    "color correction",
+    "measured survey"
+   ],
+   [
+    "Color and cut",
+    "Design phase"
+   ],
+   [
+    "color and cut",
+    "design phase"
+   ],
+   [
+    "Color touch-up",
+    "Extra room"
+   ],
+   [
+    "color touch-up",
+    "extra room"
+   ],
+   [
+    "color plan",
+    "design plan"
+   ],
+   [
+    "Color plan",
+    "Design plan"
+   ],
+   [
+    "valves",
+    "garages"
+   ],
+   [
+    "Valves",
+    "Garages"
+   ],
+   [
+    "clogs",
+    "stalls"
+   ],
+   [
+    "Clogs",
+    "Stalls"
+   ],
+   [
+    "water heaters",
+    "kitchens"
+   ],
+   [
+    "Water heaters",
+    "Kitchens"
+   ],
+   [
+    "heaters",
+    "frames"
+   ],
+   [
+    "Heaters",
+    "Frames"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Design Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Design Studio"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Architects"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Interior Plans"
+   ],
+   [
+    "Lee Electric",
+    "Lee Permit Drawings"
+   ],
+   [
+    "Riley Chen",
+    "Vera Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Hugo Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Luis Price"
+   ],
+   [
+    "Casey Moore",
+    "Iris Moore"
+   ],
+   [
+    "Riley",
+    "Vera"
+   ],
+   [
+    "Avery",
+    "Hugo"
+   ],
+   [
+    "Jordan",
+    "Luis"
+   ],
+   [
+    "Casey",
+    "Iris"
+   ],
+   [
+    "barbershops",
+    "design studios"
+   ],
+   [
+    "barbershop",
+    "design studio"
+   ],
+   [
+    "Barbershop",
+    "Design studio"
+   ],
+   [
+    "barbers",
+    "architects"
+   ],
+   [
+    "barber chair",
+    "drafting table"
+   ],
+   [
+    "barber",
+    "architect"
+   ],
+   [
+    "Barber",
+    "Architect"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "shop's",
+    "studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Haircuts",
+    "Design reviews"
+   ],
+   [
+    "haircuts",
+    "design reviews"
+   ],
+   [
+    "Haircut",
+    "Design review"
+   ],
+   [
+    "haircut",
+    "design review"
+   ],
+   [
+    "Beard trim",
+    "Extra room"
+   ],
+   [
+    "beard trim",
+    "extra room"
+   ],
+   [
+    "beard line",
+    "room line"
+   ],
+   [
+    "beard",
+    "room"
+   ],
+   [
+    "Skin fades",
+    "Site visits"
+   ],
+   [
+    "skin fades",
+    "site visits"
+   ],
+   [
+    "Skin fade",
+    "Site visit"
+   ],
+   [
+    "skin fade",
+    "site visit"
+   ],
+   [
+    "Kids cuts",
+    "Room looks"
+   ],
+   [
+    "kids cuts",
+    "room looks"
+   ],
+   [
+    "Groom's package",
+    "Design package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Design phase"
+   ],
+   [
+    "Signature cut and shave",
+    "Design phase"
+   ],
+   [
+    "hot towel shaves",
+    "site visits"
+   ],
+   [
+    "hot towel",
+    "site"
+   ],
+   [
+    "shaves",
+    "visits"
+   ],
+   [
+    "shave",
+    "visit"
+   ],
+   [
+    "perms",
+    "permit reviews"
+   ],
+   [
+    "perm",
+    "permit review"
+   ],
+   [
+    "cape clip",
+    "tape measure"
+   ],
+   [
+    "cape",
+    "tape"
+   ],
+   [
+    "massage",
+    "site visit"
+   ],
+   [
+    "Massage",
+    "Site visit"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "finish"
+   ],
+   [
+    "house calls",
+    "site visits"
+   ],
+   [
+    "house call",
+    "site visit"
+   ],
+   [
+    "House calls",
+    "Site visits"
+   ],
+   [
+    "House call",
+    "Site visit"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Plumbing and electrical",
+    "Design and permit drawings"
+   ],
+   [
+    "plumbing and electrical",
+    "design and permit drawings"
+   ],
+   [
+    "plumber",
+    "architect"
+   ],
+   [
+    "Plumber",
+    "Architect"
+   ],
+   [
+    "plumbing",
+    "design"
+   ],
+   [
+    "Plumbing",
+    "Design"
+   ],
+   [
+    "electrician",
+    "architect"
+   ],
+   [
+    "electrical",
+    "design"
+   ],
+   [
+    "Electrical",
+    "Design"
+   ],
+   [
+    "Drain clearing",
+    "Site visit"
+   ],
+   [
+    "drain clearing",
+    "site visit"
+   ],
+   [
+    "clogged drain",
+    "stuck drawer"
+   ],
+   [
+    "drain",
+    "drawing"
+   ],
+   [
+    "Drain",
+    "Drawing"
+   ],
+   [
+    "water heater flush",
+    "design phase"
+   ],
+   [
+    "Water heater flush",
+    "Design phase"
+   ],
+   [
+    "water heater replacement",
+    "design quote"
+   ],
+   [
+    "Water heater replacement",
+    "Design quote"
+   ],
+   [
+    "water heater",
+    "kitchen"
+   ],
+   [
+    "Water heater",
+    "Kitchen"
+   ],
+   [
+    "heater",
+    "frame"
+   ],
+   [
+    "flush",
+    "visit"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "faucet",
+    "frame"
+   ],
+   [
+    "dishwasher",
+    "display case"
+   ],
+   [
+    "garbage disposal",
+    "storage unit"
+   ],
+   [
+    "sewer",
+    "storage unit"
+   ],
+   [
+    "toilet",
+    "storage unit"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "pipes",
+    "frames"
+   ],
+   [
+    "pipe",
+    "frame"
+   ],
+   [
+    "valve",
+    "lock"
+   ],
+   [
+    "shutoff",
+    "lock"
+   ],
+   [
+    "repipe",
+    "rebuild"
+   ],
+   [
+    "supply line",
+    "wiring line"
+   ],
+   [
+    "water line",
+    "wiring line"
+   ],
+   [
+    "heating and cooling",
+    "mechanical plan"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "crack"
+   ],
+   [
+    "leaks",
+    "cracks"
+   ],
+   [
+    "Short on the sides",
+    "Short on the frame"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "520 Grove Ave"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "Elm St",
+    "Grove Ave"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "Estate collection",
+    "Design phase"
+   ],
+   [
+    "estate collection",
+    "design phase"
+   ],
+   [
+    "Estate visit",
+    "Site visit"
+   ],
+   [
+    "estate visit",
+    "site visit"
+   ],
+   [
+    "Estate appraisal",
+    "Design review"
+   ],
+   [
+    "estate appraisal",
+    "design review"
+   ],
+   [
+    "Single-item look",
+    "Room look"
+   ],
+   [
+    "single-item look",
+    "room look"
+   ],
+   [
+    "Home appraisal",
+    "Site visit"
+   ],
+   [
+    "home appraisal",
+    "site visit"
+   ],
+   [
+    "Extra item",
+    "Extra room"
+   ],
+   [
+    "extra item",
+    "extra room"
+   ],
+   [
+    "Storage unit camera inspection",
+    "Site survey"
+   ],
+   [
+    "Estate inspection",
+    "Survey"
+   ],
+   [
+    "estate inspection",
+    "survey"
+   ],
+   [
+    "Condition check",
+    "Measured survey"
+   ],
+   [
+    "condition check",
+    "measured survey"
+   ],
+   [
+    "Collection quote from photos",
+    "Design quote from photos"
+   ],
+   [
+    "Collection quote",
+    "Design quote"
+   ],
+   [
+    "collection quote",
+    "design quote"
+   ],
+   [
+    "Video appraisal",
+    "Video design review"
+   ],
+   [
+    "video appraisal",
+    "video design review"
+   ],
+   [
+    "Studio appraisal",
+    "Studio consult"
+   ],
+   [
+    "studio appraisal",
+    "studio consult"
+   ],
+   [
+    "appraisal studio",
+    "design studio"
+   ],
+   [
+    "appraisers",
+    "architects"
+   ],
+   [
+    "appraiser",
+    "architect"
+   ],
+   [
+    "Appraiser",
+    "Architect"
+   ],
+   [
+    "appraisals",
+    "design reviews"
+   ],
+   [
+    "Appraisals",
+    "Design reviews"
+   ],
+   [
+    "appraisal",
+    "design review"
+   ],
+   [
+    "Appraisal",
+    "Design review"
+   ],
+   [
+    "Lee Appraisals LLC",
+    "Lee Design Studio LLC"
+   ],
+   [
+    "Lee Appraisals",
+    "Lee Design Studio"
+   ],
+   [
+    "Lee Home Appraisals",
+    "Lee Architects"
+   ],
+   [
+    "Lee Estate Appraisals",
+    "Lee Interior Plans"
+   ],
+   [
+    "Lee Insurance Appraisals",
+    "Lee Permit Drawings"
+   ],
+   [
+    "Lee Art Appraisals",
+    "Lee Design Studio"
+   ],
+   [
+    "Barbershops",
+    "Design studios"
+   ],
+   [
+    "Barbers",
+    "Architects"
+   ],
+   [
+    "Barber chair",
+    "Drafting table"
+   ],
+   [
+    "Shops",
+    "Studios"
+   ],
+   [
+    "Beard line",
+    "Room line"
+   ],
+   [
+    "Beard",
+    "Room"
+   ],
+   [
+    "Hot towel shaves",
+    "Site visits"
+   ],
+   [
+    "Hot towel",
+    "Site"
+   ],
+   [
+    "Shaves",
+    "Visits"
+   ],
+   [
+    "Shave",
+    "Visit"
+   ],
+   [
+    "Perms",
+    "Permit reviews"
+   ],
+   [
+    "Perm",
+    "Permit review"
+   ],
+   [
+    "Cape clip",
+    "Tape measure"
+   ],
+   [
+    "Cape",
+    "Tape"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Finish"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Architect"
+   ],
+   [
+    "Clogged drain",
+    "Stuck drawer"
+   ],
+   [
+    "Heater",
+    "Frame"
+   ],
+   [
+    "Flush",
+    "Visit"
+   ],
+   [
+    "Faucet",
+    "Frame"
+   ],
+   [
+    "Dishwasher",
+    "Display case"
+   ],
+   [
+    "Garbage disposal",
+    "Storage unit"
+   ],
+   [
+    "Sewer",
+    "Storage unit"
+   ],
+   [
+    "Toilet",
+    "Storage unit"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "Pipes",
+    "Frames"
+   ],
+   [
+    "Pipe",
+    "Frame"
+   ],
+   [
+    "Valve",
+    "Lock"
+   ],
+   [
+    "Shutoff",
+    "Lock"
+   ],
+   [
+    "Repipe",
+    "Rebuild"
+   ],
+   [
+    "Supply line",
+    "Wiring line"
+   ],
+   [
+    "Water line",
+    "Wiring line"
+   ],
+   [
+    "Heating and cooling",
+    "Mechanical plan"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Crack"
+   ],
+   [
+    "Leaks",
+    "Cracks"
+   ],
+   [
+    "Appraisal studio",
+    "Design studio"
+   ],
+   [
+    "Appraisers",
+    "Architects"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books Lee Design Studio for a design review of one room, Sat Oct 24 at 11:00am. Vera reviews the room sketch at the studio, and Alex pays $35 at the front desk after the consult.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Architects for a site visit at 9 Willow Ct to measure 5 rooms. Luis comes Thu Oct 22 between 8 and 10am, measures each room and writes the notes. The $179 is charged to Alex's saved card, or the bill comes after the visit."
+ },
+ "cast": {
+  "A": {
+   "staff": "Vera and Gia (architect and desk)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a builder, a city permit desk)"
+  },
+  "B": {
+   "staff": "Luis and Iris (architects)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a builder, a bank, an HOA)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Vera"
+  },
+  "B": {
+   "staff": "Luis"
+  }
+ },
+ "keep": [
+  "Travel fee",
+  "travel fee"
+ ],
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|deposit|bill",
+    "photos|none|none"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a design consult for one room at the studio, $35. A card is saved for the $20 fee; Alex pays the $35 at the front desk after the consult.",
+    "list|full|none": "A video design review of one room, $55, paid in full when booking.",
+    "list|deposit|counter": "A schematic design review at the studio: a $40 deposit when booking, the $100 rest at the desk when the drawings are picked up.",
+    "photos|deposit|bill": "A design quoted from photos: a $20 deposit once the quote is OK'd; the rest is billed when the drawings are sent.",
+    "photos|none|none": "A quote from photos, free: nothing taken, nothing charged."
+   },
+   "amounts": {
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Design consult, one room"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$20",
+     "name": "Video design review, one room"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Schematic design review"
+    },
+    "photos|deposit|*": {
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "fee": "$20",
+     "name": "Design quoted from photos"
+    },
+    "photos|none|*": {
+     "price": "$0",
+     "fee": "$0",
+     "name": "Design quote from photos, free"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra room at the studio",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Two rooms by video",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$110",
+      "paid": "$110",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Design review pack (10 rooms)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|deposit|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a site visit and measure for 5 rooms, $179 with the travel fee. A card is saved for the $89 fee; Rosie texts the bill after the visit.",
+    "list|deposit|card": "A design phase at home: $150, a $40 deposit when booking, the $110 rest charged to the saved card at DONE.",
+    "list|full|none": "A permit-drawing review at home, $75, paid in full when booking."
+   },
+   "amounts": {
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Home site visit and measure"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Design phase at home"
+    },
+    "list|full|*": {
+     "price": "$75",
+     "paid": "$75",
+     "fee": "$40",
+     "name": "Permit-drawing review at home"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra room measured",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$120",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Second room, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Design visit pack (5 visits)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "B4-38",
+   "B8-93",
+   "B5-34"
+  ]
+ },
+ "notes": "Architect: an interior-design start (from interior: a studio review in flow A, an in-home visit and design phases in flow B). Refit for the rebuilt master (N4, Oct 27): a design consult, a video or photo review, a site visit with measured rooms, and design phases paid by deposit and rest. Architect licenses are the owner's own, shown as given, never checked (D96).",
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for an architect (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license lookup (D96): the owner's own papers only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Architects are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: consults, reviews and site visits."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Design work is never sent now: every consult and visit is booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is left unsigned: a design phase is signed on the secure page before it starts."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books an architect's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books an architect's time, never a room."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at the studio is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No health, vision or pet plan pays for design work."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio; the owner takes it home."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "The owner stays for the review; no child is left with the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A review is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "The studio keeps nothing of the owner's."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for design work."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "No children's visits at an architect: the owner of the property books for themselves."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for an architect (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license lookup (D96): the owner's own papers only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Architects are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Design work is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is left unsigned: a design phase is signed before it starts."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for design work."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Design work books visits, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Design work books an architect's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for design work."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A design is paid per phase as the owner agrees (no stages fact here): the phase deposit and the rest, not a stage plan."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No design is billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Bank transfer is for big jobs the studio never takes here (no bank-transfer fact)."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "The owner of the property pays; no third party is set up for this work."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Design work is never sent now, so no architect is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Design work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Design work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Design work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the architect's care; an adult stays on the visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A visit is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Proposals stay in the design phase as signed on the secure page; no separate proposal step."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "The drawings are delivered at the end of the phase; no later results step."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Riley may price a range, like $80 to $100, set at the visit inside it.",
+    "Send Alex M. the color and cut at $85, not $90?",
+    "We'd share only where they're working, only after a missed check.",
+    "Kids cut",
+    "kids cut",
+    "Shop's",
+    "Color quotes",
+    "Color quote",
+    "At the chair",
+    "Color correction",
+    "color correction",
+    "Color and cut",
+    "color and cut",
+    "Color touch-up",
+    "color touch-up",
+    "color plan",
+    "Color plan",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "beard",
+    "skin fades",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perms",
+    "perm",
+    "cape clip",
+    "cape",
+    "massage",
+    "Massage",
+    "gloss",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain clearing",
+    "Drain",
+    "water heater",
+    "heater",
+    "pipe",
+    "valve",
+    "leak",
+    "Springfield",
+    "2020-1187",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Beard",
+    "Gloss",
+    "Leak",
+    "Leaks"
+   ],
+   "B": [
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "We'd share only where they're working, only after a missed check.",
+    "Like tapping a neighbor's water line without asking.",
+    "Kitchen drain clearing",
+    "cabinet",
+    "Cabinet",
+    "valves",
+    "clogs",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircut",
+    "haircut",
+    "beard trim",
+    "beard",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perm",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain clearing",
+    "drain clearing",
+    "drain",
+    "Drain",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater",
+    "Water heater",
+    "heater",
+    "flush",
+    "service call",
+    "Service call",
+    "faucet",
+    "dishwasher",
+    "sewer",
+    "overflowing",
+    "sink",
+    "clog",
+    "pipes",
+    "pipe",
+    "valve",
+    "shutoff",
+    "repipe",
+    "supply line",
+    "water line",
+    "heating and cooling",
+    "leak",
+    "Springfield",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Sewer",
+    "Overflowing",
+    "Shutoff",
+    "Repipe",
+    "Supply line",
+    "Heating and cooling",
+    "Leak",
+    "Leaks"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-29": "fb61245096",
+   "A4-66": "f622d7fe12",
+   "A4-28": "c8e677520c",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A10-06": "a9f01f141d",
+   "A9-15": "bd2a17c3c5",
+   "A4-24": "0a292df05b"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-29": "592bd8f1a2",
+   "B4-43": "fc9855955a",
+   "B4-83": "93095f28e5",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "B10-38": "867fe1ab7c",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1"
+  }
+ }
+}

@@ -1,0 +1,2378 @@
+{
+ "id": "contractor",
+ "name": "General contractor",
+ "style": "Project",
+ "pattern": "project",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a contractor or home improvement registration or license for the company, where the state's form requires one (often by job size or kind of work)",
+   "ask": [
+    "The company's registration or license number, and its class",
+    "Any job-size limit the license has",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business; plus a qualifying person where the state's form names one. Trade subcontractors (electrical, plumbing, gas, HVAC) hold their own.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No remodeling goes live until the company's registration or license checks out, where one is required",
+    "A job over the license's size limit is never offered or quoted: the owner is told why"
+   ],
+   "renewals": "License, insurance and bond dates kept; reminded 30 days out; a lapse pauses new bookings",
+   "lead_safe": "Work that disturbs paint in older homes only by a firm and a person certified for lead-safe work, where the rules require it",
+   "design_studio": "A design consult needs no license in most states. Where the state's form licenses interior designers or registers the studio (a few do, and the example's state does), the studio's number and each designer's are checked like any license. The work it leads to is booked under the remodeling license.",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Estimate visit, then project: the job is booked only after a written quote and a signed contract",
+   "B": [
+    {
+     "name": "Estimate visit",
+     "price": "$89, credited to the job if Alex signs (the example business's own price; a free estimate is a starting option)",
+     "length": "60 to 90 minutes",
+     "where": "at the customer's place",
+     "before": "nothing taken (or the $89 held)",
+     "after": "billed only if no contract follows"
+    },
+    {
+     "name": "Bathroom remodel",
+     "price": "quoted after the estimate visit: a written quote within 3 business days, good for 30 days",
+     "length": "about 4 weeks of work days",
+     "where": "at the customer's place",
+     "before": "nothing at booking; a deposit only after the contract is signed",
+     "after": "stage bills as each checked stage is done; the last after the walk-through and final inspection"
+    },
+    {
+     "name": "Kitchen remodel",
+     "price": "quoted after the estimate visit",
+     "length": "about 6 to 10 weeks",
+     "where": "at the customer's place",
+     "before": "the same as the bathroom",
+     "after": "the same, in stages"
+    },
+    {
+     "name": "Basement finishing",
+     "price": "quoted after the estimate visit",
+     "length": "about 4 to 8 weeks",
+     "where": "at the customer's place",
+     "before": "the same",
+     "after": "the same, in stages"
+    },
+    {
+     "name": "Vanity replacement",
+     "price": "priced from photos (example: $640); over $500, Sam OKs it",
+     "length": "1 day",
+     "where": "at the customer's place",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Gutter cleaning",
+     "price": "$179, from the list",
+     "length": "1 to 2 hours",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "the $89 held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Deck sealing",
+     "price": "$150, from the list",
+     "length": "half a day",
+     "where": "at the customer's place",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Pre-remodel inspection",
+     "price": "$199, with a written report",
+     "length": "1 hour",
+     "where": "at the customer's place",
+     "before": "the $89 held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Labor",
+     "price": "$120 an hour, 1-hour minimum",
+     "where": "added to a job, never booked alone"
+    },
+    {
+     "name": "Change order",
+     "price": "priced, written and signed by both before the changed work; added to the next stage bill"
+    },
+    {
+     "name": "Permit, dumpster and any tests",
+     "price": "in every quote"
+    }
+   ],
+   "A": [
+    {
+     "name": "Design consult",
+     "price": "$35, 30 minutes",
+     "where": "at the studio; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the studio desk"
+    },
+    {
+     "name": "Tile and fixture picks",
+     "price": "$40",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the studio desk"
+    },
+    {
+     "name": "Sample board",
+     "price": "$20, an add-on to take home",
+     "where": "at the studio"
+    },
+    {
+     "name": "Hardware pick",
+     "price": "$15, an add-on at a consult",
+     "where": "at the studio"
+    },
+    {
+     "name": "Paint color pick",
+     "price": "$25",
+     "where": "at the studio"
+    },
+    {
+     "name": "3D design session",
+     "price": "$55, 60 minutes; credited to the remodel if Alex signs",
+     "where": "at the studio",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Kitchen design package (layout, finishes, 3D drawing)",
+     "price": "$140, 2½ hours",
+     "where": "at the studio",
+     "before": "the $40 fee held (over 2 hours), or a $40 deposit",
+     "after": "at the studio desk"
+    },
+    {
+     "name": "Custom layout",
+     "price": "priced from the customer's photos and measurements (example: $90); Sam OKs each one",
+     "where": "at the studio"
+    },
+    {
+     "name": "Cabinet redesign",
+     "price": "priced at the studio after a $25 consult",
+     "where": "at the studio"
+    }
+   ],
+   "capacity": "One estimator or designer per booking; 2 jobs at once per crew; the studio's design table is saved with long sessions",
+   "skills": "Estimates and running a job: project leads. Design consults: designers. Trade work: licensed subcontractors.",
+   "nobody_home": "Work days with a lockbox: nobody needs to be home; a start and end photo each day",
+   "online": "A design consult can be a video call (counts as at the studio)",
+   "smallest_job": "A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the old example took no remodel under $10,000 and sent smaller jobs to a handyman). This example also lists small jobs (gutters, deck sealing, a vanity) to show the list and photo paths; its main path is the estimate visit."
+  },
+  "pf.questions": {
+   "before_times": [
+    "What do you want done? (the room, in a few words)",
+    "Rough size of the room",
+    "When should it be finished?",
+    "The year the home was built (older homes may need lead-safe work and tests, where the rules require them)"
+   ],
+   "after_time": [
+    "Who will sign the contract? Everyone who signs should be at the estimate visit",
+    "Do you own the home or rent? (the owner must sign)",
+    "Parking, and how to get in",
+    "Pets or children at home during the work"
+   ],
+   "secure_page_only": [
+    "Budget range",
+    "Photos of the room (optional)",
+    "Door or lockbox codes"
+   ],
+   "who_may_book": "An adult who owns the home, or someone with the owner's written OK. A renter's job needs the owner to sign.",
+   "studio": [
+    "Which room, and a rough budget (on the secure page)",
+    "Photos or measurements to bring (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "gas smell, hissing near a gas line, sparking or smoking wires, a carbon monoxide alarm",
+     "says": "Leave the house now. Then call 911 and the gas or power company.",
+     "booking": "no booking; a new request must say the home was made safe"
+    },
+    {
+     "words": "a ceiling sagging or falling, a wall or beam cracking and moving",
+     "says": "Stay out of that room, and call 911 if anyone is at risk.",
+     "booking": "no booking until it's safe"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "water coming through a ceiling or a wall",
+     "says": "Shut off the water at the main valve. Stay away from wet outlets and switches. Call a plumber first if it's still leaking.",
+     "booking": "goes on, marked urgent"
+    },
+    {
+     "words": "worry about asbestos or lead dust",
+     "says": "Don't sand, scrape or break old floors, paint or plaster. We'll test first.",
+     "booking": "goes on; testing becomes a first step"
+    }
+   ],
+   "business_line": "Questions about whether a wall can come out, or about the structure, go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_quote": "The estimate visit at the home, with everyone who will sign there",
+   "after_contract": [
+    "The cancel window ends before any work or orders, where the state's rules give one",
+    "The permit, pulled by the license holder in the business's name, where the work needs one",
+    "Tests in older homes, where the rules require them: asbestos sampling of old floors or plaster; lead-safe setup",
+    "Special-order materials ordered once the window ends"
+   ],
+   "prep": [
+    "Clear the room and the path to it",
+    "Plan to use another bathroom during the work",
+    "Keep pets and children out of the work area",
+    "Put any door or lockbox code on the secure page"
+   ],
+   "studio_prep": [
+    "Bring photos and rough measurements of the room",
+    "Bring any samples you already like"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Estimate visit: the check-in code at the door. Each work day: that day's code, or the lockbox and a start photo when nobody is home. Studio: the code at the desk.",
+   "at_the_visit": "The estimator measures and photographs; the written quote follows within 3 business days, good for 30 days",
+   "changes": "A written change order, priced and signed by both, before any changed work. Hidden damage (rot, old wiring) is priced this way.",
+   "outside_checks": "Inspections at rough-in and at the end, where the permit requires them",
+   "done": "The final inspection where needed, then the walk-through and punch list, then DONE on the last work day",
+   "studio_done": "DONE after the consult, with the designer's notes and the picks saved for the estimate",
+   "before_photos": "The room, the floor, the walls and anything already damaged"
+  },
+  "pf.money": {
+   "estimate": "The example's $89 estimate visit is credited to the job; billed only if no contract follows. A free estimate is the safe start.",
+   "no_money_before_contract": "On project work, nothing is taken before the contract is signed by everyone",
+   "deposit": "Only after signing; the deposit cap comes from the state's form",
+   "kept_apart": "Money paid before the work is kept apart or bonded where the state's rules require it (a switch from the state's form)",
+   "stages": "Each stage is billed only when it's done and any inspection has passed; never ahead of the work",
+   "last_payment": "After the walk-through and the final inspection",
+   "change_orders": "Added to the next stage bill",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the project lead texts 'paid check'.",
+   "tips": "No tip line",
+   "tax": "Tax on materials and labor follows the state's form",
+   "studio": "The 3D design session's $55 is credited to the remodel if Alex signs; the $20 missed-consult fee only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Door or lockbox codes",
+    "The budget",
+    "Contract, change order and permit papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who lets the crew in"
+  },
+  "pf.staff": {
+   "roles": "Project leads (Marco, Luis): estimates, quotes and running the job, with the crew. Designers (Mia, Theo) at the studio.",
+   "licenses": "The company holds the registration or license. Where the state's form also licenses each person (the example's state does, for project leads, the roofer and designers), each one's number is checked. Trade subcontractors hold their own, checked before they're named on a job.",
+   "lead_safe": "A certified renovator on each job in an older home, where lead-safe rules apply",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another project lead may take an estimate visit; a job keeps its project lead unless Sam moves it"
+  },
+  "pf.rules": {
+   "contract": "A written contract for project work where the state's rules require one, signed by everyone on title and by the business before any money",
+   "contract_parts": "The parts the state's form lists (license number, dates, price, deposit, cancel notice, any lien notice)",
+   "cancel_window": "A cancel window after signing, where the state's rules give one; work and orders wait for it",
+   "permits": "Pulled by the license holder in the business's name, never the homeowner's",
+   "change_orders": "Written and signed by both before the changed work",
+   "final": "The final inspection and permit sign-off before the last payment",
+   "lien_waivers": "Lien waivers from the business and its subcontractors with the last payment, where the state's rules provide them",
+   "show": "The license number on the listing, the quote, the contract and the receipt, where the state's rules require it",
+   "warranty": "1 year on workmanship (the example's); makers' warranties on products",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "hidden_damage": "Rot or old wiring found during the work: a change order before the fix",
+   "asbestos_found": "Licensed removal first, by its own quote; the start moves, and Alex is told",
+   "permit_late": "The start moves with no fee; Alex is told",
+   "backorder": "A special-order item is late: wait, or switch to an in-stock one",
+   "inspection_fails": "The crew fixes it and it's checked again; the next stage and its bill wait",
+   "cancel_after_window": "Sam and the customer settle it; Rosie moves no money on its own",
+   "nobody_home": "Lockbox work days with start and end photos",
+   "over_license_limit": "Not offered, and the owner is told why",
+   "walk_through_dispute": "Goes to Sam; the last bill waits",
+   "weather": "Roofing and outside work: the forecast is checked the day before",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "stages",
+   "photos",
+   "extrawork",
+   "firststeps",
+   "sentnow",
+   "banktransfer"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "two skin fades on",
+    "two design consults on"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a roof repair, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Design Studio doesn't do roof repairs."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A tile sample fell and chipped my phone."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a tile sample fell and chipped their phone today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "likes warm wood, matte black fixtures, no open shelves"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a design consult for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most design studios set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A kitchen and bath design studio on Elm St. Layouts, finishes and 3D design."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most design studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules design studios often set."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds lighting design to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Lighting design for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW lighting design"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like gutters overflowing in a storm"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a paintcolor pick is $25"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una consulta de diseño el sábado."
+   ],
+   [
+    "Gloss to finish",
+    "Hardware pick"
+   ],
+   [
+    "gloss",
+    "hardware pick"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like gutters overflowing in a storm"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Remodeling's"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A contractor's example: water through a ceiling gets 'shut off the main valve, and stay away from wet outlets'."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small jobs have a set price. Remodels are quoted after an estimate visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Drain clearing",
+    "Gutter cleaning"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Tile and fixture picks at Lee Design Studio are $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for tile and fixture picks at $35"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Mia sees the room photos"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do paintcolor picks? We're redoing the kids' rooms."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Design consults, picks and sample boards at the studio. A consult at home too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A design consult could mean an interior designer or a remodeler's studio."
+   ],
+   [
+    "MP045210",
+    "GC045210"
+   ],
+   [
+    "EC22871",
+    "RF22871"
+   ],
+   [
+    "BS20981",
+    "DS20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's rooms together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books consults for three rooms on one morning. Rosie finds times side by side with Mia and Theo."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A design consult and a paintcolor pick work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your room"
+   ],
+   [
+    "patch test",
+    "measure check"
+   ],
+   [
+    "skin-test result",
+    "measure check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the studio during my consult?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The leak over my bathroom got worse. Can I still come in?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the linen closet."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the linen closet"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Mill Rd"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Remodeling"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Design Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Design Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Remodeling"
+   ],
+   [
+    "Lee Electric",
+    "Lee Roofing"
+   ],
+   [
+    "1200 Main St",
+    "900 Front St"
+   ],
+   [
+    "88 Elm St",
+    "75 Mill Rd"
+   ],
+   [
+    "Riley",
+    "Mia"
+   ],
+   [
+    "Avery",
+    "Theo"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "plumbing and electrical",
+    "remodeling and roofing"
+   ],
+   [
+    "Plumbing and electrical",
+    "Remodeling and roofing"
+   ],
+   [
+    "electrical",
+    "roofing"
+   ],
+   [
+    "Electrical",
+    "Roofing"
+   ],
+   [
+    "Panel upgrade",
+    "Roof replacement"
+   ],
+   [
+    "Plumber",
+    "General contractor"
+   ],
+   [
+    "plumber",
+    "project lead"
+   ],
+   [
+    "plumbing",
+    "remodeling"
+   ],
+   [
+    "Plumbing",
+    "Remodeling"
+   ],
+   [
+    "barbershop",
+    "design studio"
+   ],
+   [
+    "Barbershop",
+    "Design studio"
+   ],
+   [
+    "barbers",
+    "designers"
+   ],
+   [
+    "barber",
+    "designer"
+   ],
+   [
+    "Barber",
+    "Designer"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "3D design session"
+   ],
+   [
+    "Signature cut and shave",
+    "3D design session"
+   ],
+   [
+    "signature cut",
+    "3D design session"
+   ],
+   [
+    "Groom's package",
+    "Kitchen design package"
+   ],
+   [
+    "Color and cut",
+    "Custom layout"
+   ],
+   [
+    "color and cut",
+    "custom layout"
+   ],
+   [
+    "Color correction",
+    "Cabinet redesign"
+   ],
+   [
+    "color correction",
+    "cabinet redesign"
+   ],
+   [
+    "color quote",
+    "design quote"
+   ],
+   [
+    "color",
+    "custom design"
+   ],
+   [
+    "Color",
+    "Custom design"
+   ],
+   [
+    "Kids cut",
+    "Paint color pick"
+   ],
+   [
+    "kids cut",
+    "paint color pick"
+   ],
+   [
+    "Skin fade",
+    "Tile and fixture picks"
+   ],
+   [
+    "skin fade",
+    "tile and fixture picks"
+   ],
+   [
+    "Beard trim",
+    "Sample board"
+   ],
+   [
+    "beard trim",
+    "sample board"
+   ],
+   [
+    "Haircuts",
+    "Design consults"
+   ],
+   [
+    "haircuts",
+    "design consults"
+   ],
+   [
+    "Haircut",
+    "Design consult"
+   ],
+   [
+    "haircut",
+    "design consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the studio"
+   ],
+   [
+    "water heaters",
+    "vanities"
+   ],
+   [
+    "water heater",
+    "vanity"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ]
+  ],
+  "B": [
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And which room is it, and about how big?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Remodeling can come for an estimate visit:"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about redoing my hall bathroom. A text back is fine."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like skipping a permit the work needs."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My bathroom needs redoing' fits a bathroom remodel."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a vanity? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the hall bathroom."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a remodel's work days."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the bathroom and the path to it."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack in the new tile this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an estimate visit, today,"
+   ],
+   [
+    "The service call is $89.",
+    "The estimate visit is $89."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Marco measures the bathroom and texts the quote with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 7000 demolition and tile 4500 fixtures 2500"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Tile and fixtures · $540"
+   ],
+   [
+    "Supply line · $80",
+    "Haul-away · $80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Marco measured the bathroom. Here's the written quote."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Demolition and tile · $4,500"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the demolition and tile only, $4,500. Leave the fixtures."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Marco does the demolition and tile, $4,500. The fixtures line stays good until Thu Oct 29."
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Marco's estimate visit at Harper J.'s is for a $24,000 bathroom remodel."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 24000 bathroom remodel, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Remodeling's quote for your bathroom remodel."
+   ],
+   [
+    "Repipe · $2,400",
+    "Bathroom remodel · $24,000"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$1,000 to start, $16,000 when the rough-in passes, $7,000 at the finish"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · bathroom remodel"
+   ],
+   [
+    "The $800 start payment",
+    "The $1,000 start payment"
+   ],
+   [
+    "Your $800 start payment",
+    "Your $1,000 start payment"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Say Harper J.'s $24,000 bathroom remodel is billed in three stages"
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: the rough-in passed its inspection."
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your bathroom remodel"
+   ],
+   [
+    "$800",
+    "$16,000"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most design studios set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A kitchen and bath design studio on Elm St. Layouts, finishes and 3D design."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most design studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules design studios often set."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds siding to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Siding for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW siding"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I paint the bathroom before you come?"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like gutters overflowing in a storm"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Marco's notes"
+   ],
+   [
+    "sewer camera report",
+    "pre-remodel inspection report"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 deck rebuild"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like regrouting the shower Marco noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to regrout the shower, from Marco's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Regrout the shower"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like gutters overflowing in a storm"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Water's pouring over the gutters. Can someone come tonight?"
+   ],
+   [
+    "LATE camera report",
+    "LATE inspection report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A remodel happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Remodeling doesn't do, like a pool install."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Remodeling does remodeling and roofing, not pools. Nothing was saved. You can look for a pool builder near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Remodeling's"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which room, about how big, when it should be done, and the year the home was built."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, sparking wires, or a ceiling or wall giving way."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE soft floor by the tub, cracked wall tile"
+   ],
+   [
+    "Under the sink, before",
+    "Bathroom, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor by the tub, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A remodel is quoted after the estimate visit: only the $89 visit was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Marco finds mold behind the shower wall. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold behind the shower wall"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold behind the shower wall"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Marco found mold behind your shower wall and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the shower wall"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left dust in the hallway.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left dust in the hallway."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marco look at my kitchen next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Marco's next times for a kitchen estimate."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the kitchen estimate for today"
+   ],
+   [
+    "$245",
+    "$7,000"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Entra agua por el techo del baño."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Water is coming through the bathroom ceiling."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A contractor's example: water through a ceiling gets 'shut off the main valve, and stay away from wet outlets'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to shut the main valve and stay away from wet outlets. If there's a gas smell, she leaves and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Cierre la llave principal del agua y no toque enchufes mojados. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Shut the main water valve, and don't touch wet outlets. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can you take out the wall between my kitchen and dining room?"
+   ],
+   [
+    "a dripping faucet",
+    "a sticking cabinet door"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The cabinet door is a small repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone come for a remodel estimate this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Estimate visit"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa estimate Thu 12-2 Luis"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a gutter cleaning at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's gutter cleaning?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I want to redo my hall bathroom. Can someone come for an estimate Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the front ones, over the door."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Does water pool at the front door?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that water is now pouring in by the front door."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Water is coming in by the front door now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Move rugs and boxes away, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you seal my deck every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Remodeling has a yearly deck sealing plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a deck sealing every year."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 7000 bathroom remodel"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE heavy leaves at the front corner. Guards would help: quote next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A tile cracks 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A tile in the new shower cracked."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your remodel is under warranty"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Marco finds two rotted window sills."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace both window sills, rotted"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both window sills"
+   ],
+   [
+    "both shutoff valves",
+    "both window sills"
+   ],
+   [
+    "the shutoff valves",
+    "the window sills"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 window sill quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 window sill work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Marco also check the house before the remodel?"
+   ],
+   [
+    "Sewer camera report",
+    "Inspection report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the inspection report link"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small jobs have a set price. Remodels are quoted after an estimate visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Estimate visit"
+   ],
+   [
+    "Drain clearings",
+    "Estimate visits"
+   ],
+   [
+    "drain clearings",
+    "estimate visits"
+   ],
+   [
+    "Drain clearing",
+    "Estimate visit"
+   ],
+   [
+    "drain clearing",
+    "estimate visit"
+   ],
+   [
+    "Kitchen drain",
+    "Hall bathroom"
+   ],
+   [
+    "kitchen drain",
+    "hall bathroom"
+   ],
+   [
+    "Water heater flush",
+    "Deck sealing"
+   ],
+   [
+    "water heater flush",
+    "deck sealing"
+   ],
+   [
+    "drain",
+    "gutter"
+   ],
+   [
+    "leehomeservices.com",
+    "leeremodeling.com"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Design consults, picks and sample boards at the studio. A consult at home too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A design consult could mean an interior designer or a remodeler's studio."
+   ],
+   [
+    "MP045210",
+    "GC045210"
+   ],
+   [
+    "EC22871",
+    "RF22871"
+   ],
+   [
+    "BS20981",
+    "DS20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The studio is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Design Studio can do your design consult at the studio for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Remodeling LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Remodeling"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Design Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Remodeling"
+   ],
+   [
+    "Lee Electric",
+    "Lee Roofing"
+   ],
+   [
+    "1200 Main St",
+    "900 Front St"
+   ],
+   [
+    "88 Elm St",
+    "75 Mill Rd"
+   ],
+   [
+    "42 Oak St",
+    "17 Birch Ave"
+   ],
+   [
+    "Riley",
+    "Mia"
+   ],
+   [
+    "Avery",
+    "Theo"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "plumbing and electrical",
+    "remodeling and roofing"
+   ],
+   [
+    "Plumbing and electrical",
+    "Remodeling and roofing"
+   ],
+   [
+    "electrical",
+    "roofing"
+   ],
+   [
+    "Electrical",
+    "Roofing"
+   ],
+   [
+    "Panel upgrade",
+    "Roof replacement"
+   ],
+   [
+    "Plumber",
+    "General contractor"
+   ],
+   [
+    "plumber",
+    "project lead"
+   ],
+   [
+    "plumbing",
+    "remodeling"
+   ],
+   [
+    "Plumbing",
+    "Remodeling"
+   ],
+   [
+    "barbershop",
+    "design studio"
+   ],
+   [
+    "Barbershop",
+    "Design studio"
+   ],
+   [
+    "barbers",
+    "designers"
+   ],
+   [
+    "barber",
+    "designer"
+   ],
+   [
+    "Barber",
+    "Designer"
+   ],
+   [
+    "color",
+    "custom design"
+   ],
+   [
+    "haircut",
+    "design consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the studio"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "service call",
+    "estimate visit"
+   ],
+   [
+    "Service call",
+    "Estimate visit"
+   ],
+   [
+    "Water heater replacement",
+    "Vanity replacement"
+   ],
+   [
+    "water heater replacement",
+    "vanity replacement"
+   ],
+   [
+    "Leak repair",
+    "Bathroom remodel"
+   ],
+   [
+    "leak repair",
+    "bathroom remodel"
+   ],
+   [
+    "Sewer camera inspection",
+    "Pre-remodel inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "pre-remodel inspection"
+   ],
+   [
+    "water heaters",
+    "vanities"
+   ],
+   [
+    "Water heater",
+    "Vanity"
+   ],
+   [
+    "water heater",
+    "vanity"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "valve",
+  "overflowing",
+  "cabinet"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Design Studio, Sam's kitchen and bath showroom, for a design consult with Mia on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Remodeling to redo the hall bathroom at 17 Birch Ave. Marco comes for the estimate visit Thu Oct 22 between 8 and 10am, sends a written quote, and runs the job once the contract is signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Design consult, $35 at the studio; a card saved for the $20 missed-consult fee; paid at the studio desk.",
+    "list|none|counter": "Design consult, $35; nothing taken; a YES books it; paid at the studio desk.",
+    "list|full|none": "3D design session, $55, paid in full when booking; credited to the remodel if Alex signs.",
+    "list|deposit|counter": "Kitchen design package, $140; a $40 deposit now; the $100 rest at the studio desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Design consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Design consult"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "3D design session"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$20",
+     "name": "Kitchen design package"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "Bathroom remodel: the $89 estimate visit, nothing taken; Marco's written quote; the contract, a $1,000 deposit and stage bills; the last $7,000 on the bill Rosie texts.",
+    "visit|none|own": "The same remodel, but Sam bills each stage and the last payment his own way; Rosie sends nothing about money.",
+    "visit|card|bill": "The same remodel, with a card saved for the $89 estimate visit fee when Alex books.",
+    "photos|deposit|bill": "A vanity replacement priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Bathroom remodel"
+    },
+    "visit|*|*": {
+     "price": "$7,000",
+     "name": "Bathroom remodel"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Vanity replacement"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Vanity replacement"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15"
+  ],
+  "B": [
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A design consult is for the home's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "more",
+    "at": "A5-16",
+    "more": [
+     "Sam's setting: a 3D design session is credited to the remodel if Alex goes ahead with Lee Remodeling."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the estimate visit at home",
+      "does": "Mia saves Alex's picks for the estimate. If Alex wants the remodel priced, Mia books Marco's estimate visit at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Remodeling, Sam's other company. It runs in the other flow.",
+       "The picks and photos go with it, so Marco's quote uses them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: estimate visit at home for the hall bathroom. Picks saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Mia saved your picks. Want Lee Remodeling to come measure for a quote?",
+        {
+         "buttons": [
+          "Book the estimate",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Remodeling is licensed or registered as a contractor where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Remodeling and the design studio both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The contractor's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Project leads and designers are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, projects and design consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Designers and the roofer hold their own licenses where the state's form asks; trade subs hold theirs."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Some outside work is sent now, like gutters overflowing in a storm (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Design consults use the samples, boards and screen at the studio; the plug-in offers no video or phone consult."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books a designer's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books a designer's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The studio books a designer's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A design consult has no form to sign first; the remodel's contract comes after the quote, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "The studio requires nothing brought: photos, measurements and samples are optional (pf.questions, pf.first_steps studio_prep), the measure check is a first step booked before, and a consult has no form, ID or permit to check"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the design studio."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A remodel never starts at the estimate visit: Alex signs a written contract first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A remodel quote is signed whole, as one contract. A smaller job is a new written quote from Marco, after the call Alex can ask for."
+   },
+   {
+    "op": "after",
+    "at": "B8-63",
+    "steps": [
+     {
+      "id": "B8-x06",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Tue Nov 3, 8:00am",
+      "title": "Sam pulls the permit; a test goes first",
+      "q": "Is it all ready by the start?",
+      "does": "The window ends with no cancel. Sam files the permit in Lee Remodeling's name. The house is from 1925, so the old floor is tested first, as the plug-in says.",
+      "more": [
+       "The license holder always pulls the permit, never Alex.",
+       "Sam gets a to-do with each due date, and replies when it's in.",
+       "The test is done by an outside lab, and the result is kept with the job.",
+       "Special-order items are ordered now, after the window."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s remodel: file the permit and book the floor test. Both are due before Mon Nov 16.",
+        {
+         "buttons": [
+          "Both are in",
+          "Not in yet"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner"
+      ],
+      "branches": [
+       {
+        "label": "1 Ready by the start",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 The permit is late",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "7.16",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Fri Nov 13, 10:00am",
+          "title": "Moves the start, with no fee",
+          "does": "The permit is still in review on Fri Nov 13. The business caused the move, so it's free. Alex picks a new start date.",
+          "more": [
+           "Only dates after the permit's new expected date are offered.",
+           "The stage dates move with the start."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your permit is still in review, so Lee Remodeling needs to move your start date. There's no fee.",
+            {
+             "times": [
+              "Mon Nov 23 · start · Marco",
+              "Mon Nov 30 · start · Marco"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Asbestos in the old floor",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x08",
+          "line": [
+           "7.16",
+           "8.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Nov 9, 10:00am",
+          "title": "Removal goes first, by its own quote",
+          "does": "The lab finds asbestos in the old floor. A licensed removal company goes first, with its own price, and Alex's start moves.",
+          "more": [
+           "The crew never disturbs it.",
+           "The removal is a change order or a separate job, as Sam decides with Alex.",
+           "Alex gets the new start date once the removal is booked."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The test found asbestos in the old floor. A licensed removal company must take it out first. Sam will send you its price.",
+            {
+             "card": {
+              "title": "Test result · old floor",
+              "lines": [
+               "Asbestos found",
+               "Removal first, by a licensed company",
+               "Your start date moves after that"
+              ]
+             }
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Tue Nov 17, 11:30am",
+      "title": "Marco finds rot: a change order first",
+      "q": "Does Alex sign the change order?",
+      "does": "Under the old tub, Marco finds rotted subfloor. The contract can't change by text alone, so Alex and Sam sign a change order before the fix.",
+      "more": [
+       "It's over Sam's $500, so Sam OKs the price first.",
+       "It gives the price and any days added. It goes on the next stage payment.",
+       "It's signed on the secure page, like the contract.",
+       "Other work goes on while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 1200 rotted subfloor under the tub, replace. Adds 1 day",
+        {
+         "photos": [
+          "Rot under the old tub"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Marco found rotted subfloor under the old tub. It must be fixed before the new tub goes in.",
+        {
+         "card": {
+          "title": "Change order 1 · $1,200",
+          "lines": [
+           "Replace the rotted subfloor",
+           "Adds 1 work day",
+           "Added to payment 3"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/r4c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Call me first"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Call first, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x12",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "title": "Asks Sam to call Alex",
+          "does": "Alex wants a call first, or doesn't answer in 4 hours. Sam gets a to-do to call. Nothing is done to the floor until the change order is signed.",
+          "more": [
+           "Other work goes on while it waits.",
+           "If Alex says no, Sam and Alex decide what's next. Rosie moves no money on its own."
+          ],
+          "say": [
+           [
+            "san",
+            "owner",
+            "Alex M. wants a call about change order 1: $1,200 for the rotted subfloor. Please call today.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me at 4pm"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Remodeling is licensed or registered as a contractor where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Remodeling and the design studio both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The contractor's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Project leads and designers are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, projects and design consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Designers and the roofer hold their own licenses where the state's form asks; trade subs hold theirs."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Some outside work is sent now, like gutters overflowing in a storm (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An estimate visit has no form to sign first; the remodel's contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Estimate visits and work days are booked in 2-hour arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Remodeling books visits and work days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Remodeling books a project lead's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking lets the crew in (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A remodel is rated, like any job."
+   }
+  ]
+ },
+ "notes": "Flow B (main path visit|none|bill): the booking is the $89 estimate visit, priced at the visit. Marco's written quote (B8-20 words) leads into the master's 'An estimate becomes its own job' (D33), renamed '1 Signs the contract': B8-62 (the contract, signed by everyone on title and by Sam) and B8-63 (the $1,000 deposit and the start), then the own B8-x04 (the cancel window) and B8-x06 (the permit and the floor test).\nThe work runs on B8-22's 'The job runs several days': B8-37 carries the work plan and each work day's code (was B8-x09, B8-x10), the own change order B8-x11 follows it, and B8-65's outside check holds the rough-in and the final inspection (B8-50, B8-51 words; was B8-x13, B8-x14, B8-x17, B8-x18). The stage bills are the master's B9-21 (words; was B8-x15, B8-x16).\nB8-20's '1 Yes, fix it' and '3 OK some lines' are off: a remodel never starts at the estimate visit, and its quote is signed whole. '2 Not today' keeps the master's path (only the $89 is owed), and 'No answer: Alex is out' (renamed 'No reply in 5 days') sends one reminder, then Sam.\nInspections: B10-29's 'A permit: the city inspects' is off. The remodel's permit inspections, the rough-in and the final, run during the job at B8-50, and the last bill waits for the final (pf.rules), so nothing is inspected after. The other branch is renamed 'None after: checked during the job'.\nBank transfer: S1-57 and B9-26 (G16); the master lights it on every price kind now (D39). The stage bills (B9-21) and the last bill (B9-06, B9-26 words) offer it, and a check still works.\nFlow A is Sam's second company, Lee Design Studio, a kitchen and bath showroom (the master's Lee's Barbershop). Main path list|card|counter: a $35 design consult with Mia, a card saved for the $20 missed-consult fee, paid at the studio desk. A8-x01 offers Marco's estimate visit at home, which runs in flow B.\nMoney combinations used: B visit|none|bill, visit|none|own, visit|hold|bill, photos|deposit|bill (a vanity priced from photos, with a contract before the deposit). A list|card|counter, list|none|counter, list|full|none, list|deposit|counter. Left out: B's list combos and the saved card charged at DONE (big project bills are paid by link or check); A's photo and at-the-studio pricing stay only as examples.\nThe example estimate visit costs $89, credited to the job, so the master's numbers and card-fee math stay true; the plug-in says a free estimate is the safe start. New numbers appear only in own and changed steps: the $24,500 quote, the $1,000 deposit, $9,000, $8,700 (with the $1,200 change order) and the last $7,000. Card payments land less Stripe's card fee; no Stripe percentage or net amount is written (D21).\nRosfield's $2 for the booking comes out of the deposit, the first payment through Rosie, once (matches B9-18).\nEvery state rule is a switch from the state's form: the license and its job-size limit, the written contract and its parts, the deposit cap, money kept apart, the cancel window, permits, lien waivers, what must be shown. The old flow's Pennsylvania, California, Maryland, New York and Washington rules and numbers are dropped.\nLead-safe work is written as 'older homes, where the rules require it'. The year built is asked before times, but no cutoff year from one law is written.\nThe old 'escrow everywhere' rule (Q24) is the plug-in switch pf.money kept_apart. The master now asks for that account at sign-up (S1-54, S1-55: G17), so the gap 'Upfront money kept apart' is marked taken.\nSecond kind of work: roofing (trade name Lee Roofing), which waits for Marco's own roofer license, like the master's electrical.\nNames: Riley and Avery are designers Mia and Theo; Jordan and Casey are project leads Marco and Luis. Addresses: 17 Birch Ave (Alex), 75 Mill Rd (the studio), 900 Front St (Lee Remodeling). License numbers renamed (GC, RF, DS, ID).\nThe master's list jobs keep their prices as the example business's own: gutter cleaning $179 (drain clearing), deck sealing $150 (water heater flush), vanity replacement $640 from photos (water heater replacement), pre-remodel inspection $199 (sewer camera), window sills and a window pane as extras, a cabinet door rebuilt at the workshop (the faucet). Kim's outdoor job is a gutter cleaning.\nThe studio keeps the barbershop's prices: design consult $35, tile and fixture picks $40, sample board $20, paint color pick $25, 3D design session $55, kitchen design package $140, custom layout from photos $90, cabinet redesign after a $25 consult. A patch test becomes a measure check; color work becomes custom design.\nOff in A: the child branches of A4-24 and A8-32. A child is never the one served at a design studio.\nMost of the profession's words are carried by the rename (about 400 pairs, the same list in both flows so the shared steps read the same). Exact master sentences come first, then phrases, then single words; the token 'paintcolor' only protects 'paint color pick' from the word pair for 'color'.\nWhat-ifs on the visit path that happen at the estimate visit keep the master's dates (extra work on Thu Oct 22, its cancel until Mon Oct 26). The main path's last bill, receipt, rating, warranty visit and refund were moved to December dates.\nprof-read.js writes into work/prof, which the brief doesn't list, so the same joined reading was written to the scratch folder instead and read there (sections 3-10 of both main paths).\nkeep: none. No master example word is left in either flow.\nRefit to master v1.1 (Oct 22): B8-20's new '3 OK some lines' is off (a remodel quote is signed whole). Its new 'No answer: Alex is out' branch replaces the own 'No reply in 5 days' (B8-x19 is gone): a words op on B8-49 gives the 5-day reminder, then Sam, and a rename pair gives the branch the same label.\nThe master's new visit+deposit variants (a deposit on a starting price, G26) get the remodel's words on B4-14, B8-20 and B8-21. The contractor doesn't use those paths: a remodel's price isn't 'from $89', so they stay out of money.B.combos.\nTheo is the designer (the master's Avery), so the master's new flow-A customer Theo B. is Nina B. here.\nRefit to master v1.2 (Oct 22, evening): plug-in splits keep the contractor's branches and turn the rest off (D24): a license, the $2, no agreement, people not spaces, no classes, person licenses, sent now for urgent outside work, a line for walk-ins and a designer's time at the studio, no video consult, no damage hold, booked by name, no crew or set date or minimum at the studio, a crew on a remodel, arrival windows, own or rent asked, no form at booking. Both branches stay where the contractor uses both (B4-81, B7-55, B8-58 sent now or not; B4-57 contract or not; B8-65 a check or not; A7-61 who else may do it).\nPlug-in splits (check-prof's D24 check): A8-02's 'Something required is missing' is off (the studio requires nothing brought; photos and measurements are optional). Kept whole in splitsKept: A7-61 (custom design is Mia's alone) and, in B, B4-81, B7-55, B8-58 (urgent outside work sent now), B4-57 (a contract for a remodel or a vanity), B8-69, B8-70 (gutters and lockbox days), B8-71 (a vanity set up), B8-65 (a remodel's inspections partway) and B8-72 (a cabinet door to the workshop).\nReview (Oct 22, fresh reviewer): keep 'leak' and 'valve': water through a ceiling, a leaking vanity and shutting the main valve are the contractor's own safety words and photo-path job. The master's other plumbing and barbershop words were renamed (S1-25's 'no cut of', S1-60 and S2-28's 'barbering', S2-15, S2-30, A4-22, A4-50, A7-59, A10-20, A3-07, B4-29, B6-13, B7-55, B3-25, B8-72, B10-25, B10-30); B8-22 and B8-72's item goes to the workshop, not the studio; A's $15 gloss is a hardware pick. B10-07's 'A rented fan comes back' is off like B5-26's damage hold. B10-01's visit+deposit receipts (an unused path) read like the remodel's.\nReview (later, check-prof's new word list): A4-38's work that isn't offered and A7-38's broken tool use this work's own words (the master's perm and steamer).\nKeep (Oct 22, check-prof's longer word list): 'overflowing' is the contractor's own sent-now example, gutters overflowing in a storm (S2-27, S2-30, B4-81, B4-91, B6-16 to B6-18, B7-48 to B7-50): gutter cleaning is one of its services. The other new words were renamed: S11-58's massage (lighting design), A8-37's facial (the finish picks), B4-51's garbage disposal (a new vanity), B7-16's dishwasher (painting the bathroom), B8-27 and B8-28's main water line (rotted subfloor under the vanity); B8-50's rough-in checks the new water supply.\nTouch-up 2 (Oct 23): flow A's visit-priced path (hidden today): Alex's note for the cabinet redesign is 'We painted the cabinets ourselves. The paint is peeling.' (A4-22, and Mia's note at A6-15), not the barbershop's 'It went brassy last time.'\ntouch-up 4 (Oct 23): B6-27 and B6-19 (photos path) said the old heater is hauled away; the photos job is a vanity, so three rename pairs make it the old vanity. Keep 'cabinet' and 'drips': a cabinet redesign, a sticking or rebuilt cabinet door, a cabinet floor, and a vanity that drips are real remodeling words (B8-39's hidden base line is a gutter water test).\nRefit on the REDESIGN 2 master (Tue Oct 27, agent R01): facts documents (written quote, contract), stages (stage bills), photos (a vanity priced from photos), extrawork (change orders), firststeps (the permit and the old-home tests), sentnow (gutters overflowing in a storm), banktransfer (big bills); switch cancelright in flow B only (the master's B8-78 gives the written cancel window, so the own step B8-x04 went); settings: A a set start (the studio), B a 2-hour arrival window, free cancel until 24 hours before. Money paths unchanged: A list|card|counter (main), list|none|counter, list|full|none, list|deposit|counter; B visit|none|bill (main), visit|none|own, visit|card|bill, photos|deposit|bill. Amounts: A Design consult $35, fee $20; 3D design session $55 paid in full; Kitchen design package $140, $40 deposit, $100 rest; B Bathroom remodel (the visit path; $89 estimate-visit fee; the last bill $7,000), Vanity replacement $640 from photos, $160 deposit, $480 rest. The master's example service in flow B now reads as the estimate visit (it was the gutter cleaning): the main path is the remodel. The master's repipe story (B8-62, B9-21) reads as the $24,000 bathroom remodel: $1,000 to start, $16,000 when the rough-in passes, $7,000 at the finish.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "two skin fades on",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "a Kids cut (12 and under) is $25",
+    "Quiero un corte el sábado.",
+    "Gloss to finish",
+    "gloss",
+    "takes jobs sent now, like a burst pipe",
+    "A repair shop, a tailor or a groomer does.",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Drain clearing",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color",
+    "Color",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "water heaters",
+    "water heater",
+    "shops",
+    "shop",
+    "Shop"
+   ],
+   "B": [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Like tapping a neighbor's water line without asking.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "The service call is $89.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Right to cancel · repipe",
+    "The $800 start payment",
+    "Your $800 start payment",
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of your repipe",
+    "$800",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "$245",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "drain",
+    "leehomeservices.com",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "color",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "shop",
+    "Shop"
+   ]
+  },
+  "A": {
+   "A4-24": "0a292df05b",
+   "A5-16": "8045a6b80c",
+   "A8-44": "4410a4860c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B8-93": "c1406fd6bc",
+   "B8-63": "c0d957be82",
+   "B8-37": "3ce85cf051",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

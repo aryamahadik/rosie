@@ -1,0 +1,2944 @@
+{
+ "id": "radon",
+ "name": "Radon testing and mitigation",
+ "style": "Project",
+ "pattern": "project",
+ "from": "contractor",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a contractor or radon registration or license for the company, where the state's form requires one (often by job size or kind of work)",
+   "ask": [
+    "The company's registration or license number, and its class",
+    "Any job-size limit the license has",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business; plus a qualifying person where the state's form names one. Radon testers and mitigators hold their own certification where the state's form asks. An electrician runs the fan's circuit where the rules require it.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No radon work goes live until the company's registration or license checks out, where one is required",
+    "A job over the license's size limit is never offered or quoted: the owner is told why"
+   ],
+   "renewals": "License, insurance and bond dates kept; reminded 30 days out; a lapse pauses new bookings",
+   "lead_safe": "default",
+   "design_studio": "A consult at the office needs no license in most states. The work it leads to is booked under the contractor license.",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Estimate visit, then project: the job is booked only after a written quote and a signed contract",
+   "B": [
+    {
+     "name": "Estimate visit",
+     "price": "$89, credited to the job if Alex signs (the example business's own price; a free estimate is a starting option)",
+     "length": "60 minutes",
+     "where": "at the customer's place",
+     "before": "nothing taken (or a card saved for the $89)",
+     "after": "billed only if no contract follows"
+    },
+    {
+     "name": "Radon mitigation job",
+     "price": "quoted after the estimate visit: a written quote within 3 business days, good for 30 days (the example: $2,400)",
+     "length": "about 1 work day, then a post-install test",
+     "where": "at the customer's place",
+     "before": "nothing at booking; a deposit only after the contract is signed (the example: 25%)",
+     "after": "the rest on the final bill, after the install and the walk-through"
+    },
+    {
+     "name": "Crawl space system",
+     "price": "quoted after the estimate visit",
+     "length": "1 to 2 work days",
+     "where": "at the customer's place",
+     "before": "the same as the mitigation job",
+     "after": "the same"
+    },
+    {
+     "name": "Sump pit cover and seal",
+     "price": "priced from photos (example: $640); over $500, Sam OKs it",
+     "length": "half a day",
+     "where": "at the customer's place",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Radon test, charcoal",
+     "price": "$179, from the list (a 2 to 4 day test; the device is set up and picked up)",
+     "length": "two short visits",
+     "where": "at the customer's place; nobody needs to be home if the lockbox is set",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Radon retest",
+     "price": "$150, from the list; also a plan every two years",
+     "length": "two short visits",
+     "where": "at the customer's place",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Continuous monitor test",
+     "price": "$199, with a written report (48 hours or more; the result goes on the secure page)",
+     "length": "two short visits",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Change order",
+     "price": "priced, written and signed by both before the changed work; added to the final bill"
+    },
+    {
+     "name": "Permit, slab scan, electrician and the post-install test",
+     "price": "in every quote"
+    }
+   ],
+   "A": [
+    {
+     "name": "Result review",
+     "price": "$35, 30 minutes",
+     "where": "at the office; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the office desk"
+    },
+    {
+     "name": "Quote review",
+     "price": "$40",
+     "where": "at the office",
+     "before": "a card saved",
+     "after": "at the office desk"
+    },
+    {
+     "name": "Test placement guide",
+     "price": "$20, an add-on to take home",
+     "where": "at the office"
+    },
+    {
+     "name": "Printed result summary",
+     "price": "$15, an add-on at a consult",
+     "where": "at the office"
+    },
+    {
+     "name": "Retest plan",
+     "price": "$25",
+     "where": "at the office"
+    },
+    {
+     "name": "Radon plan session",
+     "price": "$55, 60 minutes; credited to the job if Alex signs",
+     "where": "at the office",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Home radon plan (system layout, fan spot, cost range)",
+     "price": "$140, 2½ hours",
+     "where": "at the office",
+     "before": "the $40 fee held (over 2 hours), or a $40 deposit",
+     "after": "at the office desk"
+    },
+    {
+     "name": "Custom system sketch",
+     "price": "priced from the customer's photos and measurements (example: $90); Sam OKs each one",
+     "where": "at the office"
+    },
+    {
+     "name": "Plan update",
+     "price": "priced at the office after a $25 consult",
+     "where": "at the office"
+    }
+   ],
+   "capacity": "One technician per booking; one install crew per job; the office's desk is saved with long sessions",
+   "skills": "Tests and estimates: certified testers and technicians. Installs: mitigation technicians. Wiring: a licensed electrician.",
+   "nobody_home": "A test needs access only to set up and to pick up the device: nobody needs to be home if the lockbox is set. Install day: an adult on the booking is reachable by phone.",
+   "online": "A result review can be a video or phone call (counts as at the office)",
+   "smallest_job": "A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the example takes a test or a system, and sends a single sump lid repair to a handyman)."
+  },
+  "pf.questions": {
+   "before_times": [
+    "What do you want done? (a radon test, or a radon system)",
+    "Which level of the home is the concern: basement, crawl space or slab?",
+    "Is there a sump pit, a floor drain or a crawl space?",
+    "When should it be finished?"
+   ],
+   "after_time": [
+    "Who will sign the contract? Everyone on the deed should be at the estimate visit",
+    "Do you own the home or rent? (the owner must sign)",
+    "Access to the basement, and where the pipe can run",
+    "Pets at home during the work",
+    "For a test: will windows and outside doors stay closed for 12 hours before and during it?"
+   ],
+   "secure_page_only": [
+    "Budget range",
+    "Photos of the basement (optional)",
+    "Lockbox codes",
+    "Radon test results and levels"
+   ],
+   "who_may_book": "An adult who owns the property, or someone with the owner's written OK. A renter's job needs the owner to sign.",
+   "studio": [
+    "Which area, and a rough budget (on the secure page)",
+    "Photos or measurements to bring (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "gas smell, hissing near a gas line, sparking or smoking wires, a carbon monoxide alarm",
+     "says": "Leave the house now. Then call 911 and the gas or power company.",
+     "booking": "no booking; a new request must say the home was made safe"
+    },
+    {
+     "words": "a basement wall or floor giving way, a ceiling falling",
+     "says": "Stay out of that room, and call 911 if anyone is at risk.",
+     "booking": "no booking until it's safe"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "water in the basement or near outlets",
+     "says": "Stay out of the water and away from the outlets. Don't touch the sump pump or wiring. Call an electrician first.",
+     "booking": "goes on, marked urgent"
+    },
+    {
+     "words": "a worry about a radon test result",
+     "says": "A result is not an emergency. We'll talk it through on the secure page, and the next step is a retest or a quote.",
+     "booking": "goes on; the result stays on the secure page, never in a text"
+    }
+   ],
+   "business_line": "Questions about a gas furnace's venting, a well or a septic system, or what a result means for your health go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_quote": "The estimate visit at the property, with everyone who will sign there",
+   "after_contract": [
+    "The cancel window ends before any work or orders, where the state's rules give one",
+    "The slab scan for in-floor heat tubing and cables before any drilling",
+    "The permit, pulled by the license holder in the business's name, where the work needs one; the electrician for the fan's circuit",
+    "The post-install test booked once the fan has run, and the fan and pipe ordered once the window ends"
+   ],
+   "prep": [
+    "For a test: keep windows and outside doors closed for 12 hours before and during the test, except normal coming and going",
+    "For a test: no whole-house fan or window air conditioner, and don't move the device",
+    "For an install: clear the area around the slab and the planned pipe route",
+    "Keep pets and everyone else out of the work area",
+    "Put any lockbox code on the secure page"
+   ],
+   "studio_prep": [
+    "Bring photos and rough measurements of the area",
+    "Bring any samples or colors you already like"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Estimate visit: the check-in code at the door. Each work day: that day's code, or the lockbox and a start photo when nobody is home. Office: the code at the desk.",
+   "at_the_visit": "The estimator looks at the slab, the sump pit, the floor drains and the pipe route, measures and photographs; the written quote follows within 3 business days, good for 30 days",
+   "changes": "A written change order, priced and signed by both, before any changed work. A second suction point, a cracked slab or a sewer line found are priced this way.",
+   "outside_checks": "A permit inspection and the post-install test, where the permit requires them",
+   "done": "The fan check and the post-install test are set, then the walk-through, then DONE; the care notes go with it. The test result is on the secure page, never in a text",
+   "studio_done": "DONE after the consult, with the radon advisor's notes and the picks saved for the estimate",
+   "before_photos": "The slab, the sump pit, the floor drains and the pipe route"
+  },
+  "pf.money": {
+   "estimate": "The example's $89 estimate visit is credited to the job; billed only if no contract follows. A free estimate is the safe start.",
+   "no_money_before_contract": "On project work, nothing is taken before the contract is signed by everyone on the deed",
+   "deposit": "Only after signing; the deposit cap comes from the state's form",
+   "kept_apart": "Money paid before the work is kept apart or bonded where the state's rules require it (a switch from the state's form)",
+   "stages": "No stage bills: a deposit at signing, the rest on the final bill after the install and the walk-through. Never ahead of the work",
+   "last_payment": "After the walk-through and the post-install test is set",
+   "change_orders": "Added to the next stage bill",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the technician texts 'paid check'.",
+   "tips": "No tip line",
+   "tax": "Tax on materials and labor follows the state's form",
+   "studio": "The radon plan session's $55 is credited to the job if Alex signs; the $20 missed-consult fee only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Radon test results and levels (the secure page only)",
+    "Gate or lockbox codes",
+    "The budget",
+    "Contract, change order and permit papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who lets the crew in"
+  },
+  "pf.staff": {
+   "roles": "Technicians (Wes, Bea): estimates, quotes and running the job, with the crew. Radon advisors (Noor, Roy) at the office.",
+   "licenses": "The company holds the contractor registration or license. Where the state's form also licenses each person, each one may add a number (optional, shown as given, not checked by Rosie). Subcontractors hold their own, as the business says.",
+   "lead_safe": "default",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another technician may take an estimate visit; a job keeps its technician unless Sam moves it"
+  },
+  "pf.rules": {
+   "contract": "A written contract for project work where the state's rules require one, signed by everyone on the deed and by the business before any money",
+   "contract_parts": "The parts the state's form lists (license number, dates, price, deposit, cancel notice, any lien notice)",
+   "cancel_window": "A cancel window after signing, where the state's rules give one; work and orders wait for it",
+   "permits": "Pulled by the license holder in the business's name, never the homeowner's",
+   "change_orders": "Written and signed by both before the changed work",
+   "final": "The post-install test booked and any permit sign-off before the last payment",
+   "lien_waivers": "Lien waivers from the business and its subcontractors with the last payment, where the state's rules provide them",
+   "show": "The license number on the listing, the quote, the contract and the receipt, where the state's rules require it",
+   "warranty": "The owner's own (the example: the system is adjusted free if the retest isn't below the action level the quote names); 1 year on workmanship; makers' warranties on fans",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "test_conditions": "A test during a storm, with windows open or a whole-house fan on, is not valid: the tester says so and the retest is booked, with no fee for the second set-up",
+   "device_moved": "A device moved or switched off during a test: the test is marked invalid and rebooked",
+   "real_estate": "A test for a home sale has a tight clock: the tester books it early, and the result goes to the person who ordered it, on the secure page",
+   "high_result": "A high result is not an emergency: it goes on the secure page, with the next step (a retest or a quote). No result or level is ever in a text",
+   "slab_obstacles": "Heat tubing, cables or a sewer line under the slab: the crew stops and moves the spot; the start may move",
+   "weak_suction": "Weak suction at the far side of the slab: a second suction point by change order",
+   "backdrafting": "Gas appliances: venting and carbon monoxide are checked after the fan goes in, where the rules require it; a carbon monoxide alarm is a stop",
+   "post_test_high": "The post-install test is still high: the crew adjusts the system at no charge (the example's warranty), and a retest is booked",
+   "permit_late": "The start moves with no fee; Alex is told",
+   "inspection_fails": "The crew fixes it and it's checked again; the final bill waits",
+   "cancel_after_window": "Sam and the customer settle it; Rosie moves no money on its own",
+   "nobody_home": "Tests with the lockbox set, with start and end photos",
+   "over_license_limit": "Not offered, and the owner is told why",
+   "walk_through_dispute": "Goes to Sam; the last bill waits",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "photos",
+   "extrawork",
+   "firststeps",
+   "results",
+   "banktransfer",
+   "video"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "$89 service-call fee",
+    "$89 estimate visit fee"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither radon mitigation nor the radon office takes jobs sent now."
+   ],
+   [
+    "The chairs",
+    "The basement floor"
+   ],
+   [
+    "A chair, ready",
+    "A sealed sump pit"
+   ],
+   [
+    "JP031552",
+    "RM-10552"
+   ],
+   [
+    "JE30417",
+    "RT-10417"
+   ],
+   [
+    "Groom's package · ",
+    "Home radon plan · "
+   ],
+   [
+    "$40 for the Groom's package",
+    "$40 for the home radon plan"
+   ],
+   [
+    "the Groom's package",
+    "the home radon plan"
+   ],
+   [
+    "The Groom's package",
+    "The home radon plan"
+   ],
+   [
+    "$140 Groom's package",
+    "$140 home radon plan"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Noor and Roy run the result reviews; Noor also does home result reviews"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Noor: radon advisor, quote reviews, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Noor: radon advisor, quote reviews and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, quote reviews and home result reviews"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the office, and home result reviews"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A result review' or 'a quote review' fits a result review."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a landlord: 'We'd like result reviews for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A result review's example: 'A big basement needs a quick photo check first. Sent us photos in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which level of the home is the concern?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sketch next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the surface"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a licensed sewer repair company first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "cracks a basement light fixture and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a basement light fixture"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "cracked a basement light fixture at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked basement light fixture"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the office and for home result reviews"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Custom sketch quotes come to you first. List prices never need one"
+   ],
+   [
+    "Color always stays with Riley",
+    "Custom system sketches always stay with Noor"
+   ],
+   [
+    "Riley's color plan",
+    "Noor's radon plan"
+   ],
+   [
+    "Color plan",
+    "Radon plan"
+   ],
+   [
+    "color plan",
+    "radon plan"
+   ],
+   [
+    "rents a chair",
+    "works on their own"
+   ],
+   [
+    "Free on your board",
+    "Free on your list"
+   ],
+   [
+    "the shop's board",
+    "the office's list"
+   ],
+   [
+    "a chair renter",
+    "an independent contractor"
+   ],
+   [
+    "A chair renter",
+    "An independent contractor"
+   ],
+   [
+    "a step-free chair",
+    "a step-free entrance"
+   ],
+   [
+    "would like to see your hair",
+    "would like to see your basement photos"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, but add the crawl space'"
+   ],
+   [
+    "please come with dry hair",
+    "please bring your printed test report"
+   ],
+   [
+    "It's my kitchen.",
+    "It's my house."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Radon test: a set price, no quote"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words: a gas smell, a carbon monoxide alarm, sparking wires, or water near outlets."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "The plug-in has safety steps for water in the basement and for a high result, so they are sent here."
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute photo review"
+   ],
+   [
+    "two skin fades on",
+    "two result reviews on"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a mold removal, which isn't on the office's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Radon Office doesn't do mold removals."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A display stand fell and scratched my phone."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a display stand fell and scratched their phone today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "wants the quietest fan and the pipe on the garage side"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a result review for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most radon advice offices set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A radon advice office on Market Sq. Result reviews, quote reviews and radon plans."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most radon advice offices start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules radon advice offices often set."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds water testing to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Water testing for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW water testing"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a retest plan is $25"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una revisión de resultados el sábado."
+   ],
+   [
+    "Gloss to finish",
+    "Printed result summary"
+   ],
+   [
+    "gloss",
+    "printed result summary"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Radon's"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A radon contractor's example: water in the basement near outlets gets 'stay away from the water and the outlets'."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A radon test has a set price. A radon system is quoted after an estimate visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Drain clearing",
+    "Radon test, charcoal"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Quote review at Lee Radon Office is $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for quote review at $35"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Noor sees the basement photos"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you make retest plans? My last test was two years ago."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Result reviews, quote reviews and plans at the office. A review by video or phone, or at home, too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A result review could mean a radon office or a home inspection company."
+   ],
+   [
+    "MP045210",
+    "RM-1042"
+   ],
+   [
+    "EC22871",
+    "RT-2210"
+   ],
+   [
+    "BS20981",
+    "RO-3305"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's homes together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books result reviews for three homes on one morning. Rosie finds times side by side with Noor and Roy."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A result review and a retest plan work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your basement"
+   ],
+   [
+    "patch test",
+    "basement photo check"
+   ],
+   [
+    "skin-test result",
+    "basement photo check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the office during my result review?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "Water is now standing near the sump pit. Can I still come in?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the sump pit."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the sump pit"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Market Sq"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Radon"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Radon Office LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Radon Office"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Radon"
+   ],
+   [
+    "Lee Electric",
+    "Lee Radon Testing"
+   ],
+   [
+    "1200 Main St",
+    "88 Foundry Ave"
+   ],
+   [
+    "88 Elm St",
+    "21 Market Sq"
+   ],
+   [
+    "Riley",
+    "Noor"
+   ],
+   [
+    "Avery",
+    "Roy"
+   ],
+   [
+    "Jordan",
+    "Wes"
+   ],
+   [
+    "Casey",
+    "Bea"
+   ],
+   [
+    "plumbing and electrical",
+    "radon mitigation and radon testing"
+   ],
+   [
+    "Plumbing and electrical",
+    "Radon mitigation and radon testing"
+   ],
+   [
+    "electrical",
+    "radon testing"
+   ],
+   [
+    "Electrical",
+    "Radon testing"
+   ],
+   [
+    "Panel upgrade",
+    "Radon test"
+   ],
+   [
+    "Plumber",
+    "Radon contractor"
+   ],
+   [
+    "plumber",
+    "technician"
+   ],
+   [
+    "plumbing",
+    "radon mitigation"
+   ],
+   [
+    "Plumbing",
+    "Radon mitigation"
+   ],
+   [
+    "barbershop",
+    "radon advice office"
+   ],
+   [
+    "Barbershop",
+    "Radon advice office"
+   ],
+   [
+    "barbers",
+    "radon advisors"
+   ],
+   [
+    "barber",
+    "radon advisor"
+   ],
+   [
+    "Barber",
+    "Radon advisor"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Radon plan session"
+   ],
+   [
+    "Signature cut and shave",
+    "Radon plan session"
+   ],
+   [
+    "signature cut",
+    "radon plan session"
+   ],
+   [
+    "Groom's package",
+    "Home radon plan"
+   ],
+   [
+    "Color and cut",
+    "Custom system sketch"
+   ],
+   [
+    "color and cut",
+    "custom system sketch"
+   ],
+   [
+    "Color correction",
+    "Plan update"
+   ],
+   [
+    "color correction",
+    "plan update"
+   ],
+   [
+    "color quote",
+    "quote review"
+   ],
+   [
+    "Kids cut",
+    "Retest plan"
+   ],
+   [
+    "kids cut",
+    "retest plan"
+   ],
+   [
+    "Skin fade",
+    "Quote review"
+   ],
+   [
+    "skin fade",
+    "quote review"
+   ],
+   [
+    "Beard trim",
+    "Test placement guide"
+   ],
+   [
+    "beard trim",
+    "test placement guide"
+   ],
+   [
+    "Haircuts",
+    "Result reviews"
+   ],
+   [
+    "haircuts",
+    "result reviews"
+   ],
+   [
+    "Haircut",
+    "Result review"
+   ],
+   [
+    "haircut",
+    "result review"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the office"
+   ],
+   [
+    "water heaters",
+    "sump pits"
+   ],
+   [
+    "water heater",
+    "sump pit"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "A shop",
+    "An office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Elm St",
+    "Market Sq"
+   ],
+   [
+    "house calls",
+    "home result reviews"
+   ],
+   [
+    "house call",
+    "home result review"
+   ],
+   [
+    "House calls",
+    "Home result reviews"
+   ],
+   [
+    "House call",
+    "Home result review"
+   ]
+  ],
+  "B": [
+   [
+    "$89 service-call fee",
+    "$89 estimate visit fee"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither radon mitigation nor the radon office takes jobs sent now."
+   ],
+   [
+    "The chairs",
+    "The basement floor"
+   ],
+   [
+    "A chair, ready",
+    "A sealed sump pit"
+   ],
+   [
+    "JP031552",
+    "RM-10552"
+   ],
+   [
+    "JE30417",
+    "RT-10417"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Water pressure check",
+    "Free basement photo check"
+   ],
+   [
+    "Alex books on the shop's booking page",
+    "Alex books on the company's booking page"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Tells Alex it's with the shop",
+    "Tells Alex it's with the company"
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Noor and Roy run the result reviews; Noor also does home result reviews"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Noor: radon advisor, quote reviews, home consults"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Noor: radon advisor, quote reviews and home consults"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, quote reviews and home result reviews"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the office, and home result reviews"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A result review' or 'a quote review' fits a result review."
+   ],
+   [
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "like a landlord: 'We'd like result reviews for 6 homes before Saturday's open house.'"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A result review's example: 'A big basement needs a quick photo check first. Sent us photos in the last 3 months?'"
+   ],
+   [
+    "How would you like it on top?",
+    "Which level of the home is the concern?"
+   ],
+   [
+    "like the cut in the mirror",
+    "like the sketch next to the photos"
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or the surface"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a licensed sewer repair company first"
+   ],
+   [
+    "cracks the cabinet floor and texts a photo",
+    "cracks a basement light fixture and texts a photo"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked a basement light fixture"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "cracked a basement light fixture at"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked basement light fixture"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the office and for home result reviews"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Custom sketch quotes come to you first. List prices never need one"
+   ],
+   [
+    "Color always stays with Riley",
+    "Custom system sketches always stay with Noor"
+   ],
+   [
+    "Riley's color plan",
+    "Noor's radon plan"
+   ],
+   [
+    "Color plan",
+    "Radon plan"
+   ],
+   [
+    "color plan",
+    "radon plan"
+   ],
+   [
+    "rents a chair",
+    "works on their own"
+   ],
+   [
+    "Free on your board",
+    "Free on your list"
+   ],
+   [
+    "the shop's board",
+    "the office's list"
+   ],
+   [
+    "a chair renter",
+    "an independent contractor"
+   ],
+   [
+    "A chair renter",
+    "An independent contractor"
+   ],
+   [
+    "a step-free chair",
+    "a step-free entrance"
+   ],
+   [
+    "would like to see your hair",
+    "would like to see your basement photos"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, but add the crawl space'"
+   ],
+   [
+    "please come with dry hair",
+    "please bring your printed test report"
+   ],
+   [
+    "It's my kitchen.",
+    "It's my house."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Radon test: a set price, no quote"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words: a gas smell, a carbon monoxide alarm, sparking wires, or water near outlets."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "The plug-in has safety steps for water in the basement and for a high result, so they are sent here."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, there is one in the corner"
+   ],
+   [
+    "Leak repair · $245",
+    "Radon mitigation job · $2,400"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 radon test needs none."
+   ],
+   [
+    "Kim L.'s yard drain needs nobody home.",
+    "Kim L.'s retest needs nobody home."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s basement system, installed Mon Nov 2, is making a rattling noise."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT",
+    "Wes scrapes a hand and texts HURT"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "like a $620 repair",
+    "like a $2,400 system"
+   ],
+   [
+    "$620",
+    "$2,400"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "Bank transfer over $500"
+   ],
+   [
+    "Each stage is billed when Jordan texts it done. One booking, so one $2 for the whole job.",
+    "The rest is billed when Wes texts DONE. One booking, so one $2 for the whole job."
+   ],
+   [
+    "Mon Nov 2 to Wed Nov 4 · 8am–4pm",
+    "Mon Nov 2 · 8am–1pm"
+   ],
+   [
+    "Mon Nov 9 to Wed Nov 11 · 8am–4pm",
+    "Mon Nov 9 · 8am–1pm"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And which level of the home is the concern, and is there a sump pit?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Radon can come:"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a radon system for my basement. A text back is fine."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like asking us to fake a test report."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I need a radon system for my basement' fits a radon mitigation job."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a retest after the install? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the basement."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a system's drilling day and its post-install test."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the area around the slab and the planned pipe route."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a damp spot on the basement floor this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an estimate visit, today,"
+   ],
+   [
+    "The service call is $89.",
+    "The estimate visit is $89."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Wes measures the basement and texts the quote with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 2400 suction system 1900 sealing and post-install test 500"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Suction system, pipe and fan · $1,900"
+   ],
+   [
+    "Supply line · $80",
+    "Sealing and post-install test · $500"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Wes measured the basement. Here's the written quote."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Suction system, pipe and fan · $1,900"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the suction system only, $1,900. Leave the sealing and post-install test."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Wes does the suction system, $1,900. The $500 sealing and post-install test stays good until Thu Oct 29."
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Wes's estimate visit at Harper J.'s is for a $2,400 radon mitigation job."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 radon mitigation job, a deposit and a final bill"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Radon's quote for your radon mitigation job."
+   ],
+   [
+    "Repipe · $2,400",
+    "Radon mitigation job · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$600 to start, $1,800 when the system is installed and tested"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · radon mitigation job"
+   ],
+   [
+    "The $800 start payment",
+    "The $600 start payment"
+   ],
+   [
+    "Your $800 start payment",
+    "Your $600 start payment"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Say Harper J.'s $2,400 radon mitigation job is billed in three stages"
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: the system is installed and tested."
+   ],
+   [
+    "stage 2 of your repipe",
+    "your radon mitigation job, the final bill"
+   ],
+   [
+    "$800",
+    "$1,800"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most radon advice offices set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A radon advice office on Market Sq. Result reviews, quote reviews and radon plans."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most radon advice offices start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules radon advice offices often set."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds water testing to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Water testing for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW water testing"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I move my storage boxes away from the wall before you come?"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Wes's notes"
+   ],
+   [
+    "sewer camera report",
+    "monitor test report"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 radon mitigation job"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a second suction point Wes noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to add a second suction point, from Wes's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Add a second suction point"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Water is standing in the basement near the outlets. Can someone come tonight?"
+   ],
+   [
+    "LATE camera report",
+    "LATE monitor test report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A radon mitigation job happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Radon doesn't do, like a roof repair."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Radon does radon mitigation and radon testing, not roofing. Nothing was saved. You can look for a roofer near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Radon's"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which level is the concern, whether there is a sump pit, when, and what the foundation is."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, a carbon monoxide alarm, sparking wires, or water near outlets."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE bare slab, open sump pit, no pipe yet"
+   ],
+   [
+    "Under the sink, before",
+    "Slab, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Sump pit, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A radon mitigation job is quoted after the estimate visit: only the $89 visit was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Wes finds a cracked sewer line under the slab. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "a cracked sewer line under the slab"
+   ],
+   [
+    "Mold behind the sink wall",
+    "A cracked sewer line under the slab"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Wes found a cracked sewer line under the slab and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the drilling at that spot"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left drilling dust on the basement stairs.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left drilling dust on the basement stairs."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Wes look at my crawl space next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Wes's next times for a crawl space estimate."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the crawl space estimate for today"
+   ],
+   [
+    "$245",
+    "$1,800"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Hay agua en el sótano cerca de los enchufes."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? There is water in the basement near the outlets."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A radon contractor's example: water in the basement near outlets gets 'stay away from the water and the outlets'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to stay out of the water, keep away from the outlets, and call an electrician first."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No entre al agua. Aléjese de los enchufes. Llame primero a un electricista."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay out of the water. Keep away from the outlets. Call an electrician first."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to run my gas furnace after the fan goes in?"
+   ],
+   [
+    "a dripping faucet",
+    "a small crack in the slab"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The slab crack is a small repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone come for a radon system estimate this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Estimate visit"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa estimate Thu 12-2 Bea"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a radon retest at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's radon retest?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I want a radon system put in my basement. Can someone come for an estimate Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the basement."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a sump pit?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that water is now standing near the outlets."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Water is standing near the outlets now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay out of the water and away from the outlets. Don't touch the sump pump or any wiring."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you retest my basement every two years, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Radon has a radon retest plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a radon retest every two years."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 1800 radon mitigation job"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE fan runs quietly. Keep the sump lid sealed. Retest in two years."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The fan gauge reads different a few days later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The fan gauge reads differently from the day of the install."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your basement system is under warranty"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Wes finds an open floor drain by the pipe route."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 seal the open floor drain"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Seal the open floor drain"
+   ],
+   [
+    "both shutoff valves",
+    "the floor drain"
+   ],
+   [
+    "the shutoff valves",
+    "the floor drain"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 floor drain quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 floor drain work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Wes also check the crawl space?"
+   ],
+   [
+    "Sewer camera report",
+    "Continuous monitor test report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the monitor test report link"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A radon test has a set price. A radon system is quoted after an estimate visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Radon job"
+   ],
+   [
+    "Drain clearings",
+    "Radon jobs"
+   ],
+   [
+    "drain clearings",
+    "radon jobs"
+   ],
+   [
+    "Drain clearing",
+    "Radon job"
+   ],
+   [
+    "drain clearing",
+    "radon job"
+   ],
+   [
+    "Kitchen drain",
+    "Basement"
+   ],
+   [
+    "kitchen drain",
+    "basement"
+   ],
+   [
+    "Water heater flush",
+    "Radon retest"
+   ],
+   [
+    "water heater flush",
+    "radon retest"
+   ],
+   [
+    "leehomeservices.com",
+    "leeradon.com"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Result reviews, quote reviews and plans at the office. A review by video or phone, or at home, too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A result review could mean a radon office or a home inspection company."
+   ],
+   [
+    "MP045210",
+    "RM-1042"
+   ],
+   [
+    "EC22871",
+    "RT-2210"
+   ],
+   [
+    "BS20981",
+    "RO-3305"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The office is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Radon Office can do your result review at the office for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Radon LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Radon"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Radon Office"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Radon"
+   ],
+   [
+    "Lee Electric",
+    "Lee Radon Testing"
+   ],
+   [
+    "1200 Main St",
+    "88 Foundry Ave"
+   ],
+   [
+    "88 Elm St",
+    "21 Market Sq"
+   ],
+   [
+    "42 Oak St",
+    "14 Linden Ct"
+   ],
+   [
+    "Riley",
+    "Noor"
+   ],
+   [
+    "Avery",
+    "Roy"
+   ],
+   [
+    "Jordan",
+    "Wes"
+   ],
+   [
+    "Casey",
+    "Bea"
+   ],
+   [
+    "plumbing and electrical",
+    "radon mitigation and radon testing"
+   ],
+   [
+    "Plumbing and electrical",
+    "Radon mitigation and radon testing"
+   ],
+   [
+    "electrical",
+    "radon testing"
+   ],
+   [
+    "Electrical",
+    "Radon testing"
+   ],
+   [
+    "Panel upgrade",
+    "Radon test"
+   ],
+   [
+    "Plumber",
+    "Radon contractor"
+   ],
+   [
+    "plumber",
+    "technician"
+   ],
+   [
+    "plumbing",
+    "radon mitigation"
+   ],
+   [
+    "Plumbing",
+    "Radon mitigation"
+   ],
+   [
+    "barbershop",
+    "radon advice office"
+   ],
+   [
+    "Barbershop",
+    "Radon advice office"
+   ],
+   [
+    "barbers",
+    "radon advisors"
+   ],
+   [
+    "barber",
+    "radon advisor"
+   ],
+   [
+    "Barber",
+    "Radon advisor"
+   ],
+   [
+    "haircut",
+    "result review"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the office"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "service call",
+    "estimate visit"
+   ],
+   [
+    "Service call",
+    "Estimate visit"
+   ],
+   [
+    "Water heater replacement",
+    "Sump pit cover and seal"
+   ],
+   [
+    "water heater replacement",
+    "sump pit cover and seal"
+   ],
+   [
+    "Leak repair",
+    "Radon mitigation job"
+   ],
+   [
+    "leak repair",
+    "radon mitigation job"
+   ],
+   [
+    "Sewer camera inspection",
+    "Continuous monitor test"
+   ],
+   [
+    "sewer camera inspection",
+    "monitor test"
+   ],
+   [
+    "water heaters",
+    "sump pits"
+   ],
+   [
+    "Water heater",
+    "Sump pit"
+   ],
+   [
+    "water heater",
+    "sump pit"
+   ],
+   [
+    "A shop",
+    "An office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Elm St",
+    "Market Sq"
+   ],
+   [
+    "house calls",
+    "home result reviews"
+   ],
+   [
+    "house call",
+    "home result review"
+   ],
+   [
+    "House calls",
+    "Home result reviews"
+   ],
+   [
+    "House call",
+    "Home result review"
+   ]
+  ]
+ },
+ "keep": [
+  "color",
+  "valve",
+  "pipe",
+  "Pipe",
+  "electrician",
+  "drain",
+  "sewer",
+  "estimate visit",
+  "Estimate visit",
+  "leak",
+  "roofing",
+  "Roofing"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Radon Office, Sam's radon advice office, for a result review with Noor on Sat Oct 24 at 11:00am. The review depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Radon to put a radon system in the basement at 14 Linden Ct. Wes comes for the estimate visit Thu Oct 22 between 8 and 10am, sends a written quote, and runs the job once the contract is signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Result review, $35 at the office; a card saved for the $20 missed-consult fee; paid at the office desk.",
+    "list|none|counter": "Result review, $35; nothing taken; a YES books it; paid at the office desk.",
+    "list|full|none": "Radon plan session, $55, paid in full when booking; credited to the job if Alex signs.",
+    "list|deposit|counter": "Home radon plan, $140; a $40 deposit now; the $100 rest at the office desk."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Result review"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Result review"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Radon plan session"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$20",
+     "name": "Home radon plan"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "Radon mitigation job: the $89 estimate visit, nothing taken; Wes's written quote; the contract, a $600 deposit and stage bills; the last $1,800 on the bill Rosie texts.",
+    "visit|none|own": "The same radon mitigation job, but Sam bills each stage and the last payment his own way; Rosie sends nothing about money.",
+    "visit|card|bill": "The same radon mitigation job, with a card saved for the $89 estimate visit fee when Alex books.",
+    "photos|deposit|bill": "Sump pit cover and seal, priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Radon mitigation job"
+    },
+    "visit|*|*": {
+     "price": "$1,800",
+     "name": "Radon mitigation job"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Sump pit cover and seal"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Sump pit cover and seal"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15"
+  ],
+  "B": [
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-69"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A consult is for the property's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "more",
+    "at": "A5-16",
+    "more": [
+     "Sam's setting: a radon plan session is credited to the job if Alex goes ahead with Lee Radon."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the estimate visit at home",
+      "does": "Noor saves Alex's picks for the estimate. If Alex wants the basement priced, Noor books Wes's estimate visit at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Radon, Sam's other company. It runs in the other flow.",
+       "The picks and photos go with it, so Wes's quote uses them.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: estimate visit at home for the basement. Picks saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Noor saved your picks. Want Lee Radon to come measure for a quote?",
+        {
+         "buttons": [
+          "Book the estimate",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Radon work is licensed or registered as a contractor where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The company and its office both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and radon advisors are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, projects and consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Radon testers and mitigators hold their own certification where the state's form asks; the company holds the contractor license, and a licensed electrician runs the fan's circuit where the rules require it."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "The work is booked ahead; nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The office books a radon advisor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The office books a radon advisor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The office books a radon advisor's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A consult has no form to sign first; the job's contract comes after the quote, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the office."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "The office requires nothing brought: photos and measurements are optional (pf.questions, pf.first_steps studio_prep), and a consult has no form, ID or permit to check."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the office."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A job this size never starts at the estimate visit: Alex signs a written contract first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A quote is signed whole, as one contract. A smaller job is a new written quote from Wes, after the call Alex can ask for."
+   },
+   {
+    "op": "after",
+    "at": "B8-63",
+    "steps": [
+     {
+      "id": "B8-x06",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "owner",
+      "via": "msg",
+      "t": "Wed Oct 28, 8:00am",
+      "title": "Sam files the permit; the slab is checked first",
+      "q": "Is it all ready by the start?",
+      "does": "The window ends with no cancel. Sam files the permit in Lee Radon's name, where the work needs one. Before any drilling, the slab is scanned for in-floor heat tubing and cables.",
+      "more": [
+       "The license holder always pulls the permit, never Alex.",
+       "Sam gets a to-do with each due date, and replies when it's in.",
+       "Heat tubing and cables are found with a scan or the home's plans, never by drilling blind.",
+       "The fan's circuit is run by a licensed electrician where the rules require it."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s basement: file the permit and book the slab scan. Both are due before the work day, Mon Nov 2.",
+        {
+         "buttons": [
+          "Both are in",
+          "Not in yet"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner"
+      ],
+      "branches": [
+       {
+        "label": "1 Ready by the start",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 The permit is late",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "7.16",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Fri Oct 30, 10:00am",
+          "title": "Moves the start, with no fee",
+          "does": "The permit is still in review on Fri Oct 30. The business caused the move, so it's free. Alex picks a new start date.",
+          "more": [
+           "Only dates after the permit's new expected date are offered.",
+           "The work day moves with the start."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your permit is still in review, so Lee Radon needs to move your start date. There's no fee.",
+            {
+             "times": [
+              "Mon Nov 9 · start · Wes",
+              "Mon Nov 16 · start · Wes"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Heat tubing in the slab",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x08",
+          "line": [
+           "7.16",
+           "8.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Thu Oct 29, 10:00am",
+          "title": "Moves the drilling spot",
+          "does": "The scan finds in-floor heat tubing near the planned spot. The crew moves the drilling spot, and Alex's start may move a day.",
+          "more": [
+           "The crew never drills where the scan shows tubing or a cable.",
+           "If the fix changes the price, it's a change order first.",
+           "Alex gets the new start date once the spot is set."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The slab scan found heating tubing near the planned drilling spot. Wes will move the spot, and your start may move a day.",
+            {
+             "card": {
+              "title": "Slab scan · basement",
+              "lines": [
+               "Heat tubing is marked",
+               "The drilling spot moves",
+               "Your start date may move"
+              ]
+             }
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Tue Nov 3, 11:30am",
+      "title": "Wes adds a second suction point",
+      "q": "Does Alex sign the change order?",
+      "does": "After the first pipe is in, the fan's pull is weak in the far corner. The contract can't change by text alone, so Alex and Sam sign a change order before a second suction point is added.",
+      "more": [
+       "It's over Sam's $500, so Sam OKs the price first.",
+       "It gives the price and any days added. It goes on the final bill.",
+       "It's signed on the secure page, like the contract.",
+       "Other work goes on while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 600 add a second suction point in the far corner. Adds 1 day",
+        {
+         "photos": [
+          "Far corner of the slab"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Wes found the pull is weak in the far corner of the slab. A second suction point is needed to cover the whole slab.",
+        {
+         "card": {
+          "title": "Change order 1 · $600",
+          "lines": [
+           "Add a second suction point",
+           "Adds 1 work day",
+           "Added to the final bill"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/r4c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Call me first"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Call first, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x12",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "title": "Asks Sam to call Alex",
+          "does": "Alex wants a call first, or doesn't answer in 4 hours. Sam gets a to-do to call. Nothing is done about the second suction point until the change order is signed.",
+          "more": [
+           "Other work goes on while it waits.",
+           "If Alex says no, Sam and Alex decide what's next. Rosie moves no money on its own."
+          ],
+          "say": [
+           [
+            "san",
+            "owner",
+            "Alex M. wants a call about change order 1: $600 for adding the second suction point. Please call today.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me at 4pm"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Contractor work is licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The company and its office both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and radon advisors are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, projects and consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Radon testers and mitigators hold their own certification where the state's form asks; the company holds the contractor license, and a licensed electrician runs the fan's circuit where the rules require it."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "The work is booked ahead; nobody is on call and nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An estimate visit has no form to sign first; the contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Estimate visits and work days are booked in 2-hour arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "This work books visits and work days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "This work books a crew lead's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking lets the crew in (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A job is rated, like any job."
+   }
+  ]
+ },
+ "notes": "Started from contractor (pattern: project, refitted Tue Oct 27 on the frozen master): an estimate visit, a written quote, then a contract and stage bills. Facts, switches, settings and money paths are the parent's, re-worded for this work: documents, photos, extrawork, firststeps, results, banktransfer, video; switch cancelright in flow B only (work sold at the customer's place); arrive A a set start, B a 2-hour window; cutoff 24 hours before.\nFlow B main path visit|none|bill: the booking is the $89 estimate visit, credited to the job; Wes's written quote; the contract signed by everyone on the deed; $600 to start, $1,800 when the system is installed and tested (a $2,400 radon mitigation job). The $89 keeps the master's numbers true (97 master steps hard-code it); a free estimate is the owner's choice (pf.money).\nB money paths: visit|none|bill, visit|none|own, visit|card|bill, photos|deposit|bill (Sump pit cover and seal, $640 from photos, a $160 deposit and $480 after). Left out: list paths. Radon test, charcoal ($179) and Radon retest ($150) are in pf.services, but the master's booking cards name one list service, so a list path would show the wrong name (MASTER R02/R08).\nFlow A is Sam's second company, Lee Radon Office, Lee Radon Office, a radon advice office (the master's Lee's Barbershop). Main path list|card|counter: a $35 result review with Noor, a card saved for the $20 missed-consult fee, paid at the office desk. The other three: list|none|counter, list|full|none (radon plan session, $55, credited to the job if Alex signs), list|deposit|counter (home radon plan, $140, $40 deposit and $100 after the visit). Video or phone result reviews are on (fact `video`): the owner's printed report and basement photos are enough to talk through the next step, so the A4-01 video branch is on.\nOwn steps: A8-x01 (the result review offers the estimate visit at home), B8-x06 to B8-x08 (the permit and the slab scan go first; a late permit moves the start with no fee; heat tubing or a cable in the slab means moving the drilling spot) and B8-x11 / B8-x12 (weak suction at the far side of the slab: a second suction point by change order first, signed by both).\nRadon work is a one-day install with no stage bills (fact `stages` and `multiday` are not listed): a 25% deposit at signing and the rest on the final bill after the install; the quote lines and the day pick say so with pairs (B8-62, B8-63). A test result is never in a text: every text says it is on the secure page (pf.messages, pf.edges high_result), and the radon level is in no owner or staff text. A test needs closed-house conditions (pf.first_steps prep, pf.edges test_conditions); a mitigation needs the slab scanned before drilling (B8-x06); a gas smell, a carbon monoxide alarm, sparking wires or a failing wall are stops (pf.safety); water in the basement near outlets is safety steps then the booking goes on, marked urgent.\nBooking choices: B timing settime, times window; A times setstart. Nothing is sent now: the S2-30 'Yes' branch is off, no `sentnow` fact, and the two rows that spoke of it say so (S2-30's example sentence and S1-21's 'Jobs sent now' row now read that every job is booked ahead). I searched the joined text of all eight paths for the opposite claim: only the master's own conditional lines remain ('A job sent now reads ...' in B6-13, S13-32), hidden branches aside.\nDates (not the parent's): the own steps run forward from the cancel window (ends Tue Oct 27) to the first work day Mon Nov 2: the permit to-do is Wed Oct 28 'due before the first work day, Mon Nov 2'; a late permit Fri Oct 30 with new starts Mon Nov 9 / Mon Nov 16; the trade's surprise at the lab or locate Thu Oct 29; the change order on a work day, Tue Nov 3.\nTest results, health and money details stay off texts: the lab or test result is 'on your secure page' in every text (B8-x08), and special care needs at home are asked only on the secure page (pf.questions secure_page_only).\nPlug-in splits kept whole (splitsKept): A7-15; B5-34, B7-55, B8-58, B8-69 (as the parent).\nNames: Wes and Bea are the crew leads (the master's Jordan and Casey), Noor and Roy the radon advisors (Riley and Avery). None of them is a master customer's name. Addresses: 88 Foundry Ave (the company), 21 Market Sq (the office), 14 Linden Ct (Alex). License numbers use an obviously fake format (RM-1042, RT-2210, RO-3305; people RM-10552, RT-10417). No state, city or law is named.\nEvery state rule is a switch from the state's form: the license and its job-size limit, the written contract and its parts, the deposit cap, money kept apart, the cancel window, permits, lien waivers, what must be shown.\nkeep: color (the master's protected-classes line in S13-40 says 'race, color, religion or sex'), pipe, valve and leak (this trade's own words), the estimate visit, roofing (the work it doesn't do).\nRename: the contractor's pairs re-worded for this work (master sentences first, then phrases, then single words); the barbershop's 'cut' and 'hair' words and its price-board words are turned into this work's words (S1-38, S1-60, S13-55, B8-34); the A3-22 / A3-23 lines that said the plug-in has no danger words now name this work's.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "$89 service-call fee",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "JP031552",
+    "JE30417",
+    "Groom's package · ",
+    "$40 for the Groom's package",
+    "the Groom's package",
+    "The Groom's package",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "'A trim' or 'a fade' fits a haircut.",
+    "like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "How would you like it on top?",
+    "like the cut in the mirror",
+    "like a mark on an item or the skin",
+    "like a skin reading",
+    "at the shop and for house calls",
+    "Color quotes come to you first. Board prices never need one",
+    "Color always stays with Riley",
+    "Riley's color plan",
+    "Color plan",
+    "color plan",
+    "rents a chair",
+    "Free on your board",
+    "the shop's board",
+    "a chair renter",
+    "A chair renter",
+    "a step-free chair",
+    "would like to see your hair",
+    "'Yes, make it a fade'",
+    "please come with dry hair",
+    "Panel upgrade: a free estimate, then a quote",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop has none, so nothing is sent here.",
+    "like a 15-minute style consult",
+    "two skin fades on",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "no cut of",
+    "a Kids cut (12 and under) is $25",
+    "Quiero un corte el sábado.",
+    "Gloss to finish",
+    "gloss",
+    "A repair shop, a tailor or a groomer does.",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Drain clearing",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "water heaters",
+    "water heater",
+    "shops",
+    "A shop",
+    "shop",
+    "Shop",
+    "Elm St",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call"
+   ],
+   "B": [
+    "$89 service-call fee",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The chairs",
+    "A chair, ready",
+    "JP031552",
+    "JE30417",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Water pressure check",
+    "Alex books on the shop's booking page",
+    "Gives the shop's own line",
+    "Tells Alex it's with the shop",
+    "shop-added",
+    "Those words are cut from the recording",
+    "One question cuts the most",
+    "Riley and Avery cut hair; Riley also does color and house calls",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "At the shop, and house calls",
+    "Call a mold cleanup company first",
+    "cracks the cabinet floor and texts a photo",
+    "DAMAGE cracked the cabinet floor",
+    "cracked the cabinet floor at",
+    "Cracked cabinet floor",
+    "at the shop and for house calls",
+    "rents a chair",
+    "a chair renter",
+    "It's my kitchen.",
+    "Panel upgrade: a free estimate, then a quote",
+    "Yes, it won't drain",
+    "Leak repair · $245",
+    "The $179 drain needs none.",
+    "Kim L.'s yard drain needs nobody home.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Jordan cuts a hand and texts HURT",
+    "HURT cut my hand, need to stop",
+    "like a $620 repair",
+    "$620",
+    "A tip line · bank transfer over $500",
+    "Each stage is billed when Jordan texts it done. One booking, so one $2 for the whole job.",
+    "Mon Nov 2 to Wed Nov 4 · 8am–4pm",
+    "Mon Nov 9 to Wed Nov 11 · 8am–4pm",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Like tapping a neighbor's water line without asking.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "The service call is $89.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Right to cancel · repipe",
+    "The $800 start payment",
+    "Your $800 start payment",
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of your repipe",
+    "$800",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "no cut of",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "$245",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "leehomeservices.com",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "A shop",
+    "shop",
+    "Shop",
+    "Elm St",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call"
+   ]
+  },
+  "A": {
+   "A4-24": "0a292df05b",
+   "A5-16": "8045a6b80c",
+   "A8-44": "4410a4860c",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B8-93": "c1406fd6bc",
+   "B8-63": "c0d957be82",
+   "B8-37": "3ce85cf051",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-38": "9539521dc7",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255"
+  }
+ }
+}

@@ -1,0 +1,5091 @@
+{
+ "id": "holiday-lights",
+ "name": "Holiday lighting installer",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "windows",
+ "plugin": {
+  "pf.license": {
+   "need": "if: most states license no holiday or event lighting. Only the business registration and insurance are kept. Electrical work (a new outlet, wiring, a bad circuit) is a licensed electrician's. Where the state's form asks for more, it comes from the state's form.",
+   "ask": [
+    "The business registration, where the state's form asks for one",
+    "General liability insurance; workers' compensation where the state's form requires it",
+    "Ladder and lift safety training records, kept on file",
+    "Each crew lead's own card or number, only where the state's form asks"
+   ],
+   "holder": "The business. Crews work under it. A licensed electrician the client hires holds their own license for any outlet or circuit work.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "A house with a power line touching it, its gutter or its lights is not booked until the power company says it is safe",
+    "New outlets, wiring and a bad circuit are never booked, quoted or billed as Lee Holiday Lights' own: they belong to a licensed electrician the client hires"
+   ],
+   "renewals": "Registration and insurance dates kept; reminded 30 days out; a lapse pauses the work that needs it",
+   "background": "Background checks only where the state's form asks, or where the owner chooses them for crews who enter yards"
+  },
+  "pf.services": {
+   "pattern": "Set service: a crew at the customer's home or business, priced by feet of roofline and stories, put up in the fall and taken down in January. Small fixed jobs book from the list; a whole display is quoted after a walk-through.",
+   "B": [
+    {
+     "name": "Porch and doorway lights",
+     "price": "$179, from the list: up to 30 feet, lights and clips supplied, installed in the fall and taken down in January",
+     "length": "about 2 hours to install, 1 hour to take down",
+     "where": "at the customer's place; nobody needs to be home for outside work",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill",
+     "weather": "no ladders in wind over 25 mph, rain or ice; the move is free"
+    },
+    {
+     "name": "Takedown only",
+     "price": "$150, from the list: up to 100 feet of the customer's own lights taken down and boxed",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Roofline and window lights, priced from photos",
+     "price": "priced from the customer's photos (the example: $640 for a 2-story home); over $500, Sam OKs it; a 25% deposit orders the lights, the rest on the bill",
+     "where": "at the customer's place",
+     "before": "a deposit",
+     "after": "the rest on the bill Rosie texts"
+    },
+    {
+     "name": "Custom light display (roofline, trees, bushes, walkway)",
+     "price": "quoted after a light walk-through: a written quote with a drawing within 1 business day, good for 14 days (the example: a $3,200 display with install and the January takedown)",
+     "length": "install 1 to 2 days; takedown in January, included",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 walk-through fee; half the price as a deposit once the agreement is signed",
+     "after": "the rest after the install, on the bill Rosie texts (or the business's own way)"
+    },
+    {
+     "name": "Timer and controller setup",
+     "price": "$199, from the list",
+     "where": "at the customer's place",
+     "before": "a card saved",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Season plan",
+     "price": "$179 a season (the example): the same porch and doorway lights put up each November and taken down each January; each season is booked and paid like a single one",
+     "where": "at the customer's place",
+     "before": "a card saved; its terms come with their own yes",
+     "after": "the saved card is charged at DONE after the plan's yes and a reminder"
+    },
+    {
+     "name": "Extra crew time",
+     "price": "$120 an hour, 1-hour minimum",
+     "where": "added to a job for work beyond the booking, only with the customer's yes, never booked alone"
+    },
+    {
+     "name": "Add-ons",
+     "price": "one price each, added only when the customer asks and paid at the visit or on the bill with the rest: an extra tree wrap $25, a wreath $30, replacing a dead strand $20"
+    },
+    {
+     "name": "Light walk-through fee",
+     "price": "$89: a card saved at booking, charged only for a late cancel or no way in that Sam confirms, or owed when a display is quoted and the customer says no; credited to the display if Alex signs",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Change order",
+     "price": "an added tree or section: priced, written and signed before the work; added to the final bill"
+    },
+    {
+     "name": "Event lighting (the second kind of work)",
+     "price": "quoted from photos or a walk-through; weddings, parties and business storefronts; setup and takedown on set days"
+    },
+    {
+     "name": "Light strand repair at the shop (Lee Light Shop)",
+     "price": "one price by box, from photos, or at the counter: strand repair $35, bulb check $15 (an add-on), inflatable repair $40, plug and socket repair $25, strand test $20, wreath and figure repair from photos, custom prop rebuild priced at the counter after a $25 bench check",
+     "where": "dropped off at the shop; a strand can also be fixed at the customer's home ($75)",
+     "money": "nothing taken; paid at the counter at pick-up"
+    }
+   ],
+   "instant_booking": "Homes up to 2 stories with a normal roof and up to 100 feet of roofline book from the list. Taller, steeper or bigger homes, trees, and businesses are priced from photos or a walk-through first.",
+   "capacity": "A crew of two for roofline work; one person for porch and doorway lights and takedowns. A drop-off needs one person at the counter.",
+   "nobody_home": "Yes, for outside work (install, takedown, repairs outdoors). DONE with after photos confirms it. The walk-through always needs an adult there or a video.",
+   "online": "No. The walk-through can be done from the customer's photos for small homes.",
+   "not_offered": "Roof repair, new outlets or wiring, tree trimming, lift work unless a crew is set up for it, and any work within 10 feet of a power line.",
+   "drop_off_slots": "Strands, wreaths and props are booked into drop-off slots by the shop's daily number, with no light tech named."
+  },
+  "pf.questions": {
+   "before_times": [
+    "Which parts of the house: roofline, windows, porch, trees, bushes?",
+    "A house, a business or an event?",
+    "How many stories, and about how many feet of roofline?",
+    "When do you want the lights on, and until when?"
+   ],
+   "after_time": [
+    "Where are the outdoor outlets, and do they work?",
+    "Does a power line run near the roof or the trees?",
+    "Is the roof steep, icy or tile? Any loose gutter?",
+    "A switch or a timer?",
+    "Gates and pets: how does the crew reach the yard?",
+    "Who else decides? They should be at the walk-through"
+   ],
+   "secure_page_only": [
+    "Gate or door codes",
+    "The budget",
+    "Photos of each side of the house"
+   ],
+   "who_may_book": "An adult 18 or older who owns the home or runs the business, or someone they authorize. A renter's roofline lights need the landlord's OK.",
+   "shop": [
+    "Which strands or props, and how many boxes?",
+    "Photos of the damage (optional)",
+    "A rough budget (on the secure page)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a power line touching the house, its gutter or the lights, sparking or smoking wires, a gas smell",
+     "says": "Stay away and keep everyone back. Call the power company's emergency line, or 911 if it's sparking or anyone is hurt.",
+     "booking": "no booking until the power company says it is safe"
+    },
+    {
+     "words": "someone fell from a ladder or roof, or a ladder or lift tipped",
+     "says": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "a roof edge or gutter giving way",
+     "says": "Stay off and keep people and cars away. Call 911 if anyone is at risk.",
+     "booking": "no booking until it is repaired"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "worry about wind, rain or ice at the house",
+     "says": "No ladders in strong wind, rain or ice. The day moves, with no fee.",
+     "booking": "goes on once the weather clears"
+    },
+    {
+     "words": "a hanging gutter or loose roof edge",
+     "says": "Keep people and cars away from it. The crew works around it and puts no clips on it.",
+     "booking": "goes on, with that part left out"
+    },
+    {
+     "words": "an outdoor outlet that keeps tripping the breaker",
+     "says": "Don't keep resetting it. The crew checks the circuit; a bad circuit goes to an electrician first.",
+     "booking": "goes on once the outlet works"
+    }
+   ],
+   "business_line": "Anything about power lines, circuits, roofs or whether a roof can hold a ladder goes to the crew lead, the power company or a licensed pro, never Rosie"
+  },
+  "pf.first_steps": {
+   "before_quote": "The light walk-through at the home (or from photos for a small house), with everyone who decides there",
+   "after_agreement": [
+    "The cancel window ends before any order, where the state's rules give one",
+    "The lights are ordered once the window ends and the deposit is paid; they take about 2 weeks",
+    "Install days are booked once the lights have a delivery date",
+    "An electrician the client hires fixes any outlet or circuit first"
+   ],
+   "prep": [
+    "Clear the front of the house and the path to the outdoor outlets",
+    "Keep the driveway free for the truck on install day",
+    "Unlock the gate, or put the gate code on the secure page",
+    "Keep pets inside while the ladders are up",
+    "Check that the outdoor outlets have power"
+   ],
+   "shop_prep": [
+    "Bring the strands in a box, unplugged",
+    "Bring a note of which sections are dark"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Someone home: the code at the door, entered by the crew lead. Nobody home (outside work): no code; DONE with after photos. Shop: the code at the counter when the box is left.",
+   "walk_through": "Before ladders go up, the crew lead walks around the house: where the power line comes in, loose gutters, cracked cords, the outlets, and the wind. Photos of anything already wrong.",
+   "ladders": "Ladders on firm, level ground, kept well clear of power lines, with stand-offs at the gutters. Anyone on a roof ties off first. No ladders in strong wind, rain or ice.",
+   "wind_on_the_day": "Wind over the limit at the house: ground work is done today, roofline work moves to a new day at no cost, and it's billed once when it's all done.",
+   "changes_at_visit": "Add-ons only when the customer asks, priced before they're done. Roof or gutter repair found at the visit is quoted only where the license plug-in allows it. A right to cancel where the state's rules give one for work sold at the home.",
+   "drop_off": "At the shop: the code is given at the counter when the box is left. Status words IN, READY. READY comes with a photo. Pick-up only by the customer or someone they name.",
+   "proof_done": "After photos at dusk of each side of the house, or a video with the lights on when nobody is home.",
+   "breakage": "Reported with photos the same day; the owner decides how to make it right."
+  },
+  "pf.money": {
+   "visit": "The example's $89 light walk-through is credited to a custom display if Alex signs, and is billed alone only if Alex says no to the price. It is a card saved, not a hold. A free walk-through is the owner's choice.",
+   "no_money_before_agreement": "On a custom display, nothing beyond the walk-through is taken before the agreement is signed",
+   "deposit": "Half the display price once the agreement is signed (the example's own terms), to order the lights. Photos jobs take a 25% deposit. Any cap on money paid before the work comes from the state's form.",
+   "final": "The rest after the install, with any change orders, on the bill Rosie texts (or the business's own way). The January takedown is in the price.",
+   "takedown": "Included in a list install and in a custom display; booked at the same time; a takedown-only job is $150 paid when booked",
+   "plans": "A season plan's terms show before any card and get their own yes; the saved card is charged at DONE of each season after a reminder; the customer can skip, pause or end by text",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the crew lead texts 'paid check'.",
+   "late_cancel": "Free to cancel until the business's cutoff; later, up to the fee agreed at booking, only if Sam OKs it. A move the business or the weather makes is never charged.",
+   "tips": "Tips are common at the holidays: a tip line shows on the bills Rosie texts only if the owner turns it on; Rosie never asks for a tip.",
+   "kept_apart": "Money paid before the work is kept apart only where the state's rules require it (a switch from the state's form)",
+   "tax": "Tax on the work follows the state's form",
+   "shop": "Shop repairs: nothing taken to book; paid at the counter at pick-up."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate or door codes",
+    "The budget",
+    "Quotes, agreements and change orders (secure page only, with a copy by email)"
+   ],
+   "photos": "House photos only on the secure page, and shown to others only with the client's OK",
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who answers for the crew"
+  },
+  "pf.staff": {
+   "roles": "Crew leads (Mateo, Owen) for walk-throughs and installs at the client's place; light techs (Isla, Bram) at the shop",
+   "licenses": "No person license unless the state's form asks. Crews work under the business.",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another crew lead may take a walk-through if Alex agrees; a display keeps its crew lead unless Sam moves it",
+   "assistants": "A helper may hold ladders and carry; never goes on a roof or works near a power line alone"
+  },
+  "pf.rules": {
+   "ladders_and_heights": "Rosie's rule: no ladder near a live line, no ladders in strong wind, rain or ice, a tie-off on any roof step. Where the safety rules set more, they come from the plug-in.",
+   "weather": "A weather limit per outside service, set by Sam (the example: wind over 25 mph, rain or ice). A move for weather is free, whoever calls it.",
+   "agreement": "A written agreement for a custom display, signed by the client and the business before any deposit: the roofline and trees, the install days, the January takedown, the price and how it is paid, who owns the lights, and the change-order rule",
+   "lights_stay": "Display lights are the business's own; nothing is sold; the takedown is in the price",
+   "plans": [
+    "The plan's terms show before any card: how often, the price a season, when it's charged, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking.",
+    "One reply ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask."
+   ],
+   "cancel_window": "A right to cancel where the state's rules give one for work sold at the home; nothing is ordered until it ends",
+   "association_rules": "A homeowners' association's or city's holiday-light rules are the owner's to check; the crew lead may ask",
+   "records": "7 years, with the before and after photos"
+  },
+  "pf.edges": {
+   "weather": "Weather over the limit the day before: Rosie checks the forecast for each outside job; Sam keeps it or moves it, free.",
+   "wind_on_the_day": "Wind at the house on the day: ground work done now, roofline moved free, one bill at the end.",
+   "power_line_or_gutter": "A power line or a hanging gutter: safety steps first.",
+   "dark_sections": "A section goes dark within 30 days: tell the business for a free fix. After that, a service call at the list price.",
+   "storm_damage": "Storm or animal damage after install is a paid service call, with before and after photos.",
+   "late_order": "The lights are late: the install moves, with no fee.",
+   "tripping_breaker": "An outlet that keeps tripping: the crew stops; the client's electrician fixes the circuit first.",
+   "gate_code": "A gate code that fails when nobody needs to be home: the crew waits 15 minutes, then leaves; the owner decides any fee.",
+   "plan": "Season plans: skip, pause or end, and a plan's price change.",
+   "unclaimed_strands": "Strands left at the shop and not picked up: reminders; after the free days, a storage fee only if the owner starts it, after written notice.",
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "dropoff",
+   "photos",
+   "extrawork",
+   "documents",
+   "tips",
+   "firststeps",
+   "multiday",
+   "banktransfer"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Isla and Bram (light techs)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Mateo and Owen (crew leads)",
+   "cust": "Alex M. (customer) · other customers"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "Seats cut:",
+    "Seats reduced:"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "$140 an hour",
+    "$120 an hour"
+   ],
+   [
+    "It's on file under Jordan Price, a license holder. Now send your electrical prices.",
+    "Then it goes live on the company's details. Now send your event lighting prices."
+   ],
+   [
+    "Jordan Price",
+    "Mateo Cruz"
+   ],
+   [
+    "Casey Moore",
+    "Owen Frost"
+   ],
+   [
+    "Riley Chen",
+    "Isla Ford"
+   ],
+   [
+    "Avery Diaz",
+    "Bram Doyle"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say a cord on a strand cracks more before the visit, and they ask if they can still bring it in."
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or a cord"
+   ],
+   [
+    "chair renter",
+    "self-employed pro"
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Isla use a new plug instead of the bulb check?"
+   ],
+   [
+    "Alex M. asks for a toner instead of the gloss.",
+    "Alex M. asks for a new plug instead of the bulb check."
+   ],
+   [
+    "EC22871",
+    "No, same registration"
+   ],
+   [
+    "BS20981",
+    "EX-3097"
+   ],
+   [
+    "a step-free chair",
+    "a step-free door"
+   ],
+   [
+    "chair renter",
+    "self-employed pro"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A dark section' or 'a bad plug' fits a light strand repair."
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, make it a strand test'"
+   ],
+   [
+    "Lee's Barbershop would like to see your hair before pricing it.",
+    "Lee Light Shop would like to see your photos before pricing it."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the strands in a box on Saturday."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee Light Shop about your Sat 11:00am visit: please bring the strands in a box."
+   ],
+   [
+    "like the 15-minute style consult",
+    "like the 15-minute intro call"
+   ],
+   [
+    "the free style consult",
+    "the free intro call"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most holiday lighting businesses set it."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Gutter repair: a quote from photos first"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter at pick-up"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, no card saved"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood light shop on Ridge Rd. Light strands, wreaths and props tested and fixed."
+   ],
+   [
+    "The chairs",
+    "The workbench"
+   ],
+   [
+    "A chair, ready",
+    "A strand, ready"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Holiday lighting for homes in Springfield. Porch and doorway lights, and gutters, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A porch lights job"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a new roof anchor, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Light Shop doesn't install roof anchors."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7",
+    "Ben T. books a light strand repair for Sat Nov 7"
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7",
+    "you now have two strand repairs on Sat Nov 7"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Prop quotes come to you first. Board prices never need one"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Isla: light tech, props, home visits"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A prop's example: 'A full strand set rebuild needs a quick fit check first. Had one at Lee's in the last 3 months?'"
+   ],
+   [
+    "Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Quotes already sent keep their price."
+   ],
+   [
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Nia K.'s refund for a cancelled light strand repair was due yesterday."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Priced by feet of roofline and stories. Taller homes are priced from photos. A power line on the house stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Light strands and props are dropped off at the shop and picked up when ready. Some can also be fixed at the customer's home."
+   ],
+   [
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Both go in one drop-off slot, and Rosie adds the prices: $35 and $20."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Isla can still take the strand in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no light tech. A day shows only if a light tech with the skill is in."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Lee Light Shop's visits are drop-offs. A repair shop, a tailor or a groomer works the same way."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A lights crew's example: a hanging gutter gets 'keep people and cars away from it'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. No strands and no sizes came in."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A property manager drops off boxes of strands from five buildings on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: 3 boxes of strands, two with bad plugs, one dim"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Isla suggests a new time, so the cracked wreath can be boxed first, with no fee."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds slots side by side, within the day's drop-off number."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Light Shop sent you a proposal: Isla's prop plan."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your light strand repair is part of a plan, every 4 weeks."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like a cracked cord."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Wreath making for Lee Light Shop: is it the same company?"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cord on my inflatable cracked more. Can I still bring it in?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A light strand repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says a bulb on Saturday's strand is loose at one socket."
+   ],
+   [
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "Booked · Sat Oct 24 · 11:00am drop-off · light strand repair"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "For a cracked strand: carry it coiled in a box, unplugged."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says a socket on the strand came back loose"
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises a $25 bench check, then a price"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop off a second box of strands at the same time?"
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Isla's prop plan after a bench check"
+   ],
+   [
+    "so Quinn S.'s license isn't checked yet",
+    "so Noor S.'s details aren't checked yet"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Holiday lighting · event lighting"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a plug and socket repair is $25."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A socket on my strand came back loose."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds wreath making to Lee Light Shop."
+   ],
+   [
+    "so Avery's license isn't checked yet",
+    "so Avery's details aren't checked yet"
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. light strand repair Sat 11am"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A light shop books a drop-off slot."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "could mean a salon or a barbershop",
+    "could mean a light shop or a hardware store"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for strands checked every fall."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Wreath rebuild"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you fix plugs and sockets too?"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group drop-off together"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "A bulb is loose in one socket."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Light Shop · drop-off"
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Isla stopped Alex M.'s light strand repair."
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken to book"
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything the shop should know?"
+   ],
+   [
+    "your first color plan visit",
+    "your first prop drop-off"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like my lights fixed on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero arreglar mis luces el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a fall strand check"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Isla sees the prop"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A strand repair needs only the strands themselves."
+   ],
+   [
+    "plumbing and electrical",
+    "holiday and event lighting"
+   ],
+   [
+    "Signature cut and shave",
+    "Wreath rebuild"
+   ],
+   [
+    "like a skin-test result",
+    "like a frame's size"
+   ],
+   [
+    "Add photos of your hair",
+    "Add photos of your wreath"
+   ],
+   [
+    "A barbershop has none.",
+    "A light shop has none."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s light strand repair."
+   ],
+   [
+    "No card, so no $20 fee",
+    "No card, so a no-show costs nothing"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Prop plan"
+   ],
+   [
+    "Haircut every 4 weeks",
+    "Strand check every fall"
+   ],
+   [
+    "also does color and",
+    "also does prop rebuilds and"
+   ],
+   [
+    "photos of your hair",
+    "photos of your wreath"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Holiday Lights'"
+   ],
+   [
+    "A color correction",
+    "A custom prop rebuild"
+   ],
+   [
+    "a color correction",
+    "a custom prop rebuild"
+   ],
+   [
+    "Riley · Sat Oct 24",
+    "Isla · picked up Tue Oct 27"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Holiday Lights"
+   ],
+   [
+    "barber, color and",
+    "light tech, prop rebuilds and"
+   ],
+   [
+    "a package of cuts",
+    "a package of repairs"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Light Shop"
+   ],
+   [
+    "Color correction",
+    "Custom prop rebuild"
+   ],
+   [
+    "color correction",
+    "custom prop rebuild"
+   ],
+   [
+    "Only the consult",
+    "Only the bench check"
+   ],
+   [
+    "Groom's package",
+    "Full strand set rebuild"
+   ],
+   [
+    "Gloss to finish",
+    "Bulb check"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "service, color",
+    "service, prop rebuilds"
+   ],
+   [
+    "2 Consult only",
+    "2 Bench check only"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "signature cut",
+    "wreath rebuild"
+   ],
+   [
+    "Color and cut",
+    "Wreath and figure repair"
+   ],
+   [
+    "color and cut",
+    "wreath and figure repair"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Lights"
+   ],
+   [
+    "Lee Electric",
+    "Lee Event Lights"
+   ],
+   [
+    "1200 Main St",
+    "310 Ridge Rd"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Consult only",
+    "Bench check only"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "$25 consult",
+    "$25 bench check"
+   ],
+   [
+    "color quote",
+    "door quote"
+   ],
+   [
+    "NEW massage",
+    "NEW wreath making"
+   ],
+   [
+    "the consult",
+    "the bench check"
+   ],
+   [
+    "a staff cut",
+    "the office's strands"
+   ],
+   [
+    "Electrical",
+    "Event lighting"
+   ],
+   [
+    "electrical",
+    "event lighting"
+   ],
+   [
+    "Barbershop",
+    "Light strand repair"
+   ],
+   [
+    "barbershop",
+    "light shop"
+   ],
+   [
+    "Beard trim",
+    "Strand test"
+   ],
+   [
+    "beard trim",
+    "strand test"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "patch test",
+    "fit check"
+   ],
+   [
+    "88 Elm St",
+    "28 Spruce Ln"
+   ],
+   [
+    "Skin fade",
+    "Inflatable repair"
+   ],
+   [
+    "skin fade",
+    "inflatable repair"
+   ],
+   [
+    "the chair",
+    "the counter"
+   ],
+   [
+    "visit fee",
+    "walk-through fee"
+   ],
+   [
+    "on Elm St",
+    "on Spruce Ln"
+   ],
+   [
+    "MP045210",
+    "LLC 0220142"
+   ],
+   [
+    "Plumbing",
+    "Holiday lighting"
+   ],
+   [
+    "plumbing",
+    "holiday lighting"
+   ],
+   [
+    "Kids cut",
+    "Plug and socket repair"
+   ],
+   [
+    "kids cut",
+    "plug and socket repair"
+   ],
+   [
+    "Haircuts",
+    "Strand repairs"
+   ],
+   [
+    "haircuts",
+    "strand repairs"
+   ],
+   [
+    "cut hair",
+    "fix strands"
+   ],
+   [
+    "Plumber",
+    "Holiday lighting"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "barbers",
+    "light techs"
+   ],
+   [
+    "Haircut",
+    "Light strand repair"
+   ],
+   [
+    "haircut",
+    "light strand repair"
+   ],
+   [
+    "Jordan",
+    "Mateo"
+   ],
+   [
+    "Barber",
+    "Light tech"
+   ],
+   [
+    "barber",
+    "light tech"
+   ],
+   [
+    "Casey",
+    "Owen"
+   ],
+   [
+    "Riley",
+    "Isla"
+   ],
+   [
+    "Avery",
+    "Bram"
+   ],
+   [
+    "gloss",
+    "bulb check"
+   ],
+   [
+    "repipe",
+    "light display"
+   ],
+   [
+    "toner",
+    "new plug"
+   ],
+   [
+    "Toner",
+    "New plug"
+   ],
+   [
+    "The state licenses the light shop itself, and each light tech.",
+    "Most states license no holiday lighting. The business registration is enough."
+   ]
+  ],
+  "B": [
+   [
+    "One question cuts the most",
+    "One question matters the most"
+   ],
+   [
+    "Those words are cut from the recording",
+    "Those words are removed from the recording"
+   ],
+   [
+    "Seats cut:",
+    "Seats reduced:"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT scraped my hand, need to stop"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "$140 an hour",
+    "$120 an hour"
+   ],
+   [
+    "Jordan Price",
+    "Mateo Cruz"
+   ],
+   [
+    "Casey Moore",
+    "Owen Frost"
+   ],
+   [
+    "Riley Chen",
+    "Isla Ford"
+   ],
+   [
+    "Avery Diaz",
+    "Bram Doyle"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say a cord on a strand cracks more before the visit, and they ask if they can still bring it in."
+   ],
+   [
+    "like a mark on an item or the skin",
+    "like a mark on an item or a cord"
+   ],
+   [
+    "chair renter",
+    "self-employed pro"
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Isla use a new plug instead of the bulb check?"
+   ],
+   [
+    "Alex M. asks for a toner instead of the gloss.",
+    "Alex M. asks for a new plug instead of the bulb check."
+   ],
+   [
+    "EC22871",
+    "No, same registration"
+   ],
+   [
+    "BS20981",
+    "EX-3097"
+   ],
+   [
+    "a step-free chair",
+    "a step-free door"
+   ],
+   [
+    "chair renter",
+    "self-employed pro"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A dark section' or 'a bad plug' fits a light strand repair."
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, make it a strand test'"
+   ],
+   [
+    "Lee's Barbershop would like to see your hair before pricing it.",
+    "Lee Light Shop would like to see your photos before pricing it."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the strands in a box on Saturday."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee Light Shop about your Sat 11:00am visit: please bring the strands in a box."
+   ],
+   [
+    "like the 15-minute style consult",
+    "like the 15-minute intro call"
+   ],
+   [
+    "the free style consult",
+    "the free intro call"
+   ],
+   [
+    "like a skin reading",
+    "like a measure reading"
+   ],
+   [
+    "Free until 7am on the visit day.",
+    "Free until 24 hours before."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam. Lights out in the first 30 days: tell us for a free fix."
+   ],
+   [
+    "Nora S. asked overnight for a drain clearing today.",
+    "Nora S. asked overnight for a holiday lighting today."
+   ],
+   [
+    "Panel upgrade: a free estimate, then a quote",
+    "Gutter repair: a quote from photos first"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most lighting companies start."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter at pick-up"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, no card saved"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules lighting companies often set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood light shop on Ridge Rd. Light strands, wreaths and props tested and fixed."
+   ],
+   [
+    "The chairs",
+    "The workbench"
+   ],
+   [
+    "A chair, ready",
+    "A strand, ready"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Holiday lighting for homes in Springfield. Porch and doorway lights, and gutters, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A lights job"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Isla: light tech, props, home visits"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Holiday Lights. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my house."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about Christmas lights for our house. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Lights on my porch' fits porch and doorway lights."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like using a neighbor's roof without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a strand test? Say so.'"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Holiday Lights can put up your porch and doorway lights:"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, Alex will be home"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 holiday lighting needs none."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Gutter rehang and new hangers · $540"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found three dark sections on the front lights this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's three dark sections on the roofline, today"
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9",
+    "you have two light installs on Mon Nov 9"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Priced by feet of roofline and stories. Taller homes are priced from photos. A power line on the house stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Light strands and props are dropped off at the shop and picked up when ready. Some can also be fixed at the customer's home."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Holiday Lights hangs lights and doesn't repair roofs. Nothing was saved. You can look for a roofer near you."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Stay away from the power line, and keep everyone back. Call the electric company's emergency line, or 911 if it's sparking."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said a power line is touching the house. They got the safety message, and nothing was booked."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep people and cars away from the gutter, and to call 911 if a power line is down."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: feet of roofline, how many stories, trees and bushes, and where the outlets are."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Roof work here needs the roof anchors checked first. That takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No se pare debajo del canalón y aleje los carros. Si un cable de luz toca la casa, llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep people and cars out from under the hanging gutter. The crew will work around it."
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "adds the extra strands today, $165. The $80 timer stays good until Thu Oct 29."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Can someone put lights around my front door and porch Thursday morning? It's a 2-story house in Springfield."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Mateo found a wasp nest under the back eaves and stopped work on the lights there."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Stay out from under the hanging gutter. If a power line is down, stay away and call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Holiday Lights doesn't do, like a roof repair."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For holiday lighting, a power line touching the house or gutters stops the booking."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "Mateo finds a wasp nest under the back eaves. The plug-in says the crew stops there"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Holiday lighting happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A lights crew's example: a hanging gutter gets 'keep people and cars away from it'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A gutter is hanging over my door."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The power line to my house sags onto the gutter. Is that safe?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone hang lights on my roofline this Thursday? What does it cost?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Event lighting for Lee Holiday Lights: is it the same company?"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of each side of your home, and a crew lead will price the job."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a power line touching the house, a hanging gutter or a cracked cord."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE back eaves too high for the ladder. Bring the lift next time."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how many feet of roofline, how many stories, and which trees?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Porch and doorway lights with Lee Holiday Lights are $179, not $150."
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the extra strands only, $165. Leave the timer."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Mateo walks the roofline and texts the price with its lines."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Ivy's AI asks for porch and doorway lights at $150, an old price."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Mateo measured the roofline. Here's the price to hang the lights today."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Mateo went to get the tall ladder and will be back about 9:30am."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Mateo's next times for your office."
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to rehang the back gutters, from Mateo's notes."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s lights, hung Thu Oct 22, have three dark sections upstairs."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. Timers are $199, from the list."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "That's under our bright-all-season promise, so this visit is free."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds event lighting to Lee Holiday Lights."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Mateo says no. Leave the old strands in the box: the crew sorts them."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for the lights every year."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Mateo also set up a timer?"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to stay away, then call the utility or 911"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace dead strands and clips, 3 sections"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Un canalón cuelga sobre mi puerta."
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "the porch lights at two rental houses every season"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Mateo hang lights at my office next week?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Mateo's ladder cracked a porch light at Alex M.'s."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the promise lasts: 30 days for dark sections."
+   ],
+   [
+    "come back next fall for a water heater flush",
+    "come back next fall for the roofline lights"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Guests come tomorrow. Can someone come tonight?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE a cracked light on the porch rail"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a timer."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Un cable de luz toca la casa?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The gutter is hanging lower now."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Mateo also set up a timer?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Mateo needs the tall ladder from the shop for the back."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should I take the old lights down before you come?"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like rehanging the gutters Mateo noted"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wasp nest under the back eaves, stopped"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a path to the outdoor outlets."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is a power line touching the house?"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on: the lights can still go up."
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "Mateo is the one who does 3-story homes"
+   ],
+   [
+    "so Reese K.'s license isn't checked yet",
+    "so Jude K.'s details aren't checked yet"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Holiday lighting · event lighting"
+   ],
+   [
+    "like water near outlets or a gas smell",
+    "like a power line down or a falling gutter"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Mateo finds three dead sections and bent clips."
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a building's anchor check that isn't in"
+   ],
+   [
+    "priced a water heater replacement for",
+    "priced a 3-story job for"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A section goes dark 2 days later."
+   ],
+   [
+    "so Casey's license isn't checked yet",
+    "so Casey's details aren't checked yet"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "There's a dark section on the roofline."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Mateo's crew left clips on the porch."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 extra strands 165 timer 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the back eaves"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Mateo slips off the ladder's bottom rung and texts HURT."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call pest control first"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Rehang the back gutters"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Will someone be home for the porch?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wasp nest under the back eaves"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE ladder cracked the porch light"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting the tall ladder, back 9:30"
+   ],
+   [
+    "the water heater flush you asked",
+    "the roofline lights you asked"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Mateo's ladder cracks a porch light"
+   ],
+   [
+    "The job should be done by 10am.",
+    "The job should be done by about 10:30am."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. No power line is touching it."
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing dead strands and clips"
+   ],
+   [
+    "Alex asks an AI for a plumber",
+    "Alex asks an AI to book a holiday lighting"
+   ],
+   [
+    "water heater flush, 12 months",
+    "roofline lights, 12 months"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace dead strands and clips"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Dead strands and clips"
+   ],
+   [
+    "the sink is now overflowing",
+    "the gutter is now hanging lower"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's holiday lighting"
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout or a tow"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Lights before guests"
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the job"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wasp nest under the back eaves"
+   ],
+   [
+    "Water heater replacement",
+    "Roofline and window lights"
+   ],
+   [
+    "water heater replacement",
+    "Roofline and window lights"
+   ],
+   [
+    "The repair price is good",
+    "The price is good"
+   ],
+   [
+    "plumbing and electrical",
+    "holiday and event lighting"
+   ],
+   [
+    "Sewer camera inspection",
+    "Timer and controller setup"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW event lighting"
+   ],
+   [
+    "sewer camera inspection",
+    "timer and controller setup"
+   ],
+   [
+    "A gas smell at the home",
+    "A power line touching the house"
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration LLC 0220142"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Porch and doorway lights"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your lights job"
+   ],
+   [
+    "Just the kitchen sink.",
+    "The front roofline, 2 stories."
+   ],
+   [
+    "Under the sink, before",
+    "Porch rail, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked porch light"
+   ],
+   [
+    "Cabinet floor, before",
+    "Porch light, before"
+   ],
+   [
+    "your new pipes are in",
+    "the front roofline is lit"
+   ],
+   [
+    "1-year labor warranty",
+    "bright-all-season promise"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Extra strands · $165"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 dead strands quote"
+   ],
+   [
+    "Both rentals' visits",
+    "Both shops' visits"
+   ],
+   [
+    "Drain clearing plans",
+    "Lighting plans"
+   ],
+   [
+    "leehomeservices.com",
+    "leeholidaylights.com"
+   ],
+   [
+    "also does color and",
+    "also does prop rebuilds and"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 dead strands"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Ningún cable toca la casa."
+   ],
+   [
+    "Water heater flush",
+    "Takedown only"
+   ],
+   [
+    "water heater flush",
+    "takedown only"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Holiday Lights'"
+   ],
+   [
+    "the shutoff valves",
+    "the dead strands and clips"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 10:15am"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Holiday Lights"
+   ],
+   [
+    "camera inspection",
+    "timer and controller setup"
+   ],
+   [
+    "barber, color and",
+    "light tech, prop rebuilds and"
+   ],
+   [
+    "the kitchen drain",
+    "the porch lights"
+   ],
+   [
+    "Supply line · $80",
+    "Timer · $80"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Light Shop"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa porch lights"
+   ],
+   [
+    "Service call fee",
+    "Walk-through fee"
+   ],
+   [
+    "service call fee",
+    "walk-through fee"
+   ],
+   [
+    "Drain clearings",
+    "Light installs"
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "Drain clearing",
+    "Porch and doorway lights"
+   ],
+   [
+    "drain clearing",
+    "porch and doorway lights"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 porch lights"
+   ],
+   [
+    "today's repair",
+    "today's work"
+   ],
+   [
+    "Kitchen drain",
+    "Porch and doorway lights"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 office building job"
+   ],
+   [
+    "cut your hair",
+    "fix your strands"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Lights"
+   ],
+   [
+    "Lee Electric",
+    "Lee Event Lights"
+   ],
+   [
+    "1200 Main St",
+    "310 Ridge Rd"
+   ],
+   [
+    "Service call",
+    "Walk-through fee"
+   ],
+   [
+    "service call",
+    "walk-through fee"
+   ],
+   [
+    "Water heater",
+    "3-story home"
+   ],
+   [
+    "water heater",
+    "3-story home"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "shop's chair",
+    "shop's counter"
+   ],
+   [
+    "Leak repair",
+    "Custom light display"
+   ],
+   [
+    "leak repair",
+    "custom light display"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "Electrical",
+    "Event lighting"
+   ],
+   [
+    "electrical",
+    "event lighting"
+   ],
+   [
+    "Barbershop",
+    "Light strand repair"
+   ],
+   [
+    "barbershop",
+    "light shop"
+   ],
+   [
+    "Yard drain",
+    "Roofline lights"
+   ],
+   [
+    "yard drain",
+    "roofline lights"
+   ],
+   [
+    "88 Elm St",
+    "28 Spruce Ln"
+   ],
+   [
+    "visit fee",
+    "walk-through fee"
+   ],
+   [
+    "42 Oak St",
+    "12 Larch Way"
+   ],
+   [
+    "MP045210",
+    "LLC 0220142"
+   ],
+   [
+    "Plumbing",
+    "Holiday lighting"
+   ],
+   [
+    "plumbing",
+    "holiday lighting"
+   ],
+   [
+    "cut hair",
+    "fix strands"
+   ],
+   [
+    "Rental 1",
+    "Shop 1"
+   ],
+   [
+    "Rental 2",
+    "Shop 2"
+   ],
+   [
+    "Plumber",
+    "Holiday lighting"
+   ],
+   [
+    "plumber",
+    "crew lead"
+   ],
+   [
+    "barbers",
+    "light techs"
+   ],
+   [
+    "haircut",
+    "light strand repair"
+   ],
+   [
+    "Jordan",
+    "Mateo"
+   ],
+   [
+    "Barber",
+    "Light tech"
+   ],
+   [
+    "barber",
+    "light tech"
+   ],
+   [
+    "Casey",
+    "Owen"
+   ],
+   [
+    "Riley",
+    "Isla"
+   ],
+   [
+    "Avery",
+    "Bram"
+   ],
+   [
+    "Labor",
+    "Extra crew time"
+   ],
+   [
+    "repipe",
+    "light display"
+   ],
+   [
+    "toner",
+    "new plug"
+   ],
+   [
+    "Toner",
+    "New plug"
+   ],
+   [
+    "The state licenses the light shop itself, and each light tech.",
+    "Most states license no holiday lighting. The business registration is enough."
+   ]
+  ]
+ },
+ "keep": [
+  "ladder",
+  "gutter",
+  "roof",
+  "power line",
+  "crew lead",
+  "3-story home",
+  "leak",
+  "drips",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off at Lee Light Shop, Sat Oct 24, leaves a box of light strands at the counter, and picks it up fixed a few days later. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Holiday Lights for 12 Larch Way: porch and doorway lights, Thu Oct 22, arriving 8–10am, with Mateo's crew. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "photos|none|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 light strand repair. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+    "photos|none|counter": "A wreath and figure repair, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+    "visit|none|counter": "A custom prop rebuild, priced at the counter. Only the $25 bench check is promised."
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Strand test",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Wreath rebuild",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   },
+   "amounts": {
+    "*": {
+     "name": "Light strand repair"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Light strand repair"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Wreath and figure repair"
+    },
+    "visit|*|*": {
+     "name": "Custom prop rebuild"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "list|full|none",
+    "photos|deposit|bill",
+    "visit|card|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: porch and doorway lights, $179. A card is saved for the $89 fee at booking. Mateo texts DONE with the lines, and Rosie texts the bill.",
+    "list|none|bill": "The same $179 porch lights. Nothing is taken. Rosie texts the bill after the job.",
+    "list|card|card": "The same $179 porch lights on a season plan. A card is saved and charged $179 when Mateo texts DONE, after the plan's own yes.",
+    "list|full|none": "Takedown only, $150, paid in full when booking: Sam's setting for that service.",
+    "photos|deposit|bill": "Roofline and window lights for a 2-story home, priced from photos at $640. Sam OKs it. A $160 deposit orders the lights; the rest on the bill.",
+    "visit|card|bill": "A custom light display, priced after the $89 walk-through (a card saved). Mateo's written quote; the agreement, a $1,600 deposit, a $400 change order; the last $2,000 on the bill Rosie texts. The January takedown is in the price."
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Timer and controller setup",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$120",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Takedown only",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Porch and doorway lights"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Porch and doorway lights"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Takedown only"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Roofline and window lights"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Roofline and window lights"
+    },
+    "visit|*|*": {
+     "name": "Custom light display"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": [
+   "B5-34",
+   "B4-78",
+   "B8-69",
+   "B8-72"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Holiday lighting, event lighting and light repair need no state license where Sam works (the plug-in says so); any license the state form asks for comes from its form."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The holiday lighting plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and light techs are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: lighting installs and light repair."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Crew leads and light techs need no license of their own unless the state's form says so (the plug-in's license note)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Holiday lighting is never sent now: it's booked ahead, around the weather and the season."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A light strand drop-off is never booked for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The light shop sells no repeating plan: each repair is its own drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The light shop sells no repeating plan."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A strand repair at the counter needs no written contract."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee Light Shop books drop-off slots, set by how many boxes it takes in a day."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no light tech. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The plug-in names no form to sign for light repair."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A box waits in its drop-off slot, so a light tech running late moves only the ready time (A8-11)."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The light shop sells no repeating plan."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "No: the customer stays",
+    "why": "The strands are left at the shop: READY and the pick-up follow the repair."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A strand repair is rated."
+   },
+   {
+    "op": "off",
+    "at": "A7-02",
+    "label": "A plan or count is due",
+    "why": "Lee Light Shop sells no plans or packs and books no groups."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at a light shop."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The light shop sends no proposals: the strands are READY and picked up."
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Noor S. to Lee Light Shop. Noor gets one invite and replies YES. This work needs no license of its own, so none is asked.",
+    "more": [
+     "Noor can be booked once Sam says yes.",
+     "No reply in 48 hours: one reminder, then Sam is told.",
+     "Sam sets the skills: like strands, but not prop rebuilds yet."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Light Shop. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Noor"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Noor"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "This work licenses nobody, so what comes due is the business's insurance certificate. Reminders go 30 days and 7 days before.",
+    "more": [
+     "A new certificate in the business's name keeps 'insured' on the listing.",
+     "Not renewed by the date: 'insured' comes off the listing. Bookings go on.",
+     "Where a state's form asks for a business registration, it comes due the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Light Shop's insurance certificate ends in 30 days.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "Send the new certificate before it ends",
+         "Not renewed: 'insured' comes off the listing",
+         "Bookings go on as before"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/ins"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state licenses light repair as a trade, its form asks for the license here instead.",
+     "Each light tech can link their own calendar when they join."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Light repair needs no license where Sam works, so a strand can be fixed at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Mateo: roofline lights, 3-story homes, the lift crew",
+         "Owen: lights up to 2 stories",
+         "Isla: light repair, props and home visits",
+         "Bram: light repair, at the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Light Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Isla"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Holiday Lights. Sam Lee added you to the team for lighting jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Mateo"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Isla replies YES, then checks what Sam set. One reply covers everything Isla does for the shop.",
+    "more": [
+     "No license number is asked: light repair needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Bram, Mateo and Owen join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Isla"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Light Shop! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Isla Ford · Lee Light Shop",
+        "lines": [
+         "Every shop service, prop rebuilds and home visits",
+         "Hours: the shop's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Isla"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Isla"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "t": "Tue Oct 27, 6:00pm",
+    "does": "A few hours after the pick-up, inside text hours. One question, with one tap on a page, so a rating is never mixed up with a reply to a booking text."
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "does": "It's 11:00am, and Alex brings the strands to the counter. Alex reads the code from the confirmation or the reminder, and Isla texts it in.",
+    "more": [
+     "At Lee Light Shop, the visit is a drop-off: the code is given when the box is left.",
+     "The desk can type the code on the portal's Today page instead.",
+     "The code also confirms the visit for Rosfield's $2."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M., Sat 11:00am. One box of strands, 4 strands."
+     ],
+     [
+      "san",
+      "cust",
+      "Your strands are checked in at Lee Light Shop with Isla. We'll text you when they're ready. Thanks, Alex!"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-10",
+    "does": "Lee Light Shop's main path above is the drop-off. This branch is a mail-in: strands shipped to the shop have no code, so DONE comes when they arrive.",
+    "more": [
+     "At pick-up, the strands go only to the customer or someone they name.",
+     "Next come the before notes, the price or the OK, and the repair. READY and the pick-up come after the work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Isla tests and fixes the strands over a day or two: what was booked, and anything Alex said yes to.",
+    "more": [
+     "Isla texts IN and READY as it goes.",
+     "Next, Alex hears they're ready, picks them up and pays at the counter."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "t": "Tue Oct 27, 2:00pm",
+    "does": "The strands are fixed. Isla texts READY with a photo. Rosie tells Alex in the shop's name: what was done, the pick-up times and anything due.",
+    "more": [
+     "Only Alex, or someone Alex names, can pick them up.",
+     "Anything still due is paid at the counter at pick-up.",
+     "Alex can reply within 24 hours if something's wrong, and Sam is told.",
+     "Sent inside text hours. A late READY waits for 9am."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "READY Alex M.",
+      {
+       "photos": [
+        "Strands, tested and boxed"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your strands are fixed and ready at Lee Light Shop.",
+      {
+       "card": {
+        "title": "Ready for pick-up",
+        "lines": [
+         "What was done: on your page, with a photo",
+         "Pick-up: any time the shop is open",
+         "Bring the code you used to drop them off",
+         "Anything due: paid at the counter",
+         "Something wrong? Reply within 24 hours"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/r/a7"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "does": "Alex gives the drop-off code at pick-up, or the person Alex named on the secure page shows an ID. The box is shown at the counter, and handed over once anything due is paid.",
+    "more": [
+     "Anyone else waits while Alex is asked. No answer in 30 minutes: the box stays, and they're asked to come back with Alex's code.",
+     "Anything due is paid at the counter, the shop's own way.",
+     "Mailed-in strands are sent back instead, once anything due is paid.",
+     "Not picked up by the end of the pick-up hours: it goes as 'An item isn't picked up', after the visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Show Alex the box, and hand it over once anything due is paid."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-03",
+    "more": [
+     "At Lee Light Shop, Alex pays when picking up the strands."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Holiday lighting, event lighting and light repair need no state license where Sam works (the plug-in says so); any license the state form asks for comes from its form."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The holiday lighting plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crews and light techs are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: lighting installs and light repair."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Crew leads and light techs need no license of their own unless the state's form says so (the plug-in's license note)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Holiday lighting is never sent now: it's booked ahead, around the weather and the season."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Lighting jobs are booked in arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Lighting jobs are visits, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Lighting jobs book a crew's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Holiday lighting is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Holiday lighting is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Holiday lighting is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A lighting crew never looks after a child; an adult on the booking must be there for any inside work (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Lighting visits are rated, like every visit."
+   },
+   {
+    "op": "words",
+    "at": "B4-14",
+    "does": "A custom display is quoted after the walk-through. Only the $89 light walk-through is promised now. Mateo measures the roofline, then sends a written quote with a drawing. Nothing is ordered before a signed agreement.",
+    "more": [
+     "The $89 counts toward the display price if Alex signs.",
+     "A card is saved when Alex books, for the late-cancel or no-show fee. Nothing is charged now.",
+     "No full price can be taken, since the price isn't known yet. The deposit comes with the signed agreement.",
+     "Many lighting companies give a free walk-through. The plug-in starts there, and Sam set $89.",
+     "Alex is told before booking: the $89 is owed even if Alex doesn't sign."
+    ],
+    "vary": {
+     "before:card": {
+      "more": [
+       "The $89 counts toward the display price if Alex signs.",
+       "A card is saved when Alex books, for the late-cancel or no-show fee. Nothing is charged now.",
+       "No full price can be taken, since the price isn't known yet. The deposit comes with the signed agreement.",
+       "Many lighting companies give a free walk-through. The plug-in starts there, and Sam set $89.",
+       "Alex is told before booking: the $89 is owed even if Alex doesn't sign."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "vary": {
+     "price:visit+before:card": {
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Lee Holiday Lights can come to your home for an $89 light walk-through. It counts toward the display price, and it's owed even if you don't sign. A card is saved for an $89 fee if you cancel late. Open times:",
+        {
+         "times": [
+          "Thu Oct 22 · 8–10am · Mateo",
+          "Thu Oct 22 · 12–2pm · Owen",
+          "Fri Oct 23 · 8–10am · Mateo"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "does": "Mateo walks the house with Alex and measures the roofline and trees. The same day or the next business day, Mateo sends the written quote and drawing for Alex's secure page.",
+    "more": [
+     "Mateo also checks the outlets and takes photos.",
+     "The quote is good for 14 days. The $89 walk-through counts toward the display price.",
+     "It lists the roofline, trees and walkway, the install days and the 2 payments. The January takedown is in the price.",
+     "Lights, clips, timers and the takedown are in the price. Nothing is added without Alex's yes.",
+     "Any fact the state's rules require is on the quote."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 3200 custom light display, roofline and two trees",
+      {
+       "photos": [
+        "Front roofline, measured",
+        "Front trees, measured"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "does": "Alex doesn't sign now. Only the $89 light walk-through is owed, and the quote stays good until Thu Nov 5.",
+    "more": [
+     "Mateo texts DONE 89 light walk-through. Only the $89 is owed: on the bill, the saved card or the business's own bill.",
+     "Alex can sign later from the same page, until the quote's date.",
+     "Alex can ask for a call first. Mateo calls, and the quote stays open.",
+     "Rosie never argues about the price. Questions go to Mateo, who can send a new version."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your quote stays good until Thu Nov 5. For now, only the $89 light walk-through is billed.",
+      {
+       "card": {
+        "title": "Custom light display · $3,200",
+        "lines": [
+         "Good until Thu Nov 5"
+        ],
+        "button": "Sign it later",
+        "link": "rosfield.com/q/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-62",
+    "does": "Alex taps Sign the agreement on the quote's page. Rosie builds it from the quote and the parts the state's rules require. Alex signs, then Sam does.",
+    "more": [
+     "Anyone else who decides signs on a link Alex forwards. Rosie never texts them itself.",
+     "Sam signs within 24 hours. Each one gets a copy by text and email.",
+     "Nothing is taken before everyone has signed.",
+     "Not signed by Thu Nov 5: one reminder 3 days before, then the quote lapses. Only the $89 is owed.",
+     "The agreement says the lights stay the business's own, the takedown date, and that changes need a signed change order."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 3200 custom light display, 2 payments"
+     ],
+     [
+      "san",
+      "cust",
+      "Here's Lee Holiday Lights' quote for your light display. Read it and sign on your secure page.",
+      {
+       "card": {
+        "title": "Custom light display · $3,200",
+        "lines": [
+         "Roofline, two trees, install and January takedown",
+         "$1,600 to start, $1,600 after the install",
+         "OK'd by Sam · good until Thu Nov 5",
+         "Sign to book the install"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/h1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-63",
+    "does": "With both signatures in, Alex pays the $1,600 deposit on the secure page, into Lee Holiday Lights' own Stripe. The lights are ordered after the cancel window ends, and Alex picks the install days.",
+    "more": [
+     "The deposit is half the display price, as the agreement set. Any cap on money before the work comes from the state's rules.",
+     "The $1,600 lands less Stripe's card fee.",
+     "Where the rules say money paid before the work is kept apart, it goes to the account Sam named.",
+     "Not paid in 2 days: one reminder. A day later, Sam is asked to call Alex.",
+     "Nothing is ordered until the cancel window ends."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your agreement is signed. The next step is the deposit.",
+      {
+       "pay": {
+        "amount": "$1,600",
+        "what": "your deposit",
+        "link": "rosfield.com/p/r4d"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Paid: your $1,600 deposit to Lee Holiday Lights. The receipt is on the page. Your lights are ordered after your cancel window ends. Then you pick your install days."
+     ]
+    ],
+    "vary": {
+     "price:visit+after:own": {
+      "does": "With both signatures in, Sam bills the $1,600 deposit the business's own way, as the agreement set. Rosie sends nothing about money. The lights are ordered after the cancel window ends.",
+      "more": [
+       "The deposit and the last payment are billed by Sam the business's own way.",
+       "Nothing is ordered until the cancel window ends."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your agreement is signed. Lee Holiday Lights bills the deposit its own way. Your lights are ordered after your cancel window ends. Then you pick your install days."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "does": "Alex hasn't answered the quote in 7 days. Rosie sends one reminder. Still no answer 2 days later: Sam picks to have Mateo call Alex, or let it run to its date.",
+    "t": "Thu Oct 29, 10:00am",
+    "more": [
+     "Nothing is ordered or built without the signed agreement.",
+     "Let it run: only the $89 light walk-through is owed, the same as Not now.",
+     "Alex can still sign from the page until Thu Nov 5.",
+     "Rosie sends no more texts about it.",
+     "No answer from Sam in 2 days: the quote runs to its date, as with Let it run."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "A reminder: your quote from Lee Holiday Lights is good until Thu Nov 5.",
+      {
+       "card": {
+        "title": "Custom light display · $3,200",
+        "lines": [
+         "Good until Thu Nov 5"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered Mateo's $3,200 quote in 7 days. It's good until Thu Nov 5.",
+      {
+       "buttons": [
+        "Mateo will call",
+        "Let it run"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-92",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mateo's quote for Alex M.'s custom light display is $3,200, over your $500 limit. No answer in 30 minutes: Alex is told it's with you.",
+      {
+       "card": {
+        "title": "Custom light display · $3,200",
+        "lines": [
+         "Roofline, two trees, install and takedown",
+         "Half when signed, half after the install",
+         "The $89 walk-through is included"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-93",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Here's your quote from Lee Holiday Lights. It's good until Thu Nov 5.",
+      {
+       "card": {
+        "title": "Custom light display · $3,200",
+        "lines": [
+         "Roofline, two trees · install and takedown",
+         "$1,600 deposit once the agreement is signed",
+         "$1,600 after the install",
+         "The $89 walk-through is included"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/r4"
+       },
+       "buttons": [
+        "Sign the agreement",
+        "Not now",
+        "Ask for changes"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "vary": {
+     "price:visit": {
+      "t": "Wed Oct 28, 9:30am",
+      "does": "The cancel window ended with no cancel, and Mateo ordered the lights. Alex gets the project plan: install is Mon Nov 16 and Tue Nov 17, and the takedown is Mon Jan 11.",
+      "more": [
+       "Each day gets its own code, sent the night before. Nobody needs to be home for outside work.",
+       "Lights take about 2 weeks, so install waits for the delivery date.",
+       "If a day moves for weather, only that day moves, and Alex is told. One booking, so one $2 for the whole project.",
+       "Each day is confirmed by text. Another time, or no reply in 2 days: Mateo calls Alex."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your light display is on its way. Here's the plan.",
+        {
+         "card": {
+          "title": "Project plan · Custom light display",
+          "lines": [
+           "Thu Oct 22 · light walk-through (done)",
+           "Wed Oct 28 · lights ordered",
+           "Mon Nov 16 and Tue Nov 17 · install · Mateo and Owen",
+           "Tue Nov 17 · 5:30pm · lights-on walk-through",
+           "Mon Jan 11 · takedown"
+          ],
+          "button": "Add a gate code",
+          "link": "rosfield.com/s/r4k"
+         }
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "UPDATE lights ordered for Alex M., due about Nov 11. Install Nov 16-17. Takedown Jan 11"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Nov 17, 5:30pm",
+      "does": "At dusk on the last install day, Mateo and Alex turn the lights on and check every section against the drawing. Anything dark goes on the fix list before Mateo texts DONE.",
+      "more": [
+       "One section on the back tree is dark. It goes on the fix list, and Mateo swaps the strand on the spot.",
+       "If Alex isn't home, Mateo sends a video of the lights on, and the walk-through is by video.",
+       "The plug-in names what's checked: every section lights, clips are tight, and cords are off the walk.",
+       "After photos are taken at dusk from the same angles as the before photos.",
+       "If Alex disputes the work, Sam is told, and the last bill waits.",
+       "If Alex didn't sign, there's nothing to check. Mateo texts DONE for the walk-through."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "FIXLIST one dark section on the back tree, strand swapped. All else OK"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "vary": {
+     "price:visit+after:bill": {
+      "t": "Tue Nov 17, 6:15pm",
+      "does": "The walk-through is done, and the fix list is noted. Mateo texts DONE with the last payment, so Rosie can text the bill.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 2000 final payment, with change order 1"
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Tue Nov 17, 6:15pm",
+      "does": "The walk-through is done, and the fix list is noted. Mateo texts DONE. Sam bills the last payment the business's own way.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE"
+       ],
+       [
+        "san",
+        "staff",
+        "Done: Alex M., custom light display."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE roofline warm white, two trees blue. Timer on at 5pm. Takedown Mon Jan 11."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-05",
+    "vary": {
+     "price:visit": {
+      "does": "Rosie reads Mateo's DONE back. The $2,000 is the last payment in the signed agreement, with the change order, so it needs no OK.",
+      "more": [
+       "A bill that matches the agreement or an OK'd quote never needs an OK.",
+       "The last payment is the $1,600 rest plus the $400 change order.",
+       "If Alex didn't sign, the bill is the $89 light walk-through.",
+       "A different total over Sam's $500 goes to Sam first."
+      ],
+      "say": [
+       [
+        "san",
+        "staff",
+        "Alex M.: $2,000, the last payment for the custom light display. It matches the agreement. Sending Alex the bill.",
+        {
+         "buttons": [
+          "Change it"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Nov 17, 6:20pm",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Holiday Lights: the last payment for your custom light display. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$2,000",
+          "what": "the last payment on your light display",
+          "link": "rosfield.com/p/r4"
+         },
+         "buttons": [
+          "Pay with my saved card"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-07",
+    "vary": {
+     "price:visit": {
+      "does": "The $2,000 lands in Lee Holiday Lights's own Stripe, less Stripe's card fee.",
+      "more": [
+       "Stripe's card fee goes to Stripe.",
+       "Paid by bank transfer, it counts once it clears, in a few business days.",
+       "The receipt goes out once the money is in."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-26",
+    "does": "Sam turned on bank transfer for bills over $500. The last $2,000 is over it, so the pay link offers it. It counts as paid only once it clears.",
+    "more": [
+     "The deposit link offered it the same way.",
+     "Clearing takes a few business days. Alex is told it's on the way, and again when it clears.",
+     "The receipt waits until it clears.",
+     "If it bounces, Alex gets one pay link, and Sam is told."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Holiday Lights: the last payment for your custom light display. Pay by card, or by bank transfer.",
+      {
+       "pay": {
+        "amount": "$2,000",
+        "what": "the last payment on your light display",
+        "link": "rosfield.com/p/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your $2,000 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then."
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "does": "Sam turned on bank transfer for bills over $500. The last $2,000 is over it, so the pay link offers it. It counts as paid only once it clears.",
+      "more": [
+       "The deposit link offered it the same way.",
+       "Clearing takes a few business days. Alex is told it's on the way, and again when it clears.",
+       "The receipt waits until it clears.",
+       "If it bounces, Alex gets one pay link, and Sam is told."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Holiday Lights: the last payment for your custom light display. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$2,000",
+          "what": "the last payment on your light display",
+          "link": "rosfield.com/p/r4"
+         }
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your $2,000 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-09",
+    "vary": {
+     "price:visit": {
+      "does": "Alex pays the last $2,000 by check to Mateo.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "paid check 2000"
+       ],
+       [
+        "san",
+        "staff",
+        "Recorded: $2,000 check from Alex M."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-10",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Holiday Lights: your card didn't go through for the last $2,000.",
+        {
+         "pay": {
+          "amount": "$2,000",
+          "what": "the last payment on your light display",
+          "link": "rosfield.com/p/r4"
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s card declined for the last $2,000 on the light display. Alex has one pay link."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-11",
+    "vary": {
+     "price:visit": {
+      "t": "Sat Nov 21, 11:00am",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Alex M. hasn't paid the last $2,000 for the light display after 4 days. Rosie sends no reminders of its own.",
+        {
+         "buttons": [
+          "Send one more link",
+          "I'll call Alex"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-14",
+    "t": "Sat Nov 21, 11:00am",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Holiday Lights: your saved card didn't go through for the last payment on your light display.",
+        {
+         "pay": {
+          "amount": "$2,000",
+          "what": "the light display",
+          "link": "rosfield.com/p/r4"
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s saved card declined at DONE (Tue Nov 17, Mateo). Alex has one pay link."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-15",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE paid check 2000"
+       ],
+       [
+        "san",
+        "staff",
+        "Recorded: a $2,000 check from Alex M. The card isn't charged."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-08",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "staff",
+        "Alex M.'s pay page is open on your phone. Hand it to Alex to pay.",
+        {
+         "card": {
+          "title": "Alex M.'s pay page",
+          "lines": [
+           "Lee Holiday Lights · Tue Nov 17 · $2,000"
+          ],
+          "button": "Open",
+          "link": "rosfield.com/p/r4"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Nov 17, 6:40pm",
+      "does": "The receipt goes out once the last payment is in, by text and email. It lists the project price, the change order and both payments.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "The lights stay the business's own until the takedown. The agreement and takedown date are on the secure page.",
+       "Any fact the state's rules require, like a license number, is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your custom light display. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $3,600",
+          "lines": [
+           "Display price $3,200 · change order $400",
+           "Deposit and last payment, both paid",
+           "Takedown Mon Jan 11, included"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/r4"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Tue Nov 17, 6:40pm",
+      "does": "Lee Holiday Lights sends its own receipt. Rosie sends only a thank-you note.",
+      "more": [
+       "Rosie sends no receipt here. The business's own receipt carries any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Holiday Lights. Your takedown is Mon Jan 11. If anything looks wrong, reply here."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "vary": {
+     "price:visit": {
+      "t": "Wed Nov 18, 9:00am",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Holiday Lights! How was working with Mateo?",
+        {
+         "card": {
+          "title": "Rate your light display",
+          "lines": [
+           "Custom light display · Mateo"
+          ],
+          "button": "Rate it",
+          "link": "rosfield.com/r/r4"
+         },
+         "stars": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "vary": {
+     "price:visit": {
+      "does": "A section goes dark 2 weeks later. It's under the 30-day promise, so Sam OKs a free visit to fix it.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "One section of the roofline lights is dark."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s light display, installed Tue Nov 17: a section is dark. It's under the 30-day promise.",
+        {
+         "buttons": [
+          "Book a free visit",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. The lights are under our promise, and this visit is free.",
+        {
+         "times": [
+          "Mon Nov 30 · 8–10am · Mateo",
+          "Tue Dec 1 · 8–10am · Mateo"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-10",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Holiday Lights refunded your last payment.",
+        {
+         "card": {
+          "title": "Refund · $2,000",
+          "lines": [
+           "Custom light display · paid Tue Nov 17",
+           "Back on your card in 5 to 10 days"
+          ]
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-04",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Sorry to hear that. What went wrong?"
+       ],
+       [
+        "cust",
+        "san",
+        "Mateo was late and rushed."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. rated the project 2 stars: \"Mateo was late and rushed.\"",
+        {
+         "card": {
+          "title": "Rating · 2 of 5",
+          "lines": [
+           "Custom light display with Mateo",
+           "Only you see this"
+          ]
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-09",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "cust",
+        "san",
+        "Can I get some money back? Mateo came late and rushed."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. asked for money back for the light display.",
+        {
+         "buttons": [
+          "Refund it",
+          "Keep it"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "does": "Rosie never decides a refund itself. Lee Holiday Lights was paid its own way, so Sam refunds it the same way.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "Can I get some money back? Mateo came late and rushed."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. asked for money back for the light display. You were paid your own way.",
+        {
+         "buttons": [
+          "I'll refund it",
+          "Keep it"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-12",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Reminder: Alex M. asked for money back for the light display.",
+        {
+         "buttons": [
+          "Refund it",
+          "Keep it"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your request is still with Lee Holiday Lights. We've asked Sam to get back to you."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-13",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "cust",
+        "san",
+        "The crew left clips on the porch."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M. isn't happy with the light display: \"The crew left clips on the porch.\"",
+        {
+         "buttons": [
+          "Book a free fix",
+          "Call Alex"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-14",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Alex M.'s bank opened a dispute about the light display's last payment. Rosie's record is ready.",
+        {
+         "card": {
+          "title": "Dispute · Alex M.",
+          "lines": [
+           "The booking, the check-in and every text"
+          ],
+          "button": "See the record",
+          "link": "rosfield.com/d/r4"
+         },
+         "buttons": [
+          "Send the record",
+          "Let Alex keep it"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "does": "Alex's bank disputes a payment Lee Holiday Lights took its own way. That goes through the business's own payment company. Rosie's record is ready if Sam needs it.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Alex M.'s bank is disputing the light display's last payment you took your own way. Rosie's record is ready if you need it.",
+        {
+         "card": {
+          "title": "Record · Alex M.",
+          "lines": [
+           "The booking, the check-in and every text"
+          ],
+          "button": "See the record",
+          "link": "rosfield.com/d/r4"
+         },
+         "buttons": [
+          "Send me the record",
+          "No need"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B4-34",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.26"
+      ],
+      "who": "agent",
+      "to": "cust",
+      "via": "chat",
+      "title": "Asks about outlets, the roof and power lines",
+      "q": "Where are the outlets, and any power lines?",
+      "does": "The plug-in asks where the outdoor outlets are and whether a power line runs near the roof or trees. Alex has two front outlets and the line runs to the side, so Rosie notes it for Mateo.",
+      "more": [
+       "The crew keeps well clear of a power line, and a line touching the house stops the booking.",
+       "A new outlet or a bad circuit is a licensed pro's work, hired by Alex. Lee Holiday Lights never books or bills it.",
+       "A gate or door code goes on the secure page, never in a text."
+      ],
+      "say": [
+       [
+        "agent",
+        "cust",
+        "Where are your outdoor outlets, and does a power line run near the roof or the trees?"
+       ],
+       [
+        "cust",
+        "agent",
+        "Two outlets by the front door. The power line runs to the side of the house."
+       ],
+       [
+        "agent",
+        "cust",
+        "Noted for Mateo. A new outlet would be a licensed pro's job, hired by you."
+       ]
+      ],
+      "needs": [
+       "pf.questions",
+       "pf.rules"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Outlets work, line is clear",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "An outlet or circuit needs work",
+        "steps": [],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-78",
+    "steps": [
+     {
+      "id": "B8-x11",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 11:30am",
+      "title": "Alex adds the back-yard trees: a change order",
+      "q": "Does Alex sign the change order?",
+      "does": "Looking at the drawing, Alex asks Mateo to add the back-yard trees. The agreement can't change by text alone, so Alex and Sam sign a change order first.",
+      "more": [
+       "It's over Sam's $500, so Sam OKs the price first.",
+       "It gives the price and any time added. It goes on the final bill.",
+       "It's signed on the secure page, like the agreement.",
+       "The trees go into the same lights order.",
+       "Other work goes on while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 400 add the back-yard trees to the display. Same order"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's the change order for the back-yard trees you asked Mateo about.",
+        {
+         "card": {
+          "title": "Change order 1 · $400",
+          "lines": [
+           "Add the back-yard trees",
+           "Same lights order",
+           "Added to the final bill"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/r4c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Keep the plan as is"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Keeps the plan, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x12",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "title": "Keeps the plan; tells Mateo",
+          "does": "Alex keeps the plan as signed, or doesn't answer in 3 days. The back-yard trees aren't added, and Mateo is told. Alex can ask again later.",
+          "more": [
+           "Nothing is added to the bill without a signed change order."
+          ],
+          "say": [
+           [
+            "san",
+            "owner",
+            "Alex M. didn't sign change order 1, the $400 back-yard trees. The plan stays as signed."
+           ],
+           [
+            "san",
+            "cust",
+            "No change: your display plan stays as signed."
+           ]
+          ],
+          "tells": [
+           "owner",
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x06",
+      "type": "split",
+      "line": [
+       "9.13",
+       "7.16"
+      ],
+      "who": "san",
+      "to": "staff",
+      "via": "msg",
+      "t": "Wed Oct 28, 9:00am",
+      "title": "Orders the lights after the window",
+      "q": "Do the lights have a delivery date?",
+      "does": "The cancel window ended with no cancel. Mateo orders the lights, clips and timer, including the back-yard trees. Mateo texts the delivery date, and Rosie keeps it with the project.",
+      "more": [
+       "The lights are cut to length, so they are ordered only after the window ends and the deposit is paid.",
+       "Lights take about 2 weeks. Install days are set once the order has a delivery date.",
+       "The lights stay the business's own. They are in the quoted price, and Rosfield takes no other product money.",
+       "A late order moves the install days, with no fee."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "ORDER lights, clips, timer, back-yard trees. Delivery about Wed Nov 11"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s project. Install stays Mon Nov 16 and Tue Nov 17 unless a date slips."
+       ]
+      ],
+      "rule": "Rosie's rule: made-to-length lights are ordered only after the cancel window ends. Why: nothing is made or bought for a customer who may still cancel for free.",
+      "needs": [
+       "pf.money",
+       "pf.rules"
+      ],
+      "tells": [
+       "staff"
+      ],
+      "branches": [
+       {
+        "label": "1 Delivery date set",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 The order is late",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "9.13",
+           "7.16"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Nov 9, 10:00am",
+          "title": "Moves the install days, with no fee",
+          "does": "The lights are late from the maker. The business caused the move, so it's free. Alex picks new install days.",
+          "more": [
+           "Only days after the new delivery date are offered.",
+           "Nothing else about the agreement changes."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your lights are late from the maker, so Lee Holiday Lights needs to move your install days. There's no fee.",
+            {
+             "times": [
+              "Mon Nov 23 and Tue Nov 24 · 9am–4pm · Mateo",
+              "Mon Nov 30 and Tue Dec 1 · 9am–4pm · Mateo"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Wind over the limit at the house",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.19"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:40am",
+       "title": "Mateo stops the ladder work for the wind",
+       "does": "Gusts at the house go over Sam's limit after Mateo checks in. Ladders come down. The porch and doorway need no ladder, so they're done now.",
+       "more": [
+        "The plug-in sets the limit: here, wind over 25 mph.",
+        "Rosie's rule: no ladders in strong wind, whatever the job.",
+        "Mateo never has to argue it with Alex. The text is enough."
+       ],
+       "needs": [
+        "pf.edges",
+        "pf.visit"
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "WIND gusts 30, ladders down. Doing the porch now"
+        ],
+        [
+         "san",
+         "staff",
+         "Got it. Porch today. I'll offer Alex a new day for the roofline."
+        ]
+       ],
+       "tells": [
+        "staff"
+       ]
+      },
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.19",
+        "9.12"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:42am",
+       "title": "Moves the roofline work, at no cost",
+       "does": "Alex hears that the porch lights go up today and the roofline moves to Mon Oct 26. There's no fee, and one bill comes when it's all done.",
+       "more": [
+        "Nobody needs to be home for outside work, so no reply keeps Monday. Sam is told.",
+        "Monday gets its own on-my-way text. It's the same booking, so one $2 for the whole job.",
+        "Another day: Alex picks a new time, as when a customer moves it."
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Too windy for ladders this morning, so Mateo's crew is doing your porch lights now. The roofline moves to Mon Oct 26, arriving 8–10am, at no cost.",
+         {
+          "card": {
+           "title": "Your lights · two days",
+           "lines": [
+            "Today: porch and doorway lights",
+            "Mon Oct 26 · arriving 8–10am: roofline",
+            "One bill when it's all done"
+           ]
+          },
+          "buttons": [
+           "That works",
+           "Another day"
+          ]
+         }
+        ]
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes, so Alex has them in writing.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       },
+       {
+        "label": "Yes: every season",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to the plan on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: how often, the price a season, how it's paid, and that it runs until Alex ends it.",
+           "Each season's install gets its own days, picked with Alex about 3 weeks before.",
+           "Ending it takes one reply. Seasons already done stay paid.",
+           "Any reminder the state's rules require for a running plan comes from the plug-in."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your plan with Lee Holiday Lights is set.",
+            {
+             "card": {
+              "title": "Lights every season · $179 a season",
+              "lines": [
+               "This Thursday's install is the first",
+               "We text you about 3 weeks before each season to pick days",
+               "Paid after each install, like this one",
+               "Runs until you end it"
+              ]
+             },
+             "buttons": [
+              "End the plan"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ],
+          "vary": {
+           "price:photos": {
+            "t": "Mon Oct 19, 7:59pm"
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B10-02",
+    "steps": [
+     {
+      "id": "B10-x01",
+      "type": "split",
+      "line": [
+       "10.14",
+       "8.12"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Mon Dec 14, 10:00am",
+      "title": "Books the January takedown",
+      "q": "Does Alex pick a takedown day?",
+      "does": "The takedown is in the price. A month ahead, Rosie offers January days once. Alex picks, or Mateo calls.",
+      "more": [
+       "The takedown is part of the display price: nothing more is owed for it.",
+       "A day lost to weather moves with no fee.",
+       "No pick in 7 days: Mateo calls Alex. No takedown is booked on silence.",
+       "The lights stay the business's own, so they come down on the booked day."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Time to book your takedown. It's included. Pick a day in January:",
+        {
+         "times": [
+          "Mon Jan 11 · 8–10am · Mateo",
+          "Tue Jan 12 · 8–10am · Mateo"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Picks a day",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 No pick in 7 days",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B10-x02",
+          "line": [
+           "10.14",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "staff",
+          "via": "msg",
+          "t": "Mon Dec 21, 10:00am",
+          "title": "Asks Mateo to call Alex",
+          "does": "Nobody picked a takedown day in 7 days. Mateo gets a to-do to call Alex. The takedown stays in the price.",
+          "more": [
+           "No takedown is booked for Alex on silence."
+          ],
+          "say": [
+           [
+            "san",
+            "staff",
+            "Alex M. hasn't picked a takedown day. Please call Alex.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me Monday"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "staff"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Jude K. to Lee Holiday Lights. Jude gets one invite and replies YES. This work needs no license of its own, so none is asked.",
+    "more": [
+     "Jude can be booked once Sam says yes.",
+     "No reply in 48 hours: one reminder, then Sam is told.",
+     "Sam sets the skills: like porches and roofs up to 2 stories, not lift work yet."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Holiday Lights. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Jude"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Jude"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "This work licenses nobody, so what comes due is the business's insurance certificate. Reminders go 30 days and 7 days before.",
+    "more": [
+     "A new certificate in the business's name keeps 'insured' on the listing.",
+     "Not renewed by the date: 'insured' comes off the listing. Bookings go on.",
+     "Where a state's form asks for a business registration, it comes due the same way."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Holiday Lights' insurance certificate ends in 30 days.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "Send the new certificate before it ends",
+         "Not renewed: 'insured' comes off the listing",
+         "Bookings go on as before"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/ins"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-61",
+    "more": [
+     "Where a state or city asks for a registration to hang lights on homes, its form asks for it here.",
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "more": [
+     "Holiday lighting needs no license where Sam works, so lights can go up at a home.",
+     "Where a state's rules limit work at a home, they come from its own form.",
+     "Times at the customer's place offer only people cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Mateo: roofline lights, 3-story homes, the lift crew",
+         "Owen: lights up to 2 stories",
+         "Isla: light repair, props and home visits",
+         "Bram: light repair, at the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Light Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Isla"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Holiday Lights. Sam Lee added you to the team for lighting jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Mateo"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Mateo replies YES, then checks what Sam set. One reply covers every kind of work Mateo does.",
+    "more": [
+     "No license number is asked: holiday lighting needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Owen, Isla and Bram join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Mateo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Holiday Lights! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Mateo Cruz · Lee Holiday Lights",
+        "lines": [
+         "Every lighting job, and event lighting",
+         "3-story homes: the lift crew",
+         "Hours: Mon–Fri 7:30am–5:30pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Mateo"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Mateo"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-01",
+    "more": [
+     "The lights plug-in's prep: clear the front of the house, keep the driveway free for the truck, and unlock the side gate."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-05",
+    "more": [
+     "The plug-in's other questions before times: the outdoor outlets, the power line, and how steep the roof is.",
+     "3 stories, a steep roof or a tile roof send the job to a quote from photos."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-07",
+    "more": [
+     "Homes up to 2 stories with a normal roof and up to 100 feet of roofline are priced from the list. That's the plug-in's rule.",
+     "Taller or steeper homes, more roofline, trees and businesses are priced from photos first.",
+     "The price and length come from the answers: feet of roofline, stories, trees and outlets."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Say Alex asks for the lights every year. Lee Holiday Lights offers that as a plan, so the AI shows its terms. Each season is booked and paid like a single one.",
+    "more": [
+     "The AI never offers a plan the customer didn't ask for.",
+     "A plan needs its own yes: its terms show on the secure page, before any card.",
+     "Each season gets its own reminder and code. Alex can skip, pause or end the plan by text.",
+     "Each season's days are picked when it comes up, around the weather.",
+     "Rosfield's $2 counts once a month for a plan."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can you put the lights up every year?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Lee Holiday Lights has a season plan: porch and doorway lights, $179 a season, installed in November and taken down in January. Each season is booked and paid like a single one. Want it?",
+      {
+       "buttons": [
+        "Yes, every season",
+        "Just this once"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "does": "The page shows the season plan's terms: $179 a season, installed in November and taken down in January, paid after each install. It says how to skip, pause or end, too. Alex says yes to them on their own.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Season lights plan",
+        "lines": [
+         "$179 a season, installed in November",
+         "Taken down in January",
+         "Each season is booked and paid like this one",
+         "Runs until you end it",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this season"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "A side gate code is typed on the page the same way. Only the crew lead sees it.",
+     "Pets: kept inside while the ladders are up.",
+     "Outdoor outlets: on and working, or the crew tells Alex before starting."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "For lights: Mateo walks around the house first. Loose gutters, cracked cords and old clips get photos.",
+     "A cracked cord is not plugged in. Alex is told before work starts.",
+     "Mateo finds where the power line comes in and checks the wind before any ladder goes up."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Roof or gutter repair found on the visit is home-improvement work. It's quoted only where the license plug-in allows it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-52",
+    "t": "Thu Oct 22, 10:35am"
+   },
+   {
+    "op": "words",
+    "at": "B8-10",
+    "t": "Thu Oct 22, 10:50am"
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "does": "Alex's job runs long, so Mateo will reach Kim about 11:15am. That's still inside Kim's window, so Kim just hears the new time.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 45"
+     ],
+     [
+      "san",
+      "cust",
+      "Mateo from Lee Holiday Lights is running behind and expects to reach you about 11:15am, still inside your 10am–12pm window.",
+      {
+       "buttons": [
+        "That works",
+        "Change the time"
+       ],
+       "as": "Kim L."
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "Started from the refitted windows.json (pattern service: a crew at the customer's home priced from a list, plus a drop-off shop in flow A), because a lighting crew works the same way: outside, on ladders, around the weather, with nobody needing to be home. What the window cleaner lacks, this overlay adds: a custom display quoted after a walk-through (a written quote with a drawing, a signed agreement, a deposit that orders the lights, a change order, a lights-on walk-through at dusk and the last payment), a January takedown included in the price, and a seasonal return plan.\nNames: flow B is Lee Holiday Lights (crew leads Mateo Cruz and Owen Frost); flow A is Lee Light Shop (310 Ridge Rd; light techs Isla Ford and Bram Doyle), where customers drop off light strands, wreaths and props for testing and repair and pick them up when ready. Alex lives at 12 Larch Way. Sam's second kind of work is event lighting. License and registration numbers use the obviously fake EX-1042 style.\nMoney, flow B (master numbers kept so sums stay right): porch and doorway lights are $179 from the list (a card saved for the $89 fee; Rosie texts the bill; takedown in January included); takedown only is $150 paid in full when booked (fee $89, never over the price); roofline and window lights priced from photos are $640 (over $500 Sam OKs it; a $160 deposit orders the lights, the $480 rest on the bill); a custom light display is quoted after the $89 walk-through (a card saved, not a hold, credited to the display if Alex signs): example $3,200, $1,600 deposit when the agreement is signed (the lights are ordered after the cancel window), a $400 change order (the back-yard trees, signed before the work), the last $2,000 after the install on the bill Rosie texts (or the business's own way), total $3,600, the January takedown included. Paths B: list|card|bill (main), list|none|bill, list|card|card (season plan customers: the saved card is charged at DONE after the plan's own yes and a reminder), list|full|none, photos|deposit|bill, visit|card|bill. Left out: visit|none and visit|own paths a lighting company does not use.\nMoney, flow A: light strand repair $35 at the counter (main, nothing taken to book; a YES books the drop-off; paid at pick-up), wreath and figure repair priced from photos $90, custom prop rebuild priced at the counter after a $25 bench check. Nothing is taken in advance.\nCancel right: switch cancelright in flow B only (an agreement signed at the customer's home); the master's B8-78 notice names the real last day, and nothing is ordered before it (own step B8-x06). Settings: arrive B a 2-hour window; cutoff 24 hours before in both flows (the master's literal '7am on the visit day' in S1-21 is renamed to match). The stage-bill fact is not listed: a display pays a deposit and a last payment.\nNever sent now: S2-30's yes branch is off, and the 'Jobs sent now' rule rows and S2-30's example line say none. Outside work needs nobody home (B8-69 kept): DONE with after photos or a video with the lights on; the walk-through always needs an adult or a video.\nOwn steps B: B4-x01 (asks where the outdoor outlets are and whether a power line runs near the roof), B6-x01 / B6-x02 (a season plan's terms are texted back after its own yes), B8-x01 / B8-x02 (wind over the limit: ladders come down, ground work is done, the roofline moves free), B8-x11 / B8-x12 (change order, Sat Oct 24), B8-x06 / B8-x07 (lights ordered after the window; a late order moves the install, no fee), B10-x01 / B10-x02 (books the January takedown; no pick in 7 days: the crew lead calls). Dates run forward: walk-through Thu Oct 22, quote signed Thu Oct 22, deposit Fri Oct 23, cancel window to Tue Oct 27, lights ordered Wed Oct 28, delivery about Nov 11, install Mon Nov 16 and Tue Nov 17, lights-on walk-through Tue Nov 17 at 5:30pm, DONE 6:15pm, receipt 6:40pm, takedown offered Mon Dec 14, takedown Mon Jan 11.\nSafety: stop words are a power line touching the house, its gutter or the lights (or sparking wires or a gas smell), someone falling from a ladder or roof, and a roof edge or gutter giving way; steps-then-go-on are wind, rain or ice, a hanging gutter or loose roof edge, and an outlet that keeps tripping the breaker. The Spanish danger call (B3-11 / B3-18), the after-booking danger check (B7-17) and the owner-line question use a hanging gutter or a power-line question, never a stop word as an everyday booking. New outlets, wiring and a bad circuit are a licensed electrician's job, hired by the customer, never booked or billed by the business. No work within 10 feet of a power line.\nWho may book: an adult 18 or older who owns the home or runs the business (a renter needs the landlord's OK). A child at home is never the one who answers for the crew. Licenses: most states license no holiday lighting; the business registration and insurance are kept; ladder and lift training records are kept.\nRename: windows' pairs (157 A / 222 B, all live on the frozen master) were reworded one by one for lights; the cut verbs, the on-call plumber row and the people's full names have front pairs. Keep list: ladder, gutter, roof, power line, crew lead, 3-story home, leak, drips.\nNot sure (for the verifier): (1) the project words on B8-37..B10-14 are the light display's own story on price:visit; (2) the master's booking cards name one list service on every path (MASTER R02/R08), so the photos and visit paths read 'porch and doorway lights' in a few base lines; (3) the free takedown inside the price is the owner's choice; (4) the season plan is a fact (plans) with its own terms yes; (5) A has no deposit or full-price path: a light shop takes nothing at booking.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "One question cuts the most",
+    "Those words are cut from the recording",
+    "$140 an hour",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "like a mark on an item or the skin",
+    "chair renter",
+    "Could Riley use a toner instead of the gloss?",
+    "Alex M. asks for a toner instead of the gloss.",
+    "EC22871",
+    "BS20981",
+    "a step-free chair",
+    "chair renter",
+    "'A trim' or 'a fade' fits a haircut.",
+    "'Yes, make it a fade'",
+    "Lee's Barbershop would like to see your hair before pricing it.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "like the 15-minute style consult",
+    "the free style consult",
+    "like a skin reading",
+    "Each service starts the way most barbershops set it.",
+    "Panel upgrade: a free estimate, then a quote",
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Ben T. books a skin fade for Sat Nov 7",
+    "you now have two skin fades on Sat Nov 7",
+    "Color quotes come to you first. Board prices never need one",
+    "Riley: barber, color, house calls",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Booked · Sat Oct 24, 11:00am · haircut with Riley",
+    "A barbershop has none, so nothing is sent here.",
+    "says the cape clip ripped a shirt collar today",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Promises the $25 consult; priced at the chair",
+    "Can my son wait in the shop during my cut?",
+    "like Riley's color plan after a consult",
+    "so Quinn S.'s license isn't checked yet",
+    "Plumbing JP031552 · electrical JE30417",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "so Avery's license isn't checked yet",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "A barbershop books a person's time.",
+    "Wants Saturday morning, with Riley",
+    "could mean a salon or a barbershop",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Do you do kids cuts? My son is 8.",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Lee's Barbershop · with Riley",
+    "Riley stopped Alex M.'s cut.",
+    "A card saved for the $20 fee",
+    "Anything Riley should know?",
+    "your first color plan visit",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "once Riley sees the hair",
+    "A haircut needs nothing.",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "like a skin-test result",
+    "Add photos of your hair",
+    "A barbershop has none.",
+    "Stopped Alex M.'s cut.",
+    "No card, so no $20 fee",
+    "Proposal · Color plan",
+    "Haircut every 4 weeks",
+    "also does color and",
+    "photos of your hair",
+    "Lee Home Services'",
+    "A color correction",
+    "a color correction",
+    "Riley · Sat Oct 24",
+    "Lee Home Services",
+    "barber, color and",
+    "a package of cuts",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Only the consult",
+    "Groom's package",
+    "Gloss to finish",
+    "11:00am · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "service, color",
+    "2 Consult only",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "at the chair",
+    "At the chair",
+    "Consult only",
+    "house calls",
+    "House calls",
+    "$25 consult",
+    "color quote",
+    "NEW massage",
+    "the consult",
+    "a staff cut",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "house call",
+    "patch test",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "the chair",
+    "visit fee",
+    "on Elm St",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "gloss",
+    "toner",
+    "Toner"
+   ],
+   "B": [
+    "One question cuts the most",
+    "Those words are cut from the recording",
+    "Seats cut:",
+    "HURT cut my hand, need to stop",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "$140 an hour",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "chair renter",
+    "EC22871",
+    "BS20981",
+    "chair renter",
+    "Free until 7am on the visit day.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Nora S. asked overnight for a drain clearing today.",
+    "Panel upgrade: a free estimate, then a quote",
+    "Its money card is set the way most barbershops start.",
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Here are the rules barbershops often set.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "The chairs",
+    "A chair, ready",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley: barber, color, house calls",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "Me, and yes. It's my kitchen.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services can clear the drain:",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Shutoff valve and wall pipe · $540",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "you have two drain clearings on Mon Nov 9",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Ivy's AI asks for a drain clearing at $150, an old price.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Your drain is under warranty, so this visit is free.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Jordan says no. Please wait until the job is done.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Told to leave, then call 911 and the gas company",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "The plug-in says how long the warranty lasts.",
+    "come back next fall for a water heater flush",
+    "It's overflowing. Can someone come tonight?",
+    "BEFORE old water stain on the cabinet floor",
+    "Say Alex also asks about a dripping faucet.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "Can Jordan also look at a dripping faucet?",
+    "Jordan needs a part from the supply house.",
+    "Can I run the dishwasher before you come?",
+    "like replacing the old pipes Jordan noted",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Then the booking goes on, marked urgent.",
+    "he's the one who replaces water heaters",
+    "so Reese K.'s license isn't checked yet",
+    "Plumbing JP031552 · electrical JE30417",
+    "like water near outlets or a gas smell",
+    "Jordan finds corroded shutoff valves.",
+    "like a permit it needed that isn't in",
+    "priced a water heater replacement for",
+    "The drain clogs again 2 weeks later.",
+    "so Casey's license isn't checked yet",
+    "The kitchen drain is clogged again.",
+    "Jordan left a mess under the sink.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Call a mold cleanup company first",
+    "Proposal · Replace the old pipes",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "UPDATE getting a part, back 9:30",
+    "the water heater flush you asked",
+    "Jordan cracks the cabinet floor",
+    "The job should be done by 10am.",
+    "No. It doesn't smell like gas.",
+    "replacing both shutoff valves",
+    "Alex asks an AI for a plumber",
+    "water heater flush, 12 months",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "the sink is now overflowing",
+    "next week's drain cleaning",
+    "like an overflowing drain",
+    "Overflowing kitchen drain",
+    "covers part of the repair",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "The repair price is good",
+    "plumbing and electrical",
+    "Sewer camera inspection",
+    "NEW heating and cooling",
+    "sewer camera inspection",
+    "A gas smell at the home",
+    "Registration 2019-0451",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "stage 2 of your repipe",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Cracked cabinet floor",
+    "Cabinet floor, before",
+    "your new pipes are in",
+    "1-year labor warranty",
+    "Shutoff valve · $165",
+    "The $160 valve quote",
+    "Both rentals' visits",
+    "Drain clearing plans",
+    "leehomeservices.com",
+    "also does color and",
+    "the $160 valve work",
+    "No. No huele a gas.",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services'",
+    "the shutoff valves",
+    "Thu Oct 22, 9:10am",
+    "Lee Home Services",
+    "camera inspection",
+    "barber, color and",
+    "the kitchen drain",
+    "Supply line · $80",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "BOOK Tessa drain",
+    "Service call fee",
+    "service call fee",
+    "Drain clearings",
+    "Book the repair",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "today's repair",
+    "Kitchen drain",
+    "$2,400 repipe",
+    "cut your hair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "Service call",
+    "service call",
+    "Water heater",
+    "water heater",
+    "at the chair",
+    "shop's chair",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Yard drain",
+    "yard drain",
+    "88 Elm St",
+    "visit fee",
+    "42 Oak St",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "Rental 1",
+    "Rental 2",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "Labor",
+    "repipe"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-24": "0a292df05b",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A7-02": "987e1a14cd",
+   "A8-67": "e9fd748fc5",
+   "A10-45": "855be6050a",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S1-61": "7421d186d5",
+   "S1-43": "e16d5048f3",
+   "S2-22": "6fe11c094c",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "A10-02": "c9223be948",
+   "A8-03": "7accda6f86",
+   "A8-04": "8caf7636f3",
+   "A8-10": "6409a62763",
+   "A8-43": "7b0f73c701",
+   "A8-50": "0f26abfc87",
+   "A8-54": "bc2f9467fd",
+   "A9-03": "219c966588"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "B4-14": "bea6443957",
+   "B4-15": "f13240b9c6",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "B8-49": "4fcfdeb80b",
+   "B8-92": "ccc2dc877b",
+   "B8-93": "c1406fd6bc",
+   "B8-37": "3ce85cf051",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B9-05": "6cbce323ed",
+   "B9-06": "f091432f2d",
+   "B9-07": "310f930c3b",
+   "B9-26": "d356566ab1",
+   "B9-09": "832947585f",
+   "B9-10": "4ec0979e1a",
+   "B9-11": "9525d5f9c9",
+   "B9-14": "63b87042d1",
+   "B9-15": "35e619ed4f",
+   "B9-08": "40919b5ca4",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B10-08": "01bac94fd8",
+   "B10-10": "30b382ad47",
+   "B10-04": "b25044fa47",
+   "B10-09": "b0bde2b7fe",
+   "B10-12": "ded576c8bc",
+   "B10-13": "584c827fda",
+   "B10-14": "b0840c40ca",
+   "B4-34": "74ff52d83d",
+   "B8-78": "628ca6843e",
+   "B8-22": "50d78f1af0",
+   "B6-13": "ed1f412f7d",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S1-61": "e30e71f65d",
+   "S1-43": "dd3ae2a1a9",
+   "S2-22": "6fe11c094c",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "B7-01": "f7a5523875",
+   "B4-05": "fb3a9061c8",
+   "B4-07": "9d0dbc90ad",
+   "B4-44": "514c8ab30c",
+   "B5-21": "925b7342ed",
+   "B8-18": "530038d2b8",
+   "B8-23": "dd780a2ec8",
+   "B8-52": "6f008512da",
+   "B8-10": "5c9d4b937f",
+   "B7-18": "d53cef58f7"
+  }
+ }
+}

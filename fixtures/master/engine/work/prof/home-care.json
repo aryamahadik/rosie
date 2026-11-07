@@ -1,0 +1,2728 @@
+{
+ "id": "home-care",
+ "name": "Home care aide",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "cleaner",
+ "plugin": {
+  "pf.license": {
+   "need": "Where the state licenses home care agencies, the agency needs that license before it can be booked. Some states license only hands-on personal care, some license companion care too, and some license none.",
+   "ask": "The agency's home care license number, where the state's form asks for one. Elsewhere, the business registration.",
+   "who_holds": "The agency holds the license. Caregivers hold their own aide certificate or registry listing only where the state's form says so.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "Where the state's form requires a home care license, home care goes live once it's set up.",
+   "insurance_bond": "Liability insurance and a bond are shown as given by the business, not checked by Rosie.",
+   "background_checks": "Caregiver background checks (fingerprint and abuse-registry checks) where the state's form requires them: the agency uploads proof for each person. Otherwise they show as the agency's own word.",
+   "care_planning_office": "A care planning office needs no license of its own where Sam works. A care manager who is a nurse or social worker keeps their own license, shown as given where the state's form asks.",
+   "not_this_work": "Nursing, wound care, shots, giving medicines and therapy are home health, licensed apart and usually ordered by a doctor. They aren't home care."
+  },
+  "pf.services": {
+   "pattern": "Set service: care visits at the client's home on set days, the same caregiver each time where possible, after a free home visit and a care plan.",
+   "list": [
+    {
+     "name": "Free home visit (assessment)",
+     "price_kind": "free",
+     "length": "60 to 90 minutes, with the care manager",
+     "where": "at the client's home; family can join by phone",
+     "money": "nothing taken; it's the first step before any care"
+    },
+    {
+     "name": "Home care visit",
+     "price_kind": "per hour, with a 3-hour minimum a visit",
+     "example": "$30 an hour (the example agency's own price): the first visit, 4 hours, is $120",
+     "what": "personal care (bathing, dressing, toileting help), meals, laundry, tidying, company, walks, medicine reminders",
+     "where": "at the client's home",
+     "money": "card saved at booking; each visit charged at DONE for the hours worked"
+    },
+    {
+     "name": "Care plan visits",
+     "price_kind": "per visit, from the care plan",
+     "example": "every Tue and Thu, 9am to 1pm, $120 a visit, with the same caregiver",
+     "where": "at the client's home",
+     "money": "card saved; each visit charged at its own DONE, or one bill each Friday for the week"
+    },
+    {
+     "name": "Rides and errands",
+     "price_kind": "per hour, plus mileage",
+     "example": "$30 an hour plus 70 cents a mile, in the caregiver's insured car",
+     "where": "from the client's home",
+     "money": "added to the visit's charge"
+    },
+    {
+     "name": "Overnight care (awake)",
+     "price_kind": "per hour",
+     "example": "$32 an hour, a 10-hour shift",
+     "where": "at the client's home"
+    },
+    {
+     "name": "Live-in care",
+     "price_kind": "priced after a call with the care manager, by the day",
+     "example": "two days at $320 a day: $640 (Sam OKs any price over $500)",
+     "where": "at the client's home, as a stay with a start and an end",
+     "money": "card saved; charged at DONE"
+    },
+    {
+     "name": "Holidays",
+     "price_kind": "1.5 times the hourly rate"
+    },
+    {
+     "name": "Late-cancel fee",
+     "price_kind": "one price",
+     "example": "the 3-hour minimum, $90, only if Sam confirms it",
+     "where": "not booked alone"
+    },
+    {
+     "name": "Care consultation at the care planning office",
+     "price_kind": "one price",
+     "example": "$35 for an hour with a care manager, at the office or by video; $75 at the client's home (the example office's own prices)",
+     "money": "nothing taken; paid at the front desk. Where the office sets a $20 missed-meeting fee (the example), a card is saved for it. With nobody at the front desk, like Nina's Saturday mornings, Rosie texts the bill. At the client's home: a card saved, and the bill texted after",
+     "free_note": "Many agencies make the first consultation free. $35 is only this example office's price, never a rule."
+    },
+    {
+     "name": "Family meeting at the office",
+     "price_kind": "one price",
+     "example": "$55, up to 4 family members, 1 hour, paid in full when booking"
+    },
+    {
+     "name": "Other care planning office services",
+     "price_kind": "one price, from the office's list",
+     "example": "a follow-up meeting $40, a phone check-in $20, a care planning session $140 (2½ hours): the example office's own prices",
+     "money": "a card saved for the $20 missed-meeting fee; paid at the front desk"
+    },
+    {
+     "name": "Written care plan",
+     "price_kind": "priced for each family after the consultation, and the owner OKs it",
+     "example": "$90 for the example office",
+     "money": "a card saved for the $20 fee; paid at the front desk"
+    }
+   ],
+   "capacity": "One caregiver per visit. One client per booking; a couple at one address gets one care plan.",
+   "nobody_home": "No. The client is always there; a care visit never happens in an empty home.",
+   "online": "The care consultation can be by video. Care itself is always in person.",
+   "not_offered": "Medical tasks: nursing, wound care, shots, giving medicines, therapy. Medicaid-paid visits, which start with the state's approval and its own visit check-in system: handed to the agency's own line, not booked by Rosie."
+  },
+  "pf.questions": {
+   "before_times": [
+    "Who gets the care, and how the booker is related",
+    "Who decides for them: themselves, a power of attorney, or a guardian",
+    "Have they agreed to try care?",
+    "What help: from the agency's own task list (bathing, meals, home help, rides, company)",
+    "Who pays: private, long-term care insurance, the VA, or Medicaid (Medicaid goes to the agency's own line)",
+    "Days and times, and how many hours a visit"
+   ],
+   "after_a_time": [
+    "Will someone be with them at the free home visit?",
+    "Pets, and parking",
+    "Will the booker meet the caregiver at the first visit?"
+   ],
+   "secure_page_only": [
+    "The client's address and home phone",
+    "How the caregiver gets in: the door, a lockbox, and when the lockbox may be used",
+    "Health notes, seen only by the care manager and the caregiver",
+    "Emergency contacts, and who gets visit notes",
+    "Power of attorney or guardianship papers, if someone decides for the client",
+    "The card"
+   ],
+   "who_may_book": "An adult: the client, or a family member or friend who books for them. The client's own yes comes at the free home visit, unless a power of attorney or guardian decides for them, with the papers on the secure page."
+  },
+  "pf.safety": {
+   "words": [
+    "fallen and can't get up",
+    "hurt, bleeding, or not responding",
+    "trouble breathing, chest pain, signs of a stroke",
+    "words about suicide or self-harm",
+    "abuse or neglect"
+   ],
+   "what_happens": [
+    "Fallen, hurt, not responding or a medical emergency: 'Call 911 now', and no booking until they're safe.",
+    "Suicide or self-harm: 'Call or text 988 now; call 911 if anyone is in danger right now', and no booking in that chat.",
+    "Abuse or neglect: the 911 words for danger right now, and the state's adult protective services line; the owner is told.",
+    "A medical need (shots, wound care, giving medicines): not home care. The AI points to a home health agency, and the rest of the help can still be booked.",
+    "Found hurt at a visit: the caregiver calls 911 first, stays, doesn't move them, and gives no care beyond what the dispatcher asks. Then the owner tells the family."
+   ],
+   "booking_goes_on": "No, for an emergency, crisis words or danger right now. Yes, for the non-medical help, when a medical task is pointed elsewhere."
+  },
+  "pf.first_steps": {
+   "home_visit": "A free home visit with the care manager comes first (60 to 90 minutes, at least a day before care starts): the client's day, what they want help with, and fall risks like loose rugs or no grab bars. Family can join by phone.",
+   "care_plan": "The care plan is written at the home visit: tasks, days and times, and what's never included (medical tasks). The client gives their own yes to it there.",
+   "agreement": "A signed service agreement before any care: the hourly rate, the minimum, the cancel terms and the client's rights. The payer signs on the secure page; the client signs the care plan at the home visit.",
+   "estimate": "A written estimate of the weekly cost goes with the agreement, as the agency's own practice.",
+   "good_for": "A home visit and care plan stay good until the care plan's review date, or until the client's needs change.",
+   "prep_for_reminder": [
+    "Tell us about any change since the home visit: a fall, a hospital stay, new medicines",
+    "Leave the door or lockbox the way the care plan says",
+    "Have the week's groceries in, if meals are on the plan"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "The code at the door: the client, or the family member there, gives it, and the caregiver texts it in. A client with no mobile: the caregiver texts DONE instead, and the family member gets the visit texts.",
+   "hours": "Hours run from check-in to DONE. An hourly visit is charged for the hours worked, never under the 3-hour minimum.",
+   "same_caregiver": "The same caregiver each time, where possible. Nobody new comes without the client's OK.",
+   "nobody_answers": "Nobody answers the door: a safety check, not a no-show. The caregiver waits; the owner calls the client, then the family. The lockbox is used only if the care plan allows it. Still nobody: the owner calls 911 for a welfare check.",
+   "tasks": "The care plan's tasks are ticked on the caregiver's visit page, never in a text.",
+   "changes_at_visit": "Extra hours or a new task only with the payer's yes first. A medical need found at a visit: pointed to the client's doctor or home health.",
+   "proof_done": "The check-in code, the tasks ticked, and DONE with the hours. Visit notes go to whoever the client chose.",
+   "no_photos": "Never a photo of the client."
+  },
+  "pf.money": {
+   "start": "A card saved at booking, never charged up front. Each visit is charged at DONE for the hours worked, or the agency texts one bill a week.",
+   "deposits": "None by default. Where an agency takes a retainer, only within the state's caps, from the state form.",
+   "fees": "Late cancel (inside 24 hours) or nobody home after a safety check: up to the 3-hour minimum ($90 in the example), only when the owner confirms it. Never for a cancel the agency caused, a hospital stay, or a client paid for by a public program.",
+   "third_party": "Long-term care insurance: the agency gives the paperwork and the family claims, or the agency bills the insurer its own way. The VA and Medicaid start with their own approval: handed to the agency's own line, not booked by Rosie.",
+   "plans": "Plan visits are charged one by one at DONE, or on one bill each Friday. Rosfield's $2 counts once a month for a plan.",
+   "tips": "No tip line. Most agencies don't let caregivers take tips or gifts.",
+   "tax": "A sales tax line only where the state taxes home care, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking: non-medical home care isn't a health practice."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Health notes, medicines, diagnoses, what care the client gets (bathing, toileting)",
+    "Lockbox and door codes",
+    "Why a visit changed: a caregiver's or the client's private reasons"
+   ],
+   "texts_carry": "The agency, the caregiver's first name, the day and time, and a secure link. Owner and staff texts use the client's initials (F.M.).",
+   "client_texts": "The client gets texts only if they agreed to them. Otherwise the family member who booked gets them.",
+   "photos": "Never a photo of the client.",
+   "languages": "English and Spanish. A caregiver's languages show on the booking.",
+   "minors": "Nobody under 18 books. A care visit is never left with a child in charge of the client."
+  },
+  "pf.staff": {
+   "skills": [
+    "Personal care: bathing, dressing, toileting help",
+    "Companion care and home help",
+    "Rides, in an insured car with a checked driver's license",
+    "Overnight and live-in care",
+    "Dementia care, where trained"
+   ],
+   "licenses": "Each caregiver's aide certificate or registry listing, only where the state's form requires one. Background and abuse-registry checks where the state requires them.",
+   "same_caregiver": "The client's own caregiver by default. A stand-in only with the client's OK; no answer means no stand-in, the visit is off, and nothing is charged.",
+   "care_manager": "The owner, or a care manager, does the free home visit and writes the care plan.",
+   "who_oks": "The owner OKs prices over the limit and every fee. The office manager may OK prices too; the owner's answer wins."
+  },
+  "pf.rules": {
+   "agreement": "A written service agreement and care plan before care starts, where the state's rules require them, and as the agency's own rule everywhere.",
+   "right_to_cancel": "An agreement signed at the client's home comes with a written notice of the right to cancel, as the rules for sales at the home require, or the state's longer period.",
+   "plans": [
+    "The plan's terms show before any card: the days, the hours, the price a visit, when it's charged, and how to end it.",
+    "The plan gets its own yes from the payer, apart from the agreement, and the terms are texted back.",
+    "One reply skips, pauses or ends it. A hospital stay pauses it with no charge.",
+    "A price change is told 30 days ahead, or more where the state's rules ask."
+   ],
+   "client_rights": "The client's rights notice, where the state's rules require it, shows with the agreement.",
+   "records": "7 years, or longer where the state's rules ask: the care plan, the visits and their hours, the tasks done."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "Nobody answers the door: a safety check, never a no-show first.",
+    "The client says no at the home visit: no care is booked and nothing is charged.",
+    "The caregiver can't come: a stand-in only with the client's OK; no answer, the visit is off with no charge.",
+    "The client falls or is hurt at a visit: 911 first, then the owner, then the family.",
+    "A hospital stay: the plan pauses with no charge, and one reply restarts it.",
+    "The client decides, not the booker: the client can cancel, turn down a stand-in or stop texts.",
+    "A medical task asked for: pointed to home health; the rest of the help goes on.",
+    "Weather: the owner keeps or moves a visit, and a move the agency makes is free.",
+    "Several open bookings (a plan's next visits): which one is asked first."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "plans",
+   "firststeps",
+   "documents",
+   "monthlybill",
+   "extrawork",
+   "video",
+   "incare",
+   "multiday"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Nina and Leah (care managers)",
+   "cust": "Alex M. (customer, planning care for a father) · other customers",
+   "other": "Others (Frank, Alex's father; a sister who pays; a bank)"
+  },
+  "B": {
+   "staff": "Gloria and Tasha (caregivers)",
+   "cust": "Alex M. (customer, books for a father) · other customers",
+   "other": "Others (Frank, Alex's father and the client; a long-term care insurer; a bank)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nina"
+  },
+  "B": {
+   "staff": "Gloria"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's sister. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Nina can meet for the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter meeting."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Nina goes over the meeting notes with Alex. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Means 'Matched': the request fits a listed service, in any words. 'Help planning care for Dad' fits a care consultation."
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say the customer's parent falls before the meeting, and they ask if they can still come in."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee Care Planning about your Sat 11:00am visit: please bring your questions."
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring your questions on Saturday."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the office keep photos of the home's fall risks? Yes / No"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My sister pays for this meeting."
+   ],
+   [
+    "A chair, ready",
+    "A meeting room, ready"
+   ],
+   [
+    "Style consult",
+    "Phone check-in"
+   ],
+   [
+    "Color and cut · $90",
+    "Written care plan · $90"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a care consultation is $35. Want a time?"
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at the start of a video call."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Gloria and Tasha do home care; Gloria does live-in care too. Nina and Leah are care managers at the office; Nina also meets families at home. Pat is my office manager, for prices over $500. Jules works for themself, with their own clients."
+   ],
+   [
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. Lee Care Planning meets adults only, so nothing more happens."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Home care is never sent now, so nobody is on call."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Alex asks for a nurse to give shots, which isn't on the office's list. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter.",
+    "Now money. When customers book, do you take anything? Each service starts the way most care planning offices set it. Send only what's different, by letter."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Care Planning can book you from now on, at the office and at clients' homes. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "Some services start with a first step on the same visit, like a patch test with a wait, or a screening. It comes before the price and the work.",
+    "Some services start with a first step on the same visit, like a short check of what the family needs. It comes before the price and the work."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Alex wants it at the client's home: a home visit, $75, with a card saved and the bill after. From here it's the other flow, where the business goes to the customer."
+   ],
+   [
+    "The plug-in says a color and cut is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says a written care plan is priced for each family, so Rosie's first text asks for the family's answers. No time is saved while it's priced."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some work takes several visits, like a written care plan done in two meetings. Where the plug-in says so, all the times are picked now."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "The family meeting, $55, is paid in full when booked. Nothing more is owed after."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A home care example: 'Care starts with a free home visit first. Had one with us this year?'"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds caregiver classes to Lee Care Planning. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Home care for older adults in Springfield: help at home, by the hour, within 25 miles."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms. Nothing was saved. Other businesses nearby may.",
+    "Lee Care Planning doesn't give nursing care. Nothing was saved. A home health agency may."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A care planning office on Cedar Rd. Care managers help families plan care for a parent."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Written care plan prices come to you first. List prices never need one"
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: family to compare 2 agencies; send the care plan summary"
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Home visits: allowed where you are, for those cleared"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Caregiver classes for Lee Care Planning: is it the same company?"
+   ],
+   [
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "A.M. says the office door tore a coat sleeve today."
+   ],
+   [
+    "Goes on as a house call, in the other flow.",
+    "Goes on as a home visit, in the other flow."
+   ],
+   [
+    "Goes on as a house call in the other flow.",
+    "Goes on as a home visit in the other flow."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, and meetings at clients' homes"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nina: care manager, office and home meetings"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Nina: care manager, office and home meetings"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the office, and at clients' homes"
+   ],
+   [
+    "Goes on as a house call",
+    "Goes on as a home visit"
+   ],
+   [
+    "A water heater job",
+    "A caregiver at a client's home"
+   ],
+   [
+    "Color and cut",
+    "Written care plan"
+   ],
+   [
+    "NEW massage",
+    "NEW caregiver classes"
+   ],
+   [
+    "Kids cut",
+    "Follow-up meeting"
+   ],
+   [
+    "From the price list or photos, the price is set.",
+    "From the price list, or made for the family, the price is set."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work is licensed to its own office."
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "next job:",
+    "next visit:"
+   ],
+   [
+    "An AI that asks for the shop by name hears only that: no reason, and no other shops.",
+    "An AI that asks for the office by name hears only that: no reason, and no other businesses."
+   ],
+   [
+    "1 color quote",
+    "1 care plan price"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 care plan price."
+   ],
+   [
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "Rosie is the office's booking software. Its only outside links are the care managers' phone calendars and Stripe."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "My dad is 84 and lives alone. Book me a care consultation at Lee Care Planning on Saturday, to plan help at home."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una consulta el sábado sobre el cuidado de mi mamá."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a consultation on Saturday about care for my mom."
+   ],
+   [
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "BOOK Alex M. consultation Sat 11am Nina"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The home care plug-in adds its own danger words, like a fall with no way up."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A home care example: a parent who fell today gets 'is anyone hurt?' first."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Then the booking goes on."
+   ],
+   [
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "Sam set this line at sign-up: the number families call for what only a care manager should answer."
+   ],
+   [
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "That's a question for your dad's doctor. Nina can go over care choices at your meeting."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants Saturday morning, with Nina"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a care consultation or a family meeting"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A care consultation could mean home care or a doctor's office."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a review every 3 months"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for a care plan review every 3 months. The office offers a plan, so Rosie books the first meeting and saves the next ones on the same day and time."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a consultation and a check-in"
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a phone check-in a week later. Rosie finds both times with one care manager, and adds the prices: $35 and $20."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A consultation for Alex and a check-in for a sister work the same way. Both are asked before the times."
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the office's list"
+   ],
+   [
+    "on the shop's board",
+    "on the office's price list"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A care planning office books a care manager's time."
+   ],
+   [
+    "Anything Riley should know?",
+    "Anything Nina should know?"
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "My dad will come too. Can I pay for it?"
+   ],
+   [
+    "A barbershop has none.",
+    "A care consultation has none."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Care plan review · every 3 months"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A written care plan always stays with Nina."
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code at the front desk when you arrive."
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at the front desk."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my dad's dog come with us to the meeting?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My dad fell again this morning. Should I still come Saturday?"
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Nina suggests moving the meeting until your dad is settled, with no fee."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Nina can meet for the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can I add a phone check-in for next week?"
+   ],
+   [
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "Nina has time for it. Add a phone check-in to your Saturday booking?"
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H. has a care plan review with Nina, every 3 months."
+   ],
+   [
+    "the Groom's package",
+    "the care planning session"
+   ],
+   [
+    "Groom's package",
+    "Care planning session"
+   ],
+   [
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "Back to Alex: it's Saturday, and Alex arrives at the office. If the plug-in asks for something to bring, the desk checks it first. A consultation needs nothing."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair.",
+    "It's 11:00am, and Alex is at the front desk."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens at the meeting?"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A phone check-in is on the price list: $20."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Your office door caught my coat and tore the sleeve."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like who decides for the client."
+   ],
+   [
+    "Alex pays at the chair",
+    "Alex pays at the front desk"
+   ],
+   [
+    "DONE 35 haircut",
+    "DONE 35 consultation"
+   ],
+   [
+    "My company is paying for this one.",
+    "My sister is paying for this one."
+   ],
+   [
+    "A long job or a course can be paid in stages the plug-in sets.",
+    "A long project or a course can be paid in stages the plug-in sets."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A consultation is rated, so the office takes the first branch."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next visit at the desk"
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a meeting leads to more work, like Nina's written care plan after a consultation."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Care Planning sent you a proposal: Nina's written care plan for Frank."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Written care plan"
+   ],
+   [
+    "3 visits with Riley",
+    "2 meetings with Nina"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The plan's meetings are booked like any booking, each with its own money choices and confirmation."
+   ],
+   [
+    "Color correction",
+    "Written care plan"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Can you help plan care for my mother too?"
+   ],
+   [
+    "Priced from your photos",
+    "Priced for your family"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Care's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Care"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Care Planning LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Care Planning"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Home Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Live-In Care"
+   ],
+   [
+    "plumbing and electrical",
+    "home care and live-in care"
+   ],
+   [
+    "1200 Main St",
+    "310 Grove Ave"
+   ],
+   [
+    "88 Elm St",
+    "75 Cedar Rd"
+   ],
+   [
+    "on Elm St",
+    "on Cedar Rd"
+   ],
+   [
+    "$89",
+    "$90"
+   ],
+   [
+    "Drain clearing",
+    "Home care visit"
+   ],
+   [
+    "Plumbing",
+    "Home care"
+   ],
+   [
+    "plumbing",
+    "home care"
+   ],
+   [
+    "Electrical",
+    "Live-in care"
+   ],
+   [
+    "electrical",
+    "live-in care"
+   ],
+   [
+    "Barbershop",
+    "Care planning"
+   ],
+   [
+    "barbershop",
+    "care planning office"
+   ],
+   [
+    "Barbering",
+    "Care planning"
+   ],
+   [
+    "Plumber",
+    "Caregiver"
+   ],
+   [
+    "plumber",
+    "caregiver"
+   ],
+   [
+    "barbers",
+    "care managers"
+   ],
+   [
+    "Barber",
+    "Care manager"
+   ],
+   [
+    "barber",
+    "care manager"
+   ],
+   [
+    "Haircuts",
+    "Care consultations"
+   ],
+   [
+    "haircuts",
+    "care consultations"
+   ],
+   [
+    "Haircut",
+    "Care consultation"
+   ],
+   [
+    "haircut",
+    "care consultation"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "the chair",
+    "the front desk"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Family meeting"
+   ],
+   [
+    "Signature cut and shave",
+    "Family meeting"
+   ],
+   [
+    "Skin fade",
+    "Follow-up meeting"
+   ],
+   [
+    "skin fade",
+    "follow-up meeting"
+   ],
+   [
+    "Beard trim",
+    "Phone check-in"
+   ],
+   [
+    "beard trim",
+    "phone check-in"
+   ],
+   [
+    "the price board",
+    "the price list"
+   ],
+   [
+    "Jordan",
+    "Gloria"
+   ],
+   [
+    "Casey",
+    "Tasha"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Leah"
+   ]
+  ],
+  "B": [
+   [
+    "Me, and yes. It's my kitchen.",
+    "My dad, Frank. Yes, we're both adults."
+   ],
+   [
+    "Water pressure check",
+    "Free home visit"
+   ],
+   [
+    "A chair, ready",
+    "A meeting room, ready"
+   ],
+   [
+    "The drop-off and pick-up times come with the dates. The confirmation and the reminder show both days.",
+    "The start and end times come with the dates. The confirmation and the reminder show both days."
+   ],
+   [
+    "Thu Oct 22 to Sat Oct 24 · drop-off 8–10am · Jordan",
+    "Thu Oct 22, 8am to Sat Oct 24, 8am · Gloria"
+   ],
+   [
+    "Fri Oct 23 to Sun Oct 25 · drop-off 8–10am · Casey",
+    "Fri Oct 23, 8am to Sun Oct 25, 8am · Tasha"
+   ],
+   [
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Gloria asks in person and opens Alex's page on Gloria's own phone. Alex taps there, never Gloria."
+   ],
+   [
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Gloria texts OMW before driving. The person at the door gets the pro's name and photo, the arrival time and the code to give."
+   ],
+   [
+    "Unsure who's at the door? Call the business line: it says only the pro's first name, and whether his code was entered.",
+    "Unsure who's at the door? Call the business line: it says only the pro's first name, and whether the pro's code was entered."
+   ],
+   [
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there. The receipt goes to Alex their way.",
+    "Gloria opens Alex's pay page on Gloria's own phone, and Alex pays there. The receipt goes to Alex their way."
+   ],
+   [
+    "A job sent now: the pro is told at once, before he sets out.",
+    "A job sent now: the pro is told at once, before setting out."
+   ],
+   [
+    "Water heater replacement · $640",
+    "Live-in care · $640"
+   ],
+   [
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos. Open times come next.",
+    "Lee Home Care: Gloria priced your dad's live-in stay at {{price:$90}}, after your call. Open times come next."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Gloria and Tasha do home care; Gloria does live-in care too. Nina and Leah are care managers at the office; Nina also meets families at home. Pat is my office manager, for prices over $500. Jules works for themself, with their own clients."
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like asking a caregiver to sign the client's checks. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note."
+   ],
+   [
+    "This is Rosie, the automated booking assistant for Lee Home Services. Add photos of your water heater, and a plumber will price the job. Need access, more time or a language? Tell us.",
+    "This is Rosie, the automated booking assistant for Lee Home Care. Add the care needs on the secure page. Lee Home Care will call to price the stay. Need access, more time or a language? Tell us."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "The request turns out to be for work Lee Home Care doesn't do, like nursing or wound care. Rosie says so plainly, before any name, number or time. The AI can look for another business."
+   ],
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: home care at $32 an hour for visits from Mon Nov 2. Visits already booked keep $30 an hour. Care plans go to $32 an hour from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for care every Tue and Thu, with the same caregiver. Lee Home Care offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush. Jordan texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder.",
+    "At DONE, Alex asks Gloria about extra visits next fall, when Alex travels. Gloria texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder."
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that Frank fell this morning but got up. Rosie runs the plug-in's danger check again, then asks the pro. Tasha can come sooner, so that's offered."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow. The plug-in says which services. Home care is never sent now, so nobody is on call."
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Say Morgan has a care plan: a visit every Tue and Thu for a mother. They can skip one visit, pause the plan or end it. Gloria is told."
+   ],
+   [
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted. Alex signs or declines it on the secure page.",
+    "Say Sam sends a proposal for more care after the first week, like a third visit each week. Alex signs or declines it on the secure page."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "You're all set: Lee Care Planning can book you from now on, at the office and at clients' homes. Your day list comes at 8:00am, the time you picked."
+   ],
+   [
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "One request waits for Lee Home Care. It's a home care visit, today, starts at 3:00pm, with Gloria. The visit minimum is $90. Accept it?"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Care asks: is the care at a home, a senior apartment or somewhere else? And what help is needed, and how many hours a visit?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Home Care has a care plan, $120 a visit. Each visit is booked and paid like a single one. Want it every Tue and Thu?"
+   ],
+   [
+    "Jordan priced a water heater replacement for A.M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you.",
+    "Gloria priced a live-in stay for A.M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you."
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Home Care books up to 60 days ahead. We'll text you times for the extra visits you asked Gloria about in late Aug 2027."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Gloria breaks a lamp while dusting and texts a photo. It's checked against the before notes, and Sam decides how to make it right."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "If your dad is hurt or can't get up, call 911 now. Tasha can come sooner, at the same price."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "The plug-in says live-in care is priced after a call. So Rosie's first text asks for the care needs on the secure page. No time is saved while it's priced."
+   ],
+   [
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a caregiver help Kim's mother at home this Thursday? What does it cost?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Gloria finds the shower's grab bar loose. The care plan says Gloria stops there, so Alex gets a written note."
+   ],
+   [
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Gloria. {{pay.cancel}}. Tell us about any change since the home visit, like a fall or a hospital stay."
+   ],
+   [
+    "Sorry, Lee Home Services couldn't price your water heater this time. Nothing was booked or charged. You can ask again.",
+    "Sorry, Lee Home Care couldn't price the live-in stay this time. Nothing was booked or charged. You can ask again."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Home care's price is set before the visit: $30 an hour. Only work priced at the visit would take the other branch."
+   ],
+   [
+    "Your water heater visit wasn't booked, since the document wasn't signed in time. Nothing was charged for this visit.",
+    "Your dad's care visit wasn't booked, since the service agreement wasn't signed in time. Nothing was charged for this visit."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules care planning offices often set. Your call: keep them, or change any. They become the office's own rules."
+   ],
+   [
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Means 'Matched': the request fits a listed service, in any words. 'Mom needs help bathing' fits a home care visit."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a ride to the doctor. Both go in one booking, with one visit and one code."
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "The plug-in's questions that don't change the time or price go here, like 'Any pets, and where should the caregiver park?'"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Sam adds senior move help to Lee Home Care. It brings its own plug-in, and only what's new is asked."
+   ],
+   [
+    "Reading it back: accept the leak repair for today, starts at 3:00pm, with Jordan. Say yes to go ahead.",
+    "Reading it back: accept the home care visit for today, starts at 3:00pm, with Gloria. Say yes to go ahead."
+   ],
+   [
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Your dad's service agreement is waiting for your signature. Your Thu time is saved until 7:45pm today."
+   ],
+   [
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Frank asks Gloria to stay one more hour. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Your water heater price is with Lee Home Services. We'll let you know by 12:00pm Tue either way.",
+    "Your live-in care price is with Lee Home Care. We'll let you know by 12:00pm Tue either way."
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most care planning offices start. Is it right? Send only what's different."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if Rosa's mother falls and can't get up."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what help is needed, how many hours a visit, and who decides for the client."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si su mamá se cae y no puede levantarse, llame al 911 y quédese con ella."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. A ride is $30 an hour plus 70 cents a mile. Both fit in the same visit."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 11:52am on Gloria's phone, you said yes to one more hour for $30."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, home care always needs a signed service agreement first: the rate, the minimum, the cancel terms and the client's rights."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes more than one day, like a live-in stay from Thursday to Saturday."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the live-in path, only Gloria's times show: Gloria is the one who does live-in stays."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Home care for older adults in Springfield: help at home, by the hour, within 25 miles."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My dad, 84, lives alone and needs help at home on Tue and Thu mornings. Can a caregiver start Thursday? It's in Springfield."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If your mom falls and can't get up, call 911 and stay with your mom."
+   ],
+   [
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Lee Home Care can start your dad's care at a set time. {{pay.asks}}:"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Gloria found the shower's grab bar loose, so there's no shower today. Please have it fixed before the next visit."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 live-in stay is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding a ride to an appointment? Say so.'"
+   ],
+   [
+    "A.M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "A.M. isn't happy with the Thu Oct 22 visit: \"Gloria seemed rushed today.\""
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A care planning office on Cedar Rd. Care managers help families plan care for a parent."
+   ],
+   [
+    "Price needed: A.M., water heater replacement. Price it before anyone says yes.",
+    "Price needed: A.M., live-in care. Price it before anyone says yes."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "Gloria broke a lamp at F.M.'s while dusting. The before notes show it was fine."
+   ],
+   [
+    "A.M. didn't sign the water heater contract in time, so nothing was booked.",
+    "A.M. didn't sign the service agreement in time, so nothing was booked."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Home Care sent you a proposal for more care, from Gloria's notes."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A home care example: a fall with no way up gets 'call 911, and don't move them'."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Home care $30 an hour ($32 from Nov 2) · Live-in care priced after a call"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mom needs help at home."
+   ],
+   [
+    "M.P. would like to talk about the water heater quote before booking.",
+    "M.P. would like to talk about the live-in care price before booking."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My dad has a wound that needs a new bandage every day. Can your caregiver do that?"
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Here it's every home care visit: care starts at a set time."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Senior move help for Lee Home Care: is it the same company?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about help at home for my mother, a few mornings a week. A text back is fine."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE groceries are low: remind Alex before Tuesday."
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: one more hour, $30. Sent to Alex."
+   ],
+   [
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Accepted: the home care visit today, starts at 3:00pm, with Gloria."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Home care visits already booked keep $30 an hour, even after Nov 2."
+   ],
+   [
+    "Send A.M. $600 for the water heater replacement, not $640?",
+    "Send A.M. $600 for the live-in stay, not $640?"
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Home care visits already booked keep only their saved card."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Gloria's next times for an extra visit."
+   ],
+   [
+    "A.M. asks: Can I run the dishwasher before you come?",
+    "A.M. asks: Should F.M. eat breakfast before you come?"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. Gloria leaves at 12pm, as booked."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My dad's lamp was broken after the visit."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Gloria also drive my dad to the doctor on Thursday?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi mamá necesita ayuda en casa."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 30 one more hour, help with the mail"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Gloria come every Tue and Thu, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Gloria come an extra day next week?"
+   ],
+   [
+    "NEXT A.M. asks: water heater flush, 12 months",
+    "NEXT A.M. asks: extra visits next fall"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido ahora? ¿Su mamá se cayó?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Dad fell this morning. Dad got up, but is shaky."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE loose rug in the hall"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Gloria also drive my dad to the doctor?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Should my dad eat breakfast before Gloria comes?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD shower grab bar loose, no shower today"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt right now? Did your mom fall?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Mom is in the hospital. Can I skip next Tuesday's visit?"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nina: care manager, office and home meetings"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my dad's home. Help with bathing, meals and the house, 4 hours."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more hour · $30"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: today's shower"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Gloria seemed rushed today."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Nina: care manager, office and home meetings"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Any pets, and where should the caregiver park?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the shower's grab bar is loose"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE broke a lamp while dusting"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A third visit each week"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa care Thu 12-2 Tasha"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. My mom is fine, sitting down."
+   ],
+   [
+    "A.M.: water heater replacement",
+    "A.M.: live-in care"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Care plan: every Tue and Thu"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Ride to the doctor · 1 hour · $30"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the office, and at clients' homes"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Shower grab bar loose"
+   ],
+   [
+    "Water heater replacement",
+    "Live-in care"
+   ],
+   [
+    "Sewer camera inspection",
+    "Rides and errands"
+   ],
+   [
+    "Priced from your photos",
+    "Priced after a call"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW senior move help"
+   ],
+   [
+    "Under the sink, before",
+    "Hall rug, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Bathroom, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken lamp"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Mi mamá está bien, sentada."
+   ],
+   [
+    "A.M. · water heater",
+    "A.M. · live-in care"
+   ],
+   [
+    "Yes, it won't drain",
+    "A cat. Park in the driveway."
+   ],
+   [
+    "A water heater job",
+    "A caregiver at a client's home"
+   ],
+   [
+    "Water heater flush",
+    "Care plan visits"
+   ],
+   [
+    "the shutoff valves",
+    "the extra hour"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 120 care 4 hours"
+   ],
+   [
+    "Leak repair",
+    "Overnight care"
+   ],
+   [
+    "Quoted from photos first",
+    "Priced after a call first"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some work is licensed to its own office."
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "next job:",
+    "next visit:"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the care needs"
+   ],
+   [
+    "Something of Alex's is damaged",
+    "Something of Frank's is damaged"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Gloria and Frank go over the visit"
+   ],
+   [
+    "The quote stays open 7 days",
+    "Only the booked hours today"
+   ],
+   [
+    "Drain clearing · $179",
+    "Home care visit · 4 hours · $120"
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote.",
+    "Morgan P. asked to talk about the $640 live-in price."
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise home care to 32 an hour"
+   ],
+   [
+    "Ask Sam about your jobs.",
+    "Ask Sam about your visits."
+   ],
+   [
+    "one address tried to book more jobs today than the plug-in allows",
+    "one address tried to book more visits today than the plug-in allows"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Care LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Care's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Care"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Care Planning"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomecare.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Home Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Live-In Care"
+   ],
+   [
+    "plumbing and electrical",
+    "home care and live-in care"
+   ],
+   [
+    "1200 Main St",
+    "310 Grove Ave"
+   ],
+   [
+    "42 Oak St",
+    "14 Hollis Ln"
+   ],
+   [
+    "88 Elm St",
+    "75 Cedar Rd"
+   ],
+   [
+    "on Elm St",
+    "on Cedar Rd"
+   ],
+   [
+    "Service call fee",
+    "Visit minimum"
+   ],
+   [
+    "service call fee",
+    "visit minimum"
+   ],
+   [
+    "Service call",
+    "Visit minimum"
+   ],
+   [
+    "service call",
+    "visit minimum"
+   ],
+   [
+    "an $89",
+    "a $90"
+   ],
+   [
+    "$89",
+    "$90"
+   ],
+   [
+    "$179",
+    "$120"
+   ],
+   [
+    "arriving 8–10am",
+    "8am to 12pm"
+   ],
+   [
+    "8–10am",
+    "8am–12pm"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home care visit"
+   ],
+   [
+    "Drain clearing",
+    "Home care visit"
+   ],
+   [
+    "drain clearing",
+    "home care visit"
+   ],
+   [
+    "Plumbing",
+    "Home care"
+   ],
+   [
+    "plumbing",
+    "home care"
+   ],
+   [
+    "Electrical",
+    "Live-in care"
+   ],
+   [
+    "electrical",
+    "live-in care"
+   ],
+   [
+    "Barbershop",
+    "Care planning"
+   ],
+   [
+    "barbershop",
+    "care planning office"
+   ],
+   [
+    "Plumber",
+    "Caregiver"
+   ],
+   [
+    "plumber",
+    "caregiver"
+   ],
+   [
+    "barbers",
+    "care managers"
+   ],
+   [
+    "Barber",
+    "Care manager"
+   ],
+   [
+    "barber",
+    "care manager"
+   ],
+   [
+    "Haircut",
+    "Care consultation"
+   ],
+   [
+    "haircut",
+    "care consultation"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "the chair",
+    "the front desk"
+   ],
+   [
+    "The shop's",
+    "The office's"
+   ],
+   [
+    "the shop's",
+    "the office's"
+   ],
+   [
+    "The shop",
+    "The office"
+   ],
+   [
+    "the shop",
+    "the office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "beard trim",
+    "phone check-in"
+   ],
+   [
+    "Jordan",
+    "Gloria"
+   ],
+   [
+    "Casey",
+    "Tasha"
+   ],
+   [
+    "Riley",
+    "Nina"
+   ],
+   [
+    "Avery",
+    "Leah"
+   ],
+   [
+    "Add photos",
+    "Add the care needs"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a care consultation at Lee Care Planning, Sam's second company, to plan help at home for an 84-year-old father. Nina, a care manager, meets Alex at the office on Sat Oct 24 at 11:00am, or by video. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Home Care for a father, Frank, who lives alone at 14 Hollis Ln. Sam's free home visit comes first. Then Gloria comes every Tue and Thu, starting Thu Oct 22 at 8am, for 4 hours. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|none|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 care consultation with Nina, Sat Oct 24 at 11:00am. Nothing is taken: a YES books it. Alex pays at the front desk after.",
+    "list|card|counter": "The same $35 consultation at an office that set a $20 missed-meeting fee. A card is saved for it, and nothing is taken.",
+    "list|none|bill": "A $35 consultation on a Saturday, when Nina works alone with no front desk. Rosie texts the bill when Nina texts DONE.",
+    "list|full|none": "A $55 family meeting at the office, up to 4 family members, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Care consultation"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Care consultation"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Family meeting"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|card|bill",
+    "list|none|own",
+    "photos|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: Frank's first care visit, Thu Oct 22, 8am to 12pm with Gloria: 4 hours at $30, $120. A card is saved, and it's charged when Gloria texts DONE. Then every Tue and Thu.",
+    "list|card|bill": "The same care, billed by the week: a card is saved for the late-cancel fee, and Rosie texts one bill each Friday for the week's visits.",
+    "list|none|own": "Care paid by a long-term care insurer that Lee Home Care bills itself. Nothing is taken at booking, and Rosie sends nothing about money.",
+    "photos|card|card": "Live-in care for two days, Thu to Sat, priced by Sam after a call: 2 days at $320, $640. Over $500, so Sam OKs it. A card is saved and charged when Gloria texts DONE."
+   },
+   "labels": {
+    "price": {
+     "photos": "Priced after a call first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$90",
+     "name": "Home care visit"
+    },
+    "list|*|*": {
+     "price": "$120",
+     "name": "Home care visit"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Live-in care"
+    }
+   }
+  }
+ },
+ "keep": [
+  "visit fee",
+  "Visit fee",
+  "leak"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Non-medical home care and care planning aren't health practices, so both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The home care plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Caregivers and care managers are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: care visits and consultations."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Home care is never sent now: every visit is planned, after a free home visit."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A consultation books a care manager's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A consultation books a care manager's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A consultation books a care manager's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "Lee Care Planning plans care for adults only; a child's care isn't booked here."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A care consultation needs no form signed first."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A consultation has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A consultation needs nothing brought. Papers like a medicine list help, but the meeting goes on without them."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with Lee Care Planning."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "A family meeting is one booking, by video or at the office."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No insurance pays for a care consultation here."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "Lee Care Planning sells no packages."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "Lee Care Planning sells no packages."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A consultation needs no written contract."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "A consultation is a talk: a health worry goes to 'Someone is hurt or feels sick'."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for a care consultation here."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "A consultation has nothing to fix. A question about the notes goes to Nina."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left with Lee Care Planning."
+   },
+   {
+    "op": "more",
+    "at": "S1-60",
+    "more": [
+     "Home care is licensed where the state licenses home care agencies, so Sam's agency takes the license step.",
+     "Care planning needs no license of its own, so the office gives its registration only (S1-61)."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-28",
+    "more": [
+     "Where the state keeps a list of certified aides, each caregiver's certificate is shown as given. Nina's and Leah's nurse licenses are too."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "A care plan review is paid at the front desk after each visit, never charged to a saved card ahead.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Lee Care Planning meets adults only; nobody is left in its care."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Sensitive work: no rating is asked (the switch sensitive)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Non-medical home care and care planning aren't health practices, so both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The home care plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Caregivers and care managers are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: care visits and consultations."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Home care is never sent now: every visit is planned, after a free home visit."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Lee Home Care's care happens only at the client's home. The consultation at the office is Lee Care Planning's."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Care itself is always in person."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "A couple at one address gets one care plan, booked as one."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Care visits start at a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Care books a caregiver's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "The service agreement is the signed paper (B4-57); the rest are private questions on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Home care is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Home care is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "Alex runs late",
+    "why": "The client is home for every visit, so the visit starts on time even if Alex is late."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Home care is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Home care is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "label": "Missing, but it can go on",
+    "why": "Home care asks the family to have nothing ready: the caregiver brings gloves and supplies."
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "label": "Something required is missing",
+    "why": "Home care asks the family to have nothing ready: the caregiver brings gloves and supplies."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Only a child answers",
+    "why": "The client, an adult, is home for every visit."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "The client is always home for a care visit."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "The client is always home for a care visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Care is paid visit by visit or by the week, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Visit notes are ready at DONE."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A missed task is made up at the next visit, with Sam's OK: it's a complaint, never a warranty."
+   },
+   {
+    "op": "more",
+    "at": "S1-60",
+    "more": [
+     "Home care is licensed where the state licenses home care agencies, so Sam's agency takes the license step.",
+     "Care planning needs no license of its own, so the office gives its registration only (S1-61)."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-28",
+    "more": [
+     "Where the state keeps a list of certified aides, each caregiver's certificate is shown as given. Nina's and Leah's nurse licenses are too."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "B7-55",
+    "steps": [
+     {
+      "id": "B7-x01",
+      "type": "split",
+      "line": [
+       "4.14",
+       "8.7"
+      ],
+      "who": "owner",
+      "to": "other",
+      "via": "visit",
+      "t": "Tue Oct 20, 2:00pm",
+      "title": "Sam's free home visit with Frank",
+      "q": "Does Frank say yes to the care plan?",
+      "does": "Sam meets Frank at home for about 75 minutes, with Alex on the phone. They walk through Frank's day, and Sam checks the home for fall risks.",
+      "more": [
+       "It's free, and it's the plug-in's first step before any care.",
+       "Sam writes the care plan with Frank: the tasks, the days and times, and what's never included, like medical tasks.",
+       "Frank gives Frank's own yes. Alex can't give it for Frank, unless a power of attorney or guardian decides.",
+       "Frank signs the care plan on the secure page. Alex signed the service agreement as the payer at booking.",
+       "Fall risks, like loose rugs or no grab bars, go in the care plan for the family to fix.",
+       "No check-in code: Sam meets Frank and texts HOME VISIT DONE."
+      ],
+      "say": [
+       [
+        "owner",
+        "san",
+        "HOME VISIT DONE F.M. Care plan added. Says yes"
+       ],
+       [
+        "san",
+        "cust",
+        "Sam's home visit with your dad is done, and your dad said yes to the care plan.",
+        {
+         "card": {
+          "title": "Care plan",
+          "lines": [
+           "First visit: Thu Oct 22 · Gloria",
+           "The tasks are on the page, never in texts"
+          ],
+          "button": "See the care plan",
+          "link": "rosfield.com/c/r4p"
+         }
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "F.M.'s care plan is ready for Thursday. Read it before you go.",
+        {
+         "card": {
+          "title": "F.M. · care plan",
+          "lines": [
+           "Tasks, health notes and the lockbox rule"
+          ],
+          "button": "Open it",
+          "link": "rosfield.com/s/r4"
+         },
+         "as": "Gloria"
+        }
+       ]
+      ],
+      "rule": "Rosie's rule: the person who gets the care decides. Their own yes starts it, and their no stops it, whoever booked. Why: the booker may not be the person who gets the care.",
+      "needs": [
+       "booked",
+       "pf.first_steps"
+      ],
+      "gives": [],
+      "tells": [
+       "cust",
+       "staff"
+      ],
+      "branches": [
+       {
+        "label": "1 Frank says yes",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Not yet",
+        "end": "end",
+        "endText": "Frank says no for now. The care is cancelled with no fee, and Alex and Gloria are told.",
+        "steps": [
+         {
+          "id": "B7-x02",
+          "line": [
+           "4.14",
+           "7.3"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Tue Oct 20, 3:30pm",
+          "title": "No care for now; nothing is charged",
+          "does": "Frank says no to care for now, with Alex on the phone. Frank's word stands, so Sam cancels the plan and the first visit with no fee.",
+          "more": [
+           "Sam offers a second talk or a short trial later, only if Frank wants one.",
+           "No visit happened, so Rosfield's $2 doesn't count.",
+           "Nothing was charged, and the saved card is never used."
+          ],
+          "say": [
+           [
+            "owner",
+            "san",
+            "HOME VISIT DONE F.M. Says not yet. Cancel the plan"
+           ],
+           [
+            "san",
+            "cust",
+            "Lee Home Care: no care is booked for your dad for now, and nothing was charged. Sam will check in with you both next week."
+           ],
+           [
+            "san",
+            "staff",
+            "Thursday's visit with F.M. is off. Nothing to do.",
+            {
+             "as": "Gloria"
+            }
+           ]
+          ],
+          "needs": [],
+          "gives": [],
+          "tells": [
+           "cust",
+           "staff"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "3 Needs medical care too",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B7-x03",
+          "line": [
+           "4.26",
+           "13.4"
+          ],
+          "who": "owner",
+          "to": "cust",
+          "via": "call",
+          "title": "Points to home health for the rest",
+          "does": "Frank also needs insulin shots, which a caregiver can't give. Sam suggests Alex ask Frank's doctor about home health. Gloria still helps with everything else.",
+          "more": [
+           "Rosie gives no medical advice. The care plan lists what's never included.",
+           "Gloria can remind Frank to take Frank's own pills. Gloria never gives medicines."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Sam left you a note from the home visit on the secure page. Some of your dad's needs are a nurse's work: ask your dad's doctor about home health. Gloria still starts Thursday."
+           ]
+          ],
+          "needs": [],
+          "gives": [],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Sensitive work: no rating is asked (the switch sensitive)."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "No contract needed",
+    "why": "Home care always has a signed service agreement before any care: the rate, the minimum, the cancel terms and the client's rights."
+   }
+  ]
+ },
+ "notes": "REFIT Oct 27 (REDESIGN 2, agent R03): facts plans, firststeps, documents, monthlybill, extrawork, video, incare, multiday; switches sensitive (initials, no service name, no rating) and welfare in flow B (nobody answering = a safety check first, replacing own branch B8-x01); settings set start, cutoff 24 hours before. Money amounts per path with names (A: $35 consultation, $55 family meeting paid in full, $20 fee; B: $120 visit, $640 live-in, $90 fee). Every legacy words op deleted (the record and the homes word money, contact, safety and privacy now); the story is carried by sentence rename pairs. Kept: valid off ops, the license notes at S1-60 / S2-28, own first step B7-x01 (the free home visit). Times now follow the master set start: Thu Oct 22, 8am to 12pm. The notes below are the pre-refit history.\nFrom: cleaner (the current, reviewed pilot). Why: home care runs like house cleaning's plans: visits at the client's home on set days, the same worker each time, a stand-in only with an OK, a card saved and charged after each visit, and a plan with its own yes. What the cleaner lacks is added from the dentist's ideas and the old flowchart: a first step before any care (Sam's free home visit, own split B7-x01), private health details only on the secure page, a signed service agreement (B4-57), the person served deciding, and a safety check when nobody answers (own branch B8-x01).\nFlow B is the usual side: Lee Home Care LLC (home care, plus live-in care as its second kind of work). Alex M. books for a father, Frank, 84, who lives alone at 14 Hollis Ln. Sam's free home visit Tue Oct 20 at 2:00pm writes the care plan and hears Frank's own yes; then Gloria comes every Tue and Thu, starting Thu Oct 22, 9am to 1pm.\nFlow A is the less usual side: Lee Care Planning LLC, Sam's second company, where a family meets a care manager (Nina) to plan care for a parent: a $35 care consultation at the office on Sat Oct 24 at 11:00am, or by video, or $75 at the client's home (the both-places service, which goes on in flow B). The old flowchart has no flow A nodes; flow A follows the plug-in and the master's defaults.\nKinds of work in sign-up: plumbing became home care, electrical became live-in care (it waits for its live-in caregiver, Gloria), the barbershop became the care planning office. Live-in care isn't a separate license: it runs on the agency's home care license.\nNames: Jordan and Casey became caregivers Gloria and Tasha (from the old flowchart); Riley and Avery became care managers Nina and Leah, both nurses; the master's partner Jamie is Alex's sister Elena. Addresses: 310 Grove Ave (Lee Home Care), 75 Cedar Rd (Lee Care Planning), 14 Hollis Ln (Frank). Sam stays the owner and care manager who does the free home visits.\nPrices (the example businesses' own): home care $30 an hour with a 3-hour minimum; Frank's 4-hour visit is $120 (the master's $179); the late-cancel fee is the 3-hour minimum, $90 (the master's $89); overnight $32 an hour; rides $30 an hour plus 70 cents a mile; holidays 1.5 times; live-in care priced after a call, a weekend stay at 2 days of $320 = $640 (the master's $640 from photos, so its $500 OK still applies). Lee Care Planning keeps the master's numbers: $35 consultation, $20 missed-meeting fee, $55 family meeting paid in full, $140 care planning session (a card saved for the $20 fee), $90 written care plan priced for each family and OK'd by Sam, $75 at the client's home (a card saved, the bill after).\nMoney B: list|card|card is the main path (a card saved, never charged up front; each visit's hours charged at DONE). list|card|bill is the same care billed by the week (one bill each Friday, B9-22). list|none|own is care a long-term care insurer pays, billed by the agency its own way. photos|card|card is live-in care priced after a call (the picker label says 'Priced after a call first'; no photos of a client are ever asked for). Left out: holds, deposits and full prepay: the old flowchart and the plug-in take nothing up front.\nMoney A: list|none|counter is the main path (nothing taken; $35 paid at the front desk). list|card|counter is an office that set the $20 missed-meeting fee. list|none|bill is a Saturday when Nina works alone with no front desk, so Rosie texts the bill. list|full|none is the $55 family meeting at the office, paid in full when booking.\nTimes: free cancel ends 24 hours before a visit (9am Wed for Thu 9am), so the reminder goes Tue 6pm, after Sam's home visit. Every listed path's clock runs forward: booking Mon Oct 19 6:40-6:48pm (7:40-7:58pm on the live-in path), home visit Tue 2pm, reminder Tue 6pm, OMW Thu 8:40am, check-in 9:00am, DONE 1:00pm (Sat 9am for the live-in stay), receipt 1:05pm (Fri 10:05am on the weekly bill), rating Fri 11am (Sat 11am for live-in).\nThe service agreement: Alex signs it at booking as the payer (B4-57's 'Yes: a signed contract first', B4-61); Frank signs the care plan himself at the free home visit (B7-x01). An agreement signed at the home comes with the right-to-cancel notice (pf.rules). The weekly cost estimate is the agency's own practice, never shown as a legal duty (the old Good Faith Estimate claim isn't confirmed for non-medical care).\nTexts carry only the agency, the caregiver's first name, the day and the time; health notes, the care plan's tasks and the lockbox code stay on the secure page; staff texts use the client's initials (F.M.). Never a photo of the client (B4-69, A4-65).\nStand-ins: only with Frank's own OK; no answer means nobody new is sent, the visit is off and nothing is charged (B7-20, B7-22 words; S11-46 rename). B7-56 keeps 'One person, by name'.\nNobody answering the door is a safety check first (own branch B8-x01: found safe, out and safe with Sam's fee call, or 911 for a welfare check). The master's 'Nobody home' no-show branch and the nobody-needs-to-be-home branches are off: the client is always home.\nMedical tasks and Medicaid: B4-03 points nursing to home health; B3-21 sends medical questions to the doctor and Medicaid or VA care to the agency's own line. Non-medical home care isn't a health practice, so both companies pay Rosfield's $2 (S1-62, S1-65, S11-92, S11-94 'No $2' branches off).\nLicenses: S1-60 keeps both branches (the agency license where the state licenses home care, registration elsewhere), main story HC-20418; S2-28 keeps both (aide certificates where the state keeps a registry), Gloria's HCA2041187; S1-63 takes 'registration only' for the care planning office (care managers' own nurse licenses are checked with the team).\nPlug-in splits: kept both at S1-60, S2-28 and B4-57 (splitsKept); every other split has its unused branches off. B4-83 keeps a set start (care) and a stay (live-in); arrival windows, seats and no-person times are off.\nOff for this work: sent now everywhere (S2-30, B4-16, B4-81, B6-03, B7-55, B8-58); a live line; both places in flow B (the both-places consult is flow A's); video care; series, groups, host days, crews, stock; the landlord branches (B4-78, B8-22); damage holds; delivery, parts to the shop, permits, reports, rentals, aftercare, warranty; forms on the secure page (B4-38, B7-05); the business-gets-it first step; 'A first step changes the job' (the home visit is on the main path instead); Alex running late; tips (B9-19, A9-05); stages and pay over time. In flow A: walk-ins, seats, spaces, drop-offs, stays, children, plans and insurance, packages, contracts, crews, minimums, forms, first steps, goods, rentals, aftercare.\nSection 11-12 what-ifs use home care's own ways to pay: Nora's same-day extra visit (card saved), Morgan's live-in price over $500, Lin's missed visit after a safety check ($90 minimum on her saved card), S11-56 moves overnight care to the weekly bill (flow B) and the follow-up meeting from a card saved to nothing taken (flow A), S11-58 adds senior move help (B) and caregiver classes (A), S12-20 to S12-22 an overnight rate during a declared emergency.\nWords ops with only some money paths: build helper gives every shadowed master variant the op's own words, so no master words show on a path this work uses.\nKept words: none.\nReview (Oct 23): the plug-in says plainly that $35 is only the example office's price (many agencies make the first consultation free) and lists the office's other services as the sign-up sets them; the office never holds money (S1-42 and the day-before-hold branch) and its plans are paid at the front desk; a consultation at the client's home saves a card and is billed after (flow B's list|card|bill), never paid in full; the written care plan is priced for each family and OK'd by Sam, never from answers or at a meeting; live-in care's words say 'after a call', never photos (B4-06 and B8-19 labels, S1-12, S1-13, S1-20, B4-25, B7-58); the live-in story's dates, S12-21's price, Kim's mother's visit and the S11-57 preview follow along.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Means 'Matched': the request fits a listed service, in any words. 'A trim' or 'a fade' fits a haircut.",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "May the shop show photos of your hair? Yes / No",
+    "My employer pays for this cut.",
+    "A chair, ready",
+    "Style consult",
+    "Color and cut · $90",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "The plug-in says if a child may be left without a parent, like at a class or a camp. At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Alex asks for a perm, which isn't on the shop's list. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Now money. When customers book, do you take anything? Each service starts the way most barbershops set it. Send only what's different, by letter.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "Some services start with a first step on the same visit, like a patch test with a wait, or a screening. It comes before the price and the work.",
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "The plug-in says a color and cut is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75. Nothing more is owed after.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Sam adds massage to Lee's Barbershop. It brings its own plug-in, and only what's new is asked.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lee's Barbershop doesn't do perms. Nothing was saved. Other businesses nearby may.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Color quotes come to you first. Board prices never need one",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "House calls: allowed where you are, for those cleared",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "A.M. says the cape clip ripped a shirt collar today.",
+    "Goes on as a house call, in the other flow.",
+    "Goes on as a house call in the other flow.",
+    "Every shop service, color and house calls",
+    "Riley: barber, color and house calls",
+    "Riley: barber, color, house calls",
+    "At the shop, and house calls",
+    "Goes on as a house call",
+    "A water heater job",
+    "Color and cut",
+    "NEW massage",
+    "Kids cut",
+    "From the price list or photos, the price is set.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "3 jobs",
+    "next job:",
+    "An AI that asks for the shop by name hears only that: no reason, and no other shops.",
+    "1 color quote",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Rosie is the shop's booking software. Its only outside links are the barbers' phone calendars and Stripe.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "BOOK Alex M. haircut Sat 11am Riley",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "Sam set this line at sign-up: the number customers call for what only a barber should answer.",
+    "That's a question for the barbers themselves. Riley can go over it at your visit.",
+    "Wants Saturday morning, with Riley",
+    "like a 15-minute style consult",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Books a haircut and a beard trim",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Takes the price from the shop's board",
+    "on the shop's board",
+    "A barbershop books a person's time.",
+    "Anything Riley should know?",
+    "It's a gift for my brother. Can I pay for it?",
+    "A barbershop has none.",
+    "Haircut plan · every 4 weeks",
+    "Color always stays with Riley.",
+    "Give this code at the chair when you arrive.",
+    "Give this code at the chair.",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Can I add a beard trim on Saturday?",
+    "Riley has time for it. Add a beard trim to your Sat 11:00am visit?",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "the Groom's package",
+    "Groom's package",
+    "Back to Alex: it's Saturday, and Alex arrives at the shop. If the plug-in asks for something to bring, the desk checks it first. A haircut needs nothing.",
+    "It's 11:00am, and Alex is at the chair.",
+    "What happens at the chair?",
+    "A beard trim is on the price board: $20.",
+    "The cape clip ripped my shirt collar.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "Alex pays at the chair",
+    "DONE 35 haircut",
+    "My company is paying for this one.",
+    "A long job or a course can be paid in stages the plug-in sets.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Books the next visit at the chair",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Color correction",
+    "Do you do kids cuts? My son is 8.",
+    "Priced from your photos",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "on Elm St",
+    "$89",
+    "Drain clearing",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Barbering",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "At the chair",
+    "at the chair",
+    "the chair",
+    "The shop's",
+    "the shop's",
+    "The shop",
+    "the shop",
+    "Shop",
+    "shop",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "the price board",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery"
+   ],
+   "B": [
+    "Me, and yes. It's my kitchen.",
+    "Water pressure check",
+    "A chair, ready",
+    "The drop-off and pick-up times come with the dates. The confirmation and the reminder show both days.",
+    "Thu Oct 22 to Sat Oct 24 · drop-off 8–10am · Jordan",
+    "Fri Oct 23 to Sun Oct 25 · drop-off 8–10am · Casey",
+    "Alex has no phone at hand, or doesn't answer in 15 minutes. Jordan asks in person and opens Alex's page on his own phone. Alex taps there, never Jordan.",
+    "Jordan texts OMW before he drives. The person who meets the pro gets his name and photo, the arrival time and the code to give at the door.",
+    "Unsure who's at the door? Call the business line: it says only the pro's first name, and whether his code was entered.",
+    "Jordan opens Alex's pay page on his own phone, and Alex pays there. The receipt goes to Alex their way.",
+    "A job sent now: the pro is told at once, before he sets out.",
+    "Water heater replacement · $640",
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos. Open times come next.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking. Rosie says plainly that it can't be booked, and nothing more. Sam sees a short note.",
+    "This is Rosie, the automated booking assistant for Lee Home Services. Add photos of your water heater, and a plumber will price the job. Need access, more time or a language? Tell us.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak. Rosie says so plainly, before any name, number or time. The AI can look for another business.",
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush. Jordan texts NEXT. It's past the 60 days Sam books ahead, so it's saved as a reminder.",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months. They can skip one visit, pause the plan or end it. Jordan is told.",
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted. Alex signs or declines it on the secure page.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls. Your day list comes at 8:00am, the time you picked.",
+    "One request waits for Lee Home Services. It's a leak under the sink, today, starts at 3:00pm, with Jordan. The service call is $89. Accept it?",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Jordan priced a water heater replacement for A.M. It needs your OK before it goes out. No answer by 8:01pm: they're told it's with you.",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced.",
+    "Hi, I'm an automated assistant calling for a customer, Kim. Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Reminder: your visit is tomorrow, starts at 8:00am, with Jordan. {{pay.cancel}}. Please clear the cabinet under the sink.",
+    "Sorry, Lee Home Services couldn't price your water heater this time. Nothing was booked or charged. You can ask again.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Your water heater visit wasn't booked, since the document wasn't signed in time. Nothing was charged for this visit.",
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Means 'Matched': the request fits a listed service, in any words. 'My sink won't drain' fits a drain clearing.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "Sam adds heating and cooling to Lee Home Services. It brings its own plug-in, and only what's new is asked.",
+    "Reading it back: accept the leak repair for today, starts at 3:00pm, with Jordan. Say yes to go ahead.",
+    "Your water heater contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Your water heater price is with Lee Home Services. We'll let you know by 12:00pm Tue either way.",
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Lee Home Services can start the sewer camera inspection at a set time. {{pay.asks}}:",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A.M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Price needed: A.M., water heater replacement. Price it before anyone says yes.",
+    "Jordan cracked the cabinet floor at A.M.'s. The before photo shows no crack.",
+    "A.M. didn't sign the water heater contract in time, so nothing was booked.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "M.P. would like to talk about the water heater quote before booking.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Send A.M. $600 for the water heater replacement, not $640?",
+    "Drain clearings already booked keep only their saved card.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "A.M. asks: Can I run the dishwasher before you come?",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "NEXT A.M. asks: water heater flush, 12 months",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "First: is anyone hurt? Do you smell gas?",
+    "Can I skip next week's drain cleaning?",
+    "Riley: barber, color and house calls",
+    "At my home. Just the kitchen sink.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Riley: barber, color, house calls",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "Proposal · Replace the old pipes",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "No. It doesn't smell like gas.",
+    "A.M.: water heater replacement",
+    "Yearly water heater flush plan",
+    "Sewer camera inspection · $199",
+    "At the shop, and house calls",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "Sewer camera inspection",
+    "Priced from your photos",
+    "NEW heating and cooling",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "No. No huele a gas.",
+    "A.M. · water heater",
+    "Yes, it won't drain",
+    "A water heater job",
+    "Water heater flush",
+    "the shutoff valves",
+    "DONE 179 drain",
+    "Leak repair",
+    "Quoted from photos first",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "3 jobs",
+    "next job:",
+    "Asks Alex for photos",
+    "Something of Alex's is damaged",
+    "Jordan and Alex check the work",
+    "The quote stays open 7 days",
+    "Drain clearing · $179",
+    "Morgan P. asked to talk about the $640 quote.",
+    "raise drain clearing to 199",
+    "Ask Sam about your jobs.",
+    "one address tried to book more jobs today than the plug-in allows",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "42 Oak St",
+    "88 Elm St",
+    "on Elm St",
+    "Service call fee",
+    "service call fee",
+    "Service call",
+    "service call",
+    "an $89",
+    "$89",
+    "$179",
+    "arriving 8–10am",
+    "8–10am",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Plumbing",
+    "plumbing",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Plumber",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "Haircut",
+    "haircut",
+    "at the chair",
+    "the chair",
+    "The shop's",
+    "the shop's",
+    "The shop",
+    "the shop",
+    "Shop",
+    "shop",
+    "beard trim",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "Add photos"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-24": "0a292df05b",
+   "A4-43": "c17d56f766",
+   "A7-93": "46cca94e45",
+   "A8-02": "15f418fec4",
+   "A8-53": "33f4da69f5",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A8-03": "7accda6f86",
+   "A8-86": "c989a99e52",
+   "A9-15": "bd2a17c3c5",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-89": "889628e2d6",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-45": "09e62897a6",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B10-37": "be87433467",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "B10-32": "7713bff255",
+   "B5-34": "917f89b62f"
+  }
+ }
+}

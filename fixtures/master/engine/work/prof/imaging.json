@@ -1,0 +1,4458 @@
+{
+ "id": "imaging",
+ "name": "Medical imaging center (X-ray, CT, MRI, ultrasound)",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "urgent-care",
+ "plugin": {
+  "pf.license": {
+   "need": "Optional, and nothing is required by Rosie. The center may list its own records on its page: each machine's state registration, the federal mammography certificate, accreditations, and each technologist's credential and the supervising radiologist. Rosie shows what the center enters, as given.",
+   "ask": "Optional: each machine's registration and end date; the mammography certificate; accreditations; each technologist's credential; the supervising radiologists' names.",
+   "who holds it": "The center (its machines and certificates); each technologist; each radiologist.",
+   "how it's checked": "Rosie does not check, look up or verify any license, registration, certificate or credential (D96). The center's own word only.",
+   "blocks going live": "None for a license: nothing is held back because a machine, certificate or credential is not on the page.",
+   "renewals": "None tracked by Rosie; the center keeps its own dates.",
+   "insurance or bond": "Optional: the center may list its malpractice or liability insurance; Rosie does not check it.",
+   "background check": "The center's own choice; Rosie does not run one.",
+   "own word": "If the center says an exam needs a credential a technologist doesn't have, that technologist isn't offered for that exam (the center's own word, not a check)."
+  },
+  "pf.services": {
+   "shape": "Imaging center: exams on a doctor's order, each booked as a room and its machine with a qualified technologist; a walk-in X-ray on an order; mobile X-ray and ultrasound at homes and care facilities; a mammography coach day on set days at a workplace or community site with the host's standing OK.",
+   "examples": "The example center's own self-pay prices, not a standard. A plan pays its own share; the share is billed by the center its own way.",
+   "at the center (flow A)": [
+    {
+     "name": "X-ray, one body part",
+     "length": "15 minutes",
+     "price": "$75 self-pay",
+     "order": "a doctor's order",
+     "walk-in": "yes, with the order",
+     "before": "nothing taken; self-pay may pay in full when booking",
+     "after": "the plan billed, the share billed by the center, or a copay at the desk"
+    },
+    {
+     "name": "Ultrasound (abdomen, pelvis, thyroid, vascular)",
+     "length": "45 minutes",
+     "price": "$250 self-pay",
+     "order": "a doctor's order",
+     "prep": "on a secure link: the fasting or full-bladder steps for the exam",
+     "before": "nothing taken; self-pay may pay in full when booking",
+     "after": "as above"
+    },
+    {
+     "name": "CT, without or with contrast",
+     "length": "30 minutes",
+     "price": "$350 / $500 self-pay",
+     "order": "a doctor's order; the plan's prior approval where it requires one",
+     "prep": "on a secure link",
+     "before": "nothing taken",
+     "after": "as above"
+    },
+    {
+     "name": "MRI, without or with contrast",
+     "length": "45 to 60 minutes",
+     "price": "$450 / $650 self-pay",
+     "order": "a doctor's order; the plan's prior approval where it requires one",
+     "prep": "on a secure link: the MRI safety form and what to wear",
+     "before": "nothing taken",
+     "after": "as above"
+    },
+    {
+     "name": "Screening mammogram",
+     "length": "20 minutes",
+     "price": "$150 self-pay",
+     "order": "none where the state's rules let a patient book it themselves; otherwise a doctor's order",
+     "prep": "on a secure link",
+     "before": "nothing taken",
+     "after": "the plan billed, the share billed by the center"
+    },
+    {
+     "name": "Bone density scan",
+     "length": "20 minutes",
+     "price": "$125 self-pay",
+     "order": "a doctor's order",
+     "before": "nothing taken",
+     "after": "as above"
+    }
+   ],
+   "at the patient's place (flow B)": [
+    {
+     "name": "Mobile X-ray at home or a care facility",
+     "length": "20 minutes on site",
+     "price": "$175 self-pay plus a $50 trip fee, one bill of $225",
+     "order": "a doctor's order",
+     "before": "nothing taken",
+     "after": "the plan billed by the center its own way, the share after; a care facility under its contract, billed the business's own way",
+     "same day": "a care facility's urgent order is sent now to the on-call technologist, within 4 hours"
+    },
+    {
+     "name": "Mobile ultrasound at home",
+     "length": "45 minutes on site",
+     "price": "$300 self-pay",
+     "order": "a doctor's order",
+     "before": "nothing taken",
+     "after": "as above"
+    },
+    {
+     "name": "Mammography coach day at a host's site",
+     "length": "20-minute slots",
+     "price": "the plan billed; $150 self-pay",
+     "order": "as at the center",
+     "where": "a workplace or community site with its standing OK",
+     "minimum": "20 booked by 7 days before, or the day is called off"
+    }
+   ],
+   "capacity": "a room and its machine per exam; MRI and CT one patient at a time; ultrasound a sonographer and a room; mobile teams one exam at a time per technologist",
+   "skills": "X-ray, CT, MRI, ultrasound (by kind), mammography; who may run contrast exams",
+   "online": "none: every exam is in person"
+  },
+  "pf.questions": {
+   "before times": [
+    "Which exam, as your doctor's order says it? Do you have the order, or is your doctor sending it?",
+    "Will a plan pay? Just its name here.",
+    "For MRI: do you have a pacemaker, defibrillator, nerve stimulator, cochlear implant, pump, aneurysm clip, or metal in your body or eyes? Yes or no here; details on the secure page.",
+    "Weight over 350 pounds? (the table's limit; a wider machine elsewhere)",
+    "For CT or MRI with contrast: have you had a reaction to contrast before? Yes or no here; details on the secure page.",
+    "Is it for a child?"
+   ],
+   "after a time is picked": [
+    "Anything that helps the visit, like a step-free way in, a wheelchair transfer, or an interpreter.",
+    "Would you like a female technologist? (asked before anyone else does the exam; offered where one is free)"
+   ],
+   "only on the secure page": [
+    "Date of birth; the plan's member number",
+    "The MRI safety form: each implant, device or metal, and its card if you have one",
+    "Could you be pregnant? Are you breastfeeding? (for anyone who could be)",
+    "Allergies, a contrast reaction, kidney disease, diabetes and its medicines",
+    "For calming medicine: who drives you home",
+    "Consent for contrast",
+    "Who your results go to: your ordering doctor; any other doctor you name"
+   ],
+   "whoMayBook": "An adult for themselves; a parent or legal guardian for a child; a guardian or health care agent for an adult who can't consent; a care facility for its residents, with the resident's or agent's consent on file; a doctor's office for its patient."
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, a stroke sign, a bad fall or injury now",
+     "say": "Call 911 now. Don't come in for an X-ray.",
+     "booking": "no booking in that chat"
+    },
+    {
+     "words": "crisis words",
+     "say": "the 988 line and 911",
+     "booking": "no booking in that chat"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a pacemaker or other implant, or metal in the body",
+     "what": "not booked for MRI until the MRI safety technologist reads the form and the implant card; some are never scanned here"
+    },
+    {
+     "words": "could be pregnant",
+     "what": "X-ray and CT wait for the ordering doctor's word; MRI contrast isn't given; the technologist asks again at the visit"
+    },
+    {
+     "words": "a contrast reaction before",
+     "what": "the radiologist OKs it first; any medicine to take before comes from the patient's own doctor"
+    },
+    {
+     "words": "afraid of tight spaces",
+     "what": "a calming medicine only from the patient's own doctor, and then a driver home"
+    }
+   ],
+   "medical questions": "Never answered: what the exam shows, whether it's needed, or how to take medicines. Those go to the ordering doctor. Results are never given by Rosie."
+  },
+  "pf.first_steps": {
+   "required": [
+    {
+     "name": "The doctor's order",
+     "when": "by the day before (or at the desk for a walk-in X-ray)",
+     "who": "the ordering doctor's office sends it to the center",
+     "goodFor": "the time the order says, often 30 to 90 days",
+     "result": "not in: the desk calls the doctor's office; still not in, the visit can't go ahead"
+    },
+    {
+     "name": "The plan's prior approval",
+     "when": "before the visit, where the plan requires one for CT or MRI",
+     "who": "the ordering doctor's office or the center's desk",
+     "result": "not approved by the day before: self-pay price with the patient's yes, or a move with no fee"
+    },
+    {
+     "name": "MRI safety form",
+     "when": "at booking",
+     "who": "the patient, on the secure page; read by the MRI safety technologist",
+     "result": "OK, No (never scanned here), or Need more (the implant card)"
+    },
+    {
+     "name": "Kidney blood test",
+     "when": "within 30 days before a contrast exam, for those who need it",
+     "who": "the patient's doctor or a lab",
+     "goodFor": "30 days"
+    },
+    {
+     "name": "An X-ray of the eyes before MRI",
+     "when": "before the MRI, for anyone who has worked with metal",
+     "who": "booked first at the center"
+    }
+   ],
+   "prep for the reminder": "On a secure link: fasting or a full bladder as the exam needs; no metal or jewelry for MRI; no deodorant for a mammogram; the order, a photo ID and the plan card; a driver if calming medicine is taken.",
+   "prep timing": "Fasting starts 4 to 8 hours before; for a morning exam that means from the night before. The prep link goes in the confirmation whenever the prep starts before the next reminder."
+  },
+  "pf.visit": {
+   "check-in": "The code at the desk. A walk-in X-ray: a place in the line with the order. Mobile: the code at the door, or the facility's nurse at the front desk.",
+   "at the visit": "The technologist checks the order, the identity, the safety form and pregnancy again before any exam. A chaperone is offered for intimate exams.",
+   "work changes": "An exam the order doesn't name is never added; a new or changed order comes from the doctor first.",
+   "stops": "A pregnancy, an implant not cleared, missed fasting, or no driver after calming medicine: that exam doesn't go ahead; another time, with no fee.",
+   "what proves it's done": "The code, or DONE when the images are taken.",
+   "results": "A radiologist reads the images and the report goes to the ordering doctor through the center's own system, usually within 1 to 2 business days. The patient's own copy comes through the center's patient portal under the federal rules; for a mammogram, the federal mammography letter goes to the patient. Rosie never texts a result."
+  },
+  "pf.money": {
+   "before": "Nothing taken (the starting answer). A self-pay patient may pay the self-pay price in full when booking, after the written estimate.",
+   "after": "The plan is billed by the center its own way; the patient's share is billed by the center after the plan pays, or a copay is paid at the desk. A care facility's residents under its contract: billed the business's own way.",
+   "estimate": "A self-pay or uninsured patient gets a written good-faith estimate when booking, where the federal rule applies.",
+   "fees": "No late-cancel or no-show fee, for anyone.",
+   "tips": "None.",
+   "tax": "None.",
+   "rosfield": "Rosfield's $2 per booking applies as for every business (D97); the center pays it, never the patient."
+  },
+  "pf.messages": {
+   "never in a text": "The exam, the body part, the order's reason, pregnancy, implants, contrast, results. Texts name only the center, the date, the time and the place; staff and owner texts use initials and a secure link.",
+   "results": "Never in a text; 'your doctor has the report' at most, only where the patient agreed.",
+   "languages": "English and Spanish, plus the center's interpreter line.",
+   "minors": "A parent or guardian books; texts go to them."
+  },
+  "pf.staff": {
+   "roles": "Radiologic technologists, CT and MRI technologists, sonographers, mammography technologists, an MRI safety technologist, radiologists (reading and supervising), front desk.",
+   "supervision": "A contrast exam is offered only while a supervising radiologist or doctor is on site.",
+   "skills": "each technologist's kinds of exam, as the center lists them",
+   "who OKs": "The MRI safety technologist reads every MRI safety form; the radiologist OKs a past contrast reaction.",
+   "stand-ins": "Another technologist with the same skill. A patient who asked for a female technologist is asked before anyone else does the exam; nobody moves on silence.",
+   "chaperone": "Offered for every intimate exam; a patient's request is honored."
+  },
+  "pf.rules": {
+   "orders": "No exam without the order it needs, except a screening mammogram where the state's rules allow it without one.",
+   "health privacy": "The center signs Rosie's health-privacy agreement before going live.",
+   "radiation": "Pregnancy screening before X-ray and CT for anyone who could be pregnant.",
+   "results": "Reports go to the ordering doctor; the patient's copy by the federal rules; the mammography letter by the federal rule.",
+   "records": "Images and reports kept as long as the state's and federal rules require (mammograms at least 5 years), in the center's own system; booking records 7 years. A patient's copy within 30 days.",
+   "estimates": "A written good-faith estimate for self-pay patients, where the federal rule applies."
+  },
+  "pf.edges": {
+   "matter most": {
+    "no order on the day": "The desk calls the doctor's office; no order, no exam, no fee.",
+    "prior approval not back": "Self-pay with a yes, or a move with no fee.",
+    "missed fasting": "Moved with no fee.",
+    "could be pregnant": "Stopped until the ordering doctor says.",
+    "implant not cleared": "Not scanned; the doctor is told to order another exam.",
+    "no driver after calming medicine": "The exam waits, or goes ahead without the medicine if the patient wants.",
+    "a child": "A parent stays; a pregnant parent waits outside the X-ray room.",
+    "a care home resident who can't consent": "The agent's consent on file.",
+    "a screening callback": "Booked soon, with no offers.",
+    "results questions": "The ordering doctor."
+   },
+   "the rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "planbill",
+   "firststeps",
+   "forms",
+   "results",
+   "children",
+   "sentnow"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Imaging Center",
+   "staff": "Dana (radiologic technologist), Omar (MRI technologist), with the front desk",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Mobile Imaging",
+   "staff": "Priya (sonographer, on call) and Ben (radiologic technologist, the backup), who drive out with a portable X-ray unit",
+   "cust": "Alex M. (patient, at home) · other patients",
+   "other": "Others (a parent or guardian, a care facility's nurse, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dana"
+  },
+  "B": {
+   "staff": "Priya"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "a $20 fee ($40 for the Bone density scan), only if a card, a deposit or the full price was taken and you say yes",
+    "no fee, since nothing is taken at booking"
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code follows the visit kind: at the front desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Any question about your care? Reply here. How was your visit with Jordan?"
+   ],
+   [
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "On this path, a recheck checked from photos is free: nothing before, nothing after."
+   ],
+   [
+    "The $640 X-ray machine is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 extra is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "It's a bone density scan today at 2:00pm with Omar, for a new customer. It's $20.",
+    "It's a bone density scan today at 2:00pm with Omar, for a new customer. It's $125."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An example: a patient who feels faint on the table gets the table lowered first."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "J: a recheck in the first 2 weeks, checked from photos, free."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some licenses cover only the licensed place, like a center."
+   ],
+   [
+    "can cut your hair at the center for $35, or at your home for $75",
+    "can take your X-ray at the center for $75, or at your home for $225"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery are technologists; Riley also does mobile X-rays."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A test's example: 'This test needs a quick screening first."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "X-ray $75 ($80 from Nov 2) · Ultrasound $250 · Bone density scan $125"
+   ],
+   [
+    "Send A.M. $600 for the X-ray machine replacement, not $640?",
+    "Send A.M. $75 for the extra view, not $80?"
+   ],
+   [
+    "Sam raises the X-ray to $40 for visits from Mon Nov 2.",
+    "Sam raises the X-ray to $80 for visits from Mon Nov 2."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "The price, {{price}}, comes straight from Sam's list.",
+    "The price, {{price:$225}}, comes straight from Sam's list."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most imaging centers start."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Physical therapy for Lee Imaging Center: is it the same company?"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most imaging centers set it."
+   ],
+   [
+    "Visits already booked keep $35, even after Nov 2.",
+    "Visits already booked keep $75, even after Nov 2."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "contrast check done, the view is ready"
+   ],
+   [
+    "At your center, paid at the chair, your own way",
+    "At your center, paid at the desk, your own way"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 test quote."
+   ],
+   [
+    "A bone density scan is on the price list: $20.",
+    "A bone density scan is on the price list: $125."
+   ],
+   [
+    "Promises the $25 consult; priced in the room",
+    "Promises the consult; priced in the room"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "'Adding a bone density scan, +$20? Say so.'",
+    "'Adding a second view, +$75? Say so.'"
+   ],
+   [
+    "a card saved for the $89 service-call fee",
+    "nothing taken"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every center service, X-rays, scans and mobile visits"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules imaging centers often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Walk-in visits, tests and X-rays, no appointment needed."
+   ],
+   [
+    "the X-ray goes to $40 for new bookings",
+    "the X-ray goes to $80 for new bookings"
+   ],
+   [
+    "Dana also does color and mobile X-rays",
+    "Dana also does mobile X-rays"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached during care?"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The gown tie snagged my shirt collar."
+   ],
+   [
+    "Reminds Alex before free cancel ends",
+    "Texts Alex when it's almost time"
+   ],
+   [
+    "a card saved, for a $20 fee you OK",
+    "nothing taken"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do sleep studies."
+   ],
+   [
+    "The $179 mobile X-ray needs none.",
+    "The $225 mobile X-ray needs none."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: technologist, mobile X-rays, MRI"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Physical and X-ray"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Ultrasound, abdomen"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Adds a test to the visit"
+   ],
+   [
+    "What happens before Sat 11:00am?",
+    "What happens while Alex waits?"
+   ],
+   [
+    "Riley helps; Sam is told at once",
+    "Dana helps; Sam is told at once"
+   ],
+   [
+    "centerian, color, mobile X-rays",
+    "technologist, mobile X-rays"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Quotes made in the room come to you first."
+   ],
+   [
+    "Stops, and sends a written note",
+    "Sends Alex on, with a written note"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Stitches always stay with Riley."
+   ],
+   [
+    "Riley adds notes for next time",
+    "Notes stay in the center's record"
+   ],
+   [
+    "adds the prices: $35 and $20.",
+    "adds the prices: $75 and $125."
+   ],
+   [
+    "Yes: a Child's visit is $25.",
+    "Yes: a child's X-ray is $75."
+   ],
+   [
+    "Asks Riley to check Alex in",
+    "Asks the desk to check Alex in"
+   ],
+   [
+    "Checks it, then asks Riley",
+    "Checks it, then asks the desk"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens in the room?"
+   ],
+   [
+    "X-ray machine replacement",
+    "extra X-ray view"
+   ],
+   [
+    "$179, paid after the job",
+    "$225, paid after the visit"
+   ],
+   [
+    "Riley asks for a day off",
+    "Dana asks for a day off"
+   ],
+   [
+    "Bone density scan · $20",
+    "Bone density scan · $125"
+   ],
+   [
+    "Riley finishes the work",
+    "Dana finishes the visit"
+   ],
+   [
+    "Signature cut and shave",
+    "Physical and X-ray"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Child's visit"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile imaging and coach days"
+   ],
+   [
+    "Signature cut and shave",
+    "MRI, lower back"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile X-ray and ultrasound"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile X-ray and ultrasound"
+   ],
+   [
+    "sewer camera inspection",
+    "mobile ultrasound"
+   ],
+   [
+    "Sewer camera inspection",
+    "Mobile ultrasound"
+   ],
+   [
+    "Asks Riley to check it",
+    "Asks the desk to check it"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Dana adds a test"
+   ],
+   [
+    "Offers the next times",
+    "Offers the next estimates"
+   ],
+   [
+    "Riley enters the code",
+    "The desk enters the code"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Imaging Center LLC"
+   ],
+   [
+    "priced at the chair",
+    "priced in the room"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the room"
+   ],
+   [
+    "X-ray machine flush",
+    "bone density scan"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Imaging's"
+   ],
+   [
+    "Water heater flush",
+    "Bone density scan"
+   ],
+   [
+    "water heater flush",
+    "bone density scan"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "Sam adds a barber",
+    "Sam adds a technologist"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Imaging"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "Strep test · $20",
+    "Bone density scan · $125"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Color correction",
+    "Injury visit"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Imaging Center"
+   ],
+   [
+    "Color correction",
+    "CT scan"
+   ],
+   [
+    "at $140 an hour",
+    "at an hourly rate Sam sets"
+   ],
+   [
+    "hot towel shave",
+    "bone density scan"
+   ],
+   [
+    "hot towel shave",
+    "X-ray"
+   ],
+   [
+    "Groom's package",
+    "Bone density scan"
+   ],
+   [
+    "Haircut at home",
+    "Mobile X-ray at home"
+   ],
+   [
+    "Lee Mobile Care",
+    "Lee Mobile Imaging"
+   ],
+   [
+    "the $25 consult",
+    "the consult"
+   ],
+   [
+    "Color touch-up",
+    "Recheck"
+   ],
+   [
+    "Drain clearing",
+    "Ultrasound scans"
+   ],
+   [
+    "drain clearing",
+    "ultrasound scans"
+   ],
+   [
+    "workplace care",
+    "coach days"
+   ],
+   [
+    "Workplace care",
+    "Coach days"
+   ],
+   [
+    "shutoff valves",
+    "X-ray views"
+   ],
+   [
+    "1 color quote",
+    "1 test quote"
+   ],
+   [
+    "Signature cut",
+    "Physical"
+   ],
+   [
+    "color and cut",
+    "wound check from photos"
+   ],
+   [
+    "Color and cut",
+    "Wound check from photos"
+   ],
+   [
+    "Color and cut",
+    "Screening mammogram"
+   ],
+   [
+    "Style consult",
+    "Imaging consult"
+   ],
+   [
+    "water heaters",
+    "X-ray machines"
+   ],
+   [
+    "shutoff valve",
+    "X-ray view"
+   ],
+   [
+    "Shutoff valve",
+    "X-ray view"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "shop's board",
+    "center's price list"
+   ],
+   [
+    "1200 Main St",
+    "640 Main St"
+   ],
+   [
+    "Jordan Price",
+    "Priya Chen"
+   ],
+   [
+    "water heater",
+    "X-ray machine"
+   ],
+   [
+    "Water heater",
+    "X-ray machine"
+   ],
+   [
+    "a burst pipe",
+    "a care facility's urgent order"
+   ],
+   [
+    "Sewer camera",
+    "Second view"
+   ],
+   [
+    "sewer camera",
+    "second view"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Casey Moore",
+    "Ben Moore"
+   ],
+   [
+    "NEW massage",
+    "NEW ultrasound"
+   ],
+   [
+    "Electrician",
+    "Sonographer"
+   ],
+   [
+    "electrician",
+    "sonographer"
+   ],
+   [
+    "mobile care",
+    "mobile imaging"
+   ],
+   [
+    "Mobile care",
+    "Mobile imaging"
+   ],
+   [
+    "house calls",
+    "mobile X-rays"
+   ],
+   [
+    "House calls",
+    "Mobile X-rays"
+   ],
+   [
+    "valve quote",
+    "view quote"
+   ],
+   [
+    "overflowing",
+    "urgent"
+   ],
+   [
+    "Overflowing",
+    "Urgent"
+   ],
+   [
+    "barbershop",
+    "imaging center"
+   ],
+   [
+    "Barbershop",
+    "Imaging Center"
+   ],
+   [
+    "Beard trim",
+    "Bone density scan"
+   ],
+   [
+    "Riley Chen",
+    "Dana Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Omar Diaz"
+   ],
+   [
+    "electrical",
+    "coach days"
+   ],
+   [
+    "barbershop",
+    "center"
+   ],
+   [
+    "Barbershop",
+    "Center"
+   ],
+   [
+    "beard trim",
+    "bone density scan"
+   ],
+   [
+    "Electrical",
+    "Ultrasound"
+   ],
+   [
+    "electrical",
+    "ultrasound"
+   ],
+   [
+    "burst pipe",
+    "urgent order"
+   ],
+   [
+    "Barbershop",
+    "Imaging center"
+   ],
+   [
+    "house call",
+    "mobile X-ray"
+   ],
+   [
+    "House call",
+    "Mobile X-ray"
+   ],
+   [
+    "patch test",
+    "contrast check"
+   ],
+   [
+    "Patch test",
+    "Contrast check"
+   ],
+   [
+    "beard line",
+    "scan line"
+   ],
+   [
+    "sewer line",
+    "second view"
+   ],
+   [
+    "valve work",
+    "view work"
+   ],
+   [
+    "dishwasher",
+    "medicine"
+   ],
+   [
+    "hot towel",
+    "X-ray"
+   ],
+   [
+    "kids cuts",
+    "child's visits"
+   ],
+   [
+    "Skin fade",
+    "Flu test"
+   ],
+   [
+    "88 Elm St",
+    "75 Market St"
+   ],
+   [
+    "Barbering",
+    "The center's work"
+   ],
+   [
+    "Skin fade",
+    "Ultrasound"
+   ],
+   [
+    "skin fade",
+    "ultrasound"
+   ],
+   [
+    "clinician",
+    "technologist"
+   ],
+   [
+    "Clinician",
+    "Technologist"
+   ],
+   [
+    "cape clip",
+    "gown tie"
+   ],
+   [
+    "kids cut",
+    "child's visit"
+   ],
+   [
+    "haircuts",
+    "visits"
+   ],
+   [
+    "Haircuts",
+    "Visits"
+   ],
+   [
+    "MP045210",
+    "MD045210"
+   ],
+   [
+    "JP031552",
+    "NP031552"
+   ],
+   [
+    "plumbing",
+    "mobile imaging"
+   ],
+   [
+    "Plumbing",
+    "Mobile imaging"
+   ],
+   [
+    "Kids cut",
+    "Child's visit"
+   ],
+   [
+    "Kids cut",
+    "Child's X-ray"
+   ],
+   [
+    "kids cut",
+    "child's X-ray"
+   ],
+   [
+    "cut hair",
+    "run scans"
+   ],
+   [
+    "Plumbing",
+    "Mobile X-ray"
+   ],
+   [
+    "plumbing",
+    "mobile X-ray"
+   ],
+   [
+    "haircut",
+    "X-ray"
+   ],
+   [
+    "Haircut",
+    "X-ray"
+   ],
+   [
+    "haircut",
+    "visit"
+   ],
+   [
+    "Haircut",
+    "Visit"
+   ],
+   [
+    "BS20981",
+    "UC20981"
+   ],
+   [
+    "EC22871",
+    "MU22871"
+   ],
+   [
+    "JE30417",
+    "NP031552"
+   ],
+   [
+    "plumber",
+    "technologist"
+   ],
+   [
+    "Plumber",
+    "Centerian"
+   ],
+   [
+    "barbers",
+    "technologists"
+   ],
+   [
+    "massage",
+    "ultrasound"
+   ],
+   [
+    "Plumber",
+    "Technologist"
+   ],
+   [
+    "Jordan",
+    "Priya"
+   ],
+   [
+    "barber",
+    "technologist"
+   ],
+   [
+    "Barber",
+    "Technologist"
+   ],
+   [
+    "Barber",
+    "Centerian"
+   ],
+   [
+    "heater",
+    "machine"
+   ],
+   [
+    "clinic",
+    "center"
+   ],
+   [
+    "Clinic",
+    "Center"
+   ],
+   [
+    "faucet",
+    "second view"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Omar"
+   ],
+   [
+    "Casey",
+    "Ben"
+   ],
+   [
+    "color",
+    "scan"
+   ],
+   [
+    "Color",
+    "Scan"
+   ],
+   [
+    "shops",
+    "centers"
+   ],
+   [
+    "drain",
+    "scan"
+   ],
+   [
+    "beard",
+    "scan"
+   ],
+   [
+    "valve",
+    "view"
+   ],
+   [
+    "pipes",
+    "views"
+   ],
+   [
+    "shop",
+    "center"
+   ],
+   [
+    "Shop",
+    "Center"
+   ],
+   [
+    "perm",
+    "PET scan"
+   ],
+   [
+    "clog",
+    "delay"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "pipe",
+    "view"
+   ]
+  ],
+  "B": [
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Mobile Imaging asks: is the visit at a home, a care facility or somewhere else? And which side is the pain on?"
+   ],
+   [
+    "a $20 fee ($40 for the Bone density scan), only if a card, a deposit or the full price was taken and you say yes",
+    "no fee, since nothing is taken at booking"
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "The plug-in's questions that don't change the time or price go here, like 'Can you stay still for the scan?'"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Any question about your care? Reply here. How was your visit with Jordan?"
+   ],
+   [
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted.",
+    "Say Sam sends a proposal for more work after the visit, like a second view Priya noted."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the exam is, the order, and whether Alex can stay still."
+   ],
+   [
+    "Here, Lin W. wasn't home for the Tue 10am–12pm drain clearing with Casey, and didn't answer.",
+    "Here, Lin W. wasn't home for the Tue 10am–12pm mobile X-ray with Casey, and didn't answer."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Priya's phone, you said yes to one more X-ray view for $75."
+   ],
+   [
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "On this path, a recheck checked from photos is free: nothing before, nothing after."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Stay still, and call 911 if it's an emergency."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Trouble breathing: call 911 now. Don't wait for the mobile X-ray."
+   ],
+   [
+    "The $640 X-ray machine is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 extra is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Mobile Imaging doesn't do, like a dental X-ray."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan stopped part of today's visit for your safety. The note is on your secure page."
+   ],
+   [
+    "It's a bone density scan today at 2:00pm with Omar, for a new customer. It's $20.",
+    "It's a bone density scan today at 2:00pm with Omar, for a new customer. It's $125."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A mobile X-ray happens only at the patient's place, so nothing is asked."
+   ],
+   [
+    "Extra for {{alex.staff}}: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for {{alex.staff}}: one more X-ray view, $75. Sent to Alex."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Priya to come back next fall for a bone density scan."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Mobile X-ray at home $225 · Mobile ultrasound $300"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An example: a patient who feels faint on the table gets the table lowered first."
+   ],
+   [
+    "Lee Home Services can start the sewer camera inspection at a set time.",
+    "Lee Mobile Imaging can start the second view at a set time."
+   ],
+   [
+    "Say Alex was told at DONE that a sewer camera report comes Fri Oct 23.",
+    "Say Alex was told at DONE that a lab result comes Fri Oct 23."
+   ],
+   [
+    "Lee Home Services: your sewer camera report needs a little more time.",
+    "Lee Mobile Imaging: your report needs a little more time."
+   ],
+   [
+    "Lee Home Services: your sewer camera report from Thu Oct 22 is ready.",
+    "Lee Mobile Imaging: your report from Thu Oct 22 is ready."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent orders sent now, like a care facility's chest X-ray."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "J: a recheck in the first 2 weeks, checked from photos, free."
+   ],
+   [
+    "The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "The main story: Alex asks an AI for a mobile X-ray on Thu Oct 22, 6:40am."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: one more X-ray view, $75. Sent to Alex."
+   ],
+   [
+    "Done: the $160 valve work is cancelled, and you owe nothing for it.",
+    "Done: the extra view is cancelled, and you owe nothing for it."
+   ],
+   [
+    "Lee Home Services: your sewer camera report from Thursday is ready.",
+    "Lee Mobile Imaging: your report from Thursday is ready."
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like a mobile ultrasound."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Lab draws at home for Lee Mobile Imaging: is it the same company?"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some licenses cover only the licensed place, like a center."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE the view was clear. Bring the same kit next time."
+   ],
+   [
+    "can cut your hair at the center for $35, or at your home for $75",
+    "can take your X-ray at the center for $75, or at your home for $225"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for A.M.: one more X-ray view, $75. Sent to Alex."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A test's example: 'This test needs a quick screening first."
+   ],
+   [
+    "N.K. would like to talk about the color quote before booking.",
+    "N.K. would like to talk about the test quote before booking."
+   ],
+   [
+    "Send A.M. $600 for the X-ray machine replacement, not $640?",
+    "Send A.M. $75 for the extra view, not $80?"
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "A mobile X-ray with Lee Home Services is $179, not $150."
+   ],
+   [
+    "Sam raises the X-ray to $40 for visits from Mon Nov 2.",
+    "Sam raises the X-ray to $80 for visits from Mon Nov 2."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's bag scuffs the floor and Jordan texts a photo."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "The price, {{price}}, comes straight from Sam's list.",
+    "The price, {{price:$225}}, comes straight from Sam's list."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most imaging centers start."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $75 view is good for 7 days."
+   ],
+   [
+    "The work is priced at the visit, like a leak repair.",
+    "The work is priced at the visit, like a CT with contrast."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like asking for a prescription for someone else."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most imaging centers set it."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a bone density scan every year."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a mobile X-ray."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds lab draws at home to Lee Mobile Imaging."
+   ],
+   [
+    "Visits already booked keep $35, even after Nov 2.",
+    "Visits already booked keep $75, even after Nov 2."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The view is quoted at the visit, like a CT with contrast."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found the room was not set up this morning."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the floor this morning."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Priya also do a second view today?"
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Mobile X-ray takes urgent orders sent now, like a care facility's order."
+   ],
+   [
+    "At your center, paid at the chair, your own way",
+    "At your center, paid at the desk, your own way"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 75 one more X-ray view, ordered by the doctor"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can someone come see me at home this Thursday?"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 test quote."
+   ],
+   [
+    "A bone density scan is on the price list: $20.",
+    "A bone density scan is on the price list: $125."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Priya do a second view next week?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come again next week?"
+   ],
+   [
+    "Promises the $25 consult; priced in the room",
+    "Promises the consult; priced in the room"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My knee won't bend' fits a mobile X-ray."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the pain is getting worse."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, my doctor ordered a chest X-ray and I can't get out."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that breathing is getting harder."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "'Adding a bone density scan, +$20? Say so.'",
+    "'Adding a second view, +$75? Say so.'"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It's getting worse. Can someone come tonight?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a second view."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "It's getting harder to breathe now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scuff on the bedroom floor"
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's bag scuffed the floor at A.M.'s."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Priya also look at a second view?"
+   ],
+   [
+    "a card saved for the $89 service-call fee",
+    "nothing taken"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I take my usual medicine before you come?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD unsafe to treat here, stopped"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules imaging centers often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Walk-in visits, tests and X-rays, no appointment needed."
+   ],
+   [
+    "One booking, so one $2 for the whole job.",
+    "It's one booking for the whole job."
+   ],
+   [
+    "The work never started, so there's no $2.",
+    "The work never started."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $75 view is good for 7 days."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the space around the machine."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your medicine list ready."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Priya finds Alex needs a second view."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "I have chest pain and my arm feels numb."
+   ],
+   [
+    "the X-ray goes to $40 for new bookings",
+    "the X-ray goes to $80 for new bookings"
+   ],
+   [
+    "Dana also does color and mobile X-rays",
+    "Dana also does mobile X-rays"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Home Services can come to you:"
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached during care?"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Priya finds the doctor has ordered one more view."
+   ],
+   [
+    "Jordan found more work. Add it today?",
+    "Priya found more work. Add it today?"
+   ],
+   [
+    "Texts the report link on the new date",
+    "Texts the update on the new date"
+   ],
+   [
+    "Sent now · Overflowing kitchen drain",
+    "Sent now · Care facility's urgent order"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The second view is needed 2 weeks later."
+   ],
+   [
+    "Sent now · Overflowing kitchen drain",
+    "Sent now · Fever, can't drive"
+   ],
+   [
+    "Can Jordan also check my son's ear?",
+    "Can Priya also check my son's chest?"
+   ],
+   [
+    "a card saved, for a $20 fee you OK",
+    "nothing taken"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more X-ray view · $75"
+   ],
+   [
+    "like an overflowing drain at night",
+    "like a care facility's urgent order at night"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the second view"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Priya left the room in a mess."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a chest X-ray at home, today,"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan was rushed and didn't explain the medicine."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: that part of the visit"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do sleep studies."
+   ],
+   [
+    "The $179 mobile X-ray needs none.",
+    "The $225 mobile X-ray needs none."
+   ],
+   [
+    "What comes up while Jordan works?",
+    "What comes up during the visit?"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Physical and X-ray"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Can you stay still for the scan?"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the floor"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: something to check first"
+   ],
+   [
+    "centerian, color, mobile X-rays",
+    "technologist, mobile X-rays"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa mobile X-ray Thu 12-2 Casey"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Quotes made in the room come to you first."
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Extra X-ray view · $75"
+   ],
+   [
+    "Sewer camera inspection · $160",
+    "Extra X-ray view · $75"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a second view? Say so."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Stitches always stay with Riley."
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Jordan goes over the result with Alex"
+   ],
+   [
+    "adds the prices: $35 and $20.",
+    "adds the prices: $75 and $125."
+   ],
+   [
+    "One booking, so no second $2.",
+    "The extra stays part of the one booking."
+   ],
+   [
+    "Saves the time for 10 minutes",
+    "Saves the visit for 10 minutes"
+   ],
+   [
+    "Yes: a Child's visit is $25.",
+    "Yes: a child's X-ray is $75."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My doctor ordered a scan and I need it at home."
+   ],
+   [
+    "Jordan texts OMW (on my way)",
+    "A window booked ahead: OMW"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts that an update is ready"
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the update ready on time?"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more X-ray view"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise mobile X-ray to 199"
+   ],
+   [
+    "The quote stays open 7 days",
+    "Only the visit is done"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 mobile X-ray needs none."
+   ],
+   [
+    "2 No, just the booked work",
+    "2 No, just the visit"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Unsafe to treat here"
+   ],
+   [
+    "X-ray machine replacement",
+    "extra X-ray view"
+   ],
+   [
+    "$179, paid after the job",
+    "$225, paid after the visit"
+   ],
+   [
+    "Bone density scan · $20",
+    "Bone density scan · $125"
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · today's visit"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW lab draws at home"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile imaging and coach days"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile X-ray and ultrasound"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile X-ray and ultrasound"
+   ],
+   [
+    "Under the sink, before",
+    "The bedside, before"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just me."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Mobile X-ray"
+   ],
+   [
+    "Cabinet floor, before",
+    "Bedroom floor, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed floor"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Imaging LLC"
+   ],
+   [
+    "Texts Jordan the day",
+    "Texts Ben the day"
+   ],
+   [
+    "A fix-a-leak class.",
+    "A bone density class."
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilecare.com"
+   ],
+   [
+    "sewer camera report",
+    "lab result"
+   ],
+   [
+    "Sewer camera report",
+    "Lab result"
+   ],
+   [
+    "X-ray machine flush",
+    "bone density scan"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Imaging's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Imaging"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Eye Care"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "Strep test · $20",
+    "Bone density scan · $125"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Imaging Center"
+   ],
+   [
+    "at $140 an hour",
+    "at an hourly rate Sam sets"
+   ],
+   [
+    "drain clearings",
+    "mobile X-rays"
+   ],
+   [
+    "Drain clearings",
+    "Mobile X-rays"
+   ],
+   [
+    "Lee Mobile Care",
+    "Lee Mobile Imaging"
+   ],
+   [
+    "Groom's package",
+    "Bone density scan"
+   ],
+   [
+    "the $25 consult",
+    "the consult"
+   ],
+   [
+    "drain clearing",
+    "mobile X-ray"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 mobile X-ray"
+   ],
+   [
+    "Color touch-up",
+    "Recheck"
+   ],
+   [
+    "Drain clearing",
+    "Mobile X-ray"
+   ],
+   [
+    "Drain clearing",
+    "Ultrasound scans"
+   ],
+   [
+    "drain clearing",
+    "ultrasound scans"
+   ],
+   [
+    "workplace care",
+    "coach days"
+   ],
+   [
+    "Workplace care",
+    "Coach days"
+   ],
+   [
+    "1 color quote",
+    "1 test quote"
+   ],
+   [
+    "water heaters",
+    "X-ray machines"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "1200 Main St",
+    "640 Main St"
+   ],
+   [
+    "Jordan Price",
+    "Priya Chen"
+   ],
+   [
+    "water heater",
+    "X-ray machine"
+   ],
+   [
+    "Water heater",
+    "X-ray machine"
+   ],
+   [
+    "a burst pipe",
+    "a care facility's urgent order"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Casey Moore",
+    "Ben Moore"
+   ],
+   [
+    "Electrician",
+    "Technologist"
+   ],
+   [
+    "electrician",
+    "technologist"
+   ],
+   [
+    "mobile care",
+    "mobile imaging"
+   ],
+   [
+    "Mobile care",
+    "Mobile imaging"
+   ],
+   [
+    "house calls",
+    "mobile X-rays"
+   ],
+   [
+    "House calls",
+    "Mobile X-rays"
+   ],
+   [
+    "electrical",
+    "coach days"
+   ],
+   [
+    "Beard trim",
+    "Bone density scan"
+   ],
+   [
+    "Riley Chen",
+    "Dana Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Omar Diaz"
+   ],
+   [
+    "barbershop",
+    "center"
+   ],
+   [
+    "Barbershop",
+    "Center"
+   ],
+   [
+    "Electrical",
+    "Ultrasound"
+   ],
+   [
+    "electrical",
+    "ultrasound"
+   ],
+   [
+    "burst pipe",
+    "urgent order"
+   ],
+   [
+    "barbershop",
+    "imaging center"
+   ],
+   [
+    "Barbershop",
+    "Imaging center"
+   ],
+   [
+    "house call",
+    "mobile X-ray"
+   ],
+   [
+    "House call",
+    "Mobile X-ray"
+   ],
+   [
+    "patch test",
+    "contrast check"
+   ],
+   [
+    "Patch test",
+    "Contrast check"
+   ],
+   [
+    "88 Elm St",
+    "75 Market St"
+   ],
+   [
+    "42 Oak St",
+    "19 Birch Ln"
+   ],
+   [
+    "clinician",
+    "technologist"
+   ],
+   [
+    "Clinician",
+    "Technologist"
+   ],
+   [
+    "plumbing",
+    "mobile imaging"
+   ],
+   [
+    "MP045210",
+    "MD045210"
+   ],
+   [
+    "JP031552",
+    "NP031552"
+   ],
+   [
+    "Plumbing",
+    "Mobile imaging"
+   ],
+   [
+    "cut hair",
+    "run scans"
+   ],
+   [
+    "Plumbing",
+    "Mobile X-ray"
+   ],
+   [
+    "plumbing",
+    "mobile X-ray"
+   ],
+   [
+    "haircut",
+    "X-ray"
+   ],
+   [
+    "haircut",
+    "visit"
+   ],
+   [
+    "Haircut",
+    "Visit"
+   ],
+   [
+    "BS20981",
+    "UC20981"
+   ],
+   [
+    "EC22871",
+    "MU22871"
+   ],
+   [
+    "JE30417",
+    "NP031552"
+   ],
+   [
+    "plumber",
+    "technologist"
+   ],
+   [
+    "Plumber",
+    "Centerian"
+   ],
+   [
+    "barbers",
+    "technologists"
+   ],
+   [
+    "Haircut",
+    "X-ray"
+   ],
+   [
+    "Plumber",
+    "Sonographer"
+   ],
+   [
+    "plumber",
+    "sonographer"
+   ],
+   [
+    "Jordan",
+    "Priya"
+   ],
+   [
+    "barber",
+    "technologist"
+   ],
+   [
+    "Barber",
+    "Centerian"
+   ],
+   [
+    "heater",
+    "machine"
+   ],
+   [
+    "Barber",
+    "Technologist"
+   ],
+   [
+    "clinic",
+    "center"
+   ],
+   [
+    "Clinic",
+    "Center"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Casey",
+    "Ben"
+   ],
+   [
+    "Avery",
+    "Omar"
+   ],
+   [
+    "Riley",
+    "Priya"
+   ],
+   [
+    "Avery",
+    "Ben"
+   ],
+   [
+    "drain",
+    "scan"
+   ],
+   [
+    "shop",
+    "center"
+   ],
+   [
+    "Shop",
+    "Center"
+   ],
+   [
+    "perm",
+    "PET scan"
+   ]
+  ]
+ },
+ "keep": [
+  "Visit",
+  "X-ray",
+  "child's visit",
+  "Child's visit",
+  "75 Market St",
+  "640 Main St",
+  "19 Birch Ln",
+  "color",
+  "leak",
+  "trip fee",
+  "Trip fee"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then on Sat Oct 24 at 9:30am, Alex asks an AI for an MRI of the lower back at Lee Imaging Center, on a doctor's order, and books a time. The center checks the order and the plan's approval, Alex fills in the MRI safety form on the secure page, and nothing is taken. The plan is billed by the center, and Alex's share is billed by the center after the plan pays.",
+  "B": "Sam Lee signs up two companies by text. Then on Thu Oct 22 at 6:40am, Alex, who can't leave home, asks an AI for a chest X-ray at home on a doctor's order. Lee Mobile Imaging sends Priya, the sonographer on call, now. She checks in at Alex's door, nothing is taken, the plan is billed by the center its own way, and the share is billed after."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|none|own": "The main story: an MRI on the doctor's order; nothing taken; the plan billed by the center, and the patient's share billed by the center after.",
+    "list|none|counter": "A walk-in X-ray with a copay paid at the desk.",
+    "list|full|none": "A self-pay ultrasound at $250, paid in full when booking, after the good-faith estimate."
+   },
+   "amounts": {
+    "*": {
+     "name": "Imaging exam",
+     "fee": "$0"
+    },
+    "list|none|*": {
+     "price": "$450",
+     "fee": "$0",
+     "name": "MRI, lower back, without contrast"
+    },
+    "list|full|*": {
+     "price": "$250",
+     "paid": "$250",
+     "fee": "$0",
+     "name": "Ultrasound, abdomen"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Bone density scan, added at the visit",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$125"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Ultrasound, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$250",
+      "paid": "$250",
+      "fee": "$0"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "MRI (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a mobile chest X-ray at home on the doctor's order; nothing taken; the plan billed by the center and the share billed after.",
+    "list|none|bill": "A self-pay mobile X-ray at home, $225 with the trip fee; nothing taken, and Rosie texts the bill when the technologist texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "name": "Mobile X-ray at home",
+     "fee": "$0"
+    },
+    "list|none|*": {
+     "price": "$225",
+     "name": "Mobile X-ray at home"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Mobile ultrasound, added at the visit",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$300"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Mobile ultrasound, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$300",
+      "paid": "$300",
+      "fee": "$0"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Mobile X-ray (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Imaging runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Sam's mobile team sends house calls now, with a clinician on call (pf.staff.onCall).",
+    "label": "2 No: never sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "Imaging books no repeat plans: each visit is for today.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A spot in the line is a place in a clinician's line, not a seat.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "An imaging visit is never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "Every imaging visit has the health forms and consent on the secure page.",
+    "label": "No"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The clinic sells no gift cards and gives no booking discounts.",
+    "label": "A discount code"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The example clinic sells no packages or memberships.",
+    "label": "A package or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The example clinic sells no packages or memberships.",
+    "label": "Buys a pack or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "Imaging books no repeat plans.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "why": "An imaging visit needs no written contract; consent is signed on the secure page.",
+    "label": "Yes: everyone signs"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "Imaging books no repeat plans.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "Imaging books no repeat plans.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "Imaging books no repeat plans.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left at the clinic: the patient is in the room.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A parent or guardian stays for a child's visit (pf.edges.child).",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "An imaging visit is paid at once.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "Each visit is billed on its own.",
+    "label": "One bill for many visits"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "The clinic sends the patient to their own doctor for follow-up; it books no next visit.",
+    "label": "Next visit booked at checkout"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "The clinic sends no proposals for more work.",
+    "label": "The business sends a proposal"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "why": "A visit has no fix to redo; questions go to the clinic's phone.",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "why": "Nothing is left at the clinic.",
+    "label": "An item isn't picked up"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "The line itself is the wait: every spot is a place in it, with an estimate.",
+    "label": "Joins the waitlist"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "An estimate in the line is never taken by someone else: each new spot goes after the last one.",
+    "label": "Wants a time that's taken"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "Each patient has their own spot; a parent adds a child on the secure page (A4-71).",
+    "label": "A group or party"
+   },
+   {
+    "op": "off",
+    "at": "A6-01",
+    "why": "A spot in the line never waits for an OK: the line is first come, and sicker patients first.",
+    "label": "Sam's OK first"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "The clinic runs no classes.",
+    "label": "A class: names on a roster"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "Nothing is left at the clinic.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "why": "An imaging visit signs no contract with a cancel period; the clinic sells no memberships.",
+    "label": "Yes: a contract signed today"
+   },
+   {
+    "op": "off",
+    "at": "S11-03",
+    "why": "The clinic's line never waits for an OK: spots are first come, and sicker patients first. Requests that wait for Sam are the mobile team's (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "S12-23",
+    "why": "The clinic takes no card through Rosie: nothing is taken before, and visits are paid at the front desk.",
+    "label": "A stolen card"
+   },
+   {
+    "op": "off",
+    "at": "S12-23",
+    "why": "The clinic charges nothing through Rosie, so nothing can be charged twice.",
+    "label": "A double charge"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession, health included; no no-$2 choice"
+   },
+   {
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When patients book, do you take anything? Each exam starts the way most imaging centers set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every exam, to start",
+        "lines": [
+         "At your center, paid at the desk: the copay, or the self-pay price at checkout",
+         "When they book: nothing taken; a self-pay patient may pay in full if they choose",
+         "No late-cancel or no-show fee",
+         "A plan's balance after it pays: billed by your center its own way"
+        ]
+       },
+       "list": {
+        "head": [
+         "Exam",
+         "Self-pay price"
+        ],
+        "rows": [
+         [
+          "X-ray, one body part",
+          "$75"
+         ],
+         [
+          "Ultrasound",
+          "$250"
+         ],
+         [
+          "CT, without or with contrast",
+          "$350 / $500"
+         ],
+         [
+          "MRI, without or with contrast",
+          "$450 / $650"
+         ],
+         [
+          "Screening mammogram",
+          "$150"
+         ],
+         [
+          "Bone density scan",
+          "$125"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:none+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Self-pay: paid in full when booked"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay exam is paid in full when it's booked, after its written estimate. No late fee. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Self-pay: paid in full when booked"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay exam is paid in full when it's booked, after its written estimate. No late fee. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Paid at the desk."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each exam: nothing taken when booked, the copay or the self-pay price paid at the desk. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    },
+    "op": "words"
+   },
+   {
+    "at": "S1-14",
+    "does": "Nothing is taken when a patient books, and no card is asked for. The copay, or the self-pay price, is paid at the front desk.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Visits at your center: nothing is taken when they book, and no card is asked for. The copay, or the self-pay price, is paid at the front desk after the visit.",
+      {
+       "card": {
+        "title": "Your center's money",
+        "lines": [
+         "Nothing taken when booked",
+         "No card, and no late-cancel or no-show fee",
+         "Paid at the desk after the visit; a plan's balance billed by you its own way"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I send no bill for a desk payment."
+     ]
+    ],
+    "vary": {
+     "before:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. The copay, or the self-pay price, is paid at the front desk.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Nothing taken when booked. The copay, or the self-pay price, is paid at the front desk after the visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:list+before:none+after:counter": {
+      "does": "Nothing is taken when booked, and no card is asked for. The copay, or the self-pay price, is paid at the front desk.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Nothing taken when booked. The copay, or the self-pay price, is paid at the front desk after the visit.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:full": {
+      "does": "A self-pay exam is paid in full when it's booked, after its written estimate. Nothing more is owed after.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Paid in full when booked, after the written estimate. Nothing more is owed after.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     }
+    },
+    "op": "words"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Imaging runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Sam's mobile team sends house calls now, with a clinician on call (pf.staff.onCall).",
+    "label": "2 No: never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "Imaging books no repeat plans.",
+    "label": "Repeat visits: a plan"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A house call is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Each patient has their own visit.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "A house call needs no written contract; consent is signed on the secure page.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "why": "Imaging books no repeat plans.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "why": "Imaging books no repeat plans.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Imaging books no repeat plans.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Imaging books no repeat plans.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "A house call always needs the patient there.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "A house call always needs the patient there.",
+    "label": "The way in fails"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never left alone with the clinician: the parent or guardian on the booking stays.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "A house call is paid at once.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "Each house call is billed on its own.",
+    "label": "One bill for many visits"
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "why": "A house call has no warranty claim; questions go to the office's phone.",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "The team sends the patient to their own doctor for follow-up.",
+    "label": "Next visit booked at checkout"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "The team sends no proposals for more work.",
+    "label": "The business sends a proposal"
+   },
+   {
+    "op": "off",
+    "at": "B3-17",
+    "why": "Imaging's danger words always stop the booking; there are no safety steps to send before a visit.",
+    "label": "Safety steps, then go on"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "A house call is sent now, or booked in the next open window; nobody waits on a list.",
+    "label": "Joins the waitlist"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "Every house call has the health forms and consent on the secure page.",
+    "label": "No"
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "why": "The patient waits at home or in the hotel room; a patient who isn't there is handled at the door (B8-10).",
+    "label": "Alex runs late"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "A house call is never over $500, so bank transfer never comes up.",
+    "label": "Bank transfer, if it's on"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "A house call's bill goes to the patient; an employer for a workplace day is billed the office's own way.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "why": "Care already given can't be cancelled; the plug-in's rules give no cancel period for it.",
+    "label": "Cancels inside the period"
+   },
+   {
+    "op": "off",
+    "at": "S11-03",
+    "why": "A house call never waits for Sam's OK: it's sent to the clinician on call, or booked in the soonest window."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "A plan's share is billed by the office its own way (pf.money.after), never by Rosie's text."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession, health included; no no-$2 choice"
+   },
+   {
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When patients book, do you take anything? Each home visit starts the way most mobile imaging practices set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every home visit, to start",
+        "lines": [
+         "Where: at the patient's home or a care facility",
+         "When they book: nothing taken",
+         "After the visit: Rosie sends the bill for a self-pay visit; a plan's share is billed by you its own way",
+         "No late-cancel fee"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Mobile X-ray at home (with the trip fee)",
+          "$225"
+         ],
+         [
+          "Mobile ultrasound at home",
+          "$300"
+         ],
+         [
+          "Mammography coach day, per person",
+          "$150 self-pay"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Plan patients: I bill the plan my own way"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A visit a plan pays: nothing taken, and you bill the plan and any share your own way. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Plan patients: I bill the plan my own way"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A visit a plan pays: nothing taken, and you bill the plan and any share your own way. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Paid in full when booked"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay visit is paid in full when booked, after its written estimate. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:none+after:none": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Nothing before. Rosie sends the bill after."
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A self-pay home visit: $225 with the trip fee, nothing taken when booked, and Rosie sends the bill after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    },
+    "op": "words"
+   },
+   {
+    "at": "S1-14",
+    "does": "Nothing is taken when booked, and no card is asked for. A plan's visit is billed by the center its own way; a self-pay home visit is billed after the visit.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Home visits: nothing is taken when they book, and no card is asked for. A self-pay visit is billed after the visit, with the $50 trip fee in the bill. A plan's share is billed by you its own way.",
+      {
+       "card": {
+        "title": "Your home visits",
+        "lines": [
+         "Nothing taken when booked",
+         "No card, and no fee for a late cancel or a no-show",
+         "Billed after the visit: a self-pay bill from Rosie, or a plan's share by you"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Got it. Nothing more is asked for at booking."
+     ]
+    ],
+    "vary": {
+     "before:none": {
+      "does": "Nothing is taken when booked, and no card is asked for. A self-pay home visit is billed after the visit; a plan's visit is billed by the center its own way.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Nothing taken when booked. A self-pay home visit is billed after the visit, with the trip fee in the bill.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     },
+     "before:none+after:own": {
+      "does": "Nothing is taken when booked. The center bills the plan, and any share, its own way.",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Nothing taken when booked. The center bills the plan and any share its own way.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ]
+      ]
+     }
+    },
+    "op": "words"
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "S1-80",
+   "S2-30",
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28",
+   "S1-80",
+   "S2-30",
+   "B7-55",
+   "B8-58",
+   "B7-62"
+  ]
+ },
+ "notes": "Built Oct 27 2026 (K10, Haiku builder) from the refitted urgent-care overlay (R12) and the imaging test-drive plug-in (Oct 25, work/testdrive/imaging.md). Health work: sensitive on; no $2 switch (D97: the $2 applies). Licenses optional and never checked (D96): S1-60 and S2-28 keep both branches. Rooms and machines are spaces (S1-80 kept). Flow A money: list|none|own (main, the plan billed by the center), list|none|counter (walk-in copay at the desk), list|full|none (self-pay ultrasound paid in full after the estimate). Flow B: list|none|own (main), list|none|bill (self-pay mobile X-ray, $225 with the trip fee). No card, deposit or hold paths; no late-cancel or no-show fee.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Each service starts the way most barbershops set it.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Someone calls for a dentist: a wrong number.",
+    "a card saved for the $89 service-call fee",
+    "Every shop service, color and house calls",
+    "Classic cuts, fades and hot towel shaves.",
+    "or can't be reached while care is due?",
+    "The cape clip ripped my shirt collar.",
+    "Reminds Alex before free cancel ends",
+    "a card saved, for a $20 fee you OK",
+    "Lee's Barbershop doesn't do perms.",
+    "Riley: barber, color, house calls",
+    "Signature cut and hot towel shave",
+    "Signature cut and hot towel shave",
+    "Books a haircut and a beard trim",
+    "What happens before Sat 11:00am?",
+    "Riley helps; Sam is told at once",
+    "Color quotes come to you first.",
+    "Stops, and sends a written note",
+    "Color always stays with Riley.",
+    "Riley adds notes for next time",
+    "adds the prices: $35 and $20.",
+    "Asks Riley to check Alex in",
+    "Checks it, then asks Riley",
+    "What happens at the chair?",
+    "Riley asks for a day off",
+    "Riley finishes the work",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "plumbing and electrical",
+    "Signature cut and shave",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Asks Riley to check it",
+    "Alex adds a beard trim",
+    "Offers the next times",
+    "Riley enters the code",
+    "Lee's Barbershop LLC",
+    "priced at the chair",
+    "Priced at the chair",
+    "Lee Home Services'",
+    "Elm Street Dental",
+    "Sam adds a barber",
+    "Lee Home Services",
+    "paid at the chair",
+    "Color correction",
+    "Lee's Barbershop",
+    "Color correction",
+    "at $140 an hour",
+    "hot towel shave",
+    "hot towel shave",
+    "Groom's package",
+    "Haircut at home",
+    "the $25 consult",
+    "Color touch-up",
+    "Drain clearing",
+    "1 color quote",
+    "Signature cut",
+    "color and cut",
+    "Color and cut",
+    "Color and cut",
+    "Style consult",
+    "water heaters",
+    "at the chair",
+    "At the chair",
+    "shop's board",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "a burst pipe",
+    "at the chair",
+    "price board",
+    "Price board",
+    "Casey Moore",
+    "NEW massage",
+    "house calls",
+    "House calls",
+    "barbershop",
+    "Barbershop",
+    "Beard trim",
+    "Riley Chen",
+    "Avery Diaz",
+    "electrical",
+    "barbershop",
+    "Barbershop",
+    "beard trim",
+    "Electrical",
+    "electrical",
+    "burst pipe",
+    "Barbershop",
+    "house call",
+    "House call",
+    "patch test",
+    "beard line",
+    "hot towel",
+    "kids cuts",
+    "Skin fade",
+    "88 Elm St",
+    "Barbering",
+    "Skin fade",
+    "skin fade",
+    "clinician",
+    "cape clip",
+    "kids cut",
+    "haircuts",
+    "Haircuts",
+    "MP045210",
+    "JP031552",
+    "plumbing",
+    "Plumbing",
+    "Kids cut",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "Plumbing",
+    "plumbing",
+    "haircut",
+    "Haircut",
+    "haircut",
+    "Haircut",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "massage",
+    "Plumber",
+    "Jordan",
+    "barber",
+    "Barber",
+    "Barber",
+    "heater",
+    "clinic",
+    "Riley",
+    "Avery",
+    "Casey",
+    "color",
+    "Color",
+    "shops",
+    "beard",
+    "valve",
+    "shop",
+    "Shop",
+    "perm",
+    "pipe"
+   ],
+   "B": [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Here, Lin W. wasn't home for the Tue 10am–12pm drain clearing with Casey, and didn't answer.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Lee Home Services can start the sewer camera inspection at a set time.",
+    "Say Alex was told at DONE that a sewer camera report comes Fri Oct 23.",
+    "Lee Home Services: your sewer camera report needs a little more time.",
+    "Lee Home Services: your sewer camera report from Thu Oct 22 is ready.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "Done: the $160 valve work is cancelled, and you owe nothing for it.",
+    "Lee Home Services: your sewer camera report from Thursday is ready.",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Extra for A.M.: replace both shutoff valves, $160. Sent to Alex.",
+    "A drain clearing with Lee Home Services is $179, not $150.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "The price, {{price}}, comes straight from Sam's list.",
+    "Its money card is set the way most barbershops start.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "The work is priced at the visit, like a leak repair.",
+    "Like tapping a neighbor's water line without asking.",
+    "Say Alex asks for a water heater flush every year.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "I found water damage under the sink this morning.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan look at my bathroom sink next week?",
+    "'My sink won't drain' fits a drain clearing.",
+    "Alex texts that the sink is now overflowing.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "Alex texts that the sink is now overflowing.",
+    "Someone calls for a dentist: a wrong number.",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Can Jordan also look at a dripping faucet?",
+    "a card saved for the $89 service-call fee",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "One booking, so one $2 for the whole job.",
+    "The work never started, so there's no $2.",
+    "The $160 valve quote is good for 7 days.",
+    "Please clear the cabinet under the sink.",
+    "Please clear the cabinet under the sink.",
+    "Jordan finds mold behind the sink wall.",
+    "My gas water heater got wet in a flood.",
+    "Lee Home Services can clear the drain:",
+    "or can't be reached while care is due?",
+    "Jordan finds corroded shutoff valves.",
+    "Jordan found more work. Add it today?",
+    "Texts the report link on the new date",
+    "Sent now · Overflowing kitchen drain",
+    "The drain clogs again 2 weeks later.",
+    "Sent now · Overflowing kitchen drain",
+    "a card saved, for a $20 fee you OK",
+    "Replace both shutoff valves · $160",
+    "like an overflowing drain at night",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "It's a leak under the sink, today,",
+    "Jordan left a mess under the sink.",
+    "Not done: the pipe behind the wall",
+    "What comes up while Jordan works?",
+    "Is the sink still full of water?",
+    "DAMAGE cracked the cabinet floor",
+    "Found: mold behind the sink wall",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Sewer camera inspection · $199",
+    "Adding a faucet check? Say so.",
+    "Jordan and Alex check the work",
+    "One booking, so no second $2.",
+    "Saves the time for 10 minutes",
+    "My kitchen drain is clogged.",
+    "Jordan texts OMW (on my way)",
+    "Texts the camera report link",
+    "Is the report ready on time?",
+    "Replace both shutoff valves",
+    "raise drain clearing to 199",
+    "The quote stays open 7 days",
+    "The $179 drain needs none.",
+    "2 No, just the booked work",
+    "Mold behind the sink wall",
+    "$179, paid after the job",
+    "Safety note · your home",
+    "NEW heating and cooling",
+    "A plan or warranty pays",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "Under the sink, before",
+    "Just the kitchen sink.",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "Lee Home Services LLC",
+    "Texts Jordan the day",
+    "A fix-a-leak class.",
+    "leehomeservices.com",
+    "sewer camera report",
+    "Sewer camera report",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Elm Street Dental",
+    "paid at the chair",
+    "service call fee",
+    "Service call fee",
+    "Lee's Barbershop",
+    "at $140 an hour",
+    "Drain clearings",
+    "drain clearing",
+    "DONE 179 drain",
+    "Drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "water heaters",
+    "service call",
+    "Service call",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Water heater",
+    "a burst pipe",
+    "at the chair",
+    "Price board",
+    "Casey Moore",
+    "house calls",
+    "House calls",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "barbershop",
+    "Barbershop",
+    "Electrical",
+    "electrical",
+    "burst pipe",
+    "barbershop",
+    "Barbershop",
+    "house call",
+    "House call",
+    "88 Elm St",
+    "42 Oak St",
+    "clinician",
+    "plumbing",
+    "MP045210",
+    "JP031552",
+    "Plumbing",
+    "cut hair",
+    "Plumbing",
+    "plumbing",
+    "haircut",
+    "haircut",
+    "Haircut",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "Plumber",
+    "plumber",
+    "Jordan",
+    "barber",
+    "Barber",
+    "heater",
+    "Barber",
+    "clinic",
+    "Riley",
+    "Casey",
+    "Avery",
+    "Riley",
+    "Avery",
+    "drain",
+    "shop",
+    "Shop",
+    "perm"
+   ]
+  },
+  "A": {
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A5-19": "5d5db6f3c1",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A4-15": "db5792db95",
+   "A6-01": "df3c5778ea",
+   "A8-03": "7accda6f86",
+   "A10-05": "63c3536c7a",
+   "S11-03": "004f4f5fea",
+   "S12-23": "44754a3de5",
+   "A10-34": "78c2d9a6a3",
+   "S1-62": "c4f497de12",
+   "S1-13": "eca22651fd",
+   "S1-14": "c6cd09f2c0"
+  },
+  "B": {
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B9-19": "b97bfbf0d2",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B3-17": "3eb7d7f259",
+   "B4-16": "37cd99137d",
+   "B4-38": "9539521dc7",
+   "B9-06": "f091432f2d",
+   "B10-05": "a326ea3c0b",
+   "S11-03": "ff8e999c10",
+   "B10-32": "7713bff255",
+   "S1-62": "c4f497de12",
+   "S1-13": "6964bfbe60",
+   "S1-14": "518f77ff70"
+  }
+ }
+}

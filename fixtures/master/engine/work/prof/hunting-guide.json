@@ -1,0 +1,2601 @@
+{
+ "id": "hunting-guide",
+ "name": "Hunting and outdoor guide",
+ "style": "Table",
+ "pattern": "table",
+ "from": "rentals",
+ "plugin": {
+  "pf.license": {
+   "need": "The hunter's own hunting license, tags and any hunter-education card are the hunter's, where the state requires them. The guide service's and the outfitter's own license, where the state requires one for guiding: the owner's papers, shown as given.",
+   "who holds it": "Each hunter holds their own license and tags. The guide and the outfitter hold their own papers, as the owner says.",
+   "how it's checked": "Not checked by Rosie, for the hunter or the guide. The owner keeps the papers. The hunter confirms the tags and season on the secure page (D96).",
+   "insurance or bond": "Liability insurance: the owner's own certificate, shown as given, never checked.",
+   "blocks going live": "Nothing: Rosie shows no license claim for any hunter or guide.",
+   "renewals": "The owner's own list; Rosie sends no reminder for a license it never checked.",
+   "background checks": "None."
+  },
+  "pf.services": {
+   "shape": "a guided hunt, a sighting-in session and a planning meeting at the lodge (flow A: the hunter comes to the lodge or the range); a scouting day and a sighting-in at the hunter's own land (flow B: the guide goes to the customer)",
+   "price kind": "one price per hunt, per hunter, or per day, from the outfitter's own list; a travel fee on a home-land visit is part of the price shown",
+   "examples": "the example outfitter's own prices (Lee Outfitters, Lee Hunt Guides), not a standard",
+   "list": [
+    {
+     "name": "Planning meeting at the lodge",
+     "price": "free",
+     "kind": "free",
+     "length": "about 30 minutes",
+     "where": "at the lodge (flow A)",
+     "before": "nothing taken",
+     "after": "nothing to pay"
+    },
+    {
+     "name": "Sighting-in session at the range",
+     "price": "$60 a rifle, 3 shots",
+     "kind": "one price per rifle",
+     "length": "about 1 hour",
+     "where": "at the range (flow A)",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Guided half-day hunt, up to 2 hunters",
+     "price": "$450",
+     "kind": "one price per hunt",
+     "length": "half a day, out before sunrise or back before dark",
+     "where": "from the lodge (flow A)",
+     "before": "a $150 deposit when booking",
+     "after": "the $300 rest paid at the lodge check-in, before the hunt"
+    },
+    {
+     "name": "Scouting day on the hunter's land",
+     "price": "$360, with the travel",
+     "kind": "one price per day",
+     "length": "a full day",
+     "where": "at the hunter's own land (flow B)",
+     "before": "a $100 deposit when booking",
+     "after": "the $260 rest charged to the saved card when the guide texts DONE"
+    },
+    {
+     "name": "Sighting-in at the hunter's own range",
+     "price": "$180, with the travel fee",
+     "kind": "one price",
+     "where": "at the hunter's place (flow B)",
+     "before": "a card saved for the $60 fee",
+     "after": "the bill texted after the session"
+    },
+    {
+     "name": "One-day rifle check at the hunter's place",
+     "price": "$150, paid in full",
+     "kind": "one price",
+     "where": "at the hunter's place (flow B)",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Multi-day elk hunt, quoted from the plan",
+     "price": "$1,200 quoted (over $500, so the owner OKs it)",
+     "kind": "quoted from the plan",
+     "where": "from the lodge, several days (flow A)",
+     "before": "a $300 deposit once the plan is signed",
+     "after": "the rest paid at check-in"
+    }
+   ],
+   "never booked": "No hunt for anyone who isn't allowed to hold a firearm under the outfitter's own rule, the state's rules, or the landowner's; no hunt on land without the landowner's permission; no hunt outside the season, the bag limit or the tags the hunter holds.",
+   "capacity": "one guide for up to 2 hunters; a hunt for more needs a second guide, booked by the owner",
+   "online": "Rosie never books a hunt for a child without an adult on the trip, and never records a call."
+  },
+  "pf.questions": {
+   "before times": [
+    "What kind of hunt: deer, turkey, elk, birds, or a sighting-in only?",
+    "How many hunters, and the youngest's age (a youth hunt needs an adult)?",
+    "Does each hunter have their own license, tags and a rifle that's been checked?",
+    "Is it on the lodge's land, the hunter's own land, or another land with permission?"
+   ],
+   "after a time is picked": [
+    "Where to meet, and the road in",
+    "Clothing and a blaze colour, if the state asks for one"
+   ],
+   "only on the secure page": [
+    "The land's address and any gate code",
+    "The landowner's permission, if it's not the booker's land",
+    "Each hunter's name and tag number",
+    "Any medical needs or medicines on the trip",
+    "A rifle's make and caliber"
+   ],
+   "who may book": "An adult hunter, or an adult who books for a hunter. A youth hunter books only with an adult on the trip. No one books a hunt on land the booker can't use."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "someone shot, lost or hurt in the woods (call 911)",
+    "a gun pointed at a person or a threat with a weapon (call 911)"
+   ],
+   "words that go on with safety steps": [
+    "a hunter who has been drinking or is on a medicine that affects them: they don't hunt that day",
+    "a rifle that isn't safe to carry (it's checked at the range first)"
+   ],
+   "what Rosie says": {
+    "in danger right now": "Call 911 now. Nothing is booked.",
+    "lost or hurt in the field": "Call 911 now, and then the guide. Stay where you are if you're lost.",
+    "drinking or impaired": "The guide doesn't take that hunter out. The guide decides the money under the outfitter's own rule."
+   },
+   "legal questions": "Never answered: hunting, tags and season law is the hunter's own to follow; Rosie gives no legal advice."
+  },
+  "pf.first_steps": {
+   "required": "None.",
+   "prep for the reminder": [
+    "Your hunting license, tags and any hunter-education card",
+    "Your rifle checked at the range before the hunt, if you're new to it",
+    "Blaze orange or the clothing the state asks for",
+    "A way to reach the lodge or the guide on the day"
+   ]
+  },
+  "pf.visit": {
+   "check-in": "At the lodge: the code at the front desk. In the field: the code from the guide at the meeting point.",
+   "before the hunt": "The guide checks each hunter's license and tags on the outfitter's own list, the rifles at the range, and the weather. Nothing is checked by Rosie.",
+   "work changes": "A change on the hunt (a longer trip, a second day) is priced at the list price and OK'd by the hunter before it's done.",
+   "stops": "A hunter who is unsafe with a rifle, or who breaks the outfitter's rules, is sent back to the lodge; the guide decides the money under the outfitter's own rule.",
+   "report": "The hunt's notes and any game record go to the hunter on the secure page; the processor bills the hunter directly."
+  },
+  "pf.money": {
+   "before": "a sighting-in paid in full; a guided hunt with a deposit; a scouting day with a deposit; a planning meeting with nothing taken",
+   "after": "the rest paid at the lodge check-in before the hunt, or charged to the saved card when the guide texts DONE, or the bill texted after a session",
+   "cancel": "a cancel in time gets a full refund; a late cancel or no-show keeps the deposit or the fee shown; weather can move the hunt for free",
+   "caps": "the owner's own limit: any quote over $500 is OK'd by the owner first",
+   "tips": "a tip for the guide is the hunter's choice, in cash at the lodge; Rosie never asks",
+   "processing": "game processing and taxidermy are billed by the processor to the hunter directly; Rosfield takes no money for them"
+  },
+  "pf.messages": "Texts go to the adult who booked. Hunt details, tag numbers, medicines and any health detail are never in a text: the secure page only.",
+  "pf.staff": {
+   "skills": "guide (big game, upland birds, waterfowl), range instructor (sighting-in), lodge desk",
+   "licenses": "the owner's own guide papers where the state requires them, shown as given",
+   "ratio": "one guide for up to 2 hunters; a youth hunt is always one adult to one youth",
+   "standIn": "any licensed guide on the team; nobody is booked by name",
+   "oks": "Sam OKs quotes over $500, any landowner question, and any refund"
+  },
+  "pf.rules": {
+   "season": "Only the state's own season, bag limit and the tags the hunter holds; the guide follows them, and Rosie doesn't check them.",
+   "weather": "Weather can move a hunt for free; the guide decides, and the hunter picks a new day.",
+   "no tips asked": "Tips are the hunter's choice; never asked."
+  },
+  "pf.edges": {
+   "walkins": "A walk-in can sight in a rifle when the range has a free lane; else the next free day.",
+   "weather": "A high-wind day, or a range closed for weather: a free move to another day."
+  },
+  "pf.facts": [
+   "groups",
+   "forms",
+   "children",
+   "multiday",
+   "extrawork",
+   "firststeps"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "setstart"
+   },
+   "cutoff": {
+    "A": "72 hours before",
+    "B": "72 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Kids cut",
+    "Youth hunt"
+   ],
+   [
+    "kids cut",
+    "youth hunt"
+   ],
+   [
+    "Hunting lodge",
+    "Hunting lodge"
+   ],
+   [
+    "cabinet",
+    "lodge box"
+   ],
+   [
+    "Cabinet",
+    "Lodge box"
+   ],
+   [
+    "Shop's",
+    "Lodge's"
+   ],
+   [
+    "Color quotes",
+    "Hunt quotes"
+   ],
+   [
+    "Color quote",
+    "Hunt quote"
+   ],
+   [
+    "At the chair",
+    "At the lodge"
+   ],
+   [
+    "valves",
+    "lines"
+   ],
+   [
+    "Valves",
+    "Lines"
+   ],
+   [
+    "clogs",
+    "snags"
+   ],
+   [
+    "Clogs",
+    "Snags"
+   ],
+   [
+    "water heaters",
+    "blinds"
+   ],
+   [
+    "Water heaters",
+    "Blinds"
+   ],
+   [
+    "heaters",
+    "motors"
+   ],
+   [
+    "Heaters",
+    "Motors"
+   ],
+   [
+    "travel fee",
+    "pick-up fee"
+   ],
+   [
+    "Travel fee",
+    "Pick-up fee"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Lodge pick-up hunt"
+   ],
+   [
+    "kitchen drain clearing",
+    "lodge pick-up hunt"
+   ],
+   [
+    "Drain clearing",
+    "Lodge hunt"
+   ],
+   [
+    "drain clearing",
+    "lodge hunt"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Outfitters LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Outfitters"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Hunt Guides"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Blind Rentals"
+   ],
+   [
+    "Lee Electric",
+    "Lee Game Processing"
+   ],
+   [
+    "Riley Chen",
+    "Dale Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Wren Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Cal Price"
+   ],
+   [
+    "Casey Moore",
+    "Jo Moore"
+   ],
+   [
+    "Riley",
+    "Dale"
+   ],
+   [
+    "Avery",
+    "Wren"
+   ],
+   [
+    "Jordan",
+    "Cal"
+   ],
+   [
+    "Casey",
+    "Jo"
+   ],
+   [
+    "barbershops",
+    "hunting lodges"
+   ],
+   [
+    "barbershop",
+    "hunting lodge"
+   ],
+   [
+    "Barbershop",
+    "Hunting lodge"
+   ],
+   [
+    "barbers",
+    "guides"
+   ],
+   [
+    "barber chair",
+    "shooting bench"
+   ],
+   [
+    "barber",
+    "guide"
+   ],
+   [
+    "Barber",
+    "Guide"
+   ],
+   [
+    "the shop's",
+    "the lodge's"
+   ],
+   [
+    "The shop's",
+    "The lodge's"
+   ],
+   [
+    "shop's",
+    "lodge's"
+   ],
+   [
+    "the shop",
+    "the lodge"
+   ],
+   [
+    "The shop",
+    "The lodge"
+   ],
+   [
+    "shops",
+    "lodges"
+   ],
+   [
+    "shop",
+    "lodge"
+   ],
+   [
+    "Shop",
+    "Lodge"
+   ],
+   [
+    "Haircuts",
+    "Guided hunts"
+   ],
+   [
+    "haircuts",
+    "guided hunts"
+   ],
+   [
+    "Haircut",
+    "Guided hunt"
+   ],
+   [
+    "haircut",
+    "guided hunt"
+   ],
+   [
+    "Beard trim",
+    "Game processing"
+   ],
+   [
+    "beard trim",
+    "game processing"
+   ],
+   [
+    "beard line",
+    "hook line"
+   ],
+   [
+    "beard",
+    "hook"
+   ],
+   [
+    "Skin fades",
+    "Sighting-in sessions"
+   ],
+   [
+    "skin fades",
+    "sighting-in sessions"
+   ],
+   [
+    "Skin fade",
+    "Sighting-in session"
+   ],
+   [
+    "skin fade",
+    "sighting-in session"
+   ],
+   [
+    "Kids cuts",
+    "Youth seats"
+   ],
+   [
+    "kids cuts",
+    "youth seats"
+   ],
+   [
+    "Color and cut",
+    "Scouting day"
+   ],
+   [
+    "color and cut",
+    "scouting day"
+   ],
+   [
+    "Color correction",
+    "Extra hour in the blind"
+   ],
+   [
+    "color correction",
+    "extra hour in the blind"
+   ],
+   [
+    "Color touch-up",
+    "Extra hour"
+   ],
+   [
+    "color touch-up",
+    "extra hour"
+   ],
+   [
+    "color plan",
+    "hunt plan"
+   ],
+   [
+    "Color plan",
+    "Hunt plan"
+   ],
+   [
+    "Color",
+    "Game"
+   ],
+   [
+    "color",
+    "game"
+   ],
+   [
+    "patch test",
+    "safety brief"
+   ],
+   [
+    "cut hair",
+    "fish"
+   ],
+   [
+    "Groom's package",
+    "Planning meeting"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Scouting day"
+   ],
+   [
+    "Signature cut and shave",
+    "Scouting day"
+   ],
+   [
+    "hot towel shaves",
+    "sighting-in sessions"
+   ],
+   [
+    "hot towel",
+    "fish"
+   ],
+   [
+    "shaves",
+    "trips"
+   ],
+   [
+    "shave",
+    "trip"
+   ],
+   [
+    "perms",
+    "fishing trips"
+   ],
+   [
+    "perm",
+    "fishing trip"
+   ],
+   [
+    "cape clip",
+    "life vest"
+   ],
+   [
+    "cape",
+    "vest"
+   ],
+   [
+    "massage",
+    "planning meeting"
+   ],
+   [
+    "Massage",
+    "Planning meeting"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "fish"
+   ],
+   [
+    "house calls",
+    "lodge pick-ups"
+   ],
+   [
+    "house call",
+    "lodge pick-up"
+   ],
+   [
+    "House calls",
+    "Lodge pick-ups"
+   ],
+   [
+    "House call",
+    "Lodge pick-up"
+   ],
+   [
+    "at the chair",
+    "at the lodge"
+   ],
+   [
+    "in the chair",
+    "at the lodge"
+   ],
+   [
+    "the chair",
+    "the lodge"
+   ],
+   [
+    "The chair",
+    "The lodge"
+   ],
+   [
+    "chair",
+    "seat"
+   ],
+   [
+    "Plumbing and electrical",
+    "Hunts and planning meetings"
+   ],
+   [
+    "plumbing and electrical",
+    "hunts and planning meetings"
+   ],
+   [
+    "plumber",
+    "guide"
+   ],
+   [
+    "Plumber",
+    "Guide"
+   ],
+   [
+    "plumbing",
+    "hunt"
+   ],
+   [
+    "Plumbing",
+    "Hunt"
+   ],
+   [
+    "electrician",
+    "guide"
+   ],
+   [
+    "electrical",
+    "hunt"
+   ],
+   [
+    "Electrical",
+    "Hunt"
+   ],
+   [
+    "clogged drain",
+    "snagged line"
+   ],
+   [
+    "drain",
+    "line"
+   ],
+   [
+    "Drain",
+    "Line"
+   ],
+   [
+    "water heater flush",
+    "blind setup"
+   ],
+   [
+    "Water heater flush",
+    "Blind setup"
+   ],
+   [
+    "water heater replacement",
+    "blind service"
+   ],
+   [
+    "Water heater replacement",
+    "Blind service"
+   ],
+   [
+    "water heater",
+    "blind"
+   ],
+   [
+    "Water heater",
+    "Blind"
+   ],
+   [
+    "heater",
+    "motor"
+   ],
+   [
+    "flush",
+    "rinse"
+   ],
+   [
+    "service call",
+    "lodge visit"
+   ],
+   [
+    "Service call",
+    "Lodge visit"
+   ],
+   [
+    "faucet",
+    "rod"
+   ],
+   [
+    "dishwasher",
+    "cooler"
+   ],
+   [
+    "garbage disposal",
+    "lodge box"
+   ],
+   [
+    "sewer",
+    "lodge box"
+   ],
+   [
+    "toilet",
+    "lodge box"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "snag"
+   ],
+   [
+    "pipes",
+    "lines"
+   ],
+   [
+    "pipe",
+    "line"
+   ],
+   [
+    "valve",
+    "line"
+   ],
+   [
+    "shutoff",
+    "wait"
+   ],
+   [
+    "repipe",
+    "re-rig"
+   ],
+   [
+    "supply line",
+    "fuel line"
+   ],
+   [
+    "water line",
+    "fuel line"
+   ],
+   [
+    "heating and cooling",
+    "weather check"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "snag"
+   ],
+   [
+    "leaks",
+    "snags"
+   ],
+   [
+    "Short on the sides",
+    "Short on the deck"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "12 Harbor Rd"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "14 Cedar Ln"
+   ],
+   [
+    "Elm St",
+    "Harbor Rd"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "Barbershops",
+    "Hunting lodges"
+   ],
+   [
+    "Barbers",
+    "Guides"
+   ],
+   [
+    "Barber chair",
+    "Shooting bench"
+   ],
+   [
+    "Shops",
+    "Lodges"
+   ],
+   [
+    "Beard line",
+    "Hook line"
+   ],
+   [
+    "Beard",
+    "Hook"
+   ],
+   [
+    "Patch test",
+    "Safety brief"
+   ],
+   [
+    "Cut hair",
+    "Fish"
+   ],
+   [
+    "Hot towel shaves",
+    "Sighting-in sessions"
+   ],
+   [
+    "Hot towel",
+    "Fish"
+   ],
+   [
+    "Shaves",
+    "Trips"
+   ],
+   [
+    "Shave",
+    "Trip"
+   ],
+   [
+    "Perms",
+    "Fishing trips"
+   ],
+   [
+    "Perm",
+    "Fishing trip"
+   ],
+   [
+    "Cape clip",
+    "Life vest"
+   ],
+   [
+    "Cape",
+    "Vest"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Fish"
+   ],
+   [
+    "In the chair",
+    "At the lodge"
+   ],
+   [
+    "Chair",
+    "Seat"
+   ],
+   [
+    "Electrician",
+    "Guide"
+   ],
+   [
+    "Clogged drain",
+    "Snagged line"
+   ],
+   [
+    "Heater",
+    "Motor"
+   ],
+   [
+    "Flush",
+    "Rinse"
+   ],
+   [
+    "Faucet",
+    "Rod"
+   ],
+   [
+    "Dishwasher",
+    "Cooler"
+   ],
+   [
+    "Garbage disposal",
+    "Lodge box"
+   ],
+   [
+    "Sewer",
+    "Lodge box"
+   ],
+   [
+    "Toilet",
+    "Lodge box"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Snag"
+   ],
+   [
+    "Pipes",
+    "Lines"
+   ],
+   [
+    "Pipe",
+    "Line"
+   ],
+   [
+    "Valve",
+    "Line"
+   ],
+   [
+    "Shutoff",
+    "Wait"
+   ],
+   [
+    "Repipe",
+    "Re-rig"
+   ],
+   [
+    "Supply line",
+    "Fuel line"
+   ],
+   [
+    "Water line",
+    "Fuel line"
+   ],
+   [
+    "Heating and cooling",
+    "Weather check"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Snag"
+   ],
+   [
+    "Leaks",
+    "Snags"
+   ],
+   [
+    "$35",
+    "@@0@@"
+   ],
+   [
+    "$40",
+    "@@1@@"
+   ],
+   [
+    "$55",
+    "@@2@@"
+   ],
+   [
+    "$25",
+    "@@3@@"
+   ],
+   [
+    "$140",
+    "@@4@@"
+   ],
+   [
+    "$120",
+    "@@5@@"
+   ],
+   [
+    "$90",
+    "@@6@@"
+   ],
+   [
+    "$89",
+    "@@7@@"
+   ],
+   [
+    "$75",
+    "@@8@@"
+   ],
+   [
+    "@@0@@",
+    "$450"
+   ],
+   [
+    "@@1@@",
+    "$150"
+   ],
+   [
+    "@@2@@",
+    "$60"
+   ],
+   [
+    "@@3@@",
+    "$20"
+   ],
+   [
+    "@@4@@",
+    "$150"
+   ],
+   [
+    "@@5@@",
+    "$150"
+   ],
+   [
+    "@@6@@",
+    "$300"
+   ],
+   [
+    "@@7@@",
+    "$150"
+   ],
+   [
+    "@@8@@",
+    "$60"
+   ]
+  ],
+  "B": [
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like anchoring on a neighbor's reef without asking."
+   ],
+   [
+    "Kids cut",
+    "Youth hunt"
+   ],
+   [
+    "kids cut",
+    "youth hunt"
+   ],
+   [
+    "Hunting lodge",
+    "Hunting lodge"
+   ],
+   [
+    "cabinet",
+    "lodge box"
+   ],
+   [
+    "Cabinet",
+    "Lodge box"
+   ],
+   [
+    "Shop's",
+    "Lodge's"
+   ],
+   [
+    "Color quotes",
+    "Hunt quotes"
+   ],
+   [
+    "Color quote",
+    "Hunt quote"
+   ],
+   [
+    "At the chair",
+    "At the lodge"
+   ],
+   [
+    "valves",
+    "lines"
+   ],
+   [
+    "Valves",
+    "Lines"
+   ],
+   [
+    "clogs",
+    "snags"
+   ],
+   [
+    "Clogs",
+    "Snags"
+   ],
+   [
+    "water heaters",
+    "blinds"
+   ],
+   [
+    "Water heaters",
+    "Blinds"
+   ],
+   [
+    "heaters",
+    "motors"
+   ],
+   [
+    "Heaters",
+    "Motors"
+   ],
+   [
+    "travel fee",
+    "pick-up fee"
+   ],
+   [
+    "Travel fee",
+    "Pick-up fee"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Lodge pick-up hunt"
+   ],
+   [
+    "kitchen drain clearing",
+    "lodge pick-up hunt"
+   ],
+   [
+    "Drain clearing",
+    "Lodge hunt"
+   ],
+   [
+    "drain clearing",
+    "lodge hunt"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Outfitters LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Outfitters"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Hunt Guides"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Blind Rentals"
+   ],
+   [
+    "Lee Electric",
+    "Lee Game Processing"
+   ],
+   [
+    "Riley Chen",
+    "Dale Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Wren Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Cal Price"
+   ],
+   [
+    "Casey Moore",
+    "Jo Moore"
+   ],
+   [
+    "Riley",
+    "Dale"
+   ],
+   [
+    "Avery",
+    "Wren"
+   ],
+   [
+    "Jordan",
+    "Cal"
+   ],
+   [
+    "Casey",
+    "Jo"
+   ],
+   [
+    "barbershops",
+    "hunting lodges"
+   ],
+   [
+    "barbershop",
+    "hunting lodge"
+   ],
+   [
+    "Barbershop",
+    "Hunting lodge"
+   ],
+   [
+    "barbers",
+    "guides"
+   ],
+   [
+    "barber chair",
+    "shooting bench"
+   ],
+   [
+    "barber",
+    "guide"
+   ],
+   [
+    "Barber",
+    "Guide"
+   ],
+   [
+    "the shop's",
+    "the lodge's"
+   ],
+   [
+    "The shop's",
+    "The lodge's"
+   ],
+   [
+    "shop's",
+    "lodge's"
+   ],
+   [
+    "the shop",
+    "the lodge"
+   ],
+   [
+    "The shop",
+    "The lodge"
+   ],
+   [
+    "shops",
+    "lodges"
+   ],
+   [
+    "shop",
+    "lodge"
+   ],
+   [
+    "Shop",
+    "Lodge"
+   ],
+   [
+    "Haircuts",
+    "Guided hunts"
+   ],
+   [
+    "haircuts",
+    "guided hunts"
+   ],
+   [
+    "Haircut",
+    "Guided hunt"
+   ],
+   [
+    "haircut",
+    "guided hunt"
+   ],
+   [
+    "Beard trim",
+    "Game processing"
+   ],
+   [
+    "beard trim",
+    "game processing"
+   ],
+   [
+    "beard line",
+    "hook line"
+   ],
+   [
+    "beard",
+    "hook"
+   ],
+   [
+    "Skin fades",
+    "Sighting-in sessions"
+   ],
+   [
+    "skin fades",
+    "sighting-in sessions"
+   ],
+   [
+    "Skin fade",
+    "Sighting-in session"
+   ],
+   [
+    "skin fade",
+    "sighting-in session"
+   ],
+   [
+    "Kids cuts",
+    "Youth seats"
+   ],
+   [
+    "kids cuts",
+    "youth seats"
+   ],
+   [
+    "Color and cut",
+    "Scouting day"
+   ],
+   [
+    "color and cut",
+    "scouting day"
+   ],
+   [
+    "Color correction",
+    "Extra hour in the blind"
+   ],
+   [
+    "color correction",
+    "extra hour in the blind"
+   ],
+   [
+    "Color touch-up",
+    "Extra hour"
+   ],
+   [
+    "color touch-up",
+    "extra hour"
+   ],
+   [
+    "color plan",
+    "hunt plan"
+   ],
+   [
+    "Color plan",
+    "Hunt plan"
+   ],
+   [
+    "Color",
+    "Game"
+   ],
+   [
+    "color",
+    "game"
+   ],
+   [
+    "patch test",
+    "safety brief"
+   ],
+   [
+    "cut hair",
+    "fish"
+   ],
+   [
+    "Groom's package",
+    "Planning meeting"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Scouting day"
+   ],
+   [
+    "Signature cut and shave",
+    "Scouting day"
+   ],
+   [
+    "hot towel shaves",
+    "sighting-in sessions"
+   ],
+   [
+    "hot towel",
+    "fish"
+   ],
+   [
+    "shaves",
+    "trips"
+   ],
+   [
+    "shave",
+    "trip"
+   ],
+   [
+    "perms",
+    "fishing trips"
+   ],
+   [
+    "perm",
+    "fishing trip"
+   ],
+   [
+    "cape clip",
+    "life vest"
+   ],
+   [
+    "cape",
+    "vest"
+   ],
+   [
+    "massage",
+    "planning meeting"
+   ],
+   [
+    "Massage",
+    "Planning meeting"
+   ],
+   [
+    "brassy",
+    "faded"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "fish"
+   ],
+   [
+    "house calls",
+    "lodge pick-ups"
+   ],
+   [
+    "house call",
+    "lodge pick-up"
+   ],
+   [
+    "House calls",
+    "Lodge pick-ups"
+   ],
+   [
+    "House call",
+    "Lodge pick-up"
+   ],
+   [
+    "at the chair",
+    "at the lodge"
+   ],
+   [
+    "in the chair",
+    "at the lodge"
+   ],
+   [
+    "the chair",
+    "the lodge"
+   ],
+   [
+    "The chair",
+    "The lodge"
+   ],
+   [
+    "chair",
+    "seat"
+   ],
+   [
+    "Plumbing and electrical",
+    "Hunts and planning meetings"
+   ],
+   [
+    "plumbing and electrical",
+    "hunts and planning meetings"
+   ],
+   [
+    "plumber",
+    "guide"
+   ],
+   [
+    "Plumber",
+    "Guide"
+   ],
+   [
+    "plumbing",
+    "hunt"
+   ],
+   [
+    "Plumbing",
+    "Hunt"
+   ],
+   [
+    "electrician",
+    "guide"
+   ],
+   [
+    "electrical",
+    "hunt"
+   ],
+   [
+    "Electrical",
+    "Hunt"
+   ],
+   [
+    "clogged drain",
+    "snagged line"
+   ],
+   [
+    "drain",
+    "line"
+   ],
+   [
+    "Drain",
+    "Line"
+   ],
+   [
+    "water heater flush",
+    "blind setup"
+   ],
+   [
+    "Water heater flush",
+    "Blind setup"
+   ],
+   [
+    "water heater replacement",
+    "blind service"
+   ],
+   [
+    "Water heater replacement",
+    "Blind service"
+   ],
+   [
+    "water heater",
+    "blind"
+   ],
+   [
+    "Water heater",
+    "Blind"
+   ],
+   [
+    "heater",
+    "motor"
+   ],
+   [
+    "flush",
+    "rinse"
+   ],
+   [
+    "service call",
+    "lodge visit"
+   ],
+   [
+    "Service call",
+    "Lodge visit"
+   ],
+   [
+    "faucet",
+    "rod"
+   ],
+   [
+    "dishwasher",
+    "cooler"
+   ],
+   [
+    "garbage disposal",
+    "lodge box"
+   ],
+   [
+    "sewer",
+    "lodge box"
+   ],
+   [
+    "toilet",
+    "lodge box"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "snag"
+   ],
+   [
+    "pipes",
+    "lines"
+   ],
+   [
+    "pipe",
+    "line"
+   ],
+   [
+    "valve",
+    "line"
+   ],
+   [
+    "shutoff",
+    "wait"
+   ],
+   [
+    "repipe",
+    "re-rig"
+   ],
+   [
+    "supply line",
+    "fuel line"
+   ],
+   [
+    "water line",
+    "fuel line"
+   ],
+   [
+    "heating and cooling",
+    "weather check"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "snag"
+   ],
+   [
+    "leaks",
+    "snags"
+   ],
+   [
+    "Short on the sides",
+    "Short on the deck"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "12 Harbor Rd"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "14 Cedar Ln"
+   ],
+   [
+    "Elm St",
+    "Harbor Rd"
+   ],
+   [
+    "Oak St",
+    "Cedar Ln"
+   ],
+   [
+    "Barbershops",
+    "Hunting lodges"
+   ],
+   [
+    "Barbers",
+    "Guides"
+   ],
+   [
+    "Barber chair",
+    "Shooting bench"
+   ],
+   [
+    "Shops",
+    "Lodges"
+   ],
+   [
+    "Beard line",
+    "Hook line"
+   ],
+   [
+    "Beard",
+    "Hook"
+   ],
+   [
+    "Patch test",
+    "Safety brief"
+   ],
+   [
+    "Cut hair",
+    "Fish"
+   ],
+   [
+    "Hot towel shaves",
+    "Sighting-in sessions"
+   ],
+   [
+    "Hot towel",
+    "Fish"
+   ],
+   [
+    "Shaves",
+    "Trips"
+   ],
+   [
+    "Shave",
+    "Trip"
+   ],
+   [
+    "Perms",
+    "Fishing trips"
+   ],
+   [
+    "Perm",
+    "Fishing trip"
+   ],
+   [
+    "Cape clip",
+    "Life vest"
+   ],
+   [
+    "Cape",
+    "Vest"
+   ],
+   [
+    "Brassy",
+    "Faded"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Finish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Fish"
+   ],
+   [
+    "In the chair",
+    "At the lodge"
+   ],
+   [
+    "Chair",
+    "Seat"
+   ],
+   [
+    "Electrician",
+    "Guide"
+   ],
+   [
+    "Clogged drain",
+    "Snagged line"
+   ],
+   [
+    "Heater",
+    "Motor"
+   ],
+   [
+    "Flush",
+    "Rinse"
+   ],
+   [
+    "Faucet",
+    "Rod"
+   ],
+   [
+    "Dishwasher",
+    "Cooler"
+   ],
+   [
+    "Garbage disposal",
+    "Lodge box"
+   ],
+   [
+    "Sewer",
+    "Lodge box"
+   ],
+   [
+    "Toilet",
+    "Lodge box"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Snag"
+   ],
+   [
+    "Pipes",
+    "Lines"
+   ],
+   [
+    "Pipe",
+    "Line"
+   ],
+   [
+    "Valve",
+    "Line"
+   ],
+   [
+    "Shutoff",
+    "Wait"
+   ],
+   [
+    "Repipe",
+    "Re-rig"
+   ],
+   [
+    "Supply line",
+    "Fuel line"
+   ],
+   [
+    "Water line",
+    "Fuel line"
+   ],
+   [
+    "Heating and cooling",
+    "Weather check"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Snag"
+   ],
+   [
+    "Leaks",
+    "Snags"
+   ],
+   [
+    "$169",
+    "@@0@@"
+   ],
+   [
+    "$179",
+    "@@1@@"
+   ],
+   [
+    "$199",
+    "@@2@@"
+   ],
+   [
+    "$89",
+    "@@3@@"
+   ],
+   [
+    "$160",
+    "@@4@@"
+   ],
+   [
+    "$640",
+    "@@5@@"
+   ],
+   [
+    "$110",
+    "@@6@@"
+   ],
+   [
+    "$120",
+    "@@7@@"
+   ],
+   [
+    "$35",
+    "@@8@@"
+   ],
+   [
+    "$55",
+    "@@9@@"
+   ],
+   [
+    "$75",
+    "@@10@@"
+   ],
+   [
+    "$140",
+    "@@11@@"
+   ],
+   [
+    "$25",
+    "@@12@@"
+   ],
+   [
+    "$40",
+    "@@13@@"
+   ],
+   [
+    "@@0@@",
+    "$350"
+   ],
+   [
+    "@@1@@",
+    "$360"
+   ],
+   [
+    "@@2@@",
+    "$380"
+   ],
+   [
+    "@@3@@",
+    "$60"
+   ],
+   [
+    "@@4@@",
+    "$100"
+   ],
+   [
+    "@@5@@",
+    "$1200"
+   ],
+   [
+    "@@6@@",
+    "$260"
+   ],
+   [
+    "@@7@@",
+    "$75"
+   ],
+   [
+    "@@8@@",
+    "$60"
+   ],
+   [
+    "@@9@@",
+    "$75"
+   ],
+   [
+    "@@10@@",
+    "$150"
+   ],
+   [
+    "@@11@@",
+    "$150"
+   ],
+   [
+    "@@12@@",
+    "$20"
+   ],
+   [
+    "@@13@@",
+    "$100"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books a sighting-in session at Lee Outfitters for a rifle, Sat Oct 24 at 11:00am. Wren checks the rifle at the range, and the $60 is paid in full when booking.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Hunt Guides for a scouting day on Alex's own land, 14 Cedar Ln. Cal and Jo arrive Thu Oct 22 at 6:00am, walk the land and set the blind. The rest is charged to Alex's saved card when Cal texts DONE."
+ },
+ "cast": {
+  "A": {
+   "staff": "Dale and Wren (lodge and range)",
+   "cust": "Alex M. (hunter) · other hunters",
+   "other": "Others (a landowner, a processor)"
+  },
+  "B": {
+   "staff": "Cal and Jo (guides)",
+   "cust": "Alex M. (hunter) · other hunters",
+   "other": "Others (a landowner, a processor, a bank)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dale"
+  },
+  "B": {
+   "staff": "Cal"
+  }
+ },
+ "keep": [],
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|full|none",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: a guided half-day hunt for up to 2: $450, a $150 deposit when booking, the $300 rest paid at the lodge check-in before the hunt.",
+    "list|full|none": "A sighting-in session at the range: $60, paid in full when booking.",
+    "list|none|counter": "A planning meeting at the lodge: free, nothing taken."
+   },
+   "amounts": {
+    "list|deposit|*": {
+     "price": "$450",
+     "deposit": "$150",
+     "rest": "$300",
+     "fee": "$150",
+     "name": "Guided half-day hunt"
+    },
+    "list|full|*": {
+     "price": "$60",
+     "paid": "$60",
+     "fee": "$20",
+     "name": "Sighting-in session, one rifle"
+    },
+    "list|none|*": {
+     "price": "$0",
+     "fee": "$0",
+     "name": "Planning meeting"
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|card|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: a scouting day on the hunter's own land: $360. A $100 deposit when booking; the $260 rest charged to the saved card when the guide texts DONE.",
+    "list|card|bill": "A sighting-in at the hunter's own range: $180 with the travel fee. A card is saved for the $60 fee; the bill is texted after the session.",
+    "list|full|none": "A one-day rifle check at the hunter's place: $150, paid in full when booking."
+   },
+   "amounts": {
+    "list|deposit|*": {
+     "price": "$360",
+     "deposit": "$100",
+     "rest": "$260",
+     "fee": "$100",
+     "name": "Scouting day on the hunter's land"
+    },
+    "list|card|*": {
+     "price": "$180",
+     "fee": "$60",
+     "name": "Sighting-in at the hunter's range"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$40",
+     "name": "One-day rifle check"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02",
+   "S1-80",
+   "A10-34"
+  ],
+  "B": [
+   "B4-38",
+   "B8-45",
+   "B10-32"
+  ]
+ },
+ "notes": "Hunting and outdoor guide (table style; from rentals; no sample, built for the rebuilt master, N4, Oct 27). Flow A (Lee Outfitters, the hunter comes to the lodge or range): a guided half-day hunt for up to 2, $450, a $150 deposit when booking, the $300 rest paid at the lodge check-in before the hunt ($150 kept on a late cancel); a sighting-in session, $60 a rifle, paid in full ($20 kept on a late cancel); a planning meeting at the lodge, free, nothing taken. Flow B (Lee Hunt Guides, the guide goes to the hunter's own land): a scouting day, $360, a $100 deposit, the $260 rest charged to the saved card at DONE; a sighting-in at the hunter's own range, $180 with the travel, a card saved for the $60 fee, the bill after; a one-day rifle check, $150 paid in full. Game processing and taxidermy are billed by the processor to the hunter, never through Rosie. Licenses, tags and cards are the hunter's own and the guide's papers the owner's, shown as given and never checked (D96). The season, bag limit and land permission are the hunter's to follow. A youth hunter always has an adult on the trip. Weather is a free move. $2 applies to every booking (D97). Sensitive off.",
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup (D96): the guide's and the hunter's papers are their own, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person-license lookup (D96): the hunter's own tags and cards only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes; a sighting-in is booked like any range visit."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Hunts are booked ahead; nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A hunt books a guide's time, never a room or a table."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Sighting-in is one hunter's time, not a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A youth hunter is never left alone with the guide; an adult stays."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A hunt is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "No proposals: each hunt is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the lodge; game goes to the processor."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a hunt."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for a hunt."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the lodge; game goes to the processor."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup (D96): the guide's and the hunter's papers are their own, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person-license lookup (D96): the hunter's own tags and cards only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes; a sighting-in is booked like any range visit."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Hunts are booked ahead; nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a hunt."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A hunt is a set start, not a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "No seats: the guide's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Hunts are never sent now, so no guide is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Hunts are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Hunts are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "No child is left with the guide; an adult stays on a youth hunt."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for a hunt."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A hunt is paid by deposit and rest, not in stages."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No hunt is billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Bank transfer is not taken for a hunt (no bank-transfer fact)."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A guide books a hunter's time, not a space or a thing."
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "We'd share only where they're working, only after a missed check.",
+    "Kids cut",
+    "kids cut",
+    "Shop's",
+    "Color quotes",
+    "Color quote",
+    "At the chair",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Drain clearing",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "beard",
+    "skin fades",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Color touch-up",
+    "color touch-up",
+    "color plan",
+    "Color plan",
+    "Color",
+    "color",
+    "patch test",
+    "cut hair",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perms",
+    "perm",
+    "cape clip",
+    "cape",
+    "massage",
+    "Massage",
+    "gloss",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain",
+    "water heater",
+    "heater",
+    "pipe",
+    "valve",
+    "leak",
+    "Springfield",
+    "2020-1187",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Beard",
+    "Gloss",
+    "Leak",
+    "Leaks",
+    "$35",
+    "$40",
+    "$55",
+    "$25",
+    "$140",
+    "$90",
+    "$89",
+    "$75"
+   ],
+   "B": [
+    "We'd share only where they're working, only after a missed check.",
+    "Like tapping a neighbor's water line without asking.",
+    "cabinet",
+    "Cabinet",
+    "valves",
+    "clogs",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircut",
+    "haircut",
+    "beard trim",
+    "beard",
+    "color",
+    "cut hair",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perm",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "drain",
+    "Drain",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater",
+    "Water heater",
+    "heater",
+    "flush",
+    "service call",
+    "Service call",
+    "faucet",
+    "dishwasher",
+    "sewer",
+    "overflowing",
+    "sink",
+    "clog",
+    "pipes",
+    "pipe",
+    "valve",
+    "shutoff",
+    "repipe",
+    "supply line",
+    "water line",
+    "heating and cooling",
+    "leak",
+    "Springfield",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Sewer",
+    "Overflowing",
+    "Shutoff",
+    "Repipe",
+    "Supply line",
+    "Heating and cooling",
+    "Leak",
+    "Leaks",
+    "$169",
+    "$179",
+    "$199",
+    "$89",
+    "$160",
+    "$640",
+    "$110",
+    "$120",
+    "$35",
+    "$75",
+    "$140",
+    "$40"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-53": "33f4da69f5"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B4-83": "93095f28e5",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "S1-80": "1d7be919fe"
+  }
+ }
+}

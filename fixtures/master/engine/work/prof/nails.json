@@ -1,0 +1,4889 @@
+{
+ "id": "nails",
+ "name": "Nail salon",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "hair",
+ "plugin": {
+  "pf.license": {
+   "need": "always: nail work (nail technology, manicuring or cosmetology, by the state's own name) is licensed where the state's rules require it",
+   "who": "both: the salon holds a salon (shop) license, and each nail tech holds their own; a mobile business holds a mobile license where the state issues one",
+   "ask": "the salon's license number; each nail tech's number in their invite reply (or the owner sends it)",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "away": "nail work at a home, office or event only where the state's rules allow it, and only for the services they allow; some states ask for an extra permit, more years licensed, a background check or insurance (switches from the state form)",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance where the state's form asks for it",
+   "booth": "a booth renter is their own business: their own license (and a booth rental license where the state issues one), prices and Stripe; off where the state doesn't allow booth rental",
+   "lashes": "lash and brow work is its own kind of work, with its own license where the state asks"
+  },
+  "pf.services": {
+   "shape": "set services with a chosen nail tech; the length is set by the service and by what's on the nails now (a removal adds time); a pedicure also books one of the salon's pedicure chairs",
+   "examples": "the example businesses' own prices (Lee's Nail Bar and Lee Mobile Nails), not a standard",
+   "list": [
+    {
+     "name": "Gel manicure",
+     "price": "$35",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the salon",
+     "before": "nothing taken: a YES books it",
+     "after": "at the desk"
+    },
+    {
+     "name": "Spa pedicure",
+     "price": "$40",
+     "kind": "one price",
+     "length": "50 min, plus 10 min to clean the pedicure chair",
+     "where": "at the salon",
+     "before": "nothing taken",
+     "after": "at the desk",
+     "note": "books a pedicure chair too"
+    },
+    {
+     "name": "Nail art",
+     "price": "$20 for 4 nails ($5 a nail)",
+     "kind": "one price per nail; a design added at the table is priced and OK'd before it's done",
+     "length": "15 min",
+     "where": "at the salon or with a visit away from it",
+     "before": "nothing",
+     "after": "at the desk",
+     "note": "often added to a manicure; a bigger custom design is priced from photos first"
+    },
+    {
+     "name": "Kids manicure (12 and under)",
+     "price": "$25",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the salon",
+     "before": "nothing",
+     "after": "at the desk",
+     "note": "polish only; a parent or guardian books it and stays"
+    },
+    {
+     "name": "Gel pedicure",
+     "price": "$55",
+     "kind": "one price",
+     "length": "60 min, plus 10 min to clean the pedicure chair",
+     "where": "at the salon",
+     "before": "nothing taken",
+     "after": "at the desk",
+     "note": "includes a $10 paraffin dip"
+    },
+    {
+     "name": "Acrylic fill",
+     "price": "$40",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the salon",
+     "before": "nothing",
+     "after": "at the desk",
+     "note": "every 2 to 3 weeks after a full set"
+    },
+    {
+     "name": "Removal of another salon's gel or dip",
+     "price": "$10",
+     "kind": "one price, added by the answer",
+     "length": "15 min",
+     "where": "at the salon",
+     "before": "nothing",
+     "after": "at the desk"
+    },
+    {
+     "name": "Acrylic removal",
+     "price": "$20",
+     "kind": "one price, added by the answer",
+     "length": "30 min",
+     "where": "at the salon",
+     "before": "nothing",
+     "after": "at the desk"
+    },
+    {
+     "name": "Full set with art (acrylic full set and hand-painted art)",
+     "price": "$140",
+     "kind": "one price",
+     "length": "2½ hours, one whole block",
+     "where": "at the salon",
+     "before": "a $40 deposit (sets over $80)",
+     "after": "the rest at the desk"
+    },
+    {
+     "name": "Custom art set",
+     "price": "priced from the customer's design photos (the example: $90)",
+     "kind": "quoted from photos first",
+     "length": "set by the design",
+     "where": "at the salon",
+     "before": "a $20 deposit for sets over $80; nothing for smaller sets",
+     "after": "at the desk",
+     "note": "Sam OKs every custom art quote; only Linh does custom art in the example"
+    },
+    {
+     "name": "House call (gel manicure at home)",
+     "price": "$75",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the customer's home",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "only nail techs cleared for work away from the salon"
+    },
+    {
+     "name": "Gel mani-pedi at home",
+     "price": "$179",
+     "kind": "one price",
+     "length": "about 1 hour 45 min",
+     "where": "at the customer's home",
+     "before": "a card saved for the $89 trip fee (charged at DONE, as Sam sets)",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Trip fee",
+     "price": "$89",
+     "kind": "one price",
+     "length": "on every visit away from the salon",
+     "where": "at the customer's place",
+     "before": "a card saved",
+     "after": "counts toward the service"
+    },
+    {
+     "name": "Spa pedicure at home",
+     "price": "$150",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the customer's home",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "a portable basin with a new liner for each client"
+    },
+    {
+     "name": "Bridal party nails",
+     "price": "priced from photos (the example: $640 for five people)",
+     "kind": "quoted from photos first",
+     "length": "set by how many people and the designs",
+     "where": "at the customer's home or the venue",
+     "before": "a 25% deposit",
+     "after": "the rest on the bill, after the wedding",
+     "note": "a signed contract; Sam OKs quotes over $500"
+    },
+    {
+     "name": "Nail party at home (up to 4 guests, polish only)",
+     "price": "$199",
+     "kind": "one price",
+     "length": "2 hours",
+     "where": "at the customer's home",
+     "before": "a card saved for the $89 trip fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Extra time at an event",
+     "price": "$120 an hour",
+     "kind": "per hour",
+     "length": "touch-ups on the day",
+     "where": "at the customer's place",
+     "before": "added to the booking",
+     "after": "on the bill"
+    },
+    {
+     "name": "Nail repair (a broken nail)",
+     "price": "$10 a nail; at home, with the $89 trip fee",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "at the salon or at the customer's home",
+     "before": "at home: a card saved for the $89 trip fee",
+     "after": "at the desk, or on the bill Rosie texts"
+    }
+   ],
+   "capacity": "one nail tech per booking; a pedicure also takes one of the salon's 4 pedicure chairs, with 10 minutes to clean it after each client; a bridal party is one booking with several people and one code",
+   "skills": "manicure, pedicure, gel, dip, acrylic sets and fills, nail art, custom art, lashes and brows; custom art offers only nail techs who do it",
+   "online": "no: nail work is done in person",
+   "nobodyHome": "never: the customer must be there"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new or returning",
+    "hands, feet or both, and which services",
+    "what's on the nails now: nothing, gel, dip or acrylic, and from this salon or another (a removal adds time and price)",
+    "nail art: none, a little, or a custom design (design photos for a custom set)",
+    "which nail tech, or the first one free",
+    "for a bridal party or a nail party: how many people, and the date"
+   ],
+   "afterTime": [
+    "shape and length",
+    "anything the nail tech should know",
+    "for a visit away from the salon: the address, parking, and a table near a plug with good light"
+   ],
+   "securePage": [
+    "18 or older, or a parent or guardian books",
+    "diabetes, or poor feeling or blood flow in the feet",
+    "an infection, cut or sore on the hands or feet",
+    "ever reacted to gel or acrylic",
+    "known allergies"
+   ],
+   "whoMayBook": "an adult; a parent or guardian for anyone under 18, and they stay for the visit"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "an allergic reaction happening now: face, lips or throat swelling, or hard to breathe",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "nail glue, acetone or another product in the eye",
+     "say": "Rinse the eye with clean water for 15 minutes, and call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a finger or toe that's red, swollen, hot or oozing, or a cut or sore on the hands or feet",
+     "what": "no nail work on that area: the customer keeps the other service or moves it until it heals; a wound that looks infected should be seen by a doctor first; a skipped service isn't charged"
+    },
+    {
+     "words": "diabetes, or poor feeling in the feet (answered on the secure page only)",
+     "what": "the booking goes on, with care notes for the nail tech: no cutting cuticles or calluses, gentle filing, warm water, a close look at the feet"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": "none: nail work needs no first visit",
+   "reaction": "a past reaction to gel or acrylic: the page offers regular polish instead, or the booking waits for Sam's OK so the nail tech can talk it through first",
+   "prep": "for the reminder: say if gel, dip or acrylic is on now; for a pedicure, skip shaving the legs the day before; bring design photos for nail art; for a visit away from the salon, a table near a plug and good light"
+  },
+  "pf.visit": {
+   "checkIn": "at the salon: the check-in code at the front desk; at a home or event: the code from whoever will be there (the bride or the host when a mobile is given for them)",
+   "beforeWork": "the nail tech checks the hands, feet and the product on now, and reads the care notes, before starting; if the product isn't what was said (acrylic, not gel), the right removal's list price is told first",
+   "changes": "extra work (nail art, a removal, a repair) is priced and OK'd before it's done; art by design is priced at the table",
+   "walkIns": "walk-ins welcome: they wait in a line for the next free nail tech; booked customers go first; some nail techs or days can be walk-ins only (the owner's setting)",
+   "reset": "each pedicure chair is cleaned and disinfected after every client (10 minutes in the example), with a log where the state's rules require it",
+   "done": "the check-in code, or DONE from the nail tech; the product, shape and colors go in the nail tech's notes for next time"
+  },
+  "pf.money": {
+   "before": "nothing taken for most salon services: a YES books it; a card saved for the $20 fee for a customer with 2 no-shows (the owner's setting); a deposit for art sets over $80 ($40 on the $140 full set with art, $20 on a custom set from photos); away from the salon, a card saved for the $89 trip fee, a 25% deposit for bridal parties, or the full price for some services",
+   "caps": "deposit cap: from the state form",
+   "cancel": "free to cancel until 24 hours before (the owner's setting); a walk-in salon may ask only for 2 hours' notice and charge no fee",
+   "fees": "late cancel or no-show: $20 ($40 for the full set with art), only where a card is saved or a deposit was paid; the owner confirms each fee, never more than what was agreed; nothing taken means no fee",
+   "refunds": "a deposit is refunded if cancelled in time or if the salon changes the plan; a service skipped for an infection or sore isn't charged",
+   "tips": "on: at the desk by card or cash, or a tip line on the bill Rosie texts; tips go to the nail tech",
+   "tax": "a tax line for products sold, where the state's rules require it",
+   "fee2": "Rosfield's $2 applies"
+  },
+  "pf.messages": {
+   "never": "diabetes, infection, sore, reaction and allergy answers never go in a text or through the AI: only the secure page and the customer's record",
+   "languages": "English and Spanish",
+   "minors": "a minor's booking texts go to the parent or guardian"
+  },
+  "pf.staff": {
+   "licenses": "each nail tech's license per state; lash and brow work where the state licenses it",
+   "skills": "manicure, pedicure, gel, dip, acrylic, nail art, custom art, lashes and brows; only nail techs who do custom art are offered for it",
+   "supervision": "apprentices and students work only under a licensed nail tech, where the state's rules allow",
+   "oks": "Sam OKs every custom art quote and a past reaction to gel or acrylic",
+   "standIn": "any nail tech licensed for the service, who gets the care notes and the nail history; same time, chair and price",
+   "away": "only nail techs cleared for work away from the salon are offered for homes and events",
+   "walkInOnly": "some nail techs take only walk-ins on some days (the owner's setting)"
+  },
+  "pf.rules": {
+   "showLicense": "the license is shown where the state asks: posted at the salon, and in the text before a visit away from it",
+   "away": "work away from the salon only where the state allows it, and only for the services it allows (a switch from the state form)",
+   "sanitation": "pedicure basins cleaned and disinfected after every client, and tools cleaned or thrown away after each one, with a written log where the state's rules require it",
+   "receipt": "what a receipt must show (the license number, the board's contact) where the state's rules require it",
+   "records": "care notes and nail history kept with the customer's record: 7 years, or longer where the state asks; a copy or deletion on request",
+   "contracts": "a signed contract for bridal party work (the owner's setting), and where the state's rules require one above an amount",
+   "booth": "booth renters only where the state allows booth rental (a switch from the state form)"
+  },
+  "pf.edges": {
+   "lateArrival": "15 minutes' grace; after that, the spot may go to a walk-in, and the customer gets the next free nail tech or a new time, with no fee",
+   "standIn": "a nail tech out sick: a stand-in licensed for the service, with the care notes, or new times with no fee",
+   "wrongProduct": "the product on now isn't what was said (acrylic, not gel): the right removal's list price is told before starting",
+   "infection": "an infection or sore found at the visit: that area is skipped and not charged",
+   "reaction": "itching or swelling around the nails after a visit: aftercare steps, and Sam is told at once",
+   "fix": "a free fix for chips or lifting within 5 days of a gel or acrylic visit (the example salon's promise)",
+   "runsLong": "a set runs long: the next customer is told the new start",
+   "noShows": "after 2 no-shows, a card is needed to book (the owner's setting)",
+   "party": "a bridal party: one booking, several people, one check-in code",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "children",
+   "extrawork",
+   "groups",
+   "photos",
+   "spaces",
+   "tips"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Linh and Mai (nail techs)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Tuan and Hana (nail techs who travel)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a bank, a venue, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Linh"
+  },
+  "B": {
+   "staff": "Tuan"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Electrical is set up, under the company's license. AI assistants can book it once your electrician's own license checks out. You'll add your people at the end. Next, Lee's Barbershop: about 5 minutes.",
+    "Lash and brow work is set up, under the company's license. AI assistants can book it now. You'll add your people at the end. Next, Lee's Barbershop: about 5 minutes."
+   ],
+   [
+    "Sorry, Tess. The hot towel part of your Sat 2:00pm visit can't be done. Keep it as a haircut for $35, or pick a new time, with no fee. If you paid ahead, the $20 difference comes back.",
+    "Sorry, Tess. The paraffin dip part of your Sat 2:00pm gel pedicure can't be done. Keep it without the paraffin, for $45, or pick a new time, with no fee. If you paid ahead, the $10 difference comes back."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the company, and one for each nail tech where the state asks. A mani-pedi at home has a set price. A bridal party is priced from photos. An allergic reaction stops the booking."
+   ],
+   [
+    "Sam picks a deposit for color correction. It is from $110, set at the chair. So the $25 consult is taken at booking, toward the final price.",
+    "Sam picks a deposit for a custom set. It is from $20, set at the desk."
+   ],
+   [
+    "With 2, when the plumber texts DONE, Rosfield charges the saved card the agreed price, or the agreed rate times the hours.",
+    "With 2, Rosfield charges the saved card at the nail tech's DONE: the agreed price, or the rate times the hours."
+   ],
+   [
+    "The Groom's package at Lee's Barbershop is $140: a $40 deposit now, and the $100 rest charged Fri Oct 23 at 11am.",
+    "The full set with art is $140: a $40 deposit now, and the $100 rest charged Fri Oct 23 at 11am."
+   ],
+   [
+    "When it's safe to go on, the plug-in's safety steps come first. Then the search goes on, marked urgent.",
+    "When it's safe to go on, the plug-in's safety steps come first. Then the search goes on, with a note for the nail tech."
+   ],
+   [
+    "For the color correction, it's charged only for the shop's $20 fee, and only after Sam says yes.",
+    "For the custom set, it's charged only for the salon's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most salons start. Is it right? Send only what's different."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the mobile nails plug-in now, and the lash and brow and nail salon ones when Sam gets to them."
+   ],
+   [
+    "On this path, color correction takes the $25 consult as a deposit, toward the final price.",
+    "On this path, a custom set takes a $20 deposit, toward the final price."
+   ],
+   [
+    "Sam says some people charge differently: Jordan's labor, and Sam's own camera inspections.",
+    "Sam says some people charge differently: Tuan's extra time, and Sam's own nail parties."
+   ],
+   [
+    "A price set at the visit: any visit fee, and that it's owed even after a no to the price.",
+    "A price set at the visit: a removal or a repair, and that it's owed even after a no to the price."
+   ],
+   [
+    "The towel steamer breaks, so each booking that needs it is offered a change, with no fee.",
+    "The paraffin warmer breaks, so each booking that needs it is offered a change, with no fee."
+   ],
+   [
+    "Color is priced for each customer: from photos first, or at the desk after a $25 consult.",
+    "Custom art is priced for each customer, from design photos first."
+   ],
+   [
+    "On this path, color correction takes nothing before. Only the $25 consult is promised.",
+    "On this path, a gel manicure takes nothing before."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mobile nail work for homes in Springfield. House calls and nail parties, within 25 miles."
+   ],
+   [
+    "Plumbing, electrical and barbering need one, so Sam's three take the license step.",
+    "Mobile nails, lashes and brows, and salon nail work all need one, so Sam's three take the license step."
+   ],
+   [
+    "Each kind of work can have its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each kind of work can have its own trade name, like Lee Nails on the Go and Lee Lash & Brow."
+   ],
+   [
+    "Nobody on Sam's team needs one: every plumber and barber holds their own license.",
+    "Nobody on Sam's team needs one: every nail tech and lash artist holds their own license."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can do a gel manicure at the salon for $35, or at your home for $75."
+   ],
+   [
+    "Examples: a cancel notice for a contract, a written estimate, or a consent form.",
+    "Examples: a cancel notice for a contract, a notice for nail work, or a consent form."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A nail salon on Elm St. Gel manicures, pedicures and nail art."
+   ],
+   [
+    "Some visits run over several days, like a repair left at the shop or a course.",
+    "Some visits run over several days, like a nail course."
+   ],
+   [
+    "The plug-in says where barbering outside a shop is allowed, and who may go.",
+    "The plug-in says where nail work outside a salon is allowed, and who may go."
+   ],
+   [
+    "Who goes out on mobile nails and lashes and brows jobs, and who cuts hair?",
+    "Who goes out on mobile nails and lashes and brows jobs, and who works at the salon?"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A nail salon's example: a toe that looks infected gets 'see a doctor first, and no nail work on that foot'."
+   ],
+   [
+    "like Linh's color plan after a consult, or a lawyer's engagement letter",
+    "like Linh's fill plan after a full set, or a lawyer's engagement letter"
+   ],
+   [
+    "It adds any way to get ready from the plug-in. A barbershop has none.",
+    "It adds any way to get ready from the plug-in. A gel manicure on bare nails needs none."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Add photos of the design you want, and a nail tech will price your custom art set."
+   ],
+   [
+    "Should color quotes, from photos or at the chair, come to you first?",
+    "Should art quotes from photos come to you first?"
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free fix for chips within 5 days."
+   ],
+   [
+    "The $89 service call and labor at $120 an hour aren't booked alone.",
+    "The $89 trip fee and extra time at $120 an hour aren't booked alone."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: many nail salons, spas and groomers are licensed to one place."
+   ],
+   [
+    "Say Alex's visit were a color, which only Linh does at the salon.",
+    "Say Alex's visit were a custom art set, which only Linh does at the salon."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like care notes or the nail history."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A bride books manicures for herself and four friends on one morning."
+   ],
+   [
+    "Example: a color needs its patch test at least 48 hours before.",
+    "Nail work has no first step, so nothing limits the new time."
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "A job priced at the visit never takes more than its trip or consult fee."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: short almond, sheer pink gel, sensitive cuticles"
+   ],
+   [
+    "Color is priced for each customer, so Sam OKs each color quote",
+    "Custom art is priced for each customer, so Sam OKs each art quote"
+   ],
+   [
+    "Linh's supplier invoice shows the color costs more since then.",
+    "Linh's supplier invoice shows the gel polish costs more since then."
+   ],
+   [
+    "Barbering pays the $2, so the shop gets its own monthly bill.",
+    "Nail work pays the $2 too, so the salon gets its own monthly bill."
+   ],
+   [
+    "Labor is $140 an hour with Jordan, and $120 with anyone else.",
+    "Extra time is $140 an hour with Tuan, and $120 with anyone else."
+   ],
+   [
+    "Is your beard longer than an inch? A long beard takes longer.",
+    "Any acrylic on now? Taking it off adds 30 minutes."
+   ],
+   [
+    "The bridal party nails takes 25% once its photo quote is OK'd",
+    "Bridal party nails take 25% once the photo quote is OK'd"
+   ],
+   [
+    "the service's length, the color station and any special need",
+    "the service's length and any special need"
+   ],
+   [
+    "Alex's booking gets the same offer if it needs the steamer.",
+    "Alex's booking gets the same offer if it needs the paraffin warmer."
+   ],
+   [
+    "At the salon, prices are the same whichever nail tech cuts.",
+    "At the salon, prices are the same whichever nail tech does the work."
+   ],
+   [
+    "The hot towel part of your Sat 2:00pm visit can't be done.",
+    "The paraffin dip part of your Sat 2:00pm visit can't be done."
+   ],
+   [
+    "Her card is saved for the $20 fee, and nothing is charged.",
+    "Nothing is taken: her YES booked it."
+   ],
+   [
+    "The panel upgrade is a free estimate visit, then a quote.",
+    "Lashes for a bridal party start with a free consult, then a quote."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The salon's plug-in adds two: an allergic reaction now, or glue or acetone in an eye. An infected-looking finger gets safety steps."
+   ],
+   [
+    "Alex books a cut for an adult brother, and pays for it.",
+    "Alex books a manicure for an adult brother, and pays for it."
+   ],
+   [
+    "When only the visit fee is promised, it's shown first.",
+    "When only a trip or consult fee is promised, it's shown first."
+   ],
+   [
+    "How long is your beard now? A long beard takes longer.",
+    "Any gel, dip or acrylic on now? Taking it off adds time."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a lash lift, which isn't on the salon's list."
+   ],
+   [
+    "The price, {{price}}, comes straight from Sam's list.",
+    "The price, {{price:$35}}, comes straight from Sam's list."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Waxing for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most salons set it."
+   ],
+   [
+    "Add photos of your hair, and a barber will price it.",
+    "Add photos of the design you want, and a nail tech will price it."
+   ],
+   [
+    "Alex needs a cut within the hour, for an interview.",
+    "Alex chipped a nail and needs a fix within the hour, for an interview."
+   ],
+   [
+    "Before Alex pays, Linh shows the cut in the mirror.",
+    "Before Alex pays, Linh checks each nail with Alex under the lamp."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Nail work is never sent now: every visit has a set time."
+   ],
+   [
+    "Dee's card was only saved, so nothing was charged.",
+    "Nothing was taken, so nothing was charged."
+   ],
+   [
+    "Add photos of your hair, and Riley will price it.",
+    "Add photos of the design you want, and Riley will price it."
+   ],
+   [
+    "Alex asks for a perm, which the salon doesn't do.",
+    "Alex asks for a spray tan, which the salon doesn't do."
+   ],
+   [
+    "Electrical is set up; waits for its electrician",
+    "Lash work is set up; waits for its lash artist"
+   ],
+   [
+    "Reads back plumbing's money, service by service",
+    "Reads back the money, service by service"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's gel manicure needs none, so nothing is sent here."
+   ],
+   [
+    "Some bookings name a person, like Linh's chair.",
+    "Some bookings name a person, like Linh's station."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says acetone left a mark on a jacket today."
+   ],
+   [
+    "The camera inspection is $249 when Sam goes.",
+    "A nail party is $249 when Sam runs it."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "Nails could mean a salon or a nail tech who comes to you"
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a time for your first fill:"
+   ],
+   [
+    "The bridal party nails is never on the list.",
+    "Bridal party nails are never on the list."
+   ],
+   [
+    "Hi, I want to put my barbershop on Rosie",
+    "Hi, I want to put my nail salon on Rosie"
+   ],
+   [
+    "The camera inspection is 249 if I go myself",
+    "A nail party is 249 if I run it myself"
+   ],
+   [
+    "A repair salon, a tailor or a groomer does.",
+    "A repair shop, a tailor or a groomer does."
+   ],
+   [
+    "says Saturday's cut is uneven on one side.",
+    "says a nail from Saturday chipped."
+   ],
+   [
+    "so color services offer only Linh's times",
+    "so custom art offers only Linh's times"
+   ],
+   [
+    "Any scalp trouble Linh should know about?",
+    "Any cut or sore on your hands that Linh should know about?"
+   ],
+   [
+    "Plumbing is live; offers electrical next",
+    "Mobile nails is live; offers lashes next"
+   ],
+   [
+    "A hold is never more than the visit fee.",
+    "A hold is never more than the trip fee."
+   ],
+   [
+    "A cut at the salon has no cancel period.",
+    "A manicure at the salon has no cancel period."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A salon visit is in the other flow."
+   ],
+   [
+    "Kim's card is saved for the $89 fee.",
+    "Kim's card is saved for the $89 fee."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds waxing to Lee's Barbershop."
+   ],
+   [
+    "Alex has had cuts at the salon before",
+    "Alex has had manicures at the salon before"
+   ],
+   [
+    "for a color, and only Linh does color",
+    "for a custom art set, and only Linh does custom art"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Acetone spilled on my jacket and left a mark."
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A nail fill' or 'a polish change' fits a gel manicure."
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Full set with art (acrylic set and hand-painted art)"
+   ],
+   [
+    "Offers a shorter cut or a later time",
+    "Offers a shorter service or a later time"
+   ],
+   [
+    "Bridal party nails is never sent now",
+    "Bridal party nails are never sent now"
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Mani-pedis, pedicures, nail parties"
+   ],
+   [
+    "A cut paid at the chair is disputed",
+    "A visit paid at the desk is disputed"
+   ],
+   [
+    "At the chair, Alex is already there",
+    "At the table, Alex is already there"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Nail Bar doesn't do lash lifts."
+   ],
+   [
+    "Linh Tran and Mai Nguyen cut hair.",
+    "Linh Tran and Mai Nguyen work at the salon."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a gel manicure every 3 weeks."
+   ],
+   [
+    "How to care for your skin and hair",
+    "How to care for your nails and cuticles"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Gel pedicure"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "gel pedicure"
+   ],
+   [
+    "so the cut itself is already paid",
+    "so the manicure itself is already paid"
+   ],
+   [
+    "Nail repair · Priced at the visit",
+    "Classic manicure at home · $99"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there good light?"
+   ],
+   [
+    "Books the groom's party together",
+    "Books the bridal party together"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Mobile nails, Lashes and brows, Nail salon"
+   ],
+   [
+    "Lee's Nail Bar doesn't do perms.",
+    "Lee's Nail Bar doesn't do spray tans."
+   ],
+   [
+    "the color Linh can't do Saturday",
+    "the custom art set Linh can't do Saturday"
+   ],
+   [
+    "Shows Alex the cut; fixes first",
+    "Shows Alex the nails; fixes first"
+   ],
+   [
+    "Towel steamer broken until Mon",
+    "Paraffin warmer broken until Mon"
+   ],
+   [
+    "Uses a cut from Alex's package",
+    "Uses a manicure from Alex's package"
+   ],
+   [
+    "had to leave before the color.",
+    "had to leave before the art was done."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "One nail chipped on Monday."
+   ],
+   [
+    "Lee Mobile Nails · Nail repair",
+    "Lee Mobile Nails · Classic manicure at home"
+   ],
+   [
+    "Nail repair · Set at the visit",
+    "Classic manicure at home · $99"
+   ],
+   [
+    "The receipt, with any warranty",
+    "The receipt, with any free fix"
+   ],
+   [
+    "When a chair is about to open",
+    "When a nail tech is about to be free"
+   ],
+   [
+    "Color always stays with Linh.",
+    "Custom art always stays with Linh."
+   ],
+   [
+    "A skin problem stops the work",
+    "An infection stops the work"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Gel manicure, pedicure and nail art"
+   ],
+   [
+    "Booked by name, like a chair",
+    "Booked by name, like a nail tech"
+   ],
+   [
+    "Like the color in my photos.",
+    "Like the design in my photos."
+   ],
+   [
+    "Supplier invoice: color +$20",
+    "Supplier invoice: gel polish +$20"
+   ],
+   [
+    "Free estimate, then a quote",
+    "Free consult, then a quote"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a gel manicure on Saturday."
+   ],
+   [
+    "Linh stopped Alex M.'s cut.",
+    "Linh stopped Alex M.'s manicure."
+   ],
+   [
+    "No: Alex stays in the chair",
+    "No: Alex stays at the table"
+   ],
+   [
+    "Saves the color station too",
+    "Saves a pedicure chair too"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una manicura de gel el sábado."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens at the table?"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 21 · 10:00am"
+   ],
+   [
+    "Outlet or switch replaced",
+    "Lash lift"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a gel manicure every 3 weeks"
+   ],
+   [
+    "finds chairs side by side",
+    "finds stations side by side"
+   ],
+   [
+    "Back to Alex at the chair",
+    "Back to Alex at the table"
+   ],
+   [
+    "Texts Alex the $90 price",
+    "Texts Alex the price"
+   ],
+   [
+    "your yard drain tomorrow",
+    "your nail party tomorrow"
+   ],
+   [
+    "Water heater replacement",
+    "Bridal party nails"
+   ],
+   [
+    "water heater replacement",
+    "bridal party nails"
+   ],
+   [
+    "Haircuts and beard trims",
+    "Gel manicures and nail art"
+   ],
+   [
+    "mentions it at the chair",
+    "mentions it at the table"
+   ],
+   [
+    "DONE 140 grooms package",
+    "DONE 140 full set with art"
+   ],
+   [
+    "Sewer camera inspection",
+    "Nail party at home"
+   ],
+   [
+    "Signature cut and shave",
+    "Gel pedicure"
+   ],
+   [
+    "signature cut and shave",
+    "gel pedicure"
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else, like custom art"
+   ],
+   [
+    "felt faint at the chair",
+    "felt faint at the table"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids manicure (12 and under)"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Gel mani-pedi at home"
+   ],
+   [
+    "credited to the repair",
+    "counts toward the service"
+   ],
+   [
+    "A cut is one nail tech",
+    "A manicure is one nail tech"
+   ],
+   [
+    "One person, like a cut",
+    "One person, like a manicure"
+   ],
+   [
+    "No minimum, like a cut",
+    "No minimum, like a manicure"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s manicure."
+   ],
+   [
+    "No: a cut at the chair",
+    "No: a visit at the salon"
+   ],
+   [
+    "the visit fee is owed",
+    "the trip fee is owed"
+   ],
+   [
+    "Ceiling fan installed",
+    "Brow lamination"
+   ],
+   [
+    "Keep the beard short.",
+    "Short almond, please."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Nails LLC"
+   ],
+   [
+    "Plumbing + electrical",
+    "Mobile nails + lashes and brows"
+   ],
+   [
+    "says the cut was done",
+    "says the manicure was done"
+   ],
+   [
+    "so the chair is saved",
+    "so the station is saved"
+   ],
+   [
+    "color and house calls",
+    "custom art and house calls"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Fill plan"
+   ],
+   [
+    "Keep it as a haircut",
+    "Keep it, no paraffin"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Nail Bar LLC"
+   ],
+   [
+    "pays for a staff cut",
+    "pays for a staff manicure"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilenails.com"
+   ],
+   [
+    "the Groom's package",
+    "the full set with art"
+   ],
+   [
+    "The Groom's package",
+    "The full set with art"
+   ],
+   [
+    "shows the cuts left",
+    "shows the manicures left"
+   ],
+   [
+    "Just a trim on top.",
+    "Short almond, please."
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the table"
+   ],
+   [
+    "A water heater job",
+    "A nail party"
+   ],
+   [
+    "Water heater flush",
+    "Spa pedicure at home"
+   ],
+   [
+    "water heater flush",
+    "spa pedicure at home"
+   ],
+   [
+    "A cut is shortened",
+    "A late manicure is shortened or moved"
+   ],
+   [
+    "the group's chairs",
+    "the group's stations"
+   ],
+   [
+    "color, house calls",
+    "custom art, house calls"
+   ],
+   [
+    "3 visits with Linh",
+    "3 fills with Linh, every 3 weeks"
+   ],
+   [
+    "Water heater leak",
+    "Press-on removal"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Nails"
+   ],
+   [
+    "like a burst pipe",
+    "like a tow"
+   ],
+   [
+    "a package of cuts",
+    "a package of manicures"
+   ],
+   [
+    "Linh's color plan",
+    "Linh's fill plan"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "Color correction",
+    "Gel manicure"
+   ],
+   [
+    "color correction",
+    "gel manicure"
+   ],
+   [
+    "like a beard oil",
+    "like a cuticle oil"
+   ],
+   [
+    "written estimate",
+    "contract"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Nail Bar"
+   ],
+   [
+    "Groom's packages",
+    "Full sets with art"
+   ],
+   [
+    "Linh did the cut",
+    "Linh did the manicure"
+   ],
+   [
+    "Alex's color has",
+    "Alex's custom art set has"
+   ],
+   [
+    "Written estimate",
+    "Contract"
+   ],
+   [
+    "hot towel shave",
+    "gel pedicure"
+   ],
+   [
+    "Groom's package",
+    "Full set with art"
+   ],
+   [
+    "Yes, like a cut",
+    "Yes, like a manicure"
+   ],
+   [
+    "as at the chair",
+    "as at the table"
+   ],
+   [
+    "Linh does color",
+    "Linh does custom art"
+   ],
+   [
+    "About an inch.",
+    "No, they're bare."
+   ],
+   [
+    "Drain clearing",
+    "Mani-pedi"
+   ],
+   [
+    "an electrician",
+    "a lash artist"
+   ],
+   [
+    "during my cut?",
+    "during my manicure?"
+   ],
+   [
+    "A cut has none",
+    "A manicure has none"
+   ],
+   [
+    "A cut is rated",
+    "A manicure is rated"
+   ],
+   [
+    "Signature cut",
+    "Gel pedicure"
+   ],
+   [
+    "signature cut",
+    "gel pedicure"
+   ],
+   [
+    "every 4 weeks",
+    "every 3 weeks"
+   ],
+   [
+    "A package cut",
+    "A package manicure"
+   ],
+   [
+    "a package cut",
+    "a package manicure"
+   ],
+   [
+    "rents a chair",
+    "rents a station"
+   ],
+   [
+    "A nail art is",
+    "Nail art on 4 nails is"
+   ],
+   [
+    "Panel upgrade",
+    "Bridal party lashes"
+   ],
+   [
+    "Color and cut",
+    "Custom art set"
+   ],
+   [
+    "color and cut",
+    "custom art set"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Jordan Price",
+    "Tuan Pham"
+   ],
+   [
+    "1200 Main St",
+    "410 Pine Ave"
+   ],
+   [
+    "in the chair",
+    "at the table"
+   ],
+   [
+    "of your hair",
+    "of your nails"
+   ],
+   [
+    "color quotes",
+    "art quotes"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "NEW massage",
+    "NEW waxing"
+   ],
+   [
+    "Leak repair",
+    "Nail repair"
+   ],
+   [
+    "leak repair",
+    "nail repair"
+   ],
+   [
+    "electrician",
+    "lash artist"
+   ],
+   [
+    "Casey Moore",
+    "Hana Park"
+   ],
+   [
+    "color quote",
+    "art quote"
+   ],
+   [
+    "A art quote",
+    "An art quote"
+   ],
+   [
+    "Electrical",
+    "Lashes and brows"
+   ],
+   [
+    "electrical",
+    "lashes and brows"
+   ],
+   [
+    "Riley Chen",
+    "Linh Tran"
+   ],
+   [
+    "Avery Diaz",
+    "Mai Nguyen"
+   ],
+   [
+    "the facial",
+    "the art"
+   ],
+   [
+    "Beard trim",
+    "Nail art"
+   ],
+   [
+    "beard trim",
+    "nail art"
+   ],
+   [
+    "Barbershop",
+    "Nail salon"
+   ],
+   [
+    "barbershop",
+    "nail salon"
+   ],
+   [
+    "a nail art",
+    "nail art"
+   ],
+   [
+    "A nail art",
+    "Nail art"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "88 Elm St",
+    "73 Walnut St"
+   ],
+   [
+    "Skin fade",
+    "Spa pedicure"
+   ],
+   [
+    "skin fade",
+    "spa pedicure"
+   ],
+   [
+    "barbering",
+    "nail work"
+   ],
+   [
+    "but color",
+    "but custom art"
+   ],
+   [
+    "kids cuts",
+    "kids manicures"
+   ],
+   [
+    "Kids cuts",
+    "Kids manicures"
+   ],
+   [
+    "JP031552",
+    "NT031552"
+   ],
+   [
+    "MP045210",
+    "MS045210"
+   ],
+   [
+    "Plumbing",
+    "Mobile nails"
+   ],
+   [
+    "plumbing",
+    "mobile nails"
+   ],
+   [
+    "kids cut",
+    "kids manicure"
+   ],
+   [
+    "Kids cut",
+    "Kids manicure"
+   ],
+   [
+    "haircuts",
+    "gel manicures"
+   ],
+   [
+    "Haircuts",
+    "Gel manicures"
+   ],
+   [
+    "BS20981",
+    "NS20981"
+   ],
+   [
+    "EC22871",
+    "LB22871"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "BR41862",
+    "NT41862"
+   ],
+   [
+    "plumber",
+    "nail tech"
+   ],
+   [
+    "Plumber",
+    "Nail tech"
+   ],
+   [
+    "barbers",
+    "nail techs"
+   ],
+   [
+    "haircut",
+    "gel manicure"
+   ],
+   [
+    "Haircut",
+    "Gel manicure"
+   ],
+   [
+    "Jordan",
+    "Tuan"
+   ],
+   [
+    "Elm St",
+    "Walnut St"
+   ],
+   [
+    "Barber",
+    "Nail tech"
+   ],
+   [
+    "barber",
+    "nail tech"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "Riley",
+    "Linh"
+   ],
+   [
+    "Avery",
+    "Mai"
+   ],
+   [
+    "Casey",
+    "Hana"
+   ],
+   [
+    "shops",
+    "salons"
+   ],
+   [
+    "Shop",
+    "Salon"
+   ]
+  ],
+  "B": [
+   [
+    "Electrical is set up, under the company's license. AI assistants can book it once your electrician's own license checks out. You'll add your people at the end. Next, Lee's Barbershop: about 5 minutes.",
+    "Lash and brow work is set up, under the company's license. AI assistants can book it now. You'll add your people at the end. Next, Lee's Barbershop: about 5 minutes."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the company, and one for each nail tech where the state asks. A mani-pedi at home has a set price. A bridal party is priced from photos. An allergic reaction stops the booking."
+   ],
+   [
+    "The plug-in says when the place's owner matters, like a renter's new water heater. Plumbing in a home asks it. A tow, a car in a lot or a venue skips it.",
+    "The plug-in says when the place's owner matters, like a renter's big repair. Nail work in a home never asks it."
+   ],
+   [
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like a nail tech working without a license."
+   ],
+   [
+    "Alex can cancel it in the cancel period the state's rules set. Here, that's until 11:59pm Mon Oct 26, for a full $160 refund.",
+    "Alex can cancel it in the cancel period the state's rules set. Here, that's until 11:59pm Mon Oct 26, for a full $40 refund."
+   ],
+   [
+    "With 2, when the plumber texts DONE, Rosfield charges the saved card the agreed price, or the agreed rate times the hours.",
+    "With 2, Rosfield charges the saved card at the nail tech's DONE: the agreed price, or the rate times the hours."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for nail art. Both jobs go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Tips for your drain: run hot water for a minute after washing dishes, and skip store-bought drain cleaners.",
+    "Tips for your nails: wear gloves for dishes, and use cuticle oil each night."
+   ],
+   [
+    "Tuan can't start today: we need proof that you may have this work done at the home, like the owner's OK.",
+    "Tuan can't start today: the venue needs a vendor pass for him, and none was left at the desk."
+   ],
+   [
+    "A what-if for a drain job: the clog is in the main line, so Jordan clears it from the outside cleanout.",
+    "A what-if: Alex's old gel is thicker than booked, so Jordan files it down before the soak."
+   ],
+   [
+    "The people shown must also fit the customer's answers, like a certified renovator for an older home.",
+    "The people shown must also fit the customer's answers, like a nail tech cleared to work away from a salon."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches.",
+    "Please have it seen by a doctor first. No nail work goes on that hand until it heals. If she feels very ill, call 911."
+   ],
+   [
+    "Do your plumbers or barbers go to one place on set days, like an apartment building or a care home?",
+    "Do your nail techs go to one place on set days, like a senior living home or an office?"
+   ],
+   [
+    "Lee Home Services didn't sign your water heater contract in time, so nothing was booked or charged.",
+    "Lee Home Services didn't sign your bridal party contract in time, so nothing was booked or charged."
+   ],
+   [
+    "The plug-in says if this work needs a first step: an estimate visit, a permit, a form or a waiver.",
+    "The plug-in says if this work needs a first step: a trial, a consult, a form or a waiver."
+   ],
+   [
+    "Rosie can't answer safety questions about gas appliances. If you smell gas, leave and call 911.",
+    "Rosie can't answer health questions about your nails. Please see a doctor first. If it's an emergency, call 911."
+   ],
+   [
+    "Building rules, like a homeowners' group's work hours or proof of insurance, go to Sam to check.",
+    "Building or venue rules, like set-up hours or proof of insurance, go to Sam to check."
+   ],
+   [
+    "Lee Home Services can clear the drain for $179, charged to your saved card when the job's done.",
+    "Lee Home Services can do a gel mani-pedi at your home for $179, charged to your saved card when it's done."
+   ],
+   [
+    "Examples: an ID for an 18+ service, a permit or a warranty card, a parking pass, a signed form.",
+    "Examples: an ID for an 18+ service, a venue pass, a parking pass, a signed form."
+   ],
+   [
+    "Call summary: Rosa, in Spanish. Water is leaking from the water heater, and the valve is shut.",
+    "Call summary: Rosa, in Spanish. Her fingers burn after press-on nails, and she took them off."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a bridal party is priced from photos, so Rosie's first text asks for them."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to take off the press-ons and wash her hands, and to call 911 if her face swells."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: hands, feet or both, what's on the nails now, and any nail art."
+   ],
+   [
+    "Lee Home Services can replace your water heater for $640, priced by Jordan from your photos.",
+    "Lee Home Services can do your bridal party's nails for $640, priced by Jordan from your photos."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The nail art is quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads nails now, and lashes' and brows' when Sam gets to them."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the mobile nails plug-in now, and the lash and brow and nail salon ones when Sam gets to them."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Quítese las uñas postizas y lávese las manos con agua y jabón. Si se le hinchan la cara o la garganta, llame al 911."
+   ],
+   [
+    "Sam says some people charge differently: Jordan's labor, and Sam's own camera inspections.",
+    "Sam says some people charge differently: Tuan's extra time, and Sam's own nail parties."
+   ],
+   [
+    "Tips for your water heater: keep the space around it clear, and check for drips this week.",
+    "Tips for your wedding nails: wear gloves for chores, and don't pick at the gel."
+   ],
+   [
+    "Lee Home Services can flush your water heater for $150, with a $40 deposit when you book.",
+    "Lee Home Services can give you a spa pedicure at home for $150, with a $40 deposit when you book."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Please have it seen by a doctor first. No nail work goes on that foot until it heals. If you feel very ill, call 911."
+   ],
+   [
+    "Color is priced for each customer: from photos first, or at the desk after a $25 consult.",
+    "Custom art is priced for each customer, from design photos first."
+   ],
+   [
+    "The plug-in names which notices: a cancel notice, a lead-safe paper, a written estimate.",
+    "The plug-in names which notices: a cancel notice, a notice for nail work outside a salon, a contract."
+   ],
+   [
+    "Say Alex needs the water heater fast. A replacement priced from photos is never sent now",
+    "Say Alex needs the bridal party's nails fast. A bridal party priced from photos is never sent now"
+   ],
+   [
+    "Lee Home Services asks: which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services asks: anything on your nails now, and any nail art?"
+   ],
+   [
+    "Only Jordan replaces water heaters here, so the photos path shows only Jordan's times.",
+    "Only Jordan does bridal parties here, so the photos path shows only Jordan's times."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: he's the one who does bridal parties."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mobile nail work for homes in Springfield. House calls and nail parties, within 25 miles."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Take off the press-on nails and wash your hands with soap and water. If your face or throat swells, call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a spray tan."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found the outlet by your table sparks, so he stopped using the LED lamp."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 bridal party is over the plug-in's amount, so it gets a contract."
+   ],
+   [
+    "Before Jordan starts, please read and sign the lead-safe work notice for your home.",
+    "Before Jordan starts, please read and sign the notice for nail work at your home."
+   ],
+   [
+    "Lee Home Services can flush your water heater for $150, paid in full when you book.",
+    "Lee Home Services can give you a spa pedicure at home for $150, paid in full when you book."
+   ],
+   [
+    "With times to pick, all with Jordan, since only Jordan replaces water heaters here.",
+    "With times to pick, all with Jordan, since only Jordan does bridal parties here."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding nail art? Say so.'"
+   ],
+   [
+    "Plumbing, electrical and barbering need one, so Sam's three take the license step.",
+    "Mobile nails, lashes and brows, and salon nail work all need one, so Sam's three take the license step."
+   ],
+   [
+    "Each kind of work can have its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each kind of work can have its own trade name, like Lee Nails on the Go and Lee Lash & Brow."
+   ],
+   [
+    "The plug-in names the checks, like the pipes under the sink and the cabinet floor.",
+    "The plug-in names the checks, like the nails, the cuticles and the skin around them."
+   ],
+   [
+    "Your new water heater is in. 1-year labor warranty: if anything leaks, reply here.",
+    "Your bridal party's nails are done. Free fix within 5 days: if a nail chips or lifts, reply here."
+   ],
+   [
+    "Nobody on Sam's team needs one: every plumber and barber holds their own license.",
+    "Nobody on Sam's team needs one: every nail tech and lash artist holds their own license."
+   ],
+   [
+    "Some visits have a first step tied to a date, like a permit or an estimate visit.",
+    "Some visits have a first step tied to a date, like a trial or a consult."
+   ],
+   [
+    "Alex M.'s water heater contract wasn't signed in 24 hours, so nothing was booked.",
+    "Alex M.'s bridal party contract wasn't signed in 24 hours, so nothing was booked."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swelling face or throat, gets the safety steps first."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can do a gel manicure at the salon for $35, or at your home for $75."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For nail work, an allergic reaction happening now stops the booking, like a swelling face or throat."
+   ],
+   [
+    "The plug-in can name the kind of work to suggest, like a roofer for a roof leak.",
+    "The plug-in can name the kind of work to suggest, like a tanning salon for a spray tan."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric, and is it leaking?",
+    "Lee Home Services asks: how many people, and when is the wedding?"
+   ],
+   [
+    "The plug-in adds any way to get ready, like clearing the cabinet under the sink.",
+    "The plug-in adds any way to get ready, like a table near a plug, with good light."
+   ],
+   [
+    "Each job shows what to bring, from the plug-in, like a drain snake and a camera.",
+    "Each job shows what to bring, from the plug-in, like an LED lamp and a foot basin."
+   ],
+   [
+    "A clogged drain that's overflowing may be. A water heater replacement never is.",
+    "Nail work never is: every visit has a set time."
+   ],
+   [
+    "He sends photos, and prices a new one from them at $640, over Sam's $500 limit.",
+    "He sends photos of the designs Alex wants, and prices it at $640, over Sam's $500 limit."
+   ],
+   [
+    "Casey doesn't do water heater replacements here, so only Jordan's times show:",
+    "Casey doesn't do bridal parties here, so only Jordan's times show:"
+   ],
+   [
+    "A what-if: say Kim's yard drain were a two-person job, for Jordan and Casey.",
+    "A what-if: say Kim's nail party were a two-person job, for Jordan and Casey."
+   ],
+   [
+    "Casey does drains, leaks and flushes, so he isn't offered for a replacement.",
+    "Casey does mani-pedis and pedicures, so she isn't offered for a bridal party."
+   ],
+   [
+    "The $179 drain and the $150 flush are under that amount, so they need none.",
+    "The $179 mani-pedi and the $150 pedicure are under that amount, so they need none."
+   ],
+   [
+    "The plug-in says where barbering outside a shop is allowed, and who may go.",
+    "The plug-in says where nail work outside a salon is allowed, and who may go."
+   ],
+   [
+    "Book Tessa for a clogged drain, Thu Oct 22, arriving 12 to 2pm, with Casey?",
+    "Book Tessa for a gel mani-pedi, Thu Oct 22, arriving 12 to 2pm, with Casey?"
+   ],
+   [
+    "Jordan cleared the clog from the outside cleanout. It was in the main line.",
+    "Jordan filed down your old gel first. It was thicker than usual."
+   ],
+   [
+    "Alex M.'s water heater, flushed Thu Oct 22, is dripping at the drain valve.",
+    "Alex M.'s spa pedicure from Thu Oct 22: one toenail chipped."
+   ],
+   [
+    "A water heater quote from photos at $640 is over $500, so it comes to Sam.",
+    "A bridal party quote from photos at $640 is over $500, so it comes to Sam."
+   ],
+   [
+    "The plug-in adds its own questions, like where the main water shut-off is.",
+    "The plug-in adds its own questions, like where there's a table near a plug."
+   ],
+   [
+    "Here, the water jetter for Kim's yard drain is in for repair until Monday.",
+    "Here, the folding nail tables for Kim's nail party are in for repair until Monday."
+   ],
+   [
+    "Who goes out on mobile nails and lashes and brows jobs, and who cuts hair?",
+    "Who goes out on mobile nails and lashes and brows jobs, and who works at the salon?"
+   ],
+   [
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Call 911 now. If you can, take off any new nails or glue."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a gel mani-pedi at home every 3 weeks."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the bridal party quote before booking."
+   ],
+   [
+    "Alex M.'s new water heater, put in Thu Oct 22, is dripping at a fitting.",
+    "Alex M.'s bridal party, done Thu Oct 22: one bridesmaid chipped a nail."
+   ],
+   [
+    "Here, it's Jordan's $640 quote from photos for Morgan P.'s water heater.",
+    "Here, it's Jordan's $640 quote from photos for Morgan P.'s bridal party."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A nail salon's example: a toe that looks infected gets 'see a doctor first, and no nail work on that foot'."
+   ],
+   [
+    "like Linh's color plan after a consult, or a lawyer's engagement letter",
+    "like Linh's fill plan after a full set, or a lawyer's engagement letter"
+   ],
+   [
+    "It's inside the 1-year labor warranty, so Sam OKs a free return visit.",
+    "It's inside the 5-day free fix, so Sam OKs a free return visit."
+   ],
+   [
+    "NOTE five sets done, the bride's in pearl chrome. Old one hauled away.",
+    "NOTE five sets done, the bride's in pearl chrome."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Can you come to my home for a gel manicure?"
+   ],
+   [
+    "Offer Alex M. Thu Oct 22 with Jordan, the old heater hauled away Fri?",
+    "Offer Alex M. Thu Oct 22 with Jordan, with art for the bride only?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a wedding planner books nails for a bride and 4 bridesmaids at one hotel."
+   ],
+   [
+    "My water heater is old and rusty. Can a plumber replace it this week?",
+    "I'm getting married Saturday. Can a nail tech do my bridal party's nails Thursday?"
+   ],
+   [
+    "Casey does drains, leaks and flushes, not water heater replacements.",
+    "Casey does mani-pedis and pedicures, not bridal parties."
+   ],
+   [
+    "Only Jordan replaces water heaters here, so he finishes another day.",
+    "Only Jordan does bridal parties here, so he finishes another day."
+   ],
+   [
+    "Should color quotes, from photos or at the chair, come to you first?",
+    "Should art quotes from photos come to you first?"
+   ],
+   [
+    "If Alex named a warranty plan before the times, Sam checks it here.",
+    "If Alex named a plan before the times, Sam checks it here."
+   ],
+   [
+    "The $89 service call and labor at $120 an hour aren't booked alone.",
+    "The $89 trip fee and extra time at $120 an hour aren't booked alone."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My toenail looks infected. Is it safe to get a pedicure this week?"
+   ],
+   [
+    "Lee Home Services can clear the drain for $179, paid after the job.",
+    "Lee Home Services can do a gel mani-pedi at your home for $179, paid after."
+   ],
+   [
+    "Jordan quotes a new water heater for Alex M. from his photos: $640.",
+    "Jordan quotes bridal party nails for Alex M. from his photos: $640."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And which nails need work?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Waxing for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Before DONE, Jordan runs the water with Alex and checks for drips.",
+    "Before DONE, Jordan checks each nail with Alex under the lamp."
+   ],
+   [
+    "Here's the price for a new one, from his photos, as its own visit.",
+    "Here's the price, from his photos, as its own visit."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: an allergic reaction now, like a swelling face or throat."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: many nail salons, spas and groomers are licensed to one place."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the designs you want, and a nail tech will price it."
+   ],
+   [
+    "Both have signed, so a 25% deposit on the $640 water heater: $160.",
+    "Both have signed, so a 25% deposit on the $640 bridal party: $160."
+   ],
+   [
+    "CHANGE cleared the main line from the outside cleanout, same price",
+    "CHANGE filed down the old gel first, same price"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, I'd like a house call for a gel manicure. A text back is fine."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does mobile nails and lashes and brows, not hair."
+   ],
+   [
+    "The $150 flush takes a $40 deposit too, with the $110 rest later.",
+    "The $150 pedicure takes a $40 deposit too, with the $110 rest later."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE sensitive cuticles, short almond. Bring the gentle file next time."
+   ],
+   [
+    "Say Alex's visit were a color, which only Linh does at the salon.",
+    "Say Alex's visit were a custom art set, which only Linh does at the salon."
+   ],
+   [
+    "Jordan's supplier invoice shows the valves cost more since then.",
+    "Jordan's supplier invoice shows the gel polish costs more since then."
+   ],
+   [
+    "A landlord's or a parent's yes keeps it saved up to 30 minutes.",
+    "A parent's yes keeps it saved up to 30 minutes."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor.",
+    "Alex texts that one bridesmaid's finger is red and swollen."
+   ],
+   [
+    "Only Jordan replaces water heaters, and he has no earlier time.",
+    "Only Jordan does bridal parties, and he has no earlier time."
+   ],
+   [
+    "Here: the heater runs, the hot water is hot, and nothing drips.",
+    "Here: every set is cured, and nobody has a smudge."
+   ],
+   [
+    "Example: a color needs its patch test at least 48 hours before.",
+    "Nail work has no first step, so nothing limits the new time."
+   ],
+   [
+    "A job priced at the visit never takes more than the visit fee.",
+    "A job priced at the visit never takes more than its trip or consult fee."
+   ],
+   [
+    "Color is priced for each customer, so Sam OKs each color quote",
+    "Custom art is priced for each customer, so Sam OKs each art quote"
+   ],
+   [
+    "Linh's supplier invoice shows the color costs more since then.",
+    "Linh's supplier invoice shows the gel polish costs more since then."
+   ],
+   [
+    "Barbering pays the $2, so the shop gets its own monthly bill.",
+    "Nail work pays the $2 too, so the salon gets its own monthly bill."
+   ],
+   [
+    "A what-if: Jordan cracks the cabinet floor and texts a photo.",
+    "A what-if: Jordan spills acetone on a side table, and he texts a photo."
+   ],
+   [
+    "Labor is $140 an hour with Jordan, and $120 with anyone else.",
+    "Extra time is $140 an hour with Tuan, and $120 with anyone else."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric?",
+    "Lee Home Services asks: regular polish on your toes, or gel?"
+   ],
+   [
+    "All are with Jordan, the one who replaces water heaters here.",
+    "All are with Jordan, the one who does bridal parties here."
+   ],
+   [
+    "Only Jordan replaces water heaters here, so nobody stands in.",
+    "Only Jordan does bridal parties here, so nobody stands in."
+   ],
+   [
+    "The tool for your yard drain visit tomorrow is in for repair.",
+    "The nail tables for your visit tomorrow are in for repair."
+   ],
+   [
+    "Before DONE, Jordan and Alex check the water heater together.",
+    "Before DONE, Jordan and Alex check each person's nails together."
+   ],
+   [
+    "The bridal party nails takes 25% once its photo quote is OK'd",
+    "Bridal party nails take 25% once the photo quote is OK'd"
+   ],
+   [
+    "Voicemail from a new caller about a dripping kitchen faucet.",
+    "Voicemail from a new caller about a manicure at home."
+   ],
+   [
+    "Where is the water heater: a garage, a closet or a basement?",
+    "Where will the nails be done: a living room, a kitchen or a hotel suite?"
+   ],
+   [
+    "Here, Jordan quotes $190 for Morgan P.'s two shutoff valves.",
+    "Here, Jordan quotes $190 for Morgan P.'s two gel pedicures."
+   ],
+   [
+    "the service's length, the color station and any special need",
+    "the service's length and any special need"
+   ],
+   [
+    "Only Jordan does replacements, so Alex will pick a new day.",
+    "Only Jordan does bridal parties, so Alex will pick a new day."
+   ],
+   [
+    "Your water heater is under warranty, so this visit is free.",
+    "Your bridal party's nails are inside the free fix, so this visit is free."
+   ],
+   [
+    "At the salon, prices are the same whichever nail tech cuts.",
+    "At the salon, prices are the same whichever nail tech does the work."
+   ],
+   [
+    "NOTE heavy sediment in the tank. Flush again in 12 months.",
+    "NOTE dry heels. A pedicure again in 4 weeks."
+   ],
+   [
+    "My water heater's drain valve is dripping since the flush.",
+    "One toenail chipped since the pedicure."
+   ],
+   [
+    "Her card is saved for the $20 fee, and nothing is charged.",
+    "Nothing is taken: her YES booked it."
+   ],
+   [
+    "The panel upgrade is a free estimate visit, then a quote.",
+    "Lashes for a bridal party start with a free consult, then a quote."
+   ],
+   [
+    "A leak is quoted on site, and a water heater from photos.",
+    "A bridal party is priced from photos."
+   ],
+   [
+    "Jordan quotes a main water line repair for Alex M.: $900.",
+    "Jordan quotes wedding party nails for Alex M.: $900."
+   ],
+   [
+    "Lee Home Services can replace your water heater for $640.",
+    "Lee Home Services can do your bridal party's nails for $640."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Jordan went to get the gel color you picked and will be back about 9:30am."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Home Services has a plan every 3 weeks, $179 a visit."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to a paraffin treatment for $40."
+   ],
+   [
+    "The heater's drain valve drips 2 weeks after the flush.",
+    "A toenail's polish chips 3 days after the pedicure."
+   ],
+   [
+    "It's a leak under the sink, today 3 to 5pm with Jordan.",
+    "It's a broken nail, today 3 to 5pm with Jordan."
+   ],
+   [
+    "Alex books a cut for an adult brother, and pays for it.",
+    "Alex books a manicure for an adult brother, and pays for it."
+   ],
+   [
+    "When only the visit fee is promised, it's shown first.",
+    "When only a trip or consult fee is promised, it's shown first."
+   ],
+   [
+    "The $179 drain and the $150 flush need no notice here.",
+    "The $179 mani-pedi and the $150 pedicure need no notice here."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s gel mani-pedi from Thu Oct 22: one nail is lifting."
+   ],
+   [
+    "The new water heater drips at a fitting 2 weeks later.",
+    "A bridesmaid's nail chips 2 days later."
+   ],
+   [
+    "Jordan quoted $190 for Morgan P.'s two shutoff valves.",
+    "Jordan quoted $190 for Morgan P.'s two gel pedicures."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most salons start."
+   ],
+   [
+    "The price, {{price}}, comes straight from Sam's list.",
+    "The price, {{price:$35}}, comes straight from Sam's list."
+   ],
+   [
+    "Can a plumber flush my water heater Thursday morning?",
+    "Can a nail tech give me a spa pedicure at home Thursday morning?"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: a paraffin treatment for hands and feet, $40."
+   ],
+   [
+    "1-year labor warranty: if it clogs again, reply here.",
+    "Free fix within 5 days: if a nail chips or lifts, reply here."
+   ],
+   [
+    "1-year labor warranty: if anything leaks, reply here.",
+    "Free fix within 5 days: if a nail chips or lifts, reply here."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a nail tech working without a license."
+   ],
+   [
+    "Lee Home Services signed your water heater contract.",
+    "Lee Home Services signed your bridal party contract."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your nails are inside the 5-day free fix, so this visit is free."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the nail tech, one line each."
+   ],
+   [
+    "QUOTE 640 water heater leaking at the base, replace",
+    "QUOTE 640 bridal party nails, five people"
+   ],
+   [
+    "Alex needs a cut within the hour, for an interview.",
+    "Alex chipped a nail and needs a fix within the hour, for an interview."
+   ],
+   [
+    "Before Alex pays, Linh shows the cut in the mirror.",
+    "Before Alex pays, Linh checks each nail with Alex under the lamp."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Nail work is never sent now: every visit has a set time."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds waxing to Lee Home Services."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. He takes it off gently at the start."
+   ],
+   [
+    "The work is under warranty, so this visit is free.",
+    "The work is inside the 5-day free fix, so this visit is free."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your bridal party price is with Lee Home Services."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a mani-pedi at home every 3 weeks."
+   ],
+   [
+    "Jordan found that your main water line is cracked.",
+    "Jordan priced nails for your wedding party of eight."
+   ],
+   [
+    "Done: the $160 for the shutoff valves is refunded.",
+    "Done: the $40 for the paraffin treatment is refunded."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a gel mani-pedi at home."
+   ],
+   [
+    "Dee's card was only saved, so nothing was charged.",
+    "Nothing was taken, so nothing was charged."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a problem with the nails this morning."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said their lips are swelling after a home gel kit."
+   ],
+   [
+    "Leak at the gas water heater · safety steps given",
+    "Fingers burn after press-ons · safety steps given"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "Nail art is $5 a nail, so two nails add $10."
+   ],
+   [
+    "Jordan sees the water heater leaking at the base.",
+    "Alex asks Jordan about nails for the bridal party."
+   ],
+   [
+    "Alex asks for a perm, which the salon doesn't do.",
+    "Alex asks for a spray tan, which the salon doesn't do."
+   ],
+   [
+    "the proof Alex was asked to have ready is missing",
+    "the vendor pass Alex was to leave at the desk is missing"
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Nail work is never sent now."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no vendor pass at the venue desk"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do a nail party for three friends?"
+   ],
+   [
+    "Electrical is set up; waits for its electrician",
+    "Lash work is set up; waits for its lash artist"
+   ],
+   [
+    "Reads back plumbing's money, service by service",
+    "Reads back the money, service by service"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a nail tech do a nail party at my home this Thursday?"
+   ],
+   [
+    "The water heater is leaking onto the floor now.",
+    "One bridesmaid's finger is red and swollen now."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 40 paraffin treatment, hands and feet"
+   ],
+   [
+    "Jordan found that your water heater is leaking.",
+    "Jordan priced your bridal party's nails."
+   ],
+   [
+    "If you see water or lose hot water, reply here.",
+    "If a nail chips or lifts, reply here."
+   ],
+   [
+    "Some bookings name a person, like Linh's chair.",
+    "Some bookings name a person, like Linh's station."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says acetone left a mark on a jacket today."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan's acetone left a mark on Alex M.'s side table."
+   ],
+   [
+    "We got your voicemail about a dripping faucet.",
+    "We got your voicemail about a manicure at home."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every 3 weeks, too?"
+   ],
+   [
+    "Here: the drain runs clear, and nothing drips.",
+    "Here: every nail is smooth, and the polish is set."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan do my nails again next week?"
+   ],
+   [
+    "Flushes already booked keep their $40 deposit.",
+    "Pedicures already booked keep their $40 deposit."
+   ],
+   [
+    "Casey does drain work, so Casey can stand in.",
+    "Casey does mani-pedis, so Casey can stand in."
+   ],
+   [
+    "Kim L.'s yard drain was for Jordan and Casey.",
+    "Kim L.'s nail party was for Jordan and Casey."
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a nail plan, from Jordan's notes"
+   ],
+   [
+    "Here's the price to fix it, as its own visit.",
+    "Here's the price, as its own visit."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free fix lasts."
+   ],
+   [
+    "He's the one who replaces water heaters here.",
+    "He's the one who does bridal parties here."
+   ],
+   [
+    "Alex cancels the $160 valve work on the page.",
+    "Alex cancels the $40 paraffin treatment on the page."
+   ],
+   [
+    "My new water heater is dripping at a fitting.",
+    "My sister chipped a nail before the wedding."
+   ],
+   [
+    "Your drain cleaning plan's price is changing.",
+    "Your mani-pedi plan's price is changing."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'A gel manicure at home' fits a house call."
+   ],
+   [
+    "A leak priced at the visit has no price yet.",
+    "Extra nail art at the visit gets its own yes first."
+   ],
+   [
+    "The camera inspection is $249 when Sam goes.",
+    "A nail party is $249 when Sam runs it."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a toe by the nail is red and swollen."
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a time for your first fill:"
+   ],
+   [
+    "The bridal party nails is never on the list.",
+    "Bridal party nails are never on the list."
+   ],
+   [
+    "Alex can book again once the proof is ready.",
+    "Alex can book again once the pass is ready."
+   ],
+   [
+    "Alex's drain is booked with Jordan by name.",
+    "Alex's mani-pedi is booked with Jordan by name."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I broke a nail and have an interview at 9. Can someone come tonight?"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿se le hinchan la cara, los labios o la garganta?"
+   ],
+   [
+    "For older homes, where the rules require it",
+    "Where the state's rules require it"
+   ],
+   [
+    "The camera inspection is 249 if I go myself",
+    "A nail party is 249 if I run it myself"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for nail art."
+   ],
+   [
+    "Note: Electric water heater, in the garage.",
+    "Note: regular polish on the toes."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "One toe by my nail is red and swollen now."
+   ],
+   [
+    "Nobody who does replacements is free sooner",
+    "Nobody who does bridal parties is free sooner"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE split nail on the left thumb"
+   ],
+   [
+    "BEFORE rust at the base of the water heater",
+    "BEFORE each person's nails, as they are"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Tuan also do nail art?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan runs out of the gel color Alex picked, so he goes to the beauty supply for it."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also do nail art on two nails?"
+   ],
+   [
+    "Your water heater quote is with the owner.",
+    "Your bridal party quote is with the owner."
+   ],
+   [
+    "The old heater is hauled away Fri, not Thu",
+    "The bride gets the art, and the bridesmaids get French tips"
+   ],
+   [
+    "says Saturday's cut is uneven on one side.",
+    "says a nail from Saturday chipped."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules salons often set."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I take off my old polish before you come?"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a nail plan every 3 weeks, which Jordan suggested"
+   ],
+   [
+    "Alex M. signed the water heater contract.",
+    "Alex M. signed the bridal party contract."
+   ],
+   [
+    "Jordan finds the main water line cracked.",
+    "Alex asks Jordan about nails for the whole wedding party."
+   ],
+   [
+    "QUOTE 900 main water line cracked, repair",
+    "QUOTE 900 wedding party nails, eight people"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD outlet sparks, stopped using the lamp"
+   ],
+   [
+    "Flushes already booked stay paid in full.",
+    "Pedicures already booked stay paid in full."
+   ],
+   [
+    "so color services offer only Linh's times",
+    "so custom art offers only Linh's times"
+   ],
+   [
+    "Any scalp trouble Linh should know about?",
+    "Any cut or sore on your hands that Linh should know about?"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "Can you come to my home for a gel manicure?"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with a note for the nail tech."
+   ],
+   [
+    "Plumbing is live; offers electrical next",
+    "Mobile nails is live; offers lashes next"
+   ],
+   [
+    "A hold is never more than the visit fee.",
+    "A hold is never more than the trip fee."
+   ],
+   [
+    "an apartment building's maintenance days",
+    "a care home's nail days"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: are your face, lips or throat swelling?"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "My fingers have burned since I put on press-on nails."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a table near a plug, with good light."
+   ],
+   [
+    "Please clear a path to the water heater.",
+    "Please have a table and chairs ready for five."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $40 paraffin quote is good for 7 days."
+   ],
+   [
+    "NOTE new 50-gallon heater in the garage.",
+    "NOTE five sets done, the bride's in pearl chrome."
+   ],
+   [
+    "A cut at the salon has no cancel period.",
+    "A manicure at the salon has no cancel period."
+   ],
+   [
+    "Casey is free then and does drain work.",
+    "Casey is free then and does mani-pedis."
+   ],
+   [
+    "Note: the sink is full and won't drain.",
+    "Note: kitchen table by the window, near a plug."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds the outlet by the table sparks."
+   ],
+   [
+    "Can you reach the water shut-off valve?",
+    "Will anyone else want a manicure while Tuan is there?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Mobile Nails can do the nails:"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A salon visit is in the other flow."
+   ],
+   [
+    "Gas. It's rusty, but it isn't leaking.",
+    "Five of us. The wedding is Sat Oct 24."
+   ],
+   [
+    "Alex M. sent photos of a water heater.",
+    "Alex M. sent design photos for a bridal party."
+   ],
+   [
+    "Note: Gas water heater, in the garage.",
+    "Note: five people, in the living room."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's mani-pedi?"
+   ],
+   [
+    "the $480 left on the water heater bill",
+    "the $480 left on the bridal party bill"
+   ],
+   [
+    "Alex M. cancelled the $160 valve work.",
+    "Alex M. cancelled the $40 paraffin treatment."
+   ],
+   [
+    "Kim's card is saved for the $89 fee.",
+    "Kim's card is saved for the $89 fee."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan sees Alex's heels are very dry and offers a paraffin treatment."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It's inside the 5-day free fix."
+   ],
+   [
+    "Alex has had cuts at the salon before",
+    "Alex has had manicures at the salon before"
+   ],
+   [
+    "for a color, and only Linh does color",
+    "for a custom art set, and only Linh does custom art"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Acetone spilled on my jacket and left a mark."
+   ],
+   [
+    "Alex's kitchen drain has a set time.",
+    "Alex's gel mani-pedi has a set time."
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Full set with art (acrylic set and hand-painted art)"
+   ],
+   [
+    "Wants the faucet looked at this week",
+    "Wants a manicure at home this week"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "One nail lifts 3 days later."
+   ],
+   [
+    "Offers a shorter cut or a later time",
+    "Offers a shorter service or a later time"
+   ],
+   [
+    "Bridal party nails is never sent now",
+    "Bridal party nails are never sent now"
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a hairdresser near you."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Mani-pedis, pedicures, nail parties"
+   ],
+   [
+    "Nothing more is owed for the flush.",
+    "Nothing more is owed for the pedicure."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "One of my nails is lifting already."
+   ],
+   [
+    "Old heater hauled away Fri, not Thu",
+    "Art for the bride only, French tips for the rest"
+   ],
+   [
+    "A cut paid at the chair is disputed",
+    "A visit paid at the desk is disputed"
+   ],
+   [
+    "At the chair, Alex is already there",
+    "At the table, Alex is already there"
+   ],
+   [
+    "Its first steps: none for a drain.",
+    "Its first steps: none for nail work."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Paraffin treatment, hands and feet · $40"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: gel on the toes, so regular polish instead"
+   ],
+   [
+    "Alex M.: $640 for the water heater",
+    "Alex M.: $640 for the bridal party"
+   ],
+   [
+    "the $480 left on your water heater",
+    "the $480 left on your bridal party"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left nail dust all over the table."
+   ],
+   [
+    "Supplier invoice: valves +$15 each",
+    "Supplier invoice: gel polish +$15 a set"
+   ],
+   [
+    "Is water backing up into the sink?",
+    "Any gel or acrylic on your nails now?"
+   ],
+   [
+    "Linh Tran and Mai Nguyen cut hair.",
+    "Linh Tran and Mai Nguyen work at the salon."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a gel manicure every 3 weeks."
+   ],
+   [
+    "How to care for your skin and hair",
+    "How to care for your nails and cuticles"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the outlet checked before using it"
+   ],
+   [
+    "Found at Thu's water heater visit",
+    "Asked about at Thu's visit"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Gel pedicure"
+   ],
+   [
+    "so the cut itself is already paid",
+    "so the manicure itself is already paid"
+   ],
+   [
+    "Nail repair · Priced at the visit",
+    "Classic manicure at home · $99"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there good light?"
+   ],
+   [
+    "Plumbing, electrical, barbershop",
+    "Nails, lashes, brows"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no mark."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Nail plan every 3 weeks"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE acetone mark on the side table"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting Alex's gel color, back 9:30"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the outlet by the table sparks"
+   ],
+   [
+    "the rest of the water heater job",
+    "the rest of the bridal party"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Mobile nails, Lashes and brows, Nail salon"
+   ],
+   [
+    "How soon can someone replace it?",
+    "How soon can someone do the party's nails?"
+   ],
+   [
+    "Lee's Nail Bar doesn't do perms.",
+    "Lee's Nail Bar doesn't do spray tans."
+   ],
+   [
+    "the color Linh can't do Saturday",
+    "the custom art set Linh can't do Saturday"
+   ],
+   [
+    "Alex was to have the proof ready",
+    "Alex was to leave the vendor pass"
+   ],
+   [
+    "The job should be done by 10am.",
+    "The job should be done by about 10:45am."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa mani-pedi Thu 12-2 Casey"
+   ],
+   [
+    "Old heater, leaking at the base",
+    "The designs Alex wants"
+   ],
+   [
+    "$480 left for your water heater",
+    "$480 left for your bridal party"
+   ],
+   [
+    "Shows Alex the cut; fixes first",
+    "Shows Alex the nails; fixes first"
+   ],
+   [
+    "If it slows again, reply here.",
+    "If a nail chips or lifts, reply here."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. My fingers just burn."
+   ],
+   [
+    "Texts the receipt and warranty",
+    "Texts the receipt and the free fix"
+   ],
+   [
+    "Uses a cut from Alex's package",
+    "Uses a manicure from Alex's package"
+   ],
+   [
+    "had to leave before the color.",
+    "had to leave before the art was done."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "One nail chipped on Monday."
+   ],
+   [
+    "Lee Mobile Nails · Nail repair",
+    "Lee Mobile Nails · Classic manicure at home"
+   ],
+   [
+    "Nail repair · Set at the visit",
+    "Classic manicure at home · $99"
+   ],
+   [
+    "The receipt, with any warranty",
+    "The receipt, with any free fix"
+   ],
+   [
+    "Main water line repair · $900",
+    "Wedding party nails, eight people · $900"
+   ],
+   [
+    "the yearly flush plan's terms",
+    "the 3-week plan's terms"
+   ],
+   [
+    "When a chair is about to open",
+    "When a nail tech is about to be free"
+   ],
+   [
+    "Color always stays with Linh.",
+    "Custom art always stays with Linh."
+   ],
+   [
+    "A skin problem stops the work",
+    "An infection stops the work"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I'd like a gel mani-pedi at home."
+   ],
+   [
+    "Jetter in the shop until Mon",
+    "Nail tables in for repair until Mon"
+   ],
+   [
+    "Kitchen drain cleared · $179",
+    "Gel mani-pedi at home · $179"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Gel manicure, pedicure and nail art"
+   ],
+   [
+    "Booked by name, like a chair",
+    "Booked by name, like a nail tech"
+   ],
+   [
+    "Like the color in my photos.",
+    "Like the design in my photos."
+   ],
+   [
+    "Supplier invoice: color +$20",
+    "Supplier invoice: gel polish +$20"
+   ],
+   [
+    "Free estimate, then a quote",
+    "Free consult, then a quote"
+   ],
+   [
+    "with the plug-in's warranty",
+    "with the plug-in's free fix"
+   ],
+   [
+    "Yes, it won't drain at all.",
+    "Yes, the kitchen table."
+   ],
+   [
+    "The new water heater is in.",
+    "The bridal party's nails are done."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Paraffin treatment, hands and feet"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a gel manicure on Saturday."
+   ],
+   [
+    "Linh stopped Alex M.'s cut.",
+    "Linh stopped Alex M.'s manicure."
+   ],
+   [
+    "No: Alex stays in the chair",
+    "No: Alex stays at the table"
+   ],
+   [
+    "Saves the color station too",
+    "Saves a pedicure chair too"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $179 house call needs none."
+   ],
+   [
+    "It's a leak under the sink",
+    "It's a house call"
+   ],
+   [
+    "the $640 water heater bill",
+    "the $640 bridal party bill"
+   ],
+   [
+    "Kitchen drain · Thu Oct 22",
+    "Gel mani-pedi · Thu Oct 22"
+   ],
+   [
+    "A water heater replacement",
+    "Bridal party nails"
+   ],
+   [
+    "a water heater replacement",
+    "bridal party nails"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una manicura de gel el sábado."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens at the table?"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 21 · 10:00am"
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $2,400 bridal weekend"
+   ],
+   [
+    "Outlet or switch replaced",
+    "Lash lift"
+   ],
+   [
+    "Sale agua del calentador.",
+    "Me arden los dedos desde que me puse uñas postizas."
+   ],
+   [
+    "Mold behind the sink wall",
+    "Outlet by the table"
+   ],
+   [
+    "for your new water heater",
+    "for your bridal party's nails"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a gel manicure every 3 weeks"
+   ],
+   [
+    "finds chairs side by side",
+    "finds stations side by side"
+   ],
+   [
+    "Back to Alex at the chair",
+    "Back to Alex at the table"
+   ],
+   [
+    "your yard drain tomorrow",
+    "your nail party tomorrow"
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every 3 weeks?"
+   ],
+   [
+    "Water heater replacement",
+    "Bridal party nails"
+   ],
+   [
+    "water heater replacement",
+    "bridal party nails"
+   ],
+   [
+    "mentions it at the chair",
+    "mentions it at the table"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW waxing"
+   ],
+   [
+    "A gas smell at the home",
+    "Swelling lips after a home gel kit"
+   ],
+   [
+    "Floor around it, before",
+    "The table, before"
+   ],
+   [
+    "Sewer camera inspection",
+    "Nail party at home"
+   ],
+   [
+    "sewer camera inspection",
+    "nail party at home"
+   ],
+   [
+    "Signature cut and shave",
+    "Gel pedicure"
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else, like custom art"
+   ],
+   [
+    "felt faint at the chair",
+    "felt faint at the table"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids manicure (12 and under)"
+   ],
+   [
+    "Birch Tower apartments",
+    "Birch Tower senior living"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Nothing on now, and no art."
+   ],
+   [
+    "Water heater · Alex M.",
+    "Bridal party · Alex M."
+   ],
+   [
+    "Under the sink, before",
+    "Hands, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your bridal weekend"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Gel mani-pedi at home"
+   ],
+   [
+    "kitchen drain clearing",
+    "gel mani-pedi at home"
+   ],
+   [
+    "credited to the repair",
+    "counts toward the service"
+   ],
+   [
+    "replaces water heaters",
+    "does bridal parties"
+   ],
+   [
+    "A cut is one nail tech",
+    "A manicure is one nail tech"
+   ],
+   [
+    "One person, like a cut",
+    "One person, like a manicure"
+   ],
+   [
+    "No minimum, like a cut",
+    "No minimum, like a manicure"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s manicure."
+   ],
+   [
+    "No: a cut at the chair",
+    "No: a visit at the salon"
+   ],
+   [
+    "Right to cancel · $160",
+    "Right to cancel · $40"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Acetone mark on the side table"
+   ],
+   [
+    "Lead-safe work notice",
+    "Notice for nail work at home"
+   ],
+   [
+    "Ceiling fan installed",
+    "Brow lamination"
+   ],
+   [
+    "Cabinet floor, before",
+    "Left thumb, before"
+   ],
+   [
+    "The drain runs clear.",
+    "The mani-pedi is done."
+   ],
+   [
+    "like the $160 valves.",
+    "like the $40 paraffin treatment."
+   ],
+   [
+    "DONE 640 water heater",
+    "DONE 640 bridal party"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Nails LLC"
+   ],
+   [
+    "Plumbing + electrical",
+    "Mobile nails + lashes and brows"
+   ],
+   [
+    "water heater contract",
+    "bridal party contract"
+   ],
+   [
+    "replace water heaters",
+    "do bridal parties"
+   ],
+   [
+    "says the cut was done",
+    "says the manicure was done"
+   ],
+   [
+    "so the chair is saved",
+    "so the station is saved"
+   ],
+   [
+    "color and house calls",
+    "custom art and house calls"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Fill plan"
+   ],
+   [
+    "Water heater, before",
+    "The party's nails, before"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Nail Bar LLC"
+   ],
+   [
+    "pays for a staff cut",
+    "pays for a staff manicure"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes"
+   ],
+   [
+    "like a move-out day",
+    "like a wedding day"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo me arden los dedos."
+   ],
+   [
+    "Yard drain clearing",
+    "Nail party at home"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilenails.com"
+   ],
+   [
+    "shows the cuts left",
+    "shows the manicures left"
+   ],
+   [
+    "Just a trim on top.",
+    "Short almond, please."
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the table"
+   ],
+   [
+    "A water heater job",
+    "A nail party"
+   ],
+   [
+    "the shutoff valves",
+    "the paraffin treatment"
+   ],
+   [
+    "Water heater flush",
+    "Spa pedicure at home"
+   ],
+   [
+    "water heater flush",
+    "spa pedicure at home"
+   ],
+   [
+    "signs the estimate",
+    "signs the contract"
+   ],
+   [
+    "A cut is shortened",
+    "A late manicure is shortened or moved"
+   ],
+   [
+    "the group's chairs",
+    "the group's stations"
+   ],
+   [
+    "color, house calls",
+    "custom art, house calls"
+   ],
+   [
+    "3 visits with Linh",
+    "3 fills with Linh, every 3 weeks"
+   ],
+   [
+    "the cabinet floor",
+    "the floor"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Nails"
+   ],
+   [
+    "Water heater leak",
+    "Press-on removal"
+   ],
+   [
+    "the kitchen drain",
+    "the mani-pedi"
+   ],
+   [
+    "like a burst pipe",
+    "like a tow"
+   ],
+   [
+    "a package of cuts",
+    "a package of manicures"
+   ],
+   [
+    "Linh's color plan",
+    "Linh's fill plan"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "hot towel shaves",
+    "gel manicures"
+   ],
+   [
+    "Its rating plate",
+    "The designs Alex wants"
+   ],
+   [
+    "any part on hand",
+    "any supplies on hand"
+   ],
+   [
+    "A warranty claim",
+    "Asks for a free fix"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "written estimate",
+    "contract"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Nail Bar"
+   ],
+   [
+    "Linh did the cut",
+    "Linh did the manicure"
+   ],
+   [
+    "Alex's color has",
+    "Alex's custom art set has"
+   ],
+   [
+    "Written estimate",
+    "Contract"
+   ],
+   [
+    "drain clearings",
+    "nail appointments"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 3 weeks"
+   ],
+   [
+    "DONE 160 valves",
+    "DONE 40 paraffin"
+   ],
+   [
+    "Drain clearings",
+    "Mani-pedis"
+   ],
+   [
+    "signed estimate",
+    "signed contract"
+   ],
+   [
+    "Groom's package",
+    "Full set with art"
+   ],
+   [
+    "Yes, like a cut",
+    "Yes, like a manicure"
+   ],
+   [
+    "as at the chair",
+    "as at the table"
+   ],
+   [
+    "Linh does color",
+    "Linh does custom art"
+   ],
+   [
+    "In the garage.",
+    "In the living room."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 mani-pedi"
+   ],
+   [
+    "Drain clearing",
+    "Mani-pedi"
+   ],
+   [
+    "drain clearing",
+    "mani-pedi"
+   ],
+   [
+    "an electrician",
+    "a lash artist"
+   ],
+   [
+    "during my cut?",
+    "during my manicure?"
+   ],
+   [
+    "A cut has none",
+    "A manicure has none"
+   ],
+   [
+    "A cut is rated",
+    "A manicure is rated"
+   ],
+   [
+    "A leak repair",
+    "A nail repair"
+   ],
+   [
+    "Kitchen drain",
+    "Gel mani-pedi"
+   ],
+   [
+    "signature cut",
+    "gel pedicure"
+   ],
+   [
+    "every 4 weeks",
+    "every 3 weeks"
+   ],
+   [
+    "A package cut",
+    "A package manicure"
+   ],
+   [
+    "a package cut",
+    "a package manicure"
+   ],
+   [
+    "rents a chair",
+    "rents a station"
+   ],
+   [
+    "A nail art is",
+    "Nail art on 4 nails is"
+   ],
+   [
+    "Panel upgrade",
+    "Bridal party lashes"
+   ],
+   [
+    "Color and cut",
+    "Custom art set"
+   ],
+   [
+    "color and cut",
+    "custom art set"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Jordan Price",
+    "Tuan Pham"
+   ],
+   [
+    "1200 Main St",
+    "410 Pine Ave"
+   ],
+   [
+    "water heater",
+    "bridal party"
+   ],
+   [
+    "in the chair",
+    "at the table"
+   ],
+   [
+    "of your hair",
+    "of your nails"
+   ],
+   [
+    "color quotes",
+    "art quotes"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "barbershops",
+    "salons"
+   ],
+   [
+    "Leak repair",
+    "Nail repair"
+   ],
+   [
+    "leak repair",
+    "nail repair"
+   ],
+   [
+    "electrician",
+    "lash artist"
+   ],
+   [
+    "Casey Moore",
+    "Hana Park"
+   ],
+   [
+    "color quote",
+    "art quote"
+   ],
+   [
+    "A art quote",
+    "An art quote"
+   ],
+   [
+    "barbershop",
+    "salon"
+   ],
+   [
+    "Yard drain",
+    "Nail party"
+   ],
+   [
+    "the repair",
+    "the work"
+   ],
+   [
+    "Electrical",
+    "Lashes and brows"
+   ],
+   [
+    "electrical",
+    "lashes and brows"
+   ],
+   [
+    "Riley Chen",
+    "Linh Tran"
+   ],
+   [
+    "Avery Diaz",
+    "Mai Nguyen"
+   ],
+   [
+    "Beard trim",
+    "Nail art"
+   ],
+   [
+    "beard trim",
+    "nail art"
+   ],
+   [
+    "Barbershop",
+    "Nail salon"
+   ],
+   [
+    "barbershop",
+    "nail salon"
+   ],
+   [
+    "a nail art",
+    "nail art"
+   ],
+   [
+    "A nail art",
+    "Nail art"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "hot towel",
+    "gel"
+   ],
+   [
+    "Electric.",
+    "Regular polish."
+   ],
+   [
+    "88 Elm St",
+    "73 Walnut St"
+   ],
+   [
+    "42 Oak St",
+    "29 Willow Ct"
+   ],
+   [
+    "Skin fade",
+    "Spa pedicure"
+   ],
+   [
+    "barbering",
+    "nail work"
+   ],
+   [
+    "but color",
+    "but custom art"
+   ],
+   [
+    "kids cuts",
+    "kids manicures"
+   ],
+   [
+    "Kids cuts",
+    "Kids manicures"
+   ],
+   [
+    "JP031552",
+    "NT031552"
+   ],
+   [
+    "MP045210",
+    "MS045210"
+   ],
+   [
+    "Plumbing",
+    "Mobile nails"
+   ],
+   [
+    "plumbing",
+    "mobile nails"
+   ],
+   [
+    "plumbers",
+    "nail techs"
+   ],
+   [
+    "kids cut",
+    "kids manicure"
+   ],
+   [
+    "Kids cut",
+    "Kids manicure"
+   ],
+   [
+    "haircuts",
+    "gel manicures"
+   ],
+   [
+    "Haircuts",
+    "Gel manicures"
+   ],
+   [
+    "BS20981",
+    "NS20981"
+   ],
+   [
+    "EC22871",
+    "LB22871"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "plumber",
+    "nail tech"
+   ],
+   [
+    "Plumber",
+    "Nail tech"
+   ],
+   [
+    "barbers",
+    "nail techs"
+   ],
+   [
+    "haircut",
+    "gel manicure"
+   ],
+   [
+    "Haircut",
+    "Gel manicure"
+   ],
+   [
+    "Jordan",
+    "Tuan"
+   ],
+   [
+    "Barber",
+    "Nail tech"
+   ],
+   [
+    "barber",
+    "nail tech"
+   ],
+   [
+    "shave",
+    "polish"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "Riley",
+    "Linh"
+   ],
+   [
+    "Avery",
+    "Mai"
+   ],
+   [
+    "Casey",
+    "Hana"
+   ],
+   [
+    "Shop",
+    "Salon"
+   ]
+  ]
+ },
+ "keep": [
+  "salon",
+  "bridal party",
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a gel manicure with Linh at Lee's Nail Bar, for Sat Oct 24 at 11:00am. Walk-ins wait in a line, a custom art set is priced from design photos, and a big art set takes a deposit. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Nails at home, 29 Willow Ct, and Tuan comes Thu Oct 22 between 8 and 10am. The service depends on the money choice you pick: a gel mani-pedi at home, a spa pedicure paid when booking, or a bridal party priced from photos."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|deposit|counter",
+    "photos|none|counter",
+    "photos|deposit|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 gel manicure with Linh. Nothing is taken: a YES books it. Alex pays at the desk, with any tip.",
+    "list|card|counter": "A $35 gel manicure with a card saved for the salon's $20 fee, for a customer with 2 no-shows (the owner's setting).",
+    "list|deposit|counter": "The $140 full set with art (2½ hours). A $40 deposit now, as for every art set over $80, and $100 at the desk.",
+    "photos|none|counter": "A custom art set under $80, priced from Alex's design photos and OK'd by Sam. Nothing is taken. Alex pays at the desk.",
+    "photos|deposit|counter": "A custom art set, priced from Alex's design photos at $90 and OK'd by Sam. A $20 deposit now, the $70 rest at the desk."
+   },
+   "amounts": {
+    "list|none|*": {
+     "price": "$35",
+     "name": "Gel manicure"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Gel manicure"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Full set with art"
+    },
+    "photos|none|*": {
+     "price": "$70",
+     "name": "Custom art set"
+    },
+    "photos|deposit|*": {
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "fee": "$20",
+     "name": "Custom art set"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|card|card",
+    "list|full|none",
+    "photos|deposit|bill",
+    "photos|deposit|card"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 gel mani-pedi at Alex's home. A card is saved for the $89 trip fee. Rosie texts the bill after, with a tip line.",
+    "list|card|card": "A $179 gel mani-pedi at home. A card is saved and charged $179 when Tuan texts DONE.",
+    "list|full|none": "A $150 spa pedicure at home, paid in full when booking.",
+    "photos|deposit|bill": "Bridal party nails for five, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+    "photos|deposit|card": "The $640 bridal party nails. A $160 deposit now. The $480 rest is charged to the saved card at DONE."
+   },
+   "amounts": {
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Gel mani-pedi at home"
+    },
+    "list|full|*": {
+     "price": "$75",
+     "paid": "$75",
+     "fee": "$75",
+     "name": "House call (gel manicure at home)"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Bridal party nails"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Nail work is done in person."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for nail work."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The salon books a nail tech's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The salon books a nail tech's time; a pedicure chair is saved with it (A4-35)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nail work is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "Nail work has no form to sign; health answers are questions on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "Salon services need no written contract; a bridal party away from the salon signs one in flow B."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A nail visit needs nothing brought from home."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays for a kids manicure, as the plug-in's who-may-book says."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the salon: the customer is at the table."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for nail work."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A salon visit is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nail work has no results that come later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the salon."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Nail work is licensed: the company and each nail tech."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Nail work pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Nail work adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Nail work books nail techs, never spaces; a pedicure chair is saved with the nail tech."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The salon runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each nail tech holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nail work is always booked for a time, never sent now."
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: what's on the nails now, and any nail art. A removal or art adds time.",
+     "Questions that only add detail come later, once a time is saved.",
+     "If it's for a child, the kids manicure is picked here, so the times fit it."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Any gel, dip or acrylic on your nails now? And nail art too, or just the gel manicure?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Just the gel manicure. My nails are bare."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "more": [
+     "Nail work needs no first visit. Only a past reaction to gel or acrylic changes how it books.",
+     "That answer is asked on the secure page, never by text or through the AI."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "Nail work needs no first visit. Only a past reaction to gel or acrylic changes how it books.",
+       "That answer is asked on the secure page, never by text or through the AI.",
+       "Its page not finished: it stays booked, with nothing taken."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 15"
+     ],
+     [
+      "san",
+      "cust",
+      "Linh is running about 15 minutes behind. Your 11:45am nail art will start about 12:00pm.",
+      {
+       "as": "Dana",
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-65",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "line": [
+       "4.11",
+       "13.5"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex answers the health questions",
+      "does": "On the same secure page, Alex answers the plug-in's health questions. They matter for safe nail work, and they never go in a text or through the AI.",
+      "more": [
+       "Diabetes or poor feeling in the feet: the booking goes on, with care notes for the nail tech, like no cutting cuticles.",
+       "An infection, cut or sore: no nail work on that spot. Alex keeps the rest, or moves the visit with no fee.",
+       "A past reaction to gel or acrylic: regular polish instead, or the booking waits for Sam's OK.",
+       "The answers stay on this page and in the salon's record. Linh reads them before the visit."
+      ],
+      "form": [
+       [
+        "Diabetes, or poor feeling in your feet?",
+        "No"
+       ],
+       [
+        "An infection, cut or sore on your hands or feet?",
+        "No"
+       ],
+       [
+        "Ever reacted to gel or acrylic?",
+        "No"
+       ],
+       [
+        "Any allergies?",
+        "None"
+       ]
+      ],
+      "needs": [
+       "pf.questions",
+       "pf.messages",
+       "pf.safety"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "Acrylic on, not gel",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.8"
+       ],
+       "who": "staff",
+       "to": "cust",
+       "via": "visit",
+       "title": "Prices the right removal first",
+       "does": "A what-if: Linh finds acrylic, not gel, under the polish. Acrylic removal is on the price list at $20, and it adds 30 minutes, so Alex hears both first.",
+       "more": [
+        "It's a list price, so it needs no OK from Sam.",
+        "No, or no answer: Linh does only what was booked, if it can be done over the acrylic.",
+        "The extra time must fit before Linh's next booking. If it doesn't, Alex gets a later time, with no fee."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "extra 20 acrylic removal Alex M."
+        ],
+        [
+         "san",
+         "cust",
+         "Linh found acrylic on your nails. Taking it off first is on the price list:",
+         {
+          "card": {
+           "title": "Acrylic removal · $20",
+           "lines": [
+            "Adds about 30 minutes",
+            "Done today, if you say yes"
+           ]
+          },
+          "buttons": [
+           "Yes, add it",
+           "No thanks"
+          ]
+         }
+        ]
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "after",
+    "at": "A8-43",
+    "steps": [
+     {
+      "id": "A8-x02",
+      "line": [
+       "8.12",
+       "13.8"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "portal",
+      "title": "Cleans and logs a pedicure chair",
+      "does": "After every pedicure, the nail tech cleans and disinfects the pedicure chair, then ticks it on the Today page. The chair's next pedicure starts 10 minutes later.",
+      "more": [
+       "Alex's gel manicure used no pedicure chair, so there's nothing to log today.",
+       "The log keeps the chair, the time and who cleaned it, where the state's rules require one.",
+       "The 10 minutes were kept free when the times were offered."
+      ],
+      "needs": [
+       "pf.rules"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-08",
+    "form": [
+     [
+      "Alex M.: custom art set",
+      "From 3 photos and answers"
+     ],
+     [
+      "Linh's price",
+      "Typed here, from the photos"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The salon runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at the salon."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The salon sends no proposals: fills and the next visit are booked at the desk, or as a repeat plan."
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee's Nail Bar",
+      "73 Walnut St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Gel manicure $35 ($40 from Nov 2) · Spa pedicure $40 · Nail art $20"
+     ],
+     [
+      "To book",
+      "Nothing taken for most services · art sets over $80 take a deposit"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Mobile Nails",
+      "Mobile nails · within 25 miles of 410 Pine Ave, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-32",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee's Nail Bar: you now have two {{svc.intext:gel manicures|visits}} on Sat Nov 7. They're at 2:00pm and 2:30pm. Keep both, or was that the same visit? No reply by 6:00pm Fri Nov 6: we keep 2:00pm and let 2:30pm go.",
+      {
+       "buttons": [
+        "Keep both",
+        "Just one: keep 2:00pm"
+       ],
+       "as": "Ben T.",
+       "stop": "first"
+      }
+     ]
+    ],
+    "does": "Ben T. books a gel manicure for Sat Nov 7 at 2:00pm. A second one at 2:30pm comes from another app. Rosie asks once which Ben meant. Nothing is charged twice.",
+    "why": "Nail appointments are not skin fades: the example is a gel manicure (a slot's example words can't be renamed)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Nail work is done in person."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for nail work."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Nail work is always booked for a time, never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nail work is always booked for a time, never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Mobile nails runs no group classes."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Nail work at a home never needs the owner's OK, so no landlord pays."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Mobile nails bills each visit after it; a plan is charged visit by visit or once a month to the saved card (B7-52)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Nail work is paid once: a deposit, then the rest."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for nail work."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nail work has no report that comes later."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nail work is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile nails sells no seats in a session: each booking has its own nail tech."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "Nail work has no form to sign; health answers are questions on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Nail work is always booked for a time, never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Nail work is always booked for a time, never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Nail work always needs the customer there, so a visit with nobody home never happens."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "Nail work always needs the customer there, so there's no visit with nobody home and a gate code."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the nail tech's care: a parent stays for the visit."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Nail work is licensed: the company and each nail tech."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Nail work pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Nail work adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Nail work books nail techs, never spaces; a pedicure chair is saved with the nail tech."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The salon runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each nail tech holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nail work is always booked for a time, never sent now."
+   },
+   {
+    "op": "words",
+    "at": "B4-16",
+    "more": [
+     "Nail work is never sent now, so every pick is a set time."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-55",
+    "does": "Nothing is asked again here: this follows the booking. Nail work is never sent now, so Alex's gel mani-pedi has a set time.",
+    "more": [
+     "Every sent-now branch is the same choice, made once at booking. Work that's never sent now turns them all off.",
+     "So every visit gets its reminder and the day list."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-58",
+    "more": [
+     "Nail work is never sent now, so every visit gets the day list and an on-my-way text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-84",
+    "does": "Say the work starts at a set time, like a nail party or a wedding morning. The times read 'starts at 4:00pm', not a window.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Mobile Nails can start the nail party at home at a set time:",
+      {
+       "times": [
+        "Thu Oct 22 · starts at 4:00pm · Tuan",
+        "Fri Oct 23 · starts at 1:00pm · Hana",
+        "Fri Oct 23 · starts at 4:00pm · Tuan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-54",
+    "more": [
+     "Here, say Alex's visit were at a hotel suite, and the hotel wants a vendor pass left at the desk."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Tuan to come back in March, before a beach trip, for a spa pedicure at home. Tuan texts NEXT. It's past the 60 days Sam books ahead, so Rosie saves it as a reminder.",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the customer asks.",
+     "In mid-Jan 2027, once it's inside the 60 days, Alex gets times to pick, or skips.",
+     "It's booked with the same money rules as any visit."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: spa pedicure at home, mid-March"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Mobile Nails books up to 60 days ahead. We'll text you times in mid-Jan for the spa pedicure at home you asked Tuan about.",
+      {
+       "buttons": [
+        "Sounds good",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-01",
+    "more": [
+     "Away from the salon, nail work is offered only where the state's rules allow it, and only for the services they allow."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-02",
+    "more": [
+     "Where the state's rules require it, the text also shows Tuan's license number."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:05am",
+    "more": [
+     "DONE is the word a worker texts when the job is finished.",
+     "A gel mani-pedi takes about 1 hour 45 minutes, so Tuan is done by about 10:05am."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 10:07am"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Mobile nails sends no proposals: the next visit is booked at DONE, or as a repeat plan."
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Mobile Nails does nails, lashes and brows, not spray tans. Nothing was saved. You can look for a tanning salon near you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "form": [
+     [
+      "Lee's Nail Bar",
+      "73 Walnut St, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Gel manicure $35 · Spa pedicure $40 · Nail art $20"
+     ],
+     [
+      "To book",
+      "Nothing taken for most services · art sets over $80 take a deposit"
+     ],
+     [
+      "Licenses",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Mobile Nails",
+      "Mobile nails · within 25 miles of 410 Pine Ave, Springfield · Gel mani-pedi $179 ($199 from Nov 2)"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A nail visit is rated, like any service (not sensitive work)."
+   }
+  ]
+ },
+ "notes": "Pilot: started from the current work/prof/hair.json (the chair pilot), since a nail salon runs the same way: booked by nail tech, services by length, walk-ins in a line, a second company that goes to homes and events. What hair lacked, nails adds: a pedicure chair saved with the nail tech, the health questions on the secure page, and no first step at all.\nNames: Sam Lee's main company is Lee Mobile Nails LLC (410 Pine Ave; nails at homes, offices and events, with lashes and brows as its second kind of work); his second company is Lee's Nail Bar LLC (the salon, 73 Walnut St). As in the master, flow A's story is at the second company and flow B's at the main one. Alex's home is 29 Willow Ct.\nNail techs: Linh and Mai at the salon (the master's Riley and Avery), Tuan and Hana who travel (Jordan and Casey). Kim L.'s job in flow B is a nail party for two nail techs.\nPrices are the example salon's own, not a standard, and keep the master's numbers: gel manicure $35 (45 min), spa pedicure $40, nail art $20 for 4 nails, kids manicure $25, gel pedicure $55 (60 min, with a $10 paraffin dip), full set with art $140 (2½ hours), custom art set from photos ($90 in the example), house call $75. Away from the salon: gel mani-pedi $179, $89 trip fee, spa pedicure $150, classic manicure $99, bridal party nails from photos ($640 for five), nail party $199, extra time $120 an hour.\nThe main gel manicure takes 45 minutes, so Dana's 11:30am becomes 11:45am in the day list and the late text (A8-01, A8-36). In flow B the mani-pedi takes about 1 hour 45 minutes, so DONE, the bill and the receipt move to about 10:05 to 10:10am; the spa pedicure ends about 9:20am and the bridal party (five gel manicures, one nail tech) about 12:05pm (B8-41, B9-06, B10-01, B10-02). The photos path in flow B is priced first, then booked, so its booking steps move after the $640 price (B4-23, B4-29, B5-11, B6-10, B6-13). Every listed path's clock runs forward.\nMoney A: nothing taken is the main path (the old salon takes nothing up front); a card saved for the $20 fee is Sam's per-service setting (the old salon asks for one only after 2 no-shows, a gap); art sets over $80 take a deposit ($40 for the full set, $20 for a custom set from photos); a custom set under $80 takes nothing. Paid at the desk. No hold, no full price at the salon (the house call is flow B's), no bill or card after (there's a front desk), and no price at the visit: nail art added at the table is a list price, priced first as extra work (A8-33).\nMoney B: a card saved for the $89 trip fee, the bill after with a tip line (main); a card saved and charged at DONE; a spa pedicure paid in full; bridal party nails from photos with a 25% deposit, the rest on the bill or charged on the set day before the wedding. No visit price: every mobile service is priced before the visit, so the sign-up's 'set at the visit' row becomes a classic manicure at home (S1-12, S1-13, S1-16 rewritten).\nSign-up (S1-41 to S1-47, S1-12 to S1-16) is rewritten to how nail work is really priced and paid: nothing taken at the salon, deposits for art sets, no hold anywhere at the salon (S11-56 too). In flow B the salon's sign-up shows its real setup (nothing taken).\nFree cancel: the master's 24 hours before is kept as Sam's setting; the old salon only asked for 2 hours' notice and charged no fee, which a walk-in salon can set.\nKept the plug-in splits as decided: A7-61 (custom art is Linh's only), A7-70 (inside the 15 minutes' grace the manicure is shortened; past it the spot goes to a walk-in and Alex gets the next free nail tech or another time), B4-57 (the $640 bridal party needs a contract), B4-83 (2-hour arrival windows, or a set start for a wedding morning or a nail party), B7-56 (one person by name, a wedding day that can't move, a two-tech nail party).\nOff: everything nail work never has: classes, spaces, drop-offs, stays, video, first steps and forms, plans or insurance paying, damage holds, deliveries, items to the shop, permits, outside checks, nobody home, the owner's OK at a home (B4-78), live lines and work sent now (S2-30, B4-81, B6-03, B7-55, B8-58), the expert read, weather, ordered parts, a series, seats at a host's place, paid in stages, one bill for many visits, and at the salon the crew, the set date, the minimum, the contract and the day-before hold (the salon never holds).\nOwn steps: A4-x01 and B4-x01 (the health questions on the secure page: diabetes, an infection or sore, a past reaction to gel or acrylic, allergies), A8-x01 (acrylic found, not gel: the right removal's list price first, an own branch on A8-32) and A8-x02 (the pedicure chair cleaned and logged).\nDanger: an allergic reaction happening now, or glue or acetone in an eye, stops the booking (911). A finger or toe that looks infected gets the safety steps (see a doctor, no nail work on that spot), and the rest can still book. Rosa's call in flow B is a reaction to press-on nails at home.\nFlow B maps the home-repair what-ifs to nails: the tool that's out is the folding nail tables, damage is an acetone mark on a side table, a hazard is a sparking outlet by the LED lamp, the extra work is a $40 paraffin treatment (so the right-to-cancel refund is $40), the bigger job is bridal party nails from photos, the plan is a mani-pedi every 3 weeks, the visit day is a care home's nail days, and the missing item at the door is a venue's vendor pass.\nKept words: salon (it's a nail salon) and bridal party (bridal party nails are this work's own).\nReview (Oct 23): flow A's custom art set with nothing taken is $70, under the salon's $80 line for a deposit (the $90 set takes the $20 deposit). A gel manicure plan takes nothing on every path but the card one (A5-21). Off: a class roster, a drop-off, a visit over several days and proposals (A), proposals and pay over time (B). On the deposit paths, Lin's missed visit and the double charge in sections 11 and 12 are bridal party nails ($160 of $640): the spa pedicure at home is paid in full. S11-56 (B) switches the spa pedicure to the trip fee held, or the bridal deposit to 50%. Sign-up says the 24-hour free cancel is Sam's own pick (S1-47). Pairs: 'An art quote' now runs after 'art quote'; A7-30 names a notice for nail work; the safety steps add a note for the nail tech, not 'urgent'; the mobile $99 service is the classic manicure at home.\nReview (Oct 23), more: the portal preview (S11-57) shows the salon takes nothing for most services, and flow B's own raised price; the plug-in lists the nail repair that sign-up and section 11 name.",
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A7-70"
+  ],
+  "B": [
+   "B5-34",
+   "B4-83",
+   "B7-56"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Sam picks a deposit for color correction. It is from $110, set at the chair. So the $25 consult is taken at booking, toward the final price.",
+    "For the color correction, it's charged only for the shop's $20 fee, and only after Sam says yes.",
+    "On this path, color correction takes the $25 consult as a deposit, toward the final price.",
+    "A price set at the visit: any visit fee, and that it's owed even after a no to the price.",
+    "On this path, color correction takes nothing before. Only the $25 consult is promised.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Each service starts the way most barbershops set it.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A barbershop has none, so nothing is sent here.",
+    "says the cape clip ripped a shirt collar today.",
+    "A haircut could mean a salon or a barbershop",
+    "Pick a time for your first color plan visit:",
+    "Hi, I want to put my barbershop on Rosie",
+    "says Saturday's cut is uneven on one side.",
+    "Sam adds massage to Lee's Barbershop.",
+    "The cape clip ripped my shirt collar.",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Lee's Barbershop doesn't do perms.",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Haircut, fade and beard trim",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "What happens at the chair?",
+    "Next: Sat Nov 28 · 10:00am",
+    "Books a cut every 4 weeks",
+    "finds chairs side by side",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "Stopped Alex M.'s cut.",
+    "the visit fee is owed",
+    "color and house calls",
+    "Proposal · Color plan",
+    "Lee's Barbershop LLC",
+    "the Groom's package",
+    "The Groom's package",
+    "Priced at the chair",
+    "A water heater job",
+    "color, house calls",
+    "Lee Home Services",
+    "like a burst pipe",
+    "a package of cuts",
+    "paid at the chair",
+    "Color correction",
+    "color correction",
+    "written estimate",
+    "Lee's Barbershop",
+    "hot towel shave",
+    "Groom's package",
+    "as at the chair",
+    "Drain clearing",
+    "during my cut?",
+    "A cut is rated",
+    "Signature cut",
+    "signature cut",
+    "every 4 weeks",
+    "rents a chair",
+    "Panel upgrade",
+    "Color and cut",
+    "color and cut",
+    "Jordan Price",
+    "1200 Main St",
+    "in the chair",
+    "of your hair",
+    "at the chair",
+    "At the chair",
+    "NEW massage",
+    "Casey Moore",
+    "color quote",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "Beard trim",
+    "beard trim",
+    "Barbershop",
+    "barbershop",
+    "visit fee",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "JP031552",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "kids cut",
+    "Kids cut",
+    "haircuts",
+    "Haircuts",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "haircut",
+    "Haircut",
+    "Jordan",
+    "Elm St",
+    "Barber",
+    "barber",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "Shop"
+   ],
+   "B": [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Say a request is improper or unlawful, by its meaning or on the plug-in's list. Like tapping a neighbor's water line without asking.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "A job priced at the visit never takes more than the visit fee.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Its money card is set the way most barbershops start.",
+    "The price, {{price}}, comes straight from Sam's list.",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Like tapping a neighbor's water line without asking.",
+    "Your drain is under warranty, so this visit is free.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Jordan says no. Please wait until the job is done.",
+    "Your water heater price is with Lee Home Services.",
+    "Say Alex asks for a water heater flush every year.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "I found water damage under the sink this morning.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "CANT START no proof Alex may have this work done",
+    "Told to leave, then call 911 and the gas company",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "a proposal for new pipes, from Jordan's notes",
+    "The plug-in says how long the warranty lasts.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Alex texts that the sink is now overflowing.",
+    "It's overflowing. Can someone come tonight?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Jordan needs a part from the supply house.",
+    "Can Jordan also look at a dripping faucet?",
+    "Here are the rules barbershops often set.",
+    "Can I run the dishwasher before you come?",
+    "like replacing the old pipes Jordan noted",
+    "HAZARD mold behind the sink wall, stopped",
+    "Water is coming out of the water heater.",
+    "Then the booking goes on, marked urgent.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Water is coming out of the water heater.",
+    "Please clear the cabinet under the sink.",
+    "The $160 valve quote is good for 7 days.",
+    "Jordan finds mold behind the sink wall.",
+    "Lee Home Services can clear the drain:",
+    "The shop's chair is in the other flow.",
+    "Can I skip next week's drain cleaning?",
+    "Jordan finds corroded shutoff valves.",
+    "It's under the 1-year labor warranty.",
+    "The drain clogs again 2 weeks later.",
+    "You can look for a roofer near you.",
+    "The kitchen drain is clogged again.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Plumbing, electrical, barbershop",
+    "The before photo shows no crack.",
+    "Proposal · Replace the old pipes",
+    "DAMAGE cracked the cabinet floor",
+    "UPDATE getting a part, back 9:30",
+    "Found: mold behind the sink wall",
+    "The job should be done by 10am.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "No. It doesn't smell like gas.",
+    "My kitchen drain is clogged.",
+    "Haircut, fade and beard trim",
+    "Replace both shutoff valves",
+    "The $179 drain needs none.",
+    "It's a leak under the sink",
+    "a water heater replacement",
+    "Harper J.'s $2,400 repipe",
+    "Sale agua del calentador.",
+    "Mold behind the sink wall",
+    "Want it every 12 months?",
+    "Water heater replacement",
+    "water heater replacement",
+    "NEW heating and cooling",
+    "A gas smell at the home",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "replaces water heaters",
+    "Cracked cabinet floor",
+    "Cabinet floor, before",
+    "Lee Home Services LLC",
+    "water heater contract",
+    "color and house calls",
+    "Yes, it won't drain",
+    "like a move-out day",
+    "No. No huele a gas.",
+    "leehomeservices.com",
+    "A water heater job",
+    "the shutoff valves",
+    "Water heater flush",
+    "water heater flush",
+    "color, house calls",
+    "the cabinet floor",
+    "Lee Home Services",
+    "the kitchen drain",
+    "like a burst pipe",
+    "paid at the chair",
+    "hot towel shaves",
+    "Service call fee",
+    "service call fee",
+    "written estimate",
+    "Lee's Barbershop",
+    "Written estimate",
+    "drain clearings",
+    "Yes, every year",
+    "Drain clearings",
+    "DONE 179 drain",
+    "Drain clearing",
+    "drain clearing",
+    "A leak repair",
+    "Kitchen drain",
+    "rents a chair",
+    "Panel upgrade",
+    "Service call",
+    "service call",
+    "Jordan Price",
+    "1200 Main St",
+    "water heater",
+    "at the chair",
+    "barbershops",
+    "Leak repair",
+    "leak repair",
+    "Casey Moore",
+    "barbershop",
+    "Yard drain",
+    "the repair",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "Barbershop",
+    "barbershop",
+    "visit fee",
+    "hot towel",
+    "Electric.",
+    "88 Elm St",
+    "42 Oak St",
+    "JP031552",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "haircut",
+    "Haircut",
+    "Jordan",
+    "Barber",
+    "barber",
+    "shave",
+    "Labor",
+    "Riley",
+    "Avery",
+    "Casey",
+    "Shop"
+   ]
+  },
+  "A": {
+   "A4-01": "9d65299834",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A5-19": "5d5db6f3c1",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-29": "fb61245096",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-50": "6f43775326",
+   "A7-14": "6a57738a17",
+   "A4-65": "fa7ec0389d",
+   "A8-32": "632f2b5b40",
+   "A8-43": "7b0f73c701",
+   "A4-08": "97dc7b9309",
+   "A8-03": "7fe61cccf5",
+   "S11-57": "c1617c0a10",
+   "S12-32": "69107511cd"
+  },
+  "B": {
+   "B4-01": "826f4058c2",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-90": "a5b8b2fe42",
+   "B9-06": "f091432f2d",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B4-83": "93095f28e5",
+   "B4-38": "9539521dc7",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-29": "592bd8f1a2",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-84": "c34fdfb8fc",
+   "B8-54": "0f180048ca",
+   "B10-18": "3d7ba16539",
+   "B8-02": "024afae342",
+   "B8-41": "6e8e9825b2",
+   "B4-03": "1126d68737",
+   "S11-57": "b6dcb02723",
+   "B10-32": "7713bff255"
+  }
+ }
+}

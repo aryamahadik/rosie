@@ -1,0 +1,6303 @@
+{
+ "id": "hearing",
+ "name": "Audiologist & hearing aids",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "optometrist",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each audiologist holds their own active license from the state's board; anyone who fits and sells prescription hearing aids holds the state's hearing aid license or registration (a switch from the state form)",
+   "who": "each person: audiologists, and hearing aid specialists (also called dispensers or fitters); the practice too where the state's form registers hearing aid sellers or their places",
+   "ask": "each person's license number in their invite reply (or the owner sends it); the practice's registration from the owner, where the state asks",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "scope": "who may test whom and who may fit whom comes from the state form (a switch): which tests a hearing aid specialist may run, whether a first full test or a child's test needs an audiologist, and who may remove earwax; a visit the person's license doesn't cover is never offered or booked",
+   "otc": "over-the-counter hearing aids, for adults with mild to moderate hearing loss, need no license to sell and are never sold to anyone under 18; prescription aids are fitted only by a licensed person",
+   "away": "tests and fittings at a care home or a home only where the state's rules allow them; any registration for visits away from the clinic, from the state form (a switch)",
+   "remote": "an adjustment made from a distance through the hearing aid's app follows the license rules of the state where the patient is at the time (a switch)",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance where the state's form asks for it"
+  },
+  "pf.services": {
+   "shape": "visit types with a person, each with a set length; a hearing test needs the clinic's one sound booth, so two tests never overlap; hearing aids are chosen after a test, ordered, then fitted at a second visit about 2 weeks later, with follow-up adjustments during the trial",
+   "examples": "the example clinic's own prices (Lee Hearing Center and Lee Home Hearing), not a standard; a plan pays its own in-network amount, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "Hearing test and results talk (new patient)",
+     "price": "$120",
+     "kind": "one price; the plan's share is shown when a plan pays",
+     "length": "90 min with an audiologist, in the sound booth",
+     "where": "at the clinic (or at a care home or home, below)",
+     "before": "nothing taken",
+     "after": "the patient's share at the front desk",
+     "note": "some plans ask for a doctor's order first, which the clinic gets itself"
+    },
+    {
+     "name": "Hearing aid talk",
+     "price": "free",
+     "kind": "one price",
+     "length": "right after the test, inside its 90 minutes",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "nothing to pay"
+    },
+    {
+     "name": "Hearing screening",
+     "price": "free",
+     "kind": "one price",
+     "length": "15 min, with an audiologist or hearing aid specialist",
+     "where": "at the clinic, or at a school screening day",
+     "before": "nothing taken",
+     "after": "nothing to pay",
+     "note": "a quick check, not a full test; a patient who doesn't pass is offered a full hearing test"
+    },
+    {
+     "name": "Earwax removal",
+     "price": "$45",
+     "kind": "one price, also added at a visit with the patient's yes",
+     "length": "15 min, with an audiologist (or a hearing aid specialist where the state's rules allow: a switch)",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Hearing aid clean and check",
+     "price": "$40; free for 3 years after buying aids here",
+     "kind": "one price",
+     "length": "20 min, either license",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "at the front desk, or with the home visit"
+    },
+    {
+     "name": "Hearing aid repair",
+     "price": "priced at the visit: only the $40 clean and check is promised",
+     "kind": "quoted at the visit",
+     "length": "30 min, either license",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "the repair is priced and OK'd before it's done; one sent to the maker gets a loaner where the clinic has one"
+    },
+    {
+     "name": "Child's hearing test",
+     "price": "$120",
+     "kind": "one price; the plan's share when a plan pays",
+     "length": "60 min, with an audiologist only",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk, or billed to the plan",
+     "note": "a parent or guardian books, signs the consent and stays"
+    },
+    {
+     "name": "Prescription hearing aids (a pair)",
+     "price": "the clinic's own prices (the example: $2,800 standard, $3,400 rechargeable)",
+     "kind": "quoted in writing after a test",
+     "length": "ordered at the visit; in about 1 to 2 weeks",
+     "where": "fitted at the clinic, or at a care home or home",
+     "before": "not booked: ordered at the visit, on a signed purchase agreement",
+     "after": "at the clinic: a $500 deposit at the front desk when ordered, the rest at the fitting",
+     "note": "never paid in full up front; the fitting, follow-up adjustments and 3 years of checks are included; buying aids here is never required"
+    },
+    {
+     "name": "Hearing aid fitting",
+     "price": "included with the aids",
+     "kind": "one price",
+     "length": "60 min, about 2 weeks after the order, with an audiologist or hearing aid specialist",
+     "where": "both places",
+     "before": "nothing more taken",
+     "after": "the rest of the aids' price",
+     "note": "booked by the staff when the aids are ordered; the trial starts here"
+    },
+    {
+     "name": "Follow-up adjustment",
+     "price": "included with the aids",
+     "kind": "one price",
+     "length": "30 min, 1 to 2 weeks after the fitting, and more during the trial",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "nothing more",
+     "note": "booked by the staff at the fitting"
+    },
+    {
+     "name": "Over-the-counter hearing aids",
+     "price": "$799 a pair; a $60 setup visit if wanted",
+     "kind": "sold at the front desk",
+     "length": "setup visit 30 min",
+     "where": "at the clinic",
+     "before": "not booked",
+     "after": "at the front desk",
+     "note": "adults 18 and older only"
+    },
+    {
+     "name": "Hearing test at a care home or home",
+     "price": "$179",
+     "kind": "one price",
+     "length": "60 min, with a portable hearing test kit in a quiet room",
+     "where": "at the customer's place (a care home or a home), for people who can't come in",
+     "before": "nothing taken",
+     "after": "the clinic bills the plan its own way; private pay: Rosie texts the bill after",
+     "note": "home visits need Sam's OK; the audiologist decides if a booth test at the clinic is needed later"
+    },
+    {
+     "name": "Hearing aid repair at a care home or home",
+     "price": "only the $89 home check is promised; the repair is priced at the visit (the example: $245 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min",
+     "where": "at the customer's place",
+     "before": "nothing taken",
+     "after": "Rosie texts the bill after"
+    },
+    {
+     "name": "Hearing aids fitted at a care home or home",
+     "price": "the clinic's own prices (the example: $2,800 a pair)",
+     "kind": "one price, from a written quote after a test",
+     "length": "60 min, about 2 weeks after the test",
+     "where": "at the customer's place",
+     "before": "a $500 deposit when booked",
+     "after": "Rosie texts the bill for the rest when the fitter texts DONE"
+    },
+    {
+     "name": "Listening devices (a TV streamer and a remote mic)",
+     "price": "a free check, then a quote (the example: $640)",
+     "kind": "quoted after a first visit",
+     "length": "two visits",
+     "where": "at the customer's place",
+     "before": "nothing taken: once the quote is OK'd, the second visit is booked at that price",
+     "after": "Rosie texts the bill",
+     "note": "quotes over $500 go to Sam first"
+    },
+    {
+     "name": "School hearing screening day",
+     "price": "free to families, set with the school",
+     "kind": "one price per child",
+     "length": "a whole morning",
+     "where": "at the school (the host's place)",
+     "before": "nothing taken",
+     "after": "nothing to pay",
+     "note": "each child needs a parent's or guardian's signed consent on the secure page"
+    }
+   ],
+   "capacity": "one patient per person; the sound booth holds one test at a time; the portable hearing test kit is booked like a person",
+   "nobodyHome": "never: the patient is always there",
+   "online": "none for tests: a test needs the booth or the portable kit; follow-up adjustments may be made through the hearing aid's app where the rules allow"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, your child, or someone you help (a care home resident)",
+    "new or returning patient",
+    "which visit: a hearing test, a free screening, a hearing aid check or repair, or earwax removal (the clinic's own visit types; never symptoms typed into the AI)",
+    "do you wear hearing aids now",
+    "a health plan (its name only), or paying yourself",
+    "the best way to reach you: texts, email, or a relay or captioned call"
+   ],
+   "afterTime": [
+    "would you like to bring someone whose voice you know (it helps with part of the test)",
+    "anything the clinic should know to help, like a wheelchair, or an interpreter for spoken or sign language",
+    "for a care home visit: the place's name, the room, and who meets the audiologist"
+   ],
+   "securePage": [
+    "birth date",
+    "plan member ID, the plan holder and a photo of the card",
+    "a doctor's order, where the plan asks for one: the doctor's name only, and the clinic gets the order itself",
+    "health history: ear infections or surgery, medicines, noise at work, and when the hearing changed",
+    "current hearing aids (the maker and model), and the last hearing test date",
+    "consent and the privacy notice",
+    "a parent's or guardian's consent for anyone under 18, or the consent of the person who decides for an adult who can't"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18; a guardian or health care agent for an adult who can't consent; the care home's staff for a resident, with the decider's consent on the secure page; a minor alone only where the state's rules let minors consent to this care (a switch)",
+   "neverAsked": "Rosie never asks for symptoms, results or medicines in the AI chat; what a patient types anyway is checked for danger, and the details go only to the secure page"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "hearing that dropped suddenly, in one or both ears, over a few days or less (with or without new ringing or fullness)",
+     "say": "Sudden hearing loss needs a doctor today. Please see your own doctor, an urgent care or an emergency room today. Don't wait for a hearing test.",
+     "booking": "no booking in that conversation; if it comes in before a booked visit, the visit stays booked, the same words are sent, and the owner is told with initials only"
+    },
+    {
+     "words": "ear pain with fluid, pus or blood coming from the ear, or ear pain with a high fever",
+     "say": "This needs a doctor today. Please see your own doctor or an urgent care today, before any hearing test.",
+     "booking": "no booking in that conversation"
+    },
+    {
+     "words": "dizziness or spinning that started suddenly, or ringing in one ear that started suddenly",
+     "say": "This needs a doctor today. Please see your own doctor or an urgent care today, before any hearing test.",
+     "booking": "no booking in that conversation"
+    },
+    {
+     "words": "a face that droops, weakness on one side, trouble speaking, or a hard blow to the head",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "an ear that feels blocked or full, with no pain",
+     "what": "one safety question first: did the hearing drop suddenly, is fluid coming from the ear, or is there dizziness? Any yes: the 'see a doctor today' words and no booking; all no: the booking goes on"
+    },
+    {
+     "words": "hearing that has slowly gotten worse, muffled voices, trouble on the phone, or a hearing aid that stopped working",
+     "what": "matched to the clinic's own visit types; Rosie never judges how serious it is, and same-day times need the owner's OK"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988; the danger words are checked in every message, every time"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history, consent and the plan's papers",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+     "who": "every new patient; returning patients once a year, or when their health changes",
+     "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or the door, before the test), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered; some services only (hearing aids are often not covered); not covered; or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "A doctor's order, where the plan asks for one",
+     "when": "before the visit, or before the plan is billed",
+     "who": "a patient whose plan pays for the test only with a doctor's order",
+     "result": "the clinic asks the doctor's office for it itself: a to-do for the front desk with its due date; the patient is never asked to fetch it"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; given in the time the rules set (the example clinic: within 1 business day)",
+     "who": "every patient paying for themselves, and hearing aids a plan doesn't pay for",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "A doctor's OK before hearing aids, where the rules require one",
+     "when": "before the aids are ordered",
+     "who": "a child, or anyone the state's rules name (a switch); anyone with the warning signs found at the ear check",
+     "result": "the aids wait until it's on file; the test itself can go on"
+    },
+    {
+     "name": "The care home's OK",
+     "when": "before any visit there",
+     "who": "the host place agrees to host the visits",
+     "result": "no OK: no times at that place"
+    }
+   ],
+   "prep": "bring a photo ID, the plan card and any hearing aids you wear now, and someone whose voice you know if you like; stay away from loud noise and earbuds the day of the test; at a care home: the medicine list ready with the nurse, and a quiet room"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the check-in code at the front desk; at a care home or home: the code from the patient, or from the nurse or family member named on the booking",
+   "earCheck": "the audiologist looks in each ear with a light first: earwax that blocks the ear is removed first (priced and OK'd) or the test moves; signs that need a doctor first mean the test may go on, but hearing aids wait for a doctor's OK",
+   "test": "a hearing test in the sound booth: tones, words, and a check of how the eardrum moves, then the results talk; at a home, a portable kit in a quiet room",
+   "results": "explained in person, with a printed copy to keep; never by text and never through Rosie",
+   "choice": "prescription hearing aids, over-the-counter aids, or nothing for now; buying aids here is never required, and the patient may take the results anywhere",
+   "orders": "prescription aids are ordered from the maker once the purchase agreement is signed on the secure page; they arrive in about 1 to 2 weeks; the staff texts READY when they're in, or LATE with a new date, and the fitting moves with no fee",
+   "fitting": "the fitting sets the aids to the test results, checks the fit and the sound, and teaches care, batteries or charging, and the app; the trial starts at the fitting, with its last day in writing",
+   "followUps": "follow-up adjustments are included: one 1 to 2 weeks after the fitting, and more during the trial; an adjustment through the app where the rules allow",
+   "repairs": "a check first; a repair is priced and OK'd before it's done; an aid sent to the maker gets a loaner where the clinic has one, and the days away are added to the trial where the rules require it",
+   "done": "the check-in code or DONE; test results, notes and hearing aid settings stay in the clinic's own records, never in Rosie or a text",
+   "away": "a portable hearing test kit in a quiet room; the care home's nurse is told when the visit is done, never the results",
+   "recheck": "the example clinic rechecks the same problem free within 30 days of a visit, and adjusts aids free in the trial (A10-08, B10-08)"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking for any test, screening, check or repair, and no card saved (the example clinic bills health plans and charges no fees); hearing aids fitted at a care home or home: a $500 deposit when booked",
+   "plans": "health plans for hearing tests (some ask for a doctor's order first); hearing aids are often not covered, or covered only in part; the clinic's own list of plans it takes; the front desk checks each plan by hand and records it; the patient's share is an estimate, not a promise",
+   "aids": "never paid in full up front: at the clinic, a $500 deposit at the front desk when ordered and the rest at the fitting; at a care home or home, a $500 deposit on the secure page when booked and the rest on the bill Rosie texts after the fitting; where the clinic bills a plan its own way, it may bill the aids that way too",
+   "trial": "the trial or return period where the state's rules require one (a switch from the state form: its length, when it starts, days in the shop added, any fee kept on a return and its cap, and the refund's due date); the example clinic's own 45 days when that's longer; a refund goes back the way it was paid, with the owner's OK",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; hearing aids a plan doesn't pay for count as self-pay for it where the rules say so; a bill far above it can be disputed (the federal rules set how)",
+   "fees": "none at the example clinic: no late-cancel or missed-visit fee; a switch lets a clinic turn one on, with a card saved for it and the same fee for every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free",
+   "after": "claims sent by the clinic; the patient pays their share at the front desk, its own way; a balance after the plan pays is billed by the clinic, not by Rosie's text; at a care home or home, the clinic bills a plan its own way, and private pay gets the bill Rosie texts",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form; the fee kept on a hearing aid return: from the state form; fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line on tests; any sales tax on hearing aids or batteries comes from the state form (a switch)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, results or medicines; at the clinic, not the audiologist's name either; when the audiologist or hearing aid specialist comes to a care home or home, their name stays, for the door check; a READY text says only that the order is in",
+   "contact": "texts first: many patients are hard of hearing, so Rosie texts instead of calling and never depends on a patient hearing a phone call; each patient's choice (texts, email, or a relay or captioned call) is kept on their record; when a person at the clinic must reach a patient, they text first, or use a relay or captioned call; the AI phone line takes relay and captioned calls like any other",
+   "staff": "texts to the owner and staff use the patient's initials only (A.M., never Alex M.)",
+   "languages": "English and Spanish; a spoken or sign language interpreter is set up by the clinic when asked",
+   "largePrint": "the secure page and the agreement in large print when asked",
+   "minors": "a minor's texts go to the parent or guardian; a minor who may consent alone gets texts only on their own phone, with no visit type",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the audiologist"
+  },
+  "pf.staff": {
+   "licenses": "each audiologist's own license, per state; each hearing aid specialist's own license or registration, per state",
+   "skills": "audiologists: full hearing tests, children's tests, earwax removal, fittings, adjustments, repairs and results; hearing aid specialists: fittings, adjustments, cleanings and repairs, and the tests the state's rules let them run to fit aids (a switch); only people cleared for visits away go to care homes and homes",
+   "supervision": "who may test or fit whom comes from the state form (a switch); in the example clinic, a first full test and every child's test are with an audiologist; a hearing aid specialist is never booked for work beyond their license",
+   "oks": "the owner OKs same-day visits and home visits, and anything a hearing aid specialist flags",
+   "standIn": "an audiologist out: another audiologist takes the test (Sam is one), or new times; a hearing aid specialist out: an audiologist does the fitting or the check, or new times; a hearing aid specialist never stands in for a test beyond their license",
+   "away": "the team at a care home or home is the people cleared for visits away, with the portable hearing test kit"
+  },
+  "pf.rules": {
+   "trial": "the hearing aid trial or return period where the state's rules require one: its length, when it starts (usually the fitting), days in the shop added, any fee kept on a return and its cap, and when the refund is due (a switch from the state form); shown in the purchase agreement before any money",
+   "agreement": "a written purchase agreement for hearing aids where the state's rules require one: the price, the deposit, the trial and return terms, the warranty, and whether the aids are new or used; signed on the secure page before the order (a switch)",
+   "homeSales": "hearing aids sold at a care home or home: the cancel notice and period where the state's rules require it (a switch), sent in writing",
+   "medical": "a doctor's OK before hearing aids where the state's rules require one, like for a child (a switch); warning signs found at the ear check mean a doctor first",
+   "otc": "over-the-counter aids only for adults 18 and older; a child's aid needs a prescription and a licensed fitter",
+   "records": "hearing records are kept by the clinic for as long as the state's rules require (a child's records may be kept longer); a delete request removes only Rosie's own booking details, never the clinic's records",
+   "copies": "a patient's copy of their test results within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "the license shown where the state asks: posted at the clinic, and on a visit away from it",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "host": "a visit at a care home or school only under the host's written OK, and the host's sign-in rules; visit days at a host's place (S1-58) need the host's standing OK on file; the example's care home visits are booked one resident at a time under the care home's OK, so no visit days are set",
+   "ads": "no free-test or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "more than 15 minutes late: the test may not fit the booth's time, so the clinic offers the time left or a new time with no fee (the clinic decides; Rosie never changes the booking itself)",
+   "noisyRoom": "a home visit in a noisy room: the audiologist asks for a quiet room, and may book a booth test at the clinic later",
+   "contact": "a patient who can't hear calls is never called by default: texts, email, or a relay or captioned call; a call-back the master would make goes as a text first",
+   "standIn": "an audiologist out: a stand-in audiologist, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before the test), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "planNotDue": "the plan pays for one test a year and it isn't due yet: keep the time at the clinic's own price, or move it to the date the plan allows",
+   "aidsLate": "the maker is late: the staff texts LATE with a new date, and the fitting moves with no fee before the old date passes",
+   "trialReturn": "a return in the trial: Sam OKs the refund under the signed agreement's terms; Rosie never moves money alone, and the refund's due date is tracked",
+   "repairAway": "an aid sent to the maker for repair: a loaner where the clinic has one, and the days away added to the trial where the rules require it",
+   "twoBookings": "a patient with a fitting and a follow-up both open: Rosie asks which one before any change",
+   "healthQuestion": "a question about medicine, ringing or a hearing change before the visit is checked for danger first, then goes to the audiologist; Rosie gives no advice",
+   "careHome": "the resident is out (at the hospital, or asleep): the nurse says so, and the visit moves with no fee",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): a hearing aid that stopped working gets the soonest time, with the owner's OK for the same day; sudden hearing loss, ear drainage or sudden dizziness get the 'see a doctor today' words, and stroke signs get 911",
+   "other": "all other edge cases the generic way",
+   "van": "where the clinic runs a hearing care van (a mobile sound room), it's booked like the sound booth; a van out of service moves its visits with no fee (B7-45)",
+   "weather": "visits in the van or at homes: an ice or snow warning on the roads at 5pm the day before; Sam keeps or moves the visit, and a move or cancel never costs the patient (B7-35)"
+  },
+  "pf.facts": [
+   "aftercare",
+   "children",
+   "documents",
+   "dropoff",
+   "extrawork",
+   "firststeps",
+   "forms",
+   "incare",
+   "planbill",
+   "results",
+   "spaces"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   },
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Hearing Center",
+   "staff": "Maya (audiologist) and Lucy (hearing aid specialist)",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Home Hearing",
+   "staff": "Victor (audiologist) and Noah (hearing aid specialist), who travel with a portable hearing test kit",
+   "cust": "Alex M. (patient, lives at Pine Hill care home) · other patients",
+   "other": "Others (the care home's nurse, a school nurse, a parent or guardian, a family member who pays, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Maya"
+  },
+  "B": {
+   "staff": "Victor"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "No card, so no $20 fee",
+    "No card, so no fee"
+   ],
+   [
+    "Earwax removal $20",
+    "Earwax removal $45"
+   ],
+   [
+    "Sam switches the hearing test from a card saved for the $20 fee to a $20 deposit.",
+    "Sam switches a hearing aid order from a $500 deposit to nothing before."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "Nothing taken · paid at the front desk"
+   ],
+   [
+    "D.W.'s $20 payment through Rosie",
+    "D.W.'s $120 payment through Rosie"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $120"
+   ],
+   [
+    "Card saved for the $20 fee",
+    "Nothing taken, no card saved"
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The hearing test, $120, is paid at the front desk. So is a home test, $179."
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Hearing test and earwax removal · $165"
+   ],
+   [
+    "Haircut at home · $75",
+    "Hearing test at home · $179"
+   ],
+   [
+    "· Paid in full · Nothing more",
+    "· Nothing taken · The desk's own way"
+   ],
+   [
+    "$75",
+    "$179"
+   ],
+   [
+    "$55",
+    "$165"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, and no card is saved"
+   ],
+   [
+    "A card saved, only for a $20 fee",
+    "Nothing taken, and no card saved"
+   ],
+   [
+    "It's charged only for the shop's $20 fee, and only after Sam says yes.",
+    "Nothing is charged for a hearing test."
+   ],
+   [
+    "a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken",
+    "no fee"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee",
+    "When they book: nothing taken, and no card is saved"
+   ],
+   [
+    "$35",
+    "$120"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the check; the price stays open"
+   ],
+   [
+    "BS20981",
+    "HC-EX-2098"
+   ],
+   [
+    "2 Sam calls Alex",
+    "2 Sam reaches Alex"
+   ],
+   [
+    "MP045210",
+    "AUD-EX-0452"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every office service, and home visits"
+   ],
+   [
+    "NEW massage",
+    "NEW balance testing"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a hearing test plan with Riley, every year."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat May 1 · 10:00am"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show photos of your smile?"
+   ],
+   [
+    "photos of your hair",
+    "photos of your smile"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's hearing care takes no jobs sent now, at the office or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Hearing test plan · every year"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Ear drops · $15"
+   ],
+   [
+    "gloss",
+    "ear drops"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Hearing Center LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Hearing's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Hearing Center"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Hearing"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Hearing Tests and Lee Hearing Aids"
+   ],
+   [
+    "plumbing and electrical",
+    "home hearing care and hearing aid fitting"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home hearing care and hearing aid fitting"
+   ],
+   [
+    "1200 Main St",
+    "60 Birch St"
+   ],
+   [
+    "88 Elm St",
+    "410 Maple Ave"
+   ],
+   [
+    "Riley Chen",
+    "Maya Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Lucy Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Victor Price"
+   ],
+   [
+    "Casey Moore",
+    "Noah Moore"
+   ],
+   [
+    "Riley",
+    "Maya"
+   ],
+   [
+    "Avery",
+    "Lucy"
+   ],
+   [
+    "Jordan",
+    "Victor"
+   ],
+   [
+    "Casey",
+    "Noah"
+   ],
+   [
+    "electrical",
+    "hearing aid fitting"
+   ],
+   [
+    "Electrical",
+    "Hearing aid fitting"
+   ],
+   [
+    "A plumber",
+    "An audiologist"
+   ],
+   [
+    "plumber",
+    "audiologist"
+   ],
+   [
+    "Plumber",
+    "Audiologist"
+   ],
+   [
+    "plumbing",
+    "home hearing care"
+   ],
+   [
+    "Plumbing",
+    "Home hearing care"
+   ],
+   [
+    "a barbershop",
+    "a hearing clinic"
+   ],
+   [
+    "A barbershop",
+    "A hearing clinic"
+   ],
+   [
+    "barbershop",
+    "hearing clinic"
+   ],
+   [
+    "Barbershop",
+    "Hearing clinic"
+   ],
+   [
+    "barbers",
+    "audiologists"
+   ],
+   [
+    "a barber",
+    "an audiologist"
+   ],
+   [
+    "A barber",
+    "An audiologist"
+   ],
+   [
+    "barber",
+    "audiologist"
+   ],
+   [
+    "Barber",
+    "Audiologist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Hearing test and earwax removal"
+   ],
+   [
+    "Signature cut and shave",
+    "Hearing test and earwax removal"
+   ],
+   [
+    "hot towel shave",
+    "earwax removal"
+   ],
+   [
+    "signature cut",
+    "hearing test and earwax removal"
+   ],
+   [
+    "Groom's package",
+    "Tinnitus visit"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "spare batteries"
+   ],
+   [
+    "Color and cut",
+    "Spare batteries"
+   ],
+   [
+    "a color correction",
+    "a hearing aid repair"
+   ],
+   [
+    "A color correction",
+    "A hearing aid repair"
+   ],
+   [
+    "color correction",
+    "hearing aid repair"
+   ],
+   [
+    "Color correction",
+    "Hearing aid repair"
+   ],
+   [
+    "kids cuts",
+    "child's hearing tests"
+   ],
+   [
+    "Kids cut",
+    "Child's hearing test"
+   ],
+   [
+    "kids cut",
+    "child's hearing test"
+   ],
+   [
+    "skin fade",
+    "hearing aid cleaning"
+   ],
+   [
+    "Skin fade",
+    "Hearing aid cleaning"
+   ],
+   [
+    "a beard trim",
+    "earwax removal"
+   ],
+   [
+    "A beard trim",
+    "Earwax removal"
+   ],
+   [
+    "beard trim",
+    "earwax removal"
+   ],
+   [
+    "Beard trim",
+    "Earwax removal"
+   ],
+   [
+    "haircuts",
+    "hearing tests"
+   ],
+   [
+    "Haircuts",
+    "Hearing tests"
+   ],
+   [
+    "a haircut",
+    "a hearing test"
+   ],
+   [
+    "A haircut",
+    "A hearing test"
+   ],
+   [
+    "haircut",
+    "hearing test"
+   ],
+   [
+    "Haircut",
+    "Hearing test"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "earwax removal"
+   ],
+   [
+    "Color",
+    "Earwax removal"
+   ],
+   [
+    "a patch test",
+    "an exam"
+   ],
+   [
+    "patch test",
+    "exam"
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $40 check; priced at the visit"
+   ],
+   [
+    "The $25 consult",
+    "The $40 check"
+   ],
+   [
+    "the $25 consult",
+    "the $40 check"
+   ],
+   [
+    "a consult",
+    "an exam"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "Consult",
+    "Exam"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "A shop",
+    "An office"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "set at the chair",
+    "set at the visit"
+   ],
+   [
+    "quote at the chair",
+    "quote at the visit"
+   ],
+   [
+    "is at the chair",
+    "is at the visit"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "Hearing test"
+   ],
+   [
+    "water heaters",
+    "hearing aids"
+   ],
+   [
+    "water heater",
+    "hearing aids"
+   ],
+   [
+    "Panel upgrade",
+    "Listening devices"
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a hearing test on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a hearing test every year"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a hearing test every year."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A parent books hearing tests for three children on one morning."
+   ],
+   [
+    "staff cut",
+    "staff hearing test"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My sore gum got worse. Can I still come in?"
+   ],
+   [
+    "like a skin-test result",
+    "like the date of the last ear scans"
+   ],
+   [
+    "A step-free door on Elm St",
+    "A step-free door on Maple Ave"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Maple Ave"
+   ],
+   [
+    "only after a missed check",
+    "after a missed check"
+   ],
+   [
+    "pipe",
+    "hearing aid"
+   ],
+   [
+    "perm",
+    "exam"
+   ],
+   [
+    "cape",
+    "demo kit"
+   ],
+   [
+    "massage",
+    "balance testing"
+   ],
+   [
+    "Massage",
+    "Balance testing"
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the front desk, at a drop-off, or at the start of a video call.",
+    "The code line follows the visit kind: at the front desk, or at a home visit."
+   ],
+   [
+    "barbershops",
+    "hearing clinics"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Hearing tests, hearing aids and earwax removal."
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do cochlear implant surgery"
+   ]
+  ],
+  "B": [
+   [
+    "No card, so no $20 fee",
+    "No card, so no fee"
+   ],
+   [
+    "Earwax removal $20",
+    "Earwax removal $45"
+   ],
+   [
+    "Card saved for the $89 fee",
+    "Nothing taken, no card saved"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "When they book: nothing taken, and no card is saved"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, and no card is saved"
+   ],
+   [
+    "A card is saved for the $89 service-call fee. Nothing is taken.",
+    "Nothing is taken, and no card is saved."
+   ],
+   [
+    "up to the $89 service call, only if a card, a deposit or the full price was taken",
+    "no fee"
+   ],
+   [
+    "$89, credited to the repair",
+    "$89 home check, credited to the repair"
+   ],
+   [
+    "BS20981",
+    "HC-EX-2098"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomehearing.com"
+   ],
+   [
+    "MP045210",
+    "AUD-EX-0452"
+   ],
+   [
+    "At my home.",
+    "At my care home."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Tinnitus care for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds tinnitus care to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW tinnitus care"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "does the first line today, $165. The $80 line stays good until Thu Oct 29."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 listening training program, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your listening training program"
+   ],
+   [
+    "Repipe · $2,400",
+    "Listening training program · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the try-in is done, $800 at the finish"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your listening training program"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the listening devices Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Lee Home Hearing"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's hearing care takes no jobs sent now, at the office or away."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "like a move-out day",
+    "like a move to another home"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Hearing LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Hearing's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Hearing Center"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Hearing"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Hearing Tests and Lee Hearing Aids"
+   ],
+   [
+    "plumbing and electrical",
+    "home hearing care and hearing aid fitting"
+   ],
+   [
+    "Plumbing and electrical",
+    "Home hearing care and hearing aid fitting"
+   ],
+   [
+    "1200 Main St",
+    "60 Birch St"
+   ],
+   [
+    "88 Elm St",
+    "410 Maple Ave"
+   ],
+   [
+    "42 Oak St",
+    "16 Brook Rd"
+   ],
+   [
+    "Riley Chen",
+    "Maya Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Lucy Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Victor Price"
+   ],
+   [
+    "Casey Moore",
+    "Noah Moore"
+   ],
+   [
+    "Riley",
+    "Maya"
+   ],
+   [
+    "Avery",
+    "Lucy"
+   ],
+   [
+    "Jordan",
+    "Victor"
+   ],
+   [
+    "Casey",
+    "Noah"
+   ],
+   [
+    "electrical",
+    "hearing aid fitting"
+   ],
+   [
+    "Electrical",
+    "Hearing aid fitting"
+   ],
+   [
+    "plumbing license",
+    "audiology license"
+   ],
+   [
+    "Plumbing license",
+    "Audiology license"
+   ],
+   [
+    "a plumber",
+    "an audiologist"
+   ],
+   [
+    "A plumber",
+    "An audiologist"
+   ],
+   [
+    "plumber",
+    "audiologist"
+   ],
+   [
+    "Plumber",
+    "Audiologist"
+   ],
+   [
+    "plumbing",
+    "home hearing care"
+   ],
+   [
+    "Plumbing",
+    "Home hearing care"
+   ],
+   [
+    "barbershop",
+    "hearing clinic"
+   ],
+   [
+    "Barbershop",
+    "Hearing clinic"
+   ],
+   [
+    "barbers",
+    "audiologists"
+   ],
+   [
+    "a barber",
+    "an audiologist"
+   ],
+   [
+    "barber",
+    "audiologist"
+   ],
+   [
+    "Barber",
+    "Audiologist"
+   ],
+   [
+    "hot towel shave",
+    "earwax removal"
+   ],
+   [
+    "beard trim",
+    "earwax removal"
+   ],
+   [
+    "a haircut",
+    "a hearing test"
+   ],
+   [
+    "A haircut",
+    "A hearing test"
+   ],
+   [
+    "Haircut",
+    "Hearing test"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "color",
+    "earwax removal"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Hearing test"
+   ],
+   [
+    "a drain clearing",
+    "a hearing test"
+   ],
+   [
+    "A drain clearing",
+    "A hearing test"
+   ],
+   [
+    "drain clearing",
+    "hearing test"
+   ],
+   [
+    "Drain clearing",
+    "Hearing test"
+   ],
+   [
+    "Water heater replacement",
+    "Special lenses"
+   ],
+   [
+    "water heater replacement",
+    "special lenses"
+   ],
+   [
+    "Water heater flush",
+    "New hearing aids"
+   ],
+   [
+    "water heater flush",
+    "new hearing aids"
+   ],
+   [
+    "water heaters",
+    "hearing aids"
+   ],
+   [
+    "water heater",
+    "hearing aids"
+   ],
+   [
+    "Water heater",
+    "Hearing aids"
+   ],
+   [
+    "a leak repair",
+    "a hearing aid repair"
+   ],
+   [
+    "A leak repair",
+    "A hearing aid repair"
+   ],
+   [
+    "leak repair",
+    "hearing aid repair"
+   ],
+   [
+    "Leak repair",
+    "Hearing aid repair"
+   ],
+   [
+    "service call fee",
+    "home check"
+   ],
+   [
+    "service call",
+    "home check"
+   ],
+   [
+    "Service call fee",
+    "Home check"
+   ],
+   [
+    "Service call",
+    "Home check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Eye scan"
+   ],
+   [
+    "sewer camera inspection",
+    "ear scan"
+   ],
+   [
+    "Panel upgrade",
+    "Listening devices"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if her face swells with a fever."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene la cara hinchada o fiebre?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face swollen, or do you have a fever?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tengo fiebre."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't have a fever."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se le hincha la cara con fiebre, vaya a urgencias o llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If your face swells with a fever, go to the emergency room or call 911."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a hearing visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like cochlear implant surgery"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face or jaw with a fever, or trouble breathing or swallowing."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a broken hearing aid."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Which room are you in at Pine Hill?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "home warranty",
+    "health plan"
+   ],
+   [
+    "the warranty company",
+    "the plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Alex says yes before any work",
+    "Alex says yes first"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and plan card ready."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that his eye turned red and sore."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "My left eye is red and sore now."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan runs Pine Court care home, with a repeat plan: hearing tests for two residents every year."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's pre-tests?"
+   ],
+   [
+    "Rental 1",
+    "Resident 1"
+   ],
+   [
+    "Rental 2",
+    "Resident 2"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 hearing aid repair 165 ear scan 80"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Visit line · $165"
+   ],
+   [
+    "Supply line · $80",
+    "ear scan · $80"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 one more test"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "one more test, $160"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "More work · $160"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more test"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 quote"
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "the extra work for $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the pre-tests"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the wall by the bed"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed wall"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 hearing test"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M.: next hearing test in 12 months. Bring the sound booth then."
+   ],
+   [
+    "the shutoff valves",
+    "the extra work"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My eye still feels scratchy since the exam."
+   ],
+   [
+    "with the store's receipt",
+    "with the lab's receipt"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. A check within 30 days is free, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the test report is ready"
+   ],
+   [
+    "Sewer camera report",
+    "Test report"
+   ],
+   [
+    "The repair price",
+    "The treatment price"
+   ],
+   [
+    "the repair price",
+    "the treatment price"
+   ],
+   [
+    "Book the repair",
+    "Book the treatment"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It hurts a lot. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back in my room 30 minutes late, sorry!"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 listening training program"
+   ],
+   [
+    "drying fan",
+    "loaner hearing aids"
+   ],
+   [
+    "flush",
+    "hearing aid order"
+   ],
+   [
+    "faucet",
+    "hearing aids"
+   ],
+   [
+    "the shutoff valve",
+    "the first line"
+   ],
+   [
+    "only after a missed check",
+    "after a missed check"
+   ],
+   [
+    "pipes",
+    "hearing aids"
+   ],
+   [
+    "pipe",
+    "hearing aid"
+   ],
+   [
+    "drain",
+    "hearing test"
+   ],
+   [
+    "Drain",
+    "Hearing test"
+   ],
+   [
+    "sink",
+    "ear"
+   ],
+   [
+    "water line",
+    "ear canal"
+   ],
+   [
+    "sewer",
+    "ear"
+   ],
+   [
+    "shutoff valves",
+    "hearing aids"
+   ],
+   [
+    "Shutoff valve",
+    "Receiver"
+   ],
+   [
+    "valve",
+    "part"
+   ],
+   [
+    "supply line",
+    "ear scan"
+   ],
+   [
+    "cabinet",
+    "wall"
+   ],
+   [
+    "clog",
+    "build-up"
+   ],
+   [
+    "repipes",
+    "listening training programs"
+   ],
+   [
+    "clogs",
+    "builds up"
+   ],
+   [
+    "clog",
+    "build-up"
+   ],
+   [
+    "repipe",
+    "listening training program"
+   ]
+  ]
+ },
+ "keep": [
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee, an audiologist, signs up two companies by text. Then Alex books a hearing test at Lee Hearing Center for Sat Oct 24 at 11:00am, by text, since calls are hard for Alex. The desk checks Alex's health plan by hand, and the health forms stay on the secure page. After the results, Alex orders hearing aids with a deposit at the front desk, and comes back for the fitting, which starts the trial. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who lives at Pine Hill care home, books a hearing test there with Lee Home Hearing. Victor brings a portable hearing test kit Thu Oct 22, arriving 8 to 10am, and the clinic bills Alex's plan its own way. Alex orders hearing aids, and Noah fits them at Pine Hill two weeks later. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "visit|none|counter",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $120 hearing test. Nothing is taken. The desk checks Alex's health plan, and Alex pays the share at the front desk.",
+    "visit|none|counter": "A hearing aid that stopped working: Maya prices the repair at the visit, with Alex's yes first. Alex pays at the front desk. Only the clean and check is promised.",
+    "list|deposit|counter": "Hearing aids ordered at the visit: $2,800 a pair. A $500 deposit is paid at the front desk when ordered, and the $2,300 rest at the fitting."
+   },
+   "amounts": {
+    "*": {
+     "fee": "free",
+     "name": "Hearing test"
+    },
+    "list|none|*": {
+     "price": "$120",
+     "name": "Hearing test"
+    },
+    "visit|none|*": {
+     "name": "Hearing aid repair"
+    },
+    "list|deposit|*": {
+     "price": "$2,800",
+     "deposit": "$500",
+     "rest": "$2,300",
+     "fee": "free",
+     "name": "Hearing aids (a pair)"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Earwax removal",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$45"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|none|bill",
+    "visit|none|bill",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a $179 hearing test at Pine Hill care home. Nothing is taken. The clinic bills Alex's plan its own way.",
+    "list|none|bill": "The same hearing test, paid privately: nothing is taken, and Rosie texts the $179 bill when Victor texts DONE.",
+    "visit|none|bill": "A hearing aid that stopped working, at the care home. Only the $89 home check is promised. Victor prices the repair at the visit, with Alex's yes first, and Rosie texts the bill.",
+    "list|deposit|bill": "Hearing aids fitted at Pine Hill: $2,800 a pair, a $500 deposit when booked on the secure page, and Rosie texts the bill for the $2,300 rest when Victor texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "free",
+     "name": "Hearing test at home"
+    },
+    "list|none|*": {
+     "price": "$179",
+     "name": "Hearing test at home"
+    },
+    "visit|none|*": {
+     "name": "Hearing aid repair at home"
+    },
+    "list|deposit|*": {
+     "price": "$2,800",
+     "deposit": "$500",
+     "rest": "$2,300",
+     "fee": "free",
+     "name": "Hearing aids fitted at home (a pair)"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Hearing aid clean and check",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$40"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's hearing care companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Hearing care records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For a hearing visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever brings the patient to the office."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Hearing Center, the forms are the health history, the consent and the health plan's papers.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A hearing aid problem gets the soonest same-day time instead, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Hearing care always needs a license: each audiologist and hearing aid specialist, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Hearing care books people (an audiologist or a hearing aid specialist), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Hearing care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each audiologist and hearing aid specialist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No hearing care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A hearing visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A hearing visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A hearing visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the office: the patient is at the visit."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's hearing visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "words",
+    "at": "A3-15",
+    "more": [
+     "With no OK to text, Rosie calls back inside the office's hours, ready for relay or captions.",
+     "The message already had the danger check, like any call.",
+     "Sam gets the call summary, with the message written out."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-30",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Did A.M. agree to get texts from Rosie? With no yes, A.M. gets no texts.",
+      {
+       "buttons": [
+        "Yes, A.M. agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-60",
+    "say": [
+     [
+      "san",
+      "cust",
+      "A spot opened at Lee Hearing Center. It's yours if you want it.",
+      {
+       "card": {
+        "title": "Sat Oct 24 · 10:00am",
+        "lines": [
+         "Take it within 30 minutes",
+         "Within 24 hours of the visit: no free cancel",
+         "After that, it goes to the next person"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Sat 3pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Sat Oct 24 at 3:00pm with Maya?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-17",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Hearing Center can't do Sat 11:00am. They offered another time instead:",
+      {
+       "card": {
+        "title": "Lee Hearing Center · 410 Maple Ave",
+        "lines": [
+         "Sat Oct 24 · 3:00pm",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-17",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Hearing Center can take your booking, with one change:",
+      {
+       "card": {
+        "title": "Lee Hearing Center · 410 Maple Ave",
+        "lines": [
+         "Sat Oct 24 · 11:00am, with someone else on the team",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-03",
+    "say": [
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. Pick a new time:",
+      {
+       "times": [
+        "Sat Oct 24 · 3:00pm",
+        "Sun Oct 25 · 11:00am"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "A"
+     ],
+     [
+      "san",
+      "cust",
+      "Moved. Give this code at the front desk.",
+      {
+       "card": {
+        "title": "Lee Hearing Center · 410 Maple Ave",
+        "lines": [
+         "Sat Oct 24 · 3:00pm"
+        ]
+       },
+       "code": "5160",
+       "buttons": [
+        "Change the time",
+        "Cancel the visit"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Change: A.M. moved the 11:00am.",
+      {
+       "card": {
+        "title": "A.M.",
+        "lines": [
+         "Was: Sat 11:00am",
+         "Now: Sat Oct 24 · 3:00pm"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 20"
+     ],
+     [
+      "san",
+      "cust",
+      "The office is running about 20 minutes late, so your 11:00am starts about 11:20am.",
+      {
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: A.M., Sat 11:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "You're checked in at Lee Hearing Center. Thanks, Alex!"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-05",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5106"
+     ],
+     [
+      "san",
+      "staff",
+      "That isn't A.M.'s code. Check it with A.M. and send it again."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-07",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Maya couldn't enter A.M.'s check-in code after 3 tries. The visit goes on, and it counts once Maya texts DONE."
+     ],
+     [
+      "san",
+      "cust",
+      "The desk couldn't enter your check-in code. That's OK: your visit goes on."
+     ],
+     [
+      "staff",
+      "san",
+      "DONE Alex M."
+     ]
+    ],
+    "more": [
+     "At the office, Alex is already at the front desk, so there's no door check.",
+     "Sam can look into it on the portal."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-08",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE Alex M."
+     ],
+     [
+      "san",
+      "staff",
+      "Done: A.M., Sat 11:00am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Lee Hearing Center you're here."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says they're here for the 11:00am. Check A.M. in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HELP A.M. at the visit. Note on the secure page."
+     ],
+     [
+      "san",
+      "owner",
+      "Maya is helping A.M. at the visit. The note is on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-04",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M. rated the visit 2 stars.",
+      {
+       "card": {
+        "title": "Rating · 2 of 5",
+        "lines": [
+         "Your Sat Oct 24 visit",
+         "Only you see this"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-33",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Signed, thanks! Pick a time for your first visit:",
+      {
+       "times": [
+        "Sat Nov 14 · 11:00am",
+        "Sat Nov 21 · 11:00am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-14",
+    "say": [
+     [
+      "cust",
+      "san",
+      "I waited 25 minutes past my time."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. has a complaint about Saturday's visit: \"I waited 25 minutes past my time.\"",
+      {
+       "buttons": [
+        "Text A.M. now"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks for telling us. We've passed it to the owner."
+     ]
+    ],
+    "more": [
+     "Sam answers by text through Rosie, or by a relay or captioned call."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Hearing Center",
+          "6 bookings · Maya 3, Lucy 3"
+         ],
+         [
+          "Lee Home Hearing",
+          "3 jobs"
+         ],
+         [
+          "Waiting on you",
+          "D.W.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-17",
+    "say": [
+     [
+      "san",
+      "owner",
+      "What do you need from D.W. first?",
+      {
+       "buttons": [
+        "One question",
+        "A call first"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-02",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Reminder: D.W. is still waiting for an answer.",
+      {
+       "buttons": [
+        "Accept",
+        "Another time",
+        "Decline",
+        "Yes, with a change",
+        "Need more first"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Hearing Center. The office hasn't answered your request yet. We'll text you by 12:00pm either way.",
+      {
+       "stop": true,
+       "as": "Dee W."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-13",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BLOCK Thu 2-5"
+     ],
+     [
+      "san",
+      "owner",
+      "Block which business?",
+      {
+       "buttons": [
+        [
+         "A",
+         "Lee Hearing Center"
+        ],
+        [
+         "B",
+         "Lee Home Hearing"
+        ]
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "A"
+     ],
+     [
+      "san",
+      "owner",
+      "Block Thu Oct 29, 2 to 5pm at Lee Hearing Center? B.T. is booked at 3:00.",
+      {
+       "buttons": [
+        "Block; offer new times",
+        "Block around it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero un examen de audición el sábado."
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Hearing Center. Esta llamada se graba. ¿En qué le ayudo?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-12",
+    "does": "Someone calls for a hearing clinic: a wrong number. Rosie says whose line this is, once. A sales caller or a robocall is ended politely.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Is this Elm Street Hearing? I need to move my hearing test."
+     ],
+     [
+      "san",
+      "cust",
+      "This is Lee Hearing Center's booking line, so I can't reach Elm Street Hearing. Please check their number. Goodbye."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "When Lucy is about to be free, Omar gets a text with his check-in code. Lucy is told who's next.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're next! Please come in and give this code at the front desk.",
+      {
+       "code": "2718",
+       "buttons": [
+        "On my way",
+        "Leave the line"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Next from the line: O. Details: rosfield.com/s/o1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "more": [
+     "Hearing care's safety step: for an ear that feels blocked, Rosie first asks about sudden hearing loss, fluid or dizziness.",
+     "None: the booking goes on. Any: the next branch, and no booking.",
+     "Another kind of work's example: a gas smell gets 'leave the house first'."
+    ],
+    "does": "When it's safe to go on, the plug-in's safety step comes first. Then the booking goes on."
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "more": [
+     "Hearing care's words: sudden hearing loss, ear pain with fluid or a fever, or sudden dizziness or ringing. They need a doctor today.",
+     "A face that droops, weakness on one side or trouble speaking gets 911 at once.",
+     "Rosie never judges how serious it is. Everyone gets the same words."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Hearing that drops suddenly, ear pain with fluid coming out, or sudden dizziness or ringing needs a doctor today. Please see your own doctor, an urgent care or an emergency room today. Don't wait for a hearing test. If your face droops or one side is weak, call 911 now."
+     ]
+    ],
+    "does": "No search and no booking. The AI shows Alex where to get care, in the plug-in's own words. On a call, Rosie says it aloud, and Sam gets the call summary."
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the audiologist. Maya can go over it at your visit. For anything sooner, text or call Lee Hearing Center at (555) 010-0177. If it's urgent, see a doctor or call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: A.M. called at 7:15pm to book for Saturday.",
+      {
+       "card": {
+        "title": "Call · A.M. · 4 min",
+        "lines": [
+         "Wants Saturday morning",
+         "Booked · Sat Oct 24, 11:00am",
+         "English · recorded"
+        ],
+        "button": "Hear the call",
+        "link": "rosfield.com/k/a1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-31",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Hearing Center. Our call dropped, so here's what we agreed. You can finish on this link.",
+      {
+       "card": {
+        "title": "Lee Hearing Center · your visit",
+        "lines": [
+         "Sat Oct 24 · 11:00am",
+         "Your answers so far are kept",
+         "The time is saved for 10 minutes"
+        ],
+        "button": "Finish booking",
+        "link": "rosfield.com/c/r2"
+       },
+       "stop": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "A hearing test needs the office's own equipment, so the example offices book no video or phone visits (pf.services.online).",
+    "label": "By video or phone"
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "Here: a first hearing test, or a check on hearing aids Alex wears now? A first test is the full 90 minutes.",
+     "Questions that only add detail come later, once a time is saved.",
+     "If it's for a child, the child's hearing test is picked here, so the times fit it.",
+     "Symptoms are never asked here. A hearing aid that stopped working is booked as a repair."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Is this a first hearing test, or a check on hearing aids you wear now?"
+     ],
+     [
+      "cust",
+      "agent",
+      "A first test. I don't have hearing aids."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-30",
+    "does": "Some jobs take several visits, like a hearing aid fitting and its follow-up. Where the plug-in says so, all the times are picked now."
+   },
+   {
+    "op": "words",
+    "at": "A4-32",
+    "does": "A parent books hearing tests for three children on one morning. Rosie finds back-to-back times with Maya and Sam, one child at a time in the sound booth."
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "Some services need a room or equipment as well as a person. Hearing tests need the office's one sound booth, so two can't overlap."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Would you like to bring someone whose voice you know? It helps with part of the test. And is there anything Maya should know to help?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Yes, my brother Jo will come. And I use a wheelchair."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-25",
+    "does": "A child's hearing test is for ages 5 and up. Alex picked one for Alex's child before the times, so the times fit it. Alex is the parent, so Alex books, stays and gets the texts."
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "more": [
+     "The health history, the consent and the health plan's papers are signed on the secure page, never by text.",
+     "They're due the day before. Alex is new here, so they're all asked.",
+     "Where a plan asks for a doctor's order, the office gets it itself: 'The office must get it'."
+    ],
+    "does": "The plug-in says if this work needs a first step: a test, a consult, a form or a waiver. Rosie checks before the secure link, so the page knows what to ask."
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Before this fitting, Lee Hearing Center needs a hearing test, at least 2 days before. Pick a time:",
+      {
+       "times": [
+        "Thu Oct 22 · 10:15am",
+        "Thu Oct 22 · 12:30pm"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "more": [
+     "The new pick is saved for 10 minutes instead.",
+     "Maya stays the audiologist, since she runs the test too."
+    ],
+    "does": "Neither test time works. The AI offers later fittings, each with room for a test first. Alex picks again.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "No problem. Here are later fittings, each with a test 2 days before:",
+      {
+       "times": [
+        "Tue Oct 27 · 11:00am · Maya",
+        "Wed Oct 28 · 2:00pm · Maya"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "san",
+      "cust",
+      "One quick question.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way"
+       ]
+      }
+     ]
+    ],
+    "does": "On the secure page, Alex answers one short question: are texts to this phone safe? Hearing care shows no patient photos, so the photo question isn't asked.",
+    "more": [
+     "Texts aren't safe, like a shared phone: Alex picks this page, email or a call. Rosie then reaches Alex only that way.",
+     "A patient who can't hear calls well picks this page or email, never a plain call.",
+     "Here, Alex says texts are safe."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-03",
+    "does": "A what-if: Alex bought hearing aids here, so clean and checks are free for 3 years. A clean and check booked in those years is already covered."
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "does": "Sam says yes, with a change, like another audiologist or a shorter visit. Rosie reads it back, then asks Alex. Here, Sam takes the visit himself.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Me instead, same time"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Sat Oct 24 at 11:00am with Sam?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another change"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-11",
+    "more": [
+     "Alex picked Maya, so Maya's next times show."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-03",
+    "more": [
+     "Example: a hearing aid fitting needs a hearing test at least 2 days before.",
+     "A first step that's still good counts for the new time, even with another audiologist.",
+     "If no time keeps the gap, Alex gets a new pair of times, another service, or a free cancel.",
+     "Both visits move with one 'Moved' text, and Maya is told."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my brother come in with me for the test?"
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. asks: Can my brother come in with me for the test?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Text A.M. now"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "The office says yes. A voice you know helps with part of the test."
+     ]
+    ],
+    "more": [
+     "No answer in 10 minutes: it goes to Sam, and Alex hears the office was asked.",
+     "At night, Alex is told it waits for the morning. Sam is texted at 8am.",
+     "A question only a pro may answer gets: 'Maya will go over it at your visit. For anything urgent, text (555) 010-0177.'"
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The example office saves no card, so no plan visit is ever charged to one (pf.money.before).",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "words",
+    "at": "A8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Sat Oct 24 at Lee Hearing Center:",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Patient",
+         "Length"
+        ],
+        "rows": [
+         [
+          "9:30am",
+          "B.T.",
+          "30 min"
+         ],
+         [
+          "11:00am",
+          "A.M.",
+          "60 min"
+         ],
+         [
+          "12:00pm",
+          "D.R.",
+          "30 min"
+         ],
+         [
+          "2:00pm",
+          "T.L.",
+          "45 min"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open them",
+        "link": "rosfield.com/d/r24"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "more": [
+     "A stand-in sees them too.",
+     "They never go in a text to Alex.",
+     "Alex can get a copy, as with any record.",
+     "The plug-in names what's worth keeping, like the date of the last hearing test.",
+     "Where the plug-in marks the work as health, notes are typed on the secure page. Any text says only 'notes added'."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE A.M.: next hearing test in 12 months, mornings best"
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to A.M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-28",
+    "does": "Some work has something ready later, like hearing aids from the maker. Alex was told the ready date at the front desk. If it won't be ready by then, Lucy says so first."
+   },
+   {
+    "op": "words",
+    "at": "A10-29",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE R.F. Fri Oct 30"
+     ],
+     [
+      "san",
+      "cust",
+      "Your order needs a little more time. It'll be ready Fri Oct 30.",
+      {
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in gives the state's form: what to ask, and what stops home hearing care from going live. Each kind of work has its own form.",
+    "more": [
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state registers hearing tests away from an office, the form asks for that number too.",
+     "Each person's own license comes later, with their invite reply.",
+     "Where the state asks for insurance, the form asks for it here too."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses each audiologist. Hearing tests away from an office may need a registration too. What's your audiology license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, AUD-EX-0452"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses hearing aid specialists, and registers a business that sells hearing aids. What's the company's registration?"
+     ],
+     [
+      "owner",
+      "san",
+      "HA-EX-2287"
+     ],
+     [
+      "san",
+      "owner",
+      "Hearing aid fitting is set up, under the company's registration. AI assistants can book it now. You'll add your people at the end. Next, Lee Hearing Center: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "Sam leaves hearing aids to Victor, so hearing aid fitting waits for Victor's say-so.",
+     "Whose license counts comes from the state's form: the company's, each person's, or both."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses each person who fits and sells hearing aids, and may register the business. What's the company's registration?"
+     ],
+     [
+      "owner",
+      "san",
+      "HA-EX-2287"
+     ],
+     [
+      "san",
+      "owner",
+      "Hearing aid fitting is set up, under the company's registration. AI assistants can book it now. You'll add your people at the end. Next, Lee Hearing Center: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Noah Moore"
+     ],
+     [
+      "Company",
+      "Lee Home Hearing"
+     ],
+     [
+      "Kinds of work",
+      "Home hearing care"
+     ],
+     [
+      "Jobs",
+      "Hearing aid fittings, cleanings and repairs"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7:30am–5:30pm"
+     ],
+     [
+      "Noah agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone who works with you have their own business? Like an audiologist who rents a test room.",
+      {
+       "buttons": [
+        "No",
+        "Yes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone's licenses are on file as you gave them, and nothing is looked up. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Victor: audiologist, home hearing care and hearing aid fitting",
+         "Noah: hearing aid specialist, home hearing care",
+         "Maya: audiologist, the office and home visits",
+         "Lucy: hearing aid specialist, the office"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, hearing aid fitting and the office now show to AI assistants too. Each person hears they can be booked for their own work: Lucy at the office, Noah for home hearing care.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Hearing Center can book you from now on, at the office and for home visits. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Maya"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Hearing Center can book you from now on, at the office. Your day list comes at the time you picked.",
+      {
+       "as": "Lucy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Home Hearing can book you for home hearing care and hearing aid fitting from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Victor"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Hearing aid fitting and Lee Hearing Center now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-19",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Yesterday, nobody answered for Lee Hearing Center.",
+      {
+       "list": {
+        "plain": true,
+        "rows": [
+         [
+          "2 requests",
+          "Declined at 4 hours"
+         ]
+        ]
+       },
+       "buttons": [
+        "See them",
+        "Set up AWAY"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-40",
+    "does": "Nia K. asked to talk about hearing aids before she books. Sam taps Call, and the call goes out from the office's number.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nia K. would like to talk about hearing aids before booking.",
+      {
+       "buttons": [
+        "Call Nia"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-41",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Today, Fri Oct 23, for each business:",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Hearing Center",
+          "1 missed visit · nothing waits on you · first tomorrow: 9:30am, Maya"
+         ],
+         [
+          "Lee Home Hearing",
+          "1 missed visit · nothing waits on you · next visit: Mon 8 to 10am"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-01",
+    "does": "Claude asks for Ben T., and Gemini for Dee W. Both want Sat Oct 31, 2:00pm with Maya, 0.4 seconds apart. Claude asked first, so Ben's time is saved for 10 minutes."
+   },
+   {
+    "op": "words",
+    "at": "A6-11",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry, that time was just taken. Here are the next open times:",
+      {
+       "times": [
+        "Sat Oct 24 · 2:00pm",
+        "Tue Oct 27 · 11:00am"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Neither works"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your Sat Oct 31 visit needs a step done at least 2 days before, and it isn't done yet. Pick a later time, or keep Sat for a shorter visit.",
+      {
+       "as": "Dana",
+       "times": [
+        "Tue Nov 3 · 2:00pm",
+        "Thu Nov 5 · 4:00pm"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Shorter, Sat Oct 31"
+        ]
+       ]
+      }
+     ]
+    ],
+    "does": "Say another patient, Dana R., booked a hearing aid fitting for Sat Oct 31 with Maya. It needs a hearing test first, which isn't done in time, so it can't go ahead as booked."
+   },
+   {
+    "op": "words",
+    "at": "A10-32",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Hearing Center sent you a proposal. Read it, then sign or decline on the secure page.",
+      {
+       "card": {
+        "title": "Proposal · Lee Hearing Center",
+        "lines": [
+         "3 visits",
+         "Good until Sat Nov 7"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/p/a15"
+       }
+      }
+     ]
+    ],
+    "does": "Say a visit leads to more work, like Maya's listening training plan after a test, or a lawyer's engagement letter. It goes on the secure page, to sign or decline."
+   },
+   {
+    "op": "off",
+    "at": "S11-22",
+    "why": "The example offices charge no late-cancel or missed-visit fee, so every patient is fee-free (pf.money.fees).",
+    "label": "Yes: a fee may be asked"
+   },
+   {
+    "op": "words",
+    "at": "A3-10",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I talk to a real person?"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. I'm putting you through to Lee Hearing Center now. If nobody picks up, I'll set a callback at a time you pick."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. asked for a person. I'm putting the call through to the office's phone now."
+     ]
+    ],
+    "more": [
+     "Sam gets the call summary either way.",
+     "After hours, the callback is set for the office's next open hour.",
+     "A caller who says calls are hard gets a text instead, or a relay or captioned call."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-15",
+    "does": "Maya texts in sick at 10:20am, after Alex's reminder. Rosie blocks Maya's Saturday, so nobody new is offered Maya that day. Sam picks.",
+    "more": [
+     "With no reply by 10:50am, Rosie offers Alex Sam, who's an audiologist too.",
+     "The plug-in says who may take each booking. Sam may take any of Maya's visits.",
+     "Sam sees patients on Saturday afternoons, and comes in early to stand in when asked.",
+     "Alex asked for texts, so Sam would reach Alex by text, or a relay or captioned call."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Sick, can't come in Saturday"
+     ],
+     [
+      "san",
+      "owner",
+      "Maya is out Sat Oct 24. A.M. is booked at 11:00am. You're free to see A.M. yourself, or you can reach A.M. first.",
+      {
+       "buttons": [
+        "I'll see A.M.",
+        "I'll reach them"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Sat Oct 24 at Lee Hearing Center:",
+      {
+       "card": {
+        "title": "Answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open them",
+        "link": "rosfield.com/d/r24"
+       },
+       "list": {
+        "rows": [
+         [
+          "9:30am",
+          "B.T.",
+          "30 min"
+         ],
+         [
+          "11:00am",
+          "A.M.",
+          "90 min"
+         ],
+         [
+          "12:30pm",
+          "D.R.",
+          "30 min"
+         ],
+         [
+          "2:00pm",
+          "T.L.",
+          "90 min"
+         ]
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-40",
+    "say": [
+     [
+      "san",
+      "owner",
+      "N.K. would like to talk about hearing aids before booking.",
+      {
+       "buttons": [
+        "Call Nia"
+       ]
+      }
+     ]
+    ],
+    "does": "Nia K. asked to talk about hearing aids before she books. Nia uses a captioned phone, so she reads Sam's words as he talks. Sam taps Call, and it goes out from the office's number."
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "more": [
+     "A record is kept on the secure page, never in a text: not to the customer, Sam or the team.",
+     "Lost means a child or a pet in the office's care.",
+     "The plug-in says what staff must do for this work."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-19",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BOOK Alex M. hearing test Sat 11am Maya"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-24",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "type": "split",
+      "line": [
+       "8.12"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "What is today's visit?",
+      "q": "A hearing test, or a hearing aid repair?",
+      "does": "This follows the booking, so nothing is asked again. Each branch is the visit for one kind of booking.",
+      "needs": [
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "A hearing test",
+        "when": {
+         "price": [
+          "list"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x02",
+          "line": [
+           "8.12"
+          ],
+          "who": "staff",
+          "via": "visit",
+          "t": "Sat Oct 24, 11:15am",
+          "title": "Maya tests Alex's hearing in the booth",
+          "does": "In the sound booth, Alex listens for tones and repeats words through headphones. Jo reads some words aloud, since a voice Alex knows helps. Maya also checks how each eardrum moves.",
+          "more": [
+           "Only a licensed person runs the test. In this clinic, a first full test is always with an audiologist.",
+           "The test takes about 45 minutes. Maya goes over the results with Alex in person, below.",
+           "What the test shows stays in the clinic's chart. Rosie never sees it, and no text names it."
+          ],
+          "needs": [
+           "pf.visit",
+           "pf.staff"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "A hearing aid repair",
+        "when": {
+         "price": [
+          "visit"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x03",
+          "line": [
+           "8.12"
+          ],
+          "who": "staff",
+          "via": "visit",
+          "t": "Sat Oct 24, 11:30am",
+          "title": "Maya repairs the hearing aid, as OK'd",
+          "does": "With Alex's yes to the price, Maya fits a new receiver and cleans the aid. She checks it in Alex's ear, so Alex hears the difference before leaving.",
+          "more": [
+           "A repair sent to the maker gets a loaner, where the clinic has one.",
+           "The aid's settings stay in the clinic's records, never in Rosie or a text."
+          ],
+          "needs": [
+           "pf.visit"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-45",
+    "steps": [
+     {
+      "id": "A8-x05",
+      "type": "split",
+      "line": [
+       "8.12",
+       "9.13"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "What comes next for Alex?",
+      "q": "After a test, or after a repair?",
+      "does": "This follows the booking too. After a hearing test, Alex may choose hearing aids. After a repair, there's nothing more to choose.",
+      "needs": [
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "After a hearing test",
+        "when": {
+         "price": [
+          "list"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x06",
+          "type": "split",
+          "line": [
+           "8.12",
+           "9.13"
+          ],
+          "who": "cust",
+          "to": "staff",
+          "via": "visit",
+          "t": "Sat Oct 24, 12:15pm",
+          "title": "Alex talks hearing aids with Lucy",
+          "q": "Does Alex order hearing aids here?",
+          "does": "With the results in hand, Alex looks at hearing aids with Lucy, the hearing aid specialist. Buying them here is never required.",
+          "more": [
+           "Lucy shows what Alex's plan pays toward aids first. Many plans pay little or nothing.",
+           "For mild to moderate loss, an adult may pick over-the-counter aids instead: $799 here, or from any store.",
+           "Alex may take the results to any clinic."
+          ],
+          "needs": [
+           "pf.rules",
+           "pf.money"
+          ],
+          "branches": [
+           {
+            "label": "Orders a pair here",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "A8-x07",
+              "line": [
+               "9.13",
+               "5.4"
+              ],
+              "who": "cust",
+              "to": "san",
+              "via": "page",
+              "title": "Alex signs the hearing aid agreement",
+              "does": "Lucy writes the quote: a $2,800 pair. Alex reads and signs the purchase agreement on the secure page, at the desk. It shows the price, the $500 deposit and the trial.",
+              "more": [
+               "The trial or return period follows the state's rules where they require one. This clinic gives 45 days from the fitting when that's longer.",
+               "It also shows any fee kept on a return, days in the shop added to the trial, and the warranty.",
+               "Aids the plan doesn't pay for get a written price estimate too, where the rules say so.",
+               "It comes in large print when asked. Nothing in it goes by text."
+              ],
+              "needs": [
+               "pf.rules",
+               "pf.money"
+              ]
+             },
+             {
+              "id": "A8-x08",
+              "line": [
+               "9.13",
+               "10.10",
+               "10.11"
+              ],
+              "who": "staff",
+              "to": "san",
+              "via": "portal",
+              "title": "Lucy orders the aids; the fitting is booked",
+              "does": "Lucy orders the pair from the maker. She books the fitting for Mon Nov 9 at 10:00am, about 2 weeks out. Alex pays the $500 deposit at the front desk today.",
+              "more": [
+               "Lucy adds the order to Alex's booking on the portal, with its due date.",
+               "The rest, $2,300, is paid at the fitting, at the front desk. Aids are never paid in full up front.",
+               "The fitting's booking is drawn after the visit: 'Next visit booked at checkout'."
+              ],
+              "needs": [
+               "pf.money",
+               "pf.visit"
+              ]
+             }
+            ]
+           },
+           {
+            "label": "Takes the results elsewhere",
+            "end": "merge",
+            "steps": []
+           },
+           {
+            "label": "Thinks about it",
+            "end": "merge",
+            "steps": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "After a repair",
+        "when": {
+         "price": [
+          "visit"
+         ]
+        },
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-22",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.11",
+       "8.22"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "t": "Mon Nov 9, 10:00am",
+      "title": "Maya fits Alex's hearing aids",
+      "does": "Alex gives the new check-in code at the front desk. Maya sets the aids to Alex's test results, checks the fit and the sound, and shows how to charge and clean them.",
+      "more": [
+       "The fitting takes about an hour. Jo comes along again.",
+       "Alex pays the $2,300 rest at the front desk, the clinic's own way. Rosie sends no bill.",
+       "The aids' settings stay in the clinic's records."
+      ],
+      "needs": [
+       "pf.visit"
+      ]
+     },
+     {
+      "id": "A10-x02",
+      "line": [
+       "10.3",
+       "10.10"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "The trial starts, with its last day in writing",
+      "does": "The trial starts today. Lucy gives Alex the last day to return the aids, in writing: Thu Dec 24. A free follow-up adjustment is booked for Mon Nov 23.",
+      "more": [
+       "The trial's length follows the state's rules where they require one, or the clinic's own 45 days if that's longer.",
+       "Days the aids spend in the shop for repair are added, where the rules say so.",
+       "Adjustments in the trial are free. A return goes to Sam, who OKs the refund under the agreement.",
+       "The follow-up gets its own code and reminder.",
+       "An adjustment through the hearing aid's app follows the license rules of the state Alex is in that day."
+      ],
+      "needs": [
+       "pf.rules",
+       "pf.money"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-22",
+    "more": [
+     "The general check looks for danger to life, fire, gas, a medical emergency or self-harm.",
+     "Every answer later in the booking is checked the same way.",
+     "On a call, the voice AI says any safety words out loud.",
+     "The hearing care plug-in adds its own: hearing that dropped suddenly, ear pain with drainage, or dizziness or ringing that started suddenly."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "The test is saved with the main visit, on the same secure link. At booking, it gets its own check-in code."
+   },
+   {
+    "op": "words",
+    "at": "A6-01",
+    "more": [
+     "Rosie checked this before the secure page too.",
+     "Here it books right away: this office books new patients straight away, and it isn't for today.",
+     "A request also waits for Sam if it has an answer only Sam, or an expert, should read.",
+     "Pat, the office manager, gets the same requests. Sam's answer wins."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-15",
+    "does": "Nothing changes until Sam reaches Alex. Alex asked for texts, so Sam texts, or uses a relay or captioned call. Any change is then confirmed by text."
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "does": "Dana's hearing test is done, and Maya texts that the result is in. It's kept on Dana's record, and counts for later visits until it runs out.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "D.R.'s hearing test is done. The result is on the page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex arrives at the office. If the plug-in asks for something to bring, the desk checks it first. This visit needs a photo ID and the plan card, from the reminder."
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "A hearing test at the office has no cancel period. Hearing aids get a trial from the fitting instead. A contract the state's rules cover gets one, like a membership."
+   },
+   {
+    "op": "words",
+    "at": "A4-23",
+    "does": "The AI sends Rosie only Alex's name and mobile. From the mobile, Rosie finds Alex in the office's list, or adds Alex as new. Here, Alex is a new patient."
+   },
+   {
+    "op": "more",
+    "at": "S11-49",
+    "more": [
+     "No reply in 24 hours: Sam is asked to reach the patient. Nobody is moved without the patient's yes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-12",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Hearing Center's online booking is paused for a few minutes. Nothing was booked or changed. To book now, text or call (555) 010-0177."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-28",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Hearing Center can't take this booking online today. Please text or call the office at (555) 010-0177."
+     ],
+     [
+      "san",
+      "owner",
+      "Flag: one phone tried to book more visits today than the plug-in allows. Nothing was booked. Rosie's team will check it within 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Hearing Center. Sam Lee added you to the team. Reply YES with your license number to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES AUD-EX-4471",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Hearing tests always need one, and so does fitting hearing aids, where the state licenses it. So Sam's three take the license step."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-19",
+    "more": [
+     "Hearing care: a patient who can't hear calls is reached by email, or a relay or captioned call, never a plain call."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "Hearing care sells no packs or memberships while booking. Aids bought here bring 3 years of free checks instead (A5-03)."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "A hearing aid order at the office has a trial from the fitting (A10-x02), not a cancel period. The office sells no memberships."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "sensitive work (health): no rating is asked (the sensitive switch is on)"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's hearing care companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "For a hearing visit, the page also asks the birth date, the plan's member ID and a photo of the card.",
+     "The health history and consent forms are on it too. Alex can finish them before the visit."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A hearing visit always needs the patient there."
+   },
+   {
+    "op": "words",
+    "at": "B10-19",
+    "more": [
+     "Test results never go through Rosie.",
+     "The text says only that the report is ready. Victor goes over it in person, at his next visit."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your report from Thursday is ready. Victor will go over it with you in person, at his next visit.",
+      {
+       "card": {
+        "title": "Report ready",
+        "lines": [
+         "Lee Home Hearing · Thu Oct 22",
+         "Shared in person, never by text"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Hearing care records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a hearing visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever meets the audiologist, like the care home's nurse."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "For home hearing care, the forms are the health history, the consent and the health plan's papers.",
+     "Kept: the patient, or the person who decides, signs them on the secure page at the door before any work."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Home hearing care takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for hearing care (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A hearing visit always needs the patient there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the audiologist's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A hearing aid problem gets the soonest same-day time instead, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Hearing care always needs a license: each audiologist and hearing aid specialist, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Hearing care books people (an audiologist or a hearing aid specialist), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Hearing care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each audiologist and hearing aid specialist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No hearing care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Home hearing care books a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A hearing visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Home hearing care sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No hearing visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No hearing visit is sent now (S2-30)."
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Home Hearing. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Home Hearing · Your visit",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: R., in Spanish. She wants a visit soon.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "R. · speaks Spanish",
+         "Wants a visit soon",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Home Hearing. We got your voicemail. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Home Hearing · Your visit",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants a visit this week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Before this visit, Lee Home Hearing needs a free first visit. Pick a time:",
+      {
+       "times": [
+        "Tue Oct 20 · arriving 4–5pm",
+        "Wed Oct 21 · arriving 8–9am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Fri 8am"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Fri Oct 23, arriving 8 to 10am, with Victor?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-07",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sure. Pick a new time:",
+      {
+       "times": [
+        "Fri Oct 23 · arriving 8–10am · Victor",
+        "Mon Oct 26 · arriving 8–10am · Victor",
+        "Tue Oct 27 · arriving 8–10am · Victor"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "A"
+     ],
+     [
+      "san",
+      "cust",
+      "Moved: Fri Oct 23, arriving 8–10am, with Victor."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. moved to Fri Oct 23, arriving 8–10am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3906"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: A.M., 8–10."
+     ],
+     [
+      "san",
+      "cust",
+      "Victor from Lee Home Hearing is checked in for your 8–10am visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-05",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3960"
+     ],
+     [
+      "san",
+      "staff",
+      "That isn't A.M.'s code. Check it with A.M. and send it again."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-06",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Victor couldn't enter A.M.'s check-in code after 3 tries. The visit goes on, and it counts once Victor texts DONE."
+     ],
+     [
+      "san",
+      "cust",
+      "Victor couldn't enter your code. If the person at your door isn't Victor, don't let them in.",
+      {
+       "buttons": [
+        [
+         "2",
+         "It isn't Victor"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. says the person at the door isn't Victor. Reach A.M. now, by text first.",
+      {
+       "card": {
+        "title": "Safety check · A.M.",
+        "lines": [
+         "Thu 8–10am · 16 Brook Rd",
+         "A.M. was told to keep the door closed"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says the person at the door isn't you. Please wait: Sam is reaching A.M."
+     ],
+     [
+      "san",
+      "cust",
+      "Keep your door closed. If you feel unsafe, call 911. Sam will text you now.",
+      {
+       "buttons": [
+        [
+         "1",
+         "It was Victor after all"
+        ]
+       ]
+      }
+     ]
+    ],
+    "does": "Alex replies 2. Alex keeps the door closed, and calls 911 if unsafe. Sam reaches Alex right away, by text first."
+   },
+   {
+    "op": "words",
+    "at": "B8-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Victor you're home."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says they're home. Try the door again, and check in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry to hear that. What went wrong?"
+     ],
+     [
+      "cust",
+      "san",
+      "Victor was late and rushed."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. rated the visit 2 stars: \"Victor was late and rushed.\"",
+      {
+       "card": {
+        "title": "Rating · 2 of 5",
+        "lines": [
+         "Thu Oct 22 visit with Victor",
+         "Only you see this"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-13",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Victor rushed and didn't explain anything."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. isn't happy with the Thu Oct 22 visit: \"Victor rushed and didn't explain anything.\"",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call A.M. now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Victor check my other hearing aids next week?"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. Here are Victor's next times:",
+      {
+       "times": [
+        "Tue Nov 24 · arriving 8–10am · Victor",
+        "Wed Nov 25 · arriving 10am–12pm · Victor"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Hearing Center",
+          "6 bookings"
+         ],
+         [
+          "Lee Home Hearing",
+          "3 jobs · Victor 2, Noah 1"
+         ],
+         [
+          "Waiting on you",
+          "N.S.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-29",
+    "say": [
+     [
+      "san",
+      "owner",
+      "What do you need from N.S. first?",
+      {
+       "buttons": [
+        "One question",
+        "A call first"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-13",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BLOCK Thu 12-5"
+     ],
+     [
+      "san",
+      "owner",
+      "Block which business?",
+      {
+       "buttons": [
+        [
+         "A",
+         "Lee Hearing Center"
+        ],
+        [
+         "B",
+         "Lee Home Hearing"
+        ]
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "B"
+     ],
+     [
+      "san",
+      "owner",
+      "Block Thu Oct 29, 12 to 5pm at Lee Home Hearing? L.W. is booked, arriving 12 to 2pm.",
+      {
+       "buttons": [
+        "Block; offer new times",
+        "Block around it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in gives the state's form: what to ask, and what stops home hearing care from going live. Each kind of work has its own form.",
+    "more": [
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state registers hearing tests away from an office, the form asks for that number too.",
+     "Each person's own license comes later, with their invite reply.",
+     "Where the state asks for insurance, the form asks for it here too."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses each audiologist. Hearing tests away from an office may need a registration too. What's your audiology license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, AUD-EX-0452"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses hearing aid specialists, and registers a business that sells hearing aids. What's the company's registration?"
+     ],
+     [
+      "owner",
+      "san",
+      "HA-EX-2287"
+     ],
+     [
+      "san",
+      "owner",
+      "Hearing aid fitting is set up, under the company's registration. AI assistants can book it now. You'll add your people at the end. Next, Lee Hearing Center: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "Sam leaves hearing aids to Victor, so hearing aid fitting waits for Victor's say-so.",
+     "Whose license counts comes from the state's form: the company's, each person's, or both."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses each person who fits and sells hearing aids, and may register the business. What's the company's registration?"
+     ],
+     [
+      "owner",
+      "san",
+      "HA-EX-2287"
+     ],
+     [
+      "san",
+      "owner",
+      "Hearing aid fitting is set up, under the company's registration. AI assistants can book it now. You'll add your people at the end. Next, Lee Hearing Center: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Noah Moore"
+     ],
+     [
+      "Company",
+      "Lee Home Hearing"
+     ],
+     [
+      "Kinds of work",
+      "Home hearing care"
+     ],
+     [
+      "Jobs",
+      "Hearing aid fittings, cleanings and repairs"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7:30am–5:30pm"
+     ],
+     [
+      "Noah agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone who works with you have their own business? Like an audiologist who rents a test room.",
+      {
+       "buttons": [
+        "No",
+        "Yes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone's licenses are on file as you gave them, and nothing is looked up. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Victor: audiologist, home hearing care and hearing aid fitting",
+         "Noah: hearing aid specialist, home hearing care",
+         "Maya: audiologist, the office and home visits",
+         "Lucy: hearing aid specialist, the office"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, hearing aid fitting and the office now show to AI assistants too. Each person hears they can be booked for their own work: Lucy at the office, Noah for home hearing care.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Hearing Center can book you from now on, at the office and for home visits. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Maya"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Hearing Center can book you from now on, at the office. Your day list comes at the time you picked.",
+      {
+       "as": "Lucy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Home Hearing can book you for home hearing care and hearing aid fitting from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Victor"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Hearing aid fitting and Lee Hearing Center now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-13",
+    "does": "Someone calls for a hearing clinic: a wrong number. Rosie says whose line this is, once. Only the call log keeps it.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Is this Oak Street Hearing? I need to move my hearing test."
+     ],
+     [
+      "san",
+      "cust",
+      "This is Lee Home Hearing's booking line, so I can't reach Oak Street Hearing. Please check their number. Goodbye."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-24",
+    "does": "Rosie texts Tessa nothing. Pat adds the address from the call on the Today page and tells Tessa the time. The visit closes when Victor texts DONE.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Booked, with no texts to T. Please tell her the details yourself.",
+      {
+       "as": "Pat",
+       "card": {
+        "title": "T. · Thu Oct 22 · arriving 12–2pm",
+        "lines": [
+         "With Victor",
+         "Add the address on the Today page"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/b8"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety step comes first. Then the booking goes on. Here it's Rosa's call about a blocked ear, in Spanish, with the English under each line.",
+    "more": [
+     "Hearing care's safety step: for an ear that feels blocked, Rosie first asks about sudden hearing loss, fluid or dizziness.",
+     "None: the booking goes on. Any: the next branch, and no booking."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿perdió la audición de repente, le sale líquido del oído, o tiene mareos?",
+      {
+       "lang": "es",
+       "en": "First: did your hearing drop suddenly, is fluid coming from the ear, or are you dizzy?"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No, solo lo siento tapado.",
+      {
+       "lang": "es",
+       "en": "No, it just feels blocked."
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Bien. Si pierde la audición de repente, vea a un médico hoy.",
+      {
+       "lang": "es",
+       "en": "Good. If your hearing drops suddenly, see a doctor today."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For hearing care, hearing that dropped suddenly, ear pain with drainage or a fever, or sudden dizziness or ringing stops the booking.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Hearing that drops suddenly, ear pain with fluid coming out, or sudden dizziness or ringing needs a doctor today. Please see your own doctor, an urgent care or an emergency room today. Don't wait for a hearing test. If your face droops or one side is weak, call 911 now."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's words matched the danger list. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "The words are on the portal, not in this text",
+         "Told to see a doctor today, or call 911"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-15",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "It just stopped working. Can someone come tonight?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Lee Home Hearing can't send someone tonight. Its soonest times start Thu Oct 22. If your hearing drops suddenly, please see a doctor today."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "form": [
+     [
+      "Form",
+      "Health history and consent"
+     ],
+     [
+      "Due",
+      "The day before the visit"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Parking",
+      "Visitor spots by the front door"
+     ],
+     [
+      "Pets",
+      "None"
+     ],
+     [
+      "Gate or door code",
+      "None: sign in at the front desk"
+     ],
+     [
+      "Building rules",
+      "Visits 8am to 6pm, signed in first"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-69",
+    "does": "Where the plug-in says the business may show customers' photos, the page asks once. Hearing care shows no patient photos, so this isn't asked.",
+    "more": [
+     "A no never changes the booking."
+    ],
+    "say": [],
+    "form": []
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "4"
+     ],
+     [
+      "san",
+      "owner",
+      "What's the change?"
+     ],
+     [
+      "owner",
+      "san",
+      "Me instead of Victor, same time"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Thu Oct 22, arriving 8–10am, with Sam?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another change"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-29",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Home Hearing can take your booking with one change. Is this OK?",
+      {
+       "card": {
+        "title": "Your Lee Home Hearing visit",
+        "lines": [
+         "Thu Oct 22 · arriving 8–10am · Sam, not Victor",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Yes, book it",
+        "No, cancel free"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-19",
+    "does": "Rosie offers only a stand-in with the skill for the job, from Sam's team list. Sam does hearing tests too, so Sam can stand in."
+   },
+   {
+    "op": "words",
+    "at": "B7-32",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can we skip next week's hearing tests?",
+      {
+       "as": "Morgan"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. What would you like to do with your plan?",
+      {
+       "as": "Morgan",
+       "buttons": [
+        "Skip this one",
+        "Pause the plan",
+        "End the plan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "Home hearing care saves no card, so no plan visit is charged to one (pf.money.before).",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "words",
+    "at": "B7-55",
+    "does": "Nothing is asked again here: this follows the booking. A visit is sent now only if Alex took 'Send someone now' and someone on call took it. Alex's visit has a set time."
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "more": [
+     "Each job shows what to bring, from the plug-in, like the portable hearing kit and the demo kit.",
+     "Alex's access notes from booking show too, like where to sign in.",
+     "No OMW by 8:30: Victor is nudged, then Sam."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Thu Oct 22. Text OMW when you leave.",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Patient",
+         "Place"
+        ],
+        "rows": [
+         [
+          "8–10am",
+          "A.M.",
+          "16 Brook Rd"
+         ],
+         [
+          "10am–12pm",
+          "K.L.",
+          "The hearing care van"
+         ],
+         [
+          "12–2pm",
+          "D.",
+          "Willow House"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open the day",
+        "link": "rosfield.com/d/j22"
+       },
+       "as": "Victor"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "more": [
+     "The photo link is where a plain text finds the photo.",
+     "If Alex texted STOP, Victor calls instead.",
+     "At a care home, the nurse can meet Victor at the front desk, if the booking says so."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "more": [
+     "The plug-in names the checks, which services need them, and where they're kept.",
+     "A damage claim later is checked against them.",
+     "Hearing care results stay in the office's own chart, never in Rosie or a text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD outlet by the bed sparks, stopped",
+      {
+       "photos": [
+        "The outlet by the bed"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Victor found a problem with the outlet by your bed, so he stopped the visit.",
+      {
+       "card": {
+        "title": "Safety note · 16 Brook Rd",
+        "lines": [
+         "Found: the outlet by the bed sparks",
+         "Not done: today's visit",
+         "Ask the care home to fix the outlet first"
+        ]
+       }
+      }
+     ]
+    ],
+    "does": "Victor finds the outlet by the bed sparks when he plugs in the kit's charger. He stops there, and Alex gets a written note and the photo."
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 30"
+     ],
+     [
+      "san",
+      "cust",
+      "Victor is running behind and expects to reach you about 10:30am, still inside your 10am–12pm window.",
+      {
+       "as": "Kim L.",
+       "buttons": [
+        "That works",
+        "Change the time"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "does": "A what-if: Alex's listening devices take two visits. Alex hears the plan at the start. Each day gets its own on-my-way text and check-in code.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your visit takes two days: today, and Fri Oct 23, arriving 8–10am, to finish. Each day has its own check-in code.",
+      {
+       "buttons": [
+        "That works",
+        "Change day 2"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "does": "A what-if: Victor takes Alex's hearing aid to the clinic, to send to the maker for repair. Alex signs for it, and the return visit is booked.",
+    "more": [
+     "A loaner is left with Alex, where the clinic has one.",
+     "The return visit gets its own code, like any visit.",
+     "Days the aid is away are added to any trial, where the rules say so."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "TAKEN hearing aid to the clinic, back Mon",
+      {
+       "photos": [
+        "The hearing aid, as taken"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Victor took an item from your visit for repair. Please check the photo and sign for it.",
+      {
+       "card": {
+        "title": "Taken for repair · 1 item",
+        "lines": [
+         "Back Mon Oct 26 · arriving 8–10am · Victor"
+        ],
+        "button": "Sign for it",
+        "link": "rosfield.com/s/r4f"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-31",
+    "does": "A what-if: after the visit, Sam sends a proposal for more, like the listening devices Victor noted. Alex signs or declines it on the secure page.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Home Hearing sent you a proposal, from Victor's notes.",
+      {
+       "card": {
+        "title": "Proposal · Lee Home Hearing",
+        "lines": [
+         "Good until Thu Nov 19",
+         "Sign or decline on your secure page"
+        ],
+        "button": "Read it",
+        "link": "rosfield.com/k/r5"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-25",
+    "t": "Thu Oct 22, 11:05am",
+    "does": "A what-if: say Victor sends a full written report of the test to Alex's doctor, as Alex asked. Alex was told at DONE that it's ready Fri Oct 23.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your report will be ready Fri Oct 23. Victor or the office will go over it with you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-30",
+    "more": [
+     "Nothing private goes in the text itself.",
+     "Results are shared only in person."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your report from Thu Oct 22 is ready. Victor will go over it with you in person, at his next visit.",
+      {
+       "card": {
+        "title": "Report ready",
+        "lines": [
+         "Lee Home Hearing · Thu Oct 22",
+         "Shared in person, never by text"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-22",
+    "why": "The example offices charge no late-cancel or missed-visit fee, so every patient is fee-free (pf.money.fees).",
+    "label": "Yes: a fee may be asked"
+   },
+   {
+    "op": "words",
+    "at": "S11-19",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Yesterday, nobody answered for Lee Home Hearing.",
+      {
+       "list": {
+        "plain": true,
+        "rows": [
+         [
+          "2 requests",
+          "Declined at 4 hours"
+         ]
+        ]
+       },
+       "buttons": [
+        "See them",
+        "Set up AWAY"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-40",
+    "does": "Morgan P. asked to talk about her residents' plan. Sam taps Call, and the call goes out from the business's number.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Morgan P. would like to talk about her plan before booking.",
+      {
+       "buttons": [
+        "Call Morgan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-41",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Today, Fri Oct 23, for each business:",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Hearing Center",
+          "1 missed visit · nothing waits on you · first tomorrow: 9:30am"
+         ],
+         [
+          "Lee Home Hearing",
+          "1 missed visit · nothing waits on you · next visit: Mon 8 to 10am, Victor"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-01",
+    "does": "Claude asks for Ivy C., and Gemini for Nora S. Both want Thu Oct 29, arriving 10am to 12pm with Victor, 0.4 seconds apart. Claude asked first, so Ivy's time is saved for 10 minutes."
+   },
+   {
+    "op": "words",
+    "at": "S12-09",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're booked! Give this code to Victor at the door.",
+      {
+       "as": "Ivy C.",
+       "card": {
+        "title": "Lee Home Hearing · Pine Hill",
+        "lines": [
+         "Thu Oct 29 · arriving 10am to 12pm · Victor"
+        ]
+       },
+       "code": "4417"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 visits this week under different names, and nobody was there for any of them. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-19",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Victor can't work Thu. A.M. is booked 8–10am. You're free then, and you do hearing tests too.",
+      {
+       "buttons": [
+        "I'll go myself",
+        "I'll reach them"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Victor from Lee Home Hearing is on the way, about 15 minutes. When Victor arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in.",
+      {
+       "photos": [
+        "Victor, from Lee Home Hearing"
+       ],
+       "photoLink": "rosfield.com/m/r4",
+       "code": "3906",
+       "buttons": [
+        [
+         "2",
+         "It isn't Victor"
+        ]
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "At the door, ask A.M. for their check-in code and text it here."
+     ]
+    ],
+    "more": [
+     "The photo link is where a plain text finds the photo.",
+     "If Alex texted STOP, Victor tells the front desk instead.",
+     "At a care home, the nurse can meet Victor at the front desk, if the booking says so."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE old mark on the wall by the bed",
+      {
+       "photos": [
+        "The room, before",
+        "Wall by the bed, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with A.M.'s job."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE A.M.: next hearing test in 12 months. Bring the sound booth then."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to A.M.'s private record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-40",
+    "say": [
+     [
+      "san",
+      "owner",
+      "M.P. would like to talk about her plan before booking.",
+      {
+       "buttons": [
+        "Call Morgan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "does": "A new person in the home is offered first, never assumed. Alex can take Sam, another time, or a free cancel. Only an audiologist stands in for a test, never a hearing aid specialist.",
+    "more": [
+     "The offer comes first when the plug-in or Sam says a new person needs an OK.",
+     "It also comes first when Alex asked for Victor by name.",
+     "No reply by 8pm Wed: Sam is asked to reach Alex, since nobody new comes without the patient's yes.",
+     "Sam is an audiologist too, so he may take Alex's hearing test."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-19",
+    "does": "The report is ready on the date Alex was told. Rosie texts Alex that it's ready, with no link to the report itself.",
+    "more": [
+     "Test results never go through Rosie.",
+     "The text says only that the report is ready. Victor goes over it in person, at his next visit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-30",
+    "does": "The report is ready on the new date. Alex gets the same text as on time, with no link to the report."
+   },
+   {
+    "op": "after",
+    "at": "B8-19",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "type": "split",
+      "line": [
+       "8.12"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "What is today's visit?",
+      "q": "A test, a fitting, or a repair?",
+      "does": "This follows the booking, so nothing is asked again. Each branch is the visit for one kind of booking.",
+      "needs": [
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "A hearing test",
+        "when": {
+         "price": [
+          "list"
+         ],
+         "before": [
+          "none"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x02",
+          "line": [
+           "8.12"
+          ],
+          "who": "staff",
+          "via": "visit",
+          "t": "Thu Oct 22, 8:35am",
+          "title": "Victor tests Alex's hearing",
+          "does": "In a quiet room at Pine Hill, Alex listens for tones and repeats words through headphones. Victor uses the portable hearing test kit, and checks how each eardrum moves.",
+          "more": [
+           "Only a licensed person runs the test. Here, it's an audiologist.",
+           "A room that isn't quiet enough means a booth test at the clinic later, with no fee for today.",
+           "What the test shows stays in the clinic's chart, never in Rosie or a text."
+          ],
+          "needs": [
+           "pf.visit",
+           "pf.staff"
+          ]
+         },
+         {
+          "id": "B8-x03",
+          "line": [
+           "8.12",
+           "8.22"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "visit",
+          "t": "Thu Oct 22, 8:55am",
+          "title": "Victor explains the results in person",
+          "does": "Victor goes over the results with Alex, with a printed copy to keep. Hearing aids can help. Buying them here is never required.",
+          "more": [
+           "The nurse may sit in if Alex asks. Nobody else is told the results.",
+           "Results never go through Rosie or a text.",
+           "Alex may take the results to any clinic."
+          ],
+          "needs": [
+           "pf.visit",
+           "pf.messages"
+          ]
+         },
+         {
+          "id": "B8-x04",
+          "type": "split",
+          "line": [
+           "8.12",
+           "9.13"
+          ],
+          "who": "cust",
+          "to": "staff",
+          "via": "visit",
+          "t": "Thu Oct 22, 9:00am",
+          "title": "Alex looks at hearing aids from Victor's kit",
+          "q": "Does Alex order hearing aids here?",
+          "does": "Victor shows a few hearing aids from the demo kit, and what Alex's plan pays toward them. Buying them here is never required.",
+          "more": [
+           "For mild to moderate loss, an adult may pick over-the-counter aids instead, from any store."
+          ],
+          "needs": [
+           "pf.rules",
+           "pf.money"
+          ],
+          "branches": [
+           {
+            "label": "Orders a pair here",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "B8-x05",
+              "line": [
+               "9.13",
+               "10.10",
+               "5.4"
+              ],
+              "who": "cust",
+              "to": "san",
+              "via": "page",
+              "title": "Alex signs the agreement; Noah will fit them",
+              "does": "Victor writes the quote: a $2,800 pair. Alex signs the purchase agreement on the secure page, with the trial terms. Noah, the hearing aid specialist, fits them at Pine Hill in about 2 weeks.",
+              "more": [
+               "The agreement shows the price, the $500 deposit, the trial and the return terms, as the state's rules require.",
+               "Sold at a care home, it also carries the right to cancel in writing, where the rules give one.",
+               "Paid privately: a $500 deposit on the secure page when the fitting is booked, and the rest on the bill after it.",
+               "With a plan, the clinic bills its own way.",
+               "Noah's fitting is booked before Victor leaves (after the visit: 'Next visit booked at checkout')."
+              ],
+              "needs": [
+               "pf.money",
+               "pf.rules",
+               "pf.visit"
+              ]
+             }
+            ]
+           },
+           {
+            "label": "Takes the results elsewhere",
+            "end": "merge",
+            "steps": []
+           },
+           {
+            "label": "Not today",
+            "end": "merge",
+            "steps": []
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Hearing aids to fit",
+        "when": {
+         "price": [
+          "list"
+         ],
+         "before": [
+          "deposit"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x06",
+          "line": [
+           "8.12",
+           "8.17"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "visit",
+          "t": "Thu Oct 22, 8:35am",
+          "title": "Victor fits Alex's hearing aids",
+          "does": "Victor sets the new aids to Alex's test results, and checks the fit and the sound. He shows Alex and the nurse how to charge and clean them.",
+          "more": [
+           "The trial starts today, with its last day in writing on the receipt.",
+           "Days the aids spend in the shop for repair are added to the trial, where the rules say so.",
+           "Adjustments in the trial are free."
+          ],
+          "needs": [
+           "pf.visit",
+           "pf.rules"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "A hearing aid repair",
+        "when": {
+         "price": [
+          "visit"
+         ]
+        },
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "8.12"
+          ],
+          "who": "staff",
+          "via": "visit",
+          "t": "Thu Oct 22, 8:40am",
+          "title": "Victor repairs the hearing aid, as OK'd",
+          "does": "With Alex's yes to the price, Victor fits a new receiver and a new charger. He checks the aid in Alex's ear before he leaves.",
+          "more": [
+           "A repair that needs the maker goes to the clinic, with a loaner where there is one.",
+           "The aid's settings stay in the clinic's records, never in Rosie or a text."
+          ],
+          "needs": [
+           "pf.visit"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-15",
+    "more": [
+     "The call-back time is texted to the caller, with who will call.",
+     "Sam or Pat gets a to-do with the time and the summary.",
+     "A caller who says calls are hard gets a text instead, or a relay or captioned call."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Some jobs take more than one visit, like hearing aids: a test one day, and the fitting another. They're booked together, and each visit gets its own code."
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "The plan covers part of it. Alex sees the share before the yes, then books or lets the time go."
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "An order made at the home and not yet given, like hearing aids, can be cancelled in the period the rules set. Here, that's until 11:59pm Mon Oct 26. Work already given can't."
+   },
+   {
+    "op": "words",
+    "at": "S11-49",
+    "does": "Sam sets Noah's last day. Each later job is offered to someone with the skill and the license, with the patient's yes. If nobody can, the patient picks a new time or a free cancel."
+   },
+   {
+    "op": "more",
+    "at": "S11-49",
+    "more": [
+     "No reply in 24 hours: Sam is asked to reach the patient. Nobody is moved without the patient's yes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-12",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Home Hearing's online booking is paused for a few minutes. Nothing was booked or changed. To book now, text or call (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-28",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Home Hearing can't take this booking online today. Please text or call (555) 010-0142."
+     ],
+     [
+      "san",
+      "owner",
+      "Flag: one address tried to book more jobs today than the plug-in allows. Nothing was booked. Rosie's team will check it within 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Home Hearing. Sam Lee added you to the team. Reply YES with your license number to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES AUD-EX-4471",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Hearing tests always need one, and so does fitting hearing aids, where the state licenses it. So Sam's three take the license step."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-19",
+    "more": [
+     "Hearing care: a patient who can't hear calls is reached by email, or a relay or captioned call, never a plain call."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Hearing care bills no stages: aids are a deposit and the rest after the fitting (B8-63), and every visit is one bill."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "sensitive work (health): no rating is asked (the sensitive switch is on)"
+   }
+  ]
+ },
+ "notes": "From: the optometrist (work/prof/optometrist.json, current and reviewed Oct 23). Why: a hearing clinic runs like an eye clinic: a test first in a room with its own equipment, health forms only on the secure page, a health plan checked by hand at the desk, the share paid at the front desk, a device chosen after the test, ordered with a deposit, fitted at a second visit and adjusted after, repairs priced at the visit, no Rosie $2 for a health practice, and a home or care-home side for patients who can't travel. Its renames, no-$2 pairs, off ops and private-text words were carried over and turned into hearing words (subs.js), then reworked step by step.\nNames: Sam Lee, an audiologist, owns Lee Home Hearing LLC (the master's main company: home hearing care and hearing aids, 60 Birch St) and Lee Hearing Center LLC (the second company: the clinic, 410 Maple Ave). Flow A is at the clinic; flow B at Pine Hill care home, 16 Brook Rd, Room 12, where Alex lives. People: Maya (audiologist) and Lucy (hearing aid specialist) at the clinic; Victor (audiologist) and Noah (hearing aid specialist) on the home team; Sam is an audiologist too, so he is the stand-in for a test. Alex's companion at the test is Jo, Alex's brother. License numbers use an obviously fake format (AUD-EX-0452, HA-EX-2287, HC-EX-2098).\nKinds of work: plumbing became home hearing care, electrical became hearing aids (it waits for Victor's own license; the state's form says if a dispensing license or a business registration is needed), the barbershop became the hearing clinic.\nPrices are the example clinic's own, not a standard. Clinic: hearing test and results talk $120 (90 min, sound booth), hearing aid talk free, hearing screening free, earwax removal $45, hearing aid clean and check $40 (free 3 years after buying aids here), repair priced at the visit from the $40 check (the example: $125 = $40 + $70 receiver + $15 domes), child's test $120, aids from $2,800 a pair, over-the-counter aids $799. Home: hearing test $179, repair from the $89 home check (the example: $245), aids fitted at home $2,800 with a $500 deposit, listening devices from a quote ($640).\nMoney A: list|none|counter (the main story: a $120 hearing test, nothing taken, the plan checked by the desk, a $45 copay at the front desk; a free hearing screening rides the same path with nothing to pay) and visit|none|counter (a hearing aid repair priced at the visit, only the $40 clean and check promised, paid at the front desk). The hearing aid deposit at the clinic is paid at the front desk when ordered and the rest at the fitting, so it rides the counter path (A8-x07, A8-x08, A9-03, A10-x01), not a deposit at booking. Left out: a card saved, a hold, a deposit or full price at booking, Rosfield's bill and the saved card (the clinic has a front desk and charges no fees), and photos (nothing is priced from photos).\nMoney B: list|none|own is the main path (a hearing test billed to the resident's plan the clinic's own way); list|none|bill is the same test paid privately ($179 on Rosfield's bill); visit|none|bill is a hearing aid repair at the care home (only the $89 home check promised, the repair OK'd at the visit, Rosfield's bill: private pay, since plans rarely pay repairs); list|deposit|bill is hearing aids fitted at the care home from an earlier test's quote ($2,800, a $500 deposit on the secure page, the $2,300 rest on Rosfield's bill, with bank transfer offered since it's over Sam's $500). Left out: holds, a saved card for fees, full price at booking and photos.\nNo fees: the example clinic charges no late-cancel or missed-visit fee, so S11-22's fee branch is off and every patient is fee-free; where a deposit was paid, a late cancel or a missed visit keeps nothing (B7-10, B7-14, B8-16, B8-60, B8-66).\nNo $2: hearing care is a health practice, so the no-$2 branches stay (S1-62, S1-65, S11-92, S11-94).\nSign-up (S1-12 to S1-18, S1-38 to S1-51) now says how hearing care is really paid: nothing before a test, a plan billed the clinic's own way, private pay and repairs on Rosfield's bill at home, a $500 deposit only for aids fitted at home, aids at the clinic with a deposit at the front desk and the rest at the fitting, no tips and no fees.\nFlow A's own steps: A8-x01 splits the visit by what was booked (a test on the list price; a repair priced at the visit): A8-x02 the test in the sound booth, A8-x03 the OK'd repair. A8-44 is the results talk in person. A8-x05 splits what comes next: after a test, A8-x06 the hearing aid choice (order here, take the results elsewhere, think about it; OTC aids named), A8-x07 the purchase agreement signed on the secure page with the trial terms, A8-x08 the order and the fitting booked (A10-07). After the visit: A10-22 READY when the aids arrive (Thu Nov 5), A10-x01 the fitting (Mon Nov 9) with the rest paid at the desk, A10-x02 the trial starts with its last day in writing (Thu Dec 24) and a free follow-up (Mon Nov 23). A return in the trial goes to A10-09 (Sam OKs the refund under the agreement).\nFlow A's plan check: A4-54's 'The plan's benefit check' branch (A4-37 to A4-59) is the main story's plan check (covered, a $45 copay); a doctor's order the plan asks for is A4-48 (the clinic gets it itself).\nFlow B's own steps: B8-x01 splits the visit by what was booked: a test (B8-x02 the portable kit in a quiet room, B8-x03 the results in person, B8-x04 the hearing aid choice, B8-x05 the agreement signed, Noah fits them in about 2 weeks: B10-18, Thu Nov 5), hearing aids to fit (B8-x06, the trial starts, its last day on the receipt: Sun Dec 6), or a repair (B8-x07). B4-57's contract branch is back on (splitsKept B4-57): hearing aids need a signed purchase agreement where the state's rules require one; B4-61 to B4-60 carry it. B10-05 gives a cancel right only for an order made at the home and not yet given (where the rules give one), never for work already given (B8-24: earwax removal done today has none).\nContact (the profession's own rule): many patients are hard of hearing, so Rosie texts instead of calling and never depends on a patient hearing a call. Every master fallback where Sam or staff 'calls' the patient now reaches them by text first, email, or a relay or captioned call (A7-11, A7-15, A7-16, A7-47, A7-21, A10-14, B7-15, B7-19, B7-22, B8-07, B8-49, B9-11, S11-14, S11-46, S11-49, S11-55, S12-15); the relay steps (A3-09, B3-12) add captioned calls; a 'call first' gets captions or relay (A6-22, S11-83); the secure page offers large print.\nDanger words (pf.safety): hearing that dropped suddenly, ear pain with drainage or a fever, or dizziness or ringing that started suddenly: 'see a doctor today' (own doctor, urgent care or ER) and no booking; stroke signs get 911; crisis words 988. An ear that feels blocked gets one safety question first (A3-23, B3-18), then the booking goes on. Rosie never judges how serious anything is.\nLicenses and scope: who may test or fit whom is a switch from the state's form; in the example clinic a first full test and every child's test are with an audiologist; a hearing aid specialist never stands in for a test beyond their license (A7-15, B7-20). A child needs a parent or guardian (A4-25). Remote adjustments follow the patient's state (pf.license, master A4-36).\nTrial: the hearing aid trial or return period is a switch from the state's form (length, start, days in the shop added, any fee kept and its cap, the refund's due date); the example clinic gives 45 days from the fitting when that's longer. A missed refund date goes to S11-72.\nNobody moves on silence (the decided pattern): with no reply, a patient is never moved to another audiologist; Sam reaches them instead (A7-21 and B7-22 titles 'Holds the time; Sam reaches Alex', B7-20, S11-46, S11-49).\nTexts: customer texts carry only the clinic's name, the date, the time and the place (in flow B also the audiologist's or specialist's name, for the door check): never the visit type, the plan, results or medicines. Owner and staff texts use initials and carry no health detail: the before record says only 'noted in the chart' (A8-23, B8-18), the call summaries carry no reason (A3-13, B3-22, B3-04), the program quote is a 'listening training program'.\nClocks: every listed path runs forward in sections 3 to 10 (checked by a script): A8-x02 11:15am, A8-36 12:20pm, A8-x06 12:15pm, A9-03 12:25 to 12:30pm, A10-22 Thu Nov 5, A10-x01 Mon Nov 9; B8-x02 8:35am, B8-x03 8:55am, B8-x04 9:00am, B8-41 9:10am.\nOff (carried from the pilot, still right): video tests (A4-01), A7-02's plan charge, day-before hold and weather branches at the clinic, A10-06 rented items, A10-30 storage fee, classes, spaces, crews, sent-now work, damage holds, B7-05's plan charge, B10-07's loaner hold, B9-19 tips and pay over time. Kept: an order not fitted (A10-23, words for aids waiting at the clinic), weather and a broken van for a visit in the hearing care van.\nRenames: the pilot's pairs were kept on the master's words with their right sides turned to hearing care; new pairs fix titles and labels (S1-35, A4-13, A7-16, A7-21, A7-47, A8-30, B4-54, B7-22), the clinic's $40 check (the master's $25 consult), and flow B's $89 home check (the master's service call). Kept words: none.\nGaps: a trial or return window that starts at hand-over (A10-05, B10-05); a person's fallback call honors a patient who can't hear calls (S13-19); an order fitted at a second visit booked at ordering (same as the optometrist's 'An order picked up when it's ready').\nReview (Oct 24, fresh reviewer): STOP's rule (A7-11, B7-15, S12-15, S13-02) now says a person reaches the patient by email or a relay or captioned call, as a vary per listed path; S13-19 adds the same; the 'Sam calls' fallbacks left (A7-35, A7-37, A7-50, A8-49, B7-19, B7-33, B7-45, B8-23, B8-35, B8-49, B8-63, B10-13) now reach by text first; results are shared in person only (B10-19, B10-30). Invented services are gone: the membership (A5-03 is the 3 years of free checks; A5-01 'Buys a pack' and A10-05 'Yes: a contract' off), the tinnitus visit (A7-47, A8-34), the listening training program (B8-62, B8-63 are a new pair; B9-19 'Paid in stages' and 'Parts billed after' off). A10-32 is the written quote for a patient who thought about it (old hr25b). Aids at home take the $500 deposit on the secure page when the fitting is booked privately (B8-x05, B10-18). pf.edges.van and .weather, pf.visit.recheck added for the steps that use them.",
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "B8-71",
+   "B8-72",
+   "B5-34"
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "No card, so no $20 fee",
+    "A card saved for the $20 fee · paid after the visit",
+    "D.W.'s $20 payment through Rosie",
+    "Refund · $20",
+    "Card saved for the $20 fee",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "Signature cut and hot towel shave · $55",
+    "Haircut at home · $75",
+    "$75",
+    "$55",
+    "When they book: a card saved, for a $20 fee you OK",
+    "A card saved, only for a $20 fee",
+    "It's charged only for the shop's $20 fee, and only after Sam says yes.",
+    "a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken",
+    "When they book: a card saved for the $89 service-call fee",
+    "$35",
+    "Only the consult; the price stays open",
+    "BS20981",
+    "2 Sam calls Alex",
+    "MP045210",
+    "Every shop service, color and house calls",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "15-minute style consult",
+    "Lena",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "May the shop show photos of your hair?",
+    "photos of your hair",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "A plumber",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "a barbershop",
+    "A barbershop",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "a barber",
+    "A barber",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel shave",
+    "signature cut",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "a color correction",
+    "A color correction",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "a beard trim",
+    "A beard trim",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "a haircut",
+    "A haircut",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "Promises the $25 consult; priced at the chair",
+    "The $25 consult",
+    "the $25 consult",
+    "a consult",
+    "consult",
+    "Consult",
+    "shops",
+    "A shop",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "quote at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "home warranty plan",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "like a skin-test result",
+    "A step-free door on Elm St",
+    "Step-free door on Elm St",
+    "only after a missed check",
+    "pipe",
+    "perm",
+    "cape",
+    "massage",
+    "Massage",
+    "barbershops",
+    "Classic cuts, fades and hot towel shaves.",
+    "doesn't do perms"
+   ],
+   "B": [
+    "Card saved for the $89 fee",
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "When they book: a card saved, for a $20 fee you OK",
+    "A card is saved for the $89 service-call fee. Nothing is taken.",
+    "up to the $89 service call, only if a card, a deposit or the full price was taken",
+    "$89, credited to the repair",
+    "BS20981",
+    "leehomeservices.com",
+    "MP045210",
+    "At my home.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "like a move-out day",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "a plumber",
+    "A plumber",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "Barber",
+    "hot towel shave",
+    "beard trim",
+    "a haircut",
+    "A haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "color",
+    "consult",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "a drain clearing",
+    "A drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "a leak repair",
+    "A leak repair",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Panel upgrade",
+    "credited to the repair",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "the warranty company",
+    "A plan or warranty pays",
+    "Alex says yes before any work",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote",
+    "replacing both shutoff valves for $160",
+    "Not done: the pipe behind the wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "The kitchen drain is clogged again.",
+    "with the store's receipt",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "The repair price",
+    "the repair price",
+    "Book the repair",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "$2,400 repipe",
+    "drying fan",
+    "flush",
+    "faucet",
+    "the shutoff valve",
+    "only after a missed check",
+    "pipes",
+    "pipe",
+    "drain",
+    "Drain",
+    "sink",
+    "water line",
+    "sewer",
+    "shutoff valves",
+    "Shutoff valve",
+    "valve",
+    "supply line",
+    "cabinet",
+    "clog",
+    "clogs",
+    "clog",
+    "repipe"
+   ]
+  },
+  "A": {
+   "S1-29": "ed36650e05",
+   "A10-21": "08514557c8",
+   "A4-64": "b98f95b738",
+   "A7-74": "b3ec278ce4",
+   "S2-31": "320ac5e4cb",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A3-15": "7455c706a3",
+   "A3-30": "b53a513069",
+   "A4-60": "7f7f0f1e66",
+   "A6-04": "fe10e3d360",
+   "A6-17": "63319c6f2d",
+   "A7-03": "13bfc32bcb",
+   "A7-14": "6a57738a17",
+   "A8-04": "8caf7636f3",
+   "A8-05": "bcf176bdb3",
+   "A8-07": "f5c27acdfa",
+   "A8-08": "3662e9ea04",
+   "A8-16": "90a6202deb",
+   "A8-38": "5e48b74f3a",
+   "A10-04": "a716e16e38",
+   "A10-33": "9db84a576a",
+   "A10-14": "b60c13af2d",
+   "S11-02": "d0b2cf9f6c",
+   "A6-02": "d7d5a3ecf5",
+   "S11-13": "f3a4b561e4",
+   "A3-07": "6b005cf195",
+   "A3-12": "d473270a08",
+   "A3-20": "b8251d2535",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A3-26": "9e3630dc0b",
+   "A3-13": "1717178183",
+   "A3-31": "1e97c77c46",
+   "A4-01": "7e7a61082c",
+   "A4-50": "6f43775326",
+   "A4-30": "59603c2ded",
+   "A4-32": "d5a284a416",
+   "A4-14": "95c7ffcfab",
+   "A4-65": "fa7ec0389d",
+   "A4-25": "e9a8fd4868",
+   "A4-43": "c17d56f766",
+   "A4-15": "db5792db95",
+   "A5-03": "f143c87f27",
+   "A6-11": "a728276ed0",
+   "A7-12": "05f64179a4",
+   "A7-94": "6490d5d8e6",
+   "A8-01": "750bd94ee4",
+   "A8-45": "6589a6b4d4",
+   "A10-28": "570a3d0cc4",
+   "A10-29": "329382ef62",
+   "S1-23": "39941a5377",
+   "S1-38": "b50b0bd4e8",
+   "S11-48": "03f824b27b",
+   "S2-02": "b2094081ee",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S11-19": "65910a6777",
+   "S11-40": "0f0f0a5c8f",
+   "S11-41": "24e7a5a9a4",
+   "S12-01": "ba13bd1023",
+   "A10-32": "9f84638bce",
+   "S11-22": "03a7b7ff95",
+   "A3-10": "127abb0101",
+   "A7-15": "7ca3e4c467",
+   "A3-19": "85065db5d4",
+   "A8-24": "c802ca35ab",
+   "A10-22": "c891ad7af1",
+   "A3-22": "0057d8fc9f",
+   "A6-01": "df3c5778ea",
+   "A8-02": "15f418fec4",
+   "A10-05": "63c3536c7a",
+   "A4-23": "9f76d7b6f5",
+   "S11-49": "7ecff02163",
+   "S12-12": "de4cafb8ca",
+   "S12-28": "d18c36b330",
+   "S13-19": "bd36268e04",
+   "A5-01": "6c5c5c2f87",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "S1-29": "69d8f12a68",
+   "B4-29": "9234c5ed40",
+   "B8-03": "ac9d404766",
+   "B10-19": "4806f6eed8",
+   "B10-17": "b5f4aef51b",
+   "B4-74": "bae5529af9",
+   "B7-61": "342b55fd9b",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S2-31": "320ac5e4cb",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B3-25": "4413e58bcb",
+   "B3-22": "19f64ba1ba",
+   "B3-04": "31447caa31",
+   "B4-15": "f13240b9c6",
+   "B6-06": "1d676278da",
+   "B7-07": "954270db4b",
+   "B8-04": "6c9782920d",
+   "B8-05": "90f94e0f1e",
+   "B8-06": "3155d50758",
+   "B8-07": "4589d04c44",
+   "B8-12": "7e627afb46",
+   "B10-04": "b25044fa47",
+   "B10-13": "584c827fda",
+   "B10-16": "c7a47a391c",
+   "S11-02": "b5be5f9aa7",
+   "B6-29": "f9c7deba8d",
+   "S11-13": "4e5f75b209",
+   "S1-23": "5b2324d920",
+   "S1-38": "6301c86637",
+   "S11-48": "6fd1c7b7b9",
+   "S2-02": "b2094081ee",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "B3-13": "7427fd216d",
+   "B3-24": "a31b436ff1",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B4-38": "9539521dc7",
+   "B4-34": "74ff52d83d",
+   "B4-69": "350fbaf90a",
+   "B7-19": "59d20c8e66",
+   "B7-32": "0ca33c9fa6",
+   "B7-91": "7132851ec1",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-18": "530038d2b8",
+   "B8-30": "a1ef4983e4",
+   "B7-18": "d53cef58f7",
+   "B8-37": "3ce85cf051",
+   "B10-31": "97786c6285",
+   "B10-25": "3e0bd84dd3",
+   "B10-30": "5ecd3ded96",
+   "S11-22": "d83ca09a76",
+   "S11-19": "1efef7e356",
+   "S11-40": "af544c4b0a",
+   "S11-41": "b9894f01ce",
+   "S12-01": "a2626c6a34",
+   "S12-09": "26fec306e6",
+   "S12-24": "7514a15e65",
+   "B8-44": "3847104a93",
+   "B7-20": "364245afef",
+   "B8-19": "11e79a26d8",
+   "B3-15": "bbb89eebad",
+   "B4-44": "514c8ab30c",
+   "B4-63": "49ce39c037",
+   "B10-05": "a326ea3c0b",
+   "S11-49": "5d42a1a5ca",
+   "S12-12": "2a74304d36",
+   "S12-28": "6e7a9bf25f",
+   "S13-19": "50e2fbca8d",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255"
+  }
+ }
+}

@@ -1,0 +1,3873 @@
+{
+ "id": "painter",
+ "name": "Painter",
+ "style": "Project",
+ "pattern": "project",
+ "from": "contractor",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a painting contractor license or registration for the company, where the state's form requires one (often above a job size)",
+   "ask": [
+    "The company's license or registration number, and its class",
+    "Any job-size limit the license has",
+    "The firm's lead-safe certificate, for work on older homes where the rules require it",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business; plus a qualifying person where the state's form names one. Each painter who works on older homes holds a lead-safe certificate, where the rules require it.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No painting goes live until the company's license or registration checks out, where one is required",
+    "A job over the license's size limit is never offered or quoted, even a free estimate: the owner is told why",
+    "An older home is offered only if the firm's lead-safe certificate is on file, where the rules require it; if not, no time is offered and the customer is pointed to the kind of business that can help"
+   ],
+   "small_repairs": "Small trim or sill repairs stay inside a paint job only where the state's form says they're part of painting; anything more needs that trade's license",
+   "drywall": "Drywall repair goes live on its own license where the state's form asks for one, and each drywall finisher's own where it asks",
+   "color_shop": "A color consult at the shop needs no license: the shop gives its business registration only",
+   "renewals": "License, certificate, insurance and bond dates kept; reminded 30 days out; a lapse pauses new bookings",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Estimate visit, then project: a paint job is booked only after a written quote and a signed contract",
+   "B": [
+    {
+     "name": "Estimate at the home",
+     "price": "$89, credited to the job if the customer signs (the example business's own price; a free estimate is the safe start)",
+     "length": "60 minutes, plus the drive",
+     "where": "at the customer's place; outside, the customer is needed only for the last 15 minutes",
+     "before": "nothing taken (or the $89 held)",
+     "after": "billed only if no contract follows"
+    },
+    {
+     "name": "Exterior repaint",
+     "price": "quoted after the estimate visit, by the square foot: a written quote within 2 business days, good for 30 days",
+     "length": "about 5 to 7 work days, weather permitting",
+     "where": "at the customer's place; nobody needs to be home on work days",
+     "before": "nothing at booking; a deposit only after the contract is signed",
+     "after": "one last bill, after the walk-through and touch-ups"
+    },
+    {
+     "name": "Interior repaint",
+     "price": "quoted after the estimate visit, by the room",
+     "length": "about 2 to 5 work days",
+     "where": "at the customer's place; someone home, or a lockbox",
+     "before": "the same as the exterior",
+     "after": "the same"
+    },
+    {
+     "name": "Deck refinish (strip, sand, two coats)",
+     "price": "priced from the customer's photos (example: $640); over $500, Sam OKs it",
+     "length": "1 to 2 days, weather permitting",
+     "where": "at the customer's place",
+     "before": "a signed contract where the state's form needs one, then a 25% deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Accent wall painting",
+     "price": "$179, from the list",
+     "length": "2 to 3 hours",
+     "where": "at the customer's place",
+     "before": "the $89 held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Deck staining",
+     "price": "$150, from the list",
+     "length": "half a day, weather permitting",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Fence staining",
+     "price": "$179, from the list",
+     "length": "2 to 3 hours, weather permitting",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "the $89 held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Lead paint test",
+     "price": "$199: paint samples sent to a lab, with a written report",
+     "length": "1 hour at the home; results in a few days",
+     "where": "at the customer's place",
+     "before": "the $89 held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Color samples",
+     "price": "up to 3 sample patches free with a signed paint job; more at $25 each, OK'd by the customer first, unless Sam marks them free"
+    },
+    {
+     "name": "Small trim repairs",
+     "price": "$20 a foot, only as part of a paint job"
+    },
+    {
+     "name": "Labor",
+     "price": "$120 an hour, 1-hour minimum",
+     "where": "added to a job, never booked alone"
+    },
+    {
+     "name": "Change order",
+     "price": "priced, written and signed by both before the changed work; added to the last bill"
+    },
+    {
+     "name": "Drywall (the second kind of work)",
+     "price": "drywall patch $149; ceiling crack repair $189; ceiling replacement by a free estimate, then a quote"
+    }
+   ],
+   "A": [
+    {
+     "name": "Color consult",
+     "price": "$35, 30 minutes",
+     "where": "at the shop; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the shop counter"
+    },
+    {
+     "name": "Exterior color consult",
+     "price": "$40, 30 minutes, with photos of the house",
+     "where": "at the shop",
+     "before": "a card saved",
+     "after": "at the shop counter"
+    },
+    {
+     "name": "Sample board",
+     "price": "$20, an add-on to take home",
+     "where": "at the shop"
+    },
+    {
+     "name": "Room color pick",
+     "price": "$25, 15 minutes",
+     "where": "at the shop"
+    },
+    {
+     "name": "Whole-house color plan",
+     "price": "$55, 60 minutes; credited to the paint job if the customer hires Lee Painting",
+     "where": "at the shop",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Color package (plan, 6 sample boards, sheen guide)",
+     "price": "$140, 2 1/2 hours",
+     "where": "at the shop",
+     "before": "the $40 fee held (over 2 hours), or a $40 deposit",
+     "after": "at the shop counter"
+    },
+    {
+     "name": "Custom finish sample",
+     "price": "priced from the customer's photos (example: $90); Sam OKs each one",
+     "where": "at the shop"
+    },
+    {
+     "name": "Cabinet refinish",
+     "price": "priced at the shop after a $25 look at one door the customer brings",
+     "where": "at the shop"
+    }
+   ],
+   "capacity": "One estimator or color consultant per booking; one crew of 3 per paint job, 2 crews; the shop's one spray booth is saved for custom finish samples",
+   "skills": "Estimates and running a job: crew leads. Older homes: a certified renovator on the job, where the rules require it. Color consults: color consultants. Drywall: a drywall finisher.",
+   "nobody_home": "Outside work days, deck and fence staining: nobody needs to be home; a start and an end photo each day. Inside work: someone home, or a lockbox.",
+   "online": "A color consult can be a video call (counts as at the shop)",
+   "recent_range": "Before an estimate, the AI may show the business's range of recent jobs (example: exterior repaints ran $6,000 to $12,000), labeled as the business's own numbers, never as a quote"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Inside, outside or both?",
+    "How many stories? (ladders and the crew's size)",
+    "The siding or wall type: wood, stucco, fiber cement, vinyl or drywall",
+    "The year the home was built (older homes may need lead-safe work, where the rules require it)"
+   ],
+   "after_time": [
+    "Any peeling, rot or water damage you've seen?",
+    "Does a homeowners' group have rules on colors?",
+    "Do you own the home or rent? (the owner must OK the work)",
+    "Pets or children at home on work days, how to get in, and where the crew can park"
+   ],
+   "secure_page_only": [
+    "Photos of the walls or the house (optional)",
+    "Gate, door or lockbox codes",
+    "Budget range"
+   ],
+   "who_may_book": "An adult who owns the home, or someone with the owner's written OK. A renter's paint job needs the owner to sign.",
+   "shop": [
+    "Which rooms, or the outside of the house",
+    "Photos of the rooms, or a paint chip you like (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a fire, smoke or a gas smell",
+     "says": "Leave the house now, and call 911.",
+     "booking": "no booking"
+    },
+    {
+     "words": "someone fainted, can't breathe, or fell from a ladder",
+     "says": "Call 911 now.",
+     "booking": "no booking"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "a child may have swallowed paint chips or dust from an older home",
+     "says": "Call Poison Help at 1-800-222-1222 and the child's doctor about a lead test. If the child is very sick, call 911.",
+     "booking": "goes on; the words stay out of every text and aren't passed to the business"
+    },
+    {
+     "words": "old paint flaking or chipping in an older home",
+     "says": "Keep children and pets away from the chips, and don't sweep, sand or scrape them. We'll treat the paint as lead until it's tested.",
+     "booking": "goes on; lead-safe work becomes the plan"
+    },
+    {
+     "words": "paint fumes making someone dizzy or sick",
+     "says": "Open the windows and get everyone into fresh air. If anyone has trouble breathing, call 911.",
+     "booking": "goes on"
+    },
+    {
+     "words": "water coming through a ceiling or a wall",
+     "says": "Shut off the water at the main valve, and stay away from wet lights and outlets. Call a plumber first if it's still leaking.",
+     "booking": "goes on; drywall and paint once it's dry"
+    },
+    {
+     "words": "oily rags from staining left in a pile or a bag",
+     "says": "Lay them flat outside to dry, away from the house, or put them in a closed metal can of water. They can catch fire on their own.",
+     "booking": "goes on"
+    }
+   ],
+   "business_line": "Questions about whether old paint is safe to remove yourself go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_quote": "The estimate visit at the home. Outside, the estimator starts without the customer, who is needed only for the last 15 minutes.",
+   "after_contract": [
+    "The cancel window ends before any work starts or paint is bought, where the state's rules give one",
+    "In an older home, the lead pamphlet the rules require, given and signed for before work starts",
+    "Color samples: up to 3 patches; colors and sheens signed on the color sheet before paint is bought",
+    "The work plan, texted before the first work day"
+   ],
+   "prep": [
+    "Keep windows shut and pets inside on work days",
+    "Move cars away from the house, and clear the porch and the walls",
+    "Inside: take small things off the walls; the crew moves furniture to the middle of the room",
+    "Put any gate or lockbox code on the secure page"
+   ],
+   "shop_prep": [
+    "Bring photos of the rooms, taken in daylight",
+    "Bring any paint chip or fabric you want to match"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Estimate visit: the check-in code at the door, when the customer joins for the last 15 minutes. Each work day: that day's code, or a start photo when nobody is home outside. Shop: the code at the desk.",
+   "at_the_visit": "The estimator measures, checks the old paint and photographs any peeling or rot; the written quote follows within 2 business days, good for 30 days",
+   "older_homes": "Paint in an older home is treated as lead unless a test shows otherwise, where the rules require it",
+   "changes": "A written change order, priced and signed by both, before any changed work. Hidden rot found while scraping is priced this way; not signed by the set time, the crew lead calls and the crew paints around it.",
+   "outside_checks": "A lead dust test by an outside inspector after the work, only where the rules require one",
+   "done": "A walk-through with the color sheet; each touch-up fixed and ticked off by the customer before the last bill; then DONE on the last work day",
+   "color_disputes": "A color the customer signed off is a new, priced change",
+   "shop_done": "DONE after the consult, with the colors saved on the color sheet for the estimate",
+   "before_photos": "Peeling paint, soft wood, old stains and anything already damaged"
+  },
+  "pf.money": {
+   "estimate": "The example's $89 estimate visit is credited to the job; billed only if no contract follows. A free estimate is the safe start.",
+   "no_money_before_contract": "On a paint job, nothing is taken before the contract is signed by everyone",
+   "deposit": "Only after signing; the deposit cap comes from the state's form",
+   "kept_apart": "Money paid before the work is kept apart or bonded where the state's rules require it (a switch from the state's form)",
+   "no_payment_ahead": "Never paid ahead of the work done, where the state's rules say so: the last bill comes after the walk-through and touch-ups",
+   "change_orders": "Added to the last bill",
+   "samples": "3 sample patches free; more at the owner's price, OK'd by the customer first",
+   "weather": "A move for weather never costs the customer",
+   "big_bills": "Bank transfer through the company's own Stripe for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the crew lead texts 'paid check'.",
+   "tips": "No tip line",
+   "tax": "Tax on paint and labor follows the state's form",
+   "shop": "The whole-house color plan's $55 is credited to the paint job if the customer hires Lee Painting; the $20 missed-consult fee only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate, door or lockbox codes",
+    "The budget",
+    "A child's possible lead exposure: the safety steps go to the customer only, never to the business",
+    "Contract and change order papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who lets the crew in"
+  },
+  "pf.staff": {
+   "roles": "Crew leads (Tyler, Gabe): estimates, quotes and running each job with a crew of 3. Color consultants (Wren, Hugo) at the shop.",
+   "licenses": "The company holds the license or registration; each painter on an older home holds a lead-safe certificate where the rules require it; drywall finishers hold their own where the state asks. Color consultants need none.",
+   "lead_safe": "A certified renovator on each job in an older home, where the rules require it: on site for setup and cleanup, and directing the trained crew",
+   "sales": "An estimator who sells contracts at the home holds any salesperson registration the state's form asks for",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another crew lead may take an estimate visit; a job keeps its crew lead unless Sam moves it; an older home's stand-in must be a certified renovator"
+  },
+  "pf.rules": {
+   "contract": "A written contract for a paint job where the state's rules require one, signed by everyone on title and by the business before any money",
+   "contract_parts": "The parts the state's form lists (license number, dates, price, deposit, cancel notice, any lien notice, insurance)",
+   "cancel_window": "A cancel window after signing, where the state's rules give one; work and paint purchases wait for it",
+   "lead_safe": "In an older home, lead-safe methods where the rules require them: plastic on the ground, nearby windows shut, warning signs, no open-flame burning, power sanding only with a shroud and a HEPA vacuum, and the cleanup checked before leaving",
+   "pamphlet": "The lead pamphlet the rules require, given before work, with the customer's signed receipt kept",
+   "change_orders": "Written and signed by both before the changed work",
+   "papers": "With the last payment: any lien release the state's rules provide, the signed color sheet and the leftover-paint list",
+   "show": "The license number on the listing, the quote, the contract and the receipt, where the state's rules require it",
+   "warranty": "3 years outside, 2 years inside, against peeling or blistering (the example's own term)",
+   "records": "7 years; lead-safe records as long as the rules require"
+  },
+  "pf.edges": {
+   "weather": "Outside paint needs dry wood, no rain on fresh coats, and the paint maker's lowest temperature: the forecast is checked the day before each outside work day; only the affected days move, and a move never costs the customer",
+   "hidden_rot": "A change order before the fix; not signed by the set time: the crew lead calls, and the crew paints around it",
+   "colors_not_signed": "Not signed by the set day: the crew lead calls; paint is bought only after sign-off, so the dates may move",
+   "new_samples": "More samples on request; past the free ones, priced and OK'd first",
+   "color_dispute": "Goes to Sam; a signed-off color is a new, priced change; the last bill waits",
+   "lead_test": "A lab test of paint chips can show no lead; then the job may run without lead-safe steps, where the rules allow",
+   "mold": "Mold under peeling paint: the crew stops there, and the customer gets a written note",
+   "cancel_after_window": "Sam and the customer settle it; Rosie moves no money on its own",
+   "nobody_home": "Outside work days: start and end photos",
+   "over_license_limit": "Not offered, and the owner is told why",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "multiday",
+   "extrawork",
+   "photos",
+   "banktransfer",
+   "video"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most paint kolor shops set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Kolor consults, sample boards and custom finishes."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Accent walls and deck staining, within 25 miles."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for wallpaper hanging, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Kolor Shop doesn't hang wallpaper."
+   ],
+   [
+    "like a roofer",
+    "like a wallpaper hanger"
+   ],
+   [
+    "skin fades",
+    "kolor consults"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds wallpaper hanging to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Wallpaper hanging for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW wallpaper hanging"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout or a tow"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Painting's"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A painter's example: water through a ceiling gets 'shut off the water at the main'."
+   ],
+   [
+    "A skin fade",
+    "An exterior kolor consult"
+   ],
+   [
+    "a skin fade",
+    "an exterior kolor consult"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Painting and the kolor shop take none."
+   ],
+   [
+    "style consult",
+    "kolor consult"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex manages rentals and asks for a consult every 4 weeks."
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H., who manages rentals, has a kolor consult plan with Riley, every 4 weeks."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una consulta de kolor el sábado."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The cabinet door to price isn't here."
+   ],
+   [
+    "Avery can't be booked until it matches.",
+    "Casey can't be booked until it matches."
+   ],
+   [
+    "Avery · license not found",
+    "Casey · license not found"
+   ],
+   [
+    "Avery · license expired",
+    "Casey · license expired"
+   ],
+   [
+    "Avery stays on the team, and can be booked again once it shows renewed.",
+    "Casey stays on the team, and can be booked again once it shows renewed."
+   ],
+   [
+    "so Lee's Barbershop can't book you until it shows renewed",
+    "so Lee Home Services can't book you until it shows renewed"
+   ],
+   [
+    "Avery's license is checked again when the lookup answers.",
+    "Casey's license is checked again when the lookup answers."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a wet sample board stained a jacket today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A wet sample board stained my jacket."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Wren sees the door"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Aspen St"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do room kolor picks? It's for my son's room."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A kolor consult could mean a paint store or a painter's shop."
+   ],
+   [
+    "2 No person license",
+    "2 No person license: the shop"
+   ],
+   [
+    "Plumbing JP031552",
+    "Lead-safe LS031552"
+   ],
+   [
+    "MP045210",
+    "PC045210"
+   ],
+   [
+    "EC22871",
+    "DW22871"
+   ],
+   [
+    "JE30417",
+    "DW30417"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works independently"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's rooms together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books consults for three rooms on one morning. Rosie finds times side by side with Riley and Avery."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A kolor consult and a room kolor pick work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of the finish you like"
+   ],
+   [
+    "patch test",
+    "test board"
+   ],
+   [
+    "skin-test result",
+    "test board result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during my consult?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The fumes from our new paint make me dizzy. Can I still come in?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: warm gray walls, white trim, eggshell. Hall ceiling stain: primer first"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the hallway."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the hallway"
+   ],
+   [
+    "takes no cut of",
+    "takes no fee on"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Painting"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Kolor Shop LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Kolor Shop"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Painting"
+   ],
+   [
+    "Lee Electric",
+    "Lee Drywall"
+   ],
+   [
+    "1200 Main St",
+    "310 River Rd"
+   ],
+   [
+    "88 Elm St",
+    "64 Aspen St"
+   ],
+   [
+    "Riley",
+    "Wren"
+   ],
+   [
+    "Avery",
+    "Hugo"
+   ],
+   [
+    "Jordan",
+    "Tyler"
+   ],
+   [
+    "Casey",
+    "Gabe"
+   ],
+   [
+    "plumbing and electrical",
+    "painting and drywall"
+   ],
+   [
+    "electrical",
+    "drywall"
+   ],
+   [
+    "Electrical",
+    "Drywall"
+   ],
+   [
+    "Panel upgrade",
+    "Ceiling replacement"
+   ],
+   [
+    "plumber",
+    "painter"
+   ],
+   [
+    "plumbing",
+    "painting"
+   ],
+   [
+    "Plumbing",
+    "Painting"
+   ],
+   [
+    "barbershop",
+    "kolor shop"
+   ],
+   [
+    "Barbershop",
+    "Kolor shop"
+   ],
+   [
+    "Barbering",
+    "Kolor work"
+   ],
+   [
+    "barbers",
+    "kolor consultants"
+   ],
+   [
+    "barber",
+    "kolor consultant"
+   ],
+   [
+    "Barber",
+    "Kolor consultant"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Whole-house kolor plan"
+   ],
+   [
+    "Signature cut and shave",
+    "Whole-house kolor plan"
+   ],
+   [
+    "signature cut",
+    "whole-house kolor plan"
+   ],
+   [
+    "Groom's package",
+    "Kolor package"
+   ],
+   [
+    "Color and cut",
+    "Custom finish sample"
+   ],
+   [
+    "color and cut",
+    "custom finish sample"
+   ],
+   [
+    "Color correction",
+    "Cabinet door refinish"
+   ],
+   [
+    "color correction",
+    "cabinet door refinish"
+   ],
+   [
+    "color quote",
+    "finish quote"
+   ],
+   [
+    "color",
+    "custom finish"
+   ],
+   [
+    "Color",
+    "Custom finish"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Room kolor pick"
+   ],
+   [
+    "Kids cut",
+    "Room kolor pick"
+   ],
+   [
+    "kids cut",
+    "room kolor pick"
+   ],
+   [
+    "Skin fade",
+    "Exterior kolor consult"
+   ],
+   [
+    "Beard trim",
+    "Sample board"
+   ],
+   [
+    "beard trim",
+    "sample board"
+   ],
+   [
+    "Haircuts",
+    "Kolor consults"
+   ],
+   [
+    "haircuts",
+    "kolor consults"
+   ],
+   [
+    "Haircut",
+    "Kolor consult"
+   ],
+   [
+    "haircut",
+    "kolor consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the shop"
+   ],
+   [
+    "estimate visit",
+    "estimate"
+   ],
+   [
+    "Gloss to finish",
+    "New knobs"
+   ],
+   [
+    "gloss",
+    "knobs"
+   ],
+   [
+    "water heater",
+    "deck"
+   ],
+   [
+    "kolor",
+    "color"
+   ],
+   [
+    "Kolor",
+    "Color"
+   ],
+   [
+    "does custom finish",
+    "does custom finishes"
+   ]
+  ],
+  "B": [
+   [
+    "Harper gets the notice",
+    "Alex gets the notice"
+   ],
+   [
+    "Harper's first cancel message",
+    "Alex's first cancel message"
+   ],
+   [
+    "only in Harper's own words",
+    "only in Alex's own words"
+   ],
+   [
+    "11:59pm Tue Oct 27",
+    "11:59pm Mon Nov 2"
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Painting · Painting job"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · Painting job"
+   ],
+   [
+    "Book this drain clearing?",
+    "Book this painting job?"
+   ],
+   [
+    "can clear the drain",
+    "can do this painting job"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And what needs painting: inside, outside or both?"
+   ],
+   [
+    "a camera inspection",
+    "a lead paint test"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most paint kolor shops start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules paint kolor shops often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Kolor consults, sample boards and custom finishes."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about painting the outside of my house."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I want one wall a new kolor' fits an accent wall painting."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please move cars away from the house, and clear the porch."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found paint peeling on the porch rail this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an estimate for a deck, tomorrow,"
+   ],
+   [
+    "like a $620 repair",
+    "like the $8,600 repaint"
+   ],
+   [
+    "leak repair is $620",
+    "exterior repaint is $8,600"
+   ],
+   [
+    "Leak repair · $620",
+    "Exterior repaint · $8,600"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Siding, trim and doors · $8,240"
+   ],
+   [
+    "Supply line · $80",
+    "Lead-safe prep · $360"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like painting a neighbor's fence without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding the front door? Say so.'"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · exterior repaint"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds wallpaper hanging to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Wallpaper hanging for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW wallpaper hanging"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 hallway repaint"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like repainting the hallway Tyler noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to repaint the hallway, from Tyler's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Repaint the hallway"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout or a tow"
+   ],
+   [
+    "LATE camera report",
+    "LATE lab results"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "An exterior repaint happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Painting doesn't do, like a fallen tree."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Painting does painting and drywall, not tree work. Nothing was saved. You can look for a tree service near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Painting's"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: inside or outside, how many stories, the siding and the year the home was built."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a fire, a gas smell, fumes making someone sick, or a child who ate paint chips."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE peeling on the south side, soft trim by the back door"
+   ],
+   [
+    "Under the sink, before",
+    "South wall, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Back door trim, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A repaint is quoted after the estimate: only the $89 visit was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Tyler finds mold under the peeling paint in the bathroom. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold under the bathroom paint"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold under the bathroom paint"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Tyler found mold under the peeling paint in your bathroom and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the bathroom wall"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left paint drips on the porch.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left paint drips on the porch."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Tyler look at my kitchen walls next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Tyler's next times for an inside estimate."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the inside estimate for today"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Entra agua por el techo y se cae la pintura."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Water is coming through the ceiling, and the paint is falling."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A painter's example: water through a ceiling gets 'shut off the water at the main'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to shut off the water at the main and stay away from wet lights. If there's a gas smell, Rosa leaves and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Cierre la llave principal del agua y no toque luces ni enchufes mojados. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Shut off the water at the main, and don't touch wet lights or outlets. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to sand the old paint on my windows myself?"
+   ],
+   [
+    "a dripping faucet",
+    "a chipped cabinet door"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The cabinet door is a touch-up, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "a leak repair",
+    "an exterior repaint"
+   ],
+   [
+    "A drain clearing",
+    "An accent wall painting"
+   ],
+   [
+    "a drain clearing",
+    "an accent wall painting"
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It's under the paint warranty."
+   ],
+   [
+    "It's inside the 1-year labor warranty",
+    "It's inside the paint warranty"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 front door 165 door trim 80"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Front door · $165"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Tyler looks at the door and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Tyler looked at your door. Here's the price to paint it today."
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the job"
+   ],
+   [
+    "today's repair",
+    "today's work"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "the repair price",
+    "the price"
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Shut off the water at the main, and keep away from any outlet the water reaches."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Painting and the kolor shop take none."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs a lead test first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "It will be ready Mon Oct 26.",
+    "They will be ready Mon Oct 26."
+   ],
+   [
+    "Video and Jordan's notes",
+    "Lab report and Tyler's notes"
+   ],
+   [
+    "sewer camera report",
+    "lead test results"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Do I need to be home the whole time?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Tyler says no. Tyler needs you only for the last 15 minutes."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The paint is falling off in sheets. Can someone come tonight?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Tyler needs more paint from the paint store."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting more paint, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Tyler went to get more paint and will be back about 9:30am."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Tyler hurts a hand on a ladder and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT fell off a ladder, my hand, need to stop"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Tyler's ladder scratched the porch floor at Alex M.'s. The before photo shows no scratch."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE ladder scratched the porch floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched porch floor"
+   ],
+   [
+    "cracks the cabinet floor",
+    "scratches the porch floor with a ladder"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a painter stain a fence this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Fence staining"
+   ],
+   [
+    "yard drain",
+    "fence staining"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa accent wall Thu 12-2 Gabe"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: touch-up painting at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's touch-up painting?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I want an accent wall in my living room. Can a painter come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "The wall behind the couch. Just a few nail holes."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, please"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Will the crew need to move furniture?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the wall is now bubbling and wet."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The wall behind the couch is bubbling, and it's wet now."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 accent wall"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE kolor: deep green, eggshell. Leftover paint in the hall closet, labeled."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The accent wall peels at one corner 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The accent wall is peeling at one corner."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s accent wall, painted Thu Oct 22, is peeling at one corner."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your accent wall is under warranty"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you stain my deck every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Painting has a yearly deck staining plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a deck staining every year."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Tyler finds both porch columns peeling."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 paint both porch columns, peeling"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves",
+    "Extra for Alex M.: paint both porch columns"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Paint both porch columns"
+   ],
+   [
+    "replacing both shutoff valves",
+    "painting both porch columns"
+   ],
+   [
+    "the shutoff valves",
+    "the porch columns"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 porch column quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 porch column work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Tyler also test the old paint for lead?"
+   ],
+   [
+    "Sewer camera report",
+    "Lead test results"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the lead test results link"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your hallway repaint"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Accent wall painting"
+   ],
+   [
+    "Drain clearings",
+    "Accent walls"
+   ],
+   [
+    "Drain clearing",
+    "Accent wall painting"
+   ],
+   [
+    "drain clearing",
+    "accent wall painting"
+   ],
+   [
+    "the kitchen drain",
+    "the accent wall"
+   ],
+   [
+    "Kitchen drain",
+    "Accent wall"
+   ],
+   [
+    "kitchen drain",
+    "accent wall"
+   ],
+   [
+    "Water heater flush",
+    "Deck staining"
+   ],
+   [
+    "water heater flush",
+    "deck staining"
+   ],
+   [
+    "drain",
+    "accent wall"
+   ],
+   [
+    "leehomeservices.com",
+    "leepainting.com"
+   ],
+   [
+    "2 No person license",
+    "2 No person license: the shop"
+   ],
+   [
+    "Plumbing JP031552",
+    "Lead-safe LS031552"
+   ],
+   [
+    "MP045210",
+    "PC045210"
+   ],
+   [
+    "EC22871",
+    "DW22871"
+   ],
+   [
+    "JE30417",
+    "DW30417"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works independently"
+   ],
+   [
+    "takes no cut of",
+    "takes no fee on"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's consults are in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Kolor Shop can do your kolor consult at the shop for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Painting LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Painting"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Kolor Shop"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Painting"
+   ],
+   [
+    "Lee Electric",
+    "Lee Drywall"
+   ],
+   [
+    "1200 Main St",
+    "310 River Rd"
+   ],
+   [
+    "88 Elm St",
+    "64 Aspen St"
+   ],
+   [
+    "42 Oak St",
+    "28 Cedar Ln"
+   ],
+   [
+    "Riley",
+    "Wren"
+   ],
+   [
+    "Avery",
+    "Hugo"
+   ],
+   [
+    "Jordan",
+    "Tyler"
+   ],
+   [
+    "Casey",
+    "Gabe"
+   ],
+   [
+    "plumbing and electrical",
+    "painting and drywall"
+   ],
+   [
+    "electrical",
+    "drywall"
+   ],
+   [
+    "Electrical",
+    "Drywall"
+   ],
+   [
+    "Panel upgrade",
+    "Ceiling replacement"
+   ],
+   [
+    "plumber",
+    "painter"
+   ],
+   [
+    "plumbing",
+    "painting"
+   ],
+   [
+    "Plumbing",
+    "Painting"
+   ],
+   [
+    "barbershop",
+    "kolor shop"
+   ],
+   [
+    "barbers",
+    "kolor consultants"
+   ],
+   [
+    "barber",
+    "kolor consultant"
+   ],
+   [
+    "Barber",
+    "Kolor consultant"
+   ],
+   [
+    "color",
+    "custom finish"
+   ],
+   [
+    "haircut",
+    "kolor consult"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the shop"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "service call",
+    "estimate"
+   ],
+   [
+    "Service call",
+    "Estimate"
+   ],
+   [
+    "estimate visit",
+    "estimate"
+   ],
+   [
+    "$640 water heater",
+    "$640 deck refinish"
+   ],
+   [
+    "Water heater replacement",
+    "Deck refinish"
+   ],
+   [
+    "water heater replacement",
+    "deck refinish"
+   ],
+   [
+    "replaces water heaters",
+    "refinishes decks"
+   ],
+   [
+    "Leak repair",
+    "Exterior repaint"
+   ],
+   [
+    "leak repair",
+    "exterior repaint"
+   ],
+   [
+    "Sewer camera inspection",
+    "Lead paint test"
+   ],
+   [
+    "sewer camera inspection",
+    "lead paint test"
+   ],
+   [
+    "water heaters",
+    "decks"
+   ],
+   [
+    "Water heater",
+    "Deck"
+   ],
+   [
+    "water heater",
+    "deck"
+   ],
+   [
+    "kolor",
+    "color"
+   ],
+   [
+    "Kolor",
+    "Color"
+   ],
+   [
+    "does custom finish",
+    "does custom finishes"
+   ]
+  ]
+ },
+ "keep": [
+  "cabinet",
+  "drips",
+  "leak",
+  "roofer",
+  "estimate visit"
+ ],
+ "splitsKept": {
+  "A": [
+   "S2-28",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "S2-28",
+   "B5-34",
+   "B8-65",
+   "B8-69",
+   "B8-72"
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Color Shop, Sam's paint color showroom, for a color consult with Wren on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Painting to repaint the outside of Alex's 1952 house at 28 Cedar Ln. Tyler comes for the estimate Thu Oct 22 between 8 and 10am, sends a written quote, and runs the job once the contract and the colors are signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Color consult, $35 at the shop; a card saved for the $20 missed-consult fee; paid at the shop counter.",
+    "list|none|counter": "Color consult, $35; nothing taken; a YES books it; paid at the shop counter.",
+    "list|full|none": "Whole-house color plan, $55, paid in full when booking; credited to the paint job if Alex hires Lee Painting.",
+    "list|deposit|counter": "Color package, $140 (2½ hours); a $40 deposit now; the $100 rest at the shop counter.",
+    "photos|card|counter": "Custom finish sample, priced from Alex's photos at $90 (Sam OKs it); a card saved for the $20 fee; paid at the counter."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Color consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Color consult"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Whole-house color plan"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Color package"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Custom finish sample"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "photos|deposit|bill",
+    "list|card|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "Exterior repaint: the $89 estimate, nothing taken; Tyler's written quote of $8,600; the contract and an $860 deposit; the last $7,980 (with a $240 change order) on the bill Rosie texts.",
+    "visit|none|own": "The same repaint, but Sam bills the deposit and the last payment his own way; Rosie sends nothing about money.",
+    "visit|card|bill": "The same repaint, with a card saved when Alex books, for the $89 estimate if Alex cancels late or isn't there.",
+    "photos|deposit|bill": "A deck refinish priced from photos at $640 (over $500, so Sam OKs it); the contract signed on the page; a 25% deposit of $160; the rest on the bill.",
+    "list|card|bill": "Accent wall painting, $179 from the list: a card saved for the $89 late-cancel fee; Rosie texts the bill after the job."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Accent wall painting"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Accent wall painting"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Deck refinish"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Deck refinish"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Exterior repaint"
+    }
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A5-16",
+    "more": [
+     "Sam's setting: a whole-house color plan is credited to the paint job if Alex hires Lee Painting."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the estimate at home",
+      "does": "Wren saves Alex's colors on a color sheet. If Alex wants the house painted, Wren books Tyler's estimate at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Painting, Sam's other company. It runs in the other flow.",
+       "The color sheet goes with it, so Tyler's quote uses those colors.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: estimate at home for an exterior repaint. Color sheet saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Wren saved your colors. Want Lee Painting to come measure for a quote?",
+        {
+         "buttons": [
+          "Book the estimate",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A color consult is for the home's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The shop books a color consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The shop books a color consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The shop books a color consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A color consult has no form to sign first; a paint job's contract comes after its quote, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Painting and drywall are licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Painting, drywall and the color shop all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The painter's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and color consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, paint jobs and color consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Painting is never sent now: estimates and paint jobs are booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A color shop and a paint job bill no plan or insurance; the customer pays."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A color shop and a paint job bill no plan or insurance; the customer pays."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A color consult never keeps a child without a parent."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "The home is from 1952, so it's marked as a lead-safe job, where the rules require it. Only a crew lead with a lead-safe certificate is sent.",
+     "That mark reaches the crew too, on every work day."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-03",
+    "more": [
+     "Outside, Tyler walks the house first, without Alex. Alex joins for the last 15 minutes and gives the code then.",
+     "If Alex never comes out, Tyler texts DONE with a photo of the house instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "does": "Tyler measures the house and checks the old paint. It's from 1952, so Tyler treats it as lead. On Fri Oct 23, the written quote reaches Alex's secure page, once Sam OKs it.",
+    "more": [
+     "It's over Sam's $500, so Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+     "The quote is good for 30 days. Since the $89 estimate is credited to the job, it's billed only if Alex doesn't sign.",
+     "It's priced by the square foot from Sam's list, with the lead-safe prep as its own line.",
+     "Any fact the state's rules require, like a license number, is on the quote.",
+     "The job is checked against the job limit the owner gave, where the plug-in sets one."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 8600 exterior repaint, lead-safe. Scope on the page",
+      {
+       "photos": [
+        "House, measured",
+        "Peeling on the south side"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Tyler's quote for Alex M. is $8,600. It's over your $500 limit.",
+      {
+       "card": {
+        "title": "Exterior repaint · $8,600",
+        "lines": [
+         "Two coats, trim, 14 windows and 2 doors",
+         "Lead-safe prep, about 6 work days"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Here's your written quote from Lee Painting. It's good until Sun Nov 22.",
+      {
+       "card": {
+        "title": "Exterior repaint · $8,600",
+        "lines": [
+         "Wash, scrape, prime, two coats, trim and doors",
+         "Done the lead-safe way",
+         "$860 deposit once the contract is signed",
+         "$7,740 after the walk-through and touch-ups",
+         "Paid on the bill we text you"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/p8"
+       },
+       "buttons": [
+        "Sign the contract",
+        "Not now"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 8600 exterior repaint, lead-safe. Scope on the page",
+        {
+         "photos": [
+          "House, measured",
+          "Peeling on the south side"
+         ]
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Tyler's quote for Alex M. is $8,600. It's over your $500 limit.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Two coats, trim, 14 windows and 2 doors",
+           "Lead-safe prep, about 6 work days"
+          ]
+         },
+         "buttons": [
+          "Send it",
+          "Change it"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's your written quote from Lee Painting. It's good until Sun Nov 22.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Wash, scrape, prime, two coats, trim and doors",
+           "Done the lead-safe way",
+           "$860 deposit once the contract is signed",
+           "$7,740 after the walk-through and touch-ups",
+           "Billed by Lee Painting, its own way"
+          ],
+          "button": "Read the quote",
+          "link": "rosfield.com/q/p8"
+         },
+         "buttons": [
+          "Sign the contract",
+          "Not now"
+         ]
+        }
+       ]
+      ]
+     },
+     "after:card": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 8600 exterior repaint, lead-safe. Scope on the page",
+        {
+         "photos": [
+          "House, measured",
+          "Peeling on the south side"
+         ]
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Tyler's quote for Alex M. is $8,600. It's over your $500 limit.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Two coats, trim, 14 windows and 2 doors",
+           "Lead-safe prep, about 6 work days"
+          ]
+         },
+         "buttons": [
+          "Send it",
+          "Change it"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's your written quote from Lee Painting. It's good until Sun Nov 22.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Wash, scrape, prime, two coats, trim and doors",
+           "Done the lead-safe way",
+           "$860 deposit once the contract is signed",
+           "$7,740 after the walk-through and touch-ups",
+           "Charged to your saved card"
+          ],
+          "button": "Read the quote",
+          "link": "rosfield.com/q/p8"
+         },
+         "buttons": [
+          "Sign the contract",
+          "Not now"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit": {
+      "more": [
+       "It's over Sam's $500, so Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+       "The quote is good for 30 days. Alex paid the $89 estimate as a deposit, and it's taken off the total.",
+       "It's priced by the square foot from Sam's list, with the lead-safe prep as its own line.",
+       "Any fact the state's rules require, like a license number, is on the quote.",
+       "The job is checked against the job limit the owner gave, where the plug-in sets one."
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "more": [
+       "It's over Sam's $500, so Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+       "The quote is good for 30 days. Alex paid the $89 estimate as a deposit, and it's taken off the total.",
+       "It's priced by the square foot from Sam's list, with the lead-safe prep as its own line.",
+       "Any fact the state's rules require, like a license number, is on the quote.",
+       "The job is checked against the job limit the owner gave, where the plug-in sets one."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 8600 exterior repaint, lead-safe. Scope on the page",
+        {
+         "photos": [
+          "House, measured",
+          "Peeling on the south side"
+         ]
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Tyler's quote for Alex M. is $8,600. It's over your $500 limit.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Two coats, trim, 14 windows and 2 doors",
+           "Lead-safe prep, about 6 work days"
+          ]
+         },
+         "buttons": [
+          "Send it",
+          "Change it"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's your written quote from Lee Painting. It's good until Sun Nov 22.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Wash, scrape, prime, two coats, trim and doors",
+           "Done the lead-safe way",
+           "$860 deposit once the contract is signed",
+           "$7,740 after the walk-through and touch-ups",
+           "Charged to your saved card"
+          ],
+          "button": "Read the quote",
+          "link": "rosfield.com/q/p8"
+         },
+         "buttons": [
+          "Sign the contract",
+          "Not now"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "more": [
+       "It's over Sam's $500, so Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+       "The quote is good for 30 days. Alex paid the $89 estimate as a deposit, and it's taken off the total.",
+       "It's priced by the square foot from Sam's list, with the lead-safe prep as its own line.",
+       "Any fact the state's rules require, like a license number, is on the quote.",
+       "The job is checked against the job limit the owner gave, where the plug-in sets one."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 8600 exterior repaint, lead-safe. Scope on the page",
+        {
+         "photos": [
+          "House, measured",
+          "Peeling on the south side"
+         ]
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Tyler's quote for Alex M. is $8,600. It's over your $500 limit.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Two coats, trim, 14 windows and 2 doors",
+           "Lead-safe prep, about 6 work days"
+          ]
+         },
+         "buttons": [
+          "Send it",
+          "Change it"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's your written quote from Lee Painting. It's good until Sun Nov 22.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Wash, scrape, prime, two coats, trim and doors",
+           "Done the lead-safe way",
+           "$860 deposit once the contract is signed",
+           "$7,740 after the walk-through and touch-ups",
+           "Billed by Lee Painting, its own way"
+          ],
+          "button": "Read the quote",
+          "link": "rosfield.com/q/p8"
+         },
+         "buttons": [
+          "Sign the contract",
+          "Not now"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "does": "Alex doesn't sign now. Only the $89 estimate is owed, and the quote stays good until Sun Nov 22.",
+    "more": [
+     "Tyler texts DONE 89 estimate. The bill, or the business's own bill, is $89.",
+     "Alex can sign later from the same page, until the quote's date.",
+     "Alex can ask for a call first. Tyler or Sam calls, and the quote stays open."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your quote stays good until Sun Nov 22. For now, only the $89 estimate is billed.",
+      {
+       "card": {
+        "title": "Exterior repaint · $8,600",
+        "lines": [
+         "Good until Sun Nov 22"
+        ],
+        "button": "Sign it later",
+        "link": "rosfield.com/q/p8"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit+before:deposit": {
+      "does": "Alex doesn't sign now. The $89 deposit pays for the estimate, so nothing more is charged. The quote stays good until Sun Nov 22.",
+      "more": [
+       "Tyler texts DONE 89 estimate. The deposit already paid it, so no bill or charge goes out.",
+       "Alex can sign later from the same page, until the quote's date.",
+       "Alex can ask for a call first. Tyler or Sam calls, and the quote stays open."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "No problem. Your $89 deposit pays for the estimate, so nothing more is charged. Your quote stays good until Sun Nov 22.",
+        {
+         "card": {
+          "title": "Exterior repaint · $8,600",
+          "lines": [
+           "Good until Sun Nov 22"
+          ],
+          "button": "Sign it later",
+          "link": "rosfield.com/q/p8"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "does": "Alex hasn't answered the quote in 5 days. Rosie sends one reminder. Still no answer 2 days later: Sam picks to call Alex, or let the quote run to its date.",
+    "more": [
+     "Nothing starts without the signed contract.",
+     "Let it run: only the $89 estimate is owed, the same as Not now.",
+     "Alex can still sign from the page until Sun Nov 22.",
+     "Rosie sends no more texts about it.",
+     "No answer from Sam in 2 days: the quote runs to its date, as with Let it run."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "A reminder: your painting quote from Lee Painting is good until Sun Nov 22.",
+      {
+       "card": {
+        "title": "Exterior repaint · $8,600",
+        "lines": [
+         "Good until Sun Nov 22"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/p8"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered Tyler's $8,600 painting quote in 7 days. It's good until Sun Nov 22.",
+      {
+       "buttons": [
+        "I'll call Alex",
+        "Let it run"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Wed Oct 28, 10:00am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-62",
+    "does": "Alex taps Sign the contract on the quote's page. Rosie builds it from the quote and the parts the state's rules require. Everyone on the home's title signs, then Sam does.",
+    "more": [
+     "A co-owner signs on a link Alex forwards. Rosie never texts them itself.",
+     "The home is from 1952. Alex ticks a box for the lead pamphlet the rules require, and that receipt is kept.",
+     "Sam signs within 24 hours. Each one gets a copy by text and email.",
+     "Nothing is taken before everyone has signed.",
+     "Not signed by Sun Nov 22: one reminder 3 days before, then the quote lapses. Only the $89 estimate is owed.",
+     "The contract shows the license number and the state's notices, where the rules require them."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. signed the painting contract. Please sign it too. Nothing is charged until you do.",
+      {
+       "card": {
+        "title": "Contract · Exterior repaint · $8,600",
+        "lines": [
+         "Signed by Alex M. · Mon 7:40pm",
+         "Lead pamphlet received"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/p8"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Painting signed your contract. Your copy is on the page and in your email.",
+      {
+       "card": {
+        "title": "Contract signed by both",
+        "lines": [
+         "Exterior repaint · $8,600",
+         "Alex M. · Mon Oct 26",
+         "Sam Lee · Tue Oct 27"
+        ],
+        "button": "See your copy",
+        "link": "rosfield.com/k/p8"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Mon Oct 26, 7:40pm"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-63",
+    "does": "With both signatures in, Alex pays the $860 deposit on the secure page, into Lee Painting's own Stripe. The contract set it, within the state's cap. Then Alex picks the start.",
+    "more": [
+     "Where the state's rules say money paid before the work is kept apart, it goes to the account Sam named at sign-up.",
+     "Not paid in 2 days: one reminder. A day later, Sam is asked to call Alex or cancel under the contract.",
+     "No work starts and no paint is bought until the cancel window ends.",
+     "No start picked in 48 hours: one reminder, then Sam calls. The deposit stays."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your contract is signed. The next step is the deposit.",
+      {
+       "pay": {
+        "amount": "$860",
+        "what": "your painting deposit",
+        "link": "rosfield.com/p/p8d"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Paid: your $860 deposit to Lee Painting. The receipt is on the page. Pick your start day:",
+      {
+       "times": [
+        "Mon Nov 9 · start · Tyler",
+        "Mon Nov 16 · start · Tyler"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Tue Oct 27, 8:20am"
+     },
+     "price:visit+after:own": {
+      "t": "Tue Oct 27, 8:20am",
+      "does": "With both signatures in, Sam bills the $860 deposit outside Rosie, as the contract set. Rosie sends nothing about money. Alex picks the start.",
+      "more": [
+       "Rosfield's $2 for this booking goes on the monthly bill.",
+       "Sam bills the last payment outside Rosie too.",
+       "No work starts and no paint is bought until the cancel window ends."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your contract is signed. Lee Painting bills the deposit its own way. Pick your start day:",
+        {
+         "times": [
+          "Mon Nov 9 · start · Tyler",
+          "Mon Nov 16 · start · Tyler"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B8-78",
+    "steps": [
+     {
+      "id": "B8-x03",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "t": "Tue Nov 3, 9:00am",
+      "title": "Tyler paints samples; Alex signs the colors",
+      "q": "Are the colors signed by Thu Nov 5?",
+      "does": "The window ends with no cancel. Tyler paints 3 sample patches on the south wall. Alex picks the colors and sheens on the color sheet, on the secure page.",
+      "more": [
+       "Paint is bought only after the color sheet is signed, the same way as the contract.",
+       "Up to 3 patches are free. More are priced from Sam's list, and Alex OKs them first.",
+       "Due Thu Nov 5 at 6pm, so the paint arrives before the start."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "SAMPLES 3 patches on the south wall",
+        {
+         "photos": [
+          "Three sample patches"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Tyler painted 3 samples on your south wall. Pick your colors on the color sheet by Thu Nov 5.",
+        {
+         "card": {
+          "title": "Color sheet · Exterior repaint",
+          "lines": [
+           "Body, trim and door colors",
+           "A sheen for each",
+           "Paint is bought once you sign"
+          ],
+          "button": "Pick and sign",
+          "link": "rosfield.com/c/p8"
+         },
+         "buttons": [
+          "Sign the colors",
+          "New samples"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs the colors",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Wants new samples",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "line": [
+           "4.14",
+           "8.8"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Tue Nov 3, 6:10pm",
+          "title": "Prices 2 more samples; Alex OKs them",
+          "does": "Alex wants two lighter grays to try. They're past the 3 free patches, so Alex sees the price and OKs it first. Tyler paints them Wed morning.",
+          "more": [
+           "Two more patches are $25 each, from Sam's list. The $50 goes on the last bill.",
+           "If Sam marks them free, nothing is added.",
+           "Alex signs the color sheet Wed evening, and the start stays."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "cust",
+            "Two more samples are $25 each, $50 in all. It goes on your last bill.",
+            {
+             "card": {
+              "title": "2 more samples · $50",
+              "lines": [
+               "Painted Wed Nov 4, morning",
+               "On your last bill"
+              ]
+             },
+             "buttons": [
+              "Yes, paint them",
+              "No, thanks"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.services"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Not signed by Thu",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x05",
+          "line": [
+           "7.16",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "staff",
+          "via": "msg",
+          "t": "Thu Nov 5, 6:00pm",
+          "title": "Asks Tyler to call about the colors",
+          "does": "The color sheet isn't signed by Thu 6pm. Tyler gets a to-do to call Alex. Paint is bought only after the sign-off, so the start may move.",
+          "more": [
+           "A move caused by the colors costs Alex nothing, but the dates may slip.",
+           "Once Alex signs, the paint is ordered, and Alex gets the work plan."
+          ],
+          "say": [
+           [
+            "san",
+            "staff",
+            "Alex M. hasn't signed the color sheet. The paint order waits for it. Please call Alex today.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me at 10am"
+             ]
+            }
+           ],
+           [
+            "san",
+            "cust",
+            "Tyler will call you about your colors. Paint is bought only after you sign, so the painting days may move."
+           ]
+          ],
+          "tells": [
+           "staff",
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "vary": {
+     "price:visit": {
+      "t": "Fri Nov 6, 10:00am",
+      "does": "The colors are signed, and the paint is ordered. Alex gets the work plan: about 6 work days from Mon Nov 9, with Tyler's crew, weather permitting.",
+      "more": [
+       "Outside work needs nobody home. Each day starts with a photo, and ends with one.",
+       "Tyler texts a short update each afternoon. Alex sees each day's photos on the secure page.",
+       "The plug-in's prep: keep windows shut, keep pets inside, and move cars away from the house.",
+       "Tyler is the certified renovator. Tyler runs the setup and the cleanup the lead-safe way, where the rules require it.",
+       "If a day moves, only that day moves, and Alex is told.",
+       "Alex can move the start before day 1, to the next opening, at no cost. The cancel window's date stays as it was.",
+       "A cancel after the window goes to Sam to settle with Alex. Rosie moves no money on its own."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your painting starts Mon Nov 9, weather permitting. Here's the plan.",
+        {
+         "card": {
+          "title": "Work plan · 28 Cedar Ln",
+          "lines": [
+           "Mon–Tue · plastic down, wash, scrape, prime",
+           "Wed · caulk and the last primer",
+           "Thu–Fri · two coats on the body",
+           "Mon Nov 16 · trim, doors, cleanup"
+          ],
+          "button": "See the plan",
+          "link": "rosfield.com/s/p8"
+         }
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "IN day 1: plastic down, signs up",
+        {
+         "photos": [
+          "House, start of day 1"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Tyler's crew started day 1. Please keep the windows shut today. You'll get an update this afternoon."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x06",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Tue Nov 10, 11:30am",
+      "title": "Tyler finds rot: a change order first",
+      "q": "Does Alex sign the change order?",
+      "does": "Scraping shows the sill under the back window is rotted through. The contract can't change by text alone, so Alex and Sam sign a change order before the fix.",
+      "more": [
+       "It's $240, under Sam's $500, so it goes to Alex at once.",
+       "It gives the price and any days added. It goes on the last bill.",
+       "A sill repair stays inside the paint job only where the plug-in says it's part of painting.",
+       "Other work goes on while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 240 back window sill rotted, replace. Same days",
+        {
+         "photos": [
+          "Rotted sill, back window"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Tyler's crew found the sill under your back window rotted through. It's best fixed before the paint goes on.",
+        {
+         "card": {
+          "title": "Change order 1 · $240",
+          "lines": [
+           "Replace the rotted sill",
+           "Your dates stay the same",
+           "Added to your last bill"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/p8c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Call me first"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Call first, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "staff",
+          "via": "msg",
+          "title": "Asks Tyler to call Alex",
+          "does": "Alex wants a call first, or doesn't sign by 5pm. Tyler gets a to-do to call. Nothing is done to the sill until the change order is signed.",
+          "more": [
+           "Other work goes on while it waits.",
+           "No signature: the crew paints around the sill, and it stays as it is.",
+           "If Alex says no, Rosie moves no money on its own."
+          ],
+          "say": [
+           [
+            "san",
+            "staff",
+            "Alex M. wants a call about change order 1: $240 for the rotted sill. Please call today.",
+            {
+             "buttons": [
+              "I called",
+              "Paint around it"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "staff"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "vary": {
+     "price:visit": {
+      "does": "On the last work day, Tyler and Alex walk every side with the color sheet. Each touch-up is fixed and ticked off on the page before Tyler texts DONE.",
+      "more": [
+       "The plug-in names what's checked: even coats, clean edges, the trim and the doors.",
+       "After photos are taken from the same angles as the before photos.",
+       "A color Alex signed off is a new, priced change. If Alex disputes the work, Sam is told, and the last bill waits.",
+       "If Alex didn't sign, there's nothing to check. Tyler texts DONE for the estimate."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "PUNCH 4 touch-ups: 2 drips on a sill, an edge under the eaves, a door frame. All fixed"
+       ],
+       [
+        "san",
+        "cust",
+        "Tyler fixed the 4 touch-ups. Please tick them off on the page.",
+        {
+         "card": {
+          "title": "Touch-ups · 4 fixed",
+          "lines": [
+           "2 drips on a sill",
+           "An edge under the eaves",
+           "A scuffed door frame"
+          ],
+          "button": "Tick them off",
+          "link": "rosfield.com/t/p8"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "vary": {
+     "price:visit+after:bill": {
+      "t": "Tue Nov 17, 3:30pm",
+      "does": "The touch-ups are done and ticked off. Tyler texts DONE with the last payment, so Rosie can text the bill.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 7980 last payment"
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Tue Nov 17, 3:30pm",
+      "does": "The touch-ups are done and ticked off. Tyler texts DONE. Sam bills the last payment outside Rosie.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE"
+       ],
+       [
+        "san",
+        "staff",
+        "Done: Alex M., exterior repaint."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 7980 last payment, paint 45 extra gallon",
+        {
+         "photos": [
+          "Paint store receipt"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Alex M.: $7,980 last payment + $45 for an extra gallon Alex asked for = $8,025. It's over $500, so Sam OKs it before Alex pays."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE back sill replaced. Body Harbor Gray satin, trim Linen White. Leftover paint in the garage, labeled"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-22",
+    "vary": {
+     "price:visit": {
+      "does": "Back to the work. Each branch is one thing that can happen while Tyler works, at the estimate or on a work day. Most rejoin before DONE."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-12",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "other",
+        "This is Rosie, the automated booking assistant for Lee Painting. Here's the last bill for the repaint you OK'd at 28 Cedar Ln.",
+        {
+         "pay": {
+          "amount": "$7,980",
+          "what": "the last payment on the repaint at 28 Cedar Ln",
+          "link": "rosfield.com/p/p8l"
+         },
+         "stop": true
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Copy: the $7,980 bill went to your landlord, as agreed when you booked."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-05",
+    "vary": {
+     "price:visit": {
+      "does": "Rosie reads Tyler's DONE back. The $7,980 is the contract's $8,600 plus the $240 change order, less the $860 deposit. It matches what Alex signed, so it needs no OK.",
+      "more": [
+       "A bill that matches the contract or an OK'd quote never needs an OK.",
+       "If Alex didn't sign, the bill is the $89 estimate.",
+       "A different total over Sam's $500 goes to Sam first."
+      ],
+      "say": [
+       [
+        "san",
+        "staff",
+        "Alex M.: $7,980, the last payment for the repaint. It matches the contract and change order 1. Sending Alex the bill.",
+        {
+         "buttons": [
+          "Change it"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Painting: the last payment for your exterior repaint. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$7,980",
+          "what": "the last payment on your repaint",
+          "link": "rosfield.com/p/p8"
+         },
+         "buttons": [
+          "Pay with my saved card"
+         ]
+        }
+       ]
+      ],
+      "t": "Tue Nov 17, 3:35pm"
+     },
+     "price:visit+before:none": {
+      "t": "Tue Nov 17, 3:35pm",
+      "does": "Alex gets the last bill with a pay link. No card was saved, so the link is the way to pay. It's over Sam's $500, so it offers bank transfer too.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Painting: the last payment for your exterior repaint. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$7,980",
+          "what": "the last payment on your repaint",
+          "link": "rosfield.com/p/p8"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-07",
+    "vary": {
+     "price:visit": {
+      "does": "The $7,980 lands in Lee Painting's own Stripe, less Stripe's card fee.",
+      "more": [
+       "Paid by bank transfer, it counts once it clears, in a few business days.",
+       "The receipt goes out once the money is in."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-26",
+    "vary": {
+     "price:visit": {
+      "does": "Sam turned on bank transfer for bills over $500. The repaint's last $7,980 is over it, so the pay link offers it. It counts as paid only once it clears.",
+      "more": [
+       "Clearing takes a few business days. Alex is told it's on the way, and again when it clears.",
+       "The receipt and the lien release wait until it clears.",
+       "If it bounces, Alex gets one pay link, and Sam is told."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Painting: the last payment for your exterior repaint. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$7,980",
+          "what": "the last payment on your repaint",
+          "link": "rosfield.com/p/p8"
+         }
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your $7,980 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-09",
+    "vary": {
+     "price:visit": {
+      "does": "Alex pays the last $7,980 by check to Tyler.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "paid check 7980"
+       ],
+       [
+        "san",
+        "staff",
+        "Recorded: $7,980 check from Alex M."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-10",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Painting: your card didn't go through for the last $7,980.",
+        {
+         "pay": {
+          "amount": "$7,980",
+          "what": "the last payment on your repaint",
+          "link": "rosfield.com/p/p8"
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s card declined for the last $7,980 on the repaint. Alex has one pay link."
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "does": "The card on the pay page didn't go through. Alex can try another on the same link, and Sam is told.",
+      "more": [
+       "Rosie never tries a card again on its own.",
+       "The last payment is still owed. The receipt and the lien release wait for it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Painting: your card didn't go through for the last $7,980. Try another card on the same link.",
+        {
+         "pay": {
+          "amount": "$7,980",
+          "what": "the last payment on your repaint",
+          "link": "rosfield.com/p/p8"
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s card declined for the last $7,980 on the repaint. Alex can try another on the same link."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-11",
+    "vary": {
+     "price:visit": {
+      "t": "Sat Nov 21, 11:00am",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Alex M. hasn't paid the last $7,980 for the repaint after 4 days. Rosie sends no reminders of its own.",
+        {
+         "buttons": [
+          "Send one more link",
+          "I'll call Alex"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Nov 17, 4:00pm",
+      "does": "The receipt goes out once the last payment is in, by text and email. It carries the lien release, the color sheet and the plug-in's warranty.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "A lien release comes with it, where the state's rules provide one.",
+       "The signed color sheet and the leftover-paint list are with it, for touch-ups later.",
+       "Any fact the state's rules require, like a license number, is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your exterior repaint. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $8,840",
+          "lines": [
+           "Contract $8,600 · change order $240",
+           "$860 deposit + $7,980 last payment",
+           "Lien release, color sheet, leftover-paint list",
+           "3-year warranty against peeling, to Nov 17, 2029"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/p8"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+after:card": {
+      "t": "Tue Nov 17, 4:00pm",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your exterior repaint. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $8,840",
+          "lines": [
+           "Contract $8,600 · change order $240",
+           "Charged to your saved card",
+           "Lien release, color sheet, leftover-paint list",
+           "3-year warranty against peeling, to Nov 17, 2029"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/p8"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Tue Nov 17, 4:00pm",
+      "does": "Lee Painting sends its own receipt and lien release. Rosie sends the warranty note and the color sheet.",
+      "more": [
+       "Rosie sends no receipt here. The business's own receipt carries any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Painting. Your 3-year warranty against peeling runs to Nov 17, 2029. Your color sheet is on the page. If anything looks wrong, reply here.",
+        {
+         "card": {
+          "title": "Color sheet · 28 Cedar Ln",
+          "lines": [
+           "Body: Harbor Gray, satin",
+           "Trim: Linen White, satin",
+           "Door: Barn Red, satin"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/p8c"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "t": "Tue Nov 17, 4:00pm",
+      "does": "The receipt goes out once the last payment is in, by text and email. It carries the lien release, the color sheet and the plug-in's warranty.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "A lien release comes with it, where the state's rules provide one.",
+       "The signed color sheet and the leftover-paint list are with it, for touch-ups later.",
+       "Any fact the state's rules require, like a license number, is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your exterior repaint. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $8,840",
+          "lines": [
+           "Contract $8,600 · change order $240",
+           "$860 deposit + $7,980 last payment",
+           "Lien release, color sheet, leftover-paint list",
+           "3-year warranty against peeling, to Nov 17, 2029"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/p8"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "t": "Tue Nov 17, 4:00pm",
+      "does": "Lee Painting sends its own receipt and lien release. Rosie sends the warranty note and the color sheet.",
+      "more": [
+       "Rosie sends no receipt here. The business's own receipt carries any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Painting. Your 3-year warranty against peeling runs to Nov 17, 2029. Your color sheet is on the page. If anything looks wrong, reply here.",
+        {
+         "card": {
+          "title": "Color sheet · 28 Cedar Ln",
+          "lines": [
+           "Body: Harbor Gray, satin",
+           "Trim: Linen White, satin",
+           "Door: Barn Red, satin"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/p8c"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Nov 17, 6:00pm",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Painting! How was working with Tyler and the crew?",
+        {
+         "card": {
+          "title": "Rate your repaint",
+          "lines": [
+           "28 Cedar Ln · Tyler"
+          ],
+          "button": "Rate it",
+          "link": "rosfield.com/r/p8"
+         },
+         "stars": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "vary": {
+     "price:visit": {
+      "does": "Paint peels on one window sill 3 weeks later. It's inside the 3-year warranty, so Sam OKs a free return visit.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "The paint is peeling on one window sill."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s exterior repaint, done Tue Nov 17, is peeling on one sill. It's under the 3-year warranty.",
+        {
+         "buttons": [
+          "Book a free fix",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. Your repaint is under warranty, so this visit is free.",
+        {
+         "times": [
+          "Mon Dec 14 · arriving 8–10am · Tyler",
+          "Tue Dec 15 · arriving 8–10am · Tyler"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-10",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Painting refunded your last payment.",
+        {
+         "card": {
+          "title": "Refund · $7,980",
+          "lines": [
+           "Exterior repaint · paid Tue Nov 17",
+           "Back on your card in 5 to 10 days"
+          ]
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Painting is never sent now, so the button never shows."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Painting is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Painting is never sent now; every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Painting is never sent now; every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Estimate visits are booked in 2-hour arrival windows; work days are set in the work plan."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Painting books visits and work days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Painting books a crew lead's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An estimate visit has no form to sign first; the paint job's contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking lets the crew in."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A paint job never starts at the estimate visit: Alex signs a written contract first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A paint job's quote is signed whole, as one contract. A smaller job is a new written quote from Tyler, after a call."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Painting and drywall are licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Painting, drywall and the color shop all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The painter's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and color consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, paint jobs and color consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Painting is never sent now: estimates and paint jobs are booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "A color shop and a paint job bill no plan or insurance; the customer pays."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "A color shop and a paint job bill no plan or insurance; the customer pays."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after estimates and paint jobs."
+   }
+  ]
+ },
+ "notes": "Pilot: started from the contractor (pattern project). A paint job runs the same way: an estimate at the home, a written quote, a signed contract, a deposit, a cancel window, then several work days and one last bill. What the contractor lacks for painting is added: the color samples and the signed color sheet (B8-x03 to B8-x05) and a forecast check before the coats (B8-x08, B8-x09).\nFlow B (main path visit|none|bill): Alex's 1952 house at 28 Cedar Ln. The $89 estimate Thu Oct 22 with Tyler; the written quote, $8,600, Fri Oct 23 after Sam's OK (B8-20 words), good until Sun Nov 22; the contract Mon Oct 26 and Tue Oct 27 with the lead pamphlet receipt (B8-62); the $860 deposit (B8-63); the cancel window to Mon Nov 2 (B8-x01, B8-x02).\nThen the samples and the color sheet (B8-x03 to B8-x05), the work plan from Mon Nov 9 (B8-37 words), change order 1 for a rotted sill, $240 (B8-x06, B8-x07), a rain day skipped (B8-x08, B8-x09), a lead dust test where the rules require one (B8-50, B8-51 words), the walk-through with 4 touch-ups (B8-39), DONE Tue Nov 17.\nThe last bill is $7,980: the $8,600 contract plus the $240 change order, less the $860 deposit (B9-05, B9-06). The receipt is $8,840, with the lien release, the color sheet, the leftover-paint list and a 3-year warranty to Nov 17, 2029 (B10-01). Bank transfer or a check also work (B9-26, B9-09).\nThe estimate: the old flow's estimate was free. The example business charges $89, credited to the job and billed only if no contract follows, so the master's numbers and its visit-fee path stay true; the plug-in says a free estimate is the safe start (pf.money estimate).\nNo stage bills: a repaint is a deposit, then one last bill after the walk-through and touch-ups, never ahead of the work (pf.money). B9-21's master what-if (Harper J.'s hallway repaint in 3 stages) stays as it is. Rosfield's $2 for the job comes out of the deposit, the first payment through Rosie (B9-18 more).\nFlow A is Sam's second company, Lee Color Shop, a paint color showroom (the master's Lee's Barbershop). Main path list|card|counter: a $35 color consult with Wren, a card saved for the $20 missed-consult fee, paid at the shop counter. A8-x01 offers Tyler's estimate at home, which runs in flow B. A video color consult stays on (A4-01).\nA color consult needs no state license: S1-63 '1 A license (the shop)' is off, and rename pairs make S1-49, S1-50, S2-05, S2-06, S2-10, S2-11 and S2-22 say registration only and no license for color consultants. S2-28 keeps both branches (splitsKept): painting and drywall license each person where the state asks (a lead-safe certificate), the shop's people need none. The license-problem what-ifs (S2-12 to S2-14) are about Gabe.\nSecond kind of work: drywall (trade name Lee Drywall), which waits for Tyler's own drywall license where the state's form asks, like the master's electrical.\nPainting is never sent now: the sent-now branches of S2-30, B4-81, B4-16, B6-03, B7-55 and B8-58 are off, and S2-30 says painting and the color shop take none.\nPlug-in splits (D24): S1-60 a license, S1-62 and S1-65 the $2, S1-29 no agreement, S1-63 no license at the shop, S2-25 people not spaces, S2-32 no classes, S2-30 never sent now, S11-87 and S11-90 booked by name, S11-92 and S11-94 the $2.\nFlow A splits: A3-32 a line for the next color consultant, A4-66 a person's time, A4-43 no paper from others and no form (the test board and 'a problem last time' stay), A5-24 no damage hold, A7-59 by name, A7-62 one person, A7-63 a date that can move, A7-67 no minimum, A7-70 a shorter consult, A8-53 nothing left at the shop, A10-34 a rating. Kept whole: A7-61 (only Wren does custom finishes) and A8-02 (a cabinet door may be required).\nFlow B splits: B4-83 arrival windows, B4-78 own or rent asked, B5-26 no damage hold, B7-56 by name or a crew, B7-64 no smallest group, B8-67 an adult must be there, B8-71 no delivery, B10-29 no permit. Kept whole: B4-57 (a contract on the deck refinish, none on small jobs), B8-65 (a lead dust test only where the rules require it), B8-69 and B8-70 (outside work needs nobody home, inside work does), B8-72 (a cabinet door may go to the shop to spray).\nAlso off: B8-20 '1 Yes, fix it' and '3 OK some lines' (a paint job never starts at the estimate, and its quote is signed whole), B8-20 'Over the landlord's top amount' (the owner signs the contract), B9-27 '3 OK some lines', B4-38 and B7-05 the form branches, A4-24 and A8-32 the child branches, A7-02 the form branch.\nLead-safe work is written as 'older homes, where the rules require it'. The year built is asked before times, but no cutoff year from one law is written. Alex's 1952 home is marked lead-safe (B6-14 more); Tyler, the certified renovator, runs setup and cleanup (B8-37); paint is treated as lead unless tested (B8-20, pf.visit).\nSafety: a child who may have swallowed paint chips gets Poison Help and the child's doctor, and the booking goes on; those words stay out of every text and are never passed to the business (pf.safety, pf.messages). So Rosa's Spanish call is about water through a ceiling (the drywall side), which the call summary may name.\nWeather: the master's B7-35 checks the day before a booking (Kim's fence staining); a repaint's later work days get the own forecast check B8-x08. Listed as a gap, with the color sheet and the cancel window.\nEvery state rule is a switch from the state's form: the license and its job-size limit, lead-safe certificates for the firm and each painter, salesperson registration, the written contract and its parts, the deposit cap, money kept apart, the cancel window, the lien release, what must be shown. The old flow's California, Pennsylvania, Maryland and New York rules and numbers are dropped.\nRename: the master's list jobs become the example painter's own: drain clearing $179 = accent wall painting; Kim's yard drain = fence staining (outside, nobody home); water heater flush $150 = deck staining; water heater replacement from photos $640 = deck refinish; leak repair at the visit = exterior repaint; sewer camera $199 = lead paint test (results ready later).\nMore renames: the faucet to the shop = a cabinet door sprayed at the shop; shutoff valves $160 = porch columns; drain trap $95 = rotted door trim; the repipe in stages = Harper J.'s hallway repaint; mold behind the sink wall = mold under bathroom paint; parts at cost = supplies at cost; a cut hand = a hand hurt on a ladder.\nShop renames: haircut $35 = color consult; skin fade $40 = exterior color consult; beard trim $20 = sample board; kids cut $25 = room color pick; signature cut $55 = whole-house color plan, credited to a paint job; groom's package $140 = color package; color and cut from photos $90 = custom finish sample; color correction after a $25 consult = cabinet door refinish; gloss $15 = new knobs; the color station = the spray booth; hair color = custom finish.\nNames: Riley and Avery are color consultants Wren and Hugo; Jordan and Casey are crew leads Tyler and Gabe; the master's customer Theo B. is Nina B. Addresses: 28 Cedar Ln (Alex), 310 River Rd (Lee Painting), 64 Aspen St (Lee Color Shop). License numbers: PC045210, DW22871, LS031552, DW30417.\n'estimate visit' is one of the contractor's own words (its rename of 'service call'), so the painter says 'the estimate' everywhere. The token 'kolor' in rename right sides keeps the word color safe from the master's color-to-custom-finish pairs; the last four pairs turn it back.\nMoney combinations used: B visit|none|bill, visit|none|own, visit|hold|bill, photos|deposit|bill (a deck refinish priced from photos, with a signed contract before the 25% deposit). A list|card|counter, list|none|counter, list|full|none, list|deposit|counter. Left out: B's list combos and the saved card charged at DONE (big bills by link, bank transfer or check); A's photo and at-the-shop pricing stay as what-ifs.\nExtra samples past the 3 free ones are $25 each, OK'd first and added to the last bill (B8-x04); the main path's last bill has none. Change orders under Sam's $500 go to Alex at once; over it, Sam OKs first.\nThe what-ifs at Thursday's estimate keep the master's dates (extra work on Thu Oct 22, its cancel until Mon Oct 26). The job's own dates run from the quote on Fri Oct 23 to the walk-through on Tue Nov 17.\nkeep: none. No master or pilot example word is left in either flow.\nprof-read.js wrote work/prof/painter-read-A.md and -read-B.md; sections 3 to 10 of both main paths were read, and the other money paths were checked step by step against the main one.\nReview (Oct 22): added the money paths the plug-in itself names: A list|hold|counter (the color package's $40 held), photos|card|counter (custom finish sample), visit|card|counter (cabinet door refinish after a $25 look); B list|hold|bill (accent wall, fence staining, lead paint test) and list|full|none (deck staining, the $75 color consult at home). Fixed: A8-34's 'custom finish-correction session' on the at-the-shop path, 'only Wren does custom finishes', and B7-01's reminder on the accent wall path (it said 'your estimate').\nReview: off in both flows, the plan and insurance branches (A4-28, A4-54, A7-02, A9-15; B4-43, B4-63, B7-05, B9-19): no plan pays for color consults or paint jobs.\ntouch-up 4 (Oct 23): keep 'cabinet' and 'drips': cabinet door refinishing and paint drips on a sill or porch are real painter words.\nRefit (Tue Oct 27, REDESIGN 2 master): pf.facts firststeps, documents, multiday, extrawork, photos, banktransfer, video; cancelright on in B only (work sold at the home), off in A; arrive A set start, B window; cutoff 24 hours before. Money paths: A list|card|counter (main), list|none|counter, list|full|none, list|deposit|counter, photos|card|counter (visit|card|counter dropped: a color shop doesn't refinish doors); B visit|none|bill (main), visit|none|own, visit|card|bill, photos|deposit|bill, list|card|bill (list|full|none dropped: pf.money never takes pay ahead of the work). Amounts carry the names and dollars; the $89 estimate is the visit paths' fee (B4-14: owed even after a no). Rename pairs that match nothing on the new master were deleted (483); booking cards say 'Painting job' so they read right on every path (the master hard-codes its list service there). The $2 lines are the master's (B9-18): the painter's 'comes out of the deposit' lines are gone. The lead dust test steps (B8-50, B8-51) and the permit step are gone from the master: the dust test stays a plug-in rule (pf.visit outside_checks). The cancel window is the master's B8-78 now (switch cancelright, B only): the own steps B8-x01 and B8-x02 are gone, and the samples (B8-x03 to B8-x05) follow B8-78. The master cut forecast checks (S13-56's one path holds the weather), so the own forecast steps B8-x08 and B8-x09 are gone; pf.edges weather still says a weather move never costs the customer. Earlier notes above that name B8-x01, B8-x02, B8-x08, B8-x09, B8-50, B8-51, B10-29, S1-63 or S1-65 are history.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "like a roofer",
+    "skin fades",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "takes jobs sent now, like a burst pipe",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A skin fade",
+    "a skin fade",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "style consult",
+    "Alex asks for a cut every 4 weeks.",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "Avery can't be booked until it matches.",
+    "Avery · license not found",
+    "Avery · license expired",
+    "Avery stays on the team, and can be booked again once it shows renewed.",
+    "so Lee's Barbershop can't book you until it shows renewed",
+    "Avery's license is checked again when the lookup answers.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "once Riley sees the hair",
+    "Step-free door on Elm St",
+    "Do you do kids cuts? My son is 8.",
+    "A haircut could mean a salon or a barbershop.",
+    "2 No person license",
+    "Plumbing JP031552",
+    "MP045210",
+    "EC22871",
+    "JE30417",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "takes no cut of",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color",
+    "Color",
+    "Kids cut (12 and under)",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "estimate visit",
+    "Gloss to finish",
+    "gloss",
+    "water heater"
+   ],
+   "B": [
+    "Harper gets the notice",
+    "Harper's first cancel message",
+    "only in Harper's own words",
+    "11:59pm Tue Oct 27",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Book this drain clearing?",
+    "can clear the drain",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "a camera inspection",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "like a $620 repair",
+    "leak repair is $620",
+    "Leak repair · $620",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Right to cancel · repipe",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "a leak repair",
+    "A drain clearing",
+    "a drain clearing",
+    "It's under the 1-year labor warranty.",
+    "It's inside the 1-year labor warranty",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "covers part of the repair",
+    "today's repair",
+    "The repair price is good for 7 days.",
+    "Book the repair",
+    "the repair price",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "It will be ready Mon Oct 26.",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "It's overflowing. Can someone come tonight?",
+    "Jordan needs a part from the supply house.",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracks the cabinet floor",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Yes, it won't drain",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "stage 2 of your repipe",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "the kitchen drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "drain",
+    "leehomeservices.com",
+    "2 No person license",
+    "Plumbing JP031552",
+    "MP045210",
+    "EC22871",
+    "JE30417",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "takes no cut of",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "color",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "estimate visit",
+    "$640 water heater",
+    "Water heater replacement",
+    "water heater replacement",
+    "replaces water heaters",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater"
+   ]
+  },
+  "A": {
+   "A5-16": "8045a6b80c",
+   "A8-44": "4410a4860c",
+   "A4-24": "0a292df05b",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B6-14": "dfd03ee673",
+   "B8-03": "ac9d404766",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-49": "4fcfdeb80b",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "B8-78": "628ca6843e",
+   "B8-37": "3ce85cf051",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B8-22": "50d78f1af0",
+   "B9-12": "0beb9062e8",
+   "B9-05": "6cbce323ed",
+   "B9-06": "f091432f2d",
+   "B9-07": "310f930c3b",
+   "B9-26": "d356566ab1",
+   "B9-09": "832947585f",
+   "B9-10": "4ec0979e1a",
+   "B9-11": "9525d5f9c9",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B10-08": "01bac94fd8",
+   "B10-10": "30b382ad47",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255"
+  }
+ }
+}

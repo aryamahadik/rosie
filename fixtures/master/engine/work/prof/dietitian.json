@@ -1,0 +1,3577 @@
+{
+ "id": "dietitian",
+ "name": "Dietitian",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "therapist",
+ "plugin": {
+  "pf.license": {
+   "need": "always for medical nutrition therapy: a dietitian's own license where the state's form licenses dietitians, or the national dietitian registration (RDN) as the proof where the state's form has no license (a switch)",
+   "who": "each person; the practice too, only where the state's form registers nutrition practices (a switch)",
+   "ask": "each dietitian's license number and state, and their registration number, in the invite reply (or the owner sends them); a diabetes educator's certificate number for diabetes education",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "remote": "a video visit only with a dietitian licensed for the state the client is in during that visit, or registered where that state's form has no license, or holding a permit the state's form allows (a switch); the state is asked before times and confirmed at the start of each video visit",
+   "coach": "a nutrition coach with no dietitian license is booked only for general wellness coaching and grocery store tours, never for medical nutrition therapy, a health condition, a doctor's referral, a plan or anyone under 18; where the state's form limits all one-on-one nutrition advice to licensed dietitians, coaching stays off there (a switch)",
+   "diabetesEducation": "diabetes education as its own kind of work needs a certified diabetes educator on the team where the plug-in or a plan asks for one (a switch); it waits for that person's certificate",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance where the state's form or a plan asks for it"
+  },
+  "pf.services": {
+   "shape": "one client with one dietitian at a time, each visit a set length: a 60-minute first nutrition visit (the assessment), then 30-minute follow-ups agreed at the visit and OK'd by the client by text; a new client may ask for a free 15-minute intro call first; a parent or guardian comes with anyone under 18",
+   "examples": "the example practices' own prices (Lee Nutrition Clinic at the clinic and by video, Lee Home Nutrition at clients' homes and stores), not a standard; with a health plan, the client pays the plan's share and the practice bills the plan",
+   "list": [
+    {
+     "name": "Intro call",
+     "price": "free",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "by phone (counted as at the clinic)",
+     "before": "nothing taken",
+     "after": "nothing to pay",
+     "who": "the dietitian the client picked",
+     "note": "only for a new client who asks; about how visits work and if it's a fit; no advice"
+    },
+    {
+     "name": "First nutrition visit",
+     "price": "$150 self-pay; with a plan, the plan's share ($35 in the example; often nothing when the plan covers nutrition therapy for the condition)",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic, or by video",
+     "before": "nothing taken; a card saved only where the owner turns on the $40 late-cancel fee, never for a fee-free client",
+     "after": "at the front desk; a self-pay video visit gets the bill Rosie texts at DONE; the clinic bills the plan its own way",
+     "who": "a licensed or registered dietitian"
+    },
+    {
+     "name": "Follow-up",
+     "price": "$90 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the clinic, or by video",
+     "before": "as for the first visit",
+     "after": "as for the first visit",
+     "note": "dated visits the dietitian and client agree on, OK'd by the client by text; each paid when it happens"
+    },
+    {
+     "name": "Teen nutrition visit (13 to 17)",
+     "price": "$150, or the plan's share",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic, or by video",
+     "before": "as for the first visit",
+     "after": "as for the first visit",
+     "who": "a dietitian who sees teens (Grace in the example)",
+     "note": "a parent or guardian books, consents and comes; the owner OKs it first"
+    },
+    {
+     "name": "Family visit",
+     "price": "$120 (most plans don't pay)",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic, in its one larger room",
+     "before": "as for the first visit",
+     "after": "at the front desk",
+     "note": "a family planning meals together; each adult confirms on their own secure page"
+    },
+    {
+     "name": "30 more minutes",
+     "price": "$45, or what the plan pays",
+     "kind": "one price, added to a visit",
+     "length": "30 min",
+     "where": "both places",
+     "before": "with the visit",
+     "after": "with the visit",
+     "note": "booked ahead, never added during a visit"
+    },
+    {
+     "name": "Package of 3 follow-ups",
+     "price": "$240",
+     "kind": "a package",
+     "where": "sold only at the clinic, after the first visit",
+     "before": "paid at the front desk when bought",
+     "after": "each follow-up booked from it uses one; nothing more to pay",
+     "note": "never offered in a booking text; for self-pay clients"
+    },
+    {
+     "name": "Home nutrition visit",
+     "price": "$179 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the client's home, with a look at the kitchen and pantry if the client says yes",
+     "before": "nothing taken",
+     "after": "the bill Rosie texts at DONE, or the business bills the plan its own way",
+     "who": "a dietitian cleared for home visits"
+    },
+    {
+     "name": "Home follow-up",
+     "price": "$120 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the client's home, or by video",
+     "before": "nothing taken",
+     "after": "as for the home nutrition visit"
+    },
+    {
+     "name": "Kitchen and pantry visit",
+     "price": "$199 ($249 when Sam goes himself); with a plan, the plan's share",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the client's home",
+     "before": "nothing taken",
+     "after": "the bill Rosie texts at DONE, or the business bills the plan its own way",
+     "who": "a dietitian cleared for home visits",
+     "note": "a longer home visit: a full look at the kitchen and pantry with the client, and a shopping plan"
+    },
+    {
+     "name": "Grocery store tour",
+     "price": "$75 self-pay",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at a grocery store the client picks, in the travel area",
+     "before": "nothing taken",
+     "after": "the bill Rosie texts at DONE",
+     "who": "a dietitian; a nutrition coach only for general wellness, where the plug-in's switch allows it",
+     "note": "checked in at the store's entrance"
+    },
+    {
+     "name": "Diabetes education visit at home",
+     "price": "$199; a plan pays its own fee",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the client's home",
+     "before": "nothing taken",
+     "after": "the bill Rosie texts at DONE, or the business bills the plan its own way",
+     "who": "a certified diabetes educator (Marcus in the example), where the plug-in or a plan asks for one"
+    },
+    {
+     "name": "Late-cancel or missed-visit fee",
+     "price": "$40 at the clinic",
+     "kind": "a fee, never booked alone",
+     "where": "at the clinic and by video, only where the owner turns it on",
+     "note": "less than 24 hours' notice, or a missed visit; needs a card saved at booking; only when the owner confirms; never for a fee-free client; never billed to a plan; none for home visits in the example"
+    }
+   ],
+   "notOffered": "medicine or weight-loss shots (no prescribers); eating-disorder care booked by an AI (the clinic's own team books it by phone, with the client's doctor); lab tests (the client's doctor orders them)",
+   "capacity": "one client, or one family, per dietitian at a time; the clinic's one larger room for a family visit",
+   "nobodyHome": "never: the client is always there",
+   "online": "video visits count as at the clinic: first visits and follow-ups, only with a dietitian licensed for where the client is that day"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you (18 or older), or for your child or teen (a parent or guardian books and comes)",
+    "which state you'll be in during the visit (a dietitian must be licensed there, by video too)",
+    "a health plan (its name only), or paying yourself",
+    "has a doctor sent a referral: yes, not yet, or no",
+    "new or returning",
+    "at the clinic, by video, or at your home (the town, for a home visit or a store tour)"
+   ],
+   "afterTime": [
+    "anything that helps at the visit, like an interpreter or a step-free door",
+    "at home: parking, pets, and who else will be home",
+    "for a grocery store tour: which store"
+   ],
+   "securePage": [
+    "birth date, and 'I'm 18 or older'",
+    "the plan's member ID and photos of the plan card",
+    "the referring doctor's name and practice",
+    "the intake: health conditions, medicines and supplements, allergies and intolerances, height and weight, recent lab results, and eating history and habits",
+    "for video: where you'll be, and an emergency contact",
+    "whether texts and voicemail are safe, and what a message may say",
+    "a child's details, and the parent's or guardian's consent"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18, who comes to the visit (the owner OKs it first); a guardian or health care agent for an adult who can't consent; someone else may pay, but the client agrees for themselves",
+   "neverAsked": "the condition, weight, lab results, medicine names, eating habits and a child's details are never asked in the AI chat or by text: only on the secure page"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a medical emergency: fainting, confusion, chest pain, trouble breathing, or very high or very low blood sugar the person can't bring back",
+     "say": "This sounds like an emergency. Call 911 now. Don't wait for an appointment.",
+     "booking": "no booking"
+    },
+    {
+     "words": "thoughts of suicide or self-harm",
+     "say": "If you're thinking about harming yourself, call or text 988 now. If you're in danger right now, call 911.",
+     "booking": "no booking in that chat; if the person is already a client, the owner and their dietitian are told at once with a link, never the words"
+    },
+    {
+     "words": "signs of an eating disorder: making yourself throw up, using laxatives to get rid of food, going days without eating, or a strong fear of gaining weight",
+     "say": "The clinic's own team books this kind of care by phone, together with your doctor. Please also talk with your doctor soon. If you feel faint or unwell now, call 911. If you have thoughts of hurting yourself, call or text 988.",
+     "booking": "no booking by the AI: the clinic's own line, and no weight-loss or meal-plan visit is offered; the owner is told with a link, never the words"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "feeling unwell, or a sugar reading that worries them, with nothing above",
+     "what": "Rosie says to call their doctor today, and 911 if it gets worse; then booking goes on"
+    },
+    {
+     "words": "a question about food, weight or medicine",
+     "what": "no advice from Rosie or the AI: the dietitian answers at the visit, or on the secure page; nothing is quoted in a text"
+    }
+   ],
+   "always": "the general screen on every message, call and intake answer: danger to life or a medical emergency gets 911, self-harm gets 988; Rosie never gives diet, weight or medical advice, only booking",
+   "forms": "an intake answer that shows signs of an eating disorder or self-harm reaches the dietitian and the owner the same day, never waiting for the visit"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Doctor's referral",
+     "when": "where the client's plan pays for nutrition therapy only with a doctor's referral (often only for some conditions), or where the state's form requires one (a switch); due 2 business days before the visit, so the client hears before free cancel ends",
+     "who": "clients whose plan or state asks for it",
+     "result": "the desk logs it when the doctor's practice sends it; not in by the due time: the desk calls the doctor's practice; still missing: the client hears the plan may not pay, and keeps it at self-pay, moves it, or cancels free"
+    },
+    {
+     "name": "Intake on the secure page",
+     "when": "on the secure page only, never by text; due the day before; one reminder",
+     "who": "every client, and each adult in a family visit",
+     "result": "not done: the owner keeps the visit (filled in before it starts), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the desk, by hand or an electronic check",
+     "who": "every client who names a plan",
+     "result": "covered (the share shows), covered only for some conditions or with a referral, not covered (self-pay, or a free cancel), or can't check now (the desk checks by the next business day)"
+    },
+    {
+     "name": "Intro call",
+     "when": "before the first visit, at least a day before; booked with it on one secure link",
+     "who": "a new client who asks for one",
+     "result": "a fit: the first visit stands; another dietitian fits better: the client OKs the change; not a fit: cancelled with nothing charged"
+    },
+    {
+     "name": "A written good-faith estimate",
+     "when": "told while booking; sent on time, as the federal rules say",
+     "who": "every self-pay or uninsured client",
+     "result": "a to-do for the desk, with its due date; Rosie delivers it and records when"
+    },
+    {
+     "name": "Recent lab results",
+     "when": "on the secure page, if the client has them",
+     "who": "where the dietitian asks",
+     "result": "never a reason to hold up a visit"
+    }
+   ],
+   "prep": "for a first visit: the medicines and supplements on the secure page, and recent lab results if there are any; for video: a quiet, private place; for a home visit: the kitchen as it usually is; for a grocery store tour: meet at the store's entrance"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the code at the front desk; by video: read out at the start; at home: the code at the door; a grocery store tour: the code at the store's entrance",
+   "beforeWork": "the dietitian reads the intake; at a video visit, the dietitian confirms the client's name and where they are, for the license and in case of an emergency",
+   "changes": "nothing is added during a visit; a longer visit is booked ahead; the dietitian sets the goals with the client at the visit (never Rosie), and the follow-ups agreed there are confirmed by the client's own yes by text",
+   "done": "the code or DONE; visit notes, goals and any meal plan stay in the practice's own record and on the secure page, never in a text; Rosie keeps only booking notes",
+   "missed": "a missed visit: no fee unless a card was saved and the owner says yes",
+   "home": "at home, the dietitian looks in the kitchen and pantry only with the client's OK, and leaves at once if they feel unsafe (they text UNSAFE)"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking (the example practice keeps no card); where the owner turns on the clinic's $40 late-cancel fee, a card is saved for it, nothing taken, never for a fee-free client",
+   "plans": "the plans the practice takes (its own list); the desk checks each plan by hand or electronically and records it: active or not, in network, whether it covers nutrition therapy for this client's condition, whether it needs a doctor's referral, the share, and the covered hours or visits used and left; the share is an estimate, not a promise",
+   "referral": "where a plan pays only with a doctor's referral, the desk logs it before the visit; without it, the client hears the plan may not pay before the visit, never after",
+   "selfPay": "a self-pay or uninsured client hears while booking that they can get a written good-faith estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "outOfNetwork": "the client pays the self-pay price, and the receipt on the secure page has what their plan needs to pay them back",
+   "after": "at the clinic: the share or the self-pay price at the front desk, and the clinic bills the plan its own way; a self-pay video visit: the bill Rosie texts at DONE; at home and at a store: the bill Rosie texts at DONE, or the business bills the plan its own way; a balance after the plan pays is billed by the practice, never by Rosie's text",
+   "fees": "the late-cancel or missed-visit fee: $40 at the example clinic (the old flowchart's own number), with less than 24 hours' notice; only where the owner turns it on and a card was saved; the same fee for every client who may be charged one; only when the owner confirms; never billed to a plan; no fee for home visits in the example",
+   "feeFree": "a switch from the state's and the plan's rules: no fee ever for clients a plan or the rules protect (like Medicaid, where that applies); for some plans, like Medicare, only if every client pays the same fee; the owner can mark any client fee-free; their texts say 'No fee to cancel or miss'",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "fee limits for plan clients: from the plan's and the state's rules (switches)",
+   "tips": "none",
+   "tax": "no tax line (the default)",
+   "packages": "a package of 3 follow-ups for self-pay clients, sold only at the clinic after the first visit; a follow-up booked from it uses one",
+   "repeatPlans": "follow-ups are dated visits the client says yes to; each is paid when it happens; nothing paid ahead"
+  },
+  "pf.messages": {
+   "never": "client texts carry only the business name, the date, the time, the place and a secure link: never the kind of visit, a condition, a weight, lab results, a medicine name, food or eating details, or a child's details; at home and at a store, the dietitian's name and photo stay, for the door check; the video link stays on the secure page",
+   "staff": "texts to the owner and staff use the client's initials (A.M.), the time and a link: never health details, weights, lab results, medicine names or a child's details; a client's question or worrying words go behind a link, never quoted",
+   "safeContact": "the client says if texts and voicemail are safe; if not, Rosie reaches them only the way they pick",
+   "languages": "English and Spanish",
+   "minors": "texts about a child's or teen's visit go to the parent or guardian",
+   "ratings": "a private 1-to-5 rating only the practice sees; no public review request unless the client said yes to marketing texts",
+   "noAdvice": "Rosie gives no diet, weight or medical advice by text or chat; it answers only about booking"
+  },
+  "pf.staff": {
+   "licenses": "each dietitian's own license per state, or their registration where a state's form has no license; a diabetes educator's certificate for diabetes education",
+   "skills": "who sees adults, teens and families; who offers video, home visits and grocery store tours; who speaks which language; who is trained for eating-disorder care (booked only by the clinic's team, by phone); a dietitian with a provisional license works under a supervisor",
+   "coach": "a nutrition coach (the example practices have none) is offered only for general wellness coaching and grocery store tours, never for medical nutrition therapy, a condition, a referral, a plan or anyone under 18 (a switch from the state's form)",
+   "oks": "the owner OKs visits for anyone under 18, same-day visits, any custom price, and anything a dietitian flags",
+   "standIn": "a client's dietitian is never changed without the client's own yes; a stand-in is offered only with the same license for the client's state and the same skills",
+   "homeVisits": "only dietitians cleared for home visits go to homes",
+   "supervision": "a dietitian with a provisional license works only under the supervisor the state's form sets (a switch)"
+  },
+  "pf.rules": {
+   "records": "nutrition records are kept by the practice as long as the state's rules require (a child's may be longer); Rosie keeps only booking and payment records, and a delete removes only those",
+   "copies": "a client's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "scope": "medical nutrition therapy only by a dietitian the state's form allows: licensed there, or registered where the state has no license (a switch); general wellness coaching by others only where the state's form allows it",
+   "referral": "where the state's form requires a doctor's referral for medical nutrition therapy (a switch); a plan's own referral rule is checked by the desk",
+   "telehealth": "video visits follow the state the client is in during the visit (a switch for each state's license rule)",
+   "minors": "who may consent for a child or teen (switches from the state's form)",
+   "goodFaith": "the written good-faith estimate for self-pay and uninsured clients, on the federal timeline (a to-do with its due date)",
+   "coveredHours": "a plan's covered hours or visits for nutrition therapy, counted by the desk; more only as the plan allows, like after a new doctor's order",
+   "showLicense": "the license shown where the state asks: posted at the clinic, and on the listing",
+   "ads": "no claims the state's rules don't allow, like promised weight loss",
+   "privacy": "health privacy rules for every message and form; the business associate agreement before going live"
+  },
+  "pf.edges": {
+   "emergency": "medical emergency words in any message get 911 at once; self-harm words get 988; the booking stays, and the client's dietitian and the owner are told with a link",
+   "eatingDisorder": "signs of an eating disorder in any message or intake answer: no automatic booking or change; the clinic's own line, a doctor soon, 911 or 988 as needed; the dietitian and owner are told the same day with a link",
+   "foodQuestion": "a question about food, weight or medicine: no advice; the dietitian sees it behind a link and answers on the secure page or at the visit",
+   "lateArrival": "a late client is seen in the time left, and the visit ends on time; no fee for running late",
+   "missedVisit": "no fee unless a card was saved and the owner confirms",
+   "standIn": "a dietitian out: new times with the same dietitian, or another only with the client's yes",
+   "referral": "the referral isn't in: the desk calls the doctor's practice; still missing: self-pay, a move, or a free cancel, before the visit",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "hoursRunLow": "the plan's covered hours run low: the desk is warned, and asks the doctor for more where the plan allows, or tells the client the self-pay price",
+   "outOfState": "a video client who'll be in another state: only a dietitian licensed there, another time, or a free cancel",
+   "child": "a child or teen: a parent or guardian books and comes; the owner OKs it",
+   "forms": "the intake not done: one reminder, then the owner keeps the visit (filled in first), moves it, or cancels with no fee",
+   "weather": "home visits and store tours: an ice or snow warning on the roads at 5pm the day before; Sam keeps the visit or moves it, and a move or a cancel never costs the client"
+  },
+  "pf.facts": [
+   "planbill",
+   "firststeps",
+   "forms",
+   "video",
+   "children"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Nutrition Clinic",
+   "staff": "Grace and Priya (dietitians)",
+   "cust": "Alex M. (client) · other clients"
+  },
+  "B": {
+   "business": "Lee Home Nutrition",
+   "staff": "Marcus (dietitian and diabetes educator) and Lucia (nutrition coach)",
+   "cust": "Alex M. (client, who can't easily get out for now) · other clients",
+   "other": "Others (a family member, a doctor's practice, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Grace"
+  },
+  "B": {
+   "staff": "Marcus"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most nutrition clinics set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Nutrition visits at the clinic and by video."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Home nutrition visits and grocery store tours, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A kitchen and pantry visit"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see clients at the clinic and by video; Riley also sees families and makes home visits."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a cooking class, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't run cooking classes."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE added for A.M. on the secure page."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the visit's address, after a missed check."
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a missed visit: the $40 fee, only if you turned it on, a card was saved and you say yes"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "A teen's visit comes to you first. Board prices never need one"
+   ],
+   [
+    "Saturdays: a tip line on the bill",
+    "Saturdays: the bill Rosie sends, no tip line"
+   ],
+   [
+    "like an office manager",
+    "like a practice manager"
+   ],
+   [
+    "Pat, the office manager",
+    "Pat, the practice manager"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Clinic and video visits, families, teens and home visits"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you see teens? My son is 15."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Grace can do a shorter visit in the time left"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "A tip goes the shop's own way.",
+    "Nutrition care takes no tips."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says a waiting room chair ripped a coat today"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A loose chair in your waiting room ripped my coat."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "A what-if: a self-pay client bought a package of 3 follow-ups at the clinic, after the first visit."
+   ],
+   [
+    "A beard trim",
+    "30 more minutes"
+   ],
+   [
+    "a beard trim",
+    "30 more minutes"
+   ],
+   [
+    "Lena",
+    "Naomi"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The nutrition plug-in adds its own danger words: signs of an eating disorder, and a blood sugar emergency."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a follow-up plan with Grace, every 4 weeks."
+   ],
+   [
+    "like a color correction done in two steps",
+    "like 8 follow-ups set at the first visit"
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "so I can't reach Elm Street Dental.",
+    "so I can't reach Elm Street Eye Care."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A nutrition example: someone who feels unwell, or whose sugar reading worries them, hears to call their doctor today. Then booking goes on."
+   ],
+   [
+    "A haircut",
+    "A first visit"
+   ],
+   [
+    "a haircut",
+    "a first visit"
+   ],
+   [
+    "a kids cut",
+    "a teen visit"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "MP045210",
+    "LD-EX0452"
+   ],
+   [
+    "BS20981",
+    "PR-EX2098"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states set their own rules for work done away from the business."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Cooking classes for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds cooking classes to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW cooking classes"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the clinic show photos of you?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's nutrition care takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Follow-up plan · every 4 weeks"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Nutrition Clinic LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Nutrition's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Nutrition Clinic"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Nutrition"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Visits and Lee Diabetes Education"
+   ],
+   [
+    "plumbing and electrical",
+    "home nutrition and diabetes education"
+   ],
+   [
+    "1200 Main St",
+    "300 Main St"
+   ],
+   [
+    "88 Elm St",
+    "60 Grove St"
+   ],
+   [
+    "Riley Chen",
+    "Grace Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Priya Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Price"
+   ],
+   [
+    "Casey Moore",
+    "Noor Moore"
+   ],
+   [
+    "Riley",
+    "Grace"
+   ],
+   [
+    "Avery",
+    "Priya"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey",
+    "Noor"
+   ],
+   [
+    "electrical",
+    "diabetes education"
+   ],
+   [
+    "Electrical",
+    "Diabetes education"
+   ],
+   [
+    "plumber",
+    "dietitian"
+   ],
+   [
+    "plumbing",
+    "home nutrition"
+   ],
+   [
+    "Plumbing",
+    "Home nutrition"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "Barbershop",
+    "Clinic"
+   ],
+   [
+    "barbers",
+    "dietitians"
+   ],
+   [
+    "barber",
+    "dietitian"
+   ],
+   [
+    "Barber",
+    "Dietitian"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Family visit"
+   ],
+   [
+    "Signature cut and shave",
+    "Family visit"
+   ],
+   [
+    "signature cut",
+    "family visit"
+   ],
+   [
+    "Groom's package",
+    "Intensive visit"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "family visit"
+   ],
+   [
+    "Color and cut",
+    "Family visit"
+   ],
+   [
+    "color correction",
+    "long visit"
+   ],
+   [
+    "Color correction",
+    "Long visit"
+   ],
+   [
+    "Kids cut",
+    "Teen visit"
+   ],
+   [
+    "kids cut",
+    "teen visit"
+   ],
+   [
+    "skin fade",
+    "video visit"
+   ],
+   [
+    "Skin fade",
+    "Video visit"
+   ],
+   [
+    "beard trim",
+    "30 more minutes"
+   ],
+   [
+    "Beard trim",
+    "30 more minutes"
+   ],
+   [
+    "haircuts",
+    "first visits"
+   ],
+   [
+    "Haircuts",
+    "First visits"
+   ],
+   [
+    "haircut",
+    "first visit"
+   ],
+   [
+    "Haircut",
+    "First visit"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "color",
+    "family visit"
+   ],
+   [
+    "Color",
+    "Family visit"
+   ],
+   [
+    "a patch test",
+    "a doctor's referral"
+   ],
+   [
+    "patch test",
+    "doctor's referral"
+   ],
+   [
+    "a consult",
+    "a check"
+   ],
+   [
+    "consult",
+    "check"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "is at the chair",
+    "is at the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "labor",
+    "visit time"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a first visit on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a follow-up every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a visit every week, at the same time."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A family books a family visit, and each adult confirms on their own secure page."
+   ],
+   [
+    "staff cut",
+    "client's visits"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "I've been feeling worse this week. Is Saturday still OK?"
+   ],
+   [
+    "like a skin-test result",
+    "like a doctor's referral that's in"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "I'd like to see someone else at the clinic instead."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una evaluación el sábado."
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Grove St"
+   ],
+   [
+    "no-show fee",
+    "missed-visit fee"
+   ],
+   [
+    "No-show fee",
+    "Missed-visit fee"
+   ],
+   [
+    "like a clinic,",
+    "like a health clinic,"
+   ],
+   [
+    "$20",
+    "$40"
+   ],
+   [
+    "Books a video session",
+    "Books a video visit"
+   ]
+  ],
+  "B": [
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most nutrition clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules nutrition clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Nutrition visits at the clinic and by video."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery see clients at the clinic and by video; Riley also sees families and makes home visits."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a home nutrition visit."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa home visit Thu 12pm Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Help with meals at home' fits a home nutrition visit."
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else?",
+    "Lee Home Services asks: is the visit at a home, or a grocery store tour?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And is a look at the kitchen OK?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, two steps"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home nutrition visit needs none."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "If you feel faint or confused, or your sugar won't come back up, call 911 now."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also look at my pantry and make a shopping plan?"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan and Alex need 30 more minutes to finish."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan smells gas in the kitchen."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan smelled gas in the kitchen and stopped the visit."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan knocks a glass jar off the counter and texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan broke a glass jar at A.M.'s."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left a mess in the kitchen."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a broken jar lid in the pantry this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come back for a grocery store tour next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a grocery store tour."
+   ],
+   [
+    "It's a leak under the sink, today, starts at 3:00pm, with Jordan.",
+    "It's a home nutrition visit, today, starts at 3:00pm, with Jordan."
+   ],
+   [
+    "Iris",
+    "Dana"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Mon–Fri 7:30am–5:30pm · set start times · 1 day's notice · up to 60 days ahead"
+   ],
+   [
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. No fee for a late cancel or nobody home"
+   ],
+   [
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "Ask you first"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every visit is booked ahead"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "No tip line · the bill Rosie sends"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the visit's address, after a missed check."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "A question about the visit? Reply here."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like writing a prescription."
+   ],
+   [
+    "like an office manager",
+    "like a practice manager"
+   ],
+   [
+    "Pat, the office manager",
+    "Pat, the practice manager"
+   ],
+   [
+    "called the office, and Pat took the call",
+    "called the business, and Pat took the call"
+   ],
+   [
+    "Hours: Mon–Fri 7:30am–5:30pm",
+    "Hours: Mon–Fri 8am–6pm"
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every home visit, and diabetes education visits"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I had hip surgery last week and can't drive yet. Can a dietitian come to my home Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mother needs nutrition care at home."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi mamá necesita terapia física en casa."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien se cayó o está herido?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: has anyone fallen, or is anyone hurt?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie se cayó."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody fell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se cae y no puede levantarse, o se golpea la cabeza, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If she falls and can't get up, or hits her head, call 911."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A nutrition example: someone who feels unwell, or whose sugar reading worries them, hears to call their doctor today. Then booking goes on."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if her mother falls and can't get up, or hits her head."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a dietitian come to Kim's home this Thursday? What does it cost?"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Nutrition Clinic can do an evaluation at the clinic for $140, or at your home for $179, before any health plan."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan cares for both parents at one home, with a check-in plan for each, every 4 weeks."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's check-ins?"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "A haircut",
+    "A first visit"
+   ],
+   [
+    "a haircut",
+    "a first visit"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomenutrition.com"
+   ],
+   [
+    "MP045210",
+    "LD-EX0452"
+   ],
+   [
+    "BS20981",
+    "PR-EX2098"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states set their own rules for work done away from the business."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Occupational nutrition care for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds occupational nutrition care to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW occupational nutrition care"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your custom brace job"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a home safety check Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a home safety check, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A home safety check"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's nutrition care takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Nutrition LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Nutrition's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Nutrition Clinic"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Nutrition"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Visits and Lee Diabetes Education"
+   ],
+   [
+    "plumbing and electrical",
+    "home nutrition and diabetes education"
+   ],
+   [
+    "1200 Main St",
+    "300 Main St"
+   ],
+   [
+    "88 Elm St",
+    "60 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "16 Cedar Ct"
+   ],
+   [
+    "Riley Chen",
+    "Grace Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Priya Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Price"
+   ],
+   [
+    "Casey Moore",
+    "Noor Moore"
+   ],
+   [
+    "Riley",
+    "Grace"
+   ],
+   [
+    "Avery",
+    "Priya"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Marcus sets the goals with Alex"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey",
+    "Noor"
+   ],
+   [
+    "electrical",
+    "diabetes education"
+   ],
+   [
+    "Electrical",
+    "Diabetes education"
+   ],
+   [
+    "plumbing license",
+    "dietitian license"
+   ],
+   [
+    "Plumbing license",
+    "Dietitian license"
+   ],
+   [
+    "plumber",
+    "dietitian"
+   ],
+   [
+    "plumbing",
+    "home nutrition"
+   ],
+   [
+    "Plumbing",
+    "Home nutrition"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "barbers",
+    "dietitians"
+   ],
+   [
+    "barber",
+    "dietitian"
+   ],
+   [
+    "Barber",
+    "Dietitian"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "color",
+    "family visit"
+   ],
+   [
+    "consult",
+    "check"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home nutrition visit"
+   ],
+   [
+    "drain clearing",
+    "home nutrition visit"
+   ],
+   [
+    "Drain clearing",
+    "Home nutrition visit"
+   ],
+   [
+    "Water heater replacement",
+    "Diabetes education visit plan"
+   ],
+   [
+    "water heater replacement",
+    "diabetes education visit plan"
+   ],
+   [
+    "Water heater flush",
+    "Home follow-up"
+   ],
+   [
+    "water heater flush",
+    "home follow-up"
+   ],
+   [
+    "water heaters",
+    "braces"
+   ],
+   [
+    "water heater",
+    "brace"
+   ],
+   [
+    "leak repair",
+    "longer first visit"
+   ],
+   [
+    "Leak repair",
+    "Longer first visit"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "late-cancel fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "Service call",
+    "Late-cancel fee"
+   ],
+   [
+    "Sewer camera inspection",
+    "Kitchen and pantry visit"
+   ],
+   [
+    "sewer camera inspection",
+    "kitchen and pantry visit"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a nutrition visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like a chiropractic adjustment"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: fainting, confusion, chest pain, or a blood sugar emergency, and the signs of an eating disorder."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a loose brace."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are there steps at your door?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and plan card ready."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that they feel shaky and worse now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "I feel shaky and worse now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 45 30 more minutes"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "30 more minutes, $45"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "30 more minutes · $45"
+   ],
+   [
+    "Replace both shutoff valves",
+    "30 more minutes"
+   ],
+   [
+    "The $160 valve quote",
+    "The $45 extra time"
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "30 more minutes for $45"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a loose stair rail, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a loose stair rail"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the visit"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the outlet fixed first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the hallway floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed hallway floor"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 home nutrition visit"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M.: added on the secure page."
+   ],
+   [
+    "the shutoff valves",
+    "the extra time"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My knee has been sore since the visit."
+   ],
+   [
+    "with the store's receipt",
+    "with the lab's receipt"
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. A check within 30 days is free, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the home safety report is ready"
+   ],
+   [
+    "Sewer camera report",
+    "home safety report"
+   ],
+   [
+    "Drain clearings already booked",
+    "Home evaluations already booked"
+   ],
+   [
+    "labor",
+    "visit time"
+   ],
+   [
+    "Labor",
+    "Visit time"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I feel worse today. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back from a doctor's visit 30 minutes late, sorry!"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 custom brace job"
+   ],
+   [
+    "flush",
+    "follow-up"
+   ],
+   [
+    "faucet",
+    "brace"
+   ],
+   [
+    "· arriving 8–10am",
+    "· 8:00am"
+   ],
+   [
+    "· arriving 12–2pm",
+    "· 12:00pm"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "no-show fee",
+    "missed-visit fee"
+   ],
+   [
+    "$20",
+    "$40"
+   ],
+   [
+    "At a venue or an office, it's the day-of contact, not the customer.",
+    "At a venue or a care home, it's the day-of contact, not the customer."
+   ]
+  ]
+ },
+ "keep": [
+  "late-cancel fee",
+  "office",
+  "Office",
+  "session",
+  "video session",
+  "Video session",
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee, a registered dietitian, signs up two companies by text. Then Alex, whose doctor sent a referral to a dietitian, asks an AI to book a first nutrition visit at Lee Nutrition Clinic, with Grace on Sat Oct 24 at 11:00am. The desk checks Alex's plan by hand and logs the referral, the intake stays on the secure page, and Alex pays the $35 share at the front desk. Grace sets the goals with Alex, and Alex says yes to follow-ups by text. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who can't easily get out for now, books a home nutrition visit with Lee Home Nutrition. Marcus comes Thu Oct 22 at 8:00am, looks at the kitchen with Alex and sets goals with Alex. Rosie texts the $179 bill when Marcus texts DONE, and Alex says yes to the next visits by text. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: Alex's first nutrition visit with Grace, Sat Oct 24 at 11:00am, with a doctor's referral. Nothing is taken and no card is saved. The desk checks Willow Health and logs the referral, and Alex pays the $35 share at the front desk. Self-pay clients pay $150, then $90 a follow-up, the same way.",
+    "list|card|counter": "The same first visit where Sam turns on the clinic's $40 late-cancel fee. A card is saved for it, never for a fee-free client, and Sam confirms any charge. Alex still pays at the front desk.",
+    "list|none|bill": "The same first visit on a Saturday morning, when nobody is at the front desk (video visits work the same). Nothing is taken, and Rosie texts Alex the bill when Grace texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "price": "$150",
+     "fee": "$40",
+     "name": "First nutrition visit"
+    },
+    "list|none|*": {
+     "price": "$150",
+     "name": "First nutrition visit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|bill",
+   "combos": [
+    "list|none|bill",
+    "list|none|own"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|none|bill": "The main story: Alex, who can't easily get out for now, has a $179 home nutrition visit with Marcus, Thu Oct 22 at 8:00am, with a look at the kitchen. Alex pays out of pocket: nothing is taken, no card is saved, and Rosie texts the bill when Marcus texts DONE. Grocery store tours ($75) are paid the same way.",
+    "list|none|own": "The same home visit when Alex's health plan pays in network, with a doctor's referral. Nothing is taken, and Lee Home Nutrition bills the plan its own way."
+   },
+   "amounts": {
+    "*": {
+     "price": "$179",
+     "name": "Home nutrition visit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each client booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Nutrition care always needs a license: each dietitian, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Nutrition care books people (a dietitian), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Nutrition care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each dietitian holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No nutrition visit is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A nutrition visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A nutrition visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A nutrition visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the clinic: the client is always there."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays at the clinic for a teen's visit."
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's two companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A request for today gets the soonest open time instead, once Sam OKs it.",
+     "Words about harming yourself or someone else get 988 and 911 at once. They never wait for a time."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-50",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "line": [
+       "4.4",
+       "4.7"
+      ],
+      "who": "agent",
+      "to": "san",
+      "via": "sync",
+      "title": "Shows only dietitians who may do this visit",
+      "does": "A visit a plan pays, with a doctor's referral, is nutrition therapy. So Rosie offers only dietitians licensed where Alex will be, who take Alex's plan.",
+      "more": [
+       "Where a state has no dietitian license, the dietitian's national registration is the proof. The plug-in says which.",
+       "A nutrition coach is never offered for it, only for general wellness where the plug-in allows.",
+       "Each dietitian sets on the Team page the visits they offer and the plans they take.",
+       "Times are ranked by the soonest, never by who might fit.",
+       "Alex's reasons aren't asked, and aren't kept."
+      ],
+      "needs": [
+       "pf.questions",
+       "pf.staff",
+       "pf.license"
+      ],
+      "rule": "Rosie's rule: nutrition therapy is offered only with a dietitian the state's form allows. Why: giving it without the right license breaks the state's rules."
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Nutrition care bills each visit on its own, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "The goals and any meal ideas go on the secure page at the visit, so nothing comes later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the clinic: the client is always there."
+   },
+   {
+    "op": "after",
+    "at": "A8-45",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.12",
+       "4.18"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 12:00pm",
+      "title": "Grace and Alex set the follow-ups",
+      "does": "The first visit is done. Grace and Alex agree on 30-minute follow-ups every 4 weeks, Saturdays at 11:00am. Rosie keeps only the day, the time and the place.",
+      "more": [
+       "The goals and meal ideas stay in the clinic's own record and on the secure page, never in a text.",
+       "Follow-ups can be by video, while Alex is in a state where Grace is licensed. It's asked again at each one.",
+       "Alex's plan covers a set number of hours of nutrition care a year. The desk records them.",
+       "Rosie counts the hours booked, and warns the desk before they run out."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "FOLLOWUPS A.M. every 4 weeks, Sat 11am, from Nov 21"
+       ],
+       [
+        "san",
+        "staff",
+        "Got it. I'll ask A.M. by text to say yes to a follow-up every 4 weeks, Saturdays at 11:00am."
+       ]
+      ],
+      "needs": [
+       "pf.services",
+       "pf.staff"
+      ],
+      "tells": [
+       "staff"
+      ]
+     },
+     {
+      "id": "A8-x05",
+      "type": "split",
+      "line": [
+       "4.18",
+       "7.15"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Sat Oct 24, 12:05pm",
+      "title": "Texts the follow-ups for Alex's own yes",
+      "q": "Does Alex say yes to the follow-ups?",
+      "does": "Alex agreed to the follow-ups at the visit, but they still need Alex's own yes by text. Nothing is booked again without it, and one reply can stop them.",
+      "more": [
+       "The text names only the clinic, the days and the time. Nothing about the visits.",
+       "Each visit gets its own code, in its own reminder.",
+       "A follow-up can move to video later, with the state check first."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your follow-ups at Lee Nutrition Clinic are ready to book.",
+        {
+         "card": {
+          "title": "Follow-ups · every 4 weeks",
+          "lines": [
+           "Saturdays · 11:00am",
+           "Sat Nov 21, Dec 19 and Jan 16",
+           "Your share · at the front desk after each one",
+           "Free to cancel until 24 hours before, then a $40 fee"
+          ],
+          "button": "See the dates",
+          "link": "rosfield.com/v/a3"
+         },
+         "buttons": [
+          "All three",
+          "Just the next one"
+         ]
+        }
+       ]
+      ],
+      "rule": "Rosie's rule: follow-ups need the client's own yes, and stop with one reply. Why: nobody is booked again and again without saying so.",
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 All three",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x06",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books all three follow-ups",
+          "does": "Alex replies 1. Sat Nov 21, Dec 19 and Jan 16 at 11:00am are booked. Each visit gets its own code.",
+          "more": [
+           "Rosie counts the hours against the plan's covered hours the desk recorded.",
+           "If Alex has another open booking, a reply first asks which one."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "1"
+           ],
+           [
+            "san",
+            "cust",
+            "Done: Sat Nov 21, Dec 19 and Jan 16, at 11:00am. Each visit's code comes with its reminder.",
+            {
+             "buttons": [
+              "Change the next one",
+              "Skip the next one",
+              "Stop the follow-ups"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "2 Just the next one",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x07",
+          "line": [
+           "4.18",
+           "10.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books only the next follow-up",
+          "does": "Alex replies 2, so only Sat Nov 21 is booked. Grace asks again at that visit.",
+          "say": [
+           [
+            "cust",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: your next visit at Lee Nutrition Clinic.",
+            {
+             "card": {
+              "title": "Lee Nutrition Clinic · 60 Grove St",
+              "lines": [
+               "Sat Nov 21 · 11:00am",
+               "Free to cancel until Fri Nov 20, 11am, then a $40 fee"
+              ]
+             },
+             "code": "7314",
+             "buttons": [
+              "Change the time",
+              "Cancel the visit"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ],
+          "vary": {
+           "before:none": {
+            "say": [
+             [
+              "cust",
+              "san",
+              "2"
+             ],
+             [
+              "san",
+              "cust",
+              "Booked: your next visit at Lee Nutrition Clinic.",
+              {
+               "card": {
+                "title": "Lee Nutrition Clinic · 60 Grove St",
+                "lines": [
+                 "Sat Nov 21 · 11:00am",
+                 "No fee to cancel or miss"
+                ]
+               },
+               "code": "7314",
+               "buttons": [
+                "Change the time",
+                "Cancel the visit"
+               ]
+              }
+             ]
+            ]
+           }
+          }
+         }
+        ]
+       },
+       {
+        "label": "No reply in 2 days",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x08",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Books nothing more without Alex's yes",
+          "does": "No reply in 2 days, so nothing is booked, not even the visit agreed at the visit: follow-ups need Alex's own yes. The desk asks Alex once more, the way Alex picked, and Alex can book any time."
+         }
+        ]
+       }
+      ],
+      "vary": {
+       "price:list+before:none+after:counter": {
+        "say": [
+         [
+          "san",
+          "cust",
+          "Your follow-ups at Lee Nutrition Clinic are ready to book.",
+          {
+           "card": {
+            "title": "Follow-ups · every 4 weeks",
+            "lines": [
+             "Saturdays · 11:00am",
+             "Sat Nov 21, Dec 19 and Jan 16",
+             "Your share · at the front desk after each one",
+             "No fee to cancel or miss"
+            ],
+            "button": "See the dates",
+            "link": "rosfield.com/v/a3"
+           },
+           "buttons": [
+            "All three",
+            "Just the next one"
+           ]
+          }
+         ]
+        ]
+       },
+       "price:list+before:none+after:bill": {
+        "say": [
+         [
+          "san",
+          "cust",
+          "Your follow-ups at Lee Nutrition Clinic are ready to book.",
+          {
+           "card": {
+            "title": "Follow-ups · every 4 weeks",
+            "lines": [
+             "Saturdays · 11:00am",
+             "Sat Nov 21, Dec 19 and Jan 16",
+             "Your share · on the bill we text after each Saturday-morning visit",
+             "No fee to cancel or miss"
+            ],
+            "button": "See the dates",
+            "link": "rosfield.com/v/a3"
+           },
+           "buttons": [
+            "All three",
+            "Just the next one"
+           ]
+          }
+         ]
+        ]
+       }
+      }
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "Packages of follow-ups are sold only at the clinic, after the first visit, never on the booking page."
+   },
+   {
+    "op": "more",
+    "at": "A4-55",
+    "more": [
+     "The payer sees only the date and the amount, never what the visit is about."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For a nutrition visit, the guardian signs the consent and the intake forms on the secure page.",
+     "The code goes to whoever comes to the visit with the client."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A discount code",
+    "why": "The clinic sells no gift cards or discount codes. A lower fee comes only from Sam's sliding scale, set on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "A follow-up plan has no plan charge: each visit is paid when it happens."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "Nutrition care signs no contract or sale at a visit that the cancel rules cover."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "Nutrition care sends no proposals: the next step is agreed at the visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "A visit isn't redone. A concern goes to the dietitian or to Sam, as a complaint."
+   },
+   {
+    "op": "branch",
+    "at": "A10-06",
+    "branch": {
+     "label": "A plan's covered hours run low",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A10-x02",
+       "line": [
+        "4.25",
+        "11.1"
+       ],
+       "who": "san",
+       "to": "staff",
+       "via": "msg",
+       "t": "Mon Dec 21, 8:00am",
+       "title": "Warns the desk before covered hours run out",
+       "does": "A what-if: Alex's plan covers a set number of hours of nutrition care a year, and only 30 minutes are left. The desk asks the doctor for more, or tells Alex the self-pay price.",
+       "more": [
+        "Some plans add hours only after a new order from the doctor. The desk handles that, never Rosie.",
+        "The text names only the client's initials and the hours left.",
+        "Rosie never asks the plan itself."
+       ],
+       "say": [
+        [
+         "san",
+         "staff",
+         "A.M.: 30 minutes left of the plan's covered hours this year.",
+         {
+          "card": {
+           "title": "Hours left · A.M.",
+           "lines": [
+            "Ask the doctor for more, where the plan allows",
+            "Or tell A.M. the self-pay price first"
+           ],
+           "button": "Open the record",
+           "link": "rosfield.com/s/a4"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.money"
+       ],
+       "tells": [
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "S11-49",
+    "more": [
+     "For nutrition care, each client says yes to a new dietitian first. Priya can hold a last visit, where the client wants one."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every nutrition care booking has a first step: at least the intake and consent on the secure page."
+   },
+   {
+    "op": "branch",
+    "at": "A7-02",
+    "branch": {
+     "label": "Alex will be in another state",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A7-x01",
+       "line": [
+        "7.14",
+        "4.24"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Thu Oct 22, 7:30pm",
+       "title": "Explains where a video visit can happen",
+       "does": "A what-if: say Alex had booked Saturday by video, then texts that Saturday is at a parent's home in another state. Grace isn't licensed there.",
+       "more": [
+        "A video visit follows the state the client is in during it, from the plug-in.",
+        "Rosie offers another time or a free cancel. Another dietitian licensed there comes only if Sam calls and Alex says yes.",
+        "For a longer stay, like a winter away, the follow-ups can move to a dietitian licensed there, with Alex's yes.",
+        "No reply by the day before: the clinic is asked to call Alex. The visit stays booked until then.",
+        "The text never says why Alex is away, and names no dietitian."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "I'll be at my parents' in another state on Saturday. Can I still do the video visit?"
+        ],
+        [
+         "san",
+         "cust",
+         "A video visit must happen in a state where your dietitian is licensed, and yours isn't licensed there. Pick another time, or cancel with no fee:",
+         {
+          "times": [
+           "Mon Oct 26 · 6:00pm",
+           "Tue Oct 27 · 6:00pm"
+          ],
+          "buttons": [
+           [
+            "C",
+            "Cancel, no fee"
+           ]
+          ]
+         }
+        ]
+       ],
+       "rule": "Rosie's rule: a video visit follows the state the client is in that day. Why: a license covers the place where the client is, not where the dietitian sits.",
+       "needs": [
+        "pf.license",
+        "pf.rules"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "S1-09",
+    "more": [
+     "Client texts carry the business name, the date, the time, the place and a link. Never the kind of visit or any health detail."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-25",
+    "more": [
+     "The 988 message comes first, at once. It never waits for a time or a booking.",
+     "If the person is already a client, their dietitian and Sam are told at once, with a link, never the words."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A3-22",
+    "branch": {
+     "label": "Signs of an eating disorder",
+     "end": "end",
+     "endText": "No booking by the AI. The person has the clinic's line, a doctor, and 911 and 988.",
+     "steps": [
+      {
+       "id": "A3-x01",
+       "line": [
+        "3.9"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "sync",
+       "title": "Gives the clinic's own line for this care",
+       "does": "The words sound like an eating disorder. The AI books nothing. The clinic's own team books this care by phone, with the person's doctor.",
+       "more": [
+        "Signs like making yourself throw up, using laxatives to get rid of food, or going days without eating.",
+        "No weight-loss or meal-plan visit is offered.",
+        "Rosie never names a condition, and gives no advice about food or weight.",
+        "On a call, Rosie says the same words out loud.",
+        "If the person is already a client, their dietitian and Sam are told the same day, with a link, never the words."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "Lee Nutrition Clinic's own team books this kind of care by phone, together with your doctor: (555) 010-0177. Please also talk with your doctor soon. If you feel faint or unwell now, call 911. If you have thoughts of hurting yourself, call or text 988."
+        ]
+       ],
+       "rule": "Rosie's rule: signs of an eating disorder go to the clinic's own team and a doctor, never to an automatic booking. Why: a weight or meal-plan visit booked by an AI could harm someone who has one.",
+       "needs": [
+        "pf.safety"
+       ],
+       "tells": [
+        "agent"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "S11-49",
+    "more": [
+     "No reply: Sam calls. Nobody is moved to a new dietitian without the client's yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Every intake answer gets the danger check too.",
+     "Signs of an eating disorder or self-harm reach the dietitian and Sam that day, by a link."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When clients book, do you take anything? Each service starts the way most nutrition clinics set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your clinic and by video, paid at the front desk, your own way",
+         "When they book: nothing taken, no card saved",
+         "A card saved for the $40 late-cancel fee, only if you turn it on",
+         "With a plan: the client pays the share, and you bill the plan your own way",
+         "Free on your board: nothing taken, nothing after"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "First nutrition visit",
+          "$150"
+         ],
+         [
+          "Follow-up",
+          "$90"
+         ],
+         [
+          "Teen nutrition visit",
+          "$150"
+         ],
+         [
+          "Family visit",
+          "$120"
+         ],
+         [
+          "30 more minutes",
+          "$45"
+         ],
+         [
+          "Package of 3 follow-ups",
+          "$240, at the desk only"
+         ],
+         [
+          "Intro call",
+          "Free"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "after:counter": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Saturday mornings Grace works alone: send the bill then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Saturday mornings: the bill Rosie sends after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, Saturday mornings are paid by the bill Rosie sends."
+      ]
+     },
+     "after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Saturday mornings Grace works alone: send the bill then"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Saturday mornings: the bill Rosie sends after the visit. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, Saturday mornings are paid by the bill Rosie sends."
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Nutrition care is health care, sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A nutrition visit always needs the client there."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Home nutrition takes no visits sent now, so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for nutrition care."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A nutrition visit always needs the client there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the dietitian's care at home: an adult on the booking is there."
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each client booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Nutrition care always needs a license: each dietitian, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Nutrition care books people (a dietitian), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Nutrition care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each dietitian holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No nutrition visit is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A nutrition visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Home nutrition sells no seats in a visit: each client has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No nutrition visit is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No nutrition visit is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A visit at home needs no signed contract: the consent is a form on the secure page."
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's two companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A request for today gets the soonest open time instead, once Sam OKs it.",
+     "Words about harming yourself or someone else get 988 and 911 at once. They never wait for a time."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Nutrition care bills each visit on its own, never in stages."
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a nutrition visit, they sign the consent and the intake forms on the secure page.",
+     "The code goes to whoever meets the dietitian, like a family member at home."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-44",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.12",
+       "4.18"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Thu Oct 22, 9:05am",
+      "title": "Marcus and Alex set the follow-ups",
+      "does": "The first visit is done. Marcus and Alex agree on home follow-ups every 4 weeks, Thursdays at 8:00am. Rosie keeps only the day, the time and the place.",
+      "more": [
+       "The goals and the shopping plan stay in the business's own record and on the secure page, never in a text.",
+       "Once Alex can get out, follow-ups can move to the clinic or to video, in the other flow.",
+       "A grocery store tour can come later, at a store Alex picks.",
+       "A plan that must OK visits ahead is checked by Sam's team."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "FOLLOWUPS A.M. every 4 weeks, Thu 8am at home, from Nov 19"
+       ],
+       [
+        "san",
+        "staff",
+        "Got it. I'll ask A.M. by text to say yes to a home follow-up every 4 weeks, Thursdays at 8:00am."
+       ]
+      ],
+      "needs": [
+       "pf.services",
+       "pf.staff"
+      ],
+      "tells": [
+       "staff"
+      ]
+     },
+     {
+      "id": "B8-x02",
+      "type": "split",
+      "line": [
+       "4.18",
+       "7.15"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 9:10am",
+      "title": "Texts the follow-ups for Alex's own yes",
+      "q": "Does Alex say yes to the follow-ups?",
+      "does": "Alex agreed to the follow-ups with Marcus, but they still need Alex's own yes by text. Nothing is booked again without it, and one reply can stop them.",
+      "more": [
+       "At home, the text names who comes, for the door check. Nothing about the visits.",
+       "Each visit gets its own code, in Marcus's on-my-way text."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your follow-ups with Lee Home Nutrition are ready to book.",
+        {
+         "card": {
+          "title": "Follow-ups · every 4 weeks",
+          "lines": [
+           "Thursdays · 8:00am · at your home, with Marcus",
+           "Thu Nov 19, Dec 17 and Jan 14",
+           "$120 a visit, on the bill we text after each one",
+           "No fee to cancel or miss"
+          ],
+          "button": "See the dates",
+          "link": "rosfield.com/v/r6"
+         },
+         "buttons": [
+          "All three",
+          "Just the next one"
+         ]
+        }
+       ]
+      ],
+      "vary": {
+       "price:list+before:none+after:own": {
+        "say": [
+         [
+          "san",
+          "cust",
+          "Your follow-ups with Lee Home Nutrition are ready to book.",
+          {
+           "card": {
+            "title": "Follow-ups · every 4 weeks",
+            "lines": [
+             "Thursdays · 8:00am · at your home, with Marcus",
+             "Thu Nov 19, Dec 17 and Jan 14",
+             "Your plan is billed after each visit",
+             "No fee to cancel or miss"
+            ],
+            "button": "See the dates",
+            "link": "rosfield.com/v/r6"
+           },
+           "buttons": [
+            "All three",
+            "Just the next one"
+           ]
+          }
+         ]
+        ]
+       }
+      },
+      "rule": "Rosie's rule: follow-ups need the client's own yes, and stop with one reply. Why: nobody is booked again and again without saying so.",
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 All three",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x03",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books all three home follow-ups",
+          "does": "Alex replies 1. Thu Nov 19, Dec 17 and Jan 14 at 8:00am are booked. Each visit gets its own code.",
+          "more": [
+           "If Alex has another open booking, a reply first asks which one."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "1"
+           ],
+           [
+            "san",
+            "cust",
+            "Done: Thu Nov 19, Dec 17 and Jan 14, at 8:00am, at home with Marcus. Each visit's code comes with Marcus's on-my-way text.",
+            {
+             "buttons": [
+              "Change the next one",
+              "Skip the next one",
+              "Stop the follow-ups"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "2 Just the next one",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "line": [
+           "4.18",
+           "10.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books only the next home follow-up",
+          "does": "Alex replies 2, so only Thu Nov 19 is booked. Marcus asks again at that visit.",
+          "say": [
+           [
+            "cust",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: your next visit.",
+            {
+             "card": {
+              "title": "Lee Home Nutrition · 16 Cedar Ct",
+              "lines": [
+               "Thu Nov 19 · 8:00am · Marcus",
+               "No fee to cancel or miss"
+              ]
+             },
+             "buttons": [
+              "Change the time",
+              "Cancel the visit"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No reply in 2 days",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x05",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Books nothing more without Alex's yes",
+          "does": "No reply in 2 days, so nothing is booked, not even the visit agreed with Marcus: follow-ups need Alex's own yes. Sam's team asks Alex once more, the way Alex picked, and Alex can book any time."
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "Follow-ups are each paid when they happen, so no plan charge is ever texted."
+   },
+   {
+    "op": "after",
+    "at": "B4-05",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "line": [
+       "4.4",
+       "4.7"
+      ],
+      "who": "agent",
+      "to": "san",
+      "via": "sync",
+      "title": "Notes what Alex wants in a dietitian",
+      "does": "Alex has no wish about the dietitian, beyond a Thursday morning. Rosie shows anyone licensed in Alex's state who does home visits, soonest first.",
+      "more": [
+       "A nutrition coach is never offered for a nutrition visit.",
+       "A client may ask for a woman or a man, or someone who speaks their language. Only people who fit are shown.",
+       "Times are ranked by the soonest, never by who might fit."
+      ],
+      "needs": [
+       "pf.questions",
+       "pf.staff",
+       "pf.license"
+      ],
+      "vary": {
+       "price:list+before:none+after:own": {
+        "more": [
+         "A nutrition coach is never offered for a nutrition visit.",
+         "A client may ask for a woman or a man, or someone who speaks their language. Only people who fit are shown.",
+         "Times are ranked by the soonest, never by who might fit.",
+         "Alex's plan pays, so only dietitians in network with it show."
+        ]
+       }
+      }
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A nutrition visit starts at a set time, not in an arrival window."
+   },
+   {
+    "op": "more",
+    "at": "B4-27",
+    "more": [
+     "A family member who stays with Alex can get the code, when a mobile is given for them. They don't join the visit."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "Nothing about a visit goes by text while it runs."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at a home visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at a home visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A visit isn't redone. A concern goes to Sam, as a complaint."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Nutrition care sends no proposals: the next step is agreed at the visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "The goals and any shopping plan go on the secure page at the visit, so nothing comes later."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "No",
+    "why": "Every nutrition care booking has a first step: at least the intake and consent on the secure page."
+   },
+   {
+    "op": "more",
+    "at": "S1-09",
+    "more": [
+     "Client texts carry the business name, the date, the time, the place and a link. Never the kind of visit or any health detail."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-20",
+    "more": [
+     "The 988 message comes first, at once. It never waits for a time or a booking.",
+     "If the person is already a client, their dietitian and Sam are told at once, with a link, never the words."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "B3-17",
+    "branch": {
+     "label": "Signs of an eating disorder",
+     "end": "end",
+     "endText": "No booking by the AI. The person has the business's own line, a doctor, and 911 and 988.",
+     "steps": [
+      {
+       "id": "B3-x01",
+       "line": [
+        "3.9"
+       ],
+       "who": "san",
+       "to": "agent",
+       "via": "sync",
+       "title": "Gives the business's own line for this care",
+       "does": "The words sound like an eating disorder. The AI books nothing. Lee Home Nutrition's own team books this care by phone, with the person's doctor.",
+       "more": [
+        "Signs like making yourself throw up, using laxatives to get rid of food, or going days without eating.",
+        "No weight-loss or meal-plan visit is offered.",
+        "Rosie never names a condition, and gives no advice about food or weight.",
+        "On a call, Rosie says the same words out loud.",
+        "If the person is already a client, their dietitian and Sam are told the same day, with a link, never the words."
+       ],
+       "say": [
+        [
+         "san",
+         "agent",
+         "Lee Home Nutrition's own team books this kind of care by phone, together with your doctor: (555) 010-0142. Please also talk with your doctor soon. If you feel faint or unwell now, call 911. If you have thoughts of hurting yourself, call or text 988."
+        ]
+       ],
+       "rule": "Rosie's rule: signs of an eating disorder go to the business's own team and a doctor, never to an automatic booking. Why: a weight or meal-plan visit booked by an AI could harm someone who has one.",
+       "needs": [
+        "pf.safety"
+       ],
+       "tells": [
+        "agent"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "Sam left bank transfer off: home nutrition bills are small.",
+    "label": "Bank transfer, if it's on"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "A landlord never pays for a nutrition visit.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "more",
+    "at": "S11-49",
+    "more": [
+     "No reply: Sam calls. Nobody is moved to a new dietitian without the client's yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Every intake answer gets the danger check too.",
+     "Signs of an eating disorder or self-harm reach the dietitian and Sam that day, by a link."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When clients book, do you take anything? Each service starts the way most home nutrition practices set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every home visit, to start",
+        "lines": [
+         "Where: at the client's home, or a grocery store",
+         "When they book: nothing taken, no card saved",
+         "After the visit: Rosie sends the bill",
+         "No late-cancel fee for home visits"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Home nutrition visit",
+          "$179"
+         ],
+         [
+          "Home follow-up",
+          "$120"
+         ],
+         [
+          "Kitchen and pantry visit",
+          "$199"
+         ],
+         [
+          "Diabetes education visit",
+          "$199"
+         ],
+         [
+          "Grocery store tour",
+          "$75"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:deposit+after:own": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "after:bill": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Plan clients: I bill the plan my own way"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A visit a plan pays: nothing taken, and you bill the plan your own way. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, a visit a plan pays is billed Sam's own way."
+      ]
+     },
+     "after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Plan clients: I bill the plan my own way"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A visit a plan pays: nothing taken, and you bill the plan your own way. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, a visit a plan pays is billed Sam's own way."
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Nutrition care is health care, sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "From: therapist (the current overlay, itself built from physical-therapist and the dentist pilot), reviewed. Why: a dietitian's practice runs like it: visits of a set length with a named, licensed clinician; video visits counted as flow A, with the client's state asked before times and checked at the start (the old flowchart's winter-away case); the intake only on the secure page; the plan checked by hand; safety words with 988 and 911; no $2; and follow-ups agreed at the visit, then OK'd by the client's own yes. Physical-therapist has the referral but no video or crisis handling; therapist has both of those, so it fits more of this work.\nAdded for this work: the doctor's referral as the first step (A4-43 'The clinic must get it', A4-48, A7-33 to A7-36; B4-38, B4-42, B7-33); signs of an eating disorder as an own ending branch (A3-x01, B3-x01); the goals set by the dietitian, never Rosie (A8-44, B8-39); a plan's covered hours (A10-x02); a private rating (A10-34 'Yes' and B10-02 on); a package of follow-ups used as a credit (A5-03 on). Removed from the pilot: 'Crisis words, then still books' (self-harm gets 988 and no booking in that chat) and the yearly weekly-time reminder.\nNames: Sam Lee, a registered dietitian, owns Lee Home Nutrition LLC (the master's main company: home nutrition and diabetes education, 300 Main St, a 25-mile area) and Lee Nutrition Clinic LLC (the second company: the clinic at 60 Grove St, Springfield, and video). Alex's home is 16 Cedar Ct.\nPeople: Riley became Grace (clinic and video; families, teens and some home visits), Avery became Priya (clinic and video; licensed in a second state), Jordan became Marcus (home visits; also a certified diabetes educator), Casey became Noor (a dietitian with a provisional license, under Sam's supervision, a switch). Sam, Pat (now 'practice manager') and Alex M. stay. Alex has no pronoun.\nKinds of work: plumbing became home nutrition, electrical became diabetes education (it waits for a certified diabetes educator, where the plug-in or a plan asks), the barbershop became the nutrition clinic. A nutrition coach with no dietitian license is booked only for general wellness, never for nutrition therapy (plugin pf.license.coach; S2-15); the example practices have none.\nLicense: nutrition therapy only with a dietitian the state's form allows: licensed there, or registered where the state has no license (switches; A4-x01, B4-x01, pf.license). Example IDs use an obviously made-up format (LD-EX0452).\nPrices are the example practices' own, not a standard: first nutrition visit $150 and follow-up $90 (the old flowchart's own), teen visit $150, family visit $120, 30 more minutes $45, a package of 3 follow-ups $240 (sold only at the clinic), the late-cancel fee $40 (the old flowchart's own, only where Sam turns it on), a plan's share $35 (the master's number); home nutrition visit $179 (the master's), home follow-up $120, kitchen and pantry visit $199 ($249 when Sam goes), grocery store tour $75 (the old flowchart's own), diabetes education visit $199; the intro call is free.\nMoney A: list|none|counter is the main path (the old flowchart's way: no deposit, no card; the clinic bills the plan after the visit, and the share or the self-pay price is paid at the front desk). list|card|counter: where Sam turns on the $40 late-cancel fee, a card is saved for it, never for a fee-free client. list|none|bill: Saturday mornings with no front desk, and video visits: Rosie texts the bill at DONE. Left out: holds, deposits, full price before (a package is a credit bought at the clinic, A5-03), photo or at-the-visit pricing, and the saved card charged at DONE.\nMoney B: list|none|bill is the main path (a self-pay home or store visit; nothing taken, no card; Rosie texts the bill at DONE). list|none|own: a plan pays in network, with a doctor's referral, and Lee Home Nutrition bills it its own way. Left out: a card saved (no fee at home in the example), holds, deposits, full price, photo or at-the-visit pricing.\nThe old flowchart's fee by pay link with no card saved has no master path (with nothing saved, the master charges no fee): it's the gap 'A fee asked by pay link, with no card saved', and the overlay offers the saved-card path instead.\nThe free intro call is a first step a new client may ask for (A4-43 'Yes: booked first', A4-45 to A4-47), not a money path: nothing is taken and nothing is owed.\nSign-up words changed to how nutrition care is paid (S1-12 to S1-18, S1-41 to S1-47): home visits take nothing and get the bill texted (Sam taps 1 at S1-15; plan clients go Sam's own way, S1-18); the clinic takes nothing, or saves a card only for the $40 fee; Saturday mornings and video use the texted bill (S1-46). Bank transfer stays off (S1-57). No tips.\nPrivacy: client texts carry the business name, date, time, place and a link; never the kind of visit, a condition, a weight, labs, medicines or food details; at the clinic, no dietitian's name in a text; at home, the dietitian's name stays for the door check. Owner and staff texts use initials and links (A6-15, A9-04 to A9-11, B6-14, B9-05 to B9-11, B10-04). No plain display name switch: the business names say nutrition, as the old flowchart's did.\nSafety: a medical emergency gets 911 (A3-24, B3-19); self-harm gets 988 and no booking in that chat (A3-25, B3-20); signs of an eating disorder go to the clinic's own team and a doctor, never an AI booking (A3-x01, B3-x01); feeling unwell goes on after 'call your doctor today' (A3-23, B3-18); worrying words before a visit alert the dietitian and Sam with a link (A7-13, B7-17, the old flowchart's own text); the dietitian may stop a visit for the clinic's own plan (A8-35, B8-30).\nNo advice: Rosie and the AI give no diet, weight or medical advice (A3-26, B3-21, A7-12 'I can't give food advice', B7-16); the goals are the dietitian's to set with the client (A8-44, B8-39).\nVideo: counts as flow A; the state is asked before times (A4-50) and confirmed at the start (A8-03); A7-x01 handles another state, and a winter away moves the follow-ups to a dietitian licensed there, with the client's yes.\nChildren: a parent or guardian books, consents and comes; Sam OKs visits for anyone under 18 (S1-47, A4-25).\nFollow-ups: A8-x01 and A8-x05 (three dated visits every 4 weeks: Sat Nov 21, Dec 19, Jan 16, with Alex's own yes); B8-x01 and B8-x02 (Thu Nov 19, Dec 17, Jan 14). A follow-up's price change gets 30 days' notice (A7-55, S11-54).\nStand-ins: nobody is moved to another dietitian on silence; Sam calls (A7-61 'Someone has it' off, B7-58 'Yes: Sam has it' off, S11-46, S11-49, B7-46).\nFlow B: set start times (B4-83 '2 A set start time'); the kitchen look only with the client's OK (B4-24, B8-45); Maple Court care home's visit days as the host's place (S1-59 in B, B4-66). The grocery store tour is a B service at a store the client picks.\nClocks: sign-up Mon Oct 19 from 2:05pm to 3:05pm. Flow A: the chat Wed Oct 21 7:15pm, booked 7:22pm, the reminder Fri 10:00am, the visit Sat Oct 24 11:00am to noon, the follow-ups 12:05pm, the rating 4:00pm. Flow B: the chat Mon Oct 19 6:40pm, booked 6:48pm, the reminder Tue 6:00pm, the visit Thu Oct 22 8:00 to 9:00am, the follow-ups 9:10am, the bill 9:12am, the receipt 9:15am. Sections 11 and 12 keep the pilot's own vignettes and times.\nNo $2: a health practice; S1-62, S1-65 and S11-92 take the no-$2 branch, and every $2 sentence on the listed paths says Rosfield takes nothing.\nkeep: 'late-cancel fee' (the old flowchart's own fee; the pilot had used it for the plumber's service call).\nRename pairs: the pilot's chain pairs were re-keyed to the new words; pairs with master phrases that say 'office' come first (Pat is the 'practice manager').\nMaster issues found: Alex is given 'his' in master words (B4-54's title 'Shows Alex his share first' and its 'Alex sees his share'; B4-73 'Alex adds his partner'; A9-23 'so his link offers a card'), fixed here with rename pairs; the master's B9 bill steps and B6-14's bill words still name the plumber's job (drain, valves), so each profession on a texted-bill path must cover them.\nNot sure: whether the old flowchart's fee by pay link should become a master path (the gap); whether a nutrition coach should appear as a person at all (kept only as a switch); the referral's due time (1 business day before) is the example practice's choice; plan rules on covered hours differ, so the overlay says 'a plan's covered hours' and leaves the counts to the desk.\nReview (Oct 24, fresh reviewer): S1-49/S1-51 on the paths with nothing saved now speak of the texted bills for Saturdays and video, not saved cards and the $40 fee; S1-46 says video visits get the texted bill (as S1-42 and pf.money.after). The referral is due 2 business days before (pf.first_steps; A4-48 Thu 11am; A7-33; B4-42 Tue 8am; B7-33), so the client hears before free cancel ends. A8-x08 and B8-x05: silence books nothing. Owner and staff texts never name diabetes (B7-35, B8-01, S11-08, S11-40). Flow B says the business, not the clinic (B3-x01, B7-17, B8-18, B8-44, B8-61). pf.edges.weather added for B7-35. B4-43 'Needs a crew or equipment' off.\nRefit Oct 27 2026 (R13) to the REDESIGN 2 master: facts planbill, firststeps, forms, video, children; switches sensitive (health care: no rating, initials only) and welfare in B (a client who can't easily get out); set start times, free cancel until 24 hours before. Every legacy words op dropped (the record and the homes word the money now); kept the own steps, the more lines and the off ops on live branches; own words only on S1-13 (the money card, both flows). Kept words: 'office' (the master's office manager role), 'session' (the master's video or phone session), 'leak' (a privacy leak).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "We'd share only where they're working, only after a missed check.",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Color quotes come to you first. Board prices never need one",
+    "Saturdays: a tip line on the bill",
+    "like an office manager",
+    "Pat, the office manager",
+    "Every shop service, color and house calls",
+    "Do you do kids cuts? My son is 8.",
+    "Riley can do a shorter cut in the time left",
+    "3 jobs",
+    "A tip goes the shop's own way.",
+    "says the cape clip ripped a shirt collar today",
+    "The cape clip ripped my shirt collar.",
+    "Alex bought a package of cuts at the shop.",
+    "A beard trim",
+    "a beard trim",
+    "Lena",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "like a color correction done in two steps",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "so I can't reach Elm Street Dental.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A haircut",
+    "a haircut",
+    "a kids cut",
+    "a house call",
+    "MP045210",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "May the shop show photos of your hair?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "a consult",
+    "consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "labor",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "like a skin-test result",
+    "The cut is uneven on one side.",
+    "Quiero un corte el sábado.",
+    "Step-free door on Elm St",
+    "no-show fee",
+    "No-show fee",
+    "like a clinic,",
+    "$20",
+    "Books a video session"
+   ],
+   "B": [
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds mold behind the sink wall.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today, starts at 3:00pm, with Jordan.",
+    "Iris",
+    "Mon–Fri 7:30am–5:30pm · 2-hour windows · 1 hour's notice · up to 60 days ahead",
+    "Free until 7am on the visit day. After that, or nobody home: up to the $89 service call, only if a card, a deposit or the full price was taken and you say yes",
+    "Ask you first · 2–4pm weekdays kept for them, open to everyone at 10am",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "A tip line · bank transfer over $500",
+    "We'd share only where they're working, only after a missed check.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Like tapping a neighbor's water line without asking.",
+    "like an office manager",
+    "Pat, the office manager",
+    "called the office, and Pat took the call",
+    "Hours: Mon–Fri 7:30am–5:30pm",
+    "Every plumbing job, and electrical jobs",
+    "3 jobs",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Someone calls for a dentist: a wrong number.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "A haircut",
+    "a haircut",
+    "leehomeservices.com",
+    "MP045210",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan and Alex check the work",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "house calls",
+    "color",
+    "consult",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "water heater",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "credited to the repair",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "A plan or warranty pays",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote",
+    "replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "The kitchen drain is clogged again.",
+    "with the store's receipt",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "Drain clearings already booked",
+    "labor",
+    "Labor",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "$2,400 repipe",
+    "flush",
+    "faucet",
+    "· arriving 8–10am",
+    "· arriving 12–2pm",
+    "8–10am",
+    "no-show fee",
+    "$20",
+    "At a venue or an office, it's the day-of contact, not the customer."
+   ]
+  },
+  "A": {
+   "S1-26": "776159519e",
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "S1-29": "fb61245096",
+   "S2-31": "320ac5e4cb",
+   "A4-50": "6f43775326",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A8-45": "6589a6b4d4",
+   "A5-01": "6c5c5c2f87",
+   "A4-55": "c4555e49e7",
+   "A4-64": "b98f95b738",
+   "A7-94": "6490d5d8e6",
+   "A10-05": "63c3536c7a",
+   "A10-44": "50aad85ac2",
+   "S11-49": "9b6eda6f4b",
+   "A4-43": "c17d56f766",
+   "A7-02": "987e1a14cd",
+   "S1-09": "0d1e9bcbb2",
+   "A3-25": "c5e67f2b42",
+   "A3-22": "0057d8fc9f",
+   "S1-13": "eca22651fd",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "B8-03": "ac9d404766",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-26": "776159519e",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B5-34": "917f89b62f",
+   "S1-29": "592bd8f1a2",
+   "S2-31": "320ac5e4cb",
+   "B9-19": "b97bfbf0d2",
+   "B4-74": "bae5529af9",
+   "B8-44": "3847104a93",
+   "B7-91": "7132851ec1",
+   "B4-05": "fb3a9061c8",
+   "B4-27": "4b45128d2c",
+   "B8-22": "50d78f1af0",
+   "B10-05": "a326ea3c0b",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B4-38": "9539521dc7",
+   "S1-09": "2edb6f5b15",
+   "B3-20": "86aca4ccb5",
+   "B3-17": "3eb7d7f259",
+   "B9-06": "f091432f2d",
+   "S11-49": "de7b90619f",
+   "S1-13": "6964bfbe60",
+   "B10-32": "7713bff255"
+  }
+ }
+}

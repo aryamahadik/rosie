@@ -1,0 +1,2717 @@
+{
+ "id": "swim",
+ "name": "Swim school",
+ "style": "Class",
+ "pattern": "class",
+ "from": "dance",
+ "plugin": {
+  "pf.license": {
+   "need": "from the state form: teaching swimming usually needs no state license; a pool used for lessons may need a health permit and inspections where the state's or county's rules require it (a switch); some places register a swim school or set rules for selling lessons ahead",
+   "who": "the business, for any registration and the school's pool permit; each instructor and lifeguard, for their own certificates",
+   "ask": "any business registration number; for the school's own pool, the pool permit number and its renewal date where the state's form asks; for each instructor, a current water safety instructor certificate and a CPR and first aid certificate; for each lifeguard, a current lifeguard certificate",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "certificates": "lifesaving and CPR certificates for each instructor in the water, and a lifeguard certificate for anyone guarding: switches from the state's form, on by default; a person teaches or guards only while their certificates are current",
+   "background": "a background check for each person who teaches or works with children, where the state's rules require it (a switch from the state's form; the owner can also turn it on): who ran it and when, kept on file, renewed on the state's schedule",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "reminded 30 days before a certificate, a background check, the pool permit or insurance comes due; a lapsed certificate takes that person off lessons until it's renewed",
+   "insurance": "liability insurance where the state's form asks for it, or where a host pool (a community center, an apartment building) asks for proof"
+  },
+  "pf.services": {
+   "shape": "class: a spot in a set 30-minute group lesson by age and level, with a set number of swimmers per instructor, 1 trial spot per lesson and a waitlist; each swimmer is checked in on their own. A private lesson books one instructor, at the school's pool or the family's own pool. A lesson at a host pool (a community center, an apartment pool) books an instructor's time, with the host's OK",
+   "examples": "the example school's own prices (Lee Swim School and Lee Swim Lessons), not a standard",
+   "list": [
+    {
+     "name": "Trial lesson for a child (once per child; it places the child)",
+     "price": "$20",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the school's pool",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "1 trial spot in each group lesson",
+     "note": "a parent or guardian books, signs the waiver and sets the pick-up list"
+    },
+    {
+     "name": "Group lessons by age and level",
+     "price": "on a monthly session (a trial first)",
+     "kind": "a plan",
+     "length": "30 min, once a week",
+     "where": "at the school's pool",
+     "capacity": "4 swimmers per instructor in Preschool, 5 in Swim Kids, 6 parent-and-child pairs in Parent and Tot",
+     "note": "Parent and Tot (6 months to 3 years, a parent in the water), Preschool 1 to 3 (ages 3 to 5), Swim Kids 1 to 6 (ages 6 to 12)"
+    },
+    {
+     "name": "Monthly session, one group lesson a week",
+     "price": "$112 a month (4 lessons; $96 for Parent and Tot)",
+     "kind": "a plan, billed on the 1st of each month",
+     "length": "month to month",
+     "where": "at the school's pool",
+     "before": "the first month paid in full when enrolling; then the saved card on the 1st, with a text the day before",
+     "after": "nothing more",
+     "note": "the plan's terms get their own yes; ended by the 20th for the next month (the school's setting)"
+    },
+    {
+     "name": "Single group lesson (a swimmer already placed)",
+     "price": "$28",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the school's pool",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Private lesson at the school (any age)",
+     "price": "$65",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the school's pool",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "one instructor and one swimmer; a child with a seizure history is booked only after Sam reads the note"
+    },
+    {
+     "name": "Private lesson at the family's pool",
+     "price": "$75",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the customer's home",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "the pool is fenced with a gate that latches; a parent or guardian stays at the pool's edge for the whole lesson"
+    },
+    {
+     "name": "Group lesson at a host pool (a community center, an apartment pool)",
+     "price": "$150 a lesson, up to 4 swimmers",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the host's place",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "with the host's written OK, under the host's pool rules"
+    },
+    {
+     "name": "Lifeguard for a pool party (Lee Swim Lessons' second kind of work)",
+     "price": "$120 for 2 hours, up to 20 swimmers",
+     "kind": "one price",
+     "length": "2 hours",
+     "where": "at the customer's place",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "only lifeguards with a current lifeguard and CPR certificate; the lifeguard watches the water and teaches nothing"
+    },
+    {
+     "name": "Make-up lesson",
+     "price": "free",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the school's pool",
+     "note": "for a lesson the school or the pool cancelled, or one monthly-session lesson a month missed with notice"
+    }
+   ],
+   "trial": "one trial per child, in a group lesson that fits the child's age and comfort in water; 1 trial spot per lesson; checked by the parent's mobile and the child's first name",
+   "placement": "by age first, then comfort in water: face in the water, floating, a few strokes alone; the trial places the child, and the instructor may move them after; a level above level 1 needs Sam's OK",
+   "packs": "the monthly session is sold on the secure page with its own yes and terms, never offered in a booking text",
+   "capacity": "swimmers per instructor, set by the school (a ratio from the state's form wins); 1 trial spot per lesson; each spot is one swimmer with their own check-in code; a private lesson is one instructor and one swimmer",
+   "waitlist": "a full lesson keeps a waitlist in order; a freed spot is offered by text inside text hours, to one family at a time, for 30 minutes",
+   "minimum": "none: a group lesson runs with one swimmer",
+   "makeups": "a lesson the school or the pool cancels: a free make-up or a full refund, never a fee; a monthly-session lesson missed with notice by 9am that day: one free make-up a month, in a lesson of the same level with room (the school's setting)",
+   "skills": "group lessons by level, Parent and Tot, private lessons, adult beginners, swimmers with extra needs (Sam's OK), lifeguarding",
+   "online": "never: every lesson is in the water",
+   "nobodyHome": "never: the swimmer must be there; for a child's lesson at home, a parent or guardian stays at the pool's edge the whole time"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "who is swimming: the parent's own child, or the adult themselves",
+    "for a child: the age (it sets the lesson group)",
+    "comfort in water: puts their face in? floats? swims a few strokes alone? (it sets the level)",
+    "for a private lesson: at the school's pool or the family's own pool, and the goal",
+    "for a lesson at home: is the pool fenced, with a gate that latches?"
+   ],
+   "afterTime": [
+    "is the child potty-trained? (if not, a swim diaper is needed)",
+    "is anything about water scary for the swimmer, or anything the instructor should know?",
+    "for a lesson at home: the address, and the way to the pool gate"
+   ],
+   "securePage": [
+    "the parent or guardian's yes that they may book for the child, and the waiver signed for the child",
+    "the child's first name and age, health notes (like ear tubes, seizures or asthma) and an emergency contact",
+    "the pick-up list: the adults who may take the child home",
+    "a yes or no for photos or video of the child in the lesson",
+    "adults: their own waiver; Parent and Tot: the parent's own line too"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or legal guardian for anyone under 18, who books, signs and gets every text; a teen gets a link to send to a parent"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a child who was in the water and is now coughing hard, struggling to breathe or very sleepy; someone hurt or unwell right now",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a health note, like ear tubes or asthma",
+     "what": "the booking goes on; the note goes on the secure page for the instructor; Rosie gives no health advice"
+    },
+    {
+     "words": "a seizure history",
+     "what": "Sam reads the note on the secure page before it's booked: often a private lesson, with the instructor within arm's reach"
+    },
+    {
+     "words": "a child who is scared of water",
+     "what": "the booking goes on; the note goes to the instructor, who goes slowly; a scared child is never forced"
+    }
+   ],
+   "weather": "lessons stop at the first thunder or lightning: everyone out of the water, and back in only after a set time with none (the school's setting, like 30 minutes); a lesson stopped this way gets a free make-up or a refund, never a fee",
+   "pool": "the pool closes at once after a bathroom accident or vomit in the water, or when the water isn't safe, for the time the pool's rules set; lessons it hits get a free make-up or a refund",
+   "children": "a parent or guardian stays on the pool deck for children under 6 (a switch for the age); at a home pool, a parent stays at the pool's edge for every child's lesson; a child is never alone with one adult behind a closed door; any worry about a child's safety goes to Sam at once, and Sam reports it where the state's rules require",
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Waiver and the child's details",
+     "when": "before the first lesson, signed on the secure page while booking",
+     "who": "a parent or guardian signs for anyone under 18; adults sign their own; in Parent and Tot, the parent also signs a line for themselves",
+     "goodFor": "1 year, or until the school changes it",
+     "result": "signed: the booking goes on; not signed in 10 minutes: nothing is booked"
+    },
+    {
+     "name": "The pick-up list and the photo yes or no",
+     "when": "on the secure page while booking; the parent can change them any time",
+     "result": "only adults on the list take the child home; no answer to photos counts as no"
+    },
+    {
+     "name": "Placement",
+     "when": "the trial places the child; a level above level 1 is asked about before booking",
+     "result": "Sam OKs a level above level 1 first"
+    },
+    {
+     "name": "A seizure history",
+     "when": "when the secure page shows one",
+     "result": "Sam reads the note before it's booked; often a private lesson, the instructor within arm's reach"
+    },
+    {
+     "name": "The home pool check",
+     "when": "for a lesson at home, on the secure page while booking, and again when the instructor arrives",
+     "result": "the pool is fenced with a latching gate, the water is clear to the bottom, and a parent stays at the edge; if not, no lesson, and a make-up or a refund"
+    }
+   ],
+   "prep": "for the reminder: come 10 minutes early to check in; a swimsuit, a towel, and goggles if the child has them; a swim diaper (a disposable one under a reusable cover) for a child who isn't potty-trained; a parent stays on the deck; for a lesson at home, the gate unlocked and the pool cover off"
+  },
+  "pf.visit": {
+   "checkIn": "at the school: the parent gives the child's check-in code at the front desk, or the instructor ticks names on the lesson roster; at a home pool: the code at the gate; at a host pool: the host's contact gives the code",
+   "children": "a child goes home only with an adult on the pick-up list; anyone else waits with staff while the parent is asked; a parent or guardian stays on the pool deck for children under 6 (a switch for the age)",
+   "water": "the instructor watches the sky and the water the whole lesson; at the first thunder or lightning, everyone gets out",
+   "lateEntry": "a late swimmer joins on arrival, and the lesson still ends on time",
+   "changes": "an instructor change is texted to every parent booked; a level change after the trial goes in the instructor's note",
+   "done": "the check-in code or the roster tick; at a home pool, the code at the gate or DONE from the instructor",
+   "note": "after a trial, the instructor writes a short note on the secure page: what the child tried, how it went, and which level fits next; the parent gets a private link"
+  },
+  "pf.money": {
+   "before": "a trial, a single lesson and a private lesson (at the school or at home): paid in full when booking; a monthly session: the first month paid in full when enrolling, then each month on the saved card; a lesson at a host pool and a pool party lifeguard: paid in full when booking",
+   "tuition": "the monthly session is billed on the 1st to the saved card, with a text the day before; the plan's terms get their own yes; a parent can end it by the 20th for the next month (the school's setting; a longer notice or a cancel right from the state's form wins)",
+   "caps": "how far ahead lessons may be charged, and any bond or account kept apart for money paid ahead: from the state's form",
+   "cancel": "free to cancel a trial, a single or a private lesson until 24 hours before (the school's setting); a longer right to cancel from the state's form wins",
+   "fees": "a late cancel or a no-show for a trial, a single or a private lesson: the price paid may be kept only with Sam's OK, and no answer in 24 hours means a full refund; a monthly-session lesson missed is a make-up, never a refund or a fee",
+   "makeups": "when the school or the pool cancels (thunder or lightning, a pool closure, no instructor): a free make-up or a full refund, never a fee, and never kept as a credit without a yes; a lesson stopped by thunder or lightning before halfway gets the same; past halfway, it counts as taught (the school's setting)",
+   "tips": "no tips line",
+   "tax": "no tax line, unless the owner sets one",
+   "fee2": "pays Rosfield's $2 for each confirmed booking",
+   "leaveEarly": "a lesson the swimmer leaves early counts as given: nothing comes back (the school's setting); a lesson the school stops for safety follows the make-up rule"
+  },
+  "pf.messages": {
+   "never": "a child's last name, age, health notes (like ear tubes or seizures), skills note, pick-up list or photos never go in a text; texts to the parent may use the child's first name only; texts to Sam or the staff carry no child details at all: they name the parent and the lesson, and link to the secure page",
+   "to": "texts go only to the parent's phone, never to the child",
+   "languages": "English and Spanish",
+   "minors": "a teen under 18 gets a link to send to a parent; Rosie never texts the parent first",
+   "photos": "photos or video of a child are shared only with the parent's yes, and never by text"
+  },
+  "pf.staff": {
+   "skills": "group lessons by level, Parent and Tot, private lessons, adult beginners, swimmers with extra needs, lifeguarding",
+   "certificates": "each instructor in the water holds a current water safety instructor certificate and a CPR and first aid certificate; a lifeguard holds a current lifeguard certificate (switches from the state's form, on by default)",
+   "lifeguard": "a lifeguard on the deck during lessons at the school's pool where the pool's rules require one (a switch)",
+   "checks": "a background check on file for anyone who teaches or works with children, where the state's rules require it (a switch); a sub teaches only with their own certificates and check on file",
+   "supervision": "a child is never alone with one adult behind a closed door; two adults on the deck for group lessons (the school's setting)",
+   "ratio": "4 swimmers per instructor in Preschool, 5 in Swim Kids, 6 parent-and-child pairs in Parent and Tot (the school's setting; a ratio from the state's form wins)",
+   "whoOKs": "Sam places swimmers above level 1, reads seizure notes and OKs private lessons; Pat may OK them too",
+   "license": "no person license for teaching swimming unless the state's form names one; the certificates above"
+  },
+  "pf.rules": {
+   "items": [
+    "the school's pool: a health permit, inspections and water tests where the state's or county's rules require them (a switch)",
+    "selling lessons ahead (a monthly session): any bond, account kept apart, written contract, cancel right, or limit on how far ahead money is taken comes from the state's form",
+    "a waiver is a risk notice and consent; where the state's rules limit what a parent may sign for a child, the state's form sets the words",
+    "instructor and lifeguard certificates, and background checks for people who work with children: from the state's form",
+    "a worry about a child's safety: Sam reports it where the state's rules require",
+    "a plan that renews: its terms, 30 days' notice before a price change, and how to end it; the state's form can set more",
+    "phone calls: the line always says first that the call is recorded",
+    "records kept 7 years"
+   ],
+   "weather": "thunder or lightning: everyone out of the water at once, and back in only after the school's set time with none (like 30 minutes)",
+   "photos": "photos or video of a child: only with the parent's yes (on by default)"
+  },
+  "pf.edges": {
+   "applies": [
+    "the pool closes (thunder or lightning, a bathroom accident in the water, a water problem): every parent told at once, a free make-up or a full refund",
+    "thunder or lightning stops a lesson: before halfway, a free make-up or a refund; past halfway, it counts as taught",
+    "an instructor is out: a sub with current certificates, and parents told",
+    "a full lesson or no trial spot left: the waitlist, or another lesson that fits",
+    "a child who already swims: placed at the trial; a level above level 1 needs Sam's OK first",
+    "a scared child: stays on the step with the instructor, with no pressure, and is never forced",
+    "a child swallows water and coughs: lifted out and checked with the parent right there; 911 for trouble breathing; an incident note to Sam on the secure page",
+    "a seizure history: Sam reads the note first, often a private lesson",
+    "someone not on the pick-up list: the child stays with staff while the parent is asked",
+    "arriving late: joins on arrival, and the lesson still ends on time",
+    "a home pool that isn't safe on arrival (no latching gate, cloudy water, thunder): no lesson, and a make-up or a refund with no fee"
+   ],
+   "generic": "all others handled the generic way"
+  },
+  "pf.facts": [
+   "classes",
+   "children",
+   "plans",
+   "forms",
+   "waitlist",
+   "groups"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Grace and Rosa (swim instructors) and the front desk",
+   "cust": "Alex M. (a parent, for their 4-year-old, Noah) · other parents and swimmers"
+  },
+  "B": {
+   "staff": "Marcus and Leo (swim instructors who teach at families' pools)",
+   "cust": "Alex M. (a parent, for their 6-year-old, Sofia) · other customers",
+   "other": "Others (a bank, a host pool's manager, a day camp)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Grace"
+  },
+  "B": {
+   "staff": "Marcus"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Barbershop, plumbing, electrical",
+    "Swim school, lifeguards"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Group and private swim lessons for all ages."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Private lessons at family pools, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A pool party lifeguard"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery teach swimming; Riley also teaches at family pools."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: swim instructor, private lessons, home pools"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every school lesson, private lessons and home pools"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: swim instructor, private lessons and home pools"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for scuba lessons, which aren't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't teach scuba."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A swim school's example: 'A new swimmer starts with a trial lesson. Had one at Lee's in the last 3 months?'"
+   ],
+   [
+    "An organization books the same way, like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "An organization books the same way, like a day camp: 'We'd like a group lesson for 6 campers on Saturday.'"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a preschool lesson before the times, so the times fit it."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A lesson for Alex and a preschool lesson for a child work the same way."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Private lessons always stay with Riley."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A deck chair ripped my jacket."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a deck chair ripped a jacket today."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At the pool, a parent stays on the deck for a preschool lesson, so nothing more happens."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE added for Noah on the secure page."
+   ],
+   [
+    "Do you do kids cuts?",
+    "Do you teach preschoolers?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: Preschool 1 is for ages 3 to 5, $112 a month."
+   ],
+   [
+    "Skin fade · $40",
+    "Single lesson · $28"
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Single lesson $35 ($40 from Nov 2) · Private lesson $65 · Trial lesson $20"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds lifeguarding to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW lifeguarding"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Lifeguarding for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Host pool quotes come to you first."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked.",
+    "The trial lesson, $20, is paid in full when booked."
+   ],
+   [
+    "Barbering workshop",
+    "Preschool 1"
+   ],
+   [
+    "'Yes, make it a fade'",
+    "'Yes, but at 9:00am'"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A first lesson' or 'a try-out' fits a trial lesson."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a lesson every Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a lesson every Saturday"
+   ],
+   [
+    "like Alex's employer for a staff cut",
+    "like a grandparent who pays for lessons"
+   ],
+   [
+    "My employer pays for this cut.",
+    "Noah's grandparent pays for this lesson."
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter lesson."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I watch from the deck during the lesson?"
+   ],
+   [
+    "A barbershop runs no classes.",
+    "A barbershop runs no classes; a swim school does."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley shows what Noah learned, like floating on the back."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Noah got little time in the water."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Noah got little time in the water on Saturday."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the lesson's address, after a missed check."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books lessons for two children"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A swim school books a spot in a group lesson, or an instructor's time for a private lesson."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A pool company's example: cloudy water gets 'keep everyone out of the pool'."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A lesson is rated, so the school takes the first branch."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Noah can join when you get here. The lesson still ends at 11:30am, at the same price."
+   ],
+   [
+    "Riley's color plan after a consult",
+    "Grace's lesson plan after a check"
+   ],
+   [
+    "sent you a proposal: Riley's color plan.",
+    "sent you a proposal: Grace's lesson plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Lesson plan"
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a time for your first lesson:"
+   ],
+   [
+    "Registration 2020-1187",
+    "Registration SR41907"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's swim work takes no jobs sent now, at the school or away."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Swim Lessons'"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Swim School LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Swim School"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Swim Lessons"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Swim at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Pool Lifeguards"
+   ],
+   [
+    "plumbing and electrical",
+    "swim lessons and lifeguarding"
+   ],
+   [
+    "Electrical",
+    "Lifeguarding"
+   ],
+   [
+    "electrical",
+    "lifeguarding"
+   ],
+   [
+    "Plumbing",
+    "Swim lessons"
+   ],
+   [
+    "plumbing",
+    "swim lessons"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "Riley Chen",
+    "Grace Brooks"
+   ],
+   [
+    "Riley",
+    "Grace"
+   ],
+   [
+    "Avery Diaz",
+    "Rosa Diaz"
+   ],
+   [
+    "Avery",
+    "Rosa"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Price"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey Moore",
+    "Leo Moore"
+   ],
+   [
+    "Casey",
+    "Leo"
+   ],
+   [
+    "88 Elm St",
+    "140 Harbor Rd"
+   ],
+   [
+    "Elm St",
+    "Harbor Rd"
+   ],
+   [
+    "1200 Main St",
+    "77 Cove Rd"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Trial lesson"
+   ],
+   [
+    "Signature cut and shave",
+    "Trial lesson"
+   ],
+   [
+    "A beard trim",
+    "A swim diaper"
+   ],
+   [
+    "a beard trim",
+    "a swim diaper"
+   ],
+   [
+    "Beard trim",
+    "Swim diaper"
+   ],
+   [
+    "beard trim",
+    "swim diaper"
+   ],
+   [
+    "a color correction",
+    "a lesson for extra needs"
+   ],
+   [
+    "Color correction",
+    "Lesson for extra needs"
+   ],
+   [
+    "color quote",
+    "special request"
+   ],
+   [
+    "consult",
+    "swim check"
+   ],
+   [
+    "Haircut",
+    "Trial lesson"
+   ],
+   [
+    "haircut",
+    "trial lesson"
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "house call",
+    "home lesson"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "priced at the chair",
+    "priced at the lesson"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the lesson"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "barbershop",
+    "swim school"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "shops",
+    "schools"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "BS20981",
+    "SR41907"
+   ],
+   [
+    "The lookup shows the license as expired.",
+    "The lookup shows Marcus's lifeguard certificate as expired."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a swim lesson for my child on Saturday."
+   ],
+   [
+    "Books the groom's party together",
+    "Books two children together"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s lesson."
+   ],
+   [
+    "I put a note and a photo on the page.",
+    "I put a note on the page."
+   ],
+   [
+    "The note and photo are on the secure page.",
+    "The note is on the secure page."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una clase de natación para mi hijo el sábado."
+   ],
+   [
+    "$55",
+    "$20"
+   ],
+   [
+    "$35",
+    "$20"
+   ],
+   [
+    "Just this visit",
+    "Just this lesson"
+   ],
+   [
+    "skin fades",
+    "single lessons"
+   ],
+   [
+    "Skin fade",
+    "Single lesson"
+   ],
+   [
+    "skin fade",
+    "single lesson"
+   ],
+   [
+    "Kids cut",
+    "Preschool lesson"
+   ],
+   [
+    "kids cut",
+    "preschool lesson"
+   ],
+   [
+    "Groom's package",
+    "Pool party lifeguard"
+   ],
+   [
+    "Color and cut",
+    "Private lesson"
+   ],
+   [
+    "color and cut",
+    "private lesson"
+   ],
+   [
+    "Color touch-up",
+    "Make-up lesson"
+   ],
+   [
+    "color touch-up",
+    "make-up lesson"
+   ],
+   [
+    "color correction",
+    "lesson for extra needs"
+   ],
+   [
+    "Haircuts",
+    "Swim lessons"
+   ],
+   [
+    "haircuts",
+    "swim lessons"
+   ],
+   [
+    "teacher",
+    "instructor"
+   ]
+  ],
+  "B": [
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Private lessons at family pools, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A pool party lifeguard"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Private lesson at home"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can teach at the school for $65, or at your pool for $75."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most swim schools start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules swim schools often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Group and private swim lessons for all ages."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery teach swimming; Riley also teaches at family pools."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Riley: swim instructor, private lessons, home pools"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Riley: swim instructor, private lessons and home pools"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My 6-year-old is nervous in the water."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "Our pool's water looks cloudy."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a private swim lesson at our pool."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A swim school's example: a child who went under and is coughing gets 'call 911 now'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone out of the pool, and to call 911 if anyone is hurt."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está herido."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is hurt."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Que nadie entre a la piscina. Si alguien se lastima, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep everyone out of the pool. If anyone gets hurt, call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Our pool fence broke in the storm."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a swim instructor teach at a family's pool this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa private lesson Thu 4:30pm Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Lessons at our pool' fits a private lesson at home."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Home Services doesn't do, like pool cleaning."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a lesson in a neighbor's pool."
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a sibling's lesson?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how deep is the pool, and is it fenced?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Four feet at the shallow end, and yes."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some lessons come as a weekly plan, one lesson at a time."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Sofia have a lesson every week, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Home Services has a weekly lesson plan, $75 a lesson."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a lesson for a younger child."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also teach my 4-year-old?"
+   ],
+   [
+    "can clear the drain",
+    "can teach at your pool"
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like the pool party lifeguard."
+   ],
+   [
+    "can start the sewer camera inspection at a set time.",
+    "can start the pool party lifeguard at a set time."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 summer swim camp is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is the pool fenced?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the pool fenced?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, with a locked gate"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The private lesson needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the pool gate unlocked."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also teach my 4-year-old?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Second child's lesson · $75"
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Say Morgan has a repeat plan: a weekly lesson at home for two children."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's lesson?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I add chlorine before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a storm is coming in."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "There's thunder now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep everyone out of the pool until 30 minutes after the last thunder."
+   ],
+   [
+    "Kitchen drain",
+    "Private lesson"
+   ],
+   [
+    "Yard drain",
+    "Sibling lesson"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE pool gate latch already loose"
+   ],
+   [
+    "Under the sink, before",
+    "Pool gate, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Pool deck, before"
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A swim assessment is priced at the visit: only the $89 visit was promised."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Sofia is ready for 15 more minutes."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 25 15 more minutes"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: 15 more minutes, $25."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "15 more minutes · $25"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $25 extra time offer is good for 7 days."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 4:52pm on Jordan's phone, you said yes to 15 more minutes for $25."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds the pool gate won't latch."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD pool gate won't latch, stopped"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found the pool gate won't latch and stopped the lesson."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the pool gate won't latch"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Pool gate won't latch"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the lesson"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a fence repair company first"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's kickboard knocks over a potted plant, and Jordan texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE broke a potted plant"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken potted plant"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan broke a potted plant at Alex M.'s."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 75 lesson"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE added for Sofia on the secure page."
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Bring the small kickboard next time."
+   ],
+   [
+    "the kitchen drain",
+    "the private lesson"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Alex asks about the lesson 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Sofia still won't put her face in."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M. asks about Sofia's lesson on Thu Oct 22."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "A make-up lesson is free when a lesson was cut short."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left wet towels on the deck."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack in the pool step this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan come back next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a private lesson."
+   ],
+   [
+    "Sewer camera inspection",
+    "Private lesson"
+   ],
+   [
+    "accept the leak repair for today, starts at 3:00pm, with Jordan.",
+    "accept the private lesson for today, starts at 3:00pm, with Jordan."
+   ],
+   [
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Accepted: the private lesson today, starts at 3:00pm, with Jordan."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the pool party quote before booking."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds lifeguarding to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW lifeguarding"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Lifeguarding for Lee Home Services: is it the same company?"
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9.",
+    "you have two private lessons on Mon Nov 9."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the lesson's address, after a missed check."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the swimmer's age, comfort in the water, and the pool's depth."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "A younger child's lesson is its own booking."
+   ],
+   [
+    "It's a leak under the sink, today, starts at 3:00pm, with Jordan.",
+    "It's a private lesson at your pool, today, starts at 3:00pm, with Jordan."
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code at the pool gate"
+   ],
+   [
+    "The door stayed shut.",
+    "The gate stayed shut."
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the practice plan ready on time?"
+   ],
+   [
+    "Texts the report link on the new date",
+    "Texts the plan link on the new date"
+   ],
+   [
+    "The report is ready on the new date.",
+    "The plan is ready on the new date."
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Dee can ask to be next for that time."
+   ],
+   [
+    "Nora S.",
+    "Dee W."
+   ],
+   [
+    "Nora",
+    "Dee"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Swim lessons book a set start time."
+   ],
+   [
+    "Registration 2019-0451",
+    "Registration SR418220"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's swim work takes no jobs sent now, at the school or away."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Certificates on file"
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Each lesson has a set start time, as Sam set at sign-up."
+   ],
+   [
+    "Drain clearing",
+    "Private lesson at home"
+   ],
+   [
+    "drain clearing",
+    "private lesson at home"
+   ],
+   [
+    "a water heater flush",
+    "a private lesson at home"
+   ],
+   [
+    "Water heater flush",
+    "Private lesson at home"
+   ],
+   [
+    "water heater flush",
+    "private lesson at home"
+   ],
+   [
+    "Water heater replacement",
+    "Camp water safety lessons"
+   ],
+   [
+    "water heater replacement",
+    "camp water safety lessons"
+   ],
+   [
+    "replaces water heaters",
+    "teaches camps"
+   ],
+   [
+    "Service call fee",
+    "Starting fee"
+   ],
+   [
+    "service call fee",
+    "starting fee"
+   ],
+   [
+    "service call",
+    "starting fee"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Swim Lessons'"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Swim School"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Swim Lessons LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Swim Lessons"
+   ],
+   [
+    "leehomeservices.com",
+    "leeswimlessons.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Swim at Home"
+   ],
+   [
+    "Lee Electric",
+    "Lee Pool Lifeguards"
+   ],
+   [
+    "plumbing and electrical",
+    "swim lessons and lifeguarding"
+   ],
+   [
+    "Electrical",
+    "Lifeguarding"
+   ],
+   [
+    "electrical",
+    "lifeguarding"
+   ],
+   [
+    "Plumbing",
+    "Swim lessons"
+   ],
+   [
+    "plumbing",
+    "swim lessons"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "Riley Chen",
+    "Grace Brooks"
+   ],
+   [
+    "Riley",
+    "Grace"
+   ],
+   [
+    "Avery Diaz",
+    "Rosa Diaz"
+   ],
+   [
+    "Avery",
+    "Rosa"
+   ],
+   [
+    "Jordan Price",
+    "Marcus Price"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey Moore",
+    "Leo Moore"
+   ],
+   [
+    "Casey",
+    "Leo"
+   ],
+   [
+    "88 Elm St",
+    "140 Harbor Rd"
+   ],
+   [
+    "1200 Main St",
+    "77 Cove Rd"
+   ],
+   [
+    "42 Oak St",
+    "31 Birch Ln"
+   ],
+   [
+    "haircut",
+    "private lesson"
+   ],
+   [
+    "house calls",
+    "home lessons"
+   ],
+   [
+    "barbershop",
+    "swim school"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "after the job",
+    "after the lesson"
+   ],
+   [
+    "BS20981",
+    "SR41907"
+   ],
+   [
+    "Arrival windows",
+    "Time held per visit"
+   ],
+   [
+    "Arrival times:",
+    "Start times:"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 4:30pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 5:30pm"
+   ],
+   [
+    "8–10am",
+    "4:30pm"
+   ],
+   [
+    "Drive time from the jobs before and after is checked again.",
+    "Drive time from the lessons before and after is checked again."
+   ],
+   [
+    "Each rejoins: the job stays on Alex's record.",
+    "Each rejoins: the lesson stays on Alex's record."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the practice plan link"
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or benefit pays"
+   ],
+   [
+    "Books one job for a group",
+    "Books one lesson for a group"
+   ],
+   [
+    "$150",
+    "$75"
+   ],
+   [
+    "$179",
+    "$75"
+   ],
+   [
+    "Drain clearings",
+    "Private lessons"
+   ],
+   [
+    "teacher",
+    "instructor"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ]
+  ]
+ },
+ "keep": [
+  "private lesson",
+  "leak",
+  "visit fee",
+  "Visit fee"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a $20 trial swim lesson for their 4-year-old, Noah, who has never had lessons: Grace's Preschool 1 (ages 3 to 5, 4 swimmers per instructor), Sat Oct 24 at 11:00am, paid in full. Alex signs the waiver, adds Noah's health note and sets the pick-up list on the secure page, and stays on the pool deck. After the lesson, Grace's note comes by private link, and Alex starts a monthly session. Thunder or a pool closure means a free make-up or a refund, never a fee.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a private swim lesson at the family's pool, 31 Birch Ln, for their 6-year-old, Sofia, who is nervous in the water. Marcus comes Thu Oct 22 after school, starting at 4:30pm, for 30 minutes, paid in full when booking. Alex signs the waiver and the pool check on the secure page, and stays at the pool's edge. Thunder or an unsafe pool means no lesson, and a free make-up or a refund."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none"
+   ],
+   "examples": {
+    "list|full|none": "The main story: Noah's $20 trial lesson in Grace's Preschool 1, Sat Oct 24 at 11:00am, paid in full when booking. A single lesson ($28), a private lesson ($65) and each month of a monthly session ($112 for 4 weekly lessons, billed on the 1st with a text the day before) are paid this way too. A late cancel or a no-show: the price may be kept, only with Sam's OK. A missed monthly lesson gets a make-up with notice. Thunder or a pool closure: a free make-up or a refund."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Trial lesson"
+    },
+    "list|full|*": {
+     "price": "$20",
+     "paid": "$20",
+     "fee": "$20",
+     "name": "Trial lesson"
+    }
+   }
+  },
+  "B": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none"
+   ],
+   "examples": {
+    "list|full|none": "The main story: Sofia's $75 private lesson at the family's pool with Marcus, Thu Oct 22 at 4:30pm, paid in full when booking. A $150 group lesson at a host pool and a pool party lifeguard ($120) are paid this way too. Late or nobody at the pool: the $75 may be kept, only with Sam's OK. Thunder or an unsafe pool: a free make-up or a refund."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$75",
+     "name": "Private lesson at your pool"
+    },
+    "list|full|*": {
+     "price": "$75",
+     "paid": "$75",
+     "fee": "$75",
+     "name": "Private lesson at your pool"
+    },
+    "list|deposit|bill": {
+     "price": "$75"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Teaching swimming needs no state license, so the company gives only its registration (S1-61). Where the state's form names one, this branch comes back."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Swim lessons, lifeguarding and the school all pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Swim lessons book spots in a lesson and instructors' time, never lanes on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The school runs group lessons on a timetable (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No swim instructor or lifeguard holds a state license. Lifesaving and CPR certificates, and a background check where it's on, are asked instead (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No swim lesson is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "A swim school bills no health plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The school books spots in a lesson and instructors' time, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A lesson is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A swim diaper is sold at the front desk and the waiver is signed while booking, so nothing missing stops a lesson."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "A swimmer hurt or unwell is 'Someone is hurt or feels sick' (A8-38)."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the school."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "A swim school bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Trial lessons, group lessons and private lessons are rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "After a trial, a child's next lesson comes with starting a monthly session (A10-x02). An adult books the next private lesson like any booking."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The school sends no proposals: the session's terms are on the note page, and starting one is the parent's own choice."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing from a lesson comes back later. The instructor's note comes the same day (A10-x01)."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the school for work."
+   },
+   {
+    "op": "more",
+    "at": "S2-02",
+    "more": [
+     "Jules's registration is shown as given, not checked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-60",
+    "more": [
+     "For a trial, only the trial spot counts. A lesson with its trial spot taken offers the waitlist, or another lesson.",
+     "The waitlist stays open until 2 hours before the lesson, the school's setting."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-01",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.8"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Sat Oct 24, 12:30pm",
+      "title": "Sends Grace's trial note by private link",
+      "does": "Grace's note goes to Alex by private link: what Noah tried, how it went, and which level fits next. The text itself carries none of it.",
+      "more": [
+       "The note page also shows the monthly session for that level, plainly, once.",
+       "No deadline, no discount for deciding fast, and no reminder. Alex decides in their own time.",
+       "From the page, Alex can ask Grace a question, or start a monthly session.",
+       "A child's notes stay on the secure page, never in a text."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for bringing Noah to Lee Swim School today. Grace wrote a short note about the trial lesson.",
+        {
+         "card": {
+          "title": "Grace's note · Noah's trial",
+          "lines": [
+           "Preschool 1 · Sat Oct 24",
+           "Opens on the secure page"
+          ],
+          "button": "Read the note",
+          "link": "rosfield.com/n/a8"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.messages"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-05",
+    "steps": [
+     {
+      "id": "A10-x02",
+      "type": "split",
+      "line": [
+       "10.10"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "t": "Sun Oct 25, 8:15pm",
+      "title": "Alex decides about a monthly session",
+      "q": "Does Alex start a monthly session for Noah?",
+      "does": "Back to Alex, the next evening. On the note page, Alex decides what's next. Rosie sends nothing to push either way.",
+      "more": [
+       "The page shows the level, the price a month, the make-up rule and the terms.",
+       "Starting one is Alex's own tap on the page, never an offer in a text."
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "branches": [
+       {
+        "label": "Starts a monthly session",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A10-x03",
+          "line": [
+           "10.10"
+          ],
+          "who": "cust",
+          "to": "pay",
+          "via": "page",
+          "t": "Sun Oct 25, 8:20pm",
+          "title": "Alex starts a session, with its own yes",
+          "does": "Alex starts a monthly session for Noah: Preschool 1, Saturdays at 11:00am with Grace. The terms get their own yes, and Alex pays November's $112 now.",
+          "more": [
+           "Each month after is $112, billed on the 1st to the saved card, with a text the day before.",
+           "November has 4 lessons: Nov 7, 14, 21 and 28.",
+           "A lesson missed with notice by 9am gets one free make-up that month.",
+           "A lesson the school or the pool calls off gets a free make-up or a refund.",
+           "Alex can end it by the 20th for the next month, by text.",
+           "Where the state's rules set more, like a bond or a cancel period, the state's form sets the terms.",
+           "Noah's waiver, photo answer and pick-up list carry over."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The monthly session's terms, before any card:",
+            {
+             "card": {
+              "title": "Noah's monthly session · Preschool 1",
+              "lines": [
+               "Saturdays · 11:00am · Grace · from Nov 7",
+               "$112 a month (4 lessons) · billed on the 1st",
+               "One free make-up a month, with notice by 9am",
+               "End it by the 20th for the next month, by text",
+               "Paid now: $112 for November"
+              ]
+             },
+             "buttons": [
+              "I agree, pay $112",
+              "Not now"
+             ]
+            }
+           ],
+           [
+            "cust",
+            "san",
+            "1"
+           ]
+          ],
+          "needs": [
+           "pf.services",
+           "pf.money"
+          ],
+          "tells": [
+           "cust"
+          ]
+         },
+         {
+          "id": "A10-x04",
+          "line": [
+           "10.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Sun Oct 25, 8:21pm",
+          "title": "Confirms the session; tells Grace",
+          "does": "Alex gets the session in one text: the lesson, the first date and the charges. Each lesson gets its own code, with its reminder.",
+          "more": [
+           "Rosfield's $2 for a plan counts once a month.",
+           "Grace's roster gets Noah from Nov 7. The text to Grace names no child.",
+           "The receipt for the $112 comes with it."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Noah is signed up! The code for each lesson comes with that week's reminder.",
+            {
+             "card": {
+              "title": "Lee Swim School · Noah's monthly session",
+              "lines": [
+               "Preschool 1 · Saturdays · 11:00am · Grace",
+               "First lesson: Sat Nov 7",
+               "Paid: $112 · next: $112 on Tue Dec 1"
+              ]
+             }
+            }
+           ],
+           [
+            "san",
+            "staff",
+            "New on your Preschool 1 roster from Sat Nov 7: Alex M.'s swimmer. Notes are on the secure page."
+           ]
+          ],
+          "needs": [
+           "pf.messages"
+          ],
+          "tells": [
+           "cust",
+           "staff"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Not now, or no answer",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Every swim lesson is in the water, so none is ever by video or phone."
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "Noah is scared of the water",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.12"
+       ],
+       "who": "staff",
+       "to": "cust",
+       "via": "visit",
+       "title": "Grace goes slowly on the step",
+       "does": "Noah won't get in. Grace keeps Noah on the pool step with a kickboard and bubbles: no dunking and no pressure. A scared child is never forced.",
+       "more": [
+        "Many children warm up within a lesson or two.",
+        "If Noah would rather sit with Alex on the deck, that's fine.",
+        "The trial still counts as given, and Grace's note says what helped."
+       ],
+       "needs": [
+        "pf.visit",
+        "pf.safety"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "Thunder stops the lesson",
+     "end": "end",
+     "endText": "Stopped by thunder: a free make-up is booked, or the $20 is refunded.",
+     "steps": [
+      {
+       "id": "A8-x02",
+       "line": [
+        "8.6"
+       ],
+       "who": "staff",
+       "to": "cust",
+       "via": "visit",
+       "t": "Sat Oct 24, 11:12am",
+       "title": "Grace clears the pool at the first thunder",
+       "does": "At 11:12am, Grace hears thunder. Everyone gets out of the water and under cover at once. Back in only after 30 minutes with none, so today's lesson ends.",
+       "more": [
+        "The school's rule: everyone out at the first thunder or lightning, indoors too.",
+        "Stopped before halfway, like here: a free make-up or a full refund.",
+        "Stopped past halfway: the lesson counts as taught.",
+        "Never a fee: the school stopped it for safety.",
+        "Parents stay with their children under cover."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "THUNDER 11:00 Preschool 1 out of the water, 12 min in"
+        ]
+       ],
+       "needs": [
+        "pf.safety",
+        "pf.visit"
+       ]
+      },
+      {
+       "id": "A8-x03",
+       "line": [
+        "8.6"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Sat Oct 24, 11:15am",
+       "title": "Offers a free make-up or a refund",
+       "does": "Each family hears at once. Alex picks a free make-up, or a full $20 refund. No reply in 24 hours: the $20 is refunded.",
+       "more": [
+        "A make-up books like any lesson, at no charge, with the same waiver.",
+        "It's never kept as a credit without a yes.",
+        "Grace's skills note from today goes with the make-up.",
+        "If Alex takes the refund, Rosfield's $2 goes back to the school too."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Thunder stopped Noah's lesson 12 minutes in, so everyone left the water. Pick a free make-up, or a full refund.",
+         {
+          "times": [
+           "Tue Oct 27 · 4:30pm · Rosa",
+           "Sat Oct 31 · 11:00am · Grace"
+          ],
+          "buttons": [
+           [
+            "C",
+            "Full $20 refund"
+           ]
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.money"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When families book, do you take anything? Each service starts the way most swim schools set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every lesson, to start",
+        "lines": [
+         "At your school: paid in full when they book",
+         "Monthly sessions: the first month when they enroll, then the saved card on the 1st, with a text the day before",
+         "A late cancel or a no-show: the price may be kept, only with your OK",
+         "Thunder or a pool closure: a free make-up or a refund"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trial lesson",
+          "$20"
+         ],
+         [
+          "Single group lesson",
+          "$28"
+         ],
+         [
+          "Monthly session, 4 lessons",
+          "$112"
+         ],
+         [
+          "Private lesson at the school",
+          "$65"
+         ],
+         [
+          "Make-up lesson",
+          "Free"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:full": {
+      "addSay": [],
+      "addMore": []
+     },
+     "before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Teaching swimming needs no state license, so the company gives only its registration (S1-61). Where the state's form names one, this branch comes back."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Swim lessons, lifeguarding and the school all pay the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement is added, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Swim lessons book spots in a lesson and instructors' time, never lanes on their own."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "The school runs group lessons on a timetable (S2-33)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No swim instructor or lifeguard holds a state license. Lifesaving and CPR certificates, and a background check where it's on, are asked instead (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No swim lesson is sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A lesson is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A group lesson at a host pool is booked for the group, not spot by spot."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Swim lessons take no jobs sent now (S2-31), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A lesson needs no contract: the waiver is the form signed on the secure page (B4-86)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for swim lessons (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No swim lesson is sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No swim lesson is sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A lesson always needs the swimmer there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A lesson always needs the swimmer there."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left alone with the instructor at home: a parent or guardian stays home the whole lesson (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A lesson is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "A lesson needs no proposal: the next lesson is booked like any other (B10-18)."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Every swim lesson is in the water, so none is ever by video or phone."
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Thunder stops the lesson",
+     "end": "end",
+     "endText": "Stopped by thunder: a free make-up is booked, or the $75 is refunded.",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.6"
+       ],
+       "who": "staff",
+       "to": "cust",
+       "via": "visit",
+       "t": "Thu Oct 22, 4:40pm",
+       "title": "Marcus clears the pool at the first thunder",
+       "does": "At 4:40pm, Marcus hears thunder. Sofia gets out of the pool at once, and everyone goes inside. Back in only after 30 minutes with none, so today's lesson ends.",
+       "more": [
+        "The rule: everyone out at the first thunder or lightning.",
+        "Stopped before halfway, like here: a free make-up or a full refund.",
+        "Stopped past halfway: the lesson counts as taught.",
+        "Never a fee: the lesson stopped for safety."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "THUNDER out of the water at 4:40, 10 min in"
+        ]
+       ],
+       "needs": [
+        "pf.safety",
+        "pf.visit"
+       ]
+      },
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.6"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Thu Oct 22, 4:42pm",
+       "title": "Offers a free make-up or a refund",
+       "does": "Alex picks a free make-up, or a full $75 refund. No reply in 24 hours: the $75 is refunded.",
+       "more": [
+        "A make-up books like any lesson, at no charge, with the same waiver.",
+        "It's never kept as a credit without a yes.",
+        "If Alex takes the refund, Rosfield's $2 goes back to the business too."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Thunder stopped Sofia's lesson 10 minutes in. Pick a free make-up, or a full refund.",
+         {
+          "times": [
+           "Mon Oct 26 · 4:30pm · Marcus",
+           "Thu Oct 29 · 4:30pm · Marcus"
+          ],
+          "buttons": [
+           [
+            "C",
+            "Full $75 refund"
+           ]
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.money"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "The second lesson was given that day, and work already given has no cancel period (B8-24); only something sold at the home and not given yet can have one."
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When families book, do you take anything? Each service starts the way most swim schools set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every lesson away from the school, to start",
+        "lines": [
+         "Where: at the family's pool, or a host pool",
+         "When they book: paid in full",
+         "A late cancel or nobody at the pool: the price may be kept, only with your OK",
+         "Thunder or an unsafe pool: a free make-up or a refund"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Private lesson at your pool",
+          "$75"
+         ],
+         [
+          "Group lesson at a host pool, up to 4",
+          "$150"
+         ],
+         [
+          "Pool party lifeguard, 2 hours",
+          "$120"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:full": {
+      "addSay": [],
+      "addMore": []
+     },
+     "price:list+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": []
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Swim lessons ask one rating, like the school's flow A."
+   }
+  ]
+ },
+ "notes": "Pilot: dance (a class studio with children: a trial for a young child, paid in full, a parent signs the waiver and sets the pick-up list on the secure page, the teacher's note by private link, then monthly enrollment). A swim school runs the same way, so dance fits better than yoga (adults, no children) or martial arts (a free trial, nothing taken). Yoga and martial arts were read for ideas only.\nHow it was built: dance's ops were cut to the money path swim lists, its texts converted, then every shown step was rewritten for swim; dance's rename pairs were cut to those that still change shown words, and rewritten.\nNames: Sam Lee's main company is Lee Swim Lessons LLC (private lessons at families' pools, group lessons at host pools; second kind of work: lifeguarding for pool parties). Second company: Lee Swim School LLC (its own indoor heated pool, 140 Harbor Rd). Main company 77 Cove Rd; Alex's home 31 Birch Ln. Registrations SR418220 and SR41907; pool permit PP5512.\nStaff: Grace and Rosa teach at the school (A); Marcus and Leo teach at families' pools (B). Customer Alex M. (no set pronoun: name or they) with Noah, 4 (A) and Sofia, 6 (B); children are named, never given pronouns.\nFlow A (main, list|full|none): Wed Oct 21 7:15pm Alex asks an AI for a trial for Noah, 4, no lessons yet, no face in the water. Placed by age and comfort in water into Preschool 1 (ages 3 to 5, 4 per instructor, 1 trial spot). Sat Oct 24 11:00 to 11:30am with Grace, $20 paid in full; waiver, health note (ear tubes), pick-up list and photo choice on the secure page; code 5160 at the front desk; Alex stays on the deck (a parent stays for a child under 6). Grace's note (A8-45, A10-x01); Sun Oct 25 Alex starts a monthly session (A10-x02 to A10-x04): $112 for November's 4 Saturdays, then $112 on the 1st with a text the day before, one free make-up a month with notice by 9am, end by the 20th.\nFlow B (main, list|full|none): Mon Oct 19 6:40pm Alex books a private lesson at the family's fenced, heated pool for Sofia, 6. Marcus, Thu Oct 22, starts 4:30pm, 30 minutes, $75 paid in full; day list 3:00pm, OMW 4:10pm, code at the pool gate 4:27pm, pool check (gate latches, water clear to the bottom, parent at the edge, no thunder) B8-45, DONE 5:00pm, receipt 5:00pm, rating 7:00pm.\nMoney paths, from the old flowchart (paid in full at booking: $20 trial, $28 single, $65 private) and the brief: one path per flow, list|full|none. The monthly session's later months are a plan on the saved card (A5-21, A7-32, A7-54, A7-55, A10-x03); B's weekly plan charges each lesson the day before (B5-21, B7-52). No holds, deposits, bills or card-at-DONE: a swim school isn't paid that way. The sign-up example (S1-12 to S1-17, S1-41 to S1-47) now sets every service paid in full.\nMake-ups and fees: a lesson the school or pool calls off (thunder or lightning, a bathroom accident, a heating failure, no instructor) gets a free make-up or a full refund, never a fee, never a credit without a yes (A7-22, A8-40, A8-x02/x03, B8-x01/x02, B8-60). Thunder stops a lesson at once; before halfway a make-up or refund, past halfway it counts as taught. A late cancel or no-show for a trial, single or private lesson: the price may be kept only with Sam's OK, no answer in 24 hours means a refund (old flowchart). A missed monthly-session lesson is a make-up with notice, never a fee.\nWater safety: a parent on the deck for a child under 6 (a switch for the age, A8-67), at a home pool a parent at the edge for every child's lesson (B4-26, B4-32, B8-67); thunder stops lessons (A8-x02, B8-x01; B7-35 forecast check for outdoor pools); pool closures (A7-22, A8-40); instructors' lifesaving and CPR certificates are switches from the state's form, on by default (S2-29, S11-50, S11-51); a scared child is never forced (A8-x01); a child who swallows water is lifted out and checked, 911 for trouble breathing (A8-38, B8-34). A seizure note goes to Sam before booking (A6-01, A6-02 to A6-21, B6-03).\nChild safety and privacy: a parent or guardian books and signs (A4-24, A4-25, B4-32); the child's name, age, health notes, skills note, pick-up list and photos stay on the secure page; texts to the parent use the first name only; texts to Sam or staff name the parent and the lesson (A6-15, A8-01, A10-x04, B6-14, B8-01, B8-44). Pick-up only by a listed adult (A8-42). Background checks are a switch (S2-29).\nPlug-in splits kept (splitsKept A): A4-66 (a spot in a group lesson, or an instructor's time for a private lesson), A7-59 and A7-61 (group lessons name no one; private lessons are by name; 'Nobody else, like extra needs'), A8-67 (children under 6 stay with a parent; older swimmers may be dropped off), S11-87, S11-90. A7-67 now turns off 'A minimum, by a cutoff' (a group lesson runs with one swimmer); A7-70 keeps only 'Shorter, in the time left' (a late swimmer joins on arrival, the lesson ends on time); A3-32 keeps only 'No walk-ins'.\nB branches turned on or off for swim: 'Storms in the forecast' is ON in B (outdoor home pools: B7-35, B7-36); video or phone sessions are off in both flows; own branch 'Thunder stops the lesson' in A8-32 and B8-22.\nState rules only as switches: the pool's health permit and inspections, certificates and background checks, selling lessons ahead (bond, account kept apart, contract, cancel right), the waiver's words for a child, reporting a worry about a child. The old flowchart's one-state call-recording, cancel-window and pool-permit rules are outdated as state rules: the line always says the call is recorded, and the cancel window is the school's setting with a longer state right winning.\nClocks: flow A runs Wed Oct 21 to Sun Oct 25 (Sat Nov 7 for a later text); same-day what-ifs before the lesson were moved before Saturday's 8am day list (A7-14 Fri 6:30pm, A7-21 Fri 8pm, A7-29 Sat 7:50am). Flow B runs Mon Oct 19 to Thu Oct 22 (Fri Oct 23 for the practice plan); B7-18 and B7-27 come before the 3pm day list. Left as the master draws them: the section restarts (S2-01, S11-01, S12-01), A6-14 after the Sam's-OK what-if, A8-44 after the next-morning question, B4-77 after the other callers' what-ifs, B10-01 after the next-morning question, S11-41 after the AWAY branch.\nOutdated in the old flowchart: the outside scheduling software (Acuity and others), one state's call-recording, cancel and pool-permit laws, and the founder's 'single and trial lessons only' rule (Jay's two flows include the monthly session, started on the note page, never by a sales text).\nKeep: 'private lesson' is a real swim school service (the dance pilot had renamed 'color and cut' to it, so the checker counts it as a pilot word).\nReview (Oct 23): nobody who booked a person by name, and no child, is moved to another instructor on silence: Sam calls (A7-21, B7-20, B7-22, S11-46, S11-49). Leo teaches children too, with a background check (S2-04, S2-15, S2-21, S2-22, S2-29), as flow B always had him. The brother's second lesson, given that day, has no cancel period (B8-24, B10-05; branch 'Cancels by Mon Oct 26' off). Texts to Sam and staff carry no child's name or health detail (A7-12, B3-19, B7-16, B8-x01). Leaving early counts as given (pf.money.leaveEarly, A8-37).\nRefit Oct 27 2026 (R13) to the REDESIGN 2 master: facts classes, children, plans, forms, waitlist, groups; no switches (the $2 stays); set start times, free cancel until 24 hours before. Every legacy words op dropped; kept the own steps (the trial note A10-x01, the monthly-session choice A10-x02, a scared child A8-x01, thunder A8-x02 / B8-x01), the more lines and the off ops on live branches.",
+ "splitsKept": {
+  "A": [
+   "A4-66",
+   "A7-15",
+   "A8-67",
+   "A4-43"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Barbershop, plumbing, electrical",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Every shop service, color and house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "An organization books the same way, like a coach: 'We'd like haircuts for 6 players before Saturday's team photo.'",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Color always stays with Riley.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts?",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Skin fade · $40",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Color quotes come to you first.",
+    "The signature cut, $55, is paid in full when booked.",
+    "Barbering workshop",
+    "'Yes, make it a fade'",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Alex asks for a cut every 4 weeks.",
+    "Books a cut every 4 weeks",
+    "like Alex's employer for a staff cut",
+    "My employer pays for this cut.",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "A barbershop runs no classes.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "We'd share only where they're working, only after a missed check.",
+    "Books a haircut and a beard trim",
+    "A barbershop books a person's time.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "like a burst pipe or a lockout",
+    "A cut is rated, so the shop takes the first branch.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Riley's color plan after a consult",
+    "sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "Pick a time for your first color plan visit:",
+    "Registration 2020-1187",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee Home Services'",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "A beard trim",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "a color correction",
+    "Color correction",
+    "color quote",
+    "consult",
+    "Haircut",
+    "haircut",
+    "house calls",
+    "house call",
+    "price board",
+    "priced at the chair",
+    "Priced at the chair",
+    "at the chair",
+    "At the chair",
+    "barbershop",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "BS20981",
+    "The lookup shows the license as expired.",
+    "I'd like a cut on Saturday.",
+    "Books the groom's party together",
+    "Stopped Alex M.'s cut.",
+    "I put a note and a photo on the page.",
+    "The note and photo are on the secure page.",
+    "Quiero un corte el sábado.",
+    "$55",
+    "$35",
+    "Just this visit",
+    "skin fades",
+    "Skin fade",
+    "skin fade",
+    "Kids cut",
+    "kids cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color touch-up",
+    "color touch-up",
+    "color correction",
+    "Haircuts",
+    "haircuts",
+    "teacher"
+   ],
+   "B": [
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Kitchen drain clearing",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "My kitchen drain is clogged.",
+    "Water is coming out of the water heater.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Like tapping a neighbor's water line without asking.",
+    "Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "can clear the drain",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "can start the sewer camera inspection at a set time.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Kitchen drain",
+    "Yard drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in.",
+    "Old pipes: bring the camera next time.",
+    "the kitchen drain",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty, so this visit is free.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Sewer camera inspection",
+    "accept the leak repair for today, starts at 3:00pm, with Jordan.",
+    "Accepted: the leak repair today, starts at 3:00pm, with Jordan.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "you have two drain clearings on Mon Nov 9.",
+    "We'd share only where they're working, only after a missed check.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "It's a leak under the sink, today, starts at 3:00pm, with Jordan.",
+    "Alex gives the code at the door",
+    "The door stayed shut.",
+    "Is the report ready on time?",
+    "Texts the report link on the new date",
+    "The report is ready on the new date.",
+    "Nora can ask to be next for that window.",
+    "Nora S.",
+    "Nora",
+    "like a burst pipe or a lockout",
+    "Plumbing books a 2-hour window.",
+    "Registration 2019-0451",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Drain clearing",
+    "drain clearing",
+    "a water heater flush",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "replaces water heaters",
+    "Service call fee",
+    "service call fee",
+    "service call",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "haircut",
+    "house calls",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Shop",
+    "shop",
+    "after the job",
+    "BS20981",
+    "Arrival windows",
+    "Arrival times:",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "Drive time from the jobs before and after is checked again.",
+    "Each rejoins: the job stays on Alex's record.",
+    "Texts the camera report link",
+    "A plan or warranty pays",
+    "Books one job for a group",
+    "$150",
+    "$179",
+    "Drain clearings",
+    "teacher",
+    "Barber"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A8-02": "15f418fec4",
+   "A8-86": "c989a99e52",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "S2-02": "b2094081ee",
+   "A4-60": "7f7f0f1e66",
+   "A10-01": "77ff9c7550",
+   "A10-05": "63c3536c7a",
+   "A4-01": "7e7a61082c",
+   "A8-32": "632f2b5b40",
+   "S1-13": "eca22651fd"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B4-01": "15f683e6cb",
+   "B8-22": "50d78f1af0",
+   "B10-05": "a326ea3c0b",
+   "S1-13": "6964bfbe60",
+   "B10-32": "7713bff255"
+  }
+ }
+}

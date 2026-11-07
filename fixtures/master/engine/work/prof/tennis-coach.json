@@ -1,0 +1,2440 @@
+{
+ "id": "tennis-coach",
+ "name": "Tennis Coach",
+ "style": "Lesson",
+ "pattern": "class",
+ "from": "coach",
+ "plugin": {
+  "pf.license": {
+   "need": "No state license for coaching. The business registers as the state's rules require (registration only). The practice's own word, not checked by Rosie.",
+   "who holds it": "The business: its registration, where required. Coaches: no license.",
+   "checks for coaches who teach children": "A background check and abuse-prevention training that the business keeps on its own record before a coach is booked with a child (the business's own rule). Rosie doesn't check them; the business says so.",
+   "certifications": "Teaching certifications (from tennis or pickleball associations) are shown only when the coach or the business says so. Rosie does not check them.",
+   "insurance": "Liability insurance is the business's own record; a club may ask to see it."
+  },
+  "pf.services": {
+   "at the business's courts (the club or park courts the example coach teaches on; prices include the court)": [
+    {
+     "service": "Private lesson, 60 min (tennis or pickleball)",
+     "price kind": "one price",
+     "price": "$90",
+     "length": "60 min",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "service": "Private lesson, 30 min",
+     "price kind": "one price",
+     "price": "$50",
+     "length": "30 min",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "service": "Semi-private lesson (2 players), 60 min",
+     "price kind": "one price",
+     "price": "$120 for the pair, booked by one player",
+     "length": "60 min",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "service": "Adult group clinic, 90 min (4 to 8 players)",
+     "price kind": "per seat",
+     "price": "$35 a seat",
+     "length": "90 min",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "runs with at least 4"
+    },
+    {
+     "service": "Kids' clinic, ages 6 to 12, 60 min (4 to 8 kids)",
+     "price kind": "per seat",
+     "price": "$25 a seat",
+     "length": "60 min",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "runs with at least 4; children may be left"
+    },
+    {
+     "service": "Pickleball intro for beginners, 60 min",
+     "price kind": "one price",
+     "price": "$70",
+     "length": "60 min",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "service": "5-lesson pack (private, 60 min)",
+     "price kind": "pack",
+     "price": "$425",
+     "length": "5 lessons, good for 6 months",
+     "before": "bought on the page",
+     "after": "each lesson uses one"
+    },
+    {
+     "service": "Weekly lesson (same day and time each week)",
+     "price kind": "one price a lesson",
+     "price": "$90 a lesson",
+     "length": "60 min",
+     "before": "a card saved",
+     "after": "charged after each lesson",
+     "note": "a repeat plan, with its own yes"
+    }
+   ],
+   "at the customer's place (flow B: a home court, or a community or HOA court near them)": [
+    {
+     "service": "Home-court private lesson, 60 min",
+     "price kind": "one price",
+     "price": "$110",
+     "length": "60 min",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "inside the travel area; the customer's court must be free"
+    },
+    {
+     "service": "Family pickleball lesson at a home court (up to 4 players), 60 min",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "60 min",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    }
+   ],
+   "capacity": "One coach per lesson; a clinic has seats.",
+   "online": "None."
+  },
+  "pf.questions": {
+   "before times (they set the service, length or who can teach)": [
+    "Tennis or pickleball",
+    "Level: new, beginner, intermediate, advanced or competitive",
+    "Private, semi-private, or a clinic",
+    "Who plays: an adult or a child, and the child's age",
+    "For a home court: where it is, and is the court free then"
+   ],
+   "after a time is picked": [
+    "The second player's name, for a semi-private lesson",
+    "Needs a racquet or paddle (a loaner is free)"
+   ],
+   "only on the secure page": [
+    "Injuries or health limits the coach should know (a bad knee, a heart condition, a recent surgery)",
+    "A child's details, and the adults who may pick the child up",
+    "The waiver"
+   ],
+   "who may book": "An adult for themselves; a parent or guardian for a child under 18 (a teen never books alone)."
+  },
+  "pf.safety": {
+   "stops the booking or the lesson": [
+    {
+     "words": "Someone collapsed, chest pain, can't breathe, or a head injury with confusion",
+     "says": "Call 911 now. The club's AED is at the front desk.",
+     "booking": "The lesson stops; no booking until they say it's handled."
+    },
+    {
+     "words": "Lightning or thunder",
+     "says": "Everyone off the court and indoors or in a car. Play waits 30 minutes after the last thunder.",
+     "booking": "The lesson stops; it's moved, with no fee."
+    },
+    {
+     "words": "Heat illness: dizzy, sick, confused, or stopped sweating",
+     "says": "Stop, get to shade, sip water. Call 911 if they're confused or faint.",
+     "booking": "The lesson stops."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "An injury that's healing",
+     "says": "Book a light session; the coach reads the note on the secure page first."
+    }
+   ]
+  },
+  "pf.first_steps": {
+   "before the first lesson": [
+    {
+     "step": "A waiver signed on the secure page (a parent signs for a child)",
+     "timing": "before the first lesson",
+     "late": "not signed: signed at the court before play, or the lesson doesn't start"
+    }
+   ],
+   "prep for the reminder": "Court shoes, water, a hat, and a racquet or paddle (a loaner is free)."
+  },
+  "pf.visit": {
+   "check-in": "The check-in code at the court; the coach enters it. Clinics: names on a roster.",
+   "children": "A private lesson with a child: a parent, or an adult they name, stays on site. Kids' clinics: children may be left, and are handed back only to an adult the parent named.",
+   "changes at the lesson": "Extending a lesson by 30 minutes when the court is free: priced first, and the player's yes.",
+   "what proves it's done": "The coach texts DONE.",
+   "weather": "Rain, wet courts, lightning or extreme heat: the coach makes the call, up to 2 hours before or at the court. A rainout is moved or cancelled with no fee, and a pack lesson goes back to the pack.",
+   "stopped by weather partway": "Under half the lesson done: a free make-up lesson. Half or more done: it counts as given (the example coach's rule)."
+  },
+  "pf.money": {
+   "Rosfield's $2": "$2 per confirmed booking, a flat fee for each booking Rosie makes. It applies here too (D97).",
+   "private lessons": "Paid in full when booked (the main way), or a card saved and charged at DONE, or paid at the court on the coach's phone.",
+   "packs": "A 5-lesson pack bought on the page; each lesson then uses one. Good for 6 months (the coach's own term, told at purchase). No reminder from Rosie.",
+   "clinics": "A seat paid in full when booked.",
+   "weekly lessons": "A repeat plan with its own yes: a card saved, charged after each lesson.",
+   "late cancel and no-show": "Inside 24 hours, or a no-show: the full lesson kept, or a pack lesson used, only with the coach's yes.",
+   "rainouts": "No fee. A paid lesson moves or is refunded; a pack lesson goes back to the pack.",
+   "tips and codes": "No tip line. No discount codes.",
+   "reserved time": "A lesson is the coach's reserved court time: a player who arrives late or stops early pays the full price, and nothing comes back for time not used (S13-55's reserved-time line)."
+  },
+  "pf.messages": {
+   "never in a text": "Injuries and health notes, a child's details, and who may pick a child up.",
+   "languages": "English and Spanish.",
+   "minors": "Texts about a child's lesson or clinic go to the parent."
+  },
+  "pf.staff": {
+   "people": "The head coach (the owner) and assistant coaches. No license; the business's own word on each coach's background check.",
+   "skills": [
+    "Tennis",
+    "Pickleball",
+    "Children",
+    "Beginners",
+    "Advanced and competitive players"
+   ],
+   "supervision": "Anyone who coaches children has a cleared background check and abuse-prevention training on file. A child is never alone with one adult out of sight of others (the business's own rule).",
+   "stand-ins": "Another coach with the same skill (and the child checks, for a child). A player who named their coach moves only with their yes."
+  },
+  "pf.rules": {
+   "waiver": "A signed waiver before the first lesson.",
+   "child safety": "Background checks and training for coaches who teach children, the business's own record; lessons with a child in an open place others can see; no one-on-one contact with a child off the court (the business's own rules, from the programs it belongs to).",
+   "weather": "The coach makes the weather call; a rainout is never charged.",
+   "fees": "Late-cancel and no-show: the coach's own rule, asked each time."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most here:",
+   "coaching": [
+    "Rain, wet courts, lightning or extreme heat: moved or cancelled, no fee; a pack lesson goes back",
+    "The court isn't free (the club closed it or double-booked it): moved, no fee",
+    "The player runs late: the lesson still ends on time; the price stands",
+    "Stopped partway by weather: a make-up when under half was done",
+    "A clinic with fewer than 4: the coach runs it or cancels; everyone gets their seat back",
+    "A child not picked up after a clinic: the coach waits with the child and calls the parent",
+    "A pack runs out in 6 months: the coach's own term, told at purchase; Rosie sends no reminder for it",
+    "A player gets hurt: first aid; 911 when needed"
+   ]
+  },
+  "pf.facts": [
+   "packs",
+   "classes",
+   "plans",
+   "forms",
+   "children",
+   "waitlist",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "24 hours before"
+   }
+  },
+  "pf.switches": {}
+ },
+ "rename": {
+  "A": [
+   [
+    "takes jobs sent now.",
+    "takes no jobs sent now."
+   ],
+   [
+    "at the chair",
+    "at the court"
+   ],
+   [
+    "At the chair",
+    "At the court"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Tennis"
+   ],
+   [
+    "Lee Electric",
+    "Lee Pickleball"
+   ],
+   [
+    "visit fee",
+    "lesson fee"
+   ],
+   [
+    "Visit fee",
+    "Lesson fee"
+   ],
+   [
+    "Coach",
+    "Coach"
+   ],
+   [
+    "coach",
+    "coach"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Racquet Club LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Racquet Club"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Court Coaching LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Court Coaching"
+   ],
+   [
+    "Groom's Package",
+    "5-lesson pack"
+   ],
+   [
+    "Groom's package",
+    "5-lesson pack"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Private lesson, 60 min"
+   ],
+   [
+    "Signature cut and shave",
+    "Private lesson, 60 min"
+   ],
+   [
+    "signature cut and shave",
+    "private lesson, 60 min"
+   ],
+   [
+    "Skin fades",
+    "Pickleball intro"
+   ],
+   [
+    "Skin fade",
+    "Pickleball intro"
+   ],
+   [
+    "skin fades",
+    "pickleball intro"
+   ],
+   [
+    "skin fade",
+    "pickleball intro"
+   ],
+   [
+    "Beard trims",
+    "Semi-private lessons"
+   ],
+   [
+    "Beard trim",
+    "Semi-private lesson"
+   ],
+   [
+    "beard trims",
+    "semi-private lessons"
+   ],
+   [
+    "beard trim",
+    "semi-private lesson"
+   ],
+   [
+    "Kids cuts",
+    "Kids' clinics"
+   ],
+   [
+    "Kids cut",
+    "Kids' clinic"
+   ],
+   [
+    "kids cuts",
+    "kids' clinics"
+   ],
+   [
+    "kids cut",
+    "kids' clinic"
+   ],
+   [
+    "Color and cut",
+    "Family pickleball"
+   ],
+   [
+    "color and cut",
+    "family pickleball"
+   ],
+   [
+    "Color correction",
+    "Semi-private lesson"
+   ],
+   [
+    "color correction",
+    "semi-private lesson"
+   ],
+   [
+    "hot towel",
+    "water break"
+   ],
+   [
+    "Hot towel",
+    "Water break"
+   ],
+   [
+    "Haircuts",
+    "Lessons"
+   ],
+   [
+    "haircuts",
+    "lessons"
+   ],
+   [
+    "Haircut",
+    "Lesson"
+   ],
+   [
+    "haircut",
+    "lesson"
+   ],
+   [
+    "barbershops",
+    "clubs"
+   ],
+   [
+    "barbershop",
+    "club"
+   ],
+   [
+    "Barbershop",
+    "Club"
+   ],
+   [
+    "barbers",
+    "coaches"
+   ],
+   [
+    "barber",
+    "coach"
+   ],
+   [
+    "Barber",
+    "Coach"
+   ],
+   [
+    "clinicians",
+    "coaches"
+   ],
+   [
+    "clinician",
+    "coach"
+   ],
+   [
+    "Clinician",
+    "Coach"
+   ],
+   [
+    "Riley",
+    "Tomas"
+   ],
+   [
+    "Avery",
+    "Mina"
+   ],
+   [
+    "Jordan",
+    "Ines"
+   ],
+   [
+    "Casey",
+    "Paulo"
+   ],
+   [
+    "Jules",
+    "Noor"
+   ],
+   [
+    "Tessa",
+    "Ellen"
+   ],
+   [
+    "Kim",
+    "Ana"
+   ],
+   [
+    "Nia",
+    "Rosa"
+   ],
+   [
+    "Hugo",
+    "Felix"
+   ],
+   [
+    "Lena",
+    "Greta"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "house calls",
+    "home-court lessons"
+   ],
+   [
+    "House calls",
+    "Home-court lessons"
+   ],
+   [
+    "house call",
+    "home-court lesson"
+   ],
+   [
+    "House call",
+    "Home-court lesson"
+   ],
+   [
+    "plumbing and electrical",
+    "tennis and pickleball"
+   ],
+   [
+    "Plumbing and electrical",
+    "Tennis and pickleball"
+   ],
+   [
+    "plumbing",
+    "tennis"
+   ],
+   [
+    "Plumbing",
+    "Tennis"
+   ],
+   [
+    "plumber",
+    "coach"
+   ],
+   [
+    "Plumber",
+    "Coach"
+   ],
+   [
+    "electrician",
+    "assistant coach"
+   ],
+   [
+    "electrical",
+    "pickleball"
+   ],
+   [
+    "Electrical",
+    "Pickleball"
+   ],
+   [
+    "water heater flush",
+    "clinic"
+   ],
+   [
+    "Water heater flush",
+    "Clinic"
+   ],
+   [
+    "water heater replacement",
+    "private lesson"
+   ],
+   [
+    "Water heater replacement",
+    "Private lesson"
+   ],
+   [
+    "water heater fix",
+    "home-court lesson"
+   ],
+   [
+    "Water heater fix",
+    "Home-court lesson"
+   ],
+   [
+    "water heaters",
+    "clinics"
+   ],
+   [
+    "Water heaters",
+    "Clinics"
+   ],
+   [
+    "water heater",
+    "clinic"
+   ],
+   [
+    "Water heater",
+    "Clinic"
+   ],
+   [
+    "service call fee",
+    "lesson fee"
+   ],
+   [
+    "service call",
+    "lesson"
+   ],
+   [
+    "Service call",
+    "Lesson"
+   ],
+   [
+    "Drain clearings",
+    "Private lessons"
+   ],
+   [
+    "drain clearings",
+    "private lessons"
+   ],
+   [
+    "drain clearing",
+    "private lesson"
+   ],
+   [
+    "Drain clearing",
+    "Private lesson"
+   ],
+   [
+    "perms",
+    "clinics"
+   ],
+   [
+    "Perms",
+    "Clinics"
+   ],
+   [
+    "perm",
+    "clinic"
+   ],
+   [
+    "Perm",
+    "Clinic"
+   ],
+   [
+    "massage",
+    "pickleball"
+   ],
+   [
+    "Massage",
+    "Pickleball"
+   ],
+   [
+    "heater",
+    "clinic"
+   ],
+   [
+    "Heater",
+    "Clinic"
+   ],
+   [
+    "Heating and cooling",
+    "Pickleball"
+   ],
+   [
+    "heating and cooling",
+    "pickleball"
+   ],
+   [
+    "My gas",
+    "My"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Respira bien?"
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Llame al 911 ahora. Si alguien se desploma o tiene dolor de pecho, es una emergencia."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Respira bien."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Call 911 now."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said a player collapsed."
+   ],
+   [
+    "A gas smell at the home",
+    "A player who collapsed"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell,",
+    "Real danger, like lightning or a collapse,"
+   ],
+   [
+    "A coach's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a player who collapses gets 'call 911 now'."
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Pickleball intro · $70"
+   ],
+   [
+    "Sewer camera inspection",
+    "Pickleball intro"
+   ],
+   [
+    "Lee Court Coaching can clear the drain",
+    "Lee Court Coaching can come to you"
+   ],
+   [
+    "Ruth lets himself in the agreed way",
+    "Ruth goes in the agreed way"
+   ],
+   [
+    "Riley lets himself in",
+    "Riley goes in"
+   ],
+   [
+    "Lessons may also be done at home, for those cleared.",
+    "Lessons may also be done at home, for those cleared."
+   ],
+   [
+    "Lessons at the shop work like this:",
+    "Lessons at the club work like this:"
+   ],
+   [
+    "A neighborhood practice on Elm St. Classic cuts, fades and foot soak shaves.",
+    "A neighborhood club on Elm St. Private lessons, clinics and pickleball."
+   ],
+   [
+    "Do you do kids' clinics? My son is 8.",
+    "Do you do kids' clinics? My son is 8."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the place, after a missed check."
+   ],
+   [
+    "while care is due",
+    "while a lesson is due"
+   ],
+   [
+    "like labor or water breaking",
+    "like a collapse or a head injury"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a collapse or a head injury"
+   ],
+   [
+    "A podiatrist's example:",
+    "A coach's example:"
+   ],
+   [
+    "A coach's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a player who collapses gets 'call 911 now'."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The net clip ripped my shirt collar."
+   ],
+   [
+    "the cape clip ripped a shirt collar today.",
+    "the net clip ripped a shirt collar today."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: strong forehand, weak backhand, work on the volley."
+   ],
+   [
+    "shaves",
+    "lessons"
+   ],
+   [
+    "shave",
+    "lesson"
+   ],
+   [
+    "beard",
+    "grip"
+   ],
+   [
+    "Beard",
+    "Grip"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a second player."
+   ],
+   [
+    "Can Ines also look at a dripping faucet?",
+    "Can Ines also add a second player?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The second player is a private lesson."
+   ],
+   [
+    "Kitchen drain",
+    "Home court"
+   ],
+   [
+    "Yard drain",
+    "Back court"
+   ],
+   [
+    "$20 fee ($40 for the custom orthotics)",
+    "@@FEE@@"
+   ],
+   [
+    "raises the lesson to $50",
+    "raises the lesson to $100"
+   ],
+   [
+    "Saved: lesson $50 for visits from Mon Nov 2.",
+    "Saved: lesson $100 for visits from Mon Nov 2."
+   ],
+   [
+    "Lesson plans go to $50 from Wed Nov 25",
+    "Lesson plans go to $100 from Wed Nov 25"
+   ],
+   [
+    "A plan goes to $50 from Wed Nov 25",
+    "A plan goes to $100 from Wed Nov 25"
+   ],
+   [
+    "Lesson $90 ($50 from Nov 2) · Pickleball intro $50 · Semi-private lesson $90",
+    "Lesson $90 ($100 from Nov 2) · Pickleball intro $70 · Semi-private lesson $120"
+   ],
+   [
+    "Ben's AI asks for a pickleball intro at $90, an old price.",
+    "Ben's AI asks for a pickleball intro at $60, an old price."
+   ],
+   [
+    "the real price, $50.",
+    "the real price, $70."
+   ],
+   [
+    "A pickleball intro at Lee Racquet Club is $50, not $90. Here are the open times at $50.",
+    "A pickleball intro at Lee Racquet Club is $70, not $60. Here are the open times at $70."
+   ],
+   [
+    "Ines does pickleball too, at $425 an hour.",
+    "Ines does pickleball too."
+   ],
+   [
+    "tennis and pickleball, $425 an hour",
+    "tennis and pickleball"
+   ],
+   [
+    "The signature cut, $50,",
+    "The 30-minute lesson, $50,"
+   ],
+   [
+    "adds the prices: $35 and $20.",
+    "adds the prices: $90 and $35."
+   ],
+   [
+    "$20 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$40 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$20 deposit",
+    "@@DEP@@"
+   ],
+   [
+    "$40 deposit",
+    "@@DEP@@"
+   ],
+   [
+    "$89 service-call fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$35",
+    "$90"
+   ],
+   [
+    "$55",
+    "$50"
+   ],
+   [
+    "$140",
+    "$425"
+   ],
+   [
+    "$75",
+    "$110"
+   ],
+   [
+    "$90 color quote",
+    "$90 quote"
+   ],
+   [
+    "$20",
+    "$35"
+   ],
+   [
+    "$25",
+    "$25"
+   ],
+   [
+    "$40",
+    "$70"
+   ],
+   [
+    "@@FEE@@",
+    "$90 fee"
+   ],
+   [
+    "@@DEP@@",
+    "$90 deposit"
+   ]
+  ],
+  "B": [
+   [
+    "takes jobs sent now.",
+    "takes no jobs sent now."
+   ],
+   [
+    "at the chair",
+    "at the court"
+   ],
+   [
+    "At the chair",
+    "At the court"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Tennis"
+   ],
+   [
+    "Lee Electric",
+    "Lee Pickleball"
+   ],
+   [
+    "visit fee",
+    "lesson fee"
+   ],
+   [
+    "Visit fee",
+    "Lesson fee"
+   ],
+   [
+    "Coach",
+    "Coach"
+   ],
+   [
+    "coach",
+    "coach"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Racquet Club LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Racquet Club"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Court Coaching LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Court Coaching"
+   ],
+   [
+    "Groom's Package",
+    "5-lesson pack"
+   ],
+   [
+    "Groom's package",
+    "5-lesson pack"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Private lesson, 60 min"
+   ],
+   [
+    "Signature cut and shave",
+    "Private lesson, 60 min"
+   ],
+   [
+    "signature cut and shave",
+    "private lesson, 60 min"
+   ],
+   [
+    "Skin fades",
+    "Pickleball intro"
+   ],
+   [
+    "Skin fade",
+    "Pickleball intro"
+   ],
+   [
+    "skin fades",
+    "pickleball intro"
+   ],
+   [
+    "skin fade",
+    "pickleball intro"
+   ],
+   [
+    "Beard trims",
+    "Semi-private lessons"
+   ],
+   [
+    "Beard trim",
+    "Semi-private lesson"
+   ],
+   [
+    "beard trims",
+    "semi-private lessons"
+   ],
+   [
+    "beard trim",
+    "semi-private lesson"
+   ],
+   [
+    "Kids cuts",
+    "Kids' clinics"
+   ],
+   [
+    "Kids cut",
+    "Kids' clinic"
+   ],
+   [
+    "kids cuts",
+    "kids' clinics"
+   ],
+   [
+    "kids cut",
+    "kids' clinic"
+   ],
+   [
+    "Color and cut",
+    "Family pickleball"
+   ],
+   [
+    "color and cut",
+    "family pickleball"
+   ],
+   [
+    "Color correction",
+    "Semi-private lesson"
+   ],
+   [
+    "color correction",
+    "semi-private lesson"
+   ],
+   [
+    "hot towel",
+    "water break"
+   ],
+   [
+    "Hot towel",
+    "Water break"
+   ],
+   [
+    "Haircuts",
+    "Lessons"
+   ],
+   [
+    "haircuts",
+    "lessons"
+   ],
+   [
+    "Haircut",
+    "Lesson"
+   ],
+   [
+    "haircut",
+    "lesson"
+   ],
+   [
+    "barbershops",
+    "clubs"
+   ],
+   [
+    "barbershop",
+    "club"
+   ],
+   [
+    "Barbershop",
+    "Club"
+   ],
+   [
+    "barbers",
+    "coaches"
+   ],
+   [
+    "barber",
+    "coach"
+   ],
+   [
+    "Barber",
+    "Coach"
+   ],
+   [
+    "clinicians",
+    "coaches"
+   ],
+   [
+    "clinician",
+    "coach"
+   ],
+   [
+    "Clinician",
+    "Coach"
+   ],
+   [
+    "Riley",
+    "Tomas"
+   ],
+   [
+    "Avery",
+    "Mina"
+   ],
+   [
+    "Jordan",
+    "Ines"
+   ],
+   [
+    "Casey",
+    "Paulo"
+   ],
+   [
+    "Jules",
+    "Noor"
+   ],
+   [
+    "Tessa",
+    "Ellen"
+   ],
+   [
+    "Kim",
+    "Ana"
+   ],
+   [
+    "Nia",
+    "Rosa"
+   ],
+   [
+    "Hugo",
+    "Felix"
+   ],
+   [
+    "Lena",
+    "Greta"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "house calls",
+    "home-court lessons"
+   ],
+   [
+    "House calls",
+    "Home-court lessons"
+   ],
+   [
+    "house call",
+    "home-court lesson"
+   ],
+   [
+    "House call",
+    "Home-court lesson"
+   ],
+   [
+    "plumbing and electrical",
+    "tennis and pickleball"
+   ],
+   [
+    "Plumbing and electrical",
+    "Tennis and pickleball"
+   ],
+   [
+    "plumbing",
+    "tennis"
+   ],
+   [
+    "Plumbing",
+    "Tennis"
+   ],
+   [
+    "plumber",
+    "coach"
+   ],
+   [
+    "Plumber",
+    "Coach"
+   ],
+   [
+    "electrician",
+    "assistant coach"
+   ],
+   [
+    "electrical",
+    "pickleball"
+   ],
+   [
+    "Electrical",
+    "Pickleball"
+   ],
+   [
+    "water heater flush",
+    "clinic"
+   ],
+   [
+    "Water heater flush",
+    "Clinic"
+   ],
+   [
+    "water heater replacement",
+    "private lesson"
+   ],
+   [
+    "Water heater replacement",
+    "Private lesson"
+   ],
+   [
+    "water heater fix",
+    "home-court lesson"
+   ],
+   [
+    "Water heater fix",
+    "Home-court lesson"
+   ],
+   [
+    "water heaters",
+    "clinics"
+   ],
+   [
+    "Water heaters",
+    "Clinics"
+   ],
+   [
+    "water heater",
+    "clinic"
+   ],
+   [
+    "Water heater",
+    "Clinic"
+   ],
+   [
+    "service call fee",
+    "lesson fee"
+   ],
+   [
+    "service call",
+    "lesson"
+   ],
+   [
+    "Service call",
+    "Lesson"
+   ],
+   [
+    "Drain clearings",
+    "Private lessons"
+   ],
+   [
+    "drain clearings",
+    "private lessons"
+   ],
+   [
+    "drain clearing",
+    "private lesson"
+   ],
+   [
+    "Drain clearing",
+    "Private lesson"
+   ],
+   [
+    "perms",
+    "clinics"
+   ],
+   [
+    "Perms",
+    "Clinics"
+   ],
+   [
+    "perm",
+    "clinic"
+   ],
+   [
+    "Perm",
+    "Clinic"
+   ],
+   [
+    "massage",
+    "pickleball"
+   ],
+   [
+    "Massage",
+    "Pickleball"
+   ],
+   [
+    "heater",
+    "clinic"
+   ],
+   [
+    "Heater",
+    "Clinic"
+   ],
+   [
+    "Heating and cooling",
+    "Pickleball"
+   ],
+   [
+    "heating and cooling",
+    "pickleball"
+   ],
+   [
+    "My gas",
+    "My"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Respira bien?"
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Llame al 911 ahora. Si alguien se desploma o tiene dolor de pecho, es una emergencia."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Respira bien."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Call 911 now."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said a player collapsed."
+   ],
+   [
+    "A gas smell at the home",
+    "A player who collapsed"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell,",
+    "Real danger, like lightning or a collapse,"
+   ],
+   [
+    "A coach's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a player who collapses gets 'call 911 now'."
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Pickleball intro · $70"
+   ],
+   [
+    "Sewer camera inspection",
+    "Pickleball intro"
+   ],
+   [
+    "Lee Court Coaching can clear the drain",
+    "Lee Court Coaching can come to you"
+   ],
+   [
+    "Ruth lets himself in the agreed way",
+    "Ruth goes in the agreed way"
+   ],
+   [
+    "Riley lets himself in",
+    "Riley goes in"
+   ],
+   [
+    "Lessons may also be done at home, for those cleared.",
+    "Lessons may also be done at home, for those cleared."
+   ],
+   [
+    "Lessons at the shop work like this:",
+    "Lessons at the club work like this:"
+   ],
+   [
+    "A neighborhood practice on Elm St. Classic cuts, fades and foot soak shaves.",
+    "A neighborhood club on Elm St. Private lessons, clinics and pickleball."
+   ],
+   [
+    "Do you do kids' clinics? My son is 8.",
+    "Do you do kids' clinics? My son is 8."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only the place, after a missed check."
+   ],
+   [
+    "while care is due",
+    "while a lesson is due"
+   ],
+   [
+    "like labor or water breaking",
+    "like a collapse or a head injury"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a collapse or a head injury"
+   ],
+   [
+    "A podiatrist's example:",
+    "A coach's example:"
+   ],
+   [
+    "A coach's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a player who collapses gets 'call 911 now'."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The net clip ripped my shirt collar."
+   ],
+   [
+    "the cape clip ripped a shirt collar today.",
+    "the net clip ripped a shirt collar today."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: strong forehand, weak backhand, work on the volley."
+   ],
+   [
+    "shaves",
+    "lessons"
+   ],
+   [
+    "shave",
+    "lesson"
+   ],
+   [
+    "beard",
+    "grip"
+   ],
+   [
+    "Beard",
+    "Grip"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a second player."
+   ],
+   [
+    "Can Ines also look at a dripping faucet?",
+    "Can Ines also add a second player?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The second player is a private lesson."
+   ],
+   [
+    "Kitchen drain",
+    "Home court"
+   ],
+   [
+    "Yard drain",
+    "Back court"
+   ],
+   [
+    "Ines finds corroded shutoff valves.",
+    "Ines finds a worn grip that needs replacing."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 50 extend the lesson 30 minutes"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: a 30-minute extension, $50."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "30-minute extension · $50"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $50 extension is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to a 30-minute extension for $50."
+   ],
+   [
+    "Yes. Lee Court Coaching has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Court Coaching has a yearly clinic plan, $140 a visit."
+   ],
+   [
+    "$89, credited to the repair",
+    "$110, credited to the lesson"
+   ],
+   [
+    "$20 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$40 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 service-call fee",
+    "@@FEE@@"
+   ],
+   [
+    "cut your hair at the shop for $35, or at your home for $75.",
+    "teach you at the club for $90, or at your home court for $110."
+   ],
+   [
+    "$110, credited to the repair",
+    "$110, credited to the lesson"
+   ],
+   [
+    "The $640 clinic is over",
+    "The $640 course is over"
+   ],
+   [
+    "Labor",
+    "Racquet restring"
+   ],
+   [
+    "$120 an hour",
+    "$120"
+   ],
+   [
+    "for $160. It's added to what you pay for this visit.",
+    "for $50. It's added to what you pay for this visit."
+   ],
+   [
+    "$160 for today's extra work",
+    "$50 for today's extra work"
+   ],
+   [
+    "Rental 1",
+    "Lesson 1"
+   ],
+   [
+    "Rental 2",
+    "Lesson 2"
+   ],
+   [
+    "$358",
+    "$220"
+   ],
+   [
+    "$35",
+    "$90"
+   ],
+   [
+    "$75",
+    "$110"
+   ],
+   [
+    "$89",
+    "$110"
+   ],
+   [
+    "$179",
+    "$110"
+   ],
+   [
+    "$199",
+    "$140"
+   ],
+   [
+    "$40",
+    "$70"
+   ],
+   [
+    "$20",
+    "$35"
+   ],
+   [
+    "$150",
+    "$110"
+   ],
+   [
+    "$160",
+    "$50"
+   ],
+   [
+    "$640",
+    "$560"
+   ],
+   [
+    "@@FEE@@",
+    "$110 fee"
+   ],
+   [
+    "My kitchen drain is clogged. Can a coach come Thursday morning? I'm in Springfield.",
+    "My home court needs a coach. Can a coach come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a lesson for my daughter. A text back is fine."
+   ],
+   [
+    "Can a coach clear a yard drain this Thursday? What does it cost?",
+    "Can a coach teach Ana on a home court this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Ellen drain Thu 12-2 Paulo",
+    "BOOK Ellen lesson Thu 12-2 Paulo"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the court is, what level the player is, and whether the court is free then."
+   ],
+   [
+    "'My sink won't drain' fits a private lesson.",
+    "'I want to learn the serve' fits a private lesson."
+   ],
+   [
+    "like a roof leak.",
+    "like a roof repair."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a prescription for someone never seen."
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a racquet restring? Say so."
+   ],
+   [
+    "is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "is the lesson at a home court, a club or somewhere else? And what level is the player, and is the court free?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home court. Just my daughter."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some lessons take more than one visit, like a multi-day camp."
+   ],
+   [
+    "Can you flush my clinic every year, too?",
+    "Can you run my clinic every year, too?"
+   ],
+   [
+    "Yes. Lee Court Coaching has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Court Coaching has a yearly clinic plan, $140 a visit."
+   ],
+   [
+    "like the sewer camera inspection.",
+    "like the pickleball intro."
+   ],
+   [
+    "can start the sewer camera inspection at a set time.",
+    "can start the pickleball intro at a set time."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is the court still wet?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the court still wet?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, the court is wet"
+   ],
+   [
+    "The $110 drain needs none.",
+    "The $110 lesson needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please bring water and a racquet."
+   ],
+   [
+    "Can Ines also run a camera down my sewer line?",
+    "Can Ines also run a clinic for my kids?"
+   ],
+   [
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Say Morgan has a repeat plan: a weekly lesson at two courts every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's lesson?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I warm up on the court before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the player is now sick."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The player feels sick now, and is sitting down."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Sit the player down in the shade, sip water, and call 911 if they're confused."
+   ],
+   [
+    "Say Ana L.'s yard drain needs nobody home.",
+    "Say Ana L. needs nobody home."
+   ],
+   [
+    "Ines lets himself in",
+    "Ines goes in"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scuff on the court"
+   ],
+   [
+    "Under the sink, before",
+    "Court, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Court, before"
+   ],
+   [
+    "Most jobs have a price before the visit.",
+    "Most lessons have a price before the visit."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $110 lesson was promised.",
+    "A court repair is priced at the visit: only the $110 lesson was promised."
+   ],
+   [
+    "Ines finds mold behind the sink wall.",
+    "Ines finds a wet court."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD wet court, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wet court"
+   ],
+   [
+    "Ines found mold behind the wall under your sink and stopped that part of the work.",
+    "Ines found a wet court and stopped that part of the lesson."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a wet court"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the part that isn't safe"
+   ],
+   [
+    "Say Ines cracks the cabinet floor and texts a photo.",
+    "Say Ines cracks the court surface and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cracked the court surface"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked court surface"
+   ],
+   [
+    "Ines cracked the cabinet floor at Alex M.'s.",
+    "Ines cracked the court surface at Alex M.'s."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 110 lesson"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE the serve needs work. Bring the ball machine next time."
+   ],
+   [
+    "the shutoff valves",
+    "the extension"
+   ],
+   [
+    "the kitchen drain",
+    "the home-court lesson"
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The serve is off again 2 weeks later. It's inside the free return window, so Sam OKs a free return lesson at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The player's serve is off again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s lesson, given Thu Oct 22, needs a repeat. It's inside the free return window."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. The return lesson is free."
+   ],
+   [
+    "Ines left a mess under the sink.",
+    "Ines left the balls on the court."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on my court this morning."
+   ],
+   [
+    "Can Ines look at my bathroom sink next week?",
+    "Can Ines look at my other court next week?"
+   ],
+   [
+    "Here are Ines's next times for a bathroom drain.",
+    "Here are Ines's next times for a home court."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a private lesson today,"
+   ],
+   [
+    "The lesson is $110. Accept it?",
+    "The lesson is $110. Accept it?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please bring water and a racquet."
+   ],
+   [
+    "A coach's example: water near outlets gets 'shut off the main valve'.",
+    "A coach's example: a player who collapses gets 'call 911 now'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now, since a player collapsed."
+   ],
+   [
+    "Shut the cold-water valve, above the clinic. If you smell gas, get out and call 911.",
+    "Call 911 now. The lesson can wait."
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "coach",
+  "Coach",
+  "lesson",
+  "Lesson"
+ ],
+ "story": {
+  "A": "Alex books a 60-minute private tennis lesson at the club's courts and pays $90 when booking; the coach checks Alex in at the court and texts DONE.",
+  "B": "Alex books a home-court pickleball lesson for $110, paid when booking; the coach comes to Alex's community court."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|card",
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a $90 private lesson, paid in full when booking.",
+    "list|card|card": "A weekly $90 lesson: a card is saved and charged when the coach texts DONE.",
+    "list|none|counter": "A $90 lesson paid at the court on the coach's phone. Nothing is taken when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$90",
+     "name": "Private lesson"
+    },
+    "list|*|*": {
+     "price": "$90",
+     "name": "Private lesson"
+    },
+    "list|full|*": {
+     "price": "$90",
+     "paid": "$90",
+     "name": "Private lesson"
+    }
+   }
+  },
+  "B": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a $110 home-court lesson, paid in full when booking.",
+    "list|card|card": "A $110 home-court lesson: a card is saved and charged when the coach texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$110",
+     "name": "Home-court lesson"
+    },
+    "list|*|*": {
+     "price": "$110",
+     "name": "Home-court lesson"
+    },
+    "list|full|*": {
+     "price": "$110",
+     "paid": "$110",
+     "name": "Home-court lesson"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Coaching needs no state license: registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The coach's time is booked, not courts."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "Clinics run on a timetable (the classes fact is listed)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies to every profession (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license; child checks are the business's own rule."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The coach's time or a clinic seat."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "Anyone may book."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with the coach."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ],
+    "why": "The sent-now branch is off here, so the sign-up card's sent-now lines go (addendum self-check 1)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Coaching needs no state license: registration only."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The coach's time is booked, not courts."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "Clinics run on a timetable (the classes fact is listed)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies to every profession (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license; child checks are the business's own rule."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A lesson has a set start."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Home-court lessons are private."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A parent or an adult they name stays for a child's home-court lesson."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked."
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ],
+    "why": "The sent-now branch is off here, so the sign-up card's sent-now lines go (addendum self-check 1)."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "A8-67"
+  ],
+  "B": []
+ },
+ "notes": "H1 build, Tue Oct 27 2026 (professions pass P3). From coach (refitted); the test-drive plug-in (work/testdrive/tennis-coach.md) is the base: services, prices, fees, the coach's rules, safety words, splits and off ops kept.\nMoney: private lesson $90 (A) and home-court lesson $110 (B), paid in full at booking or a card saved and charged at DONE; the 5-lesson pack ($425, a credit per lesson, paidby credit); the weekly lesson (a repeat plan with its own yes); clinic seats; the $2 applies (D97: the test-drive's 'No $2' off op is kept only as the no-$2 branch being off).\nA pack: the coach's own term (good 6 months, told at purchase); no reminder from Rosie (the test-drive's finding 3 is accepted: a business that wants one adds its own step).\nLicenses: none for coaching (registration only); child checks and certifications are the business's own word, never checked by Rosie (D96). The master's lookup wording is a MASTER line (log).\nUNSURE FOR JAY (test-drive #2, unclear): a coach's own weather rule ('stopped after half or more done: it counts as given') is kept as the plug-in's rule; the master's A8-40 / B8-29 'the part not given: a free make-up or a refund' runs beside it. Jay decides; see the H1 log.\nFlow B's safety stop (weather) and the refund of the paid part: a MASTER line (B8-29 'Paid before ... a full refund'); not changed here.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "takes jobs sent now.",
+    "at the chair",
+    "At the chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "visit fee",
+    "coach",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Skin fade",
+    "skin fades",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cuts",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "hot towel",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "clinician",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Jules",
+    "Nia",
+    "Hugo",
+    "Lena",
+    "88 Elm St",
+    "1200 Main St",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "water heaters",
+    "water heater",
+    "Drain clearing",
+    "perms",
+    "perm",
+    "massage",
+    "Massage",
+    "heater",
+    "We'd share only where they're working, only after a missed check.",
+    "while care is due",
+    "like labor or water breaking",
+    "like a burst pipe or a lockout",
+    "The cape clip ripped my shirt collar.",
+    "the cape clip ripped a shirt collar today.",
+    "shaves",
+    "shave",
+    "beard",
+    "Beard",
+    "adds the prices: $35 and $20.",
+    "$20 fee",
+    "$20 deposit",
+    "$40 deposit",
+    "$89 service-call fee",
+    "$35",
+    "$55",
+    "$140",
+    "$75",
+    "$90 color quote",
+    "$20",
+    "$25",
+    "$40"
+   ],
+   "B": [
+    "takes jobs sent now.",
+    "at the chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "visit fee",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "beard trim",
+    "hot towel",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "clinician",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Jules",
+    "Tessa",
+    "Kim",
+    "42 Oak St",
+    "88 Elm St",
+    "1200 Main St",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "Water heater fix",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "service call fee",
+    "service call",
+    "Service call",
+    "Drain clearings",
+    "drain clearings",
+    "drain clearing",
+    "Drain clearing",
+    "perm",
+    "heater",
+    "Heating and cooling",
+    "heating and cooling",
+    "My gas",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No. No huele a gas.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Real danger, like water near outlets or a gas smell,",
+    "Sewer camera inspection · $199",
+    "Sewer camera inspection",
+    "We'd share only where they're working, only after a missed check.",
+    "while care is due",
+    "like a burst pipe or a lockout",
+    "shaves",
+    "shave",
+    "beard",
+    "Say Alex also asks about a dripping faucet.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Kitchen drain",
+    "Yard drain",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "$89, credited to the repair",
+    "$20 fee",
+    "$89 fee",
+    "$89 service-call fee",
+    "cut your hair at the shop for $35, or at your home for $75.",
+    "Labor",
+    "$120 an hour",
+    "for $160. It's added to what you pay for this visit.",
+    "$160 for today's extra work",
+    "Rental 1",
+    "Rental 2",
+    "$358",
+    "$35",
+    "$75",
+    "$89",
+    "$179",
+    "$199",
+    "$40",
+    "$20",
+    "$150",
+    "$160",
+    "$640",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "like a roof leak.",
+    "Like tapping a neighbor's water line without asking.",
+    "Adding a faucet check? Say so.",
+    "is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "like the sewer camera inspection.",
+    "can start the sewer camera inspection at a set time.",
+    "like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "Please clear the cabinet under the sink.",
+    "Say Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "the kitchen drain",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "Please clear the cabinet under the sink.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell."
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "S1-21": "913a9558f4"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "S1-21": "334e0a791c"
+  }
+ }
+}

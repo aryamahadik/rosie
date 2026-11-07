@@ -1,0 +1,4213 @@
+{
+ "id": "vehicle-inspection",
+ "name": "Emissions and vehicle inspection",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "tires",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a state license for the inspection station where the state's rules require one (for the emissions test, the safety inspection or both); a certificate for each person who runs and signs a result, where the state's rules require one; the business registration. Rosie books the visit only; the result is the inspector's.",
+   "ask": [
+    "The inspection station license number, where the state's rules require one",
+    "Each inspector's certificate number, where the state's rules require one",
+    "The business registration number"
+   ],
+   "who": "both: the station, and each inspector who signs a result",
+   "check": "the state's license lookup; where there is none, a person on Rosie's team checks within 1 business day",
+   "blocks": "a station license that the owner says the business lacks keeps inspection bookings offline; a person without a current certificate is not offered for inspections",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "garage liability and coverage for customers' cars while they are at the station, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'",
+   "example": "the example walks the branch where the state licenses the station and certifies each inspector (S1-60 and S2-28 '1')"
+  },
+  "pf.services": {
+   "pattern": "a lane booked by time slot at the station: the customer waits about 30 to 45 minutes, or leaves the car and picks it up when it is READY; the van comes to a home, a lot or a seller's address for a pre-purchase check or a fleet visit",
+   "list": [
+    {
+     "name": "Combined inspection (emissions and safety)",
+     "price": "one price; the example station's own: $50, with the state's certificate or sticker fee in it where the state has one",
+     "length": "about 45 minutes",
+     "place": "at the station",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill Rosie texts when the car is ready"
+    },
+    {
+     "name": "Smog check",
+     "price": "the emissions test alone: $40 in the example",
+     "length": "about 30 minutes",
+     "place": "at the station",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Safety inspection only",
+     "price": "$25 in the example",
+     "length": "about 30 minutes",
+     "place": "at the station",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Commercial vehicle inspection",
+     "price": "$55 in the example",
+     "length": "about 45 minutes",
+     "place": "at the station",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Safety inspection, at the car",
+     "price": "by the van: $114 in the example (the $89 trip fee is in it)",
+     "length": "about 30 minutes",
+     "place": "by the van",
+     "before": "a card saved for the trip fee",
+     "after": "the bill Rosie texts after DONE"
+    },
+    {
+     "name": "Salvage or rebuilt vehicle inspection",
+     "price": "priced at the visit, after a look at the car; only the trip fee is promised by the van",
+     "place": "at the station, or by the van"
+    },
+    {
+     "name": "Extra vehicles at a fleet visit",
+     "price": "$30 a vehicle in the example, added to the counted fleet price",
+     "place": "the van at a business's lot"
+    },
+    {
+     "name": "Headlight aim check",
+     "price": "$20 in the example at the station, $109 by the van (the $89 trip fee is in it); can be added to any inspection",
+     "length": "10 minutes",
+     "place": "at the station; by the van"
+    },
+    {
+     "name": "Pre-purchase inspection (no state certificate)",
+     "price": "a full check of a used car with a written report on the secure page: $140 in the example at the station, $229 by the van (the $89 trip fee is in it)",
+     "length": "about 90 minutes",
+     "place": "at the station, or by the van at the seller's address; the seller must agree and be there",
+     "before": "nothing taken at the station; a card saved for the trip fee for the van",
+     "after": "at the counter, or the bill Rosie texts after DONE"
+    },
+    {
+     "name": "Fleet inspection at a business lot",
+     "price": "priced at the visit, per vehicle, after counting the vehicles; only the trip fee is promised; only where the state's rules allow a test away from the station",
+     "place": "the van at a business's lot",
+     "before": "a card saved for the trip fee",
+     "after": "the bill Rosie texts after DONE"
+    },
+    {
+     "name": "Re-test",
+     "price": "free within 30 days of a first test at this station, for the same tests (the example station's rule; the state's form decides the days and what is free)",
+     "length": "about 30 minutes",
+     "place": "at the station"
+    },
+    {
+     "name": "Trip fee for the van",
+     "price": "one fee, part of each mobile job's price (the example: $89)",
+     "place": "at a home, a lot or a seller's address"
+    }
+   ],
+   "never": "a certificate, sticker or passing result sold without the test, a changed result, and a test skipped are never booked: they are refused",
+   "capacity": "the station's 2 lanes book by time; one car per booking; the van does one car at a time and needs a flat, safe place to run the car",
+   "booked_as": "a lane's time at the station, not a person: the station names the inspector; the van books a person",
+   "wait_or_leave": "the customer waits at the station, or leaves the car and picks it up when READY",
+   "van": "a pre-purchase check at a home or a seller's address; a fleet visit at a business lot (an arrival window of 2 hours)",
+   "nobody_home": "no: the owner or an adult hands over the keys and the papers at the car",
+   "online": "no: the car is inspected in person"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Year, make, model and fuel (gas, diesel or electric)",
+    "What kind of inspection: emissions, safety, both, a commercial vehicle, or a pre-purchase check",
+    "Is the check-engine light on? Was the battery unplugged or a code cleared lately?",
+    "Wait at the station, or leave the car?",
+    "For the van: a home, a lot or a seller's address, and the town"
+   ],
+   "after_time": [
+    "Registration and proof of insurance: bring both (the AI says which ones)",
+    "For a pre-purchase check: the seller agrees, and will be there with the keys",
+    "For the van: where the car is parked, and if there is a flat, safe place to run it"
+   ],
+   "secure_page_only": [
+    "The VIN and the plate",
+    "A copy of the registration and the proof of insurance",
+    "The seller's name and phone, for a pre-purchase check",
+    "The inspection result and its readings (the page, never a text)"
+   ],
+   "heads_up": "a check-engine light that is on, or a code cleared lately, keeps the car from passing; the station tests the car as it is and never promises a pass",
+   "who_may_book": "an adult: the car's owner, or someone the owner lets bring it in; a car being bought is checked only with the seller's OK; for a teen's car, a parent books and says yes to prices"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "someone hurt, or a crash that just happened",
+    "a fire, or smoke from the car",
+    "someone dizzy or sick from fumes in the car"
+   ],
+   "stop_action": "'If anyone is hurt, or feels sick from fumes, get out of the car and call 911 now'; no booking",
+   "dont_drive_words": [
+    "brakes that don't work, or a pedal that goes to the floor",
+    "a fuel leak, or a strong smell of fuel",
+    "a wheel that is loose or wobbling",
+    "steering that won't hold the road"
+   ],
+   "dont_drive_action": "Rosie says: don't drive it. The booking goes on for the soonest time, or the van comes to the car.",
+   "refuse": "a request to skip the test, to change a result, or to get a certificate or sticker without the test is refused: no booking, and the owner is told",
+   "mobile_stops": "rain, a car on a slope or a busy street, or no flat, safe place to run the car: the inspector stops and offers a new time (no fee) or the station",
+   "can_continue": "yes, after the don't-drive steps; no for a refused request"
+  },
+  "pf.first_steps": {
+   "required": "none before booking; at the visit: the registration, proof of insurance and the key",
+   "prep_for_reminder": [
+    "Bring your registration and proof of insurance",
+    "Bring the key, and the gas cap",
+    "A check-engine light that is on keeps a car from passing; you can still come for the test",
+    "For a car you are buying: the seller must agree and be there with the keys"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "at the station: the check-in code at the counter, with the registration and proof of insurance; at the van: the code at the car",
+   "intake": "the inspector matches the VIN to the registration, reads the odometer, and photographs the dash and the plate; the papers are scanned to the secure page",
+   "required_items": "the registration, proof of insurance and the key; without them the inspection can't start, and no fee is owed",
+   "the_work": "the emissions test and/or the safety inspection by the state's checklist; 30 to 45 minutes; a pre-purchase check is about 90 minutes",
+   "added_work": "none: the station sells no repairs through Rosie; a failed item is written on the report",
+   "status_words": [
+    "IN",
+    "READY"
+   ],
+   "ready": "READY texts 'your inspection is done' with the pick-up hours; the result, the readings and any certificate or sticker are on the secure page and at the counter, never in a text",
+   "done_proof": "the code at the counter, then READY; at the van, the code at the car, then DONE with the report on the secure page",
+   "late": "a late car keeps its lane 15 minutes; then it moves to the next open time",
+   "aftercare": "a free re-test within 30 days after a result that needs one (the state's form decides the days and what is free)"
+  },
+  "pf.money": {
+   "before": "nothing taken at the station for any inspection; the van saves a card for the trip fee",
+   "after": "at the counter, the station's own way; or the bill Rosie texts when the car is ready, if the owner turns it on",
+   "mobile": "a card saved for the trip fee; the bill after DONE",
+   "deposit": "no deposit on inspections by default; if the owner turns one on, it follows deposit cap: from the state form",
+   "fees": "at the station, no cancel or no-show fee; the van: the trip fee on the saved card (the example: $89), only with the owner's yes, for a late cancel or a car that isn't there; the owner confirms every fee",
+   "price_shown": "the inspection price, with the state's certificate or sticker fee in it where the state has one; the posted or set fee: from the state form",
+   "tips": "no tip line",
+   "tax": "the state's sales tax on the service, where the state has one",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies; a free re-test adds none"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "The result of an inspection (pass or fail), its readings and any certificate number",
+    "The VIN or the plate",
+    "The registration or the insurance papers",
+    "A lot or gate code"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a teen's car go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "emissions testing",
+    "safety inspection",
+    "commercial vehicle inspection",
+    "pre-purchase inspection",
+    "mobile work in the van"
+   ],
+   "licenses": "a certificate for each inspector who runs and signs a result, where the state's rules require one; checked at sign-up and re-checked",
+   "supervision": "a trainee works only beside a certified inspector, where the state's rules require it",
+   "who_oks": "the owner OKs a pre-purchase check at a seller's address and any fleet quote over $500",
+   "stand_in": "only an inspector certified for that test; a job only one person is certified for waits, and the time moves"
+  },
+  "pf.rules": {
+   "station_license": "switch: the station's license and its number on the receipt: from the state form",
+   "inspector_certificate": "switch: which tests need a certified inspector, and the certificate's number on the report: from the state form",
+   "posted_fee": "switch: the inspection fee is the state's set fee or the station's posted fee: from the state form",
+   "retest_rule": "switch: the days and the fee of a re-test: from the state form",
+   "mobile_testing": "switch: whether the state allows a test, a certificate or a sticker away from the station: from the state form; off means a certificate is given at the station only",
+   "reporting": "the station reports each result to the state as the state's rules require, outside Rosie",
+   "never_alter": "a result is never changed, skipped or sold; a request to do so is refused and the owner is told",
+   "home_sale_cancel": "switch: a written cancel period for work sold at the customer's place: from the state form",
+   "records": "the station's own record kept as long as the state requires; Rosie's records 7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "The registration, insurance or key is missing: the inspection can't start, and no fee is owed",
+    "A check-engine light that is on: the station tests the car as it is and never promises a pass",
+    "A car that isn't safe to drive: the don't-drive steps, then the van or a new time",
+    "A request to skip the test or change a result: refused, the owner is told",
+    "A pre-purchase check without the seller's OK: not done",
+    "A no-show at the station: no fee",
+    "Rain or no safe place for the van: a new time, no fee",
+    "A re-test: free within 30 days, for the same tests",
+    "A car left and not picked up"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "spaces",
+   "aftercare"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": {
+     "window": 2
+    }
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Cal and Joy (inspectors)",
+   "other": "Others (a bank, a parent, the state's reporting site)"
+  },
+  "B": {
+   "staff": "Gil and Ana (inspectors)",
+   "other": "Others (a bank, a seller, a fleet manager)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Cal"
+  },
+  "B": {
+   "staff": "Gil"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a combined inspection at Lee's Inspections for Sat Oct 24 at 11:00am. Nothing is taken: the customer's YES books the lane. Alex waits or leaves the car, and pays at the counter when it is ready. The result is on the secure page, never in a text. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Car Check's van for a pre-purchase inspection of a used car at the seller's place, and Gil comes Thu Oct 22 between 8 and 10am. A card is saved for the trip fee, and Rosie texts the bill after DONE. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a combined inspection, $50 from the station's board. Nothing is taken: a YES books the lane, and Alex pays at the counter. The result is on the secure page.",
+    "list|none|bill": "The same $50 inspection with the car left at the station. Rosie texts the bill with READY, so Alex can pay before pick-up."
+   },
+   "amounts": {
+    "*": {
+     "fee": "free",
+     "name": "Combined inspection"
+    },
+    "list|*|*": {
+     "price": "$50",
+     "name": "Combined inspection"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "visit|card|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a pre-purchase inspection of a used car at the seller's place, $229 with the $89 trip fee in it. A card is saved for the trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after Gil texts DONE.",
+    "visit|card|bill": "A fleet inspection at a business lot, priced at the visit after counting the vehicles. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Pre-purchase inspection"
+    },
+    "list|*|*": {
+     "price": "$229",
+     "name": "Pre-purchase inspection"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Fleet inspection"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "color",
+  "trip fee",
+  "Grace",
+  "valve",
+  "tire rotation"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "S1-80",
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28",
+   "S1-80",
+   "B8-69",
+   "B8-72"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your station, paid at the counter, your own way"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken"
+   ],
+   [
+    "Every plumbing service",
+    "Every van job"
+   ],
+   [
+    "A water heater job",
+    "A pre-purchase inspection at a seller's place"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Pre-purchase and fleet inspections at your car or lot in Springfield, within 25 miles."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a car repair, which isn't on the station's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do car repairs."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The lane door scratched my bumper."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the lane door scratched the bumper today"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: gas cap seal is worn; mention it next visit."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do a re-test? I need one for my car."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: your re-test is free within 30 days. Want a time?"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked an inspection for a son's car before the times, so they fit."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "You told us the inspection is for your son's car, and that you're his parent."
+   ],
+   [
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "Its money card is set the way most mobile inspection services start. Is it right? Send only what's different."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The registration is missing."
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Say Alex M. left the car at Lee's Inspections. Staff text READY when the inspection is done. Alex hears that it is done, the pick-up hours, and anything due. The result is on the secure page."
+   ],
+   [
+    "READY Sofia G. Photo added.",
+    "READY Alex M."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your inspection is done. Your car is ready for pick-up at Lee's Inspections."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Mon to Sat, 8am to 5pm"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens in the lane?"
+   ],
+   [
+    "A failed test stops that part only. That's the business's side: nothing is charged for it.",
+    "A check that can't be done stops that part only. That's the business's side: nothing is charged for it."
+   ],
+   [
+    "like a skin-test result",
+    "like a worn gas cap seal"
+   ],
+   [
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A barbershop books a person's time.",
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. An inspection station books a lane's time: a space."
+   ],
+   [
+    "A what-if: for a table, a court or a room, the times show the space and its size, never a person. A space shows only if it's free and big enough for the group.",
+    "A what-if: for a lane, the times show the lane, never a person. A lane shows only if it's free and long enough for the test."
+   ],
+   [
+    "Sat Oct 24 · 6:00pm · Table for 4",
+    "Sat Oct 24 · 11:00am · Lane 1"
+   ],
+   [
+    "Sat Oct 24 · 7:30pm · Table for 6",
+    "Sat Oct 24 · 2:00pm · Lane 2"
+   ],
+   [
+    "A table for six has one code, not six.",
+    "A car has one code."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Jordan and Casey do mobile inspections; Jordan does fleet checks too. Riley and Avery inspect cars at the station; Riley also does pre-purchase checks and van visits. Pat is my office manager, for prices over $500. Jules rents a lane, with their own customers."
+   ],
+   [
+    "BS20981",
+    "EX-2087"
+   ],
+   [
+    "EC22871",
+    "EX-3310"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither the van nor the station takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a tow or a lockout. The plug-in says which services. Inspections are never sent now, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Inspections take no jobs sent now: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Does any inspection get sent now? No: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An inspector's example: brakes that fail get 'don't drive it; the van can come to the car'."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a person hurt or a fire, gets the safety steps first."
+   ],
+   [
+    "Thanks. The state licenses the shop and each barber. What's the shop's license number?",
+    "Thanks. Where the state's rules require it, the station holds a license, and so does each inspector. What's the station's license number?"
+   ],
+   [
+    "color and house calls",
+    "pre-purchase checks and van visits"
+   ],
+   [
+    "color, house calls",
+    "pre-purchase checks, van visits"
+   ],
+   [
+    "does color",
+    "does pre-purchase checks"
+   ],
+   [
+    "Color always stays",
+    "Pre-purchase checks always stay"
+   ],
+   [
+    "cut hair",
+    "inspect cars"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: mobile inspections and fleet checks"
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most inspection stations start. Is it right? Send only what's different."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules inspection stations often set. Your call: keep them, or change any. They become the station's own rules."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood inspection station on Station Rd. Emissions, safety and pre-purchase inspections, in 2 lanes."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most inspection stations set it."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Alex wants it at home: a van visit, $229, with a card saved for the $89 trip fee. From here it's the other flow, where the business goes to the customer."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The pre-purchase inspection can take a $40 deposit when booked. The other $100 is paid at the counter."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The pre-purchase inspection can take a $40 deposit when booked. The other $100 is on the bill after the visit."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The pre-purchase inspection can take a $40 deposit when booked. The other $100 is on the bill after the visit."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the pre-purchase inspection takes a $40 deposit; the $100 rest is paid after the visit."
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: no fee at the station; the van's $89 trip fee, only if a card was saved and you say yes"
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $50 combined inspection can work this way."
+   ],
+   [
+    "Haircut · $35",
+    "Combined inspection · $50"
+   ],
+   [
+    "Skin fade · $40",
+    "Smog check · $40"
+   ],
+   [
+    "Beard trim · $20",
+    "Headlight aim check · $20"
+   ],
+   [
+    "Haircut at home · $75",
+    "Combined inspection at home · $229"
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Commercial vehicle inspection · $55"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Pre-purchase inspection · $40 deposit"
+   ],
+   [
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "a headlight aim check is on the price board: $20. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a headlight aim check. Rosie finds one time long enough for both, with one inspector, and adds the prices: $50 and $20."
+   ],
+   [
+    "'Adding a beard trim, +$20? Say so.'",
+    "'Adding a headlight aim check, +$20? Say so.'"
+   ],
+   [
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "One request waits for Lee's Barbershop. It's a headlight aim check today at 2:00pm with Avery, for a new customer. It's $20. Accept it?"
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Reading it back: accept a headlight aim check today at 2:00pm with Avery. Say yes to go ahead."
+   ],
+   [
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Accepted: the headlight aim check today at 2:00pm with Avery."
+   ],
+   [
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the combined inspection goes to $55 for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the combined inspection to $55 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Combined inspections already booked keep $50, even after Nov 2."
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $55 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $50."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: combined inspection $55 for visits from Mon Nov 2. Combined inspections already booked keep $50. Combined inspection plans go to $55 from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Combined inspection $50 ($55 from Nov 2) · Smog check $40 · Headlight aim check $20"
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the combined inspection from nothing taken to a $20 deposit. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "Nothing taken when they book · paid after the visit"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a smog check at $30, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A smog check at Lee's Barbershop is $40, not $30. Here are the open times at $40."
+   ],
+   [
+    "Refund · $20",
+    "Refund · $40"
+   ],
+   [
+    "Dee W.'s $20 payment through Rosie was charged twice.",
+    "Dee W.'s $40 payment was charged twice."
+   ],
+   [
+    "Haircut (pack)",
+    "Combined inspection (pack)"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Quotes for a fleet come to you first. Board prices never need one"
+   ],
+   [
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Someone with their own customers, like an inspector, gets their own sign-up link instead."
+   ],
+   [
+    "Access, like a step-free chair: only times and places that fit show.",
+    "Access, like a step-free entrance: only times and places that fit show."
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's employer for a staff car. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this inspection."
+   ],
+   [
+    "The plug-in's plain questions are optional, like 'How would you like it on top?'",
+    "The plug-in's plain questions are optional, like 'Is the check-engine light on?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Is the check-engine light on? (optional)"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of your dash and plate? Yes / No"
+   ],
+   [
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it a fade' goes back to the times.",
+    "A yes with a 'but' isn't a yes yet. 'Yes, add the headlight check' goes back to the times."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Riley can do a shorter job in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter job."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during the inspection?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring the registration and proof of insurance on Saturday."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please bring the registration and proof of insurance."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the shop, the customer is already at the counter, so there's no door check."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s job."
+   ],
+   [
+    "stopped Alex M.'s cut.",
+    "stopped Alex M.'s job."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Riley shows the work, like the checklist at the counter. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A job is rated, so the shop takes the first branch."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The headlights still look off after the check."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the headlights still look off after the check"
+   ],
+   [
+    "1 color quote",
+    "1 quote"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A smog test' fits a combined inspection."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $245 fleet inspection quote. Sam taps Call, and the call goes out from the shop's number."
+   ],
+   [
+    "{{name.staff:Nia K.}} would like to talk about the color quote before booking.",
+    "{{name.staff:Nia K.}} would like to talk about the quote before booking."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "An inspection's example: 'An inspection here needs your registration and proof of insurance. Is the check-engine light on?'"
+   ],
+   [
+    "house calls",
+    "van visits"
+   ],
+   [
+    "house call",
+    "van visit"
+   ],
+   [
+    "House calls",
+    "Van visits"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A combined inspection for Alex's car and a headlight aim check for a second car work the same way."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Commercial vehicle inspection"
+   ],
+   [
+    "Signature cut and shave",
+    "Commercial vehicle inspection"
+   ],
+   [
+    "Kids cut",
+    "Safety inspection"
+   ],
+   [
+    "kids cut",
+    "safety inspection"
+   ],
+   [
+    "the Groom's package",
+    "the pre-purchase inspection"
+   ],
+   [
+    "The Groom's package",
+    "The pre-purchase inspection"
+   ],
+   [
+    "Groom's package",
+    "Pre-purchase inspection"
+   ],
+   [
+    "Color and cut",
+    "Salvage vehicle inspection"
+   ],
+   [
+    "color and cut",
+    "salvage vehicle inspection"
+   ],
+   [
+    "Color correction",
+    "Inspection of a modified car"
+   ],
+   [
+    "color correction",
+    "inspection of a modified car"
+   ],
+   [
+    "Ben T. books a skin fade",
+    "Ben T. books a smog check"
+   ],
+   [
+    "skin fades",
+    "smog checks"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "An inspection station takes drop-offs: the car is left and picked up when it's ready."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds window tint to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW window tint"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Window tint for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like a pre-purchase inspection at the station or at the car"
+   ],
+   [
+    "rents a chair",
+    "rents a lane"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Car Check's"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only to their shop."
+   ],
+   [
+    "Takes the price from the shop's board",
+    "Takes the price from the shop's list"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "An inspection could mean a state test or a pre-purchase check."
+   ],
+   [
+    "I'd like a cut on Saturday",
+    "I need my car inspected on Saturday"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex adds a headlight aim check"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Necesito inspeccionar mi carro el sábado."
+   ],
+   [
+    "Books the groom's party together",
+    "Books 3 company vans together"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books an inspection and a headlight aim check"
+   ],
+   [
+    "step-free door on Elm St",
+    "step-free door on Station Rd"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Step-free door on Station Rd · parking by the door"
+   ],
+   [
+    "11:00am with Riley",
+    "11:00am in Lane 2"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am · Lane 2"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm · Lane 1"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm · Lane 1"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Haircuts",
+    "Combined inspections"
+   ],
+   [
+    "haircuts",
+    "combined inspections"
+   ],
+   [
+    "Haircut",
+    "Combined inspection"
+   ],
+   [
+    "haircut",
+    "combined inspection"
+   ],
+   [
+    "Skin fade",
+    "Smog check"
+   ],
+   [
+    "skin fade",
+    "smog check"
+   ],
+   [
+    "Beard trim",
+    "Headlight aim check"
+   ],
+   [
+    "beard trim",
+    "headlight aim check"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Inspections LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Pre-Buy and Lee Fleet Check"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Inspections"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Car Check"
+   ],
+   [
+    "88 Elm St",
+    "48 Station Rd"
+   ],
+   [
+    "1200 Main St",
+    "17 Depot Ln"
+   ],
+   [
+    "Riley",
+    "Cal"
+   ],
+   [
+    "Avery",
+    "Joy"
+   ],
+   [
+    "Jordan",
+    "Gil"
+   ],
+   [
+    "Casey",
+    "Ana"
+   ],
+   [
+    "barbershop's",
+    "inspection station's"
+   ],
+   [
+    "barbershop",
+    "inspection station"
+   ],
+   [
+    "Barbershop",
+    "Inspection station"
+   ],
+   [
+    "barbers",
+    "inspectors"
+   ],
+   [
+    "barber",
+    "inspector"
+   ],
+   [
+    "Barber",
+    "Inspector"
+   ],
+   [
+    "plumbing's",
+    "mobile inspection service's"
+   ],
+   [
+    "plumbing",
+    "mobile inspection service"
+   ],
+   [
+    "Plumbing",
+    "Mobile inspection service"
+   ],
+   [
+    "plumber",
+    "inspector"
+   ],
+   [
+    "Plumber",
+    "Inspector"
+   ],
+   [
+    "electrical",
+    "fleet inspection"
+   ],
+   [
+    "Electrical",
+    "Fleet inspection"
+   ],
+   [
+    "$35",
+    "$50"
+   ],
+   [
+    "$75",
+    "$229"
+   ],
+   [
+    "Inspections's",
+    "Inspections'"
+   ],
+   [
+    "A inspection",
+    "An inspection"
+   ],
+   [
+    "a inspection",
+    "an inspection"
+   ],
+   [
+    "A inspector",
+    "An inspector"
+   ],
+   [
+    "a inspector",
+    "an inspector"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Style consult",
+    "Re-test within 30 days"
+   ],
+   [
+    "style consult",
+    "re-test within 30 days"
+   ],
+   [
+    "Elm St",
+    "Station Rd"
+   ]
+  ],
+  "B": [
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito inspeccionar mi carro, y huele a gasolina."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need my car inspected, and it smells like fuel."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told not to drive the car with a fuel smell. She is told to call 911 if anyone is hurt."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido o mareado por los gases?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt or dizzy from fumes?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está herido ni mareado."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is hurt or dizzy."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No maneje el carro con olor a gasolina. La camioneta puede ir hasta el carro. Si alguien está herido, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't drive the car with a fuel smell. The van can come to the car. If anyone is hurt, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For inspections, someone hurt, a fire, or someone dizzy or sick from fumes stops the booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hurt, a fire, or someone dizzy or sick from fumes."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurt or feels sick from fumes, get out of the car and call 911 now."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can I drive to the test with an expired sticker?"
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the car on flat ground?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the car on flat ground?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, in the driveway"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I wash the car before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that the brakes feel soft now. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The brake pedal goes almost to the floor now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Don't drive it. The van can come to the car. Casey can come sooner, at the same price."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE odometer 61,250. Dent on the rear bumper."
+   ],
+   [
+    "Under the sink, before",
+    "Dash and odometer, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Rear bumper, before"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 vans 165 trucks 80"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Vans and trucks, 14 vehicles"
+   ],
+   [
+    "Shutoff valve",
+    "6 vans"
+   ],
+   [
+    "shutoff valve only",
+    "6 vans only"
+   ],
+   [
+    "Supply line",
+    "2 trucks"
+   ],
+   [
+    "supply line",
+    "2 trucks"
+   ],
+   [
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Jordan sees the headlights point too high. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 20 headlight aim check"
+   ],
+   [
+    "Extra for {{alex.staff}}: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for {{alex.staff}}: headlight aim check, $20. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Headlight aim check · $20"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to a headlight aim check for $20."
+   ],
+   [
+    "$160 valve quote",
+    "$20 headlight aim quote"
+   ],
+   [
+    "$160 valve work",
+    "$20 headlight aim check"
+   ],
+   [
+    "replace both shutoff valves",
+    "do a headlight aim check"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Do a headlight aim check"
+   ],
+   [
+    "replacing both shutoff valves",
+    "doing a headlight aim check"
+   ],
+   [
+    "the shutoff valves",
+    "the headlights"
+   ],
+   [
+    "fixes the shutoff valve today",
+    "inspects the 6 vans today"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan counts the vehicles and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak.",
+    "Jordan counted the vehicles."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Jordan scratches the rear bumper and texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the rear bumper"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched rear bumper"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan scratched the rear bumper of Alex M.'s car. The before photo shows no scratch."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 229 pre-purchase inspection"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE gas cap seal worn. Bring a new cap next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Alex asks for the free re-test 2 weeks later."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M. asks for a free re-test of the Thu Oct 22 inspection."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "I'd like my free re-test, please."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your re-test is free"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left the driver's seat moved back."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I need a used car checked before I buy it."
+   ],
+   [
+    "a roof leak",
+    "a car repair"
+   ],
+   [
+    "Reading it back: accept the leak repair for today,",
+    "Reading it back: accept the fleet inspection for today,"
+   ],
+   [
+    "A leak repair from $89, priced at the visit. The $89 service call is paid up front as the deposit, counted toward the bill.",
+    "A fleet inspection, priced at the visit. A card is saved for the $89 trip fee, counted toward the bill."
+   ],
+   [
+    "A leak repair, priced at the visit. Only the $89 service call is promised, and a card is saved for it.",
+    "A fleet inspection, priced at the visit. Only the $89 trip fee is promised, and a card is saved for it."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A fleet inspection is priced at the visit: only the $89 trip fee was promised."
+   ],
+   [
+    "The work is priced at the visit, like a leak repair. Only the {{fee}} service call is promised now. Jordan quotes it there, and Alex says yes before any work.",
+    "The work is priced at the visit, like a fleet inspection. Only the {{fee}} trip fee is promised now. Jordan quotes it there, and Alex says yes before any work."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 fleet inspection is quoted at the visit and OK'd there; no document is signed first."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, no document is signed first: the price is from the list, or quoted at the visit and OK'd there."
+   ],
+   [
+    "The license can stop the work and cut what may be offered, so it comes before prices and money. The state licenses the barbershop itself, and each barber.",
+    "The license can stop the work and cut what may be offered, so it comes before prices and money. Where the state's rules require it, the station holds a license, and so does each inspector."
+   ],
+   [
+    "The state licenses the shop itself, and each barber. What's the shop's license number?",
+    "Where the state's rules require it, the station holds a license, and so does each inspector. What's the station's license number?"
+   ],
+   [
+    "Thanks. The state licenses plumbing for the company and each plumber. What's the license number Lee Home Services works under?",
+    "Thanks. Where the state's rules require it, the company and each inspector hold a license. What's the license number Lee Car Check works under?"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Jordan and Casey do mobile inspections; Jordan does fleet checks too. Riley and Avery inspect cars at the station; Riley also does pre-purchase checks and van visits. Pat is my office manager, for prices over $500. Jules rents a lane, with their own customers."
+   ],
+   [
+    "BS20981",
+    "EX-2087"
+   ],
+   [
+    "EC22871",
+    "EX-3310"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither the van nor the station takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a tow or a lockout. The plug-in says which services. Inspections are never sent now, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Inspections take no jobs sent now: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Does any inspection get sent now? No: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An inspector's example: brakes that fail get 'don't drive it; the van can come to the car'."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a person hurt or a fire, gets the safety steps first."
+   ],
+   [
+    "color and house calls",
+    "pre-purchase checks and van visits"
+   ],
+   [
+    "color, house calls",
+    "pre-purchase checks, van visits"
+   ],
+   [
+    "does color",
+    "does pre-purchase checks"
+   ],
+   [
+    "Color always stays",
+    "Pre-purchase checks always stay"
+   ],
+   [
+    "cut hair",
+    "inspect cars"
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: mobile inspections and fleet checks"
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most inspection stations start. Is it right? Send only what's different."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules inspection stations often set. Your call: keep them, or change any. They become the station's own rules."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood inspection station on Station Rd. Emissions, safety and pre-purchase inspections, in 2 lanes."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most inspection stations set it."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can do your combined inspection at the shop for $50, or at your home for $229. Where would you like it?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Headlight aim check · $109"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said someone feels sick from fumes."
+   ],
+   [
+    "A gas smell at the home",
+    "Someone sick from fumes in the car"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to get out of the car and call 911"
+   ],
+   [
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Someone with their own customers, like an inspector, gets their own sign-up link instead."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. The shop's counter is in the other flow."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's counter is in the other flow."
+   ],
+   [
+    "house calls",
+    "van visits"
+   ],
+   [
+    "House calls",
+    "Van visits"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Pre-purchase inspection"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Brakes going soft"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like inspecting a car that isn't yours, unasked."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Free re-test for 30 days: reply here to book it."
+   ],
+   [
+    "Every plumbing service",
+    "Every van job"
+   ],
+   [
+    "Leak repair",
+    "Fleet inspection"
+   ],
+   [
+    "Water heater replacement",
+    "Salvage vehicle inspection"
+   ],
+   [
+    "like a haircut at the shop or at home.",
+    "like a pre-purchase inspection at the station or at the car."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Pre-purchase and fleet inspections at your car or lot in Springfield, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A pre-purchase inspection at a seller's place"
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the fleet inspection quote before booking."
+   ],
+   [
+    "Work like towing or a lockout is sent now (B4-16)",
+    "No work is sent now (B4-16): every van job is booked ahead"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about checking a used car I'm buying. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Check this car before I buy it' fits a pre-purchase inspection."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the seller there with the keys, and the car on flat ground."
+   ],
+   [
+    "Water heater fix",
+    "Inspection check"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds fuel dripping under the car. The plug-in says an inspector stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD fuel dripping under the car, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Fuel dripping under the car"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found fuel dripping under the car and stopped the inspection."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a fuel leak under the car"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the road test"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a puddle under the car this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan check my other car next week?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for an inspection."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a pre-purchase inspection, today,"
+   ],
+   [
+    "accept the leak repair for today,",
+    "accept the fleet inspection for today,"
+   ],
+   [
+    "Accepted: the leak repair today,",
+    "Accepted: the fleet inspection today,"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also check the headlight aim?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about a headlight aim check. Both jobs go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also check the headlights?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The headlight check is a small job, priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds window tint to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW window tint"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Window tint for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the car's year, make and model, and whether the check-engine light is on."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "An inspection could mean a state test or a pre-purchase check."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee's Barbershop for a smog check instead. It's offered in one place, so Alex sees one price first."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a headlight aim check? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services asks: is the car at a home, a lot or a seller's address? And what is the year, make and model, and is the check-engine light on?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At the seller's house. A 2017 sedan."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can an inspector check a used car this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa inspection Thu 12-2 Casey"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $229 inspection needs none."
+   ],
+   [
+    "Kitchen drain",
+    "Pre-purchase inspection"
+   ],
+   [
+    "Yard drain",
+    "Parked car"
+   ],
+   [
+    "kitchen drain",
+    "pre-purchase inspection"
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Say Kim L.'s fleet check needs nobody home."
+   ],
+   [
+    "Jordan lets himself in the agreed way, with no check-in code.",
+    "Jordan checks the car at the lot, with no check-in code."
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Car Check's"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only to their shop."
+   ],
+   [
+    "Drain clearings",
+    "Pre-purchase inspections"
+   ],
+   [
+    "drain clearings",
+    "pre-purchase inspections"
+   ],
+   [
+    "Drain clearing",
+    "Pre-purchase inspection"
+   ],
+   [
+    "drain clearing",
+    "pre-purchase inspection"
+   ],
+   [
+    "clear the drain",
+    "inspect the car"
+   ],
+   [
+    "Water heater flush",
+    "Safety inspection, at the car"
+   ],
+   [
+    "water heater flush",
+    "safety inspection, at the car"
+   ],
+   [
+    "Sewer camera inspection",
+    "Headlight aim check"
+   ],
+   [
+    "sewer camera inspection",
+    "headlight aim check"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "the $89 service call",
+    "the $89 trip fee"
+   ],
+   [
+    "The $89 service call",
+    "The $89 trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "at the door",
+    "at the car"
+   ],
+   [
+    "plumbing visit",
+    "inspection visit"
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "Gil is the one who does fleet inspections"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Car Check LLC"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Pre-Buy and Lee Fleet Check"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Inspections"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Car Check"
+   ],
+   [
+    "leehomeservices.com",
+    "leecarcheck.com"
+   ],
+   [
+    "88 Elm St",
+    "48 Station Rd"
+   ],
+   [
+    "42 Oak St",
+    "26 Maple Ct"
+   ],
+   [
+    "1200 Main St",
+    "17 Depot Ln"
+   ],
+   [
+    "Riley",
+    "Cal"
+   ],
+   [
+    "Avery",
+    "Joy"
+   ],
+   [
+    "Jordan",
+    "Gil"
+   ],
+   [
+    "Casey",
+    "Ana"
+   ],
+   [
+    "barbershop's",
+    "inspection station's"
+   ],
+   [
+    "barbershop",
+    "inspection station"
+   ],
+   [
+    "Barbershop",
+    "Inspection station"
+   ],
+   [
+    "barbers",
+    "inspectors"
+   ],
+   [
+    "barber",
+    "inspector"
+   ],
+   [
+    "Barber",
+    "Inspector"
+   ],
+   [
+    "plumbing's",
+    "mobile inspection service's"
+   ],
+   [
+    "plumbing",
+    "mobile inspection service"
+   ],
+   [
+    "Plumbing",
+    "Mobile inspection service"
+   ],
+   [
+    "plumber",
+    "inspector"
+   ],
+   [
+    "Plumber",
+    "Inspector"
+   ],
+   [
+    "electrical",
+    "fleet inspection"
+   ],
+   [
+    "Electrical",
+    "Fleet inspection"
+   ],
+   [
+    "1-year labor warranty",
+    "free 30-day re-test"
+   ],
+   [
+    "leak repair",
+    "fleet inspection"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "$179",
+    "$229"
+   ],
+   [
+    "$150",
+    "$114"
+   ],
+   [
+    "$199",
+    "$109"
+   ],
+   [
+    "Inspections's",
+    "Inspections'"
+   ],
+   [
+    "A inspection",
+    "An inspection"
+   ],
+   [
+    "a inspection",
+    "an inspection"
+   ],
+   [
+    "A inspector",
+    "An inspector"
+   ],
+   [
+    "a inspector",
+    "an inspector"
+   ],
+   [
+    "$160",
+    "$20"
+   ],
+   [
+    "$120 an hour",
+    "$30 a vehicle"
+   ],
+   [
+    "Labor",
+    "Extra vehicles at a fleet visit"
+   ],
+   [
+    "Water pressure check",
+    "Re-test within 30 days"
+   ],
+   [
+    "Priced from photos",
+    "Priced at the visit"
+   ],
+   [
+    "service-call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Elm St",
+    "Station Rd"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "The station is licensed where the state's rules require it, so the license branch is used.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Both companies pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The station's plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Inspections run no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each inspector who signs a result holds a certificate where the state's rules require one.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Every inspection is booked ahead: nothing is sent now.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "An inspection is paid in one go, never in stages.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "No insurance pays for an inspection.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "Each inspection is billed on its own.",
+    "label": "One bill for many visits"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "A car is inspected in person. Nothing is done by video or phone.",
+    "label": "By video or phone"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Lee's Inspections books a lane's time, not a person: the station names the inspector (the space branch).",
+    "label": "A person's time"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Lee's Inspections books a lane's time, not a seat.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Inspections have no stays.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "Lane times name no inspector. A wish for one goes in the notes.",
+    "label": "Asks for one person by name"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "No form is signed first for an inspection.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A child is never left at an inspection station: a parent stays, or a teen drives in.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "An inspection is rated like any visit.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No insurance or plan pays for an inspection.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "The station sells no plan of repeat visits.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "The result is ready at READY, on the secure page; nothing comes later.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The station sells no plan of repeat visits.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The station sells no packages or memberships.",
+    "label": "A package or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The station sells no packages or memberships.",
+    "label": "Buys a pack or membership"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "The station sells no plan of repeat visits.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The station sells no plan of repeat visits.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The station sells no plan of repeat visits.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Car Check is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The van's door"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Car Check is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. I'll show the business registration, and each inspector's certificate where the state's rules require one, as you give them. They're optional and not checked. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Mobile inspection price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most mobile inspection services start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Car Check, to start",
+        "lines": [
+         "Every van job",
+         "Where: at the customer's home or office",
+         "When they book: a card saved for the $89 trip fee",
+         "After the job: Rosie sends the bill"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules mobile inspection services often set. Your call: keep them, or change any. They become its own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Car Check: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Car Check will look to customers and AI assistants. I drafted it from your website and Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Pre-purchase and fleet inspections at your car or lot in Springfield, within 25 miles."
+        ]
+       },
+       "photos": [
+        "The van",
+        "The team",
+        "A car at a seller's place"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Car Check the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Car Check · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s01"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. I'll show the business registration, and each inspector's certificate where the state's rules require one, as you give them. They're optional and not checked. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the van team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Gil Price and Ana Moore run the van. Gil does fleet inspection too. Cal Chen and Joy Diaz work the shop's bays. Cal also does pre-purchase checks and van visits"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Gil Price: the van and fleet inspection",
+         "Ana Moore: the van",
+         "Cal Chen: the shop, pre-purchase checks and van visits",
+         "Joy Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Inspections. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Cal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Car Check. Sam Lee added you to the team for van and fleet inspection jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Gil"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Cal replies YES, then checks what Sam set. One reply covers everything Cal does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Cal Chen · my profile",
+        "lines": [
+         "Every shop service, pre-purchase checks and van visits",
+         "The shop's hours"
+        ]
+       },
+       "as": "Cal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Cal"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the station and van visits, so Cal is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Cal picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Joy, Gil and Ana set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Car Check",
+       "At the customer's place",
+       "Inspector certificate EX-2051",
+       "Yes"
+      ],
+      [
+       "Gil Price",
+       "Lee Car Check",
+       "At the customer's place",
+       "Inspector certificate EX-2068",
+       "Once Sam says yes"
+      ],
+      [
+       "Ana Moore",
+       "Lee Car Check",
+       "At the customer's place",
+       "Inspector certificate EX-2085",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Car Check",
+       "Office",
+       "None needed (office)",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Cal Chen",
+       "Lee's Inspections",
+       "At the station, and van visits",
+       "Inspector certificate EX-2102",
+       "Once Sam says yes"
+      ],
+      [
+       "Joy Diaz",
+       "Lee's Inspections",
+       "At the shop",
+       "Inspector certificate EX-2119",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Gil: the van and fleet inspection",
+         "Ana: the van",
+         "Cal: the shop, pre-purchase checks and van visits",
+         "Joy: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, fleet inspection and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Joy at the shop, Ana for the van.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Inspections can book you from now on, at the station and for van visits. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Cal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Inspections can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Joy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Car Check can book you for the van and fleet inspection from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Gil"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Fleet inspection and Lee's Inspections now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on van and fleet inspection jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The station's license EX-1187 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way fleet inspection was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile inspection service",
+          "Now"
+         ],
+         [
+          "Fleet inspection",
+          "Once your fleet inspector joins and you say yes"
+         ],
+         [
+          "Lee's Inspections",
+          "Its registration is on file as given, not checked. It shows once a inspector joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "Even with the photo, the registration can't be confirmed. Mobile inspection service waits, saved, and the other kinds of work can still go live.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We still can't confirm registration EX-0451, so mobile inspection service stays offline.",
+      {
+       "card": {
+        "title": "Mobile inspection service · offline, saved",
+        "lines": [
+         "Everything is saved",
+         "Fleet inspection and the inspection station can still go live",
+         "I'll remind you once in 3 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Mobile inspection service goes live at 2:16pm, and Sam can be booked now.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile inspection service is live! AI assistants can book you now.",
+      {
+       "card": {
+        "title": "Mobile inspection service · live now",
+        "lines": [
+         "You can be booked now",
+         "Your people come next, once the rest is set up",
+         "Next, fleet inspection: about 5 minutes"
+        ]
+       },
+       "buttons": [
+        "Start now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Sam sends a photo of the station's price board and checks what Rosie read. Nothing is typed from scratch.",
+    "more": [
+     "Each price is the posted or set fee, with any state certificate or sticker fee in it.",
+     "A pre-purchase inspection has no state certificate, and says so. The result of any inspection goes on the secure page, never in a text.",
+     "A re-test shows as free for 30 days, the way the state's form sets it."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the station's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Combined inspection",
+          "$50 · 45 min"
+         ],
+         [
+          "Smog check",
+          "$40 · 30 min"
+         ],
+         [
+          "Safety inspection only",
+          "$25 · 30 min"
+         ],
+         [
+          "Commercial vehicle inspection",
+          "$55 · 45 min"
+         ],
+         [
+          "Headlight aim check",
+          "$20 · 10 min"
+         ],
+         [
+          "Pre-purchase inspection, no certificate",
+          "$140 · 90 min"
+         ],
+         [
+          "Re-test within 30 days",
+          "Free"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-81",
+    "does": "Sam lists the station's 2 lanes and which services use each one. Customers then pick a lane's time, never a person.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The station is booked by the lane. List each one, and which services use it.",
+      {
+       "card": {
+        "title": "Your lanes",
+        "lines": [
+         "Its name, like Lane 1",
+         "How many cars it fits",
+         "Which services use it",
+         "Its hours"
+        ]
+       },
+       "buttons": [
+        "List them now",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1 Lane 1 and Lane 2, any inspection. All the station's hours"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "list": {
+        "head": [
+         "Lane",
+         "Services",
+         "Hours"
+        ],
+        "rows": [
+         [
+          "Lane 1",
+          "Every inspection",
+          "The station's hours"
+         ],
+         [
+          "Lane 2",
+          "Every inspection",
+          "The station's hours"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-65",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex says if the car is ready to test",
+      "q": "Is the check-engine light off?",
+      "does": "The secure page asks if the check-engine light is on, and if the battery was unplugged or a code cleared lately. Nothing is refused: the station tests the car as it is, and never promises a pass.",
+      "more": [
+       "A light that is on, or a code cleared lately, keeps the car from passing. Alex hears that plainly, before the yes.",
+       "The answer stays on the secure page. The result of the test goes there too, never in a text."
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "branches": [
+       {
+        "label": "Light off: go on",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Light on, or a code cleared lately",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A4-x02",
+          "line": [
+           "4.7",
+           "4.15"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Says the car may not pass, and books it anyway",
+          "does": "Say Alex's check-engine light is on. Rosie says it will keep the car from passing. The station tests it as it is and never promises a pass. Alex can still book now, or fix it first.",
+          "more": [
+           "Nothing is refused, and nothing extra is taken.",
+           "The re-test is free for 30 days, the way the state's form sets it."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "A check-engine light that is on will keep a car from passing. The station tests it as it is and can't promise a pass. You can book now, or fix it first. A re-test is free for 30 days."
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-05",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.14",
+       "10.10"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Mon Oct 26, 9:00am",
+      "title": "Tells Alex a free re-test is open",
+      "does": "Two days after the inspection, Rosie texts Alex once. The result is on the secure page. A free re-test is open for 30 days. The text never says pass or fail.",
+      "more": [
+       "It's a 30-minute stop at the station, with its own check-in code.",
+       "It's a second visit on Saturday's booking: no fee, and no second $2 for Rosie.",
+       "No reply: nothing is booked. The re-test stays free for the 30 days.",
+       "It's the job's own aftercare, not a sale."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee's Inspections: your result is on your secure page. A free re-test is open for 30 days if you need one. Pick a time:",
+        {
+         "times": [
+          "Tue Nov 3 · 8:00am · Lane 1",
+          "Wed Nov 4 · 8:00am · Lane 1"
+         ]
+        }
+       ],
+       [
+        "cust",
+        "san",
+        "A"
+       ],
+       [
+        "san",
+        "cust",
+        "Booked: your free re-test. Give this code at the counter.",
+        {
+         "card": {
+          "title": "Lee's Inspections · Free re-test",
+          "lines": [
+           "Tue Nov 3 · 8:00am · Lane 1 · 30 minutes",
+           "Free: part of Saturday's inspection"
+          ]
+         },
+         "code": "3907"
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "The station is licensed where the state's rules require it, so the license branch is used.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Both companies pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The station's plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Inspections run no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each inspector who signs a result holds a certificate where the state's rules require one.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Every inspection is booked ahead: nothing is sent now.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "A car is inspected in person. Nothing is done by video or phone.",
+    "label": "A video or phone session"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Every inspection is booked ahead: nothing is sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Every inspection is booked ahead: nothing is sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "No form is signed first for an inspection.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "An inspection needs no signed contract: the price is from the list, or quoted at the visit and OK'd there.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "An inspector never minds a child: an adult on the booking must be there.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No plan or warranty pays for an inspection.",
+    "label": "A plan or warranty pays"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "An inspection is paid in one go, never in stages.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "No insurance or plan pays for an inspection.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "No landlord pays for an inspection, so no bill goes to one.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "The result is ready at DONE, on the secure page; nothing comes later.",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "The van sells no plan of repeat visits.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Each van job is rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Thanks. I'll show the business registration, and each inspector's certificate where the state's rules require one, as you give them. They're optional and not checked. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Fleet inspection price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like mobile inspection service. Send only what's different.",
+      {
+       "card": {
+        "title": "Fleet inspection, set like mobile inspection service",
+        "lines": [
+         "At the customer's place, money as for mobile inspection service",
+         "Counted at the visit, then priced; only the $89 trip fee is promised",
+         "It goes live once the team member who runs fleet checks joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee's Inspections is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Shop front"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the shop is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Where the state's rules require it, the station holds a license, and so does each inspector. What's the station's license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "EX-2087"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most inspection stations start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee's Inspections, to start",
+        "lines": [
+         "Every shop service",
+         "At your shop, paid at the counter, your own way",
+         "When they book: nothing taken"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules inspection stations often set. Your call: keep them, or change any. They become the shop's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for the shop, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee's Inspections will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "A neighborhood inspection station on Station Rd. Emissions, safety and pre-purchase inspections, in 2 lanes."
+        ]
+       },
+       "photos": [
+        "The shop front",
+        "The lanes",
+        "A car in the lane"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee's Inspections the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee's Inspections · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the van team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Gil Price and Ana Moore run the van. Gil does fleet inspection too. Cal Chen and Joy Diaz work the shop's bays. Cal also does pre-purchase checks and van visits"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Gil Price: the van and fleet inspection",
+         "Ana Moore: the van",
+         "Cal Chen: the shop, pre-purchase checks and van visits",
+         "Joy Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Inspections. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Cal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Car Check. Sam Lee added you to the team for van and fleet inspection jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Gil"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Cal replies YES, then checks what Sam set. One reply covers everything Cal does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Cal Chen · my profile",
+        "lines": [
+         "Every shop service, pre-purchase checks and van visits",
+         "The shop's hours"
+        ]
+       },
+       "as": "Cal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Cal"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the station and van visits, so Cal is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Cal picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Joy, Gil and Ana set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Car Check",
+       "At the customer's place",
+       "Inspector certificate EX-2051",
+       "Yes"
+      ],
+      [
+       "Gil Price",
+       "Lee Car Check",
+       "At the customer's place",
+       "Inspector certificate EX-2068",
+       "Once Sam says yes"
+      ],
+      [
+       "Ana Moore",
+       "Lee Car Check",
+       "At the customer's place",
+       "Inspector certificate EX-2085",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Car Check",
+       "Office",
+       "None needed (office)",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Cal Chen",
+       "Lee's Inspections",
+       "At the station, and van visits",
+       "Inspector certificate EX-2102",
+       "Once Sam says yes"
+      ],
+      [
+       "Joy Diaz",
+       "Lee's Inspections",
+       "At the shop",
+       "Inspector certificate EX-2119",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Gil: the van and fleet inspection",
+         "Ana: the van",
+         "Cal: the shop, pre-purchase checks and van visits",
+         "Joy: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, fleet inspection and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Joy at the shop, Ana for the van.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Inspections can book you from now on, at the station and for van visits. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Cal"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Inspections can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Joy"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Car Check can book you for the van and fleet inspection from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Gil"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Fleet inspection and Lee's Inspections now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on van and fleet inspection jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The station's license EX-1187 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way fleet inspection was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile inspection service",
+          "Now"
+         ],
+         [
+          "Fleet inspection",
+          "Once your fleet inspector joins and you say yes"
+         ],
+         [
+          "Lee's Inspections",
+          "Its registration is on file as given, not checked. It shows once a inspector joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "Even with the photo, the registration can't be confirmed. Mobile inspection service waits, saved, and the other kinds of work can still go live.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We still can't confirm registration EX-0451, so mobile inspection service stays offline.",
+      {
+       "card": {
+        "title": "Mobile inspection service · offline, saved",
+        "lines": [
+         "Everything is saved",
+         "Fleet inspection and the inspection station can still go live",
+         "I'll remind you once in 3 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Mobile inspection service goes live at 2:16pm, and Sam can be booked now.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile inspection service is live! AI assistants can book you now.",
+      {
+       "card": {
+        "title": "Mobile inspection service · live now",
+        "lines": [
+         "You can be booked now",
+         "Your people come next, once the rest is set up",
+         "Next, fleet inspection: about 5 minutes"
+        ]
+       },
+       "buttons": [
+        "Start now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Sam sends a photo of the van's price list and checks what Rosie read. Nothing is typed from scratch.",
+    "more": [
+     "Each van price has the $89 trip fee in it. A fleet visit is counted at the lot, then priced.",
+     "A pre-purchase inspection has no state certificate, and says so."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the van's price list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Van price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Pre-purchase inspection, at the car",
+          "$229 · 90 min"
+         ],
+         [
+          "Headlight aim check, at the car",
+          "$109 · 20 min"
+         ],
+         [
+          "Fleet inspection at a business lot",
+          "Counted at the visit, then priced · $89 trip fee"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-81",
+    "does": "The van books people, not lanes, so Sam lists no spaces for Lee Car Check. The station's 2 lanes are listed in the other flow."
+   },
+   {
+    "op": "after",
+    "at": "B4-69",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex says whose car it is",
+      "q": "Is the car Alex's own?",
+      "does": "A pre-purchase check is often of a car Alex is buying. So the secure page asks whose car it is, before anything is taken.",
+      "more": [
+       "A car Alex is buying is checked only with the seller's OK. The seller or an adult must be there with the keys.",
+       "The seller's name and phone stay on the secure page. A text says only 'the seller'."
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "branches": [
+       {
+        "label": "Alex's own car",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "A car Alex is buying",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.7",
+           "4.15"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Asks Alex to confirm the seller agrees",
+          "does": "Say the car is at a seller's house. Rosie asks Alex to confirm that the seller agrees to the check and will be there with the keys. Without the seller's OK nothing is booked.",
+          "more": [
+           "Gil never touches a car the owner hasn't OK'd.",
+           "No answer: nothing moves, and nothing is taken."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "A pre-purchase check needs the seller's OK, and the seller or an adult there with the keys. Please confirm the seller agrees. Nothing is taken yet."
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "The receipt says the report is on the secure page, and that a free re-test is at the station for 30 days."
+    ]
+   }
+  ]
+ },
+ "notes": "Built on the REDESIGN 2 master (Tue Oct 27, batch D4). Parent: the refitted tires overlay (a chair-style lane booked by time; a car waited on or left; a van that comes to the customer); not edited. No old flowchart existed (a new profession), so the plug-in is the trade's norm and every price says 'example'.\nTwo companies: Lee's Inspections (flow A, 48 Station Rd, 2 lanes) and Lee Car Check (flow B, the van; kinds of work: Lee Pre-Buy and Lee Fleet Check). Staff: Cal and Joy (station), Gil and Ana (van). Alex lives at 26 Maple Ct.\nLicenses are USED (the first work in this batch that has them): the station license and each inspector's certificate, where the state's rules require them (S1-60 '1 A license' and S2-28 '1 Yes, each one' stay; the 'no license' branches are off). Example numbers are EX-style (EX-2087, EX-3310). Nothing names a state.\nMoney A: list|none|counter (main: the combined combined inspection, $50) and list|none|bill (car left; bill with READY). Nothing is ever taken before at the station, no deposit, no cancel or no-show fee. Money B: list|card|bill (main: a pre-purchase inspection of a used car at the seller's place, $229 with the $89 trip fee in it) and visit|card|bill (a fleet inspection at a business lot, counted and priced at the visit). The card is saved for the $89 trip fee and charged only for a late cancel or a no-show, only on Sam's yes, never more than that fee.\nThe master's A numbers fit the services ($50 combined; $40 emissions; $25 safety; $20 headlight aim; $55 commercial; $140 pre-purchase at the station) and flow B keeps $89 and the $245 fleet quote ($165 vans + $80 trucks).\nThe result (pass or fail), its readings and any certificate number never go in a text (a test result): READY says 'your inspection is done', and the result is on the secure page and at the counter. Texts about a re-test never say pass or fail.\nSafety: stop words are someone hurt or a crash, a fire or smoke, someone dizzy or sick from fumes (911, no booking). Brakes that fail, a fuel leak or strong fuel smell, a loose wheel and steering that won't hold the road are don't-drive words (the van comes to the car). A request to skip the test, change a result or get a certificate without the test is refused and the owner told (pf.safety.refuse).\nWho must not be booked: a car being bought is checked only with the seller's OK (own step B4-x01 / B4-x02); registration, proof of insurance and the key are required at the visit (A8-02 kept: nothing starts without them, no fee). A teen's car is booked by a parent.\nA check-engine light that is on: own step A4-x01 / A4-x02 tells Alex plainly the car may not pass; it is booked anyway.\nNever sent now: the sent-now branches are off; the on-call lines say none.\nOff as work this trade never has: video or phone, seats, stays, forms, contracts, plans, packs, insurance, stages, a child left, repairs sold through Rosie.\nAftercare: the free 30-day re-test (own step A10-x01; B10-01 says it too); the days and what is free are the state form's switch (pf.rules.retest_rule).\nNot sure (for the verifier): $229 for a pre-purchase check at the seller's place and the 30-day free re-test are the example station's own; whether a state allows a certificate away from the station is a switch (pf.rules.mobile_testing), so the fleet visit is written as a priced check; the S1-13 and S1-14 per-path lines still show the master's example (paid in full, a $20 fee card) that no overlay can change without money words per path (MASTER line in the log).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "At your shop, paid at the chair, your own way",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Every plumbing service",
+    "A water heater job",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "READY Sofia G. Photo added.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "What happens at the chair?",
+    "A failed test stops that part only. That's the business's side: nothing is charged for it.",
+    "like a skin-test result",
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A barbershop books a person's time.",
+    "A what-if: for a table, a court or a room, the times show the space and its size, never a person. A space shows only if it's free and big enough for the group.",
+    "Sat Oct 24 · 6:00pm · Table for 4",
+    "Sat Oct 24 · 7:30pm · Table for 6",
+    "A table for six has one code, not six.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "BS20981",
+    "EC22871",
+    "MP045210",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "color and house calls",
+    "color, house calls",
+    "does color",
+    "Color always stays",
+    "cut hair",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Each service starts the way most barbershops set it.",
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Haircut · $35",
+    "Skin fade · $40",
+    "Beard trim · $20",
+    "Haircut at home · $75",
+    "Signature cut and hot towel shave · $55",
+    "Groom's package · $40 deposit",
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "'Adding a beard trim, +$20? Say so.'",
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "A card saved for the $20 fee · paid after the visit",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Refund · $20",
+    "Dee W.'s $20 payment through Rosie was charged twice.",
+    "Color quotes come to you first. Board prices never need one",
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Access, like a step-free chair: only times and places that fit show.",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "My employer pays for this cut.",
+    "The plug-in's plain questions are optional, like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "May the shop show photos of your hair? Yes / No",
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it a fade' goes back to the times.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Stopped Alex M.'s cut.",
+    "stopped Alex M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "1 color quote",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "house calls",
+    "house call",
+    "House calls",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Kids cut",
+    "kids cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Ben T. books a skin fade",
+    "skin fades",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "like a haircut at the shop or at home",
+    "rents a chair",
+    "Lee Home Services'",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Takes the price from the shop's board",
+    "A haircut could mean a salon or a barbershop.",
+    "I'd like a cut on Saturday",
+    "Alex adds a beard trim",
+    "Quiero un corte el sábado.",
+    "Books the groom's party together",
+    "Books a haircut and a beard trim",
+    "step-free door on Elm St",
+    "Step-free door on Elm St · parking in the back",
+    "11:00am with Riley",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "at the chair",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Lee's Barbershop LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "88 Elm St",
+    "1200 Main St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershop's",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "$35",
+    "$75",
+    "At the chair",
+    "Style consult",
+    "style consult",
+    "Elm St"
+   ],
+   "B": [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe",
+    "Shutoff valve",
+    "shutoff valve only",
+    "Supply line",
+    "supply line",
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves · $160",
+    "you said yes to replacing both shutoff valves for $160.",
+    "$160 valve quote",
+    "$160 valve work",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "the shutoff valves",
+    "fixes the shutoff valve today",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak.",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "a roof leak",
+    "Reading it back: accept the leak repair for today,",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "The work is priced at the visit, like a leak repair. Only the {{fee}} service call is promised now. Jordan quotes it there, and Alex says yes before any work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "BS20981",
+    "EC22871",
+    "MP045210",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "color and house calls",
+    "color, house calls",
+    "does color",
+    "cut hair",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Sewer camera inspection · $199",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "The shop's chair is in the other flow.",
+    "house calls",
+    "House calls",
+    "Kitchen drain clearing",
+    "Overflowing kitchen drain",
+    "Like tapping a neighbor's water line without asking.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Every plumbing service",
+    "Leak repair",
+    "Water heater replacement",
+    "like a haircut at the shop or at home.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "would like to talk about the water heater quote before booking.",
+    "Work like towing or a lockout is sent now (B4-16)",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "Water heater fix",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today,",
+    "Accepted: the leak repair today,",
+    "Can Jordan also run a camera down my sewer line?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "A haircut could mean a salon or a barbershop.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The $179 drain needs none.",
+    "Kitchen drain",
+    "Yard drain",
+    "kitchen drain",
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Jordan lets himself in the agreed way, with no check-in code.",
+    "rents a chair",
+    "Lee Home Services'",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "Water heater flush",
+    "water heater flush",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call fee",
+    "service call fee",
+    "the $89 service call",
+    "The $89 service call",
+    "service call",
+    "Service call",
+    "at the door",
+    "plumbing visit",
+    "he's the one who replaces water heaters",
+    "Lee Home Services LLC",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "88 Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershop's",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "1-year labor warranty",
+    "leak repair",
+    "$179",
+    "$150",
+    "$199",
+    "a inspection",
+    "$160",
+    "$120 an hour",
+    "Labor",
+    "Water pressure check",
+    "Priced from photos",
+    "service-call fee",
+    "service call",
+    "Elm St"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A9-15": "bd2a17c3c5",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A10-45": "855be6050a",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "S1-38": "b50b0bd4e8",
+   "S2-02": "b2094081ee",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S1-70": "3961b1f903",
+   "S1-50": "3167049ceb",
+   "S1-33": "eeaadba298",
+   "S1-35": "39adfc0799",
+   "S1-12": "41b86c1e72",
+   "S1-81": "c286d15ba2",
+   "A4-65": "fa7ec0389d",
+   "A10-05": "63c3536c7a"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B8-67": "b66ffbd04d",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-38": "867fe1ab7c",
+   "B7-91": "7132851ec1",
+   "B10-32": "7713bff255",
+   "S1-38": "6301c86637",
+   "S2-02": "b2094081ee",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "S1-70": "34e952eac5",
+   "S1-50": "daa9091585",
+   "S1-33": "2b5d1fa4ab",
+   "S1-35": "1b680a4c71",
+   "S1-12": "0bea92643b",
+   "S1-81": "c286d15ba2",
+   "B4-69": "350fbaf90a",
+   "B10-01": "814aa1fde7"
+  }
+ }
+}

@@ -1,0 +1,2854 @@
+{
+ "id": "recording-studio",
+ "name": "Recording studio",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "music",
+ "plugin": {
+  "pf.license": {
+   "need": "none checked by Rosie: a recording studio needs no state license in most places; the business registration is the owner's own word; a studio's insurance is optional for the booking",
+   "who": "the studio for its own registration, if it has one; each engineer for any certificate they choose to show",
+   "ask": "optional: the registration number the owner wants shown; nothing is checked",
+   "check": "none: Rosie never checks a license, certificate, insurance or permit (D96); the studio keeps its own records",
+   "blocks": "nothing: no license or certificate blocks a booking here",
+   "renewals": "a reminder the owner sets for its own dates, if it wants one",
+   "insurance": "liability and gear insurance is the studio's own matter; optional for the booking",
+   "background": "any background check for staff is the owner's own step, outside Rosie"
+  },
+  "pf.services": {
+   "shape": "a room and an engineer for a block of hours (tracking, mixing, mastering); an album block booked as several sessions; location recording at a home or venue with a mobile rig (flow B)",
+   "examples": "the example studio's own prices (Lee Sound Studio and Lee Mobile Sound), not a standard",
+   "list": [
+    {
+     "name": "3-hour tracking session",
+     "price": "$360 (example)",
+     "kind": "one price",
+     "length": "3 hours with an engineer",
+     "where": "at the studio",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "needs": "a room and an engineer",
+     "note": "a band of up to 4 players in the main room (example); extra players are a separate booking"
+    },
+    {
+     "name": "1-hour mixing session",
+     "price": "$120 (example)",
+     "kind": "one price",
+     "length": "1 hour with an engineer",
+     "where": "at the studio, or by a shared file link",
+     "before": "a card saved for the $40 no-show fee",
+     "after": "paid at the front desk after"
+    },
+    {
+     "name": "1-hour mastering session",
+     "price": "$150 (example)",
+     "kind": "one price",
+     "length": "1 hour",
+     "where": "at the studio, or by a shared file link",
+     "before": "a card saved for the $40 fee",
+     "after": "the saved card is charged at DONE, when the final files are sent"
+    },
+    {
+     "name": "Album block (10 hours)",
+     "price": "$1,000 (example)",
+     "kind": "a block booked as sessions",
+     "length": "10 hours over several days",
+     "where": "at the studio",
+     "before": "a $200 deposit now",
+     "after": "the $800 rest paid at the studio at the last session",
+     "capacity": "booked as sessions; a session that runs over is a new booking with the artist's yes"
+    },
+    {
+     "name": "Location recording (3 hours, flow B)",
+     "price": "$450 (example)",
+     "kind": "one price",
+     "length": "3 hours with an engineer and a mobile rig",
+     "where": "at the customer's home or venue",
+     "before": "a card saved for the $40 fee",
+     "after": "the saved card is charged at DONE",
+     "note": "the place's own permission and quiet hours are the customer's word; the engineer checks the room's power and space first"
+    },
+    {
+     "name": "Mix check at the customer's home (flow B)",
+     "price": "$120 (example)",
+     "kind": "one price",
+     "length": "1 hour, a listen-through with the engineer",
+     "where": "at the customer's home",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Multi-visit location shoot (flow B)",
+     "price": "$2,400 estimate (example): a $600 deposit now and the $1,800 rest on the bill after the last visit",
+     "kind": "a series of visits",
+     "length": "4 visits over several days",
+     "where": "at the customer's home or venue",
+     "before": "a $600 deposit on the estimate",
+     "after": "the $1,800 rest on the bill after the last visit",
+     "note": "the estimate is sent first and the customer says yes before the deposit"
+    }
+   ],
+   "capacity": "one engineer per session; a room shows a time only when the room and the engineer are both free",
+   "online": "mixing feedback may be by shared file link; room time never",
+   "outOfScope": "renting a room by the hour with no engineer or staff is renting a space for a time, which Rosie doesn't book (Jay, Oct 24); sessions are booked with an engineer"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new or returning, and the kind of session: tracking, mixing, mastering, or an album block",
+    "how many songs and about how long",
+    "how many people play (a band) and the instruments",
+    "for flow B: the place, and whether there is power and room for the rig",
+    "for a minor: the age"
+   ],
+   "afterTime": [
+    "the file format the artist wants at the end, and any reference tracks",
+    "whether the artist needs drums, amps or a keyboard from the studio"
+   ],
+   "securePage": [
+    "the artist's date of birth (a minor needs a parent's OK)",
+    "each performer's own recording release, read and signed",
+    "hearing and health answers the engineer should know (stay on the secure page, never in a text)",
+    "an emergency contact",
+    "for flow B: the address and the place's own rules on noise and hours"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian books and signs for anyone under 18, and stays on site"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "fire or smoke from the gear or the room right now, or someone burned, shocked or hurt by the equipment",
+     "say": "Call 911 now. Get everyone out of the room. Rosie can help you book later.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a hearing problem, a pacemaker or a health condition near the gear",
+     "what": "the booking goes on; the answer stays on the secure page, and the engineer reads it before the session; Rosie gives no medical advice"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Session agreement",
+     "when": "signed on the secure page while booking, before the session",
+     "who": "the booker, for the studio's terms",
+     "goodFor": "the session",
+     "result": "signed: it books; not signed in 10 minutes: nothing is booked"
+    },
+    {
+     "name": "Recording release",
+     "when": "on the secure page while booking",
+     "who": "every performer recorded; a parent signs for anyone under 18",
+     "goodFor": "1 year",
+     "result": "signed: it books; not signed: that person isn't recorded"
+    }
+   ],
+   "prep": "bring the songs in the file format you agreed, the lyrics, reference tracks, headphones, and any instruments you own; the studio supplies what its listing says"
+  },
+  "pf.visit": {
+   "checkIn": "at the studio: the check-in code at the front desk; for flow B: the code at the door of the place",
+   "beforeWork": "the engineer checks the room and the gear are safe and sets levels before the first take; no session starts if the gear or the power is unsafe",
+   "changes": "a session that runs past its block needs the artist's yes before anything more is booked; a gear fault gives a new time or a free cancel",
+   "done": "the check-in code, or the engineer's DONE; the final files are sent to the booker",
+   "record": "the session log (date, room, hours, what was recorded) kept with the booking",
+   "children": "a parent or guardian stays at the studio or on site for anyone under 18; a minor is never left alone in the room"
+  },
+  "pf.money": {
+   "before": "tracking and album blocks are paid in full or with a deposit when booking; mixing and mastering save a card for the fee; a location shoot's deposit is taken when the estimate is said yes to",
+   "after": "a session is charged at DONE on the saved card, or paid at the front desk; an album block's rest at the last session; a location shoot's rest on the bill after the last visit",
+   "caps": "deposit cap: from the state form; prepaid money kept apart where the state's rules require it",
+   "cancel": "free to cancel until 24 hours before (the owner's setting); a studio closure or gear fault is always free",
+   "fees": "late cancel or no-show: $40, only with the owner's OK, and never more than what was paid now; never for weather, a gear fault, or an artist who says before the session that they're ill",
+   "refunds": "a session the studio cancels is never charged; an unused album block is refunded under its terms",
+   "tax": "where the state's rules tax recording services",
+   "tips": "none",
+   "fee2": "Rosfield's $2 applies: one $2 per confirmed booking; an album block counts once",
+   "goods": "strings, cables, drumsticks and media are the studio's own sale at the desk, outside Rosie"
+  },
+  "pf.messages": {
+   "never": "health and hearing answers, minors' details, and performer releases never go in a text: only the secure page",
+   "staffTexts": "texts to engineers name the artist and the session only",
+   "languages": "English and Spanish",
+   "minors": "a minor's booking texts go to the parent or guardian"
+  },
+  "pf.staff": {
+   "licenses": "no engineer license is checked (D96); each engineer's certificate, if shown, is the engineer's own word",
+   "skills": "tracking, mixing, mastering, live recording, location recording, and vocal and drum sessions",
+   "supervision": "a junior engineer works only with a senior engineer in the building",
+   "oks": "the owner OKs each longer session, every fee and every refund; the engineer reads health and hearing answers",
+   "standIn": "another engineer with the same skill may take a session, offered to the artist first, never assumed",
+   "dutyLimits": "an engineer works no more than 10 hours in a day (the studio's own rule)",
+   "away": "only engineers the owner clears go to homes or venues"
+  },
+  "pf.rules": {
+   "scope": "engineers don't give medical or hearing advice; a hearing problem is the artist's doctor's call",
+   "noise": "loud sessions follow the building's and the place's quiet hours (the owner's rule and the place's own rules)",
+   "contracts": "a session or album contract over an amount, where the state's rules require one",
+   "minors": "a minor's recording needs a parent's signed release and a parent on site",
+   "records": "session logs and releases kept for 7 years, or longer where the state asks"
+  },
+  "pf.edges": {
+   "weather": "a location session in bad weather: a new time or a free cancel, with no fee",
+   "late": "a late artist: the session is shorter inside the block",
+   "overrun": "a session that runs over: a new block only with the artist's yes",
+   "gear": "a gear fault: another room or a free cancel, with no fee",
+   "standIn": "an engineer out: another engineer with the skill, offered first, or a move",
+   "noShow": "a no-show: the fee only with the owner's OK",
+   "minor": "a minor: a parent books, signs and stays on site",
+   "hurt": "someone is hurt by the gear: the engineer follows the studio's steps, calls 911 if it's serious, and tells the owner at once",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "forms",
+   "children",
+   "spaces",
+   "multiday"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Nico and Priya (engineers at the studio)",
+   "cust": "Alex M. (artist) · other artists",
+   "other": "Others (a parent, a bank)"
+  },
+  "B": {
+   "staff": "Theo and Mara (engineers who travel to homes and venues)",
+   "cust": "Alex M. (artist, the booker) · other customers",
+   "other": "Others (a venue, a host, a bank)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nico"
+  },
+  "B": {
+   "staff": "Theo"
+  }
+ },
+ "keep": [
+  "instructor",
+  "Instructor",
+  "instructors",
+  "grace",
+  "leak",
+  "valve",
+  "color",
+  "room",
+  "session",
+  "sessions",
+  "studio"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex, an artist, books a 3-hour tracking session at Lee Sound Studio with Nico, Sat Oct 24 at 11:00am: an engineer and the main room, paid in full when booking. Alex's release is signed on the secure page, and the front desk asks for photo ID. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Sound for a 3-hour location recording at Alex's home, with Theo, Thu Oct 22 at 8:00am. The recording release is signed on the secure page, and the saved card is charged at DONE. Pick a money choice at the top to follow its path."
+ },
+ "splitsKept": {
+  "A": [
+   "S1-80",
+   "A4-43",
+   "A4-66",
+   "A7-59",
+   "A7-15",
+   "A7-63",
+   "A7-68",
+   "A8-02",
+   "A8-67",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-80",
+   "B4-78",
+   "B5-34",
+   "B7-62",
+   "S11-87",
+   "S11-90"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "{{svc.intext:haircut|visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:color and cut|visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Color and cut|Your visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Your visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:beard trim|service}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Visits}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:haircut plan|plan}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Skin fade|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Beard trim|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Signature cut and shave|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:color correction|visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Color correction|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:a color correction|the price}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:cut|visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:color plan visit|visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Skin fade}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:skin fades|visits}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "First sessions, tracking sessions and mixing class for new and nervous artists."
+   ],
+   [
+    "books a skin fade for",
+    "books a first session for"
+   ],
+   [
+    "gives the job's address alone to their contact",
+    "gives the address alone to their contact"
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a lesson at the studio or at the customer's own airport."
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent visits sent now, like a tow or a lockout."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company sends anyone now."
+   ],
+   [
+    "Sets nobody on call: no jobs sent now",
+    "Sets nobody on call: nothing sent now"
+   ],
+   [
+    "Jobs sent now are never offered.",
+    "Nothing is ever sent now."
+   ],
+   [
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Your work is never sent now, so nobody needs to be on call."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nico: session instructor, tracking sessions and checkrides"
+   ],
+   [
+    "Avery: barber",
+    "Priya: session instructor"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every service: sessions, mixing class and room time"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the studio and at a customer's own airport"
+   ],
+   [
+    "the visit fee",
+    "the trip fee"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and at a customer's own airport"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states tie a studio's license to its place, and an instructor to their own certificate."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A studio's example: a burning smell gets 'get clear of the room, and call 911'."
+   ],
+   [
+    "raises the haircut to $40",
+    "raises the 1-hour ground lesson to $95"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Ben's AI asks for a first session at $330, an old price."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A first session at Lee Sound Studio is $360, not $330."
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "raise haircut to 40",
+    "raise the ground lesson to 95"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the lesson"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the lesson?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lesson could mean a first session or a mixing class."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a lesson every Saturday"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's first sessions together"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the school share photos of your session?"
+   ],
+   [
+    "Color always stays with Riley.",
+    "The tracking session always stays with Nico."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Nico can do a shorter lesson in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your lesson is part of a plan with Nico, every Saturday."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A lesson is rated, so the school takes the first branch."
+   ],
+   [
+    "kids cuts",
+    "junior lessons"
+   ],
+   [
+    "kids cut",
+    "junior lesson"
+   ],
+   [
+    "Kids cut",
+    "Junior lesson"
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "It's a ground lesson today at 2:00pm with Priya, for a new student. It's $120."
+   ],
+   [
+    "accept the beard trim today at 2:00pm with Avery",
+    "accept the ground lesson today at 2:00pm with Priya"
+   ],
+   [
+    "priced from photos",
+    "priced from her answers"
+   ],
+   [
+    "Color and cut",
+    "Lesson plan"
+   ],
+   [
+    "color and cut",
+    "lesson plan"
+   ],
+   [
+    "color quote",
+    "custom plan quote"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds a vocal booth to Lee Mobile Sound."
+   ],
+   [
+    "NEW massage",
+    "NEW room time"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Room time for Lee Mobile Sound: is it the same company?"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una clase de vuelo el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a mixing hour on Saturday."
+   ],
+   [
+    "JP031552",
+    "EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "EC22871",
+    "EX-1045"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Sound Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Sound Studio"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Sound'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Sound"
+   ],
+   [
+    "Riley Chen",
+    "Nico Hale"
+   ],
+   [
+    "Riley",
+    "Nico"
+   ],
+   [
+    "Avery Diaz",
+    "Priya Shah"
+   ],
+   [
+    "Avery",
+    "Priya"
+   ],
+   [
+    "Jordan Price",
+    "Theo Grant"
+   ],
+   [
+    "Jordan",
+    "Theo"
+   ],
+   [
+    "Casey Moore",
+    "Mara Lopez"
+   ],
+   [
+    "Casey",
+    "Mara"
+   ],
+   [
+    "1200 Main St",
+    "8 Studio Ln"
+   ],
+   [
+    "88 Elm St",
+    "40 Studio Ln"
+   ],
+   [
+    "Elm St",
+    "Studio Ln"
+   ],
+   [
+    "Oak St",
+    "Pine Ct"
+   ],
+   [
+    "a barber",
+    "a session instructor"
+   ],
+   [
+    "A barber",
+    "A session instructor"
+   ],
+   [
+    "plumbing and electrical",
+    "recording work and mixing class"
+   ],
+   [
+    "Electrical",
+    "Mixing class"
+   ],
+   [
+    "electrical",
+    "mixing class"
+   ],
+   [
+    "Plumbing",
+    "Recording work"
+   ],
+   [
+    "plumbing",
+    "recording work"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "Barbering",
+    "Flying"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "barbershop",
+    "studio"
+   ],
+   [
+    "Barbershop",
+    "Studio"
+   ],
+   [
+    "shops",
+    "schools"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "1 At the shop",
+    "1 At the studio"
+   ],
+   [
+    "Only at the shop",
+    "Only at the studio"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up lesson, if Sam says so"
+   ],
+   [
+    "Alex asks for a fix",
+    "Alex asks for a make-up lesson"
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Tracking session"
+   ],
+   [
+    "Signature cut and shave",
+    "Tracking session"
+   ],
+   [
+    "signature cut",
+    "tracking session"
+   ],
+   [
+    "The Groom's package",
+    "The album block"
+   ],
+   [
+    "the Groom's package",
+    "the album block"
+   ],
+   [
+    "Groom's package",
+    "album block"
+   ],
+   [
+    "Haircuts",
+    "Lessons"
+   ],
+   [
+    "haircuts",
+    "lessons"
+   ],
+   [
+    "A haircut",
+    "A 3-hour tracking session"
+   ],
+   [
+    "a haircut",
+    "a tracking session"
+   ],
+   [
+    "Haircut",
+    "3-hour tracking session"
+   ],
+   [
+    "haircut",
+    "tracking session"
+   ],
+   [
+    "a beard trim",
+    "a first session"
+   ],
+   [
+    "Beard trim",
+    "First session"
+   ],
+   [
+    "beard trim",
+    "first session"
+   ],
+   [
+    "$55",
+    "$360"
+   ],
+   [
+    "$35",
+    "$120"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "in the cockpit"
+   ],
+   [
+    "the chair",
+    "the cockpit"
+   ],
+   [
+    "Jobs",
+    "Lessons"
+   ],
+   [
+    "jobs",
+    "lessons"
+   ],
+   [
+    "Job",
+    "Lesson"
+   ],
+   [
+    "job",
+    "lesson"
+   ],
+   [
+    "cuts",
+    "lessons"
+   ],
+   [
+    "cut",
+    "lesson"
+   ],
+   [
+    "every 4 weeks",
+    "every Saturday"
+   ],
+   [
+    "skin fades",
+    "first sessions"
+   ],
+   [
+    "skin fade",
+    "first session"
+   ],
+   [
+    "Skin fade",
+    "First session"
+   ],
+   [
+    "Skin fade",
+    "First session"
+   ],
+   [
+    "skin fade",
+    "first session"
+   ],
+   [
+    "color correction",
+    "training program"
+   ],
+   [
+    "a perm",
+    "a helicopter rating"
+   ],
+   [
+    "perms",
+    "helicopter ratings"
+   ],
+   [
+    "perm",
+    "helicopter rating"
+   ],
+   [
+    "The cape clip",
+    "The seat belt clip"
+   ],
+   [
+    "the cape clip",
+    "the seat belt clip"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: crosswind landings next time; radio calls first."
+   ],
+   [
+    "barbershops",
+    "studios"
+   ],
+   [
+    "once Nico sees the hair",
+    "once Nico sees the student's needs"
+   ],
+   [
+    "Color correction",
+    "Training program"
+   ],
+   [
+    "At the cockpit",
+    "At the desk"
+   ],
+   [
+    "Recording work for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "First sessions and tracking sessions at the studio, and mixing class."
+   ],
+   [
+    "water heater",
+    "transition estimate"
+   ],
+   [
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "a phone talk about the program is free: nothing before, nothing after."
+   ],
+   [
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "a visit with nobody at the desk is paid by the bill Rosie sends."
+   ],
+   [
+    "Saturday mornings are paid by the saved card at DONE.",
+    "a visit with nobody at the desk is charged to the saved card at DONE."
+   ],
+   [
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "a studio tour is free: nothing before, nothing after."
+   ],
+   [
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "a visit with nobody at the desk is paid by the bill Rosie sends."
+   ],
+   [
+    "Saturday mornings are paid by the saved card at DONE.",
+    "a visit with nobody at the desk is charged to the saved card at DONE."
+   ],
+   [
+    "teacher",
+    "engineer"
+   ],
+   [
+    "Teacher",
+    "Engineer"
+   ]
+  ],
+  "B": [
+   [
+    "{{svc.intext:Drain clearing}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Water heater replacement}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain clearing}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:drain clearing|visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain clearing|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:plumbing visit|visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:camera inspection|service}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:home-repair class|session}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:plan|plan}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Yard drain|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Water heater flush|Visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Leak repair|Quote}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Leak repair|Your quote}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:leak repair|work}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:kitchen drain|visit}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:Sewer camera inspection}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "{{svc.intext:drain clearings|visits}}",
+    "{{svc.intext:Studio booking}}"
+   ],
+   [
+    "the shutoff valves",
+    "the extra time"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Theo also add a booth hour?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Booth hour · $120"
+   ],
+   [
+    "added a camera inspection to",
+    "added a booth hour to"
+   ],
+   [
+    "Pay $160 for the shutoff valves",
+    "Pay $80 for the extra time"
+   ],
+   [
+    "$160 for today's extra work",
+    "$80 for today's extra time"
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can start the lesson at a set time"
+   ],
+   [
+    "like the sewer camera inspection",
+    "like a ground lesson"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mixing hours at the customer's airport in Springfield, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A mix check"
+   ],
+   [
+    "up to the $89 service call",
+    "up to the $40 late-cancel fee"
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a mix check, today"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "The lesson is $1200. Accept it?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a mix check for my plane."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lesson could mean a mix check or a mixing class."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I need my mix check' fits a mix check."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like flying someone else's plane without their OK."
+   ],
+   [
+    "two drain clearings",
+    "two ground lessons"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack on my wing this morning."
+   ],
+   [
+    "the kitchen drain",
+    "the ground lesson"
+   ],
+   [
+    "gives the job's address alone to their contact",
+    "gives the address alone to their contact"
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a lesson at the studio or at the customer's airport."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent visits sent now, like a tow or a lockout."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company sends anyone now."
+   ],
+   [
+    "Sets nobody on call: no jobs sent now",
+    "Sets nobody on call: nothing sent now"
+   ],
+   [
+    "Jobs sent now are never offered.",
+    "Nothing is ever sent now."
+   ],
+   [
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Your work is never sent now, so nobody needs to be on call."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Theo: mix checks, transition training and ground lessons"
+   ],
+   [
+    "Avery: barber",
+    "Mara: mixing class and mix checks"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the studio and at the customer's airport"
+   ],
+   [
+    "the visit fee",
+    "the trip fee"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and at the customer's airport"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states tie a studio's license to its place, and an instructor to their own certificate."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A studio's example: a burning smell gets 'get clear of the room, and call 911'."
+   ],
+   [
+    "The door stayed shut.",
+    "The studio door stayed shut."
+   ],
+   [
+    "for that window",
+    "for that time"
+   ],
+   [
+    "the safety check comes before the door opens",
+    "the presession check comes before the student climbs in"
+   ],
+   [
+    "before letting anyone in",
+    "before the student climbs in"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Theo and Alex do the presession check"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The offer is good for the next lesson."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds mixing class to Lee Mobile Sound."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW mixing class"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Mixing class for Lee Mobile Sound: is it the same company?"
+   ],
+   [
+    "You go to customers",
+    "You go to the customer's airport"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Mix checks already booked keep $1200"
+   ],
+   [
+    "Drain clearing plans",
+    "Mix check plans"
+   ],
+   [
+    "at the door",
+    "at the studio"
+   ],
+   [
+    "JP031552",
+    "EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "EC22871",
+    "EX-1045"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Sound Studio"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Sound LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Sound'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Sound"
+   ],
+   [
+    "leehomeservices.com",
+    "leesessionlessons.com"
+   ],
+   [
+    "Riley Chen",
+    "Nico Hale"
+   ],
+   [
+    "Riley",
+    "Nico"
+   ],
+   [
+    "Avery Diaz",
+    "Priya Shah"
+   ],
+   [
+    "Avery",
+    "Priya"
+   ],
+   [
+    "Jordan Price",
+    "Theo Grant"
+   ],
+   [
+    "Jordan",
+    "Theo"
+   ],
+   [
+    "Casey Moore",
+    "Mara Lopez"
+   ],
+   [
+    "Casey",
+    "Mara"
+   ],
+   [
+    "1200 Main St",
+    "8 Studio Ln"
+   ],
+   [
+    "88 Elm St",
+    "40 Studio Ln"
+   ],
+   [
+    "Elm St",
+    "Studio Ln"
+   ],
+   [
+    "42 Oak St",
+    "17 Cedar Ln"
+   ],
+   [
+    "a plumber",
+    "an instructor"
+   ],
+   [
+    "a barber",
+    "an instructor"
+   ],
+   [
+    "plumbing and electrical",
+    "recording work and mixing class"
+   ],
+   [
+    "Electrical",
+    "Mixing class"
+   ],
+   [
+    "electrical",
+    "mixing class"
+   ],
+   [
+    "Plumbing",
+    "Recording work"
+   ],
+   [
+    "plumbing",
+    "recording work"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "barbershop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "2 At the shop",
+    "2 At the studio"
+   ],
+   [
+    "Booked at the shop: the other flow goes on from here.",
+    "Booked at the studio: the other flow goes on from here."
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Mix check"
+   ],
+   [
+    "Drain clearing",
+    "Mix check"
+   ],
+   [
+    "drain clearing",
+    "mix check"
+   ],
+   [
+    "Water heater flush",
+    "Album block"
+   ],
+   [
+    "water heater flush",
+    "album block"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 8:00am"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "7am Thu",
+    "7:30am Thu"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 12:00pm"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:00am"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 8:10am"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 10:00am"
+   ],
+   [
+    "$150",
+    "$1200"
+   ],
+   [
+    "$110",
+    "$120"
+   ],
+   [
+    "Jobs",
+    "Lessons"
+   ],
+   [
+    "jobs",
+    "lessons"
+   ],
+   [
+    "Job",
+    "Lesson"
+   ],
+   [
+    "job",
+    "lesson"
+   ],
+   [
+    "barbershops",
+    "studios"
+   ],
+   [
+    "for a haircut instead",
+    "for a first session instead"
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s Thu Oct 22 lesson ended 20 minutes early."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Alex missed part of a lesson when Theo left early. Sam OKs a free make-up visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The lesson ended early again."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Mara",
+    "BOOK Tessa lesson Thu 12-2 Mara"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a ground lesson? Say so."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the studio."
+   ],
+   [
+    "Send Alex M. $600 for the water heater replacement, not $1,000?",
+    "Send Alex M. $2,200 for the transition estimate, not $2,400?"
+   ],
+   [
+    "Price needed: Alex M., water heater replacement.",
+    "Price needed: Alex M., transition estimate."
+   ],
+   [
+    "Theo priced a water heater replacement for Alex M.",
+    "Theo priced a transition estimate for Alex M."
+   ],
+   [
+    "Your water heater price is with Lee Mobile Sound.",
+    "Your estimate is with Lee Mobile Sound."
+   ],
+   [
+    "your water heater replacement at {{price:$90}}",
+    "your transition estimate at {{price:$2,400}}"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your estimate this time"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount",
+    "The $2,400 transition estimate is over the plug-in's amount"
+   ],
+   [
+    "Can Theo also look at a dripping faucet?",
+    "Can Theo also look at a stuck throttle?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a stuck throttle."
+   ],
+   [
+    "with one arrival window and one code",
+    "with one start time and one code"
+   ],
+   [
+    "like new pipes put in one day and finished another.",
+    "like a transition series finished over two weeks."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is the studio still locked?'"
+   ],
+   [
+    "like an overflowing drain at night",
+    "like a tow at night"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The plane won't start. Can someone come tonight?"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $1200 mix check needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the studio door open."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I warm up the engine before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the power is leaking now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The power is leaking onto the studio floor now."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's mix check?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a mix check in two room every 3 months"
+   ],
+   [
+    "yard drain needs nobody home",
+    "studio needs nobody home"
+   ],
+   [
+    "old water stain on the cabinet floor",
+    "old oil stain on the studio floor"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 ground lesson 165 power cable 80"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 extra session time, 30 minutes"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $80.",
+    "Extra for Alex M.: 30 more minutes, $80."
+   ],
+   [
+    "Theo finds corroded shutoff valves.",
+    "Theo finds a worn spark plug."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160",
+    "you said yes to 30 more minutes for $80"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD crack in the wing strut, stopped"
+   ],
+   [
+    "Theo finds mold behind the sink wall.",
+    "Theo finds a crack in the wing strut."
+   ],
+   [
+    "Theo found mold behind the wall under your sink",
+    "Theo found a crack in the wing strut"
+   ],
+   [
+    "cabinet floor",
+    "studio floor"
+   ],
+   [
+    "shutoff valve only",
+    "power switch only"
+   ],
+   [
+    "Leave the supply line.",
+    "Leave the power cable."
+   ],
+   [
+    "fixes the shutoff valve today",
+    "fixes the power switch today"
+   ],
+   [
+    "The $80 supply line",
+    "The $80 power cable"
+   ],
+   [
+    "for your repipe",
+    "for your transition series"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 transition series, 3 stages"
+   ],
+   [
+    "Sewer camera inspection",
+    "Booth hour"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Leak repair",
+    "Transition estimate"
+   ],
+   [
+    "Water heater replacement",
+    "Transition estimate"
+   ],
+   [
+    "sewer camera report",
+    "training record"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE takeoff roll longer than usual. Next time: add crosswind practice."
+   ],
+   [
+    "repipe",
+    "transition series"
+   ],
+   [
+    "A neighborhood studio on Studio Ln.",
+    "A studio at Studio Ln."
+   ],
+   [
+    "the valve is off",
+    "the power is off"
+   ],
+   [
+    "under the sink",
+    "under the wing"
+   ],
+   [
+    "bathroom sink",
+    "bathroom"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $80 extra time is good for 7 days."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it won't start"
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Mix check|Visit}}"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 255 mix check"
+   ],
+   [
+    "leak repair is $620",
+    "transition estimate is $620"
+   ],
+   [
+    "Theo found the leak.",
+    "Theo found the fault."
+   ],
+   [
+    "Theo finds the leak",
+    "Theo finds the fault"
+   ],
+   [
+    "leak repair",
+    "transition estimate"
+   ],
+   [
+    "roof leak",
+    "roof repair"
+   ],
+   [
+    "A fix-a-leak class.",
+    "A throttle check class."
+   ],
+   [
+    "to shut the cold-water valve",
+    "to get clear of the room"
+   ],
+   [
+    "a gas smell",
+    "a burning smell"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My plane needs its yearly review."
+   ],
+   [
+    "which drain is clogged",
+    "which part needs a check"
+   ],
+   [
+    "the leak",
+    "the fault"
+   ],
+   [
+    "replaces water heaters",
+    "replaces engines"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the studio still locked?"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both power switchs"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My studio got wet in a flood. Is my plane safe to fly?"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the power is off.",
+    "Its questions: where the fault is, if anything is still wrong, and if the power is off."
+   ],
+   [
+    "The faucet is a transition estimate",
+    "The throttle is a transition estimate"
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your lesson ran short, so this make-up visit is free."
+   ],
+   [
+    "for a bathroom drain.",
+    "for a make-up lesson."
+   ],
+   [
+    "the water heater quote",
+    "the transition estimate"
+   ],
+   [
+    "Drain clearings already booked",
+    "Mix checks already booked"
+   ],
+   [
+    "a yard drain this Thursday",
+    "a mix check this Thursday"
+   ],
+   [
+    "Replace both power switchs · $80",
+    "30 more minutes · $80"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "Power is leaking out of the wing."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Get clear of the room, away from the power."
+   ],
+   [
+    "Cabinet floor, before",
+    "Hangar floor, before"
+   ],
+   [
+    "Under the sink, before",
+    "Under the wing, before"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Crack in the wing strut"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the power cable behind the wing"
+   ],
+   [
+    "Kitchen drain",
+    "Mix check"
+   ],
+   [
+    "Yard drain",
+    "Hangar check"
+   ],
+   [
+    "Water heater fix",
+    "Engine fix"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "First sessions, tracking sessions and mixing class."
+   ],
+   [
+    "A neighborhood studio on Studio Ln.",
+    "A studio at Studio Ln."
+   ],
+   [
+    "Turn off the water valve under the wing, and keep away from any outlet the water reaches.",
+    "Shut off the power switch, and keep away from any power the room spills."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a crack in the wing strut"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Crack in the wing strut"
+   ],
+   [
+    "Sale agua del calentador.",
+    "Sale humo del ala."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Aléjese de la aeronave. Si huele a humo, salga y llame al 911."
+   ],
+   [
+    "¿Huele a gas?",
+    "¿Huele a humo?"
+   ],
+   [
+    "No huele a gas.",
+    "No huele a humo."
+   ],
+   [
+    "Power is leaking out of the wing.",
+    "Smoke is coming out of the amp."
+   ],
+   [
+    "Sale gas del ala.",
+    "Sale humo del amplificador."
+   ],
+   [
+    "teacher",
+    "engineer"
+   ],
+   [
+    "Teacher",
+    "Engineer"
+   ],
+   [
+    "shutoff",
+    "power"
+   ]
+  ]
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|counter",
+    "list|card|card",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a 3-hour tracking session with an engineer, $360, paid in full when booking.",
+    "list|card|counter": "A 1-hour mixing session, $120. A card is saved for the $40 no-show fee, and Alex pays at the front desk after.",
+    "list|card|card": "A 1-hour mastering session, $150. A card is saved, and charged at DONE when the final files are sent.",
+    "list|deposit|counter": "The 10-hour album block: a $200 deposit now, and the $800 rest paid at the studio at the last session."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "studio session"
+    },
+    "list|full|none": {
+     "price": "$360",
+     "paid": "$360",
+     "name": "3-hour tracking session"
+    },
+    "list|card|counter": {
+     "price": "$120",
+     "fee": "$40",
+     "name": "1-hour mixing session"
+    },
+    "list|card|card": {
+     "price": "$150",
+     "fee": "$40",
+     "name": "1-hour mastering session"
+    },
+    "list|deposit|counter": {
+     "price": "$1,000",
+     "deposit": "$200",
+     "rest": "$800",
+     "fee": "$40",
+     "name": "album block (10 hours)"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a 3-hour location recording at Alex's home, $450. The saved card is charged at DONE.",
+    "list|full|none": "A $120 mix check at the customer's home, paid in full.",
+    "list|deposit|bill": "A multi-visit location shoot: a $600 deposit on the $2,400 estimate, and the $1,800 rest on the bill after the last visit."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "location session"
+    },
+    "list|card|card": {
+     "price": "$450",
+     "fee": "$40",
+     "name": "location recording (3 hours)"
+    },
+    "list|full|none": {
+     "price": "$120",
+     "paid": "$120",
+     "fee": "$40",
+     "name": "mix check at home"
+    },
+    "list|deposit|bill": {
+     "price": "$2,400",
+     "deposit": "$600",
+     "rest": "$1,800",
+     "fee": "$40",
+     "name": "multi-visit location shoot"
+    },
+    "list|*|*": {
+     "price": "$450"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word the company gives only its registration (S1-61)"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "this work adds no agreement with Rosie beyond the standard terms"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "this work runs classes (a timetable, seats)"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "nothing is ever sent now, and nobody is on call"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S1-71",
+    "label": "2 Yes: sign it now",
+    "why": "not health care: no health privacy agreement is signed for this work"
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The license can stop the work and cut what may be offered, so it comes before prices and money. The studio needs no state license checked here, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Decides which check runs on what each person added on their secure page. For this work none runs: no person license is checked.",
+    "more": [
+     "The plug-in says which, and which official lookup checks it: none for this work (D96).",
+     "D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word",
+     "Safe default: no person license is checked here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the the studio's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the the studio's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "nothing is left with the studio"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "nothing is dropped off at the studio"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "every session is rated"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "this work never bills a plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "no insurance plan is billed"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "a session is never paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "nothing is left at the studio"
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "The session agreement and each performer's recording release are signed on the secure page before the session.",
+     "A parent signs for anyone under 18, and stays on site.",
+     "Hearing and health answers stay on the secure page, never in a text or through the AI."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-14",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're booked! Give this code at the front desk when you arrive.",
+      {
+       "card": {
+        "title": "Lee Sound Studio · {{svc.intext:Studio booking}}",
+        "lines": [
+         "Sat Oct 24 · 11:00am · Nico",
+         "{{pay.price}}",
+         "{{pay.took}}",
+         "{{pay.cancel}}",
+         "Studio entrance on Studio Ln · parking in the back"
+        ]
+       },
+       "code": "5160",
+       "buttons": [
+        "Change the time",
+        "Call off the visit"
+       ]
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word the company gives only its registration (S1-61)"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "this work adds no agreement with Rosie beyond the standard terms"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "this work runs classes (a timetable, seats)"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "nothing is ever sent now, and nobody is on call"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S1-71",
+    "label": "2 Yes: sign it now",
+    "why": "not health care: no health privacy agreement is signed for this work"
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "D96: no license is checked by Rosie for this work; D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word"
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The license can stop the work and cut what may be offered, so it comes before prices and money. The studio needs no state license checked here, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Decides which check runs on what each person added on their secure page. For this work none runs: no person license is checked.",
+    "more": [
+     "The plug-in says which, and which official lookup checks it: none for this work (D96).",
+     "D96: no license is checked by Rosie for this work; the studio's own registration and insurance are the business's word",
+     "Safe default: no person license is checked here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the the studio's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the the studio's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "a session starts at a set time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "nobody is on call (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "a parent or guardian stays on site for anyone under 18"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "the customer must be there"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "this work never bills a plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "no insurance plan is billed"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "a shoot is paid by a deposit and the bill, not in stages"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "every session is rated"
+   },
+   {
+    "op": "words",
+    "at": "B6-13",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're booked! Give this code at the door when you arrive.",
+      {
+       "card": {
+        "title": "Lee Mobile Sound · {{svc.intext:Studio booking}}",
+        "lines": [
+         "Thu Oct 22 · starts at 8:00am · Theo",
+         "{{pay.price}}",
+         "{{pay.took}}",
+         "{{pay.cancel}}",
+         "The address and way in, from your booking"
+        ]
+       },
+       "code": "5160",
+       "buttons": [
+        "Change the time",
+        "Call off the visit"
+       ]
+      }
+     ]
+    ]
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "books a skin fade for",
+    "gives the job's address alone to their contact",
+    "Sam named you their emergency contact.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "no cut of",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sets nobody on call: no jobs sent now",
+    "Jobs sent now are never offered.",
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Every shop service, color and house calls",
+    "at the shop and for house calls",
+    "the visit fee",
+    "At the shop, and house calls",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "raises the haircut to $40",
+    "Next: Sat Nov 28 · 10:00am",
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Priced from your photos",
+    "raise haircut to 40",
+    "Priced at the chair",
+    "What happens at the chair?",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a cut every 4 weeks",
+    "Books the groom's party together",
+    "May the shop show photos of your hair?",
+    "Color always stays with Riley.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A cut is rated, so the shop takes the first branch.",
+    "kids cuts",
+    "kids cut",
+    "Kids cut",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "accept the beard trim today at 2:00pm with Avery",
+    "priced from photos",
+    "Color and cut",
+    "color and cut",
+    "color quote",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "a barber",
+    "A barber",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Barbering",
+    "barbers",
+    "Barber",
+    "barber",
+    "barbershop",
+    "Barbershop",
+    "shops",
+    "Shop",
+    "1 At the shop",
+    "Only at the shop",
+    "Books a free fix, if Sam says so",
+    "Alex asks for a fix",
+    "shop",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "The Groom's package",
+    "the Groom's package",
+    "Groom's package",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "$55",
+    "$35",
+    "paid at the chair",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "Jobs",
+    "jobs",
+    "Job",
+    "job",
+    "cuts",
+    "cut",
+    "every 4 weeks",
+    "skin fades",
+    "skin fade",
+    "Skin fade",
+    "Skin fade",
+    "skin fade",
+    "color correction",
+    "a perm",
+    "perms",
+    "perm",
+    "The cape clip",
+    "the cape clip",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "barbershops",
+    "Color correction",
+    "water heater",
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "Saturday mornings are paid by the saved card at DONE.",
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "Saturday mornings are paid by the saved card at DONE.",
+    "teacher"
+   ],
+   "B": [
+    "the shutoff valves",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "added a camera inspection to",
+    "$160 for today's extra work",
+    "can start the sewer camera inspection at a set time",
+    "like the sewer camera inspection",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "up to the $89 service call",
+    "It's a leak under the sink, today",
+    "The service call is $89. Accept it?",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "two drain clearings",
+    "I found water damage under the sink this morning.",
+    "the kitchen drain",
+    "gives the job's address alone to their contact",
+    "Sam named you their emergency contact.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sets nobody on call: no jobs sent now",
+    "Jobs sent now are never offered.",
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "at the shop and for house calls",
+    "the visit fee",
+    "At the shop, and house calls",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The door stayed shut.",
+    "for that window",
+    "the safety check comes before the door opens",
+    "before letting anyone in",
+    "Jordan and Alex check the work",
+    "The $160 valve quote is good for 7 days.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "You go to customers",
+    "Service call fee",
+    "service call fee",
+    "Drain clearings already booked keep $179",
+    "Drain clearing plans",
+    "at the door",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "a plumber",
+    "a barber",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "barbershop",
+    "Shop",
+    "2 At the shop",
+    "Booked at the shop: the other flow goes on from here.",
+    "shop",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "arriving 8–10am",
+    "8–10am",
+    "arriving 12–2pm",
+    "12–2pm",
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 9:10am",
+    "$150",
+    "$110",
+    "Jobs",
+    "jobs",
+    "Job",
+    "job",
+    "barbershops",
+    "for a haircut instead",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "Adding a faucet check? Say so.",
+    "Just the kitchen sink.",
+    "Price needed: Alex M., water heater replacement.",
+    "your water heater replacement at {{price:$90}}",
+    "couldn't price your water heater this time",
+    "The $640 water heater is over the plug-in's amount",
+    "Say Alex also asks about a dripping faucet.",
+    "with one arrival window and one code",
+    "like new pipes put in one day and finished another.",
+    "like 'Is the sink still full of water?'",
+    "like an overflowing drain at night",
+    "It's overflowing. Can someone come tonight?",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Can I skip next week's drain cleaning?",
+    "a drain cleaning at two rentals every 3 months",
+    "yard drain needs nobody home",
+    "old water stain on the cabinet floor",
+    "QUOTE 245 valve 165 supply line 80",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "you said yes to replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "cabinet floor",
+    "shutoff valve only",
+    "Leave the supply line.",
+    "fixes the shutoff valve today",
+    "The $80 supply line",
+    "for your repipe",
+    "QUOTE 2400 repipe, 3 stages",
+    "Sewer camera inspection",
+    "Service call",
+    "service call",
+    "Leak repair",
+    "Water heater replacement",
+    "sewer camera report",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "repipe",
+    "the valve is off",
+    "under the sink",
+    "bathroom sink",
+    "The $160 valve quote is good for 7 days.",
+    "Yes, it won't drain",
+    "DONE 179 drain",
+    "leak repair is $620",
+    "leak repair",
+    "roof leak",
+    "A fix-a-leak class.",
+    "to shut the cold-water valve",
+    "a gas smell",
+    "My kitchen drain is clogged.",
+    "which drain is clogged",
+    "the leak",
+    "replaces water heaters",
+    "Is the sink still full of water?",
+    "Replace both shutoff valves",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Your drain is under warranty, so this visit is free.",
+    "for a bathroom drain.",
+    "the water heater quote",
+    "Drain clearings already booked",
+    "a yard drain this Thursday",
+    "Water is coming out of the water heater.",
+    "Shut the cold-water valve, above the heater.",
+    "Cabinet floor, before",
+    "Under the sink, before",
+    "Mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Kitchen drain",
+    "Yard drain",
+    "Water heater fix",
+    "Classic cuts, fades and hot towel shaves.",
+    "Found: mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Sale agua del calentador.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "¿Huele a gas?",
+    "No huele a gas.",
+    "teacher",
+    "shutoff"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S2-28": "549fd7ae22",
+   "S1-71": "d5b18e87e4",
+   "S1-32": "60f59eda70",
+   "S1-33": "eeaadba298",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-99": "efed1e4f4d",
+   "S11-57": "a3996ae84e",
+   "S12-19": "07db0515b2",
+   "S13-41": "18b280aaa2",
+   "S13-43": "a1049201f6",
+   "S13-11": "4345036419",
+   "S1-61": "7421d186d5",
+   "S2-29": "974ca3a481",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-03": "7accda6f86",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A4-43": "c17d56f766",
+   "A6-14": "b17b52115e"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S2-28": "549fd7ae22",
+   "S1-71": "d5b18e87e4",
+   "S1-32": "60f59eda70",
+   "S1-33": "2b5d1fa4ab",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S11-99": "a97de4ca58",
+   "S11-57": "2f34f23d8a",
+   "S12-19": "176d3d2beb",
+   "S13-41": "fb75fbb382",
+   "S13-43": "55206e4cb1",
+   "S13-11": "6561316ed7",
+   "S1-61": "e30e71f65d",
+   "S2-29": "974ca3a481",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255",
+   "B6-13": "ed1f412f7d"
+  }
+ },
+ "notes": "Built Oct 27 by Haiku builder C4 from music (refitted, 0/0). No sample plug-in and no test-drive existed: the plug-in is written fresh for a studio (rooms and engineers, sessions and blocks, location recording).\nPaths A: full|none 3-hour tracking session ($360, paid in full; fee $40); card|counter 1-hour mixing session ($120, fee $40, paid at the front desk); card|card 1-hour mastering session ($150, fee $40, charged at DONE when the final files are sent); deposit|counter 10-hour album block ($1,000: $200 deposit, $800 rest paid at the studio at the last session).\nPaths B: card|card 3-hour location recording at the customer's home or venue ($450, fee $40, DONE); full|none mix check at the customer's home ($120, fee $40); deposit|bill multi-visit location shoot ($2,400 estimate: $600 deposit, $1,800 rest on the bill after the last visit).\nMinors: a parent or guardian books, signs the release and stays on site; a minor is never left alone in the room (A8-67 kept both; B8-67 child-in-care off).\nD96: no engineer certificate, insurance or permit is checked by Rosie; S1-60, S2-28 and the D96 steps off; the studio's registration is its own word.\nD97: the $2 applies (S1-62 off). Sent now off. S1-71 off (not health care). Sensitive OFF; hearing and health answers stay on the secure page.\nEach performer signs their own recording release on the secure page; that is the one part of this work the master's waiver steps must carry per person (gap: each person in a group signs their own form).\nSplits kept: S1-80 (rooms as spaces), A4-43, A4-66, A7-59, A7-15, A7-63, A7-68, A8-02, A8-67, S11-87, S11-90; B: S1-80, B4-78, B5-34, B7-62, S11-87, S11-90.\nNot sure (verifier): the album block's rest is paid at the last session (not on a set day), and a session that runs over is a new block only with the artist's yes; the sign-up example rows still show the master's example owner replies (see the log)."
+}

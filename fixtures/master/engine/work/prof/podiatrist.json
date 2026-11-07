@@ -1,0 +1,2598 @@
+{
+ "id": "podiatrist",
+ "name": "Podiatrist",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "primary-care",
+ "plugin": {
+  "pf.license": {
+   "need": "Each podiatrist's state license (DPM) is the practice's own word, given when the practice sets up. Where the state's rules require the practice to register (a professional corporation or a clinic registration), that registration is the practice's own word too.",
+   "who holds it": "Both: each podiatrist (the license) and the practice (its registration, where the state requires one). Rosie does not look either up.",
+   "what blocks going live": "Nothing: the license and registration are optional for Rosie. If the owner says a podiatrist is not licensed, that podiatrist is not offered.",
+   "renewals": "Renewal dates are the practice's own record. A lapse the owner reports stops that podiatrist's bookings until the owner says it's renewed.",
+   "other credentials": "X-ray equipment registration and an X-ray operator's credential, where the state's rules require them: the practice's own word. Malpractice insurance is the practice's own record.",
+   "limits": "Foot and ankle care only, as the practice's own scope. Ankle surgery only where the practice says it does. Surgery itself is never booked through Rosie: it's set up in the practice's own tools after a visit."
+  },
+  "pf.services": {
+   "at the practice (the example practice's own self-pay prices; insured patients pay their plan's share)": [
+    {
+     "service": "New patient visit (exam and plan)",
+     "price kind": "one price",
+     "price": "$175",
+     "length": "45 min",
+     "before": "nothing taken",
+     "after": "copay or self-pay price at the desk; the plan is billed first",
+     "note": "intake form first"
+    },
+    {
+     "service": "Follow-up visit",
+     "price kind": "one price",
+     "price": "$95",
+     "length": "20 min",
+     "before": "nothing taken",
+     "after": "at the desk"
+    },
+    {
+     "service": "Ingrown toenail removal (numbed, in the office)",
+     "price kind": "one price",
+     "price": "$325",
+     "length": "45 min",
+     "before": "nothing taken",
+     "after": "at the desk",
+     "note": "consent form signed first; aftercare link after"
+    },
+    {
+     "service": "Routine nail and callus care (diabetic foot care)",
+     "price kind": "one price",
+     "price": "$85",
+     "length": "30 min",
+     "before": "nothing taken",
+     "after": "at the desk; covered by some plans when the practice confirms the patient qualifies"
+    },
+    {
+     "service": "Diabetic foot exam",
+     "price kind": "one price",
+     "price": "$120",
+     "length": "30 min",
+     "before": "nothing taken",
+     "after": "at the desk"
+    },
+    {
+     "service": "Heel pain visit (with an injection if the podiatrist advises it)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "30 min",
+     "before": "nothing taken",
+     "after": "at the desk",
+     "note": "consent form for an injection"
+    },
+    {
+     "service": "Custom orthotics (casting or scan; fitting visit later)",
+     "price kind": "one price",
+     "price": "$450 the pair",
+     "length": "30 min, then a 20 min fitting 2 to 4 weeks later",
+     "before": "nothing taken",
+     "after": "at the desk at the casting visit",
+     "note": "often not covered: the price shows before the yes"
+    },
+    {
+     "service": "Wart treatment",
+     "price kind": "one price",
+     "price": "$120",
+     "length": "20 min",
+     "before": "nothing taken",
+     "after": "at the desk"
+    },
+    {
+     "service": "Child's foot visit (a parent comes)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "30 min",
+     "before": "nothing taken",
+     "after": "at the desk"
+    },
+    {
+     "service": "Video follow-up",
+     "price kind": "one price",
+     "price": "$75",
+     "length": "15 min",
+     "place": "video",
+     "before": "a card saved (self-pay)",
+     "after": "self-pay: the saved card charged at DONE; insured: the share billed after the plan answers"
+    }
+   ],
+   "at the patient's place (flow B: homebound patients, at home or in assisted living)": [
+    {
+     "service": "Home visit: nail and callus care",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "45 min",
+     "before": "nothing taken",
+     "after": "Rosie texts the patient's share bill after the plan answers"
+    },
+    {
+     "service": "Home visit: diabetic foot check",
+     "price kind": "one price",
+     "price": "$160",
+     "length": "45 min",
+     "before": "nothing taken",
+     "after": "Rosie texts the share bill after the plan answers"
+    }
+   ],
+   "never booked": "Surgery (set up in the practice's own tools after a visit), emergency care, and anything above the ankle.",
+   "capacity": "One podiatrist per visit; assistants help in the room.",
+   "online": "Video follow-ups only, for established patients."
+  },
+  "pf.questions": {
+   "before times (they set the service, length or who can see them)": [
+    "New or returning patient",
+    "What it's about, in a few words: heel pain, an ingrown nail, nail and callus care, a sore or wound, a child's foot, orthotics",
+    "The insurance plan's name, or self-pay",
+    "Who the visit is for: themselves, their child, or an adult they care for",
+    "For a home visit: is the patient homebound, and the town or area"
+   ],
+   "after a time is picked": [
+    "Who comes with a child",
+    "Mobility needs (wheelchair, walker)",
+    "For a home visit: who will be there to let the podiatrist in, and any pets put away"
+   ],
+   "only on the secure page": [
+    "Health history, diabetes, circulation problems, blood thinners, medicines and allergies",
+    "The insurance member ID and a photo of the card; a Medicare or Medicaid number",
+    "Photos of the foot",
+    "A guardian's or power of attorney's papers",
+    "The intake and consent forms"
+   ],
+   "who may book": "An adult for themselves; a parent or guardian for a child under 18 (a teen never books alone); a family member or caregiver for an adult in their care, with the patient's OK or legal papers; an assisted-living facility's staff for a resident, with the resident's or guardian's OK."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A foot or toe suddenly cold, pale, blue or numb, with pain",
+     "says": "This can be an emergency. Call 911 now.",
+     "booking": "No booking until they say it's handled."
+    },
+    {
+     "words": "A wound with fever, chills, spreading redness or red streaks, or a black or foul-smelling wound (above all with diabetes)",
+     "says": "This can be an emergency. Call 911 now.",
+     "booking": "No booking until they say it's handled."
+    },
+    {
+     "words": "A bone through the skin, or a foot that looks broken after a fall",
+     "says": "Call 911 now.",
+     "booking": "No booking until they say it's handled."
+    },
+    {
+     "words": "Chest pain, trouble breathing, or fainting",
+     "says": "Call 911 now.",
+     "booking": "No booking until they say it's handled."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "A new sore or blister on a diabetic foot, with no fever",
+     "says": "Keep weight off it and keep it clean and covered. The practice's own line is given, and the soonest time is offered."
+    }
+   ],
+   "at the visit": "Fainting after a shot or a procedure: the podiatrist's own first aid; 911 if the patient doesn't come round quickly.",
+   "at a home visit": "Pets put away. A home that isn't safe: the podiatrist leaves. Sharps go back with the podiatrist."
+  },
+  "pf.first_steps": {
+   "before the first visit": [
+    {
+     "step": "The intake form (health history, medicines, allergies, insurance) and the privacy notice",
+     "where": "the secure page",
+     "timing": "due 24 hours before the first visit",
+     "late": "not done: done at the desk; the patient is asked to come 15 minutes early"
+    },
+    {
+     "step": "A consent form for a procedure (an ingrown nail removal, an injection)",
+     "where": "the secure page, or at the visit before the procedure",
+     "timing": "before the procedure starts"
+    },
+    {
+     "step": "The practice checks the insurance plan",
+     "timing": "before the visit",
+     "late": "not checked yet: the visit still goes ahead; the practice checks by the next business day"
+    },
+    {
+     "step": "A referral or a prior approval, where the patient's plan needs one",
+     "timing": "due before the visit",
+     "late": "not in: the patient may pay the self-pay price, or move the visit"
+    }
+   ],
+   "prep for the reminder": "Bring your medicine list, the shoes you wear most, and any inserts you use. For nail care, no polish."
+  },
+  "pf.visit": {
+   "check-in at the practice": "The check-in code at the front desk. A new patient also shows a photo ID and the insurance card.",
+   "check-in at a home visit": "The code at the door. The on-my-way text names the podiatrist.",
+   "changes at the visit": "A same-day procedure the podiatrist advises (an ingrown nail removal, an injection, an X-ray) is explained first, with the self-pay price, or 'billed to your plan; your share after the plan answers'. The patient's yes (a parent's for a child) comes before it's done.",
+   "what proves it's done": "The podiatrist marks DONE. The visit note stays in the practice's own records.",
+   "aftercare": "Aftercare after a procedure (soaks, dressings, what to watch for) comes as a secure link.",
+   "results later": "A lab result (a nail culture, a biopsy) is ready in 1 to 2 weeks: the text says only 'ready on the secure page'.",
+   "orthotics": "Custom orthotics are cast at one visit. The fitting visit is booked when the lab says they're in (2 to 4 weeks)."
+  },
+  "pf.money": {
+   "Rosfield's $2": "$2 per confirmed booking, a flat fee for each booking Rosie makes. It applies here too.",
+   "insured patients": "Nothing taken at booking. The copay at the desk. The plan is billed first, and the patient's share comes after the plan answers.",
+   "self-pay": "The list price at the desk. The owner may save a card for a late-cancel or no-show fee (the owner's own setting; the example practice sets $40).",
+   "custom orthotics": "Often not covered: the price shows before the yes, paid at the desk at the casting visit.",
+   "video follow-ups": "Self-pay: a card saved, charged the list price at DONE. Insured: the share is billed after the plan answers (the master's S1-13: a plan-billed service never uses the saved card at DONE).",
+   "home visits": "Nothing taken at booking. Rosie texts the patient's share after the plan answers, or the self-pay price after the visit.",
+   "public programs": "Where a public health program's rules limit what may be charged, the practice sets which charges apply (a switch from the program's rules).",
+   "tips and codes": "No tips. No discount codes."
+  },
+  "pf.messages": {
+   "never in a text": "The reason for the visit, the service's name, any condition (diabetes, a wound, an infection), medicines, foot photos, results, and insurance numbers. Texts say 'your visit' with the practice's display name.",
+   "languages": "English and Spanish.",
+   "minors": "A child's details only on the secure page. Texts about a child's visit go to the parent."
+  },
+  "pf.staff": {
+   "people": "Podiatrists (DPM; the practice's own word that each is licensed); podiatric medical assistants; an X-ray tech where the state's rules require a credential; the front desk.",
+   "skills": [
+    "Nail and callus care",
+    "Ingrown nails",
+    "Wound care",
+    "Orthotics",
+    "Injections",
+    "Children",
+    "Home visits"
+   ],
+   "supervision": "An assistant does only what the state's rules allow, under a podiatrist. Procedures and injections only by a podiatrist.",
+   "stand-ins": "Another podiatrist in the practice who takes the patient's plan. A patient who named their podiatrist moves only with their yes."
+  },
+  "pf.rules": {
+   "privacy": "The health privacy agreement is signed before the practice goes live.",
+   "records": "Medical records stay in the practice's own system, kept as long as the state's rules set.",
+   "fees": "Late-cancel and no-show fees are the owner's own setting; the example practice sets $40.",
+   "minors": "A parent or guardian consents and comes to the visit.",
+   "referrals": "A referral or prior approval where the patient's plan requires one."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most here:",
+   "podiatry": [
+    "Running more than 15 minutes late: may be moved to the next open time (the owner's rule)",
+    "The podiatrist is out or called to an emergency: another podiatrist who takes the plan is offered; a patient who named theirs moves only on their yes",
+    "Weather closes the office: the practice moves the visits; nothing is charged",
+    "The insurance turns out inactive: the self-pay price is shown, or the visit moves",
+    "Orthotics not back from the lab: the fitting visit moves; nothing is charged",
+    "A homebound patient doesn't answer the door: a safety check first, then the family contact",
+    "A wound that got worse before the visit: the danger check again"
+   ]
+  },
+  "pf.facts": [
+   "forms",
+   "planbill",
+   "results",
+   "aftercare",
+   "children",
+   "video",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "takes jobs sent now.",
+    "takes no jobs sent now."
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Foot Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Orthotics"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Podiatry LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Podiatry"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Podiatry LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Podiatry"
+   ],
+   [
+    "Groom's Package",
+    "Custom orthotics"
+   ],
+   [
+    "Groom's package",
+    "custom orthotics"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Diabetic foot exam"
+   ],
+   [
+    "Signature cut and shave",
+    "Diabetic foot exam"
+   ],
+   [
+    "signature cut and shave",
+    "diabetic foot exam"
+   ],
+   [
+    "Skin fades",
+    "Nail and callus care"
+   ],
+   [
+    "Skin fade",
+    "Nail and callus care"
+   ],
+   [
+    "skin fades",
+    "nail and callus care"
+   ],
+   [
+    "skin fade",
+    "nail and callus care"
+   ],
+   [
+    "Beard trims",
+    "Wart treatments"
+   ],
+   [
+    "Beard trim",
+    "Wart treatment"
+   ],
+   [
+    "beard trims",
+    "wart treatments"
+   ],
+   [
+    "beard trim",
+    "wart treatment"
+   ],
+   [
+    "Kids cuts",
+    "Child's foot visits"
+   ],
+   [
+    "Kids cut",
+    "Child's foot visit"
+   ],
+   [
+    "kids cuts",
+    "child's foot visits"
+   ],
+   [
+    "kids cut",
+    "child's foot visit"
+   ],
+   [
+    "Color and cut",
+    "Custom orthotics"
+   ],
+   [
+    "color and cut",
+    "custom orthotics"
+   ],
+   [
+    "Color correction",
+    "Heel pain visit"
+   ],
+   [
+    "color correction",
+    "heel pain visit"
+   ],
+   [
+    "hot towel",
+    "foot soak"
+   ],
+   [
+    "Hot towel",
+    "Foot soak"
+   ],
+   [
+    "Haircuts",
+    "Visits"
+   ],
+   [
+    "haircuts",
+    "visits"
+   ],
+   [
+    "Haircut",
+    "Visit"
+   ],
+   [
+    "haircut",
+    "visit"
+   ],
+   [
+    "barbershops",
+    "practices"
+   ],
+   [
+    "barbershop",
+    "practice"
+   ],
+   [
+    "Barbershop",
+    "Practice"
+   ],
+   [
+    "barbers",
+    "podiatrists"
+   ],
+   [
+    "barber",
+    "podiatrist"
+   ],
+   [
+    "Barber",
+    "Podiatrist"
+   ],
+   [
+    "clinicians",
+    "doctors"
+   ],
+   [
+    "clinician",
+    "doctor"
+   ],
+   [
+    "Clinician",
+    "Doctor"
+   ],
+   [
+    "electrical too, at $140 an hour.",
+    "orthotics too."
+   ],
+   [
+    "plumbing and electrical, $140 an hour",
+    "foot care and orthotics"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Quotes come to you first. Board prices never need one"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, nail care and house calls"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A foot's example: 'A nail removal needs a consent form first. Signed one in the last 3 months?'"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A new patient stays with the podiatrist they picked."
+   ],
+   [
+    "1 color quote",
+    "1 quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Marisol"
+   ],
+   [
+    "Jordan",
+    "Ruth"
+   ],
+   [
+    "Casey",
+    "Tomas"
+   ],
+   [
+    "Jules",
+    "Noor"
+   ],
+   [
+    "Tessa",
+    "Ellen"
+   ],
+   [
+    "Kim",
+    "Ana"
+   ],
+   [
+    "Nia",
+    "Rosa"
+   ],
+   [
+    "Hugo",
+    "Felix"
+   ],
+   [
+    "Lena",
+    "Greta"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "plumbing and electrical",
+    "foot care and orthotics"
+   ],
+   [
+    "Plumbing and electrical",
+    "Foot care and orthotics"
+   ],
+   [
+    "plumbing",
+    "foot care"
+   ],
+   [
+    "Plumbing",
+    "Foot care"
+   ],
+   [
+    "plumber",
+    "podiatrist"
+   ],
+   [
+    "Plumber",
+    "Podiatrist"
+   ],
+   [
+    "electrician",
+    "assistant"
+   ],
+   [
+    "electrical",
+    "orthotics"
+   ],
+   [
+    "Electrical",
+    "Orthotics"
+   ],
+   [
+    "water heater flush",
+    "nail and callus care"
+   ],
+   [
+    "Water heater flush",
+    "Nail and callus care"
+   ],
+   [
+    "water heater replacement",
+    "custom orthotics"
+   ],
+   [
+    "Water heater replacement",
+    "Custom orthotics"
+   ],
+   [
+    "water heater fix",
+    "heel pain visit"
+   ],
+   [
+    "Water heater fix",
+    "Heel pain visit"
+   ],
+   [
+    "water heaters",
+    "orthotics"
+   ],
+   [
+    "Water heaters",
+    "Orthotics"
+   ],
+   [
+    "water heater",
+    "heel pain visit"
+   ],
+   [
+    "Water heater",
+    "Heel pain visit"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "Drain clearings",
+    "Nail removals"
+   ],
+   [
+    "drain clearings",
+    "nail removals"
+   ],
+   [
+    "drain clearing",
+    "nail removal"
+   ],
+   [
+    "Drain clearing",
+    "Nail removal"
+   ],
+   [
+    "perms",
+    "cosmetic procedures"
+   ],
+   [
+    "Perms",
+    "Cosmetic procedures"
+   ],
+   [
+    "perm",
+    "cosmetic procedure"
+   ],
+   [
+    "Perm",
+    "Cosmetic procedure"
+   ],
+   [
+    "massage",
+    "orthotics"
+   ],
+   [
+    "Massage",
+    "Orthotics"
+   ],
+   [
+    "heater",
+    "orthotic"
+   ],
+   [
+    "Heater",
+    "Orthotic"
+   ],
+   [
+    "My gas",
+    "My"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿El pie está frío y azul?"
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Llame al 911 ahora. Un pie frío, azul y con dolor puede ser una emergencia."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. El pie no está frío ni azul."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Call 911 now."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said a foot is cold and blue."
+   ],
+   [
+    "A gas smell at the home",
+    "A cold, blue foot"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now, since a cold, blue foot can be an emergency."
+   ],
+   [
+    "Shut the cold-water valve, above the orthotic. If you smell gas, get out and call 911.",
+    "Call 911 now. The visit can wait."
+   ],
+   [
+    "like labor or water breaking",
+    "like a foot that turns cold and blue"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Diabetic foot check · $160"
+   ],
+   [
+    "Sewer camera inspection",
+    "Diabetic foot check"
+   ],
+   [
+    "A podiatrist's example: water near outlets gets 'shut off the main valve'.",
+    "A podiatrist's example: a foot cold and blue with pain gets 'call 911 now'."
+   ],
+   [
+    "Alex picked a child's foot visit for a son before the times, so the times fit it.",
+    "Alex picked a child's foot visit before the times, so the times fit it."
+   ],
+   [
+    "Heating and cooling",
+    "Toenail care"
+   ],
+   [
+    "heating and cooling",
+    "toenail care"
+   ],
+   [
+    "Lee Podiatry can clear the drain",
+    "Lee Podiatry can see you at home"
+   ],
+   [
+    "Lee Home Podiatry can clear the drain",
+    "Lee Home Podiatry can see you at home"
+   ],
+   [
+    "Ruth lets himself in the agreed way",
+    "Ruth goes in the agreed way"
+   ],
+   [
+    "Ruth lets himself in",
+    "Ruth goes in"
+   ],
+   [
+    "Leak repair",
+    "Home visit"
+   ],
+   [
+    "Sewer camera report",
+    "Results report"
+   ],
+   [
+    "Dana also does color and home visits",
+    "Dana also does home visits"
+   ],
+   [
+    "Dana: podiatrist, color, home visits",
+    "Dana: podiatrist, home visits"
+   ],
+   [
+    "Dana: podiatrist, color and home visits",
+    "Dana: podiatrist and home visits"
+   ],
+   [
+    "Dana and Marisol cut hair",
+    "Dana and Marisol treat feet"
+   ],
+   [
+    "Noor rents a chair",
+    "Noor rents an exam room"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a same-day check for an injury"
+   ],
+   [
+    "A neighborhood practice on Elm St. Classic cuts, fades and foot soak shaves.",
+    "A neighborhood practice on Cedar Ave. Foot care, orthotics and home visits."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The exam table's edge tore my jacket."
+   ],
+   [
+    "the cape clip ripped a shirt collar today.",
+    "the exam table's edge tore a jacket today."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: a thick big toe, file it short, trim the callus"
+   ],
+   [
+    "under different names, and nobody was home for any of them.",
+    "under different names, and nobody was home."
+   ],
+   [
+    "Do you do child's foot visits? My son is 8.",
+    "Do you do child's foot visits? My son is 8."
+   ],
+   [
+    "$20 fee ($40 for the custom orthotics)",
+    "@@FEE@@"
+   ],
+   [
+    "$20 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$20 deposit",
+    "@@DEP@@"
+   ],
+   [
+    "$40 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$40 deposit",
+    "@@DEP@@"
+   ],
+   [
+    "$89 service-call fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 fee",
+    "@@FEE@@"
+   ],
+   [
+    "Visit $35 ($40 from Nov 2)",
+    "Visit $175 ($185 from Nov 2)"
+   ],
+   [
+    "Nail and callus care · $40",
+    "Nail and callus care · $85"
+   ],
+   [
+    "Nail and callus care $40",
+    "Nail and callus care $85"
+   ],
+   [
+    "goes to $40 for new bookings",
+    "goes to $185 for new bookings"
+   ],
+   [
+    "raises the visit to $40",
+    "raises the visit to $185"
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25",
+    "A plan goes to $185 from Wed Nov 25"
+   ],
+   [
+    "The plan ends after its last visit at $35.",
+    "The plan ends after its last visit at $175."
+   ],
+   [
+    "Visits already booked keep $35",
+    "New patient visits already booked keep $175"
+   ],
+   [
+    "Visit plans go to $40 from Wed Nov 25",
+    "Visit plans go to $185 from Wed Nov 25"
+   ],
+   [
+    "Rosa K. asked to talk about the $90 color quote.",
+    "Rosa K. asked to talk about the $175 visit."
+   ],
+   [
+    "Ben's AI asks for a nail and callus care at $35, an old price.",
+    "Ben's AI asks for a new patient visit at $165, an old price."
+   ],
+   [
+    "the real price, $40.",
+    "the real price, $175."
+   ],
+   [
+    "A nail and callus care at Lee Podiatry is $40, not $35. Here are the open times at $40.",
+    "A new patient visit at Lee Podiatry is $175, not $165. Here are the open times at $175."
+   ],
+   [
+    "Refund · $20",
+    "Refund · $175"
+   ],
+   [
+    "D.W.'s $20 payment",
+    "D.W.'s $175 payment"
+   ],
+   [
+    "$35",
+    "$175"
+   ],
+   [
+    "$20",
+    "$120"
+   ],
+   [
+    "$25",
+    "$150"
+   ],
+   [
+    "$55",
+    "$120"
+   ],
+   [
+    "$140",
+    "$450"
+   ],
+   [
+    "$75",
+    "$140"
+   ],
+   [
+    "$90",
+    "$175"
+   ],
+   [
+    "$40",
+    "$85"
+   ],
+   [
+    "@@FEE@@",
+    "$40 fee"
+   ],
+   [
+    "@@DEP@@",
+    "$40 deposit"
+   ]
+  ],
+  "B": [
+   [
+    "takes jobs sent now.",
+    "takes no jobs sent now."
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Foot Care"
+   ],
+   [
+    "Lee Electric",
+    "Lee Orthotics"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Podiatry LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Podiatry"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Podiatry LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Podiatry"
+   ],
+   [
+    "Groom's Package",
+    "Custom orthotics"
+   ],
+   [
+    "Groom's package",
+    "custom orthotics"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Diabetic foot exam"
+   ],
+   [
+    "Signature cut and shave",
+    "Diabetic foot exam"
+   ],
+   [
+    "signature cut and shave",
+    "diabetic foot exam"
+   ],
+   [
+    "Skin fades",
+    "Nail and callus care"
+   ],
+   [
+    "Skin fade",
+    "Nail and callus care"
+   ],
+   [
+    "skin fades",
+    "nail and callus care"
+   ],
+   [
+    "skin fade",
+    "nail and callus care"
+   ],
+   [
+    "Beard trims",
+    "Wart treatments"
+   ],
+   [
+    "Beard trim",
+    "Wart treatment"
+   ],
+   [
+    "beard trims",
+    "wart treatments"
+   ],
+   [
+    "beard trim",
+    "wart treatment"
+   ],
+   [
+    "Kids cuts",
+    "Child's foot visits"
+   ],
+   [
+    "Kids cut",
+    "Child's foot visit"
+   ],
+   [
+    "kids cuts",
+    "child's foot visits"
+   ],
+   [
+    "kids cut",
+    "child's foot visit"
+   ],
+   [
+    "Color and cut",
+    "Custom orthotics"
+   ],
+   [
+    "color and cut",
+    "custom orthotics"
+   ],
+   [
+    "Color correction",
+    "Heel pain visit"
+   ],
+   [
+    "color correction",
+    "heel pain visit"
+   ],
+   [
+    "hot towel",
+    "foot soak"
+   ],
+   [
+    "Hot towel",
+    "Foot soak"
+   ],
+   [
+    "Haircuts",
+    "Visits"
+   ],
+   [
+    "haircuts",
+    "visits"
+   ],
+   [
+    "Haircut",
+    "Visit"
+   ],
+   [
+    "haircut",
+    "visit"
+   ],
+   [
+    "barbershops",
+    "practices"
+   ],
+   [
+    "barbershop",
+    "practice"
+   ],
+   [
+    "Barbershop",
+    "Practice"
+   ],
+   [
+    "barbers",
+    "podiatrists"
+   ],
+   [
+    "barber",
+    "podiatrist"
+   ],
+   [
+    "Barber",
+    "Podiatrist"
+   ],
+   [
+    "clinicians",
+    "doctors"
+   ],
+   [
+    "clinician",
+    "doctor"
+   ],
+   [
+    "Clinician",
+    "Doctor"
+   ],
+   [
+    "electrical too, at $140 an hour.",
+    "orthotics too."
+   ],
+   [
+    "plumbing and electrical, $140 an hour",
+    "foot care and orthotics"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Quotes come to you first. Board prices never need one"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, nail care and house calls"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A foot's example: 'A nail removal needs a consent form first. Signed one in the last 3 months?'"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A new patient stays with the podiatrist they picked."
+   ],
+   [
+    "1 color quote",
+    "1 quote"
+   ],
+   [
+    "the color quote before booking",
+    "the quote before booking"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Marisol"
+   ],
+   [
+    "Jordan",
+    "Ruth"
+   ],
+   [
+    "Casey",
+    "Tomas"
+   ],
+   [
+    "Jules",
+    "Noor"
+   ],
+   [
+    "Tessa",
+    "Ellen"
+   ],
+   [
+    "Kim",
+    "Ana"
+   ],
+   [
+    "Nia",
+    "Rosa"
+   ],
+   [
+    "Hugo",
+    "Felix"
+   ],
+   [
+    "Lena",
+    "Greta"
+   ],
+   [
+    "42 Oak St",
+    "18 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ct"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "plumbing and electrical",
+    "foot care and orthotics"
+   ],
+   [
+    "Plumbing and electrical",
+    "Foot care and orthotics"
+   ],
+   [
+    "plumbing",
+    "foot care"
+   ],
+   [
+    "Plumbing",
+    "Foot care"
+   ],
+   [
+    "plumber",
+    "podiatrist"
+   ],
+   [
+    "Plumber",
+    "Podiatrist"
+   ],
+   [
+    "electrician",
+    "assistant"
+   ],
+   [
+    "electrical",
+    "orthotics"
+   ],
+   [
+    "Electrical",
+    "Orthotics"
+   ],
+   [
+    "water heater flush",
+    "nail and callus care"
+   ],
+   [
+    "Water heater flush",
+    "Nail and callus care"
+   ],
+   [
+    "water heater replacement",
+    "custom orthotics"
+   ],
+   [
+    "Water heater replacement",
+    "Custom orthotics"
+   ],
+   [
+    "water heater fix",
+    "heel pain visit"
+   ],
+   [
+    "Water heater fix",
+    "Heel pain visit"
+   ],
+   [
+    "water heaters",
+    "orthotics"
+   ],
+   [
+    "Water heaters",
+    "Orthotics"
+   ],
+   [
+    "water heater",
+    "heel pain visit"
+   ],
+   [
+    "Water heater",
+    "Heel pain visit"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "Drain clearings",
+    "Nail removals"
+   ],
+   [
+    "drain clearings",
+    "nail removals"
+   ],
+   [
+    "drain clearing",
+    "nail removal"
+   ],
+   [
+    "Drain clearing",
+    "Nail removal"
+   ],
+   [
+    "perms",
+    "cosmetic procedures"
+   ],
+   [
+    "Perms",
+    "Cosmetic procedures"
+   ],
+   [
+    "perm",
+    "cosmetic procedure"
+   ],
+   [
+    "Perm",
+    "Cosmetic procedure"
+   ],
+   [
+    "massage",
+    "orthotics"
+   ],
+   [
+    "Massage",
+    "Orthotics"
+   ],
+   [
+    "heater",
+    "orthotic"
+   ],
+   [
+    "Heater",
+    "Orthotic"
+   ],
+   [
+    "My gas",
+    "My"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿El pie está frío y azul?"
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Llame al 911 ahora. Un pie frío, azul y con dolor puede ser una emergencia."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. El pie no está frío ni azul."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Call 911 now."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said a foot is cold and blue."
+   ],
+   [
+    "A gas smell at the home",
+    "A cold, blue foot"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now, since a cold, blue foot can be an emergency."
+   ],
+   [
+    "Shut the cold-water valve, above the orthotic. If you smell gas, get out and call 911.",
+    "Call 911 now. The visit can wait."
+   ],
+   [
+    "like labor or water breaking",
+    "like a foot that turns cold and blue"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Diabetic foot check · $160"
+   ],
+   [
+    "Sewer camera inspection",
+    "Diabetic foot check"
+   ],
+   [
+    "A podiatrist's example: water near outlets gets 'shut off the main valve'.",
+    "A podiatrist's example: a foot cold and blue with pain gets 'call 911 now'."
+   ],
+   [
+    "Alex picked a child's foot visit for a son before the times, so the times fit it.",
+    "Alex picked a child's foot visit before the times, so the times fit it."
+   ],
+   [
+    "Heating and cooling",
+    "Toenail care"
+   ],
+   [
+    "heating and cooling",
+    "toenail care"
+   ],
+   [
+    "Lee Podiatry can clear the drain",
+    "Lee Podiatry can see you at home"
+   ],
+   [
+    "Lee Home Podiatry can clear the drain",
+    "Lee Home Podiatry can see you at home"
+   ],
+   [
+    "Ruth lets himself in the agreed way",
+    "Ruth goes in the agreed way"
+   ],
+   [
+    "Ruth lets himself in",
+    "Ruth goes in"
+   ],
+   [
+    "Leak repair",
+    "Home visit"
+   ],
+   [
+    "Sewer camera report",
+    "Results report"
+   ],
+   [
+    "Dana also does color and home visits",
+    "Dana also does home visits"
+   ],
+   [
+    "Dana: podiatrist, color, home visits",
+    "Dana: podiatrist, home visits"
+   ],
+   [
+    "Dana: podiatrist, color and home visits",
+    "Dana: podiatrist and home visits"
+   ],
+   [
+    "Dana and Marisol cut hair",
+    "Dana and Marisol treat feet"
+   ],
+   [
+    "Noor rents a chair",
+    "Noor rents an exam room"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a same-day check for an injury"
+   ],
+   [
+    "A neighborhood practice on Elm St. Classic cuts, fades and foot soak shaves.",
+    "A neighborhood practice on Cedar Ave. Foot care, orthotics and home visits."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The exam table's edge tore my jacket."
+   ],
+   [
+    "the cape clip ripped a shirt collar today.",
+    "the exam table's edge tore a jacket today."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: a thick big toe, file it short, trim the callus"
+   ],
+   [
+    "under different names, and nobody was home for any of them.",
+    "under different names, and nobody was home."
+   ],
+   [
+    "Do you do child's foot visits? My son is 8.",
+    "Do you do child's foot visits? My son is 8."
+   ],
+   [
+    "Kitchen nail removal $179 ($199 from Nov 2) · Nail and callus care $150",
+    "Home visit $140 ($150 from Nov 2) · Diabetic foot check $160"
+   ],
+   [
+    "Saved: nail removal $199 for visits from Mon Nov 2. Nail removals already booked keep $179. Nail removal plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: home visit @@H150@@ from Mon Nov 2. Home visits already booked keep $140. Home visit plans go to @@H150@@ from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Nail removals already booked keep $179, even after Nov 2.",
+    "Home visits already booked keep $140, even after Nov 2."
+   ],
+   [
+    "Nail removals already booked keep only their saved card.",
+    "Home visits already booked keep only their saved card."
+   ],
+   [
+    "can cut your hair at the shop for $35, or at your home for $75.",
+    "can see you at the shop for $175, or at your home for $140."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 visit was promised.",
+    "A home visit is priced at the visit: only the $140 visit was promised."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The second toe is a home visit, quoted at the visit."
+   ],
+   [
+    "leak repair",
+    "home visit"
+   ],
+   [
+    "for $160. It's added to what you pay for this visit.",
+    "for $120. It's added to what you pay for this visit."
+   ],
+   [
+    "A nail removal with Lee Home Podiatry is $179, not $150. Here are the open times at $179.",
+    "A home visit with Lee Home Podiatry is $150, not $140. Here are the open times at @@H150@@."
+   ],
+   [
+    "Ivy's AI asks for a nail removal at $150, an old price.",
+    "Ivy's AI asks for a home visit at $140, an old price."
+   ],
+   [
+    "Rosie answers with the real price, $179.",
+    "Rosie answers with the real price, @@H150@@."
+   ],
+   [
+    "Sam switches the nail removal from",
+    "Sam switches the home visit from"
+   ],
+   [
+    "Nail removal · $179",
+    "Home visit · $140"
+   ],
+   [
+    "nail removal goes to $199",
+    "home visit goes to @@H150@@"
+   ],
+   [
+    "Sam raises the nail removal to $199",
+    "Sam raises the home visit to @@H150@@"
+   ],
+   [
+    "A plan goes to $199",
+    "A plan goes to @@H150@@"
+   ],
+   [
+    "The plan ends after its last visit at $179.",
+    "The plan ends after its last visit at $140."
+   ],
+   [
+    "Nail and callus care $150",
+    "Diabetic foot check $160"
+   ],
+   [
+    "Diabetic foot check $199",
+    "Diabetic foot check $160"
+   ],
+   [
+    "The $640 heel pain visit is over",
+    "The $560 custom orthotics job is over"
+   ],
+   [
+    "the $640 quote",
+    "the $560 quote"
+   ],
+   [
+    "Refund · $20",
+    "Refund · $140"
+   ],
+   [
+    "N.S.'s $20 payment",
+    "N.S.'s $140 payment"
+   ],
+   [
+    "It's a leak under the sink, today, arriving 3–5pm, with Ruth. The visit is $89.",
+    "It's a home visit today, arriving 3–5pm, with Ruth. The visit is $140."
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $140 visit needs none."
+   ],
+   [
+    "$20 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$40 fee",
+    "@@FEE@@"
+   ],
+   [
+    "$40 deposit",
+    "@@DEP@@"
+   ],
+   [
+    "$89 service-call fee",
+    "@@FEE@@"
+   ],
+   [
+    "$89 fee",
+    "@@FEE@@"
+   ],
+   [
+    "up to the $89 visit",
+    "up to the @@FEE@@"
+   ],
+   [
+    "$89, credited to the repair",
+    "$140"
+   ],
+   [
+    "$179",
+    "$140"
+   ],
+   [
+    "$199",
+    "$160"
+   ],
+   [
+    "$150",
+    "$160"
+   ],
+   [
+    "$89",
+    "$140"
+   ],
+   [
+    "$640",
+    "$560"
+   ],
+   [
+    "$120 an hour",
+    "$120"
+   ],
+   [
+    "$140 an hour",
+    "$140"
+   ],
+   [
+    "$35",
+    "$175"
+   ],
+   [
+    "$75",
+    "$40"
+   ],
+   [
+    "@@FEE@@",
+    "$40 fee"
+   ],
+   [
+    "@@DEP@@",
+    "$40 deposit"
+   ],
+   [
+    "@@H150@@",
+    "$150"
+   ],
+   [
+    "Say Ana L.'s yard drain needs nobody home.",
+    "Say Ana L. needs nobody home."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scratch on the floor"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor, before"
+   ],
+   [
+    "cracks the cabinet floor",
+    "scratches the floor"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched floor"
+   ],
+   [
+    "cracked the cabinet floor",
+    "scratched the floor"
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the heel pain visit.",
+    "Hello, do you speak Spanish? My foot is cold and blue, and it hurts."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell,",
+    "Real danger, like a cold, blue foot or a wound with fever,"
+   ],
+   [
+    "My kitchen drain is clogged. Can a podiatrist come Thursday morning? I'm in Springfield.",
+    "My father can't leave home for foot care. Can a podiatrist come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my father's nails. A text back is fine."
+   ],
+   [
+    "Can a podiatrist clear a yard drain this Thursday? What does it cost?",
+    "Can a podiatrist see Ana at home this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Ellen drain Thu 12-2 Tomas",
+    "BOOK Ellen home visit Thu 12-2 Tomas"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the foot problem is, when it started, and if it's worse since then."
+   ],
+   [
+    "'My sink won't drain' fits a nail removal.",
+    "'My toenail is ingrown' fits a nail removal."
+   ],
+   [
+    "like a roof leak.",
+    "like a roof repair."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a prescription for someone never seen."
+   ],
+   [
+    "500 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "Lee Home Podiatry asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Podiatry asks: is the visit at a home, an office or somewhere else? And which foot or toe is the problem?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just my father's left foot."
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a nail trim? Say so."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a second toe."
+   ],
+   [
+    "Can Ruth also look at a dripping faucet?",
+    "Can Ruth also look at a second toe?"
+   ],
+   [
+    "Can Ruth also run a camera down my sewer line?",
+    "Can Ruth also do a diabetic foot check?"
+   ],
+   [
+    "'Is the sink still full of water?'",
+    "'Is it the same foot as last time?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is it the same foot as last time?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, the same foot"
+   ],
+   [
+    "On the photos path, only Ruth's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Ruth's times show: Ruth fits the orthotics."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your medicines and plan card ready."
+   ],
+   [
+    "Under the sink, before",
+    "Foot, before"
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 visit was promised.",
+    "A home visit is priced at the visit: only the $140 visit was promised."
+   ],
+   [
+    "Ruth finds corroded shutoff valves.",
+    "Ruth finds a toenail that needs care."
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Extra for A.M.: a wart treatment, $120."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Wart treatment · $120"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $120 treatment is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to a wart treatment for $120."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 120 wart treatment"
+   ],
+   [
+    "Ruth finds mold behind the sink wall.",
+    "Ruth finds an unsafe floor at the visit."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD unsafe floor, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Unsafe floor"
+   ],
+   [
+    "Ruth found mold behind the wall under your sink and stopped that part of the work.",
+    "Ruth found an unsafe floor and stopped that part of the visit."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: an unsafe floor"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the part that isn't safe"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 140 home visit"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE thick nails, both big toes. Bring the file next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The toe is sore again 2 weeks later. It's inside the free return window, so Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The toe is sore again."
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M.'s toe, seen Thu Oct 22, is sore again. It's inside the free return window."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. The return visit is free."
+   ],
+   [
+    "Ruth left a mess under the sink.",
+    "Ruth left a mess on the floor."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on my floor this morning."
+   ],
+   [
+    "Can Ruth look at my bathroom sink next week?",
+    "Can Ruth look at my other foot next week?"
+   ],
+   [
+    "Here are Ruth's next times for a bathroom drain.",
+    "Here are Ruth's next times for a foot check."
+   ],
+   [
+    "a sewer camera report comes Fri Oct 23. On that day, Rosie checks it's ready.",
+    "results come Fri Oct 23. On that day, Rosie checks they're ready."
+   ],
+   [
+    "your sewer camera report from Thursday is ready.",
+    "your results are ready on the secure page."
+   ],
+   [
+    "your sewer camera report needs a little more time. It will be ready Mon Oct 26.",
+    "your results need a little more time. They'll be ready on the secure page Mon Oct 26."
+   ],
+   [
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "your results from Thu Oct 22 are ready on the secure page."
+   ],
+   [
+    "water is off on Main St after 2pm, so afternoon jobs may run late.",
+    "the street is closed after 2pm, so afternoon visits may run late."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the foot is now worse."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The foot is worse now, with a new sore."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep the foot still and clean, and keep weight off it."
+   ],
+   [
+    "A podiatrist's example: water near outlets gets 'shut off the main valve'.",
+    "A podiatrist's example: a foot cold and blue with pain gets 'call 911 now'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 now, since a cold, blue foot can be an emergency."
+   ],
+   [
+    "Shut the cold-water valve, above the orthotic. If you smell gas, get out and call 911.",
+    "Call 911 now. The visit can wait."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my dog stay in the room during the visit?"
+   ],
+   [
+    "Say Ruth cracks the cabinet floor and texts a photo.",
+    "Say Ruth scratches the floor and texts a photo."
+   ],
+   [
+    "Ruth cracked the cabinet floor at A.M.'s.",
+    "Ruth scratched the floor at A.M.'s."
+   ],
+   [
+    "Saved: nail removal $199 for visits from Mon Nov 2. Nail removals already booked keep $179. Nail removal plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: home visit $150 from Mon Nov 2. Home visits already booked keep $140. Home visit plans go to $150 from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Nail removals already booked keep $179, even after Nov 2.",
+    "Home visits already booked keep $140, even after Nov 2."
+   ],
+   [
+    "Nail removals already booked keep only their saved card.",
+    "Home visits already booked keep only their saved card."
+   ],
+   [
+    "Texts from Lee Home Podiatry to this number are off.",
+    "Texts from Lee Home Podiatry to this number are off."
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "new patient visit",
+  "color"
+ ],
+ "story": {
+  "A": "Alex's heel has hurt for weeks. They book a new patient visit, give their plan's name, fill the intake form on the secure page, and pay the copay at the desk; the plan is billed first.",
+  "B": "Alex books a home visit for their homebound father's nail and callus care. The plan is billed first, and Rosie texts the share after."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $175 new patient visit. Nothing is taken; the copay is paid at the desk, and the plan is billed first.",
+    "list|card|counter": "A self-pay follow-up visit, $95. A card is saved for the practice's $40 no-show fee. Paid at the desk.",
+    "list|card|card": "A self-pay $75 video follow-up. The card saved is charged at DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "New patient visit"
+    },
+    "list|*|*": {
+     "price": "$175",
+     "name": "New patient visit"
+    },
+    "list|card|counter": {
+     "price": "$95",
+     "name": "Follow-up visit"
+    },
+    "list|card|card": {
+     "price": "$75",
+     "name": "Video follow-up"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|bill",
+   "combos": [
+    "list|none|bill",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|none|bill": "The main story: a $140 home visit for nail and callus care. Nothing is taken; Rosie texts the share bill after the plan answers.",
+    "list|card|card": "A self-pay home visit, $140. A card is saved and charged at DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Home visit"
+    },
+    "list|*|*": {
+     "price": "$140",
+     "name": "Home visit"
+    }
+   },
+   "booking": {
+    "times": [
+     "window"
+    ]
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Every podiatrist holds a state license (the practice's own word)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A podiatrist books people's time, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each podiatrist is licensed (the practice's own word)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nothing is sent now: emergencies go to 911."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "One patient, one podiatrist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "One patient, one podiatrist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left with the practice."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's visit."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "New patients are welcome; a referral is a plan's rule, set by the practice."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies to every profession, health included (D97)."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ],
+    "why": "The sent-now branch is off here, so the sign-up card's sent-now lines go (addendum self-check 1)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Every podiatrist holds a state license (the practice's own word)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A podiatrist books people's time, not spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each podiatrist is licensed (the practice's own word)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Nothing is sent now: emergencies go to 911."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Home visits use an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "No stays."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "No sessions."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A home visit always has an adult who lets the podiatrist in: a homebound patient may not answer the door (welfare, B8-10)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A parent or guardian is there for a child's visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "The $2 applies to every profession, health included (D97)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "more": [
+     "A short list of the few rules businesses like this usually set, ranked by the plug-in. Each row shows only where it applies.",
+     "Words: 'Businesses like yours often set these. Your call.' Never 'the law requires'.",
+     "Sam keeps them, unticks one, or taps one to change it. Each kept one becomes Sam's own rule.",
+     "Rows cover hours, cancel and any fee, same-day and new customers, and price OKs.",
+     "A fee row shows only where a card, a deposit or the full price is taken. It sets one late-cancel and no-show fee per booking.",
+     "When money was paid now, the fee is never more than what was paid now.",
+     "A fee is asked of Sam each time, never charged on silence.",
+     "For sensitive work, the suggested fee is $0: no fee unless Sam sets one.",
+     "Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK.",
+     "Sam's OK rules for requests are read at booking (A4-98 and B4-115). They cover same day, new customers, some services or dates.",
+     "A STOP before the pro sets out: the pro calls first. No answer in 15 minutes: the pro sets out.",
+     "Phone line: missed and after-hours calls go to Rosie's voice assistant. Every call opens with S13-01's words.",
+     "A call summary comes by text. A call only a person can take goes to a put-through number, never the owner's own mobile.",
+     "The phone-line row asks once for it: a staff phone or a second line that doesn't forward to Rosie.",
+     "Default: none, so the caller gets a callback. One that comes back to Rosie counts as nobody picked up (S13-56).",
+     "Kept on, the forwarding card needs one 'Done'. Later: the voice line stays off until it's done.",
+     "Bills Rosie sends: a tip line, and bank transfer over an amount, each only where bills are sent.",
+     "Where the plug-in allows it, a membership or a repeat plan charged monthly through Rosfield costs 1% of each charge.",
+     "It pays no $2 on its visits or members' classes.",
+     "A member who pays elsewhere: Rosie can't see it.",
+     "So each class they book is $2 at check-in, where the plug-in allows it.",
+     "So one row asks: take bookings from members who pay elsewhere? On unless Sam turns it off. Off: those bookings are declined (A4-80).",
+     "Not shown, kept at a safe default: the owner's text hours, 8am to 8pm, with same-day requests anytime.",
+     "Also months offered, peak dates, terms by customer, reasons with no fee, signed dated schedules and who may book.",
+     "Also the waitlist, one bill for many visits and the no-show count, all off. Stand-ins are offered, never on silence.",
+     "Each is on the summary (S1-79). Sam changes any by text or a call, or in the portal (S11-56).",
+     "Only the business's own customers may book: a row only where the plug-in suggests it. Else Sam sets it by text or a call.",
+     "Deposit or fee caps the plug-in knows show as suggested rows. They're the owner's own rules, never Rosie's checks.",
+     "Sam's answer clock runs only in Sam's text hours. Same-day requests reach Sam anytime.",
+     "Where Sam's OK rules cover it, like a new customer, Sam gets 5 minutes, any hour. Silence sends nobody (B4-115).",
+     "A booking keeps the rules it was made with. Every text's arrival and free-cancel times come from these settings.",
+     "For a drafted plug-in, the suggestions come from the closest known kinds and the checklist, reviewed with the draft.",
+     "Never: charge a fee on silence, or let a suggestion run before the owner keeps it.",
+     "Safe default: every suggestion kept as shown, any fee asked each time."
+    ],
+    "why": "The sent-now branch is off here, so the sign-up card's sent-now lines go (addendum self-check 1)."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "H1 build, Tue Oct 27 2026 (professions pass P3). From primary-care (refitted); the test-drive plug-in (work/testdrive/podiatrist.md) is the base: its verified services, prices, fees, safety words, splits and off ops are kept.\nMoney: insured patients pay the copay at the desk, the plan is billed first; self-pay: the list price at the desk; a $40 late-cancel and no-show fee (the owner's own setting, the example practice's); home visits $140 (B). $2 applies (D97): the 'No $2' op of the test-drive is removed.\nD96: no license lookup, no 'checked' claim anywhere in the plug-in; each license is the practice's own word. The master's lookup wording is a MASTER line (log).\nFacts: forms, planbill, results, aftercare, children, video, extrawork (no packs, plans, classes: those steps are hidden). Switches: sensitive (health care); welfare in flow B (homebound patients). Settings: arrive A set start, B window; cutoff 24 hours before in B (A uses the master's own 24 hours).\nNobody home is never booked for a home visit (B8-03 'Nobody needs to be home' off): an adult lets the podiatrist in; a homebound patient who doesn't answer goes to the safety check (B8-10).\nPoints for the verifier: (1) the plan's copay on the main path reads the self-pay price ($175 'paid at the desk'): a MASTER line (no plan-billed record row). (2) 'Real danger' Spanish call B3-11/B3-18 is rewritten to the podiatrist's own words (cold, blue foot: 911). (3) Two chain info lines come from the placeholder pairs for fees ($40 fee kept, $20 -> $120).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "takes jobs sent now.",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Kids cut",
+    "kids cuts",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "hot towel",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "clinician",
+    "electrical too, at $140 an hour.",
+    "plumbing and electrical, $140 an hour",
+    "Color quotes come to you first. Board prices never need one",
+    "Every shop service, color and house calls",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Color always stays with Riley.",
+    "1 color quote",
+    "At the chair",
+    "at the chair",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Jules",
+    "Nia",
+    "Hugo",
+    "Lena",
+    "88 Elm St",
+    "1200 Main St",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "water heaters",
+    "water heater",
+    "Drain clearing",
+    "perms",
+    "perm",
+    "massage",
+    "Massage",
+    "heater",
+    "like labor or water breaking",
+    "like a burst pipe or a lockout",
+    "The cape clip ripped my shirt collar.",
+    "the cape clip ripped a shirt collar today.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "$20 fee",
+    "$20 deposit",
+    "$40 deposit",
+    "$89 service-call fee",
+    "goes to $40 for new bookings",
+    "A plan goes to $40 from Wed Nov 25",
+    "The plan ends after its last visit at $35.",
+    "the real price, $40.",
+    "Refund · $20",
+    "D.W.'s $20 payment",
+    "$35",
+    "$20",
+    "$25",
+    "$55",
+    "$140",
+    "$75",
+    "$90",
+    "$40"
+   ],
+   "B": [
+    "takes jobs sent now.",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "beard trim",
+    "hot towel",
+    "Haircut",
+    "haircut",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "clinician",
+    "electrical too, at $140 an hour.",
+    "plumbing and electrical, $140 an hour",
+    "at the chair",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Jules",
+    "Tessa",
+    "Kim",
+    "42 Oak St",
+    "88 Elm St",
+    "1200 Main St",
+    "house calls",
+    "House calls",
+    "house call",
+    "House call",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "plumbing",
+    "Plumbing",
+    "plumber",
+    "Plumber",
+    "electrical",
+    "Electrical",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "Water heater fix",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "service call fee",
+    "service call",
+    "Service call",
+    "Drain clearings",
+    "drain clearing",
+    "Drain clearing",
+    "perm",
+    "heater",
+    "My gas",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No. No huele a gas.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Sewer camera inspection · $199",
+    "Sewer camera inspection",
+    "Heating and cooling",
+    "heating and cooling",
+    "Leak repair",
+    "Sewer camera report",
+    "like a burst pipe or a lockout",
+    "under different names, and nobody was home for any of them.",
+    "can cut your hair at the shop for $35, or at your home for $75.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "leak repair",
+    "for $160. It's added to what you pay for this visit.",
+    "Rosie answers with the real price, $179.",
+    "A plan goes to $199",
+    "The plan ends after its last visit at $179.",
+    "the $640 quote",
+    "Refund · $20",
+    "N.S.'s $20 payment",
+    "The $179 drain needs none.",
+    "$20 fee",
+    "$40 deposit",
+    "$89 service-call fee",
+    "$89 fee",
+    "$89, credited to the repair",
+    "$179",
+    "$199",
+    "$150",
+    "$89",
+    "$640",
+    "$120 an hour",
+    "$140 an hour",
+    "$35",
+    "$75",
+    "BEFORE old water stain on the cabinet floor",
+    "Cabinet floor, before",
+    "cracks the cabinet floor",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor",
+    "Real danger, like water near outlets or a gas smell,",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "like a roof leak.",
+    "Like tapping a neighbor's water line without asking.",
+    "At my home. Just the kitchen sink.",
+    "Adding a faucet check? Say so.",
+    "Say Alex also asks about a dripping faucet.",
+    "'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "Please clear the cabinet under the sink.",
+    "Under the sink, before",
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "I found water damage under the sink this morning.",
+    "a sewer camera report comes Fri Oct 23. On that day, Rosie checks it's ready.",
+    "your sewer camera report from Thursday is ready.",
+    "your sewer camera report needs a little more time. It will be ready Mon Oct 26.",
+    "your sewer camera report from Thu Oct 22 is ready.",
+    "water is off on Main St after 2pm, so afternoon jobs may run late.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Can I run the dishwasher before you come?"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A4-43": "c17d56f766",
+   "S1-62": "c4f497de12",
+   "A10-34": "78c2d9a6a3",
+   "S1-21": "913a9558f4"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-03": "ac9d404766",
+   "B8-67": "b66ffbd04d",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "S1-62": "c4f497de12",
+   "B10-32": "7713bff255",
+   "S1-21": "334e0a791c"
+  }
+ }
+}

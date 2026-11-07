@@ -1,0 +1,5149 @@
+{
+ "id": "baker",
+ "name": "Custom cake baker",
+ "style": "Event",
+ "pattern": "event",
+ "from": "caterer",
+ "plugin": {
+  "pf.license": {
+   "need": "Always for food: a food permit from the health department for the kitchen the cakes are made in. A home kitchen sells only under its state's cottage food rules. Dessert tables served at a venue may need a serving permit. All from the state form.",
+   "home kitchen (cottage food)": "Switches from the state's form: whether a home kitchen may sell at all; which foods (fillings that need the fridge, like cream cheese frosting or fresh fruit, are often not allowed); a registration or permit number; the label; whether orders may be taken online, delivered or only picked up; selling only inside the state; and a yearly sales cap. Rosie stops new orders when a switch says no.",
+   "who holds it": "The business holds the kitchen's food permit, any serving permit and any cottage food registration. Each person holds their own food handler card, where the state's rules require one. A certified food manager where the rules require one.",
+   "what to ask": [
+    "The kitchen's food permit number, or the home kitchen's cottage food registration number",
+    "A serving permit, if dessert tables are served at venues",
+    "Each baker's food handler card, in their invite reply",
+    "The food manager certificate, and who holds it"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "No food permit or cottage food registration on file: cakes stay offline. A food the home kitchen's state rules don't allow is never shown. No serving permit where one is required: served dessert tables stay hidden.",
+   "renewals": "A reminder 30 days before a permit, card or certificate runs out. Once one lapses, the services it covers pause.",
+   "insurance or bond": "Liability insurance on file with its end date. Many venues ask for a certificate naming them.",
+   "background checks": "Only where the state's form asks."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Lee Cake Studio's own list)": [
+    {
+     "service": "Custom tiered cake, delivered and set up",
+     "price kind": "quoted from photos and answers first (servings, tiers, flavors, the design)",
+     "price": "the quote (the example: $640 for 3 tiers for 80)",
+     "length": "a 2-hour delivery window, done before the event starts",
+     "place": "at the venue or the customer's home",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest charged to the saved card when the baker texts DONE",
+     "note": "The owner OKs quotes over $500. A cake stand is lent with a $50 damage hold."
+    },
+    {
+     "service": "Wedding cake",
+     "price kind": "quoted after a design call, and a tasting if the couple wants one",
+     "price": "the quote (the example's starting price: $6 a serving)",
+     "length": "a 2-hour delivery window",
+     "place": "at the venue",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest charged to the saved card at DONE (the design locks 14 days before)",
+     "note": "Orders close 3 weeks before. The owner OKs every wedding cake."
+    },
+    {
+     "service": "2-tier cake for 30, from the menu",
+     "price kind": "one price",
+     "price": "$150, delivered",
+     "length": "a 2-hour delivery window",
+     "place": "at the customer's place",
+     "before": "a $40 deposit, or the full price",
+     "after": "the rest charged to the saved card at DONE, or nothing more"
+    },
+    {
+     "service": "Sheet cake for 40",
+     "price kind": "one price",
+     "price": "$179, delivered",
+     "length": "a 2-hour delivery window",
+     "place": "at an office, a venue or a home",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "The same day only when the kitchen has room, and a same-day order asks the owner first"
+    },
+    {
+     "service": "Cupcake tower, 4 dozen",
+     "price kind": "by person",
+     "price": "$199, or $249 when Sam makes it",
+     "length": "a 2-hour delivery window",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Cake cutting",
+     "price kind": "per unit",
+     "price": "$2 a slice",
+     "length": "added to a delivered cake",
+     "place": "at the event",
+     "before": "with the main order, or added on the day",
+     "after": "added on the day: one pay link",
+     "note": "Only with the customer's written yes, at the price shown before booking"
+    },
+    {
+     "service": "Serving staff for dessert tables",
+     "price kind": "per hour, by person",
+     "price": "$140 an hour with Nico, $120 with anyone else (the example)",
+     "length": "1-hour minimum",
+     "place": "at the event",
+     "before": "with the main order",
+     "after": "with the main order"
+    },
+    {
+     "service": "Dessert table for 25, or for 40",
+     "price kind": "one price",
+     "price": "$149, or $189",
+     "length": "a set start time",
+     "place": "at the venue",
+     "before": "a 25% deposit",
+     "after": "the rest charged to the saved card at DONE",
+     "note": "Served dessert tables only under a serving permit and a food manager where the state's rules require them"
+    },
+    {
+     "service": "Wedding dessert table",
+     "price kind": "quoted after a venue walk-through",
+     "price": "the quote",
+     "length": "the event's hours",
+     "place": "at the venue",
+     "before": "with the wedding cake's contract and deposit",
+     "after": "with the wedding cake's rest"
+    },
+    {
+     "service": "Delivery and setup",
+     "price kind": "travel fee",
+     "price": "free within 10 miles; $89 up to 25 miles (the example)",
+     "length": "",
+     "place": "at the customer's place",
+     "before": "added to the order",
+     "after": "with the rest",
+     "note": "Never shipped or sent by a courier app"
+    },
+    {
+     "service": "Repeat orders, like an office's monthly birthday cake",
+     "price kind": "one price a delivery",
+     "price": "the menu cake's own price (the example: $150 for a 2-tier cake)",
+     "length": "a 2-hour delivery window each time",
+     "place": "at the customer's place",
+     "before": "each delivery booked and paid like a single order",
+     "after": "nothing more",
+     "note": "Only when the customer asks for it. Skip, pause or end by text."
+    }
+   ],
+   "at the business (the example: Lee's Bakeshop's own list)": [
+    {
+     "service": "Tasting for 2",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min at the tasting table",
+     "place": "at the shop",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Credited to a wedding cake ordered within 30 days (the example's own rule)"
+    },
+    {
+     "service": "Dozen cupcakes, 6-inch cake, cookie box, smash cake (for a first birthday)",
+     "price kind": "one price",
+     "price": "$35, $40, $20, $25",
+     "length": "a pickup slot: the same day from the case when it's in stock, or 2 days' notice for words or colors",
+     "place": "at the shop's counter",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "2-tier party cake (serves 30)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "a pickup slot, 2 days' notice",
+     "place": "at the shop's counter",
+     "before": "a $40 deposit",
+     "after": "the $100 rest charged to the saved card at pickup"
+    },
+    {
+     "service": "Custom cake",
+     "price kind": "quoted from photos first",
+     "price": "the quote (the example: $90)",
+     "length": "a pickup slot, 2 days' notice",
+     "place": "at the shop's counter",
+     "before": "a $20 deposit, once the quote is OK'd",
+     "after": "the rest charged to the saved card at pickup"
+    },
+    {
+     "service": "Wedding cake design",
+     "price kind": "priced at a design consult",
+     "price": "only the $25 consult is promised",
+     "length": "30 min",
+     "place": "at the shop, or by video",
+     "before": "the $25 consult",
+     "after": "the cake is booked as its own order"
+    },
+    {
+     "service": "Dozen cupcakes, delivered",
+     "price kind": "one price",
+     "price": "$75",
+     "length": "a delivery window",
+     "place": "at the customer's home",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "The same cupcakes, booked in flow B"
+    }
+   ],
+   "capacity": "The kitchen's own limit of tiered cakes a week and a weekend (the example: 6 a weekend). Pickups by slots, set by how many cakes the shop makes in a day. A design call or a tasting books the baker's time.",
+   "nobody needs to be there": "Never: a cake is handed to a person, who checks it and signs for it.",
+   "online": "A design call by video, as a first step for a custom or wedding cake. Cakes are never shipped."
+  },
+  "pf.questions": {
+   "before times (they set the price, the length or who can make it)": [
+    "What it's for, and the event's date and start time",
+    "How many servings, and how many tiers if they know",
+    "Flavors and fillings, from the menu",
+    "Pickup or delivery; for a delivery, the place's name and town",
+    "Any food allergies or diets to plan for: yes or no only"
+   ],
+   "after a time is picked": [
+    "Colors, the theme and the words on top",
+    "Photos of designs they like, on the secure page",
+    "Where the cake goes at the venue, and who takes it",
+    "The venue's delivery rules: a door to use, a contact, the hours"
+   ],
+   "only on the secure page": [
+    "Allergies and diets in detail, with their own yes",
+    "The street address and any door codes",
+    "The card"
+   ],
+   "who may book": "An adult. A cake for a child's party is booked by the parent or another adult as the customer."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "Someone is having a bad allergic reaction right now: trouble breathing, a swollen face or throat",
+     "says": "Call 911 now. Use an epinephrine pen if the person has one.",
+     "booking": "No booking now. They can come back later."
+    },
+    {
+     "words": "A fire or a gas smell, at the kitchen or the venue",
+     "says": "Get everyone out, then call 911.",
+     "booking": "No booking until it's safe."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "A food allergy question, like 'is this cake safe for a nut allergy?'",
+     "says": "Rosie never says a food is safe. The kitchen uses wheat, milk, eggs, soy, peanuts and tree nuts, so no cake is promised free of them. The baker answers from the secure page.",
+     "booking": "Goes on, with the allergy note on the secure page."
+    }
+   ],
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The signed contract",
+     "for": "Every custom or wedding cake quoted from photos",
+     "timing": "Before any money is taken, on the secure page"
+    },
+    {
+     "step": "A free 20-minute design call by video",
+     "for": "Wedding cakes, and custom cakes with a hand-made design",
+     "timing": "At least 2 days before the design locks"
+    },
+    {
+     "step": "A tasting at the shop, booked as its own visit",
+     "for": "Wedding cakes, if the couple wants one",
+     "timing": "1 to 6 months before the wedding"
+    },
+    {
+     "step": "The cake order form and the allergen notice: servings, flavors, colors, the words on top, the venue's contact, and allergies with their own yes",
+     "for": "Every order; at the shop, the allergen notice alone",
+     "timing": "Due when the design locks: 2 days before here, 14 days before for a wedding cake"
+    },
+    {
+     "step": "A venue's form for outside cakes, or an insurance certificate",
+     "for": "Venues that ask",
+     "timing": "A to-do for the owner, before the venue's date"
+    }
+   ],
+   "prep for the reminder": [
+    "A sturdy table, indoors and out of the sun, for a tiered cake",
+    "Someone at the venue to take the cake and sign for it",
+    "For a pickup: a flat spot in the car, and the air conditioning on in warm weather"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code, given to the baker who delivers. A venue coordinator can get the code instead, when a mobile is given for them.",
+   "check-in at the shop": "The code at the counter, for a tasting or a pickup.",
+   "delivery and setup": "Every cake at the customer's place is delivered and set up. The customer checks it and signs for it, with a photo of the cake on its stand and its label.",
+   "food safety on the day": "A cake with a filling that needs the fridge stays cold until it's set up. The baker tells the venue how long it may sit out, by the food code's time limit, and that leftovers go in the fridge.",
+   "allergies": "The allergen notice says plainly what the kitchen uses and can't promise. Allergy details stay on the secure page, for the baker making the cake.",
+   "cake stand": "Lent with tiered cakes and picked up the day after the event. A $50 damage hold, released 48 hours after pickup unless it's damaged.",
+   "work changes at the visit": "Extras on the day, like cake cutting, only with the customer's written yes, at the price shown before booking. No yes in 10 minutes: nothing extra.",
+   "proof it's done": "The baker texts DONE once the cake is set up level and signed for. A pickup is done when the code is given at the counter."
+  },
+  "pf.money": {
+   "starting answers": [
+    "Custom cakes quoted from photos: a signed contract, a 25% deposit when booking, and the rest charged to the saved card when the baker texts DONE",
+    "Free cancel and the design lock are on set days (the owner's); nothing is charged on a set day",
+    "Menu cakes delivered: a $40 deposit with the rest charged to the saved card at DONE, or the full price when booked",
+    "At the shop: tastings and cakes from the board paid in full when booked; a party cake or a custom cake takes a deposit, with the rest charged to the saved card at pickup",
+    "A cake stand is lent, with no hold, and picked up the day after the event"
+   ],
+   "limits": [
+    "Deposit cap: from the state form",
+    "A late cancel keeps no more than the deposit, and the owner confirms it. No answer, nothing kept",
+    "The business cancels, or the customer says no to a stand-in decorator: a full refund",
+    "A home kitchen's yearly sales cap: from the state form. Rosie stops new orders at it"
+   ],
+   "tips": "Off by default.",
+   "tax": "A tax line where the state taxes cakes, or the plates and forks supplied, at the rate from the state form.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Allergies, diets and any health detail stay on the secure page, with their own yes. Only the baker making the cake and the manager see them, for that order. They're deleted the day after the pickup or delivery.",
+   "languages": "English and Spanish.",
+   "minors": "Never booked by a minor. A cake for a child is booked by an adult."
+  },
+  "pf.staff": {
+   "roles": [
+    "Lead decorator",
+    "Baker",
+    "Delivery driver",
+    "Server for dessert tables",
+    "Certified food manager"
+   ],
+   "skills": [
+    "Custom tiered and wedding cakes (leads only)",
+    "Menu cakes, sheet cakes and cupcakes",
+    "Delivering and setting up tiered cakes",
+    "Tastings and design calls",
+    "Dessert tables, with a food manager where required"
+   ],
+   "supervision": "A certified food manager is in charge at the kitchen and at served dessert tables, where the state's rules require one.",
+   "who OKs what": "The owner OKs every wedding cake, every quote over the limit, every severe allergy note, and any stand-in decorator.",
+   "stand-ins": "A decorator the owner trusts, even from outside the team, only if the customer agrees. A cake already made can be delivered by anyone cleared to drive the van.",
+   "who does what (the example)": "Nico makes custom tiered cakes and leads dessert tables; Ellis makes menu cakes and delivers. Mara makes custom cakes and runs tastings at the shop; Ines does every other shop service."
+  },
+  "pf.rules": {
+   "written contract": "The business's own contract, filled in from the order and signed by the customer and the business before money is taken, for every cake quoted from photos. Any parts the state's rules add come from the state form.",
+   "date hold": "A cake date stays saved while the contract is signed: up to 24 hours here, and 2 days for a wedding cake quote (the owner's setting).",
+   "cakes a week": "The kitchen's own limit of tiered cakes a week and a weekend (the owner's setting).",
+   "design lock": "Final details are due on a set day before the delivery (the owner's setting: 2 days before here, 14 days before for a wedding cake). Changes after that only if the baker can make them.",
+   "cancel schedule": "Free to cancel until the set day. After that, a dated schedule from the contract. One free date move until the design locks, if the kitchen has room.",
+   "home kitchen": "A home kitchen follows its state's cottage food rules as switches: the foods allowed, the label and the home-kitchen notice on every order, pickup or hand delivery only inside the state, no shipping, and the yearly sales cap.",
+   "labels": "Every order's label lists the ingredients and allergens, and says what else the kitchen uses. A home kitchen adds its notice and registration number where the state's rules require it.",
+   "records": "Contracts, permits and payments kept 7 years, as for every kind of work. Allergy notes deleted the day after the pickup or delivery.",
+   "rush orders": "A tiered cake inside a week only when the kitchen has room that week and the design is buttercream or piped. Sugar flowers need 2 weeks, a wedding cake 3 weeks (the owner's setting)."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for custom cakes:",
+   "custom cakes": [
+    "A severe allergy note: the owner reads it before the order is accepted, and the allergen notice says plainly what the kitchen can't promise",
+    "A home kitchen's rules don't allow a filling: an allowed one is offered, or there's no order",
+    "Wants it shipped: never; pickup or hand delivery only",
+    "Orders are closed for that date, or the weekend is full: nothing is saved, and smaller choices are offered",
+    "The design changes before it locks: a new price to sign; after it locks, only if the baker can",
+    "The venue's table isn't sturdy, or the cake would sit in the sun: the baker doesn't set it up until it's fixed",
+    "The decorator can't come: a trusted stand-in if the customer agrees, or a full refund",
+    "The van runs late: the customer hears only if the cake won't be set up before the event",
+    "The stand isn't returned or comes back broken: the damage hold covers it, never more",
+    "A cake not picked up by closing: a no-show, under the policy the customer agreed to"
+   ]
+  },
+  "pf.facts": [
+   "documents",
+   "extrawork",
+   "forms",
+   "photos"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Mara and Ines (bakers at the shop)"
+  },
+  "B": {
+   "staff": "Nico and Ellis (decorators who deliver)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Mara"
+  },
+  "B": {
+   "staff": "Nico"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Cakes, cupcakes and dessert tables."
+   ],
+   [
+    "Lee's Bakeshop doesn't do perms.",
+    "Lee's Bakeshop doesn't do wedding cakes."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Tasting for 2"
+   ],
+   [
+    "two skin fades",
+    "two cupcake boxes"
+   ],
+   [
+    "Catering",
+    "Cake service"
+   ],
+   [
+    "catering",
+    "cake service"
+   ],
+   [
+    "Hot towel",
+    "Frosting"
+   ],
+   [
+    "hot towel",
+    "frosting"
+   ],
+   [
+    "A no-show is marked 15 minutes after the start",
+    "A no-show: 15 minutes late for a tasting, or a cake not picked up by closing"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, an allergy question gets the kitchen's nut notice first, and the booking goes on."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At the shop, children come with a parent, so nothing more happens."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do smash cakes? My son turns 1 soon."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds cookie decorating classes to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Cookie decorating classes for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW cookie decorating classes"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A tailor, a groomer or a phone repair counter does."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Frosting from the tasting tray stained my jacket."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says frosting from the tasting tray stained a jacket today."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A bakeshop's plug-in adds a bad allergic reaction to the danger words."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A bakeshop books a baker's time for a tasting, and a pickup slot for a cake."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A tasting is rated, so the shop takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Mara's wedding cake design after a consult"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Barbershop sent you a proposal: Mara's wedding cake design."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Wedding cake design"
+   ],
+   [
+    "your first color plan visit",
+    "your wedding cake order"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of your cake? Yes / No"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Mara can do a shorter tasting in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee's Barbershop can book you from now on, for tastings and for deliveries."
+   ],
+   [
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet.",
+    "On file as given, not checked by Rosie."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A baker's example: an allergy question gets 'Rosie never says a food is safe' first."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states limit where a kitchen's food may be delivered, like a home kitchen's."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the flavors Alex liked at a tasting."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A bride books one tasting for her family and her fiancé's on one morning."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: liked lemon with raspberry, and vanilla bean. Wedding for 120 in June"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds back-to-back tastings across Mara and Ines."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your dozen cupcakes come every 4 weeks, as a plan with Mara."
+   ],
+   [
+    "Avery's license is checked again when the lookup answers.",
+    "On file as given, not checked by Rosie."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says the writing on Saturday's cake smudged in the car."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 custom cake quote."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A tasting could mean a bakery or a winery."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a punch card of cupcake dozens at the shop."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait at the shop during my tasting?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, custom cakes and deliveries"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a smash cake is $25."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Food handler FH031552 · food manager FM30417"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Mara also makes custom cakes and does deliveries"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Mara: baker, custom cakes and deliveries"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a dozen cupcakes every 4 weeks."
+   ],
+   [
+    "A barbershop takes no drop-offs.",
+    "A bakeshop takes no drop-offs."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Ines is offered only if Alex asks for her."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The writing on my cake smudged in the car."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Mara left one flavor out of Alex M.'s tasting."
+   ],
+   [
+    "plumbing and electrical jobs",
+    "cake and dessert table orders"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a cake tasting on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una degustación de pasteles el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a dozen cupcakes every 4 weeks"
+   ],
+   [
+    "Avery · license not found",
+    "Ines · card not found"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A tasting needs nothing."
+   ],
+   [
+    "Avery · license expired",
+    "Ines · card expired"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Left one flavor out of Alex M.'s tasting."
+   ],
+   [
+    "License renewal",
+    "Card renewal"
+   ],
+   [
+    "1 color quote",
+    "1 custom cake quote"
+   ],
+   [
+    "Avery: barber",
+    "Ines: baker"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "EC22871",
+    "CP22871"
+   ],
+   [
+    "BS20981",
+    "BK020981"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Cake Studio's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Cake Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Cakes"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dessert Tables"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee's Bakeshop LLC"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee's Bakeshop's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Bakeshop"
+   ],
+   [
+    "Jordan Price",
+    "Nico Price"
+   ],
+   [
+    "Casey Moore",
+    "Ellis Moore"
+   ],
+   [
+    "Riley Chen",
+    "Mara Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Ines Diaz"
+   ],
+   [
+    "Jordan",
+    "Nico"
+   ],
+   [
+    "Casey",
+    "Ellis"
+   ],
+   [
+    "Riley",
+    "Mara"
+   ],
+   [
+    "Avery",
+    "Ines"
+   ],
+   [
+    "1200 Main St",
+    "16 Orchard St"
+   ],
+   [
+    "88 Elm St",
+    "31 Cedar St"
+   ],
+   [
+    "Elm St",
+    "Cedar St"
+   ],
+   [
+    "plumbing and electrical",
+    "custom cakes and dessert tables"
+   ],
+   [
+    "Electrical",
+    "Dessert tables"
+   ],
+   [
+    "electrical",
+    "dessert tables"
+   ],
+   [
+    "Plumbing",
+    "Custom cakes"
+   ],
+   [
+    "plumbing",
+    "custom cakes"
+   ],
+   [
+    "plumber",
+    "baker"
+   ],
+   [
+    "Barbershop",
+    "Bakeshop"
+   ],
+   [
+    "barbershop",
+    "bakeshop"
+   ],
+   [
+    "barbers",
+    "bakers"
+   ],
+   [
+    "a barber",
+    "a baker"
+   ],
+   [
+    "barber",
+    "baker"
+   ],
+   [
+    "Barber",
+    "Baker"
+   ],
+   [
+    "Signature cut and shave",
+    "Tasting for 2"
+   ],
+   [
+    "signature cut",
+    "tasting for 2"
+   ],
+   [
+    "the Groom's package",
+    "the 2-tier party cake"
+   ],
+   [
+    "The Groom's package",
+    "The 2-tier party cake"
+   ],
+   [
+    "Groom's package",
+    "2-tier party cake"
+   ],
+   [
+    "groom's party",
+    "bridal party"
+   ],
+   [
+    "kids cut",
+    "smash cake"
+   ],
+   [
+    "a skin fade",
+    "a 6-inch cake"
+   ],
+   [
+    "A skin fade",
+    "A 6-inch cake"
+   ],
+   [
+    "Skin fade",
+    "6-inch cake"
+   ],
+   [
+    "A beard trim is",
+    "A cookie box is"
+   ],
+   [
+    "a beard trim",
+    "a cookie box"
+   ],
+   [
+    "Beard trim",
+    "Cookie box"
+   ],
+   [
+    "beard trim",
+    "cookie box"
+   ],
+   [
+    "Haircuts",
+    "Cupcakes"
+   ],
+   [
+    "haircuts",
+    "cupcakes"
+   ],
+   [
+    "Haircut",
+    "Dozen cupcakes"
+   ],
+   [
+    "haircut",
+    "dozen cupcakes"
+   ],
+   [
+    "Color and cut",
+    "Custom cake"
+   ],
+   [
+    "color and cut",
+    "custom cake"
+   ],
+   [
+    "a color correction",
+    "a wedding cake design"
+   ],
+   [
+    "Color correction",
+    "Wedding cake design"
+   ],
+   [
+    "house calls",
+    "deliveries"
+   ],
+   [
+    "house call",
+    "delivery"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "shops",
+    "bakeshops"
+   ],
+   [
+    "Drain clearing",
+    "Sheet cake"
+   ],
+   [
+    "patch test",
+    "design call"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a flooded basement or a lockout"
+   ],
+   [
+    "MP045210",
+    "BK045210"
+   ],
+   [
+    "photos of your hair",
+    "photos of the cake you'd like"
+   ],
+   [
+    "water heater",
+    "cake"
+   ],
+   [
+    "heater",
+    "oven"
+   ],
+   [
+    "perm",
+    "design"
+   ],
+   [
+    "hot towel",
+    "frosting"
+   ],
+   [
+    "shave",
+    "piping"
+   ],
+   [
+    "skin fade",
+    "cupcake"
+   ],
+   [
+    "sink",
+    "cake stand"
+   ],
+   [
+    "drain",
+    "cake"
+   ],
+   [
+    "shave",
+    "piping"
+   ],
+   [
+    "Perm",
+    "Design"
+   ],
+   [
+    "perms",
+    "wedding cakes"
+   ],
+   [
+    "perm",
+    "wedding cake"
+   ]
+  ],
+  "B": [
+   [
+    "[photo: A water heater job]",
+    "[photo: A cake on its stand]"
+   ],
+   [
+    "water heaters, within 25 miles",
+    "cakes delivered within 25 miles"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, the cake is leaning on its stand. A text back is fine."
+   ],
+   [
+    "My sink won't drain",
+    "My cake won't set"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the cake still soft?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it won't set"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 cake needs none."
+   ],
+   [
+    "drain clearings",
+    "cake tastings"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "using a neighbor's kitchen without asking"
+   ],
+   [
+    "cracks the cabinet floor",
+    "cracks the cake board"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a cake stand? Say so."
+   ],
+   [
+    "Catering",
+    "Cake service"
+   ],
+   [
+    "catering",
+    "cake service"
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the custom cakes plug-in now, and the dessert tables and bakeshop ones when Sam gets to them."
+   ],
+   [
+    "Plumbing is live",
+    "Custom cakes are live"
+   ],
+   [
+    "Plumbing stays live",
+    "Custom cakes stay live"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said a guest can't breathe after eating. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "A bad allergic reaction now"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Then the booking goes on, marked urgent.",
+    "Then the booking goes on, with an allergy note for the baker."
+   ],
+   [
+    "Fri 8am",
+    "Thu 9am"
+   ],
+   [
+    "MOVE Alex to Thu 12pm",
+    "MOVE Alex to Thu 7am"
+   ],
+   [
+    "Thu Oct 22, arriving 12–2pm",
+    "Thu Oct 22, delivered 7–9am"
+   ],
+   [
+    "Written estimate and terms",
+    "Cake contract and terms"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say an office manager books a cake for 4 teams at one address."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each team's notes go to the baker, one line each."
+   ],
+   [
+    "with one arrival window and one code",
+    "with one delivery window and one code"
+   ],
+   [
+    "Both fit in the same arrival window.",
+    "Both fit in the same delivery window."
+   ],
+   [
+    "Every 12 months",
+    "Every month"
+   ],
+   [
+    "Arrival times:",
+    "Delivery windows:"
+   ],
+   [
+    "7am Thu",
+    "8am Tue"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds cake decorating classes to Lee Home Services."
+   ],
+   [
+    "Rental 1",
+    "Office 1"
+   ],
+   [
+    "Rental 2",
+    "Office 2"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for the 2-tier cake every month, for the office birthdays."
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every month?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every month"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Monthly birthday cake plan"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Mon–Sat 7:30am–5:30pm"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can you set the cake up outside on the patio?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Nico says no. Buttercream melts in the sun, so the cake goes inside."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Our party is tonight. Can you bring a cake?"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Custom cakes book a 2-hour delivery window."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a wedding cake for the sister Alex mentioned"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal for your sister's wedding cake."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Wedding cake for 120"
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "Lee's Bakeshop also delivers its cakes nearby."
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Lakeview Hall in Springfield is inside it."
+   ],
+   [
+    "At my home.",
+    "At Lakeview Hall, a party venue."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If someone can't breathe or their throat is swelling, call 911 now."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a custom cake is quoted from photos, so Rosie's first text asks for them."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told plainly that the kitchen uses nuts, so no cake can be promised nut-free."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the date, the servings, the flavors, the venue, and allergies as yes or no."
+   ],
+   [
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Before setting up, Jordan photographs the cake table and notes anything already wrong."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Nuestra cocina usa cacahuates y nueces, así que no podemos prometer un pastel sin nueces. El pastelero le dirá qué se puede hacer."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee's Barbershop can book you from now on, for tastings and for deliveries."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to cake serving at your lunch for $160."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: he makes the custom tiered cakes."
+   ],
+   [
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Jordan can come 30 minutes later if the next delivery allows, or at another time that morning."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Our kitchen uses peanuts and tree nuts, so we can't promise a nut-free cake. The baker will tell you what's possible."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for something Lee Home Services doesn't do, like shipping a cake to another state."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The cake table at the hall wobbles, so Jordan stopped before setting up the cake."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says a baker stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For cakes, a bad allergic reaction happening now stops the booking."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop has a dozen cupcakes for pickup at $35, or delivered to your home for $75."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Some jobs are priced at the visit, with only a visit fee promised. Cakes never are."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "On file as given, not checked by Rosie."
+   ],
+   [
+    "The state's license lookup is down, so Reese K.'s license isn't checked yet.",
+    "On file as given, not checked by Rosie."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A sheet cake is only delivered, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a sheet cake at two offices every month."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A baker's example: a nut allergy gets 'our kitchen uses nuts' first."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need a cake for my daughter's quinceañera on Saturday."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone having a bad allergic reaction now, or a fire."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the cake you'd like, and a baker will price it."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states limit where a kitchen's food may be delivered, like a home kitchen's."
+   ],
+   [
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "A gate or door code shows to Nico only on the day of the visit."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services makes and delivers cakes nearby. It doesn't ship them."
+   ],
+   [
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Jordan is at Lakeview Hall with your cake for your 8–10am delivery and can't reach you."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Sheet cakes already booked keep $179, even after Nov 2."
+   ],
+   [
+    "Casey's license is checked again when the lookup answers.",
+    "On file as given, not checked by Rosie."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Home Services has a monthly cake plan, $150 a delivery."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Jordan went back to the van for the topper and will be back about 9:30am."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: cake serving at lunch, $160."
+   ],
+   [
+    "Jordan priced a water heater replacement for Alex M.",
+    "Jordan priced a custom 3-tier cake for 80 for Alex M."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Delivery windows are 2 hours, as Sam set at sign-up."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your cake price is with Lee Home Services."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for an office cake."
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The cupcakes are on the list, so they're added at their price."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also bring a cupcake tower for the kids?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito un pastel para la quinceañera de mi hija el sábado."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a baker deliver a sheet cake this Thursday?"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 Ellis cuts and serves the cake at lunch, 80 min"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you bring one every month, too?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Jordan's cart scuffed the floor at Lakeview Hall."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan make a cake for my team next week?"
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "Jordan only, until others' cards are checked there"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien tiene alergia a algún alimento?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also wants two dozen cupcakes for the kids' table."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scuff on the hall floor"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can you also bring two dozen cupcakes?"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · 3-tier cake for 80 · $640"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan left the topper in the van."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD cake table wobbles, need a sturdy one"
+   ],
+   [
+    "Drain clearings already booked keep $179.",
+    "Sheet cakes already booked keep $179."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: does anyone have a food allergy?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a sturdy table ready, out of the sun."
+   ],
+   [
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "Cancel your cake delivery (Thu 8–10am)?"
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Is your chocolate cake safe for my son's nut allergy?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "The hall's cake table wobbles and can't hold 3 tiers."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The bakeshop's pickup counter is in the other flow."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next month's cake?"
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "The hall's tables are small: bring the round board next time."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Food handler FH031552 · food manager FM30417"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks for the cake to be cut and served at lunch."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Mara also makes custom cakes and does deliveries"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be at the hall 30 minutes late, sorry!"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Mara: baker, custom cakes and deliveries"
+   ],
+   [
+    "Say Alex books for a parent's home.",
+    "Say Alex books a cake for his parents' anniversary party."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a bakery near them."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Cake serving at lunch · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the cake on the table"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The top tier was lemon, but we asked for vanilla."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "The hall brings a sturdy table, then Jordan sets it up"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the cake table wobbles"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE topper is in the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE cart scuffed the hall floor"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scuff."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa sheet cake Thu 12-2 Casey"
+   ],
+   [
+    "The job should be done by 10am.",
+    "The cake is still set up by 10am."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "Yes. One guest can't eat peanuts."
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no counter at a venue."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My parents' anniversary party is Thursday."
+   ],
+   [
+    "plumbing and electrical jobs",
+    "cake and dessert table orders"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Can he eat it?"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE the hall's side door sticks; knock twice."
+   ],
+   [
+    "Mold behind the sink wall",
+    "Wobbly cake table"
+   ],
+   [
+    "Casey · license not found",
+    "Casey · card not found"
+   ],
+   [
+    "The service call is $89.",
+    "The visit fee is $89."
+   ],
+   [
+    "Priced from your photos",
+    "Quoted from your photos"
+   ],
+   [
+    "Jordan found more work.",
+    "Here's the price for what you asked Nico."
+   ],
+   [
+    "Casey · license expired",
+    "Casey · card expired"
+   ],
+   [
+    "Just the kitchen sink.",
+    "40, vanilla."
+   ],
+   [
+    "Under the sink, before",
+    "Cake table, before"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Sheet cake for 40"
+   ],
+   [
+    "Cabinet floor, before",
+    "Hall floor, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed floor"
+   ],
+   [
+    "No. No huele a gas.",
+    "Sí. Un invitado no puede comer cacahuates."
+   ],
+   [
+    "the shutoff valves",
+    "the cake serving"
+   ],
+   [
+    "Book a free fix",
+    "Free cake next time"
+   ],
+   [
+    "Arrival windows",
+    "Delivery windows"
+   ],
+   [
+    "License renewal",
+    "Card renewal"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 sheet cake"
+   ],
+   [
+    "Kitchen drain",
+    "Sheet cake"
+   ],
+   [
+    "Avery: barber",
+    "Avery: baker"
+   ],
+   [
+    "Yard drain",
+    "Sheet cake for 40"
+   ],
+   [
+    "EC22871",
+    "CP22871"
+   ],
+   [
+    "BS20981",
+    "BK020981"
+   ],
+   [
+    "leehomeservices.com",
+    "leecakestudio.com"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Cake Studio LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Cake Studio's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Cake Studio"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Cakes"
+   ],
+   [
+    "Lee Electric",
+    "Lee Dessert Tables"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Bakeshop"
+   ],
+   [
+    "Jordan Price",
+    "Nico Price"
+   ],
+   [
+    "Casey Moore",
+    "Ellis Moore"
+   ],
+   [
+    "Riley Chen",
+    "Mara Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Ines Diaz"
+   ],
+   [
+    "Jordan",
+    "Nico"
+   ],
+   [
+    "Casey",
+    "Ellis"
+   ],
+   [
+    "Riley",
+    "Mara"
+   ],
+   [
+    "Avery",
+    "Ines"
+   ],
+   [
+    "1200 Main St",
+    "16 Orchard St"
+   ],
+   [
+    "88 Elm St",
+    "31 Cedar St"
+   ],
+   [
+    "42 Oak St",
+    "Lakeview Hall, 9 Ridge Rd"
+   ],
+   [
+    "plumbing and electrical",
+    "custom cakes and dessert tables"
+   ],
+   [
+    "electrical jobs",
+    "dessert table jobs"
+   ],
+   [
+    "Electrical",
+    "Dessert tables"
+   ],
+   [
+    "electrical",
+    "dessert tables"
+   ],
+   [
+    "Plumbing license",
+    "Food permit"
+   ],
+   [
+    "Plumbing",
+    "Custom cakes"
+   ],
+   [
+    "plumbing",
+    "custom cakes"
+   ],
+   [
+    "a plumber",
+    "a baker"
+   ],
+   [
+    "plumber",
+    "baker"
+   ],
+   [
+    "barbershop",
+    "bakeshop"
+   ],
+   [
+    "a barber",
+    "a baker"
+   ],
+   [
+    "barber",
+    "baker"
+   ],
+   [
+    "Barber",
+    "Baker"
+   ],
+   [
+    "haircut",
+    "dozen cupcakes"
+   ],
+   [
+    "house calls",
+    "deliveries"
+   ],
+   [
+    "A drain clearing with",
+    "A sheet cake for 40 with"
+   ],
+   [
+    "a drain clearing",
+    "a sheet cake"
+   ],
+   [
+    "Drain clearing",
+    "Sheet cake"
+   ],
+   [
+    "drain clearing",
+    "sheet cake"
+   ],
+   [
+    "Water heater replacement",
+    "3-tier cake for 80"
+   ],
+   [
+    "water heater replacement",
+    "3-tier cake for 80"
+   ],
+   [
+    "Water heater flush",
+    "2-tier cake for 30"
+   ],
+   [
+    "water heater flush",
+    "2-tier cake for 30"
+   ],
+   [
+    "leak repair",
+    "cake cutting"
+   ],
+   [
+    "Sewer camera inspection",
+    "Cupcake tower, 4 dozen"
+   ],
+   [
+    "sewer camera inspection",
+    "cupcake tower"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "Labor",
+    "Serving staff"
+   ],
+   [
+    "arriving 8–10am",
+    "delivered 8–10am"
+   ],
+   [
+    "arriving 10am–12pm",
+    "delivered 10am–12pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "delivered 12–2pm"
+   ],
+   [
+    "new arrival time",
+    "new delivery time"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Alex is home",
+    "Alex is there"
+   ],
+   [
+    "they're home",
+    "they're there"
+   ],
+   [
+    "you're home",
+    "you're there"
+   ],
+   [
+    "Nobody home",
+    "Nobody there"
+   ],
+   [
+    "nobody home",
+    "nobody there"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "was home",
+    "was there"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a flooded basement or a lockout"
+   ],
+   [
+    "travel fee",
+    "delivery charge"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 quote"
+   ],
+   [
+    "MP045210",
+    "BK045210"
+   ],
+   [
+    "water heater",
+    "cake"
+   ],
+   [
+    "heater",
+    "oven"
+   ],
+   [
+    "sink",
+    "cake stand"
+   ],
+   [
+    "pipe",
+    "piping bag"
+   ],
+   [
+    "drain",
+    "cake"
+   ],
+   [
+    "faucet",
+    "piping tip"
+   ],
+   [
+    "cabinet",
+    "cake box"
+   ],
+   [
+    "water line",
+    "kitchen"
+   ],
+   [
+    "shave",
+    "piping"
+   ]
+  ]
+ },
+ "keep": [
+  "kitchen",
+  "dessert",
+  "dessert table",
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a cake tasting for 2 at Lee's Bakeshop, Sam's own shop, with Mara on Sat Oct 24 at 11:00am, paid in full. A cake picked up at the counter works the same way.",
+  "B": "Sam Lee signs up two companies by text. Then Alex orders a 3-tier cake for 80 from Lee Cake Studio for a grandmother's 90th birthday lunch. It's quoted from Alex's photos; a signed contract and a $160 deposit come first, and Nico delivers and sets it up at Lakeview Hall Thu Oct 22 between 8 and 10am. The rest is charged to Alex's saved card when Nico texts DONE."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|deposit|card",
+    "photos|deposit|card"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a $55 tasting for 2 with Mara, paid in full when booking. A cake from the price board, like a $40 6-inch cake picked up at the counter, is paid the same way.",
+    "list|deposit|card": "A $140 2-tier party cake for 30, picked up Sat at 11:00am. A $40 deposit now, and the $100 rest charged to the saved card at pickup.",
+    "photos|deposit|card": "A custom cake picked up at the shop, quoted by Mara from Alex's photos at $90 (Sam OKs every custom cake quote). A $20 deposit when booked, and the $70 rest charged to the saved card at pickup."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40"
+    },
+    "list|*|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Tasting for 2"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$40",
+     "name": "Tasting for 2"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "2-tier party cake (serves 30)"
+    },
+    "photos|deposit|*": {
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "fee": "$20",
+     "name": "Custom cake"
+    }
+   }
+  },
+  "B": {
+   "main": "photos|deposit|card",
+   "combos": [
+    "photos|deposit|card",
+    "list|deposit|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "photos|deposit|card": "The main story: a 3-tier cake for 80, quoted from Alex's photos at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit now, and the $480 rest charged to the saved card when Nico texts DONE.",
+    "list|deposit|card": "A $150 2-tier cake for 30 from the menu, delivered. A $40 deposit now, and the $110 rest charged to the saved card at DONE.",
+    "list|full|none": "The same $150 2-tier cake for 30, paid in full when booking."
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "name": "2-tier cake for 30"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$40",
+     "name": "2-tier cake for 30"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "2-tier cake for 30"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Custom tiered cake for 80"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-59",
+   "A7-15",
+   "S11-87",
+   "S11-90",
+   "A8-02"
+  ],
+  "B": [
+   "S11-87",
+   "S11-90",
+   "B5-34",
+   "B5-26"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Cakes, dessert tables and the bakeshop need a food permit for their kitchens, so Sam gives it (S1-23). A home kitchen gives its cottage food registration in that step, where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "A baker's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Bakers book people and pickup slots, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes here: tastings, pickups and deliveries."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each person who makes or serves food sends a food handler card, where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Cakes are baked ahead, so nothing is sent now and nobody is on call (S2-31)."
+   },
+   {
+    "op": "more",
+    "at": "S1-23",
+    "more": [
+     "Here it's food permit BK045210 for the studio's kitchen. Dessert tables add a serving permit, where the state's rules require one.",
+     "A home kitchen gives its cottage food registration here instead, where its state allows one."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Here, allergy and diet notes are sensitive answers. Only the baker making the cake and the manager see them, for that order.",
+     "They're deleted the day after the pickup or delivery. Next time, they're added again."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Extras can be added: a delivery charge, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "A custom tiered cake is never on the list. Each one is different, so it's quoted from the customer's photos and answers."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your custom cake prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Custom cake prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Cake price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Delivery and setup",
+          "Free within 10 miles, $89 up to 25"
+         ],
+         [
+          "Sheet cake for 40",
+          "$179"
+         ],
+         [
+          "2-tier cake for 30",
+          "$150"
+         ],
+         [
+          "Cake cutting",
+          "$2 a slice"
+         ],
+         [
+          "Custom tiered cake",
+          "Quoted from the customer's photos"
+         ],
+         [
+          "Cupcake tower, 4 dozen",
+          "$199"
+         ],
+         [
+          "Serving staff",
+          "$120 an hour, 1-hour minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "Rosie suggests rules to start from, never a blank form. Sam keeps them, and keeps Saturdays for wedding cakes.",
+    "more": [
+     "Sam can change each rule now, by text later, or in the portal.",
+     "The portal is the business's website for Rosie, where owners change prices, hours and rules.",
+     "Kept days are offered only for that kind of order.",
+     "Sam sets when kept days open to everyone, so they don't go unused.",
+     "A booking keeps the rules it was made with, even if Sam changes them later.",
+     "Each cake is delivered in a window, done before the event starts. A served dessert table has a set start time."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are my suggested starting rules for custom cakes. You can change any of them.",
+      {
+       "list": {
+        "rows": [
+         [
+          "Open",
+          "Mon–Sat 7:30am–5:30pm"
+         ],
+         [
+          "Delivery",
+          "2-hour windows, done before the event starts"
+         ],
+         [
+          "Notice",
+          "2 days; sugar flowers 2 weeks; wedding cakes 3 weeks"
+         ],
+         [
+          "Books ahead",
+          "Up to 60 days; wedding cakes 12 months"
+         ],
+         [
+          "Cakes a weekend",
+          "Up to 6 tiered cakes"
+         ],
+         [
+          "Free to cancel",
+          "Until 2 days before the delivery"
+         ],
+         [
+          "After that, or nobody there",
+          "The deposit, or $40 if paid in full, only if you say so"
+         ],
+         [
+          "Delivery area",
+          "25 miles from 16 Orchard St"
+         ],
+         [
+          "If your baker can't come",
+          "A stand-in decorator, same time and price"
+         ]
+        ]
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Want to keep some days for one kind of order? Other orders can't take them.",
+      {
+       "buttons": [
+        "No",
+        "Keep some days"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 Keep Saturdays for wedding cakes"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "card": {
+        "title": "Kept for wedding cakes",
+        "lines": [
+         "Saturdays · all day",
+         "Other orders can't take them",
+         "Opens to everyone 30 days before"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The dessert tables plug-in loads the same way, with its own services and license form.",
+     "A wedding dessert table gets a venue walk-through first, then a quote.",
+     "AI assistants find Lee Cake Studio under custom cakes and under dessert tables."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Dessert tables next. Send a photo of your dessert table prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Dessert table prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Dessert table price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "rows": [
+         [
+          "Delivery and setup",
+          "Free within 10 miles, $89 up to 25"
+         ],
+         [
+          "Dessert table for 25",
+          "$149"
+         ],
+         [
+          "Dessert table for 40",
+          "$189"
+         ],
+         [
+          "Serving staff",
+          "$120 an hour, 1-hour minimum"
+         ],
+         [
+          "Wedding dessert table",
+          "A venue walk-through first, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like custom cakes. Send only what's different.",
+      {
+       "card": {
+        "title": "Dessert tables, set like custom cakes",
+        "lines": [
+         "At the customer's place",
+         "A 25% deposit when they book",
+         "The rest 2 days before, as you picked for cakes",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "With 1, an extra added on the day goes on one bill after the baker texts DONE. The cakes themselves are paid before, so they get no bill.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Set: your cakes are paid before, so no bill goes out for them. Anything added on the day gets one bill, once your baker texts DONE.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Custom tiered cake",
+          "From photos",
+          "25% deposit",
+          "Rest 2 days before"
+         ],
+         [
+          "2-tier cake for 30",
+          "$150",
+          "$40 deposit",
+          "$110 2 days before"
+         ],
+         [
+          "Sheet cake for 40",
+          "$179",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "Cake cutting",
+          "$2 a slice",
+          "Added on the day",
+          "One bill after"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Add a tip line to the bills I text?",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The shop books a baker's time for tastings, and pickup slots for cakes."
+   },
+   {
+    "op": "words",
+    "at": "A4-25",
+    "does": "A smash cake is a small cake for a baby's first birthday. Alex orders one for Alex's child, so Alex books, pays and gets the texts.",
+    "more": [
+     "The plug-in says who may order for a child.",
+     "Texts go only to the parent's phone.",
+     "Booking for a pet works the same way, where the plug-in books pets."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "The smash cake is for your child's first birthday. Are you the child's parent or guardian?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Yes, I'm the parent."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Tastings and cakes are rated."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "A cake order has no problem that gets worse; a change goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "words",
+    "at": "A5-21",
+    "does": "Back to the plan from before the times. Its terms show on the secure page, with their own yes. Each order in the plan is charged to the saved card after its pickup, with a text the day before.",
+    "more": [
+     "The terms say how often, the price an order, when each one is charged, and how to skip, pause or end.",
+     "A dozen cupcakes plan follows the shop's own setup for cupcakes, whatever this visit is.",
+     "Repeat charges need this yes of their own. A yes to the booking isn't enough.",
+     "Alex gets a copy of the terms the way Alex picked."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Dozen cupcakes plan · every 4 weeks",
+        "lines": [
+         "Saturdays · 11:00am pickup",
+         "$35 an order, charged after each pickup",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "Before Alex leaves, Mara goes over it: the flavors at a tasting, or the cake in its box at a pickup. A fix Alex asks for is done first."
+   },
+   {
+    "op": "words",
+    "at": "A4-50"
+   },
+   {
+    "op": "words",
+    "at": "A4-14"
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches the 2-tier party cake from a $40 deposit to paid in full, for new bookings only. Each change is read back first.",
+    "more": [
+     "2-tier party cakes already booked keep their $40 deposit.",
+     "Paid in full is taken when the customer books, so nothing is owed after.",
+     "A cancel in time is refunded in full. After that, the $40 fee may be kept.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "For a cake, the times are pickup slots, set by how many cakes the shop makes in a day. Nobody's free hours are shown.",
+    "more": [
+     "Sam sets the daily number at sign-up. A full day isn't shown.",
+     "Each cake keeps the notice Sam set: 2 days for a party cake, 3 weeks for a wedding cake.",
+     "A baker's time is booked only for a tasting (the branch before)."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Pickup times:",
+      {
+       "times": [
+        "Sat Oct 24 · 11:00 to 11:15am",
+        "Sat Oct 24 · 2:00 to 2:15pm"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The shop's form is its allergen notice. Alex reads it on the secure page and ticks it before paying.",
+    "more": [
+     "It says plainly what the kitchen uses: wheat, milk, eggs, soy, peanuts and tree nuts.",
+     "It says what the shop can't promise: no cake is free of them, since everything is made in one kitchen.",
+     "It's ticked once a year, so a later order skips it.",
+     "Allergy details go on the same page, with their own yes. They never go in a text."
+    ],
+    "form": [
+     [
+      "Allergen notice",
+      "Our kitchen uses wheat, milk, eggs, soy, peanuts and tree nuts"
+     ],
+     [
+      "We can't promise",
+      "Any cake free of them, from a shared kitchen"
+     ],
+     [
+      "Alex M.",
+      "I've read it · ticked"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here: the allergen notice is the form, ticked once a year.",
+     "No first step for a tasting or a cake from the board. A custom cake has a 20-minute design call first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-65",
+    "more": [
+     "Allergies and diets are never asked through the AI: only yes or no. Details go on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-03",
+    "more": [
+     "A pickup checks in the same way: Alex gives the code at the counter."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-44",
+    "more": [
+     "At a pickup, Alex checks the cake in its box at the counter, against the order, before it leaves."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-70",
+    "more": [
+     "A late pickup isn't moved: the cake waits, cold, at the counter until closing."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-14",
+    "more": [
+     "A cake not picked up by closing is a no-show too. It was made for Alex, so any fee follows what Alex agreed, and Sam decides."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-42",
+    "more": [
+     "A reaction to a cake goes to Sam at once. Trouble breathing gets 'call 911' first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Cake Studio",
+       "At the customer's place",
+       "Food handler card, as given, not checked",
+       "Yes"
+      ],
+      [
+       "Nico Price",
+       "Lee Cake Studio",
+       "At the customer's place",
+       "Food handler FH031552 · food manager FM30417",
+       "Once Sam says yes"
+      ],
+      [
+       "Ellis Moore",
+       "Lee Cake Studio",
+       "At the customer's place",
+       "Food handler card, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Cake Studio",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Mara Chen",
+       "Lee's Bakeshop",
+       "At the shop, and deliveries",
+       "Food handler card, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Ines Diaz",
+       "Lee's Bakeshop",
+       "At the shop",
+       "Food handler card, as given, not checked",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-85",
+    "does": "Alex asks for a cake shipped to a sister in another state, which the shop doesn't do. Rosie says so plainly, and the AI can look for another business."
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Alex M. needs help at the counter. I'm with them. The record is on the secure page."
+     ],
+     [
+      "san",
+      "owner",
+      "Mara asked for help with Alex M. at the counter, and is with Alex. The record is on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "The plug-in says how this work takes walk-ins. A walk-in buys from the case at the counter, paid there, outside Rosie. Tastings and orders are booked.",
+    "more": [
+     "Walk-ins fill the gaps between booked times, on every branch."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14"
+   },
+   {
+    "op": "more",
+    "at": "A7-21",
+    "more": [
+     "A customer who asked for Mara by name is never moved on silence. Sam calls them instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A9-01",
+    "more": [
+     "Rosie never keeps the money. Every charge is in the shop's own Stripe.",
+     "Card payments cost the shop Stripe's own card fee, paid to Stripe. Rosfield takes no cut of them.",
+     "Rosfield's $2 comes out of one payment made through Rosie."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35"
+   },
+   {
+    "op": "words",
+    "at": "A8-37"
+   },
+   {
+    "op": "words",
+    "at": "A4-50"
+   },
+   {
+    "op": "words",
+    "at": "A6-04"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "At the shop, a tasting or a cake from the board is paid in full when booked.",
+     "A party cake takes a $40 deposit; the rest is charged to the saved card at pickup.",
+     "A custom cake takes a $20 deposit once Sam OKs the quote, and the rest at pickup.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each cake, from the plug-in. Send only what's different.",
+      {
+       "card": {
+        "title": "Every cake, to start",
+        "lines": [
+         "At the counter, paid in full when booked",
+         "Party cake: $40 deposit, the rest at pickup",
+         "Custom cake: a deposit once Sam OKs the quote"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "before:deposit+after:card": {
+      "more": [
+       "On this path, a party cake takes a $40 deposit, and its $100 rest is charged to the saved card at pickup."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Party cake: $140, $40 deposit, $100 at pickup.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "2-tier party cake (serves 30)",
+            "$140",
+            "$40 deposit",
+            "$100 at pickup"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "more": [
+       "On this path, a custom cake is quoted from photos and OK'd by Sam. A $20 deposit is paid when booked; the rest at pickup."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Custom cake: quoted from photos, $20 deposit, rest at pickup.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom cake",
+            "$20 deposit",
+            "$70 at pickup"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "more": [
+       "On this path, a tasting or a board cake is paid in full when booked, so nothing is owed after."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Tasting for 2: $55, paid in full when booked.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Tasting for 2",
+            "$55",
+            "Paid in full",
+            "Nothing more"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "a bakery books any customer"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "a cake is picked up or delivered, never dropped off"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Cakes, dessert tables and the bakeshop need a food permit for their kitchens, so Sam gives it (S1-23). A home kitchen gives its cottage food registration in that step, where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "A baker's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Bakers book people and pickup slots, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes here: tastings, pickups and deliveries."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each person who makes or serves food sends a food handler card, where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Cakes are baked ahead, so nothing is sent now and nobody is on call (S2-31)."
+   },
+   {
+    "op": "more",
+    "at": "S1-23",
+    "more": [
+     "Here it's food permit BK045210 for the studio's kitchen. Dessert tables add a serving permit, where the state's rules require one.",
+     "A home kitchen gives its cottage food registration here instead, where its state allows one."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S13-05",
+    "more": [
+     "Here, allergy and diet notes are sensitive answers. Only the baker making the cake and the manager see them, for that order.",
+     "They're deleted the day after the pickup or delivery. Next time, they're added again."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "more": [
+     "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+     "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+     "Extras can be added: a delivery charge, an after-hours price, materials at cost and a tax rate.",
+     "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+     "A custom tiered cake is never on the list. Each one is different, so it's quoted from the customer's photos and answers."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your custom cake prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Custom cake prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Cake price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Delivery and setup",
+          "Free within 10 miles, $89 up to 25"
+         ],
+         [
+          "Sheet cake for 40",
+          "$179"
+         ],
+         [
+          "2-tier cake for 30",
+          "$150"
+         ],
+         [
+          "Cake cutting",
+          "$2 a slice"
+         ],
+         [
+          "Custom tiered cake",
+          "Quoted from the customer's photos"
+         ],
+         [
+          "Cupcake tower, 4 dozen",
+          "$199"
+         ],
+         [
+          "Serving staff",
+          "$120 an hour, 1-hour minimum"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "Rosie suggests rules to start from, never a blank form. Sam keeps them, and keeps Saturdays for wedding cakes.",
+    "more": [
+     "Sam can change each rule now, by text later, or in the portal.",
+     "The portal is the business's website for Rosie, where owners change prices, hours and rules.",
+     "Kept days are offered only for that kind of order.",
+     "Sam sets when kept days open to everyone, so they don't go unused.",
+     "A booking keeps the rules it was made with, even if Sam changes them later.",
+     "Each cake is delivered in a window, done before the event starts. A served dessert table has a set start time."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here are my suggested starting rules for custom cakes. You can change any of them.",
+      {
+       "list": {
+        "rows": [
+         [
+          "Open",
+          "Mon–Sat 7:30am–5:30pm"
+         ],
+         [
+          "Delivery",
+          "2-hour windows, done before the event starts"
+         ],
+         [
+          "Notice",
+          "2 days; sugar flowers 2 weeks; wedding cakes 3 weeks"
+         ],
+         [
+          "Books ahead",
+          "Up to 60 days; wedding cakes 12 months"
+         ],
+         [
+          "Cakes a weekend",
+          "Up to 6 tiered cakes"
+         ],
+         [
+          "Free to cancel",
+          "Until 2 days before the delivery"
+         ],
+         [
+          "After that, or nobody there",
+          "The deposit, or $40 if paid in full, only if you say so"
+         ],
+         [
+          "Delivery area",
+          "25 miles from 16 Orchard St"
+         ],
+         [
+          "If your baker can't come",
+          "A stand-in decorator, same time and price"
+         ]
+        ]
+       },
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Want to keep some days for one kind of order? Other orders can't take them.",
+      {
+       "buttons": [
+        "No",
+        "Keep some days"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2 Keep Saturdays for wedding cakes"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "card": {
+        "title": "Kept for wedding cakes",
+        "lines": [
+         "Saturdays · all day",
+         "Other orders can't take them",
+         "Opens to everyone 30 days before"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The dessert tables plug-in loads the same way, with its own services and license form.",
+     "A wedding dessert table gets a venue walk-through first, then a quote.",
+     "AI assistants find Lee Cake Studio under custom cakes and under dessert tables."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Dessert tables next. Send a photo of your dessert table prices, or fill in the form.",
+      {
+       "card": {
+        "title": "Dessert table prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01e"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Dessert table price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "rows": [
+         [
+          "Delivery and setup",
+          "Free within 10 miles, $89 up to 25"
+         ],
+         [
+          "Dessert table for 25",
+          "$149"
+         ],
+         [
+          "Dessert table for 40",
+          "$189"
+         ],
+         [
+          "Serving staff",
+          "$120 an hour, 1-hour minimum"
+         ],
+         [
+          "Wedding dessert table",
+          "A venue walk-through first, then a quote"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like custom cakes. Send only what's different.",
+      {
+       "card": {
+        "title": "Dessert tables, set like custom cakes",
+        "lines": [
+         "At the customer's place",
+         "A 25% deposit when they book",
+         "The rest 2 days before, as you picked for cakes",
+         "Prices over $500 come to you"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-21",
+    "does": "With 1, an extra added on the day goes on one bill after the baker texts DONE. The cakes themselves are paid before, so they get no bill.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Set: your cakes are paid before, so no bill goes out for them. Anything added on the day gets one bill, once your baker texts DONE.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price",
+         "Before",
+         "After"
+        ],
+        "rows": [
+         [
+          "Custom tiered cake",
+          "From photos",
+          "25% deposit",
+          "Rest 2 days before"
+         ],
+         [
+          "2-tier cake for 30",
+          "$150",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "Sheet cake for 40",
+          "$179",
+          "Paid in full",
+          "Nothing more"
+         ],
+         [
+          "Cake cutting",
+          "$2 a slice",
+          "Added on the day",
+          "One bill after"
+         ]
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Add a tip line to the bills I text?",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "The shop's cakes are picked up at the shop, and a dozen cupcakes can also be delivered. Each place gets its own price, and its own money before and after.",
+    "more": [
+     "At the shop, tastings and cakes from the board are paid in full when booked.",
+     "The 2-tier party cake takes a $40 deposit. The $100 rest is charged the day before pickup.",
+     "A custom cake from photos takes a $20 deposit once its quote is OK'd.",
+     "A dozen cupcakes delivered is a delivery: $75, paid in full when booked.",
+     "The rest is charged to the saved card at DONE.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service, from the plug-in. Want any done differently, or delivered too? Tell me which.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "Picked up at your shop",
+         "Paid in full when they book"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "F $40 deposit, the rest the day before. G $20 deposit. A delivered too, 75, paid when they book"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. For a dozen cupcakes, the customer picks pickup or delivery and sees both prices first.",
+      {
+       "list": {
+        "rows": [
+         [
+          "Dozen cupcakes, picked up",
+          "$35 · Paid in full"
+         ],
+         [
+          "Dozen cupcakes, delivered",
+          "$75 · Paid in full"
+         ],
+         [
+          "6-inch cake, cookie box, smash cake",
+          "$40, $20, $25 · Paid in full"
+         ],
+         [
+          "Tasting for 2",
+          "$55 · Paid in full"
+         ],
+         [
+          "2-tier party cake",
+          "$140 · $40 deposit · $100 the day before"
+         ],
+         [
+          "Custom cake",
+          "From photos · $20 deposit · Rest the day before"
+         ],
+         [
+          "Wedding cake design",
+          "$25 consult, paid when booked"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "The tasting for 2, $55, is paid in full when booked. So are the cakes from the board, and a delivery, $75. Nothing more is owed after.",
+    "more": [
+     "A cancel in time gets a full refund.",
+     "A late cancel or a no-show: the $20 fee may be kept, and the rest is refunded.",
+     "Sam confirms first, with one reminder. No answer 24 hours after the ask: a full refund, no fee, and the customer is told."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Services paid when booked work like this:",
+      {
+       "card": {
+        "title": "Paid in full when booked",
+        "lines": [
+         "Tasting for 2 · $55",
+         "Dozen cupcakes delivered · $75",
+         "Cancel in time: a full refund",
+         "Late or no-show: the $20 fee, if you confirm",
+         "The rest is refunded"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Cakes are never sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Cakes are never sent now, so every order gets its reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Cakes are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Cakes book a delivery window, or a set start for a served dessert table."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Cakes book a delivery window, or a set start for a served dessert table."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A baker never looks after a child; an adult on the order takes the cake."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "A cake is always handed to a person, who checks it and signs for it."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A cake can't be fixed after the event. A problem goes to Sam as a complaint or a refund request."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "A cake order has no problem that gets worse; a change goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "more",
+    "at": "B4-04",
+    "more": [
+     "Its private answers: allergies and diets, only on the secure page, with their own yes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-23",
+    "more": [
+     "For a wedding cake, Sam's setting saves the date for 2 days while the quote is open, with a next-in-line list."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Here: the cake order form and allergen notice, for every order.",
+     "A design call or a tasting first for wedding cakes. Alex's birthday cake needs none."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "more": [
+     "Other forms: a consent, an entry statement for a lockout, a conflict form, or an event's planning form.",
+     "It stays on file for the plug-in's time, so a later booking skips it.",
+     "Not done by its due date: one reminder, then Sam decides to keep it, move it, or cancel with no fee.",
+     "Here: the cake order form, with the servings, flavors, colors, the words on top and the venue's contact.",
+     "It shows the kitchen's allergen notice: the kitchen uses nuts, so no cake is promised nut-free.",
+     "Allergies go on it with their own yes. Only Nico and Sam see them."
+    ],
+    "form": [
+     [
+      "Form",
+      "Cake order form and allergen notice"
+     ],
+     [
+      "Due",
+      "Tue Oct 20, 8:00am, when the design locks"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "Allergies are never asked here. Details go on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-03",
+    "more": [
+     "Sam's rule: every wedding cake waits for his OK. Alex's quote was OK'd already, so it books now.",
+     "An order with a severe allergy note waits for Sam's OK too. The note stays on the secure page; Sam reads it there."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-07",
+    "more": [
+     "Sam's rule for cakes: one free date move until the design locks, if the studio has room that week."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-10",
+    "more": [
+     "For a custom cake, what may be kept follows the contract's dated schedule, never more than it says. Sam confirms first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-18",
+    "more": [
+     "A van stuck in traffic: Alex hears only if the cake won't be set up before the event starts."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "A design call not held in time: Nico makes the cake from the order form, and Sam calls Alex."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-01",
+    "more": [
+     "For a delivery, the day list shows the venue, the window and the setup notes. Allergy notes stay on the secure page."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Nico checks the cake against the order form: tiers, flavors, colors and the words on top. No text ever names an allergy."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-39",
+    "more": [
+     "Nico tells the venue how long the cake may sit out, and that leftovers go in the fridge."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Extras on the day need Alex's written yes, at the price shown before booking. No yes in 10 minutes: nothing extra."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "Any service charge is its own line on the receipt, and it's never called a tip."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "does": "Alex's cake can't move to another day. Ellis makes menu cakes too, so Sam's default is Ellis, at the same time and price. Alex picks Ellis or a full refund.",
+    "more": [
+     "Only someone with the skill for the cake is offered, from Sam's team list.",
+     "A refund gives back everything paid. No delivery, so no $2 for Rosie. Any $2 taken from a payment goes back to the business.",
+     "No reply by 8pm Wed: Ellis makes and delivers it, as Sam set, and Alex is told."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nico can't work Thu. Alex M.'s cake is for a date that can't move. Ellis makes menu cakes, so Ellis is offered, as you set. Alex may take a full refund instead."
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry, Nico can't bring your cake tomorrow. Ellis from Lee Cake Studio can make and deliver it at the same time and price. Or you can cancel for a full refund.",
+      {
+       "photos": [
+        "Ellis, from Lee Cake Studio"
+       ],
+       "buttons": [
+        [
+         "1",
+         "Ellis instead"
+        ],
+        [
+         "3",
+         "Full refund"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-24",
+    "does": "Ellis comes back at 12:30pm to cut and serve the cake, about 80 minutes. Serving done at the event has no cancel period. Only a contract signed at the customer's place gets one, where the state's rules require it.",
+    "more": [
+     "It's paid by one pay link, since the cake itself was paid before.",
+     "Nico tells Alex out loud too."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Added to your order.",
+      {
+       "card": {
+        "title": "Cake serving at lunch · $160",
+        "lines": [
+         "Ellis cuts and serves it from 12:30pm",
+         "80 minutes of serving staff, at $120 an hour",
+         "Paid by one pay link"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "Serving done at the event has no cancel period. Only a contract signed at the customer's place does, where the state's rules give one."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Serving done at the event has no cancel period (B8-24)."
+   },
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "The design locks",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.14",
+        "7.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "as": "Morgan P.",
+       "t": "Sat Nov 28, 10:00am",
+       "type": "split",
+       "q": "Are the final details in by the lock day?",
+       "title": "Asks for the final details by the lock day",
+       "does": "A what-if: Morgan P. ordered a wedding cake for Sat Dec 12, at $6 a serving for 120. The plug-in sets when the design locks: here, 14 days before.",
+       "more": [
+        "The final details are the servings, flavors, colors and the words on top, as the contract says.",
+        "Allergies go on the same secure page, with their own yes. They never go in a text.",
+        "It goes the morning of the lock day, inside text hours. The order form asked for the same details at booking."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "The design for your Sat Dec 12 wedding cake locks today at 6pm. Please check the final details.",
+         {
+          "card": {
+           "title": "Final details · due Sat Nov 28, 6pm",
+           "lines": [
+            "Servings, tiers and flavors",
+            "Colors and the words on top",
+            "Allergies, with your own yes"
+           ],
+           "button": "Check the details",
+           "link": "rosfield.com/f/m11"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.rules",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust"
+       ],
+       "branches": [
+        {
+         "label": "In by the lock day",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x02",
+           "line": [
+            "7.14",
+            "7.10"
+           ],
+           "who": "san",
+           "to": "cust",
+           "via": "msg",
+           "as": "Morgan P.",
+           "t": "Sat Nov 28, 4:10pm",
+           "title": "Reads back the new total",
+           "does": "Morgan changes the servings to 130. The new total is read back, and the rest due at DONE changes to match.",
+           "more": [
+            "Up to 10% more servings books at the same price a serving. More than that goes to Sam first.",
+            "A change in tiers or design is a new price to sign, as the contract says.",
+            "Sam and Nico see the servings and that there's an allergy note, never what it says."
+           ],
+           "say": [
+            [
+             "san",
+             "cust",
+             "Thanks, Morgan. Your final details are in.",
+             {
+              "card": {
+               "title": "Wedding cake · 130 servings",
+               "lines": [
+                "Was 120 · now $780",
+                "The rest is charged Sat Nov 28 at 6pm, as your contract says"
+               ]
+              }
+             }
+            ]
+           ],
+           "needs": [
+            "pf.rules"
+           ],
+           "tells": [
+            "cust"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "Not in by the lock day",
+         "end": "merge",
+         "steps": [
+          {
+           "id": "B7-x03",
+           "line": [
+            "7.14",
+            "7.16"
+           ],
+           "who": "san",
+           "to": "owner",
+           "via": "msg",
+           "t": "Sat Nov 28, 6:05pm",
+           "title": "No changes: the signed design is made",
+           "does": "Nothing changed by 6pm. The signed design and its 120 servings are what Nico makes, and Sam is asked to call Morgan about any allergies.",
+           "more": [
+            "Morgan is told the same by text, inside text hours.",
+            "Nothing is cancelled for late details. A change sent later is Sam's call."
+           ],
+           "say": [
+            [
+             "san",
+             "owner",
+             "Morgan P. didn't confirm the final details for the Sat Dec 12 wedding cake. The signed design and 120 servings stand. Please call Morgan about allergies today."
+            ],
+            [
+             "san",
+             "cust",
+             "We didn't get changes for your wedding cake, so the signed design and 120 servings stand. Sam will call you about any allergies.",
+             {
+              "as": "Morgan P."
+             }
+            ]
+           ],
+           "needs": [
+            "pf.rules",
+            "pf.messages"
+           ],
+           "tells": [
+            "owner",
+            "cust"
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "A what-if: some cakes need a written notice, where the state's rules require it. Say the cake came from a home kitchen: its customer reads and signs the home kitchen notice first.",
+    "more": [
+     "The plug-in names which notices: a cancel notice, or a home kitchen notice with its registration number.",
+     "Sam's studio has a food permit, so its own cakes need none.",
+     "Not signed by the delivery: it waits, as with a first step not done in time.",
+     "A copy stays with the order for 7 years."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Before your cake is delivered, please read and sign this notice.",
+      {
+       "card": {
+        "title": "Home kitchen notice",
+        "lines": [
+         "Made in a home kitchen, with its registration number",
+         "Where the state's rules require it",
+         "Read it, then sign on the page"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/n/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "does": "A what-if: the plug-in's first step isn't done by the day before. Say Alex's cake needed a design call, and it didn't happen. Sam decides.",
+    "more": [
+     "The date can't move, so Nico makes the cake from the signed order form, and Sam calls Alex.",
+     "No answer from Sam by 6pm: Sam is reminded, and Alex is told Sam will call.",
+     "Work that can move, like a permit job, moves with no fee instead."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Alex M.'s design call, for Thursday's 8–10am cake, hasn't happened yet.",
+      {
+       "buttons": [
+        "Move the visit",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Your design call hasn't happened yet, so Sam will call you today. Nico makes your cake from the order form you signed."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "t": "Tue Oct 20, 12:00pm",
+    "does": "A what-if: Alex didn't sign the cake order form by the time the design locks, Tue at 8am. Alex gets one reminder, then Sam decides.",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Reminder: please sign the cake order form for Thursday's cake. It takes a minute.",
+      {
+       "card": {
+        "title": "Cake order form",
+        "lines": [
+         "Was due today, Tue Oct 20, at 8am",
+         "For Thu Oct 22 · delivered 8–10am · Nico"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/f/r4"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. still hasn't signed the cake order form for Thursday's cake, 4 hours after the reminder.",
+      {
+       "buttons": [
+        "Keep the visit",
+        "Move it",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Parking",
+      "At the side door, for unloading"
+     ],
+     [
+      "Pets",
+      "None"
+     ],
+     [
+      "Gate or door code",
+      "None"
+     ],
+     [
+      "Venue rules",
+      "Deliveries from 8am; ask for the coordinator"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-09",
+    "does": "Only a teen is at the hall. Nico hands the cake only to an adult on the booking.",
+    "more": [
+     "No adult in 30 minutes: it's handled like nobody there.",
+     "I'll be there soon: Nico waits up to 30 minutes, with the cake kept cool. Another time: Sam calls Alex, since the date can't move."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Only a teen is at the hall for Alex M."
+     ],
+     [
+      "san",
+      "cust",
+      "Nico is at Lakeview Hall with your cake, but only a teen is there. Nico can hand it only to an adult.",
+      {
+       "buttons": [
+        "I'll be there soon",
+        "Another time"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-54",
+    "does": "A what-if: something the plug-in requires is missing. The cake isn't set up. Whether a fee may apply depends on whose side it's on.",
+    "more": [
+     "The customer's side: a pass or paper Alex was to have ready, like the venue's delivery pass.",
+     "The business's side: something the business needed, like the insurance certificate a venue asked for."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CANT START the hall needs a delivery pass, and Alex has none"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-60",
+    "does": "Alex was to arrange the hall's delivery pass, so Sam may keep the deposit, only as the policy said. The rest charged Tuesday is refunded. No answer in 24 hours: a full refund.",
+    "more": [
+     "A fee never carries Rosfield's $2. Nothing was set up, so there's no $2.",
+     "If the pass comes while Nico is still there, he sets the cake up as usual."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Nico can't get in to set up your cake: the hall needs the delivery pass you were asked to arrange. Reply here if you can get it now.",
+      {
+       "card": {
+        "title": "Not set up",
+        "lines": [
+         "Thu Oct 22 · Nico",
+         "Your deposit may be kept, as you agreed"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nico couldn't set up Alex M.'s cake: the hall's delivery pass Alex was to arrange is missing.",
+      {
+       "card": {
+        "title": "Keep Alex's deposit, as the policy says?",
+        "lines": [
+         "Alex agreed to it when booking"
+        ]
+       },
+       "buttons": [
+        "Keep it",
+        "Refund in full"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-61",
+    "does": "A what-if: the problem is on the business's side, like the insurance certificate the hall asked for that isn't in. Nothing is charged: anything paid is refunded in full.",
+    "more": [
+     "Nothing was set up, so there's no $2. Any $2 taken from a payment goes back to the business.",
+     "Alex and Sam are told."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Nico can't set up your cake: the hall needed our insurance certificate, and it wasn't in. Nothing is charged, and everything you paid comes back in full.",
+      {
+       "card": {
+        "title": "Not set up · nothing charged",
+        "lines": [
+         "Thu Oct 22 · Nico",
+         "Anything paid goes back in full"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nico couldn't set up Alex M.'s cake: the hall's insurance certificate wasn't in. Nothing was charged."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-34",
+    "does": "Nico cuts a hand and texts HURT. Rosie tells Sam at once. If anyone needs care, call 911 first.",
+    "more": [
+     "The same goes if Alex or a guest is hurt or feels sick.",
+     "The setup stops. The cake is already made, so Sam sends Ellis to finish setting it up, or calls Alex.",
+     "What happened stays on the job record."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT cut my hand, need to stop"
+     ],
+     [
+      "san",
+      "owner",
+      "Nico is hurt at Alex M.'s delivery (Lakeview Hall, 9 Ridge Rd) and needs to stop. Call Nico now.",
+      {
+       "buttons": [
+        "Send Ellis",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam is told. If you need care, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-01"
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "more": [
+     "Where a state's rules do give one, the plug-in's switch turns it on, and the refund follows those rules.",
+     "Here, nothing waits."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "The shop's tastings and cakes are paid when booked, so nothing is owed after. Anything added at the counter is paid there, the shop's own way.",
+    "more": [
+     "Anything added at the counter, like a cookie box, is priced first and paid there.",
+     "A tip at the counter is the shop's own way, and Rosie never asks for one."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Paid when booked: nothing more after.",
+      {
+       "card": {
+        "title": "Nothing more after the visit",
+        "lines": [
+         "Tasting for 2 · $55, paid when booked",
+         "Anything added at the counter is paid there"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam switches the 2-tier cake for 30 from a $40 deposit to paid in full, for new bookings only. Each change is read back first.",
+    "more": [
+     "2-tier cakes already booked keep their $40 deposit.",
+     "Paid in full is taken when the customer books, so nothing is owed after.",
+     "Cancel 2 days ahead or more: a full refund. After that, $40 may be kept.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-58",
+    "say": [
+     [
+      "owner",
+      "san",
+      "NEW cake decorating classes"
+     ],
+     [
+      "san",
+      "owner",
+      "Cake decorating classes for Lee Cake Studio: is it the same company?",
+      {
+       "buttons": [
+        "Yes, same company",
+        "Its own company"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Does it work like custom cakes?",
+      {
+       "card": {
+        "title": "Custom cakes work like this",
+        "lines": [
+         "You go to customers",
+         "A deposit when they book",
+         "The rest is charged to the saved card at DONE"
+        ]
+       },
+       "buttons": [
+        "Same",
+        "Something's different"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-22"
+   },
+   {
+    "op": "words",
+    "at": "S11-22"
+   },
+   {
+    "op": "words",
+    "at": "S11-22"
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "more": [
+     "Take it: Nora is booked, as when Sam accepts.",
+     "No thanks, or no reply in 2 hours: nothing is booked,, and no card is charged.",
+     "A shorter service shows its own price before Nora says yes.",
+     "Where the plug-in keeps service names private, the text gives only the business, the date, the time and the place."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Hi Sam, it's Rosie, recording as always. One request waits for Lee Cake Studio. It's a sheet cake for 40, delivered today 3 to 5pm with Nico. It's $179, paid in full and until you say yes. Accept it?"
+     ],
+     [
+      "owner",
+      "san",
+      "Yeah, take it."
+     ],
+     [
+      "san",
+      "owner",
+      "Reading it back: accept the sheet cake for today, delivered 3 to 5pm, with Nico. Say yes to go ahead."
+     ],
+     [
+      "owner",
+      "san",
+      "Yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-13",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Cake Studio can make your 3-tier cake for $640.",
+      {
+       "card": {
+        "title": "3-tier cake for 80 · $640",
+        "lines": [
+         "25% deposit when you book: $160",
+         "The $480 rest when free cancel ends, 2 days before"
+        ],
+        "button": "Pick a time, pay $160",
+        "link": "rosfield.com/q/mp"
+       },
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa, in Spanish. A quinceañera cake for Saturday. She asked about allergies and heard the kitchen's notice.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "Quinceañera cake · allergen notice given",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If someone can't breathe or their throat is swelling, call 911 now."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI described an emergency happening now. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "An emergency now",
+         "Told to call 911 now"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-27",
+    "does": "Say Alex books a cake for Alex's parents' anniversary party. The parent's name and mobile go on the secure page. The parent gets the visit texts and the code. Alex gets a copy without the code."
+   },
+   {
+    "op": "words",
+    "at": "B4-46",
+    "does": "Say Alex adds a partner, Jamie. Alex forwards a link, and Jamie says yes to texts on it. Then Jamie may OK prices, sign or pay."
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "does": "Alex asks Nico about a cake for a sister's wedding. Nico prices it from Alex's photos at $640, over Sam's $500 limit. It's its own order, so Sam OKs the quote first.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 640 wedding cake for 80, May 15",
+      {
+       "photos": [
+        "Wedding cake ideas",
+        "Alex's photos"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Nico quotes a wedding cake for 80 for Alex M., from Alex's photos: $640. It's over your $500 limit.",
+      {
+       "card": {
+        "title": "3-tier cake for 80 · $640",
+        "lines": [
+         "Priced from Alex's photos at Thu's delivery",
+         "Its own job, on another day"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44"
+   },
+   {
+    "op": "words",
+    "at": "B9-04",
+    "does": "Alex said yes to the cake serving, so Ellis's DONE after lunch sends Alex one pay link. There's no counter at a venue.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 160 cake serving"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Cake Studio: $160 for today's cake serving.",
+      {
+       "pay": {
+        "amount": "$160",
+        "what": "the cake serving",
+        "link": "rosfield.com/p/r4x"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S11-46",
+    "more": [
+     "A customer who asked for Ellis by name is never moved on silence. Sam calls them, and nothing moves until they answer."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-97",
+    "does": "Say the plug-in sets a first step with a lead time, like a design call for a wedding cake. The AI says so, and the open times start only after it.",
+    "more": [
+     "The first step itself is booked or asked for once the time is saved.",
+     "A sheet cake for 40 has none, so the times start today."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A wedding cake needs a design call first, and orders close 3 weeks ahead, so the first open dates are in mid-November."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-58",
+    "more": [
+     "Cakes are never sent now. The steps below show Alex's Thursday visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-04",
+    "more": [
+     "An OK after the design lock books it, and the rest is charged to the saved card at DONE. The confirmation says free cancel has ended."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Cake Studio",
+       "At the customer's place",
+       "Food handler card, as given, not checked",
+       "Yes"
+      ],
+      [
+       "Nico Price",
+       "Lee Cake Studio",
+       "At the customer's place",
+       "Food handler FH031552 · food manager FM30417",
+       "Once Sam says yes"
+      ],
+      [
+       "Ellis Moore",
+       "Lee Cake Studio",
+       "At the customer's place",
+       "Food handler card, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Cake Studio",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Mara Chen",
+       "Lee's Bakeshop",
+       "At the shop, and deliveries",
+       "Food handler card, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Ines Diaz",
+       "Lee's Bakeshop",
+       "At the shop",
+       "Food handler card, as given, not checked",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "A custom cake is quoted from photos, with a signed contract and a $160 deposit when booked.",
+     "The rest is charged to the saved card when the baker texts DONE, after delivery and setup.",
+     "A menu cake is a $40 deposit or paid in full, delivered by Nico or Ellis.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now, for each cake: where it happens and when it's paid. I've started each one from the plug-in. Send only what's different.",
+      {
+       "card": {
+        "title": "Every cake, to start",
+        "lines": [
+         "Delivered and set up at the customer's place",
+         "Custom cake: a deposit, then the rest at DONE",
+         "Menu cake: a deposit, or paid in full"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "price:list+before:deposit+after:card": {
+      "more": [
+       "On this path, a menu cake takes a $40 deposit, and its $110 rest is charged to the saved card at DONE."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. 2-tier cake for 30: $150, $40 deposit, $110 at DONE.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "2-tier cake for 30",
+            "$150",
+            "$40 deposit",
+            "$110 at DONE"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "more": [
+       "On this path, a menu cake is paid in full when booked, so nothing is owed after the delivery."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. 2-tier cake for 30: $150, paid in full when booked.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Price",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "2-tier cake for 30",
+            "$150",
+            "Paid in full",
+            "Nothing more"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "more": [
+       "On this path, a custom cake is quoted from photos and OK'd by Sam first.",
+       "The $160 deposit is paid when booked; the $480 rest is charged at DONE."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Set. Custom tiered cake: quoted from photos, $160 deposit, $480 rest at DONE.",
+        {
+         "list": {
+          "head": [
+           "Service",
+           "Before",
+           "After"
+          ],
+          "rows": [
+           [
+            "Custom tiered cake for 80",
+            "$160 deposit",
+            "$480 at DONE"
+           ]
+          ],
+          "plain": true
+         },
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "a cake is never named-only"
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "does": "On the page, Alex adds how to get in and anything Nico should know. None of it changes the time or price."
+   }
+  ]
+ },
+ "notes": "Refit R11 (Tue Oct 27 2026, frozen master, refit-Q01). Started from the caterer (the custom-cake baker runs like catering: food for an event, quoted from photos, a contract both sign, a deposit, delivery and setup at the venue, allergies on the secure page, pickups at the shop).\nNames: Sam Lee's main company is Lee Cake Studio LLC (16 Orchard St: custom cakes and dessert tables; trade names Lee Cakes and Lee Dessert Tables). His second company is Lee's Bakeshop LLC (31 Cedar St: a pickup counter and a tasting table; the master's barbershop). Flow A runs at the bakeshop, flow B at the studio. Mara and Ines bake at the shop; Nico (lead decorator, delivers) and Ellis (menu cakes, delivers) at the studio.\nFacts: documents (a signed contract for a custom or wedding cake), extrawork (a cake cutting or a stand added on the day), forms (the allergen notice on the secure page), photos (a custom cake quoted from photos). Settings: A set start (a pickup slot), B window (a 2-hour delivery window); free cancel 24 hours before at the shop, 2 days before for the studio. No switches: no2 is off (the $2 applies to every booking, D97); no license or permit is checked by Rosie (D96).\nMoney, flow A (at the bakeshop): list|full|none (main: a $55 tasting for 2 or a board cake, paid in full when booked); list|deposit|card (a 2-tier party cake for 30: $140, a $40 deposit, the $100 rest charged to the saved card at pickup; the $40 is the fee if it's missed); photos|deposit|card (a custom cake quoted from photos at $90 that Sam OKs: a $20 deposit when booked, the $70 rest charged to the saved card at pickup).\nMoney, flow B (at the customer's place, delivered and set up): photos|deposit|card (main: a 3-tier cake for 80 quoted from photos at $640 and OK'd by Sam; a signed contract and a $160 deposit when booked; the $480 rest charged to the saved card when Nico texts DONE; the $160 fee is never more than the deposit); list|deposit|card (a 2-tier menu cake for 30: $150, a $40 deposit, the $110 rest charged to the saved card at DONE); list|full|none (the same cake paid in full when booked, fee $40).\nRemoved: every money hold (no cake stand, cake or tasting takes one), every rest charged on a set day (now at pickup or DONE, to the saved card), the money vary keys that tied with the master's variants, the license-lookup wording in rename right sides (on file as given, D96), and the extra-work quote steps are kept as the master has them (a cake cutting is one pay link on the day). Plumbing and water-heater words renamed to the cake trade.\nNot sure (for the verifier): (1) a 'DONE' charge of the saved card for a delivered cake, with no pickup; (2) B's $160 fee equals the custom cake deposit (pay.late 'may keep ... from what you paid'); (3) the food-permit line is the state's form (the owner's), not checked by Rosie.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Signature cut and hot towel shave",
+    "two skin fades",
+    "catering",
+    "hot towel",
+    "A no-show is marked 15 minutes after the start",
+    "A barbershop has none, so nothing is sent here.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Do you do kids cuts? My son is 8.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "A repair shop, a tailor or a groomer does.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop books a person's time.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "May the shop show photos of your hair? Yes / No",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "The state's license lookup is down, so Quinn S.'s license isn't checked yet.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Avery's license is checked again when the lookup answers.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "A haircut could mean a salon or a barbershop.",
+    "Alex bought a package of cuts at the shop.",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a cut every 4 weeks.",
+    "A barbershop takes no drop-offs.",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Riley stopped Alex M.'s cut.",
+    "plumbing and electrical jobs",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "Avery · license not found",
+    "A haircut needs nothing.",
+    "Avery · license expired",
+    "Stopped Alex M.'s cut.",
+    "License renewal",
+    "1 color quote",
+    "Avery: barber",
+    "At the chair",
+    "EC22871",
+    "BS20981",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop's",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Barbershop",
+    "barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "Barber",
+    "Signature cut and shave",
+    "signature cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "groom's party",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "A beard trim is",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Color and cut",
+    "color and cut",
+    "a color correction",
+    "Color correction",
+    "house calls",
+    "house call",
+    "at the chair",
+    "shops",
+    "Drain clearing",
+    "patch test",
+    "like a burst pipe or a lockout",
+    "MP045210",
+    "photos of your hair",
+    "water heater",
+    "heater",
+    "perm",
+    "hot towel",
+    "shave",
+    "skin fade",
+    "shave",
+    "perms",
+    "perm"
+   ],
+   "B": [
+    "water heaters, within 25 miles",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "My sink won't drain",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "drain clearings",
+    "tapping a neighbor's water line without asking",
+    "cracks the cabinet floor",
+    "Adding a faucet check? Say so.",
+    "catering",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Plumbing is live",
+    "Plumbing stays live",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Then the booking goes on, marked urgent.",
+    "Fri 8am",
+    "MOVE Alex to Thu 12pm",
+    "Thu Oct 22, arriving 12–2pm",
+    "Written estimate and terms",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes go to the plumber, one line each.",
+    "with one arrival window and one code",
+    "Both fit in the same arrival window.",
+    "Every 12 months",
+    "Arrival times:",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Rental 1",
+    "Rental 2",
+    "Say Alex asks for a water heater flush every year.",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Yearly water heater flush plan",
+    "Mon–Fri 7:30am–5:30pm",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing books a 2-hour window.",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "One of the shop's barbers does house calls.",
+    "Alex's home in Springfield is inside it.",
+    "At my home.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "The state's license lookup is down, so Reese K.'s license isn't checked yet.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Casey's license is checked again when the lookup answers.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Jordan priced a water heater replacement for Alex M.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Your water heater price is with Lee Home Services.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan only, until others are licensed there",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Contract · Water heater replacement · $640",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Drain clearings already booked keep $179.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "My gas water heater got wet in a flood.",
+    "Jordan finds mold behind the sink wall.",
+    "The shop's chair is in the other flow.",
+    "Can I skip next week's drain cleaning?",
+    "Old pipes: bring the camera next time.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Jordan finds corroded shutoff valves.",
+    "Riley also does color and house calls",
+    "I'll be home 30 minutes late, sorry!",
+    "Riley: barber, color and house calls",
+    "Say Alex books for a parent's home.",
+    "You can look for a roofer near you.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Call a mold cleanup company first",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The job should be done by 10am.",
+    "No. It doesn't smell like gas.",
+    "There's no counter at a home.",
+    "My kitchen drain is clogged.",
+    "plumbing and electrical jobs",
+    "Is it safe to turn back on?",
+    "NOTE grease clog 12 ft in.",
+    "Mold behind the sink wall",
+    "Casey · license not found",
+    "The service call is $89.",
+    "Priced from your photos",
+    "Jordan found more work.",
+    "Casey · license expired",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "No. No huele a gas.",
+    "the shutoff valves",
+    "Book a free fix",
+    "Arrival windows",
+    "License renewal",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "Avery: barber",
+    "Yard drain",
+    "EC22871",
+    "BS20981",
+    "leehomeservices.com",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "plumbing and electrical",
+    "electrical jobs",
+    "Electrical",
+    "electrical",
+    "Plumbing license",
+    "Plumbing",
+    "plumbing",
+    "a plumber",
+    "plumber",
+    "barbershop",
+    "a barber",
+    "barber",
+    "Barber",
+    "haircut",
+    "house calls",
+    "A drain clearing with",
+    "a drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "service call",
+    "Labor",
+    "arriving 8–10am",
+    "arriving 10am–12pm",
+    "arriving 12–2pm",
+    "new arrival time",
+    "I'm home",
+    "Alex is home",
+    "they're home",
+    "you're home",
+    "Nobody home",
+    "nobody home",
+    "wasn't home",
+    "was home",
+    "like a burst pipe or a lockout",
+    "travel fee",
+    "The $160 valve quote",
+    "MP045210",
+    "water heater",
+    "heater",
+    "sink",
+    "pipe",
+    "drain",
+    "faucet",
+    "cabinet",
+    "water line",
+    "shave"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-23": "39941a5377",
+   "S13-05": "ffcae1a1b0",
+   "S1-12": "41b86c1e72",
+   "S1-21": "913a9558f4",
+   "S1-38": "b50b0bd4e8",
+   "A4-66": "f622d7fe12",
+   "A4-25": "e9a8fd4868",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A7-96": "d540b91653",
+   "A5-21": "15fe900660",
+   "A8-44": "4410a4860c",
+   "A4-50": "6f43775326",
+   "A4-14": "95c7ffcfab",
+   "S11-56": "bd841a4732",
+   "A4-43": "c17d56f766",
+   "A4-65": "fa7ec0389d",
+   "A8-03": "7accda6f86",
+   "A7-70": "da4cede3e2",
+   "A8-14": "5b54026a9c",
+   "A10-42": "4f28189298",
+   "S2-21": "bf6617b6d3",
+   "A4-85": "f164e7b264",
+   "A8-38": "5e48b74f3a",
+   "A3-20": "b8251d2535",
+   "A7-14": "6a57738a17",
+   "A7-21": "996ff87f58",
+   "A9-01": "bad55310a4",
+   "A8-35": "a67e890a5b",
+   "A8-37": "0a30466995",
+   "A6-04": "fe10e3d360",
+   "S1-13": "eca22651fd",
+   "A8-53": "33f4da69f5"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-23": "5b2324d920",
+   "S13-05": "164ce06368",
+   "S1-12": "0bea92643b",
+   "S1-21": "334e0a791c",
+   "S1-38": "6301c86637",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B10-37": "be87433467",
+   "B7-93": "4d6f89e473",
+   "B4-04": "df3ea4b2f5",
+   "B4-23": "3bbc0f30df",
+   "B4-38": "9539521dc7",
+   "B4-34": "74ff52d83d",
+   "B7-07": "954270db4b",
+   "B7-10": "b5b9295e82",
+   "B7-18": "d53cef58f7",
+   "B7-61": "342b55fd9b",
+   "B8-01": "df9177b059",
+   "B8-18": "530038d2b8",
+   "B8-39": "aa75251207",
+   "B8-23": "dd780a2ec8",
+   "B10-01": "814aa1fde7",
+   "B7-20": "364245afef",
+   "B8-24": "bd5fb0ef0b",
+   "B10-05": "a326ea3c0b",
+   "B7-05": "e28a131872",
+   "B8-09": "8fdb7abf3f",
+   "B8-54": "0f180048ca",
+   "B8-60": "3076242203",
+   "B8-61": "79d4d31102",
+   "B8-34": "643812e26f",
+   "S11-56": "8b6c6c101f",
+   "S11-58": "3461928783",
+   "S11-22": "d83ca09a76",
+   "B6-06": "1d676278da",
+   "S11-38": "58d27fc71e",
+   "B4-13": "ecedd7f044",
+   "B3-22": "19f64ba1ba",
+   "B3-19": "2f53161fb2",
+   "B4-27": "4b45128d2c",
+   "B4-46": "cac59291a3",
+   "B8-44": "3847104a93",
+   "B9-04": "6017d4c54a",
+   "S11-46": "ed17f66a63",
+   "B4-97": "04796bf8db",
+   "B6-04": "6d888abcaa",
+   "S2-21": "bf6617b6d3",
+   "S1-13": "6964bfbe60",
+   "B10-32": "7713bff255"
+  }
+ }
+}

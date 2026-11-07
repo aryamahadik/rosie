@@ -1,0 +1,3220 @@
+{
+ "id": "flooring",
+ "name": "Flooring installer",
+ "style": "Project",
+ "pattern": "project",
+ "from": "contractor",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a home improvement or contractor license for the company, where the state's form requires one. Some states license flooring only above a job size, or only for some floor types (hard floors but not carpet). Some license none.",
+   "ask": [
+    "The company's license or registration number, and its class",
+    "Any job-size or floor-type limit the license has",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business; each installer or salesperson too, where the state's form licenses them (the business's own word)",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "no_license": "Where the state licenses no flooring work, the business gives its registration only, and customers see no license claim. Insurance or a maker's installer certificate shows only once the business sends proof, as its own words.",
+   "blocks": [
+    "No flooring goes live until the company has given its license number, where one is required (the business's own word; Rosie never checks it)",
+    "A job over the license's limit, or a floor type it doesn't cover, is never quoted: the owner is told why. The owner checks the limit again when the floor is picked at the measure visit, and at each quote and change order."
+   ],
+   "lead_safe": "Work that disturbs paint in older homes, like taking off painted baseboards, only by a firm and a person certified for lead-safe work, where the rules require it",
+   "asbestos": "The business never removes asbestos. Old tile or glue is tested by an outside licensed inspector, where the rules or the plug-in call for a test.",
+   "showroom": "A showroom that sells home improvement work may need a license for the showroom and each salesperson, where the state's form says so. Floor consults alone need none in most states.",
+   "renewals": "License, insurance and bond dates kept; reminded 30 days out; a lapse pauses new bookings",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Measure visit, then project: the install is booked only after a written quote and a signed contract. The example business's own prices.",
+   "B": [
+    {
+     "name": "Measure visit with samples",
+     "price": "$89, credited to the floor if Alex signs within 30 days (the example's own price; a free measure is a starting option)",
+     "length": "60 minutes, plus the drive",
+     "where": "at the customer's place; an adult is home",
+     "before": "nothing taken at booking; a card may be saved for the $89 fee",
+     "after": "billed only if no contract follows"
+    },
+    {
+     "name": "Wood floor install (engineered or solid)",
+     "price": "quoted after the measure visit, by the square foot with material and 10% for waste (the example: about $11 a sq ft); a written quote the next business day, good for 30 days",
+     "length": "one crew lays about 600 sq ft in 3 days, after the wood rests at least 3 days",
+     "where": "at the customer's place",
+     "before": "nothing at booking; a deposit only after the contract is signed",
+     "after": "the wood payment once it's delivered; the last payment after the walk-through"
+    },
+    {
+     "name": "Vinyl plank install",
+     "price": "quoted after the measure visit (the example: about $7 a sq ft); in stock, no resting days",
+     "where": "at the customer's place",
+     "before": "the same",
+     "after": "the same"
+    },
+    {
+     "name": "Tile floor (Lee Tile)",
+     "price": "free measure visit, then a quote",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Laundry room floor",
+     "price": "priced from photos (example: $640); over $500, Sam OKs it",
+     "length": "1 day",
+     "where": "at the customer's place",
+     "before": "a signed contract, then a 25% deposit",
+     "after": "the rest on the bill"
+    },
+    {
+     "name": "Board repair",
+     "price": "$179, from the list (up to 3 boards)",
+     "length": "1 to 2 hours",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Buff and recoat",
+     "price": "$150, from the list",
+     "length": "half a day",
+     "where": "at the customer's place",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Garage floor sealing",
+     "price": "$179, from the list",
+     "where": "at the customer's place; nobody needs to be home",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Moisture test",
+     "price": "$199, with a written report a few days later",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Old floor removal",
+     "price": "per sq ft, in the quote; old tile or black glue only after a clear lab test"
+    },
+    {
+     "name": "Lab test of old tile and glue",
+     "price": "in the quote; done by an outside licensed inspector"
+    },
+    {
+     "name": "New baseboards and thresholds",
+     "price": "per foot, in the quote"
+    },
+    {
+     "name": "Furniture moving",
+     "price": "per room, in the quote; no pianos or safes"
+    },
+    {
+     "name": "Subfloor repair",
+     "price": "priced by a signed change order when it's found (the example: $190 a sheet)"
+    },
+    {
+     "name": "Labor",
+     "price": "$120 an hour, 1-hour minimum; added to a job, never booked alone"
+    },
+    {
+     "name": "Wood sold with no install",
+     "price": "a store sale, the business's own, outside Rosie. Sold at the home, it gets any cancel notice the rules require."
+    }
+   ],
+   "A": [
+    {
+     "name": "Floor consult",
+     "price": "$35, 30 minutes, with the showroom samples",
+     "where": "at the showroom",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the showroom desk"
+    },
+    {
+     "name": "Stair and trim picks",
+     "price": "$40",
+     "where": "at the showroom",
+     "before": "a card saved",
+     "after": "at the showroom desk"
+    },
+    {
+     "name": "Sample loan",
+     "price": "$20, up to 5 samples to take home for a week"
+    },
+    {
+     "name": "Finish sample",
+     "price": "$15, an add-on to a floor match"
+    },
+    {
+     "name": "Stain pick",
+     "price": "$25",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Floor preview session",
+     "price": "$55, 60 minutes: the floors shown in the customer's own room photos; credited to the floor if Alex orders an install",
+     "where": "at the showroom",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Whole-home floor plan (layout, thresholds, materials)",
+     "price": "$140, 2½ hours",
+     "where": "at the showroom",
+     "before": "a $40 deposit, with the $100 rest at the desk, or a card saved for the $20 fee",
+     "after": "at the showroom desk"
+    },
+    {
+     "name": "Pattern layout",
+     "price": "priced from the customer's photos and measurements (example: $90), like herringbone; Sam OKs each one",
+     "where": "at the showroom"
+    },
+    {
+     "name": "Floor match",
+     "price": "priced at the showroom after a $25 consult, once the old floor is seen (the example: from $110); a 15-minute board check first",
+     "where": "at the showroom"
+    }
+   ],
+   "capacity": "One estimator or consultant per booking; one install crew, one job at a time; the showroom's one layout table is saved with specialty work",
+   "skills": "Measure visits and quotes: estimators (the owner can stand in). Installs: the crew lead and crew. Showroom: floor consultants. Specialty work: only the consultants Sam names.",
+   "nobody_home": "Install days with a lockbox and garage floor sealing: nobody needs to be home; a start and end photo. The measure visit needs an adult home.",
+   "online": "No video consult: the showroom's samples are the point",
+   "store_sales": "Materials sold at the showroom counter are the showroom's own sales, outside Rosie"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What's on the floor now? (carpet, tile, vinyl, wood, not sure)",
+    "Which rooms, and about how big?",
+    "What floor would you like? (wood, vinyl plank, tile, carpet)"
+   ],
+   "after_time": [
+    "The year the home was built (old tile or glue may be tested first; painted trim in older homes is taken off the lead-safe way, where the rules require it)",
+    "Furniture to move",
+    "Slab or crawl space?",
+    "Do you own the home or rent? (the owner signs the contract)",
+    "Parking, pets, and how to get in"
+   ],
+   "secure_page_only": [
+    "Photos of the floors (optional)",
+    "Budget range",
+    "Door or lockbox codes"
+   ],
+   "who_may_book": "An adult who owns the home, or someone with the owner's written OK. A renter's install needs the owner to sign.",
+   "showroom": [
+    "Which rooms, and a rough size",
+    "Photos or a loose board to bring (optional; a floor match needs a board check first)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "part of a floor has caved in or dropped, cracking sounds under foot, a hole someone could fall through",
+     "says": "Leave that room now, and keep everyone out of it. Call 911 if anyone is hurt.",
+     "booking": "no booking until it's safe"
+    },
+    {
+     "words": "a gas smell, sparking wires, a carbon monoxide alarm",
+     "says": "Leave the house now. Then call 911 and the gas or power company.",
+     "booking": "no booking"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "a soft spot that may give way",
+     "says": "Keep everyone off the soft spot, and move heavy furniture away from it. If it drops or cracks, leave the room and call 911.",
+     "booking": "goes on, marked urgent, soonest times first"
+    },
+    {
+     "words": "water coming up through the floor, or a leak under it",
+     "says": "Shut off the water, and stay away from wet outlets. Call a plumber first if it's still coming.",
+     "booking": "goes on"
+    },
+    {
+     "words": "worry about old tiles, black glue or old paint",
+     "says": "Please don't sand, scrape or pull them up. They're tested first.",
+     "booking": "goes on; the test becomes a first step"
+    }
+   ],
+   "every_message": "The danger check runs first on every customer message: the first ask, the answers, and any later text",
+   "business_line": "Questions about old tiles, asbestos or the structure go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_quote": "The measure visit at the home, with samples, and an adult home",
+   "after_contract": [
+    "The cancel window ends before any test, order or work, where the state's rules give one",
+    "Old tile or black glue in an older home: lab-tested by an outside licensed inspector before anything comes up; nothing is touched meanwhile",
+    "Special-order wood is ordered only after the window and the test; stock vinyl plank needs no wait",
+    "The wood rests in the home at least 3 days, then a moisture check before a board goes down"
+   ],
+   "prep": [
+    "Leave the furniture in place for the measure visit",
+    "Before the install: empty dressers and closets, and put away anything fragile; the crew moves the big furniture",
+    "Keep the heat or air on while the wood rests",
+    "Put any door or lockbox code on the secure page"
+   ],
+   "lead_safe_pamphlet": "In an older home, the lead-safety pamphlet is given before work, with a signed receipt, where the rules require it",
+   "showroom_prep": [
+    "Bring room sizes, photos, or a loose board from the old floor",
+    "A floor match needs a 15-minute board check at least 2 days before"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Measure visit: the check-in code at the door. Each install day: that day's code, or the lockbox and a start photo when nobody is home. Showroom: the code at the desk.",
+   "at_the_visit": "The estimator measures, lifts a carpet corner in a closet to see what's under it, and brings samples; the customer picks the floor; the written quote follows the next business day",
+   "outside_visits": "Anyone from outside the team (the lab tester, a removal company) is named to the customer ahead, so they aren't turned away at the door; the owner marks their visit done",
+   "changes": "Hidden damage under the old floor, like a soft subfloor, is priced by a written change order with photos, signed by both before the fix. Wood never goes over soft subfloor; the crew works in other rooms meanwhile.",
+   "moisture": "The wood and the subfloor are checked with a moisture meter against the wood maker's limits before a board goes down; too damp, the crew waits",
+   "install": "A moisture barrier, the boards, new baseboards and thresholds; the furniture goes back; spare boards are left for repairs",
+   "done": "The walk-through of every room against the contract, fixes on the spot, then DONE on the last day",
+   "showroom_done": "DONE after the consult, with the picks saved for the measure visit and quote",
+   "before_photos": "The floors, the baseboards, and any old water stain or damage"
+  },
+  "pf.money": {
+   "measure": "The example's $89 measure visit is credited to the floor; billed only if no contract follows. A free measure is the safe start.",
+   "no_money_before_contract": "On an install, nothing is taken before the contract is signed by everyone",
+   "deposit": "Only after signing; the deposit cap comes from the state's form (the example: $920 on $9,200)",
+   "kept_apart": "Money paid before the work is kept apart or bonded where the state's rules require it (a switch from the state's form)",
+   "materials": "The wood payment is billed once the wood is delivered to the home, never ahead of it, where the state's rules say so",
+   "last_payment": "After the walk-through, with nothing left to fix",
+   "change_orders": "Added to the last payment",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the estimator texts 'paid check'.",
+   "tips": "No tip line",
+   "tax": "Tax on materials and labor follows the state's form",
+   "showroom": "The floor preview session's $55 is credited to the floor if Alex orders an install; the $20 missed-consult fee only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Door or lockbox codes",
+    "The budget",
+    "Contract, change order and test papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who lets the crew in"
+  },
+  "pf.staff": {
+   "roles": "Estimator (Danny): measure visits, quotes and running the job. Crew lead (Hugo): installs with the crew, board repairs and recoats; he can measure too. Floor consultants (Elena, Leo) at the showroom.",
+   "licenses": "The company holds the license or registration. Where the state's form also licenses each installer or salesperson, each one may add a number (optional, shown as given, not checked by Rosie).",
+   "lead_safe": "A certified renovator on each install in an older home whenever painted parts are disturbed, where lead-safe rules apply. A crew without one isn't scheduled for those days.",
+   "outside": "The lab tester and any removal company aren't on the team: no texts from Rosie, no check-in code",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Sam or another estimator may take a measure visit; a job keeps its estimator unless Sam moves it; only Elena does specialty work at the showroom"
+  },
+  "pf.rules": {
+   "contract": "A written contract for an install where the state's rules require one (often above an amount), signed by everyone on title and by the business before any money",
+   "contract_parts": "The parts the state's form lists (license number, dates, price, deposit, cancel notice, any lien or homestead notice), with special-order material listed apart and the outside tester named",
+   "cancel_window": "A cancel window after a contract signed at the home, where the state's rules give one; the test, orders and work wait for it; a cancel in it gets a full refund in the time the rules set",
+   "sale_at_home": "Goods sold at the home get the cancel notice the rules require, even with no install",
+   "change_orders": "Written, priced and signed by both before the changed work",
+   "subcontractors": "A list of subcontractors and suppliers before work starts, where the state's rules require it",
+   "lien_release": "A lien release with the last payment, where the state's rules provide one",
+   "show": "The license number on the listing, the quote, the contract and the receipt, where the state's rules require it",
+   "warranty": "2 years on the install (the example's); the maker's warranty on the finish; a care guide",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "asbestos_found": "The business never removes it. The customer picks: cover it (no sanding or leveling, a new price by change order), a licensed removal company first, or cancel with a full refund. Nothing is touched or ordered meanwhile. Rosie's rule.",
+   "too_damp": "The crew waits, the install days move, and nothing is added to the price. Rosie's rule.",
+   "hidden_damage": "A soft or water-damaged subfloor: a change order with photos before the fix; wood never goes over it",
+   "backorder": "Special-order wood is late: new install dates only with the customer's OK; no reply in 2 days, the owner calls",
+   "cancel_after_window": "Sam and the customer settle it; Rosie moves no money on its own",
+   "over_license_limit": "Not quoted, and the owner is told why",
+   "walk_through_dispute": "Goes to Sam; the last payment waits",
+   "nobody_home": "Lockbox install days with start and end photos",
+   "weather": "Garage floor sealing: the forecast is checked the day before (cold or damp air)",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "photos",
+   "documents",
+   "firststeps",
+   "extrawork",
+   "stages",
+   "banktransfer",
+   "multiday"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Elena and Leo (floor consultants)",
+   "other": "Others (a bank, a landlord)"
+  },
+  "B": {
+   "staff": "Danny and Hugo (estimator and crew lead)",
+   "out": "Outside checks (ID check, forecast, the tile lab)",
+   "other": "Others (a bank, a landlord, the tile tester)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Elena"
+  },
+  "B": {
+   "staff": "Danny"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Riley and Avery cut hair;",
+    "Elena and Leo sell floors;"
+   ],
+   [
+    "Elena and Leo cut hair;",
+    "Elena and Leo sell floors;"
+   ],
+   [
+    "at $140 an hour",
+    "at $120 an hour"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do carpet installs"
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the board repair for today"
+   ],
+   [
+    "the leak repair",
+    "the board repair"
+   ],
+   [
+    "massage",
+    "carpet"
+   ],
+   [
+    "Massage",
+    "Carpet"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a soft spot in my floor."
+   ],
+   [
+    "My sink won't drain",
+    "My floor is soft"
+   ],
+   [
+    "under the sink this morning",
+    "under the floor this morning"
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a soft spot under the floor, today"
+   ],
+   [
+    "The service call is $89.",
+    "The board repair is $179."
+   ],
+   [
+    "new pipes put in one day",
+    "new floors put in one day"
+   ],
+   [
+    "pipes are in",
+    "subfloor is in"
+   ],
+   [
+    "wall pipe",
+    "wall trim"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "pulling up a neighbor's floor without asking"
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a moisture test?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the area by the back door."
+   ],
+   [
+    "Estimate visit",
+    "Measure visit"
+   ],
+   [
+    "fades and hot towel shaves",
+    "stair picks and sample loans"
+   ],
+   [
+    "barbershops",
+    "floor showrooms"
+   ],
+   [
+    "asks for a perm",
+    "asks for a carpet install"
+   ],
+   [
+    "skin fades",
+    "stair and trim picks"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a car tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Flooring takes no jobs sent now, and neither does the showroom."
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a car tow"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Repairs have a set price. New floors are quoted after a measure visit. A floor that has dropped stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company where the state asks, and one for each installer where it licenses them."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Floor consults, stair picks and sample loans at the showroom. Sales licenses only where the state asks."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works with us"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A flooring example: a soft spot gets 'keep everyone off it'."
+   ],
+   [
+    "Electric.",
+    "Old sheet vinyl."
+   ],
+   [
+    "A plumber",
+    "An installer"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Stair and trim picks at Lee Floor Gallery are $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for stair and trim picks at $35"
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a sample board fell and scratched a bag today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A sample board fell and scratched my bag."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Elena sees the old floor"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do stain picks? We're refinishing our stairs."
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a stain pick is $25"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A floor consult could mean a flooring store or an installer."
+   ],
+   [
+    "Books the groom's party together",
+    "Books three neighbors together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Three neighbors book floor consults for one morning. Rosie finds times side by side with Elena and Leo."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A floor consult and a stain pick work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your floor"
+   ],
+   [
+    "Alex's hair",
+    "Alex's photos"
+   ],
+   [
+    "patch test",
+    "board check"
+   ],
+   [
+    "skin-test result",
+    "board check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the showroom during my consult?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The soft spot in my floor got worse. Can I still come in?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: engineered white oak, 7-inch planks, matte finish, level thresholds"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the hall closet."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the hall closet"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Market St"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero escoger pisos el sábado."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero escoger pisos el sábado."
+   ],
+   [
+    "Gloss to finish",
+    "Finish sample"
+   ],
+   [
+    "$15 gloss",
+    "$15 finish sample"
+   ],
+   [
+    "gloss",
+    "finish sample"
+   ],
+   [
+    "Barber license",
+    "Sales license"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Room-by-room plan"
+   ],
+   [
+    "Color plan",
+    "Room-by-room plan"
+   ],
+   [
+    "color plan",
+    "room-by-room plan"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Flooring's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Flooring"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Floor Gallery LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Floor Gallery"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Flooring"
+   ],
+   [
+    "Lee Electric",
+    "Lee Tile"
+   ],
+   [
+    "1200 Main St",
+    "1500 Commerce Dr"
+   ],
+   [
+    "88 Elm St",
+    "140 Market St"
+   ],
+   [
+    "MP045210",
+    "HI045210"
+   ],
+   [
+    "EC22871",
+    "TL22871"
+   ],
+   [
+    "BS20981",
+    "HS20981"
+   ],
+   [
+    "JP031552",
+    "FI031552"
+   ],
+   [
+    "JE30417",
+    "TS30417"
+   ],
+   [
+    "Riley",
+    "Elena"
+   ],
+   [
+    "Avery",
+    "Leo"
+   ],
+   [
+    "Jordan",
+    "Danny"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "plumbing and electrical",
+    "flooring and tile"
+   ],
+   [
+    "electrical",
+    "tile"
+   ],
+   [
+    "Electrical",
+    "Tile"
+   ],
+   [
+    "Panel upgrade",
+    "Tile floor"
+   ],
+   [
+    "Plumber",
+    "Flooring installer"
+   ],
+   [
+    "plumber",
+    "installer"
+   ],
+   [
+    "plumbing",
+    "flooring"
+   ],
+   [
+    "Plumbing",
+    "Flooring"
+   ],
+   [
+    "barbershop",
+    "floor showroom"
+   ],
+   [
+    "Barbershop",
+    "Floor showroom"
+   ],
+   [
+    "barbers",
+    "consultants"
+   ],
+   [
+    "Barbers",
+    "Consultants"
+   ],
+   [
+    "barber",
+    "consultant"
+   ],
+   [
+    "Barber",
+    "Consultant"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Floor preview session"
+   ],
+   [
+    "Signature cut and shave",
+    "Floor preview session"
+   ],
+   [
+    "Signature cut",
+    "Floor preview session"
+   ],
+   [
+    "signature cut",
+    "floor preview session"
+   ],
+   [
+    "the Groom's package",
+    "the whole-home floor plan"
+   ],
+   [
+    "The Groom's package",
+    "The whole-home floor plan"
+   ],
+   [
+    "Groom's package",
+    "Whole-home floor plan"
+   ],
+   [
+    "Color and cut",
+    "Pattern layout"
+   ],
+   [
+    "color and cut",
+    "pattern layout"
+   ],
+   [
+    "Color correction",
+    "Floor match"
+   ],
+   [
+    "color correction",
+    "floor match"
+   ],
+   [
+    "color quote",
+    "specialty quote"
+   ],
+   [
+    "color",
+    "specialty work"
+   ],
+   [
+    "Color",
+    "Specialty work"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Stain pick"
+   ],
+   [
+    "kids cuts",
+    "stain picks"
+   ],
+   [
+    "Kids cut",
+    "Stain pick"
+   ],
+   [
+    "kids cut",
+    "stain pick"
+   ],
+   [
+    "Skin fade",
+    "Stair and trim picks"
+   ],
+   [
+    "skin fade",
+    "stair and trim picks"
+   ],
+   [
+    "Beard trim",
+    "Sample loan"
+   ],
+   [
+    "beard trim",
+    "sample loan"
+   ],
+   [
+    "Haircuts",
+    "Floor consults"
+   ],
+   [
+    "haircuts",
+    "floor consults"
+   ],
+   [
+    "Haircut",
+    "Floor consult"
+   ],
+   [
+    "haircut",
+    "floor consult"
+   ],
+   [
+    "the chair",
+    "the showroom"
+   ],
+   [
+    "Drain clearing",
+    "Board repair"
+   ],
+   [
+    "Drains",
+    "Board repairs"
+   ],
+   [
+    "Drain",
+    "Board repair"
+   ],
+   [
+    "an estimate visit",
+    "a measure visit"
+   ],
+   [
+    "estimate visit",
+    "measure visit"
+   ],
+   [
+    "water heaters",
+    "laundry room floors"
+   ],
+   [
+    "water heater",
+    "laundry room floor"
+   ],
+   [
+    "shops",
+    "showrooms"
+   ],
+   [
+    "shop",
+    "showroom"
+   ],
+   [
+    "Shop",
+    "Showroom"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "cabinet floor",
+    "hall door"
+   ]
+  ],
+  "B": [
+   [
+    "Riley and Avery cut hair;",
+    "Elena and Leo sell floors;"
+   ],
+   [
+    "Elena and Leo cut hair;",
+    "Elena and Leo sell floors;"
+   ],
+   [
+    "at $140 an hour",
+    "at $120 an hour"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do carpet installs"
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the board repair for today"
+   ],
+   [
+    "the leak repair",
+    "the board repair"
+   ],
+   [
+    "massage",
+    "carpet"
+   ],
+   [
+    "Massage",
+    "Carpet"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a soft spot in my floor."
+   ],
+   [
+    "My sink won't drain",
+    "My floor is soft"
+   ],
+   [
+    "under the sink this morning",
+    "under the floor this morning"
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a soft spot under the floor, today"
+   ],
+   [
+    "The service call is $89.",
+    "The board repair is $179."
+   ],
+   [
+    "new pipes put in one day",
+    "new floors put in one day"
+   ],
+   [
+    "pipes are in",
+    "subfloor is in"
+   ],
+   [
+    "wall pipe",
+    "wall trim"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "pulling up a neighbor's floor without asking"
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a moisture test?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the area by the back door."
+   ],
+   [
+    "Estimate visit",
+    "Measure visit"
+   ],
+   [
+    "fades and hot towel shaves",
+    "stair picks and sample loans"
+   ],
+   [
+    "barbershops",
+    "floor showrooms"
+   ],
+   [
+    "asks for a perm",
+    "asks for a carpet install"
+   ],
+   [
+    "skin fades",
+    "stair and trim picks"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a car tow."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Flooring takes no jobs sent now, and neither does the showroom."
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a car tow"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Repairs have a set price. New floors are quoted after a measure visit. A floor that has dropped stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company where the state asks, and one for each installer where it licenses them."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Floor consults, stair picks and sample loans at the showroom. A consult at home too. Sales licenses only where the state asks."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works with us"
+   ],
+   [
+    "Sam adds heating and cooling to",
+    "Sam adds carpet cleaning to"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW carpet cleaning"
+   ],
+   [
+    "Heating and cooling for",
+    "Carpet cleaning for"
+   ],
+   [
+    "leehomeservices.com",
+    "leeflooring.com"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Danny measured. Here's the price for your floor."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Danny measures and texts the price with its lines."
+   ],
+   [
+    "credited to the repair",
+    "credited to the floor"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the floor now, the rooms and their size, the year the home was built, and the floor wanted."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a floor that has dropped, or a soft spot that may give way."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old water stain by the hall bath, carpet worn"
+   ],
+   [
+    "Under the sink, before",
+    "Living room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Hall bath doorway, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A new floor is quoted after the measure visit: only the $89 visit was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Danny finds mold under the old carpet pad. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Danny found mold under your old carpet pad and stopped that part of the work."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold under the carpet pad"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold under the carpet pad"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the floor in that room"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left sawdust in the hall.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left sawdust in the hall."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Danny measure my kitchen next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Danny's next times for a kitchen measure."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? El piso del baño está blando."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? The bathroom floor feels soft."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A flooring example: a soft spot gets 'keep everyone off it'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep everyone off the soft spot, and to leave the room and call 911 if the floor drops."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No pise la parte blanda y aleje los muebles pesados. Si el piso se hunde o cruje, salga del cuarto y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep off the soft spot, and move heavy furniture away. If the floor drops or cracks, leave the room and call 911."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Leave that room now, and keep everyone out of it. Then call 911."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said part of a floor caved in. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "Part of a floor caved in"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to leave the room, then call 911"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to sand the old tiles under my carpet myself?"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A new floor happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Flooring doesn't do, like new kitchen cabinets."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Flooring does floors and tile, not cabinets. Nothing was saved. You can look for a cabinet maker near you."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Do we need to move the furniture before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Danny says no. Please leave it where it is."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE old water stain under the boards, now dry. Check the subfloor next time."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Danny gashes a hand and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT gashed my hand, need to stop"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the hall door"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched hall door"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Danny scratched the hall door at Alex M.'s."
+   ],
+   [
+    "Signed: the deposit, then the work days",
+    "Signed: the deposit comes next"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 stair redo, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your stairs"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 stair redo"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your stair redo"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like refinishing the stairs Danny noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to refinish the stairs, from Danny's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Refinish the stairs"
+   ],
+   [
+    "Repipe",
+    "Stair redo"
+   ],
+   [
+    "repipe",
+    "stair redo"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like special-order wood that hasn't come"
+   ],
+   [
+    "This job needs a permit first.",
+    "This job needs an old-tile test first."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Three boards by my back door are cupped. Can someone replace them Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Three, by the back door. It doesn't feel soft."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Do the boards move when you step on them?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a board by the back door now gives underfoot."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "A board by the back door gives when I step on it now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep everyone off that spot, and move heavy furniture away from it."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you recoat my floor every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Flooring has a yearly recoat plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a recoat every year."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 board repair"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "One of the new boards lifts 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "One of the new boards is lifting."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s board repair from Thu Oct 22 is lifting."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your board repair is under warranty"
+   ],
+   [
+    "Electric.",
+    "Old sheet vinyl."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Danny finds two cracked door thresholds."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace both door thresholds, cracked"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both door thresholds"
+   ],
+   [
+    "both shutoff valves",
+    "both door thresholds"
+   ],
+   [
+    "the shutoff valves",
+    "the door thresholds"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 threshold quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 threshold work"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 subfloor 165 boards 80"
+   ],
+   [
+    "1-year labor warranty",
+    "2-year install warranty"
+   ],
+   [
+    "Shutoff valve",
+    "Subfloor patch"
+   ],
+   [
+    "shutoff valve",
+    "subfloor patch"
+   ],
+   [
+    "Supply line",
+    "New boards"
+   ],
+   [
+    "supply line",
+    "new boards"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Danny also test my slab for moisture?"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Readings and Danny's notes"
+   ],
+   [
+    "LATE camera report",
+    "LATE moisture report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the moisture report link"
+   ],
+   [
+    "Sewer camera report",
+    "Moisture report"
+   ],
+   [
+    "sewer camera report",
+    "moisture report"
+   ],
+   [
+    "Sewer camera inspection",
+    "Moisture test"
+   ],
+   [
+    "sewer camera inspection",
+    "moisture test"
+   ],
+   [
+    "a dripping faucet",
+    "a squeaky stair"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The squeaky stair is a small repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone seal my garage floor this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Garage floor"
+   ],
+   [
+    "yard drain",
+    "garage floor sealing"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa board repair Thu 12-2 Hugo"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a floor check at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's floor check?"
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Urgent board repair"
+   ],
+   [
+    "a plumber",
+    "an installer"
+   ],
+   [
+    "A plumber",
+    "An installer"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A floor consult could mean a flooring store or an installer."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The showroom is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Floor Gallery can do your floor consult at the showroom for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Flooring's"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Flooring LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Flooring"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Floor Gallery"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Flooring"
+   ],
+   [
+    "Lee Electric",
+    "Lee Tile"
+   ],
+   [
+    "1200 Main St",
+    "1500 Commerce Dr"
+   ],
+   [
+    "88 Elm St",
+    "140 Market St"
+   ],
+   [
+    "42 Oak St",
+    "31 Aspen Ct"
+   ],
+   [
+    "MP045210",
+    "HI045210"
+   ],
+   [
+    "EC22871",
+    "TL22871"
+   ],
+   [
+    "BS20981",
+    "HS20981"
+   ],
+   [
+    "JP031552",
+    "FI031552"
+   ],
+   [
+    "JE30417",
+    "TS30417"
+   ],
+   [
+    "Riley",
+    "Elena"
+   ],
+   [
+    "Avery",
+    "Leo"
+   ],
+   [
+    "Jordan",
+    "Danny"
+   ],
+   [
+    "Casey",
+    "Hugo"
+   ],
+   [
+    "plumbing and electrical",
+    "flooring and tile"
+   ],
+   [
+    "electrical",
+    "tile"
+   ],
+   [
+    "Electrical",
+    "Tile"
+   ],
+   [
+    "Panel upgrade",
+    "Tile floor"
+   ],
+   [
+    "Plumber",
+    "Flooring installer"
+   ],
+   [
+    "plumber",
+    "installer"
+   ],
+   [
+    "plumbing",
+    "flooring"
+   ],
+   [
+    "Plumbing",
+    "Flooring"
+   ],
+   [
+    "barbershop",
+    "floor showroom"
+   ],
+   [
+    "Barbershop",
+    "Floor showroom"
+   ],
+   [
+    "barbers",
+    "consultants"
+   ],
+   [
+    "Barbers",
+    "Consultants"
+   ],
+   [
+    "barber",
+    "consultant"
+   ],
+   [
+    "Barber",
+    "Consultant"
+   ],
+   [
+    "color",
+    "specialty work"
+   ],
+   [
+    "beard trim",
+    "sample loan"
+   ],
+   [
+    "Haircut",
+    "Floor consult"
+   ],
+   [
+    "haircut",
+    "floor consult"
+   ],
+   [
+    "the chair",
+    "the showroom"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Board repair"
+   ],
+   [
+    "Drain clearings",
+    "Board repairs"
+   ],
+   [
+    "Drain clearing",
+    "Board repair"
+   ],
+   [
+    "drain clearing",
+    "board repair"
+   ],
+   [
+    "the kitchen drain",
+    "the board repair"
+   ],
+   [
+    "Kitchen drain",
+    "Board repair"
+   ],
+   [
+    "kitchen drain",
+    "board repair"
+   ],
+   [
+    "Water heater flush",
+    "Buff and recoat"
+   ],
+   [
+    "water heater flush",
+    "buff and recoat"
+   ],
+   [
+    "flush",
+    "recoat"
+   ],
+   [
+    "Drains",
+    "Board repairs"
+   ],
+   [
+    "drain",
+    "board repair"
+   ],
+   [
+    "Drain",
+    "Board repair"
+   ],
+   [
+    "service call",
+    "measure visit"
+   ],
+   [
+    "Service call",
+    "Measure visit"
+   ],
+   [
+    "an estimate visit",
+    "a measure visit"
+   ],
+   [
+    "estimate visit",
+    "measure visit"
+   ],
+   [
+    "Water heater replacement",
+    "Laundry room floor"
+   ],
+   [
+    "water heater replacement",
+    "laundry room floor"
+   ],
+   [
+    "Leak repair",
+    "Wood floor"
+   ],
+   [
+    "leak repair",
+    "wood floor"
+   ],
+   [
+    "water heaters",
+    "laundry room floors"
+   ],
+   [
+    "Water heater",
+    "Laundry room floor"
+   ],
+   [
+    "water heater",
+    "laundry room floor"
+   ],
+   [
+    "shops",
+    "showrooms"
+   ],
+   [
+    "shop",
+    "showroom"
+   ],
+   [
+    "Shop",
+    "Showroom"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "cabinet floor",
+    "hall door"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "cabinet"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Floor Gallery, Sam's flooring showroom, to pick floors from the samples with Elena on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Flooring to replace the carpet at 31 Aspen Ct with wood. Danny measures Thu Oct 22 between 8 and 10am and sends a written quote. The old tiles are tested, the wood rests, and Hugo's crew lays it. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "Floor consult, $35 at the showroom; a card saved for the $20 missed-consult fee; paid at the showroom desk.",
+    "list|none|counter": "Floor consult, $35; nothing taken; a YES books it; paid at the showroom desk.",
+    "list|full|none": "Floor preview session, $55, paid in full when booking; credited to the floor if Alex orders an install.",
+    "list|deposit|counter": "Whole-home floor plan, $140; a $40 deposit now; the $100 rest at the showroom desk.",
+    "photos|card|counter": "Pattern layout, priced from Alex's photos at $90 (Sam OKs it); a card saved for the $20 fee; paid at the showroom desk.",
+    "visit|card|counter": "Floor match, priced at the showroom after a $25 consult; a card saved for the $20 fee; paid at the showroom desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Floor consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Floor consult"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Floor preview session"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$20",
+     "name": "Whole-home floor plan"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Pattern layout"
+    },
+    "visit|*|*": {
+     "name": "Floor match"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Stair and trim picks",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$40",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Floor preview session",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "photos|deposit|bill",
+    "list|card|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "visit|none|bill": "Wood floors, 594 sq ft: the $89 measure visit, nothing taken; Danny's $9,200 written quote; the contract, a $920 deposit, $3,370 when the wood arrives; the last $4,910 on the bill Rosie texts.",
+    "visit|none|own": "The same floors, but Sam bills the deposit, the wood payment and the last payment his own way; Rosie sends nothing about money.",
+    "visit|card|bill": "The same floors, with a card saved for the $89 measure visit fee when he books.",
+    "photos|deposit|bill": "A laundry room floor priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill.",
+    "list|card|bill": "Board repair, $179 from the list (or a garage floor sealing); a card saved for the $89 fee; Rosie texts the bill after the job.",
+    "list|full|none": "Buff and recoat, $150 from the list, paid in full when booking; nothing more after."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Wood floor install"
+    },
+    "visit|*|*": {
+     "name": "Wood floor install"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Board repair"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Buff and recoat"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Laundry room floor"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "Laundry room floor"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Board repair",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$179",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Buff and recoat",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-15"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B5-34",
+   "B8-69"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Flooring and tile both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The flooring plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Estimators, crews and floor consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: measure visits, installs and floor consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No flooring job is ever sent now. A soft spot is marked urgent and shown the soonest times (B4-82), and the showroom takes none."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A floor consult is for the home's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the measure visit at home",
+      "does": "Elena saves Alex's picks: engineered white oak, with the rooms and sizes. If Alex wants it quoted, Elena books Danny's measure visit at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Flooring, Sam's other company. It runs in the other flow.",
+       "The picks go with it, so Danny brings those samples, and the quote uses them.",
+       "Materials bought at the counter are the showroom's own sales, outside Rosie.",
+       "Alex can also book the measure later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: measure visit at home, 4 rooms. Picks saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Elena saved your floor picks. Want Lee Flooring to come measure for a quote?",
+        {
+         "buttons": [
+          "Book the measure",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Floor consults use the samples at the showroom; the plug-in offers no video or phone consult."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The showroom books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The showroom books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The showroom books a consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A floor consult has no form to sign first; an install's contract comes after the quote, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the showroom."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "The showroom requires nothing brought: a board or photos help, and a floor match's board check is a first step booked before (A4-43)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No health, vision or pet plan pays for a floor consult, and the showroom bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No health, vision or pet plan pays for a floor consult, and the showroom bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the showroom for its work (A8-53's drop-off is off)."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Floor work: no child is left with the crew or alone in the showroom; minors are never booked"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Flooring and tile both pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The flooring plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Estimators, crews and floor consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: measure visits, installs and floor consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No flooring job is ever sent now. A soft spot is marked urgent and shown the soonest times (B4-82), and the showroom takes none."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "No floor goes in at the measure visit: Alex signs a written contract first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A floor quote is signed whole, as one contract. A smaller job is a new written quote from Danny, after the call Alex can ask for."
+   },
+   {
+    "op": "after",
+    "at": "B8-63",
+    "steps": [
+     {
+      "id": "B8-x03",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16",
+       "8.2"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Tue Nov 3, 9:00am",
+      "title": "A tester checks the old tiles first",
+      "q": "What does the lab find?",
+      "does": "The window ends with no cancel. Sam books an outside tester for the old tiles. Rosie tells Alex who is coming, so they aren't turned away at the door.",
+      "more": [
+       "The tester isn't on Sam's team, so there's no check-in code. Sam marks the visit done.",
+       "They cut two small samples, seal the spots, and send them to a lab.",
+       "Nothing is torn out, sanded or ordered until the result is in.",
+       "Rosie never texts the tester. Sam books and pays them, and the price is in the quote."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "To-do for Alex M.'s floors: book the old-tile test. The wood order waits for the result.",
+        {
+         "buttons": [
+          "Booked",
+          "Not yet"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Booked Wed Nov 4 9am, Springfield Testing"
+       ],
+       [
+        "san",
+        "cust",
+        "A tester from Springfield Testing comes Wed Nov 4 at 9am to sample your old tiles. They work for Lee Flooring, so please let them in."
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.rules"
+      ],
+      "tells": [
+       "owner",
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Clear: no asbestos",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Asbestos found",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "type": "split",
+          "line": [
+           "7.16",
+           "8.10",
+           "10.5"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Tue Nov 10, 10:00am",
+          "title": "Asbestos found: Alex picks what's next",
+          "q": "What does Alex pick?",
+          "does": "The lab finds asbestos in the old tile glue. Lee Flooring never removes it, so Alex picks: cover it, have a licensed company remove it first, or cancel.",
+          "more": [
+           "Nothing is touched, and no wood is ordered, while Alex decides.",
+           "Covering it means no sanding or leveling of the old tile.",
+           "No reply in 2 days: Sam is asked to call Alex.",
+           "The plug-in sets these choices, from Rosie's rule for this work."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "The lab found asbestos in the glue under your old tiles. Lee Flooring won't pull them up. What would you like to do?",
+            {
+             "card": {
+              "title": "Test result · old tiles",
+              "lines": [
+               "Asbestos in the glue",
+               "Nothing is touched meanwhile"
+              ]
+             },
+             "buttons": [
+              "Cover them",
+              "Removal first",
+              "Cancel, full refund"
+             ]
+            }
+           ]
+          ],
+          "needs": [
+           "pf.edges"
+          ],
+          "tells": [
+           "cust"
+          ],
+          "branches": [
+           {
+            "label": "1 Cover them",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "B8-x05",
+              "line": [
+               "8.8",
+               "7.14"
+              ],
+              "who": "san",
+              "to": "cust",
+              "via": "page",
+              "title": "Sam prices the floor over the old tiles",
+              "does": "Sam prices the floor laid over the old tiles, with no tear-out. Alex signs the change order on the secure page, like the contract. Then the wood is ordered.",
+              "more": [
+               "A lower price comes off the last payment. A higher one is added to it."
+              ],
+              "say": [
+               [
+                "san",
+                "cust",
+                "Here's the new price, with your floor laid over the old tiles.",
+                {
+                 "card": {
+                  "title": "Change order · Floor over the old tiles",
+                  "lines": [
+                   "Priced by Sam",
+                   "Signed before the wood is ordered"
+                  ],
+                  "button": "Read and sign",
+                  "link": "rosfield.com/k/f4c0"
+                 }
+                }
+               ]
+              ],
+              "needs": [
+               "pf.rules"
+              ],
+              "tells": [
+               "cust"
+              ]
+             }
+            ]
+           },
+           {
+            "label": "2 Removal first",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "B8-x06",
+              "line": [
+               "7.16",
+               "8.10"
+              ],
+              "who": "san",
+              "to": "cust",
+              "via": "msg",
+              "title": "Waits for the removal company",
+              "does": "Alex books a licensed removal company, outside Rosie. Lee Flooring waits, and orders the wood once the floor is cleared.",
+              "more": [
+               "The removal is its own job, with its own price.",
+               "Alex sends the clearance letter on the secure page. Then Sam orders the wood."
+              ],
+              "say": [
+               [
+                "san",
+                "cust",
+                "OK. Lee Flooring will wait. Send the removal company's clearance letter here when they're done, and Sam orders your wood.",
+                {
+                 "form": [
+                  "Clearance letter"
+                 ]
+                }
+               ]
+              ],
+              "tells": [
+               "cust"
+              ]
+             }
+            ]
+           },
+           {
+            "label": "3 Cancel, full refund",
+            "end": "end",
+            "endText": "Cancelled after the test. The $920 is refunded in full, and Sam and Danny are told.",
+            "steps": [
+             {
+              "id": "B8-x07",
+              "line": [
+               "10.5",
+               "7.16"
+              ],
+              "who": "pay",
+              "to": "cust",
+              "via": "sync",
+              "title": "Refunds the deposit in full",
+              "does": "Alex cancels. The $920 deposit comes back in full, as the contract says for this result. Sam and Danny are told.",
+              "more": [
+               "Only the $89 measure visit stays owed."
+              ],
+              "say": [
+               [
+                "san",
+                "cust",
+                "Your contract is cancelled, and your deposit is on its way back.",
+                {
+                 "card": {
+                  "title": "Refund · $920",
+                  "lines": [
+                   "Cancelled after the tile test",
+                   "Back to your card"
+                  ]
+                 }
+                }
+               ]
+              ],
+              "tells": [
+               "cust"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x08",
+      "type": "split",
+      "line": [
+       "4.29",
+       "7.17",
+       "8.18"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Tue Nov 10, 11:00am",
+      "title": "Orders the wood; Alex picks install days",
+      "q": "Does the wood come on time?",
+      "does": "Back to the main path: the lab finds no asbestos. Sam orders the white oak, now that the window and the test are done. Alex picks the install days.",
+      "more": [
+       "Special-order wood is ordered only now, as the contract says.",
+       "It rests in the home at least 3 days before the install.",
+       "The order, the delivery and the rest days are kept with the job.",
+       "No pick in 48 hours: one reminder, then Sam calls."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Good news: the lab found no asbestos, so the old tiles can come up. Your white oak is ordered and arrives about Tue Nov 17. Pick your install days:",
+        {
+         "times": [
+          "Mon Nov 23 to Wed Nov 25 · Danny",
+          "Mon Nov 30 to Wed Dec 2 · Danny"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "On time",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "A week late",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x09",
+          "line": [
+           "7.17"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Nov 16, 10:00am",
+          "title": "The wood is late: new install days",
+          "does": "The supplier moves the wood to Tue Nov 24. The install days move only with Alex's OK, at the same price.",
+          "more": [
+           "No reply in 2 days: Sam is asked to call Alex.",
+           "Nothing else in the contract changes."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "LATE white oak for Alex M. now Tue Nov 24"
+           ],
+           [
+            "san",
+            "cust",
+            "The supplier moved your white oak to Tue Nov 24, so your install moves to Mon Nov 30 to Wed Dec 2. Same price.",
+            {
+             "buttons": [
+              "That works",
+              "Call me first"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x10",
+      "line": [
+       "8.17",
+       "7.1"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Tue Nov 17, 2:00pm",
+      "title": "The wood arrives and rests",
+      "does": "The wood is delivered and stacked in the living room. It rests at least 3 days, so it settles to the home. Payment 2 of 3 is billed now that it's here.",
+      "more": [
+       "Alex signs for the delivery on the secure page, with the photo.",
+       "Keep the heat or air on while the wood rests.",
+       "Before the install: empty the dressers and closets, and put away anything fragile. The crew moves the big furniture.",
+       "Questions about the prep go to Danny, after the danger check."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "DELIVERED white oak, 24 boxes, living room",
+        {
+         "photos": [
+          "Boxes stacked to rest"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your white oak is here, resting in the living room until Mon Nov 23. Please keep the air on, and empty the dressers and closets before then.",
+        {
+         "card": {
+          "title": "Delivery · white oak",
+          "lines": [
+           "24 boxes · Tue Nov 17"
+          ],
+          "button": "Sign for it",
+          "link": "rosfield.com/d/f4w"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "B8-x11",
+      "line": [
+       "8.18",
+       "7.1"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Fri Nov 20, 6:00pm",
+      "title": "Alex gets the install plan",
+      "does": "The wood has rested. Alex gets the install plan: Mon Nov 23 to Wed Nov 25, with Danny and Hugo's crew. Each day has its own check-in code.",
+      "more": [
+       "Each code comes the night before. Nobody home: the lockbox code on the secure page, and a start photo.",
+       "The crew moves the furniture, pulls the carpet and old tiles, and lays the floor.",
+       "In an older home, a certified renovator takes the painted baseboards off the lead-safe way, where the rules require it.",
+       "Danny texts a short update each afternoon. Alex sees each day's photos on the secure page.",
+       "If a day moves, only that day moves, and Alex is told. One booking, so one $2 for the whole job."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your install starts Mon Nov 23. Here's the plan.",
+        {
+         "card": {
+          "title": "Install plan · 594 sq ft",
+          "lines": [
+           "Mon Nov 23 · moisture check, old floors out",
+           "Tue Nov 24 · white oak goes down",
+           "Wed Nov 25 · baseboards, then the walk-through"
+          ],
+          "button": "Add a lockbox code",
+          "link": "rosfield.com/s/f4k"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     },
+     {
+      "id": "B8-x12",
+      "type": "split",
+      "line": [
+       "7.18",
+       "8.18"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 23, 8:30am",
+      "title": "Checks moisture before a board goes down",
+      "q": "Dry enough to lay?",
+      "does": "Day 1: the crew checks in with the day's code. Hugo checks the boards and the subfloor with a moisture meter. Both must be within the wood maker's limits.",
+      "more": [
+       "The readings are kept with the job.",
+       "The maker's limits come from its install guide."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "IN 2650 day 1"
+       ],
+       [
+        "san",
+        "cust",
+        "Danny and Hugo's crew are checked in for day 1 of your install."
+       ],
+       [
+        "staff",
+        "san",
+        "MOISTURE wood 8%, subfloor 10%. OK to lay",
+        {
+         "as": "Hugo"
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "Readings OK",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Too damp: waits 2 days",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x13",
+          "line": [
+           "7.18",
+           "7.9"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Moves the laying days; nothing added",
+          "does": "The wood needs 2 more days to settle. The crew takes the old floors out today and lays the wood from Wed Nov 25. Nothing is added to the price.",
+          "more": [
+           "A wait for moisture never costs Alex anything, as the plug-in says.",
+           "Only the install days move; nothing else in the contract changes."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your wood needs 2 more days to settle before it's safe to lay. The crew lays it from Wed Nov 25 and finishes Mon Nov 30, with no work Thanksgiving Thu and Fri. Nothing is added to your price."
+           ]
+          ],
+          "needs": [
+           "pf.edges"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x14",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9",
+       "8.10"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 23, 1:30pm",
+      "title": "Soft subfloor: a change order first",
+      "q": "Does Alex sign the change order?",
+      "does": "Under the old tiles, two subfloor sheets by the hall bath are soft from old water damage. Wood never goes over soft subfloor, so Alex and Sam sign a change order first.",
+      "more": [
+       "It's under Sam's $500, so it goes out with no OK.",
+       "It gives the price and the half day added. It goes on the last payment.",
+       "It's signed on the secure page, like the contract. Sam countersigns before the fix.",
+       "The crew works in the other rooms while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 380 replace 2 soft subfloor sheets by the hall bath. Adds half a day",
+        {
+         "photos": [
+          "Soft subfloor by the bath"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "The crew found 2 soft subfloor sheets by your hall bath. They must be replaced before the wood goes down there.",
+        {
+         "card": {
+          "title": "Change order 1 · $380",
+          "lines": [
+           "Replace 2 subfloor sheets",
+           "Adds half a day",
+           "Added to the last payment"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/f4c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Call me first"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Call first, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x15",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "owner",
+          "via": "msg",
+          "title": "Asks Sam to call Alex",
+          "does": "Alex wants a call first, or doesn't answer in 2 hours. Sam gets a to-do to call. Nothing is laid by the hall bath until the change order is signed.",
+          "more": [
+           "The crew works in the other rooms meanwhile.",
+           "If Alex says no, Sam and Alex decide what's next. Rosie moves no money on its own."
+          ],
+          "say": [
+           [
+            "san",
+            "owner",
+            "Alex M. wants a call about change order 1: $380 for 2 soft subfloor sheets by the hall bath. Please call today.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me at 4pm"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "A measure visit has no form to sign first; the floor's contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "words",
+    "at": "B8-22",
+    "does": "Back to Alex's job. Each branch is one thing that can come up while Danny or the crew works. It can happen at the measure visit or on an install day. Most rejoin before DONE."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Measure visits and install days are booked in 2-hour arrival windows."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Flooring books visits and install days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Flooring books an estimator's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No flooring job is sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No flooring job is sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking lets the crew in (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "No flooring job is ever sent now (B4-81's sent-now branch is off), so none reaches the on-call installer."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Floor jobs are not named-only work: every finished job asks for a rating (the plug-in's answer)"
+   }
+  ]
+ },
+ "notes": "Pilot: contractor (from: contractor), the project pattern: a measure visit at the home, a written quote, a contract signed by everyone on title, a deposit, a cancel window, a lab test before anything comes up, special-order wood, resting days, a moisture check, a change order for hidden damage, a walk-through, then the last bill.\nPlug-in facts: photos, documents, firststeps, extrawork, stages, banktransfer, multiday. Switches: cancelright on in flow B only (the master's own cancel window, B8-78, carries the notice); sensitive, welfare and no2 are off (no2 off: the $2 is paid, as the master says). Settings: arrive setstart in flow A (the showroom consult at a set time), window in flow B (Danny's arrival window); cutoff 24 hours before.\nFlow A money: list|card|counter (main; $35 consult, card saved for the $20 missed-consult fee), list|none|counter, list|full|none (the $55 floor preview, paid in full, credited to the floor on an install), list|deposit|counter (the $140 whole-home floor plan: $40 deposit now, $100 rest at the desk, $20 fee), photos|card|counter ($90 pattern layout from photos, Sam OKs; $20 fee), visit|card|counter (floor match, priced at the showroom: row name only, $20 fee). The at-home consult ($75) is not offered in flow A: a home measure is Danny's visit in flow B. No holds: a card is saved instead, or a deposit is taken.\nFlow B money: visit|none|bill (main; the $89 measure visit, nothing taken; the project is quoted at the visit and billed by the deposit, the wood payment and the last payment: $920, $3,370, $4,910), visit|none|own (Sam bills his own way), visit|card|bill (a card saved for the $89 measure fee), photos|deposit|bill (laundry room floor $640 from photos; $160 deposit, $480 rest on the bill; $89 fee), list|card|bill (board repair $179; a card saved for the $89 fee), list|full|none (buff and recoat $150 paid in full). The $89 is the trip fee, the late-cancel and no-show fee. Example sums add up: $920 + $3,370 + $4,910 = $9,200; with the $380 change order the last payment is $5,290.\nVisit-priced bills (floor match, the wood quote) show the master's sample figures in the walk ($125, $9,200 style) because the record has no price for a visit-priced job; the live bill takes the price OK'd at the visit. Logged as MASTER in the refit log.\nRemoved (refit): every legacy money words op (vary keys by price/before/after), the B8-x01 own cancel window (the master's B8-78 does it now), the old $2 and license-lookup ops, all dead off ops. Own steps kept: A8-x01 (the showroom hands the home measure to flow B), B8-x03 (an outside tester checks old tiles), B8-x04 to B8-x07 (asbestos: cover, removal first, or cancel with a full refund), B8-x08 and x09 (wood ordered only after the window and the test), B8-x10 (delivered, rests, air on), B8-x11 (install plan), B8-x12 and x13 (moisture check), B8-x14 and x15 (soft subfloor change order).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Riley and Avery cut hair;",
+    "at $140 an hour",
+    "doesn't do perms",
+    "massage",
+    "Massage",
+    "fades and hot towel shaves",
+    "barbershops",
+    "asks for a perm",
+    "skin fades",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "takes jobs sent now, like a burst pipe",
+    "like a burst pipe or a lockout",
+    "A repair shop, a tailor or a groomer does.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Electric.",
+    "A plumber",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "a Kids cut (12 and under) is $25",
+    "A haircut could mean a salon or a barbershop.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "Alex's hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Quiero un corte el sábado.",
+    "Gloss to finish",
+    "$15 gloss",
+    "gloss",
+    "Barber license",
+    "Proposal · Color plan",
+    "Color plan",
+    "color plan",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "JP031552",
+    "JE30417",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color",
+    "Color",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "the chair",
+    "Drain clearing",
+    "Drains",
+    "Drain",
+    "an estimate visit",
+    "estimate visit",
+    "water heaters",
+    "water heater",
+    "shops",
+    "shop",
+    "Shop",
+    "House calls",
+    "House call",
+    "house calls",
+    "house call"
+   ],
+   "B": [
+    "Riley and Avery cut hair;",
+    "at $140 an hour",
+    "Reading it back: accept the leak repair for today",
+    "the leak repair",
+    "Hi, it's about a leaking pipe under my sink.",
+    "My sink won't drain",
+    "under the sink this morning",
+    "It's a leak under the sink, today",
+    "The service call is $89.",
+    "new pipes put in one day",
+    "pipes are in",
+    "wall pipe",
+    "tapping a neighbor's water line without asking",
+    "Adding a faucet check?",
+    "Please clear the cabinet under the sink.",
+    "Estimate visit",
+    "fades and hot towel shaves",
+    "barbershops",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "takes jobs sent now, like a burst pipe",
+    "like a burst pipe or a lockout",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Sam adds heating and cooling to",
+    "NEW heating and cooling",
+    "Heating and cooling for",
+    "leehomeservices.com",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "credited to the repair",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Signed: the deposit, then the work days",
+    "The estimate becomes its own job",
+    "An estimate becomes its own job",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Repipe",
+    "repipe",
+    "The before photo shows no crack.",
+    "like a permit it needed that isn't in",
+    "This job needs a permit first.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Electric.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "QUOTE 245 valve 165 supply line 80",
+    "1-year labor warranty",
+    "Shutoff valve",
+    "shutoff valve",
+    "Supply line",
+    "supply line",
+    "Can Jordan also run a camera down my sewer line?",
+    "Video and Jordan's notes",
+    "LATE camera report",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "sewer camera report",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "like an overflowing drain",
+    "Overflowing kitchen drain",
+    "a plumber",
+    "A plumber",
+    "A haircut could mean a salon or a barbershop.",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services'",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "JP031552",
+    "JE30417",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "color",
+    "beard trim",
+    "Haircut",
+    "haircut",
+    "the chair",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "the kitchen drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "flush",
+    "Drains",
+    "drain",
+    "Drain",
+    "service call",
+    "Service call",
+    "an estimate visit",
+    "estimate visit",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "shops",
+    "shop",
+    "Shop",
+    "House calls",
+    "House call",
+    "house calls",
+    "house call",
+    "cabinet floor"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-24": "0a292df05b",
+   "A8-44": "4410a4860c",
+   "A4-01": "7e7a61082c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A10-34": "78c2d9a6a3",
+   "A8-02": "15f418fec4",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B8-93": "c1406fd6bc",
+   "B8-63": "c0d957be82",
+   "B4-38": "9539521dc7",
+   "B8-22": "50d78f1af0",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B6-03": "dcc1eb310c",
+   "B10-32": "7713bff255"
+  }
+ }
+}

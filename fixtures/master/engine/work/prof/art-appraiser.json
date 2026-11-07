@@ -1,0 +1,2605 @@
+{
+ "id": "art-appraiser",
+ "name": "Art and jewelry appraiser",
+ "style": "Consult",
+ "pattern": "consult",
+ "from": "notary",
+ "plugin": {
+  "pf.license": {
+   "need": "No state license for appraising art or jewelry in most places. Where a state or city asks for an appraiser's registration or certificate, or the business's own, the owner names it: shown as given, never checked by Rosie.",
+   "who holds it": "The owner, and each appraiser, as the owner says. Rosie holds no license of anyone.",
+   "how it's checked": "Not checked by Rosie. The owner keeps the papers.",
+   "insurance or bond": "Errors-and-omissions insurance: the owner's own certificate, shown as given, never checked.",
+   "blocks going live": "Nothing: Rosie shows no license claim for any appraiser.",
+   "renewals": "The owner's own list. Rosie sends no reminder for a license it never checked.",
+   "background checks": "None."
+  },
+  "pf.services": {
+   "shape": "appraisal visits at the studio (flow A) and at the customer's place (flow B); a video or photo appraisal counts as flow A",
+   "price kind": "one price per item or per collection, from the owner's own list; a travel fee at a home visit is part of the price shown",
+   "examples": "the example studio's own prices (Lee Appraisals, Lee Home Appraisals), not a standard",
+   "list": [
+    {
+     "name": "Studio appraisal, one item",
+     "price": "$35",
+     "kind": "one price",
+     "length": "about 30 minutes",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the front desk at the visit"
+    },
+    {
+     "name": "Video appraisal, one item",
+     "price": "$55, paid in full",
+     "kind": "one price",
+     "length": "about 30 minutes, by video",
+     "where": "by video, from good photos",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Estate collection, at the studio",
+     "price": "$140 for up to 10 items",
+     "kind": "one price per collection",
+     "length": "1 to 2 hours",
+     "where": "at the studio",
+     "before": "a $40 deposit when booking",
+     "after": "the $100 rest paid at the desk when the report is picked up"
+    },
+    {
+     "name": "Collection quote from photos",
+     "price": "quoted from photos first, e.g. $90",
+     "kind": "quoted from photos",
+     "where": "by photos and a call (flow A)",
+     "before": "a $20 deposit once the quote is OK'd",
+     "after": "the rest paid when the report is sent"
+    },
+    {
+     "name": "Home appraisal, up to 5 items",
+     "price": "$179, with the $89 travel fee",
+     "kind": "one price",
+     "where": "at the customer's place (flow B)",
+     "before": "a card saved for the $89 fee",
+     "after": "the bill texted after the visit"
+    },
+    {
+     "name": "Estate collection at home, up to 10 items",
+     "price": "$150",
+     "where": "at the customer's place",
+     "before": "a $40 deposit when booking",
+     "after": "the $110 rest charged to the saved card when the appraiser texts DONE"
+    },
+    {
+     "name": "One item at a home",
+     "price": "$75, paid in full",
+     "where": "at the customer's place",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Large estate, quoted from photos",
+     "price": "$640 quoted (over $500, so the owner OKs it)",
+     "kind": "quoted from photos",
+     "where": "at the customer's place",
+     "before": "a $160 deposit once signed",
+     "after": "the $480 rest charged when the report is done"
+    }
+   ],
+   "never appraised": "No buying, selling or auctions by the appraiser; no appraisal for a sale to the appraiser; no legal or tax advice; no sign-off for a court.",
+   "capacity": "one appraiser per visit; a second person from the team only when the owner books one",
+   "online": "video and photo appraisals only, and only where the owner allows them; Rosie never records a call or a video."
+  },
+  "pf.questions": {
+   "before times": [
+    "What items: art, jewelry, silver, or a mix? And how many?",
+    "Why the appraisal: insurance, an estate, a sale, a donation, or the owner's own record?",
+    "Any photos of the items, with the marks, signatures or labels?",
+    "At the studio, at the customer's place, or by video?"
+   ],
+   "after a time is picked": [
+    "Where the items are kept, and the room they'll be shown in",
+    "Parking or the building's sign-in"
+   ],
+   "only on the secure page": [
+    "The street address and any gate code",
+    "Who owns the items: the owner's name on the papers, or a family member or trust",
+    "Items the customer wants kept private",
+    "Where the items are kept (a home safe, a bank box)"
+   ],
+   "who may book": "An adult who owns the items, or who has the owner's written permission. An appraisal of items the booker doesn't own needs that owner's yes."
+  },
+  "pf.safety": {
+   "words that stop a booking": [
+    "someone hurt, or a fire or smoke at the place (call 911)"
+   ],
+   "words that go on with safety steps": [
+    "an item that may be stolen or isn't the booker's to show"
+   ],
+   "what Rosie says": {
+    "in danger right now": "Call 911 now. Nothing is booked.",
+    "stolen item": "The appraiser asks for the papers and may decline. Rosie doesn't judge the item."
+   },
+   "legal questions": "Never answered: an appraiser can't give legal or tax advice."
+  },
+  "pf.first_steps": {
+   "required": "None.",
+   "prep for the reminder": [
+    "Bring the papers, receipts and any earlier appraisals",
+    "Have the items clean and dry; don't tape or glue anything",
+    "Photos of marks, signatures and labels",
+    "A flat table with good light for the items"
+   ]
+  },
+  "pf.visit": {
+   "check-in": "At the studio: the code at the front desk. At a home: the code from whoever meets the appraiser.",
+   "before appraising": "The appraiser checks each item's marks and papers in person, then writes a report for the owner. Nothing is valued in a text.",
+   "work changes": "A second item found at the visit is priced at the list price and OK'd by the owner before it's done.",
+   "stops": "An item looks stolen, or the owner has no right to it: the appraiser stops and says so.",
+   "report": "The written report goes to the owner on the secure page, with the value stated once."
+  },
+  "pf.money": {
+   "before": "a card saved for the late-cancel fee at the studio; paid in full for video and single-item visits; a deposit for estate collections",
+   "after": "paid at the desk, the bill texted after a home visit, or the saved card charged at DONE",
+   "cancel": "a cancel in time gets a full refund; a late cancel or no-show keeps the fee shown on the booking",
+   "caps": "the owner's own limit: any quote over $500 is OK'd by the owner first",
+   "tips": "none: appraisers take no tips"
+  },
+  "pf.messages": "Texts go to the owner who booked. Item values and descriptions are never in a text: the secure page only.",
+  "pf.staff": {
+   "skills": "appraiser (art, jewelry, silver), desk",
+   "licenses": "none from the state; the owner's own certificates, shown as given",
+   "ratio": "one appraiser per visit",
+   "standIn": "any trained appraiser; nobody is booked by name",
+   "oks": "Sam OKs quotes over $500 and any value dispute"
+  },
+  "pf.rules": {
+   "no sales": "Rosie never sells anything for the appraiser. No buying, no auctions, no consignment.",
+   "values": "A value is in the written report only, never in a text or on a screen shared with others.",
+   "limits": "Items over the insurer's limit need the owner's yes first."
+  },
+  "pf.edges": {
+   "walkins": "A walk-in takes a visit when there's a free slot; else the next free day.",
+   "photos": "A photo appraisal needs clear photos of every mark first; without them the appraiser asks for more."
+  },
+  "pf.facts": [
+   "photos",
+   "video",
+   "documents",
+   "extrawork"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "may price a range, like $80 to $100, set at the visit inside it.",
+    "may give a price range, set at the visit inside it."
+   ],
+   [
+    "Send Alex M. the color and cut at $85, not $90?",
+    "Send Alex M. the collection quote at $90?"
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "cabinet",
+    "storage unit"
+   ],
+   [
+    "Cabinet",
+    "Storage unit"
+   ],
+   [
+    "Document review",
+    "Condition check"
+   ],
+   [
+    "document review",
+    "condition check"
+   ],
+   [
+    "valves",
+    "locks"
+   ],
+   [
+    "Valves",
+    "Locks"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "Clogs",
+    "Jams"
+   ],
+   [
+    "water heaters",
+    "paintings"
+   ],
+   [
+    "Water heaters",
+    "Paintings"
+   ],
+   [
+    "heaters",
+    "frames"
+   ],
+   [
+    "Heaters",
+    "Frames"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "Shop's",
+    "Studio's"
+   ],
+   [
+    "Color quotes",
+    "Appraisal quotes"
+   ],
+   [
+    "Color quote",
+    "Appraisal quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Appraisals LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Appraisals"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Appraisals"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Estate Appraisals"
+   ],
+   [
+    "Lee Electric",
+    "Lee Insurance Appraisals"
+   ],
+   [
+    "Riley Chen",
+    "Vera Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Ines Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Tomas Price"
+   ],
+   [
+    "Casey Moore",
+    "Remy Moore"
+   ],
+   [
+    "Riley",
+    "Vera"
+   ],
+   [
+    "Avery",
+    "Ines"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Remy"
+   ],
+   [
+    "barbershops",
+    "studios"
+   ],
+   [
+    "barbershop",
+    "appraisal studio"
+   ],
+   [
+    "Barbershop",
+    "Appraisal studio"
+   ],
+   [
+    "barbers",
+    "appraisers"
+   ],
+   [
+    "barber chair",
+    "viewing table"
+   ],
+   [
+    "barber",
+    "appraiser"
+   ],
+   [
+    "Barber",
+    "Appraiser"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "shop's",
+    "studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Haircuts",
+    "Appraisals"
+   ],
+   [
+    "haircuts",
+    "appraisals"
+   ],
+   [
+    "Haircut",
+    "Appraisal"
+   ],
+   [
+    "haircut",
+    "appraisal"
+   ],
+   [
+    "Beard trim",
+    "Extra item"
+   ],
+   [
+    "beard trim",
+    "extra item"
+   ],
+   [
+    "beard line",
+    "frame line"
+   ],
+   [
+    "beard",
+    "frame"
+   ],
+   [
+    "Skin fades",
+    "Estate visits"
+   ],
+   [
+    "skin fades",
+    "estate visits"
+   ],
+   [
+    "Skin fade",
+    "Estate appraisal"
+   ],
+   [
+    "skin fade",
+    "estate appraisal"
+   ],
+   [
+    "Kids cuts",
+    "Single-item looks"
+   ],
+   [
+    "kids cuts",
+    "single-item looks"
+   ],
+   [
+    "Kids cut",
+    "Single-item look"
+   ],
+   [
+    "kids cut",
+    "single-item look"
+   ],
+   [
+    "Color and cut",
+    "Estate collection"
+   ],
+   [
+    "color and cut",
+    "estate collection"
+   ],
+   [
+    "Color correction",
+    "Condition check"
+   ],
+   [
+    "color correction",
+    "condition check"
+   ],
+   [
+    "Color touch-up",
+    "Extra item"
+   ],
+   [
+    "color touch-up",
+    "extra item"
+   ],
+   [
+    "color plan",
+    "appraisal plan"
+   ],
+   [
+    "Color plan",
+    "Appraisal plan"
+   ],
+   [
+    "patch test",
+    "condition check"
+   ],
+   [
+    "cut hair",
+    "appraise"
+   ],
+   [
+    "Color",
+    "Appraisal"
+   ],
+   [
+    "color",
+    "appraisal"
+   ],
+   [
+    "Groom's package",
+    "Collection package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Estate collection"
+   ],
+   [
+    "Signature cut and shave",
+    "Estate collection"
+   ],
+   [
+    "hot towel shaves",
+    "estate visits"
+   ],
+   [
+    "hot towel",
+    "estate"
+   ],
+   [
+    "shaves",
+    "visits"
+   ],
+   [
+    "shave",
+    "visit"
+   ],
+   [
+    "perms",
+    "insurance reports"
+   ],
+   [
+    "perm",
+    "insurance report"
+   ],
+   [
+    "cape clip",
+    "display stand"
+   ],
+   [
+    "cape",
+    "stand"
+   ],
+   [
+    "massage",
+    "estate visit"
+   ],
+   [
+    "Massage",
+    "Estate visit"
+   ],
+   [
+    "brassy",
+    "tarnished"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "polish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "condition check"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home appraisal"
+   ],
+   [
+    "kitchen drain clearing",
+    "home appraisal"
+   ],
+   [
+    "Drain clearing",
+    "Home appraisal"
+   ],
+   [
+    "drain clearing",
+    "home appraisal"
+   ],
+   [
+    "Plumbing and electrical",
+    "Estate and insurance appraisals"
+   ],
+   [
+    "plumbing and electrical",
+    "estate and insurance appraisals"
+   ],
+   [
+    "plumber",
+    "appraiser"
+   ],
+   [
+    "Plumber",
+    "Appraiser"
+   ],
+   [
+    "plumbing",
+    "appraisal"
+   ],
+   [
+    "Plumbing",
+    "Appraisal"
+   ],
+   [
+    "electrician",
+    "appraiser"
+   ],
+   [
+    "electrical",
+    "estate"
+   ],
+   [
+    "Electrical",
+    "Estate"
+   ],
+   [
+    "clogged drain",
+    "stuck drawer"
+   ],
+   [
+    "drain",
+    "drawer"
+   ],
+   [
+    "Drain",
+    "Drawer"
+   ],
+   [
+    "water heater flush",
+    "estate visit"
+   ],
+   [
+    "Water heater flush",
+    "Estate visit"
+   ],
+   [
+    "water heater replacement",
+    "estate collection quote"
+   ],
+   [
+    "Water heater replacement",
+    "Estate collection quote"
+   ],
+   [
+    "water heater",
+    "painting"
+   ],
+   [
+    "Water heater",
+    "Painting"
+   ],
+   [
+    "heater",
+    "frame"
+   ],
+   [
+    "flush",
+    "visit"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "faucet",
+    "frame"
+   ],
+   [
+    "dishwasher",
+    "display case"
+   ],
+   [
+    "garbage disposal",
+    "storage unit"
+   ],
+   [
+    "sewer",
+    "storage unit"
+   ],
+   [
+    "toilet",
+    "storage unit"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "pipes",
+    "frames"
+   ],
+   [
+    "pipe",
+    "frame"
+   ],
+   [
+    "valve",
+    "lock"
+   ],
+   [
+    "shutoff",
+    "lock"
+   ],
+   [
+    "repipe",
+    "reframe"
+   ],
+   [
+    "supply line",
+    "display line"
+   ],
+   [
+    "water line",
+    "display line"
+   ],
+   [
+    "heating and cooling",
+    "climate control"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "crack"
+   ],
+   [
+    "leaks",
+    "cracks"
+   ],
+   [
+    "Short on the sides",
+    "Short on the frame"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "520 Grove Ave"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "Elm St",
+    "Grove Ave"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "Barbershops",
+    "Studios"
+   ],
+   [
+    "Barbers",
+    "Appraisers"
+   ],
+   [
+    "Barber chair",
+    "Viewing table"
+   ],
+   [
+    "Shops",
+    "Studios"
+   ],
+   [
+    "Beard line",
+    "Frame line"
+   ],
+   [
+    "Beard",
+    "Frame"
+   ],
+   [
+    "Patch test",
+    "Condition check"
+   ],
+   [
+    "Cut hair",
+    "Appraise"
+   ],
+   [
+    "Hot towel shaves",
+    "Estate visits"
+   ],
+   [
+    "Hot towel",
+    "Estate"
+   ],
+   [
+    "Shaves",
+    "Visits"
+   ],
+   [
+    "Shave",
+    "Visit"
+   ],
+   [
+    "Perms",
+    "Insurance reports"
+   ],
+   [
+    "Perm",
+    "Insurance report"
+   ],
+   [
+    "Cape clip",
+    "Display stand"
+   ],
+   [
+    "Cape",
+    "Stand"
+   ],
+   [
+    "Brassy",
+    "Tarnished"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Polish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Condition check"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Appraiser"
+   ],
+   [
+    "Clogged drain",
+    "Stuck drawer"
+   ],
+   [
+    "Heater",
+    "Frame"
+   ],
+   [
+    "Flush",
+    "Visit"
+   ],
+   [
+    "Faucet",
+    "Frame"
+   ],
+   [
+    "Dishwasher",
+    "Display case"
+   ],
+   [
+    "Garbage disposal",
+    "Storage unit"
+   ],
+   [
+    "Sewer",
+    "Storage unit"
+   ],
+   [
+    "Toilet",
+    "Storage unit"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "Pipes",
+    "Frames"
+   ],
+   [
+    "Pipe",
+    "Frame"
+   ],
+   [
+    "Valve",
+    "Lock"
+   ],
+   [
+    "Shutoff",
+    "Lock"
+   ],
+   [
+    "Repipe",
+    "Reframe"
+   ],
+   [
+    "Supply line",
+    "Display line"
+   ],
+   [
+    "Water line",
+    "Display line"
+   ],
+   [
+    "Heating and cooling",
+    "Climate control"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Crack"
+   ],
+   [
+    "Leaks",
+    "Cracks"
+   ]
+  ],
+  "B": [
+   [
+    "Sewer camera inspection",
+    "Estate inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "estate inspection"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like hanging a neighbor's art without asking."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "cabinet",
+    "storage unit"
+   ],
+   [
+    "Cabinet",
+    "Storage unit"
+   ],
+   [
+    "Document review",
+    "Condition check"
+   ],
+   [
+    "document review",
+    "condition check"
+   ],
+   [
+    "valves",
+    "locks"
+   ],
+   [
+    "Valves",
+    "Locks"
+   ],
+   [
+    "clogs",
+    "jams"
+   ],
+   [
+    "Clogs",
+    "Jams"
+   ],
+   [
+    "water heaters",
+    "paintings"
+   ],
+   [
+    "Water heaters",
+    "Paintings"
+   ],
+   [
+    "heaters",
+    "frames"
+   ],
+   [
+    "Heaters",
+    "Frames"
+   ],
+   [
+    "travel fee",
+    "travel fee"
+   ],
+   [
+    "Travel fee",
+    "Travel fee"
+   ],
+   [
+    "Shop's",
+    "Studio's"
+   ],
+   [
+    "Color quotes",
+    "Appraisal quotes"
+   ],
+   [
+    "Color quote",
+    "Appraisal quote"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Appraisals LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Appraisals"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Appraisals"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Estate Appraisals"
+   ],
+   [
+    "Lee Electric",
+    "Lee Insurance Appraisals"
+   ],
+   [
+    "Riley Chen",
+    "Vera Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Ines Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Tomas Price"
+   ],
+   [
+    "Casey Moore",
+    "Remy Moore"
+   ],
+   [
+    "Riley",
+    "Vera"
+   ],
+   [
+    "Avery",
+    "Ines"
+   ],
+   [
+    "Jordan",
+    "Tomas"
+   ],
+   [
+    "Casey",
+    "Remy"
+   ],
+   [
+    "barbershops",
+    "studios"
+   ],
+   [
+    "barbershop",
+    "appraisal studio"
+   ],
+   [
+    "Barbershop",
+    "Appraisal studio"
+   ],
+   [
+    "barbers",
+    "appraisers"
+   ],
+   [
+    "barber chair",
+    "viewing table"
+   ],
+   [
+    "barber",
+    "appraiser"
+   ],
+   [
+    "Barber",
+    "Appraiser"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "shop's",
+    "studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Haircuts",
+    "Appraisals"
+   ],
+   [
+    "haircuts",
+    "appraisals"
+   ],
+   [
+    "Haircut",
+    "Appraisal"
+   ],
+   [
+    "haircut",
+    "appraisal"
+   ],
+   [
+    "Beard trim",
+    "Extra item"
+   ],
+   [
+    "beard trim",
+    "extra item"
+   ],
+   [
+    "beard line",
+    "frame line"
+   ],
+   [
+    "beard",
+    "frame"
+   ],
+   [
+    "Skin fades",
+    "Estate visits"
+   ],
+   [
+    "skin fades",
+    "estate visits"
+   ],
+   [
+    "Skin fade",
+    "Estate appraisal"
+   ],
+   [
+    "skin fade",
+    "estate appraisal"
+   ],
+   [
+    "Kids cuts",
+    "Single-item looks"
+   ],
+   [
+    "kids cuts",
+    "single-item looks"
+   ],
+   [
+    "Kids cut",
+    "Single-item look"
+   ],
+   [
+    "kids cut",
+    "single-item look"
+   ],
+   [
+    "Color and cut",
+    "Estate collection"
+   ],
+   [
+    "color and cut",
+    "estate collection"
+   ],
+   [
+    "Color correction",
+    "Condition check"
+   ],
+   [
+    "color correction",
+    "condition check"
+   ],
+   [
+    "Color touch-up",
+    "Extra item"
+   ],
+   [
+    "color touch-up",
+    "extra item"
+   ],
+   [
+    "color plan",
+    "appraisal plan"
+   ],
+   [
+    "Color plan",
+    "Appraisal plan"
+   ],
+   [
+    "patch test",
+    "condition check"
+   ],
+   [
+    "cut hair",
+    "appraise"
+   ],
+   [
+    "Color",
+    "Appraisal"
+   ],
+   [
+    "color",
+    "appraisal"
+   ],
+   [
+    "Groom's package",
+    "Collection package"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Estate collection"
+   ],
+   [
+    "Signature cut and shave",
+    "Estate collection"
+   ],
+   [
+    "hot towel shaves",
+    "estate visits"
+   ],
+   [
+    "hot towel",
+    "estate"
+   ],
+   [
+    "shaves",
+    "visits"
+   ],
+   [
+    "shave",
+    "visit"
+   ],
+   [
+    "perms",
+    "insurance reports"
+   ],
+   [
+    "perm",
+    "insurance report"
+   ],
+   [
+    "cape clip",
+    "display stand"
+   ],
+   [
+    "cape",
+    "stand"
+   ],
+   [
+    "massage",
+    "estate visit"
+   ],
+   [
+    "Massage",
+    "Estate visit"
+   ],
+   [
+    "brassy",
+    "tarnished"
+   ],
+   [
+    "steamer",
+    "lamp"
+   ],
+   [
+    "gloss",
+    "polish"
+   ],
+   [
+    "line-up",
+    "wait line"
+   ],
+   [
+    "facial",
+    "condition check"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "House call",
+    "Home visit"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "at the desk"
+   ],
+   [
+    "the chair",
+    "the desk"
+   ],
+   [
+    "The chair",
+    "The desk"
+   ],
+   [
+    "chair",
+    "desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home appraisal"
+   ],
+   [
+    "kitchen drain clearing",
+    "home appraisal"
+   ],
+   [
+    "Drain clearing",
+    "Home appraisal"
+   ],
+   [
+    "drain clearing",
+    "home appraisal"
+   ],
+   [
+    "Plumbing and electrical",
+    "Estate and insurance appraisals"
+   ],
+   [
+    "plumbing and electrical",
+    "estate and insurance appraisals"
+   ],
+   [
+    "plumber",
+    "appraiser"
+   ],
+   [
+    "Plumber",
+    "Appraiser"
+   ],
+   [
+    "plumbing",
+    "appraisal"
+   ],
+   [
+    "Plumbing",
+    "Appraisal"
+   ],
+   [
+    "electrician",
+    "appraiser"
+   ],
+   [
+    "electrical",
+    "estate"
+   ],
+   [
+    "Electrical",
+    "Estate"
+   ],
+   [
+    "clogged drain",
+    "stuck drawer"
+   ],
+   [
+    "drain",
+    "drawer"
+   ],
+   [
+    "Drain",
+    "Drawer"
+   ],
+   [
+    "water heater flush",
+    "estate visit"
+   ],
+   [
+    "Water heater flush",
+    "Estate visit"
+   ],
+   [
+    "water heater replacement",
+    "estate collection quote"
+   ],
+   [
+    "Water heater replacement",
+    "Estate collection quote"
+   ],
+   [
+    "water heater",
+    "painting"
+   ],
+   [
+    "Water heater",
+    "Painting"
+   ],
+   [
+    "heater",
+    "frame"
+   ],
+   [
+    "flush",
+    "visit"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Service call",
+    "Visit"
+   ],
+   [
+    "faucet",
+    "frame"
+   ],
+   [
+    "dishwasher",
+    "display case"
+   ],
+   [
+    "garbage disposal",
+    "storage unit"
+   ],
+   [
+    "sewer",
+    "storage unit"
+   ],
+   [
+    "toilet",
+    "storage unit"
+   ],
+   [
+    "overflowing",
+    "overfull"
+   ],
+   [
+    "sink",
+    "table"
+   ],
+   [
+    "clog",
+    "jam"
+   ],
+   [
+    "pipes",
+    "frames"
+   ],
+   [
+    "pipe",
+    "frame"
+   ],
+   [
+    "valve",
+    "lock"
+   ],
+   [
+    "shutoff",
+    "lock"
+   ],
+   [
+    "repipe",
+    "reframe"
+   ],
+   [
+    "supply line",
+    "display line"
+   ],
+   [
+    "water line",
+    "display line"
+   ],
+   [
+    "heating and cooling",
+    "climate control"
+   ],
+   [
+    "drips",
+    "drips"
+   ],
+   [
+    "leak",
+    "crack"
+   ],
+   [
+    "leaks",
+    "cracks"
+   ],
+   [
+    "Short on the sides",
+    "Short on the frame"
+   ],
+   [
+    "Springfield",
+    "Hillview"
+   ],
+   [
+    "2020-1187",
+    "EX-1042"
+   ],
+   [
+    "88 Elm St",
+    "520 Grove Ave"
+   ],
+   [
+    "1200 Main St",
+    "36 Grove St"
+   ],
+   [
+    "42 Oak St",
+    "9 Willow Ct"
+   ],
+   [
+    "Elm St",
+    "Grove Ave"
+   ],
+   [
+    "Oak St",
+    "Willow Ct"
+   ],
+   [
+    "Barbershops",
+    "Studios"
+   ],
+   [
+    "Barbers",
+    "Appraisers"
+   ],
+   [
+    "Barber chair",
+    "Viewing table"
+   ],
+   [
+    "Shops",
+    "Studios"
+   ],
+   [
+    "Beard line",
+    "Frame line"
+   ],
+   [
+    "Beard",
+    "Frame"
+   ],
+   [
+    "Patch test",
+    "Condition check"
+   ],
+   [
+    "Cut hair",
+    "Appraise"
+   ],
+   [
+    "Hot towel shaves",
+    "Estate visits"
+   ],
+   [
+    "Hot towel",
+    "Estate"
+   ],
+   [
+    "Shaves",
+    "Visits"
+   ],
+   [
+    "Shave",
+    "Visit"
+   ],
+   [
+    "Perms",
+    "Insurance reports"
+   ],
+   [
+    "Perm",
+    "Insurance report"
+   ],
+   [
+    "Cape clip",
+    "Display stand"
+   ],
+   [
+    "Cape",
+    "Stand"
+   ],
+   [
+    "Brassy",
+    "Tarnished"
+   ],
+   [
+    "Steamer",
+    "Lamp"
+   ],
+   [
+    "Gloss",
+    "Polish"
+   ],
+   [
+    "Line-up",
+    "Wait line"
+   ],
+   [
+    "Facial",
+    "Condition check"
+   ],
+   [
+    "In the chair",
+    "At the desk"
+   ],
+   [
+    "Chair",
+    "Desk"
+   ],
+   [
+    "Electrician",
+    "Appraiser"
+   ],
+   [
+    "Clogged drain",
+    "Stuck drawer"
+   ],
+   [
+    "Heater",
+    "Frame"
+   ],
+   [
+    "Flush",
+    "Visit"
+   ],
+   [
+    "Faucet",
+    "Frame"
+   ],
+   [
+    "Dishwasher",
+    "Display case"
+   ],
+   [
+    "Garbage disposal",
+    "Storage unit"
+   ],
+   [
+    "Sewer",
+    "Storage unit"
+   ],
+   [
+    "Toilet",
+    "Storage unit"
+   ],
+   [
+    "Overflowing",
+    "Overfull"
+   ],
+   [
+    "Sink",
+    "Table"
+   ],
+   [
+    "Clog",
+    "Jam"
+   ],
+   [
+    "Pipes",
+    "Frames"
+   ],
+   [
+    "Pipe",
+    "Frame"
+   ],
+   [
+    "Valve",
+    "Lock"
+   ],
+   [
+    "Shutoff",
+    "Lock"
+   ],
+   [
+    "Repipe",
+    "Reframe"
+   ],
+   [
+    "Supply line",
+    "Display line"
+   ],
+   [
+    "Water line",
+    "Display line"
+   ],
+   [
+    "Heating and cooling",
+    "Climate control"
+   ],
+   [
+    "Drips",
+    "Drips"
+   ],
+   [
+    "Leak",
+    "Crack"
+   ],
+   [
+    "Leaks",
+    "Cracks"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. books Lee Appraisals for one painting, Sat Oct 24 at 11:00am, for an insurance report. Vera checks the painting at the studio, and Alex pays $35 at the front desk.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. books Lee Home Appraisals to look at 5 items at home, 14 Cedar Ln. Tomas comes Thu Oct 22 between 8 and 10am, looks at each item and writes the report. The $179 is charged to Alex's saved card, or the bill comes after the visit."
+ },
+ "cast": {
+  "A": {
+   "staff": "Vera and Ines (appraiser and front desk)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (an estate lawyer, an insurer)"
+  },
+  "B": {
+   "staff": "Tomas and Remy (appraisers)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a bank, a trust, a family)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Vera"
+  },
+  "B": {
+   "staff": "Tomas"
+  }
+ },
+ "keep": [
+  "Travel fee",
+  "travel fee"
+ ],
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|deposit|bill",
+    "photos|none|none"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: one painting at the studio, $35. A card is saved for the $20 fee; Alex pays the $35 at the front desk at the visit.",
+    "list|full|none": "A video appraisal of one item, $55, paid in full when booking.",
+    "list|deposit|counter": "An estate collection at the studio: a $40 deposit when booking, the $100 rest at the desk when the report is picked up.",
+    "photos|deposit|bill": "A collection quoted from photos: a $20 deposit once the quote is OK'd; the rest is billed when the report is sent.",
+    "photos|none|none": "A quote from photos, free: nothing taken, nothing charged."
+   },
+   "amounts": {
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "Studio appraisal, one item"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$20",
+     "name": "Video appraisal, one item"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Estate collection, at the studio"
+    },
+    "photos|deposit|*": {
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "fee": "$20",
+     "name": "Collection quote from photos"
+    },
+    "photos|none|*": {
+     "price": "$0",
+     "fee": "$0",
+     "name": "Quote from photos, free"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra item at the studio",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Two items by video",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$110",
+      "paid": "$110",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Appraisal pack (10 items)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|deposit|card",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a home appraisal of up to 5 items, $179 with the travel fee. A card is saved for the $89 fee; Rosie texts the bill after the visit.",
+    "list|deposit|card": "An estate collection at home: $150, a $40 deposit when booking, the $110 rest charged to the saved card at DONE.",
+    "list|full|none": "One item at a home, $75, paid in full when booking."
+   },
+   "amounts": {
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Home appraisal, up to 5 items"
+    },
+    "list|deposit|*": {
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "fee": "$40",
+     "name": "Estate collection at home"
+    },
+    "list|full|*": {
+     "price": "$75",
+     "paid": "$75",
+     "fee": "$40",
+     "name": "One item at a home"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra item at the home visit",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$120",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Second room, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Estate visit pack (5 visits)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02"
+  ],
+  "B": [
+   "B4-38",
+   "B5-34"
+  ]
+ },
+ "notes": "Art and jewelry appraiser (from notary: an appointment for papers and items, checked in person; flow B a home visit). Refit for the rebuilt master (N4, Oct 27). Flow A (Lee Appraisals, the studio): a one-item studio appraisal, $35, a card saved for the $20 fee, paid at the desk; a video appraisal of one item, $55, paid in full; an estate collection at the studio, $140 ($40 deposit, $100 rest at the desk); a collection quoted from photos, $90 ($20 deposit once OK'd, $70 rest billed with the report); a free quote from photos. Flow B (Lee Home Appraisals, the appraiser comes to the customer): a home appraisal of up to 5 items, $179 with the $89 travel fee (card saved, bill after); an estate collection at home, $150 ($40 deposit, $110 rest at DONE); one item at a home, $75 paid in full. Items are never sold, bought or kept; values are in the written report only. Licenses, insurance and certificates are the owner's, shown as given, never checked (D96). Child visits are off (A4-24). $2 applies to every booking (D97). Sensitive is off. Gap: a damaged item during a visit (work/gaps/art-appraiser.json).",
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for an appraiser (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for appraisers (D96): the owner's own certificates only."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "An appraiser books itself, never a room, table or court."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Appraisals are booked for a set time; nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The appraisal agreement is signed on the secure page before the visit, not left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "No children's visits at an appraiser: the owner of the items books for themselves."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "No repeat plans: each appraisal is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for an appraisal."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books an appraiser's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books an appraiser's time, never a room."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at the studio is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes, so no roster."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Items are never left with the studio: the owner is there."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Items are never left with the studio; the owner takes them home."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "The owner stays for the appraisal; no child is left with the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "An appraisal is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "No proposals: each appraisal is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "The report is given at the visit or sent with the report; no later results step."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "The studio keeps no items."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No license lookup for an appraiser (D96): the owner's own papers, never checked by Rosie."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license for appraisers (D96)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every booking pays Rosfield's $2 (D97)."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "An appraiser books itself, never a room, table or court."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Appraisals are booked for a set time; nothing is sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for an appraisal."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "No seats: the appraiser's time is booked."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Appraisals are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Appraisals are never sent now, so no appraiser is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Appraisals are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Appraisals are never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "No child is left with the appraiser; an adult stays."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "The owner or someone the owner allows is there for the visit."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "No updates are texted during the visit."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "Something of Alex's is damaged",
+    "why": "Not in this version: a damaged item is handled by the owner's own terms, not a notary's."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "An appraisal is not quoted at the visit; a quote is made from photos first."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "No proposals: each appraisal is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "The report is given at the visit or on the secure page; no later results step."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "An appraisal is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "An appraisal is paid once, not in stages (no stages fact)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No appraisal is billed as many visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Bank transfer is for big jobs the appraiser never takes (no bank-transfer fact)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans."
+   }
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "may price a range, like $80 to $100, set at the visit inside it.",
+    "Send Alex M. the color and cut at $85, not $90?",
+    "We'd share only where they're working, only after a missed check.",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Shop's",
+    "Color quotes",
+    "Color quote",
+    "At the chair",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "Beard trim",
+    "beard trim",
+    "beard line",
+    "beard",
+    "skin fades",
+    "Skin fade",
+    "skin fade",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "Color touch-up",
+    "color touch-up",
+    "color plan",
+    "Color plan",
+    "patch test",
+    "cut hair",
+    "Color",
+    "color",
+    "Groom's package",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perms",
+    "perm",
+    "cape clip",
+    "cape",
+    "massage",
+    "Massage",
+    "gloss",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Drain clearing",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "Drain",
+    "water heater",
+    "heater",
+    "pipe",
+    "valve",
+    "leak",
+    "Springfield",
+    "2020-1187",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Beard",
+    "Gloss",
+    "Leak",
+    "Leaks"
+   ],
+   "B": [
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Like tapping a neighbor's water line without asking.",
+    "We'd share only where they're working, only after a missed check.",
+    "cabinet",
+    "Cabinet",
+    "valves",
+    "clogs",
+    "water heaters",
+    "heaters",
+    "travel fee",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "the shop's",
+    "The shop's",
+    "shop's",
+    "the shop",
+    "The shop",
+    "shops",
+    "shop",
+    "Shop",
+    "Haircut",
+    "haircut",
+    "beard trim",
+    "beard",
+    "cut hair",
+    "color",
+    "hot towel shaves",
+    "hot towel",
+    "shaves",
+    "shave",
+    "perm",
+    "house calls",
+    "house call",
+    "House calls",
+    "House call",
+    "at the chair",
+    "the chair",
+    "The chair",
+    "chair",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Plumbing and electrical",
+    "plumbing and electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "electrical",
+    "Electrical",
+    "drain",
+    "Drain",
+    "water heater flush",
+    "Water heater flush",
+    "water heater replacement",
+    "Water heater replacement",
+    "water heater",
+    "Water heater",
+    "heater",
+    "flush",
+    "service call",
+    "Service call",
+    "faucet",
+    "dishwasher",
+    "sewer",
+    "overflowing",
+    "sink",
+    "clog",
+    "pipes",
+    "pipe",
+    "valve",
+    "shutoff",
+    "repipe",
+    "supply line",
+    "water line",
+    "heating and cooling",
+    "leak",
+    "Springfield",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Barbers",
+    "Sewer",
+    "Overflowing",
+    "Shutoff",
+    "Repipe",
+    "Supply line",
+    "Heating and cooling",
+    "Leak",
+    "Leaks"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S1-29": "fb61245096",
+   "A4-24": "0a292df05b",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A8-03": "7fe61cccf5",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6"
+  },
+  "B": {
+   "S1-60": "6b80e83cea",
+   "S2-28": "578f6c41b7",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B4-83": "93095f28e5",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B8-22": "50d78f1af0",
+   "B8-93": "c1406fd6bc",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255",
+   "B7-89": "889628e2d6",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B7-91": "7132851ec1",
+   "B5-01": "841c417586"
+  }
+ }
+}

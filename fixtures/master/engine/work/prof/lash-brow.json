@@ -1,0 +1,6372 @@
+{
+ "id": "lash-brow",
+ "name": "Lash and brow studio",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "hair",
+ "plugin": {
+  "pf.license": {
+   "need": "always where the state's rules license lash and brow work: lash extensions, lifts, tints, waxing and lamination fall under cosmetology, esthetics or an eyelash license, as the state form says",
+   "who": "both: the studio holds an establishment license where the state issues one, and each artist holds their own",
+   "ask": "the studio's license number; each artist's number in their invite reply (or the owner sends it)",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "threading": "where the state's form exempts brow threading, a threader is checked for what the form asks instead (an ID, a course, insurance) and is offered for threading only",
+   "away": "work at a customer's home or a venue only where the state's rules allow lash and brow work away from a licensed place, and only for the services the state allows there; some states allow only strip lashes and brow shaping away from a studio, or ask for an extra permit (a switch from the state form)",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance where the state's form or a venue asks for it",
+   "booth": "a booth renter is their own business: their own license (and a renter's license where the state issues one), prices and Stripe",
+   "makeup": "makeup is its own kind of work, with its own license where the state asks"
+  },
+  "pf.services": {
+   "shape": "set appointments with a chosen artist; the length is set by the service, and a fill turns into a full set when the plug-in's fill rule isn't met",
+   "examples": "the example studio's own prices (Lee Lash Studio and Lee Mobile Lash), not a standard",
+   "list": [
+    {
+     "name": "Lash fill (within 3 weeks, at least half the lashes left)",
+     "price": "$70",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "at the desk",
+     "note": "past 3 weeks, or fewer than half left: it's a Classic full set, $140. Both prices show before the yes, and the time after it stays free when it can"
+    },
+    {
+     "name": "Classic full set",
+     "price": "$140",
+     "kind": "one price",
+     "length": "2½ hours",
+     "where": "at the studio",
+     "before": "a $40 deposit, counted toward the price",
+     "after": "the $100 rest at the desk",
+     "note": "a glue patch test 1 to 2 days before a first set"
+    },
+    {
+     "name": "Volume full set",
+     "price": "$200",
+     "kind": "one price",
+     "length": "3 hours",
+     "where": "at the studio",
+     "before": "a $40 deposit",
+     "after": "the rest at the desk",
+     "note": "a glue patch test before a first set"
+    },
+    {
+     "name": "Lash lift and tint",
+     "price": "$95",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the studio only",
+     "before": "a card saved for the $20 fee",
+     "after": "at the desk",
+     "note": "a patch test before a first lift or tint"
+    },
+    {
+     "name": "Brow lamination and tint",
+     "price": "$95",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the studio only",
+     "before": "a card saved for the $20 fee",
+     "after": "at the desk",
+     "note": "a patch test before a first lamination or tint"
+    },
+    {
+     "name": "Brow tint",
+     "price": "$40",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the studio only",
+     "before": "a card saved",
+     "after": "at the desk",
+     "note": "a patch test before a first tint; the tint product is named at sign-up"
+    },
+    {
+     "name": "Brow wax",
+     "price": "$20",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the desk",
+     "note": "often added to a fill"
+    },
+    {
+     "name": "Teen brow wax (13 to 17)",
+     "price": "$25",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the desk",
+     "note": "a parent or guardian books it and stays"
+    },
+    {
+     "name": "Glue patch test",
+     "price": "free",
+     "kind": "a first step",
+     "length": "15 min",
+     "where": "at the studio",
+     "before": "nothing",
+     "after": "nothing more",
+     "note": "1 to 2 days before a first full set; the same test checks a tint or lift product when one is added"
+    },
+    {
+     "name": "Lash removal",
+     "price": "$25",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the studio",
+     "before": "a card saved",
+     "after": "at the desk",
+     "note": "free after a reaction"
+    },
+    {
+     "name": "Classic full set at home",
+     "price": "$179",
+     "kind": "one price",
+     "length": "2 hours",
+     "where": "at the customer's home",
+     "before": "$89 of it held (the trip fee)",
+     "after": "Rosie texts the bill, with a tip line",
+     "note": "only artists cleared for work away from the studio, and only where the state allows extensions there"
+    },
+    {
+     "name": "Lash fill at home (every 3 weeks, as a plan)",
+     "price": "$110",
+     "kind": "one price",
+     "length": "75 min",
+     "where": "at the customer's home",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Brow wax at home",
+     "price": "$25",
+     "kind": "one price",
+     "length": "15 min",
+     "where": "at the customer's home",
+     "before": "added to a booking",
+     "after": "on the bill",
+     "note": "never booked alone"
+    },
+    {
+     "name": "Bridal lash trial",
+     "price": "$150",
+     "kind": "one price",
+     "length": "90 min",
+     "where": "at the customer's home",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill",
+     "note": "the look and timing are saved for the wedding day"
+    },
+    {
+     "name": "Bridal lash set",
+     "price": "$199 ($249 with Sam)",
+     "kind": "one price",
+     "length": "2½ hours",
+     "where": "at the customer's home",
+     "before": "the $89 trip fee held",
+     "after": "Rosie texts the bill",
+     "note": "2 to 3 days before the wedding"
+    },
+    {
+     "name": "Wedding party lashes",
+     "price": "priced from the party's answers and a photo of the look (the example: $640 for five)",
+     "kind": "quoted from photos first",
+     "length": "set by how many people",
+     "where": "at the customer's home or the venue",
+     "before": "a 25% deposit",
+     "after": "the rest charged to the saved card when the artist texts DONE",
+     "note": "strip or cluster lashes and a brow tidy for each person; a signed contract; Sam OKs quotes over $500"
+    },
+    {
+     "name": "Trip fee",
+     "price": "$89",
+     "kind": "one price",
+     "length": "on every visit away from the studio",
+     "where": "at the customer's place",
+     "before": "held",
+     "after": "counts toward the service"
+    },
+    {
+     "name": "On-site touch-ups",
+     "price": "$120 an hour, 1-hour minimum ($140 with Diego)",
+     "kind": "per hour",
+     "length": "on the wedding day",
+     "where": "at the customer's place",
+     "before": "added to the booking",
+     "after": "on the bill"
+    }
+   ],
+   "fillRule": "a fill is priced as a fill only within 3 weeks of the last set or fill, with at least half the extensions left; otherwise it's booked and priced as a full set. The reminder asks once: fewer than half left? Then it's rebooked as a full set before the visit",
+   "tint": "the tint product is named at sign-up; tints can't be booked until it is",
+   "aftercare": "the same note after every set: keep them dry for 24 hours, then wash them daily with a lash cleanser; no oil-based products or mascara on the extensions; don't rub or pull them",
+   "capacity": "one artist per booking; a wedding party is one booking with several people and one code, and may need two artists",
+   "skills": "classic and volume sets, lifts, tints, lamination, waxing, threading, makeup; each service offers only artists whose skill and license cover it",
+   "online": "no: lash and brow work is done in person",
+   "nobodyHome": "never: the customer must be there"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new or returning, and for lashes: a first set, or the date of the last set or fill (it decides a fill or a full set, and the patch test)",
+    "which service: a fill, a full set, a lift, brows",
+    "for a full set: the look (natural, wispy or full)",
+    "for a wedding party: how many people, the date, and where everyone gets ready"
+   ],
+   "afterTime": [
+    "contact lenses (they come out before lash work)",
+    "anything the artist should know (a look to keep)",
+    "for a visit at home or a venue: the address, parking, and a quiet room with space for a lash bed and a plug"
+   ],
+   "securePage": [
+    "18 or older, or a parent or guardian books",
+    "an allergy to lash glue, latex or medical tape",
+    "eye surgery in the last 3 months, like LASIK",
+    "an eye infection, stye or irritation now",
+    "a reaction to a lash or brow product before",
+    "the lash consent (the glue, the risks, the aftercare), signed",
+    "the patch-test check 24 hours after the test"
+   ],
+   "flags": "an allergy, recent eye surgery, an infection or a past reaction is flagged: the owner reads the page before anything is booked",
+   "whoMayBook": "an adult; a parent or guardian for anyone under 18, who signs the consent and stays for the whole visit (and a parent's OK where the state's rules require one for a minor)"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "glue or a chemical in the eye now",
+     "say": "Rinse the eye with clean running water for 15 minutes. If you can't see or the eye is badly hurt, call 911 now. Otherwise, see an eye doctor or urgent care today.",
+     "booking": "no booking, and never lashes on a hurt eye"
+    },
+    {
+     "words": "a reaction now: eyes or face swelling fast, or trouble breathing",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "eye pain or a change in sight after lash or brow work",
+     "say": "Please see a doctor today. Don't pull the lashes off. Your artist is told at once.",
+     "booking": "the next visit waits until the artist has called"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "itchy, puffy or red eyelids after a set, with no danger signs",
+     "what": "the artist calls within the hour (the owner if the artist is silent 15 minutes) and decides: often a free removal, or a doctor"
+    },
+    {
+     "words": "an eye infection, stye or irritation on the visit day",
+     "what": "no lash work on that eye; the visit moves with no fee"
+    }
+   ],
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking. Rosie never judges a reaction: the artist or a doctor decides"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Glue patch test (a few test lashes at each outer corner)",
+     "when": "1 to 2 days before a first full set; the same test checks a lift, tint or lamination product added to the booking",
+     "who": "first-set clients, and anyone whose last test ran out",
+     "goodFor": "6 months, or until the studio changes its glue (the example studio's rule)",
+     "result": "24 hours after the test, the customer answers on the secure page; anything off: the artist calls and decides (go ahead, a retest with a sensitive glue and a later set with no fee, or no extensions with a full refund); no answer: the artist checks the test lashes before starting"
+    },
+    {
+     "name": "Patch test for a tint, lift or lamination",
+     "when": "at least 1 day before a first tint, lift or lamination",
+     "result": "the same check and the same outcomes"
+    },
+    {
+     "name": "Lash consent on the secure page",
+     "when": "signed when booking a first set, lift or tint; a parent signs for a teen",
+     "result": "kept on file; a later booking skips it"
+    },
+    {
+     "name": "Bridal lash trial",
+     "when": "before the wedding day (the owner's setting)",
+     "result": "the look and the timing for the day are saved for the artist"
+    }
+   ],
+   "reaction": "a reaction to lash glue or a tint before: the booking waits for Sam's OK, and the patch test comes first",
+   "prep": "for the reminder: come with clean, makeup-free eyes, no mascara, and contact lenses out; plan to lie still with your eyes closed (about 1 hour for a fill, 2½ for a full set); for a visit at home, a quiet room with space for a lash bed and a plug"
+  },
+  "pf.visit": {
+   "checkIn": "at the studio: the check-in code at the desk or the lash bed; at a home or venue: the code from whoever will be there (the bride, or the venue contact when a mobile is given for them)",
+   "beforeWork": "the artist looks at the patch-test lashes and the eyes, asks if anything changed since the form, and has contact lenses taken out; no lash work on red, swollen or infected eyes",
+   "changes": "a fill with fewer than half the lashes left is done as a full set only with the customer's yes to the full-set price and a free 2½ hours; extra work (a brow wax, a volume upgrade) is priced and OK'd before it's done",
+   "done": "the check-in code, or DONE from the artist; the lash map (curl, lengths, glue) goes in the artist's notes for next time"
+  },
+  "pf.money": {
+   "before": "a card saved for fills, lifts, tints and brows; a $40 deposit for full sets (the example studio's amount), counted toward the price; away from the studio, a card saved for the $89 trip fee; a 25% deposit for a wedding party, the rest charged to the saved card when the artist texts DONE",
+   "caps": "deposit cap: from the state form",
+   "cancel": "free to cancel until 24 hours before at the studio (the owner's setting); away from the studio, until 7am on the day; a wedding party follows its contract",
+   "fees": "late cancel or no-show: the $20 fee for fills, lifts and brows; full sets may keep the $40 deposit; the $89 trip fee away from the studio; the owner confirms each fee, never more than what was agreed",
+   "refunds": "a full refund if the patch test rules the set out, the studio changes the plan, or the artist stops for a reaction (the owner decides any charge); no fee for missing a free patch test",
+   "tips": "on: at the desk, or a tip line on the bill Rosie texts; tips go to the artist",
+   "tax": "a tax line for products sold, like a lash cleanser, where the state's rules require it",
+   "fee2": "Rosfield's $2 applies; a free patch test and its set count as one booking"
+  },
+  "pf.messages": {
+   "never": "eye-form answers, allergies, patch-test results and reactions never go in a text or through the AI: only the secure page and the customer's record. Check texts ask nothing personal; the artist asks by phone",
+   "languages": "English and Spanish",
+   "minors": "a teen's booking texts go to the parent or guardian, never to the teen"
+  },
+  "pf.staff": {
+   "licenses": "each artist's license per state, matched to the services it covers; makeup where the state licenses it",
+   "skills": "classic, volume, lifts, tints, lamination, waxing, threading, makeup; only artists with the skill and the license are offered",
+   "supervision": "apprentices and students work only under a licensed artist, where the state's rules allow",
+   "oks": "Sam reads every flagged eye form, OKs any booking after a past reaction, and every wedding party quote over $500",
+   "standIn": "a stand-in gets the lash map, the glue used and the patch-test date",
+   "callBack": "a call-back goes to the artist first, then the owner: after 1 hour for a patch-test question, 15 minutes for a reaction",
+   "away": "only artists cleared for work away from the studio are offered for homes and venues"
+  },
+  "pf.rules": {
+   "showLicense": "the license is shown where the state asks: posted at the studio, on the artist's profile, in a confirmation or a stand-in text (a switch from the state form)",
+   "away": "work away from the studio only where the state allows it, and only for the services it allows (a switch from the state form)",
+   "tints": "only tint products the state allows for lashes and brows; the studio names its product at sign-up (a switch from the state form)",
+   "minors": "a parent's written OK for a minor, where the state's rules require it",
+   "records": "lash maps, glue batches, patch-test dates and eye forms kept with the customer's record: 7 years, or longer where the state asks",
+   "contracts": "a signed contract for wedding party work (the owner's setting), and where the state's rules require one above an amount"
+  },
+  "pf.edges": {
+   "lateArrival": "15 minutes' grace; later, the artist decides what still fits before the next client: a shorter fill, or a new time; it may count as a late cancel",
+   "fillSwitch": "fewer than half the lashes left, or past 3 weeks: the fill becomes a full set at its own price, with the customer's yes, or moves to a time with room",
+   "standIn": "an artist out sick: a stand-in whose license covers it, with the lash map, or new times with no fee; the patch test still counts",
+   "patchTest": "a patch test missed or not done in time: a later test that keeps the 1 to 2 days, or a free cancel",
+   "reaction": "a reaction during the set: the artist stops, removes the lashes for free and rinses; Sam decides any charge; after the visit, the next fill waits for the artist's call",
+   "fix": "a free touch-up within 3 days if lashes come loose (the example studio's promise)",
+   "party": "a wedding party: one booking, several people, one check-in code, and a date that can't move",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "extrawork",
+   "firststeps",
+   "forms",
+   "photos"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Kayla and Lina (lash artists)",
+   "cust": "Alex M. (customer) · other customers"
+  },
+  "B": {
+   "staff": "Diego and Luis (lash artists who travel)",
+   "cust": "Alex M. (customer) · other customers",
+   "other": "Others (a bank, a venue, a parent)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Kayla"
+  },
+  "B": {
+   "staff": "Diego"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a lash fill for a child before the times."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds body waxing to Lee Lash Studio."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Body waxing for Lee Lash Studio: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW body waxing"
+   ],
+   [
+    "It adds any way to get ready from the plug-in. A barbershop has none.",
+    "It adds the plug-in's way to get ready: come with clean eyes, no mascara, and contact lenses out."
+   ],
+   [
+    "Barbering pays the $2, so the shop gets its own monthly bill.",
+    "Lash and brow work pays the $2 too, so the studio gets its own monthly bill."
+   ],
+   [
+    "Do your plumbers or barbers go to one place on set days, like an apartment building or a care home?",
+    "Do your lash artists go to one place on set days, like an office or a care home?"
+   ],
+   [
+    "Alex's kitchen drain has a set time.",
+    "Alex's full set has a set time."
+   ],
+   [
+    "A clogged drain that's overflowing may be. A water heater replacement never is.",
+    "Lash and brow work never is: every visit has a set start."
+   ],
+   [
+    "The $179 drain and the $150 flush need no notice here.",
+    "The $179 full set and the $150 trial need no notice here."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 wedding party is over the plug-in's amount, so it gets a contract."
+   ],
+   [
+    "The $179 drain and the $150 flush are under that amount, so they need none.",
+    "The $179 full set and the $150 trial are under that amount, so they need none."
+   ],
+   [
+    "A leak priced at the visit has no price yet.",
+    "Every mobile lash price is set before the visit."
+   ],
+   [
+    "Alex's drain is booked with Jordan by name.",
+    "Alex's full set is booked with Diego by name."
+   ],
+   [
+    "Casey is free then and does drain work.",
+    "Luis is free then and does full sets."
+   ],
+   [
+    "Casey does drain work, so Casey can stand in.",
+    "Luis does full sets, so Luis can stand in."
+   ],
+   [
+    "Kim L.'s yard drain was for Jordan and Casey.",
+    "Kim L.'s wedding party was for Diego and Luis."
+   ],
+   [
+    "Jordan's estimate visit found that the new water heater can't go in as planned.",
+    "Diego's lash trial found that the bride's eyes react to lash glue, so the wedding party can't be done as planned."
+   ],
+   [
+    "like a move-out day",
+    "like a wedding day"
+   ],
+   [
+    "The plug-in says when the place's owner matters, like a renter's new water heater. Plumbing in a home asks it. A tow, a car in a lot or a venue skips it.",
+    "The plug-in says when the place matters. Mobile lash work asks where the lashes are done, since a venue may need to OK it."
+   ],
+   [
+    "1 Yes: own or rent is asked",
+    "1 Yes: home or venue"
+   ],
+   [
+    "Rosie texts the landlord only after that yes on the page.",
+    "Rosie texts the venue only after that yes on the page."
+   ],
+   [
+    "The time stays saved up to 30 minutes for the landlord.",
+    "The time stays saved up to 30 minutes for that yes."
+   ],
+   [
+    "Does the landlord OK it in 30 minutes?",
+    "Does the venue OK it in 30 minutes?"
+   ],
+   [
+    "The landlord OKs it",
+    "The venue OKs it"
+   ],
+   [
+    "The landlord said no, or didn't OK the job in 30 minutes.",
+    "The venue said no, or didn't OK the job in 30 minutes."
+   ],
+   [
+    "Your landlord didn't OK this job, so nothing was booked or charged.",
+    "Your venue didn't OK this job, so nothing was booked or charged."
+   ],
+   [
+    "A landlord's or a parent's yes keeps it saved up to 30 minutes.",
+    "A venue's or a parent's yes keeps it saved up to 30 minutes."
+   ],
+   [
+    "Only where the plug-in says the place's owner matters, and Alex rents. The landlord's yes to texts came from the secure page.",
+    "Only where a parent pays. The parent's yes to texts came from the secure page."
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $2,400 wedding weekend"
+   ],
+   [
+    "Reads back plumbing's money, service by service",
+    "Reads back the money, service by service"
+   ],
+   [
+    "He sends photos, and prices a new one from them at $640, over Sam's $500 limit.",
+    "He reads the party's answers and photo, and prices it at $640, over Sam's $500 limit."
+   ],
+   [
+    "Its rating plate",
+    "The party's list"
+   ],
+   [
+    "Building rules, like a homeowners' group's work hours or proof of insurance, go to Sam to check.",
+    "Building or venue rules, like set-up hours or proof of insurance, go to Sam to check."
+   ],
+   [
+    "Each kind of work can have its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each kind of work can have its own trade name, like Lee Mobile Lash and Lee Makeup."
+   ],
+   [
+    "Before DONE, Jordan runs the water with Alex and checks for drips.",
+    "Before DONE, Diego hands Alex a mirror, and they check the set together."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Mobile Lash does lash, brow and makeup work, not nails."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a nail tech near you."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I have an event tonight. Can someone come today?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a wedding planner books lashes for a bride and 4 bridesmaids at one hotel."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the lash artist, one line each."
+   ],
+   [
+    "Here's the price for a new one, from his photos, as its own visit.",
+    "Here's the price, from the photos, as its own visit."
+   ],
+   [
+    "Here's the price to fix it, as its own visit.",
+    "Here's the price, as its own visit."
+   ],
+   [
+    "Only Jordan does replacements, so Alex will pick a new day.",
+    "Only Diego does wedding parties, so Alex will pick a new day."
+   ],
+   [
+    "A what-if: Jordan cracks the cabinet floor and texts a photo.",
+    "A what-if: Diego spills lash glue on the sofa and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE glue spot on the sofa"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Glue spot on the sofa"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Diego left a glue spot on Alex M.'s sofa."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The lash plug-in adds its own: glue or a chemical in the eye, or eyes or a face swelling fast."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the lash map, the glue used and a patch-test date."
+   ],
+   [
+    "Nobody on Sam's team needs one: every plumber and barber holds their own license.",
+    "Nobody on Sam's team needs one: every lash artist and makeup artist holds their own license."
+   ],
+   [
+    "Free estimate, then a quote",
+    "Free consult, then a quote"
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free touch-up within 3 days."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien está herido? ¿Puede ver bien?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Can you see all right?"
+   ],
+   [
+    "No. No huele a gas.",
+    "Sí, veo bien. Pero me arde el ojo."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "Yes, I can see. But my eye stings."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Enjuáguese el ojo con agua limpia y corriente por 15 minutos. Si no puede ver o le duele mucho, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rinse your eye with clean running water for 15 minutes. If you can't see or it hurts a lot, call 911."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to rinse her eye with clean running water for 15 minutes, and to call 911 if she can't see."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For lash work, glue or a chemical in the eye now stops the booking, and so does a face swelling fast."
+   ],
+   [
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Rinse your eye with clean running water for 15 minutes. If you can't see, call 911 now."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: glue or a chemical in the eye, or eyes or a face swelling fast."
+   ],
+   [
+    "If Alex named a warranty plan before the times, Sam checks it here.",
+    "Lash and brow work bills no plan, so Sam has nothing to check here."
+   ],
+   [
+    "Does Alex own or rent the home?",
+    "Who pays, and does a venue OK it?"
+   ],
+   [
+    "The page asks if Alex owns or rents.",
+    "The page asks where the lashes are done and who pays."
+   ],
+   [
+    "A renter may need the landlord's OK, or the landlord may pay.",
+    "A venue may need to OK an outside lash artist, or a parent may pay."
+   ],
+   [
+    "Owns the home",
+    "At Alex's home; Alex pays"
+   ],
+   [
+    "Rents, and pays",
+    "At a venue; Alex pays"
+   ],
+   [
+    "Gets the landlord's OK when needed",
+    "Gets the venue's OK when needed"
+   ],
+   [
+    "Say Alex rents, and the landlord pays.",
+    "Say Alex's parent pays."
+   ],
+   [
+    "Alex still gets the code, since Alex will be home.",
+    "Alex still gets the code, since Alex will be there."
+   ],
+   [
+    "A what-if: Alex rents, and the landlord agreed at booking to pay.",
+    "A what-if: Alex's parent agreed at booking to pay."
+   ],
+   [
+    "The plug-in says if this work needs a first step: an estimate visit, a permit, a form or a waiver.",
+    "The plug-in says if this work needs a first step: a patch test, a lash trial, a consent form or a waiver."
+   ],
+   [
+    "Before this visit, Lee Home Services needs a free estimate visit.",
+    "Before this visit, Lee Mobile Lash needs a 15-minute glue patch test, 1 to 2 days before."
+   ],
+   [
+    "Alex M. hasn't picked a time for the estimate visit.",
+    "Alex M. hasn't picked a time for the patch test."
+   ],
+   [
+    "Some visits have a first step tied to a date, like a permit or an estimate visit.",
+    "Some visits have a first step tied to a date, like a patch test or a lash trial."
+   ],
+   [
+    "The plug-in names which notices: a cancel notice, a lead-safe paper, a written estimate.",
+    "The plug-in names which notices: a cancel notice, a notice for lash work outside a studio, a contract."
+   ],
+   [
+    "Before Jordan starts, please read and sign the lead-safe work notice for your home.",
+    "Before Diego starts, please read and sign the notice for lash work at your home."
+   ],
+   [
+    "Lead-safe work notice",
+    "Notice for lash work at home"
+   ],
+   [
+    "For older homes, where the rules require it",
+    "Where the state's rules require it"
+   ],
+   [
+    "Say Alex's job needs a permit, and it isn't back yet.",
+    "Say Alex's set needs a patch test first, and it isn't done yet."
+   ],
+   [
+    "The permit for Alex M.'s job (Thu 8–10am) isn't back yet.",
+    "Alex M. hasn't had the patch test for the Thu 8:30am set yet."
+   ],
+   [
+    "Your permit isn't ready yet, so Lee Home Services needs to move your visit.",
+    "Your patch test isn't done yet, so Lee Mobile Lash needs to move your visit."
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Diego needs a sensitive glue from the studio."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting a sensitive glue, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Diego went to get a sensitive glue and will be back about 9:30am."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the outlet checked before using it"
+   ],
+   [
+    "A warranty claim",
+    "Asks for a free touch-up"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free touch-up lasts."
+   ],
+   [
+    "Texts the receipt and warranty",
+    "Texts the receipt and the free touch-up"
+   ],
+   [
+    "The $89 service call and labor at $120 an hour aren't booked alone.",
+    "The $89 trip fee and on-site touch-ups at $120 an hour aren't booked alone."
+   ],
+   [
+    "The $150 flush takes a $40 deposit too, with the $110 rest later.",
+    "The $150 trial holds $89 too, and is billed after."
+   ],
+   [
+    "A water heater quote from photos at $640 is over $500, so it comes to Sam.",
+    "A wedding party quote at $640 is over $500, so it comes to Sam."
+   ],
+   [
+    "Outlet or switch replaced",
+    "Event makeup"
+   ],
+   [
+    "Ceiling fan installed",
+    "Bridal makeup"
+   ],
+   [
+    "The panel upgrade is a free estimate visit, then a quote.",
+    "Group makeup starts with a free consult, then a quote."
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Classic full set"
+   ],
+   [
+    "The plug-in says where barbering outside a shop is allowed, and who may go.",
+    "The plug-in says where lash work outside a studio is allowed, and who may go."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: many lash artists, nail techs and groomers must work in a licensed place."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Full sets, fills and trials at home"
+   ],
+   [
+    "Sam says some people charge differently: Jordan's labor, and Sam's own camera inspections.",
+    "Sam says some people charge differently: Diego's on-site touch-ups, and Sam's own bridal lash sets."
+   ],
+   [
+    "The camera inspection is 249 if I go myself",
+    "The bridal lash set is 249 if I do it myself"
+   ],
+   [
+    "Labor is $140 an hour with Jordan, and $120 with anyone else.",
+    "On-site touch-ups are $140 an hour with Diego, and $120 with anyone else."
+   ],
+   [
+    "The camera inspection is $249 when Sam goes.",
+    "The bridal lash set is $249 when Sam does it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A lash example: glue in the eye gets 'rinse it with clean running water for 15 minutes'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's lash fill needs none, so nothing is sent here."
+   ],
+   [
+    "How long is your beard now? A long beard takes longer.",
+    "When was your last set or fill? After 3 weeks, it's booked as a full set."
+   ],
+   [
+    "Books the groom's party together",
+    "Books the bride's party together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A bride books lash lifts for herself and four friends on one morning."
+   ],
+   [
+    "Keep the beard short.",
+    "I wear contact lenses."
+   ],
+   [
+    "The towel steamer breaks, so each booking that needs it is offered a change, with no fee.",
+    "The lash lamp breaks, so each booking that needs it is offered a change, with no fee."
+   ],
+   [
+    "Alex's booking gets the same offer if it needs the steamer.",
+    "Alex's booking gets the same offer if it needs the lamp."
+   ],
+   [
+    "Towel steamer broken until Mon",
+    "Lash lamp broken until Mon"
+   ],
+   [
+    "The hot towel part of your Sat 2:00pm visit can't be done.",
+    "The lash part of your Sat 2:00pm visit can't be done."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: classic, C curl, 10 to 12 mm, sensitive glue"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I want a classic full set of lash extensions at home."
+   ],
+   [
+    "Can a plumber flush my water heater Thursday morning?",
+    "Can a lash artist do my bridal lash trial Thursday morning?"
+   ],
+   [
+    "My water heater is old and rusty. Can a plumber replace it this week?",
+    "I'm getting married Thursday. Can a lash artist do lashes for me and 4 friends at home?"
+   ],
+   [
+    "Sale agua del calentador.",
+    "Me entró pegamento de pestañas en el ojo."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "Lash glue got in my eye."
+   ],
+   [
+    "Call summary: Rosa, in Spanish. Water is leaking from the water heater, and the valve is shut.",
+    "Call summary: Rosa, in Spanish. Lash glue got in her eye at home, and she rinsed it."
+   ],
+   [
+    "Leak at the gas water heater · safety steps given",
+    "Lash glue in the eye · safety steps given"
+   ],
+   [
+    "We got your voicemail about a dripping faucet.",
+    "We got your voicemail about lashes at home."
+   ],
+   [
+    "Voicemail from a new caller about a dripping kitchen faucet.",
+    "Voicemail from a new caller about a lash fill at home."
+   ],
+   [
+    "Wants the faucet looked at this week",
+    "Wants a fill at home this week"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a lash artist do lashes for my wedding party of 8 this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa full set Thu 1pm Luis"
+   ],
+   [
+    "Book Tessa for a clogged drain, Thu Oct 22, arriving 12 to 2pm, with Casey?",
+    "Book Tessa for a full set at home, Thu Oct 22, starting 1:00pm, with Luis?"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My eye has been red since my last set. Is it safe to get a fill?"
+   ],
+   [
+    "Rosie can't answer safety questions about gas appliances. If you smell gas, leave and call 911.",
+    "Rosie can't answer health questions about your eyes. If your eye hurts or your sight changes, see a doctor today."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Mobile Lash doesn't do, like a manicure."
+   ],
+   [
+    "The plug-in can name the kind of work to suggest, like a roofer for a roof leak.",
+    "The plug-in can name the kind of work to suggest, like a nail tech for a manicure."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: a first set or not, when the last set was, and contact lenses."
+   ],
+   [
+    "Its first steps: none for a drain.",
+    "Its first steps: a glue patch test before a first set."
+   ],
+   [
+    "A leak is quoted on site, and a water heater from photos.",
+    "A wedding party is priced from the party's answers and a photo of the look."
+   ],
+   [
+    "Lee Home Services asks: which drain is clogged, and is water backing up anywhere else?",
+    "Lee Mobile Lash asks: is this your first set of lash extensions, and when was your last one?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Not my first. My last set was 5 weeks ago."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric?",
+    "Lee Mobile Lash asks: when is the wedding, and what look do you want?"
+   ],
+   [
+    "Electric.",
+    "Sat Nov 14. A natural look."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric, and is it leaking?",
+    "Lee Mobile Lash asks: how many people, and where will you get ready?"
+   ],
+   [
+    "Gas. It's rusty, but it isn't leaking.",
+    "Five of us, at my home."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a wedding party is priced from the party's answers and a photo, so Rosie's first text asks for them."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add a photo of the look you want and the party's list, and a lash artist will price it."
+   ],
+   [
+    "Alex M. sent photos of a water heater.",
+    "Alex M. sent a photo and the party's list."
+   ],
+   [
+    "Water heater · Alex M.",
+    "Wedding party · Alex M."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your wedding party price is with Lee Mobile Lash."
+   ],
+   [
+    "Lee Home Services can replace your water heater for $640, priced by Jordan from your photos.",
+    "Lee Mobile Lash can do your wedding party's lashes for $640, priced by Diego from your answers."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a fill at home every 3 weeks."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come for a fill every 3 weeks, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Mobile Lash has a fill plan every 3 weeks, $110 a visit."
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every 3 weeks?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 3 weeks"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a brow wax."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Diego also wax my brows?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "A brow wax is $25 on the list, so it's added to the visit."
+   ],
+   [
+    "All are with Jordan, the one who replaces water heaters here.",
+    "All are with Diego, the one who does wedding parties here."
+   ],
+   [
+    "Casey does drains, leaks and flushes, not water heater replacements.",
+    "Luis does full sets, fills and trials, not wedding parties."
+   ],
+   [
+    "Casey doesn't do water heater replacements here, so only Jordan's times show:",
+    "Luis doesn't do wedding parties here, so only Diego's times show:"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a quiet room with space for a lash bed and a plug?"
+   ],
+   [
+    "Yes, it won't drain at all.",
+    "Yes, the living room."
+   ],
+   [
+    "Where is the water heater: a garage, a closet or a basement?",
+    "Where will everyone get ready: a living room, a bedroom or a hotel suite?"
+   ],
+   [
+    "In the garage.",
+    "In the living room."
+   ],
+   [
+    "The plug-in adds its own questions, like where the main water shut-off is.",
+    "The plug-in adds its own questions, like a quiet room with space for a lash bed and a plug."
+   ],
+   [
+    "A drain clearing needs no landlord's OK.",
+    "A full set at Alex's home needs no venue's OK."
+   ],
+   [
+    "Alex M. signed the water heater contract.",
+    "Alex M. signed the wedding party contract."
+   ],
+   [
+    "Lee Home Services signed your water heater contract.",
+    "Lee Mobile Lash signed your wedding party contract."
+   ],
+   [
+    "Lee Home Services didn't sign your water heater contract in time, so nothing was booked or charged.",
+    "Lee Mobile Lash didn't sign your wedding party contract in time, so nothing was booked or charged."
+   ],
+   [
+    "Alex M.'s water heater contract wasn't signed in 24 hours, so nothing was booked.",
+    "Alex M.'s wedding party contract wasn't signed in 24 hours, so nothing was booked."
+   ],
+   [
+    "Both have signed, so a 25% deposit on the $640 water heater: $160.",
+    "Both have signed, so a 25% deposit on the $640 wedding party: $160."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Diego's times show: he's the one who does wedding parties."
+   ],
+   [
+    "Note: the sink is full and won't drain.",
+    "Note: not a first set; the last one was 5 weeks ago. Wears contacts."
+   ],
+   [
+    "Note: Gas water heater, in the garage.",
+    "Note: five people, getting ready in the living room."
+   ],
+   [
+    "The plug-in adds any way to get ready, like clearing the cabinet under the sink.",
+    "The plug-in adds any way to get ready, like clean eyes, no mascara, and contact lenses out."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please come with clean eyes, no mascara, and contact lenses out."
+   ],
+   [
+    "Please clear a path to the water heater.",
+    "Please have a room ready with space for five, and clean eyes for everyone."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that one eye is red and itchy since the last set."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like glue in the eye or a swelling face, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "One eye is red and itchy since my last set."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Don't rub it or pull at the lashes. If your eye hurts or your sight changes, see a doctor today."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor.",
+    "Alex texts that one eye is red and itchy since the last set."
+   ],
+   [
+    "Only Jordan replaces water heaters, and he has no earlier time.",
+    "Only Diego does wedding parties, and he has no earlier time."
+   ],
+   [
+    "The water heater is leaking onto the floor now.",
+    "One eye is red and itchy since my last set."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches.",
+    "Don't rub it or pull at the lashes. If your eye hurts or your sight changes, see a doctor today."
+   ],
+   [
+    "Nobody who does replacements is free sooner",
+    "Nobody who does wedding parties is free sooner"
+   ],
+   [
+    "Casey does drains, leaks and flushes, so he isn't offered for a replacement.",
+    "Luis does full sets, fills and trials, so he isn't offered for a wedding party."
+   ],
+   [
+    "Only Jordan replaces water heaters here, so nobody stands in.",
+    "Only Diego does wedding parties here, so nobody stands in."
+   ],
+   [
+    "He's the one who replaces water heaters here.",
+    "He's the one who does wedding parties here."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Diego also wax my brows?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a fill at home every 3 weeks."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's fill?"
+   ],
+   [
+    "Here, the water jetter for Kim's yard drain is in for repair until Monday.",
+    "Here, the lash bed for Kim's wedding party is in for repair until Monday."
+   ],
+   [
+    "Jetter in the shop until Mon",
+    "Lash bed in for repair until Mon"
+   ],
+   [
+    "The tool for your yard drain visit tomorrow is in for repair.",
+    "The lash bed for your visit tomorrow is in for repair."
+   ],
+   [
+    "A what-if: say Alex's job is the water heater replacement priced from photos, with an estimate visit first.",
+    "A what-if: say Alex's job is the wedding party priced from photos, with a lash trial first."
+   ],
+   [
+    "Alex M.: the vent pipe needs replacing too.",
+    "Alex M.: the trial added a sixth person, the bride's mother."
+   ],
+   [
+    "Old vent pipe",
+    "The trial look"
+   ],
+   [
+    "Jordan's new price for Alex M.'s water heater: $700, was $640.",
+    "Diego's new price for Alex M.'s wedding party: $700, was $640."
+   ],
+   [
+    "Jordan's estimate visit found that the vent pipe needs replacing too.",
+    "Diego's lash trial found that the bride's mother joins the party too."
+   ],
+   [
+    "Was $640: the new vent pipe adds $60",
+    "Was $640: the bride's mother adds $60"
+   ],
+   [
+    "Each job shows what to bring, from the plug-in, like a drain snake and a camera.",
+    "Each job shows what to bring, from the plug-in, like the lash bed, a lamp and a sensitive glue."
+   ],
+   [
+    "The plug-in names the checks, like the pipes under the sink and the cabinet floor.",
+    "The plug-in names the checks, like the natural lashes, the lids and any redness."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE natural lashes, a few gaps on the left"
+   ],
+   [
+    "Under the sink, before",
+    "Left eye, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Right eye, before"
+   ],
+   [
+    "BEFORE rust at the base of the water heater",
+    "BEFORE each person's lashes, as they are"
+   ],
+   [
+    "Water heater, before",
+    "The party's lashes, before"
+   ],
+   [
+    "Floor around it, before",
+    "The room, before"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks Diego for a fuller look, a volume set."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 upgrade to a volume set"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: upgrade to a volume set, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Upgrade to a volume set · $160"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 volume upgrade quote is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to upgrading to a volume set for $160."
+   ],
+   [
+    "Jordan sees the water heater leaking at the base.",
+    "Alex asks Diego about lashes for the wedding party."
+   ],
+   [
+    "QUOTE 640 water heater leaking at the base, replace",
+    "QUOTE 640 wedding party lashes, five people"
+   ],
+   [
+    "Old heater, leaking at the base",
+    "The look Alex wants"
+   ],
+   [
+    "Jordan quotes a new water heater for Alex M. from his photos: $640.",
+    "Diego quotes the wedding party's lashes for Alex M.: $640."
+   ],
+   [
+    "Jordan finds the main water line cracked.",
+    "Alex asks Diego about a bridal weekend: a bridal set, party lashes and touch-ups."
+   ],
+   [
+    "QUOTE 900 main water line cracked, repair",
+    "QUOTE 900 bridal weekend: bridal set, party lashes, touch-ups"
+   ],
+   [
+    "Jordan quotes a main water line repair for Alex M.: $900.",
+    "Diego quotes a bridal weekend for Alex M.: $900."
+   ],
+   [
+    "Main water line repair · $900",
+    "Bridal weekend · $900"
+   ],
+   [
+    "Found at Thu's water heater visit",
+    "Asked about at Thu's visit"
+   ],
+   [
+    "Jordan found that your water heater is leaking.",
+    "Diego priced your wedding party's lashes."
+   ],
+   [
+    "Jordan found that your main water line is cracked.",
+    "Diego priced your bridal weekend."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Diego finds the outlet by the lash bed sparks."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD outlet sparks, stopped using it"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Outlet by the lash bed"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Diego found the outlet by the lash bed sparks, so he stopped using it and works by daylight."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the outlet by the lash bed sparks"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the bottom lashes, which need the lamp"
+   ],
+   [
+    "A what-if for a drain job: the clog is in the main line, so Jordan clears it from the outside cleanout.",
+    "A what-if for a full set: Alex's lashes are too fine for 12 mm, so Diego uses 9 to 10 mm."
+   ],
+   [
+    "CHANGE cleared the main line from the outside cleanout, same price",
+    "CHANGE shorter lashes, 9 to 10 mm, same price"
+   ],
+   [
+    "Jordan cleared the clog from the outside cleanout. It was in the main line.",
+    "Diego used shorter lashes, 9 to 10 mm, to keep your natural lashes healthy."
+   ],
+   [
+    "Only Jordan replaces water heaters here, so he finishes another day.",
+    "Only Diego does wedding parties here, so he finishes another day."
+   ],
+   [
+    "Here: the drain runs clear, and nothing drips.",
+    "Here: no lashes are stuck together, and Alex likes the look."
+   ],
+   [
+    "Before DONE, Jordan and Alex check the water heater together.",
+    "Before DONE, Diego and Alex check each person's lashes together."
+   ],
+   [
+    "Here: the heater runs, the hot water is hot, and nothing drips.",
+    "Here: every set is even, comfortable and ready for photos."
+   ],
+   [
+    "The drain runs clear.",
+    "The full set is done."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE classic, C curl, 10 to 12 mm. Sensitive glue next time."
+   ],
+   [
+    "NOTE new 50-gallon heater in the garage.",
+    "NOTE five sets done, the bride's in a soft cat-eye."
+   ],
+   [
+    "Nothing more is owed for the flush.",
+    "Nothing more is owed for the trial."
+   ],
+   [
+    "DONE 160 valves",
+    "DONE 160 volume upgrade"
+   ],
+   [
+    "Done: the $160 for the shutoff valves is refunded.",
+    "Done: the $160 for the volume upgrade is refunded."
+   ],
+   [
+    "the shutoff valves",
+    "the volume upgrade"
+   ],
+   [
+    "like the $160 valves.",
+    "like the $160 volume upgrade."
+   ],
+   [
+    "Alex M.: $640 for the water heater",
+    "Alex M.: $640 for the wedding party"
+   ],
+   [
+    "the rest of the water heater job",
+    "the rest of the wedding party"
+   ],
+   [
+    "the rest of the water heater at 42 Oak St",
+    "the rest of the wedding party at 15 Juniper Ln"
+   ],
+   [
+    "$480 left for your water heater",
+    "$480 left for your wedding party"
+   ],
+   [
+    "the $480 left on your water heater",
+    "the $480 left on your wedding party"
+   ],
+   [
+    "the $640 water heater bill",
+    "the $640 wedding party bill"
+   ],
+   [
+    "the $480 left on the water heater bill",
+    "the $480 left on the wedding party bill"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your bridal weekend"
+   ],
+   [
+    "Your new water heater is in. 1-year labor warranty: if anything leaks, reply here.",
+    "Your wedding party is all set. Free touch-up within 3 days: if lashes come loose, reply here."
+   ],
+   [
+    "1-year labor warranty: if it clogs again, reply here.",
+    "Free touch-up within 3 days: if lashes come loose, reply here."
+   ],
+   [
+    "Kitchen drain cleared · $179",
+    "Classic full set at home · $179"
+   ],
+   [
+    "1-year labor warranty: if anything leaks, reply here.",
+    "Free touch-up within 3 days: if lashes come loose, reply here."
+   ],
+   [
+    "Alex cancels the $160 valve work on the page.",
+    "Alex cancels the $160 volume upgrade on the page."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Upgrade to a volume set"
+   ],
+   [
+    "Alex M. cancelled the $160 valve work.",
+    "Alex M. cancelled the $160 volume upgrade."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A few lashes come loose 2 days later."
+   ],
+   [
+    "It's inside the 1-year labor warranty, so Sam OKs a free return visit.",
+    "It's inside the 3-day free touch-up, so Sam OKs a free return visit."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A few lashes came loose on my left eye."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s full set, done Thu Oct 22, has a few loose lashes."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It's inside the 3-day free touch-up."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your set is inside the free touch-up, so this visit is free."
+   ],
+   [
+    "The new water heater drips at a fitting 2 weeks later.",
+    "A bridesmaid's lashes lift at one corner 2 days later."
+   ],
+   [
+    "My new water heater is dripping at a fitting.",
+    "My sister's lashes are lifting at one corner."
+   ],
+   [
+    "Alex M.'s new water heater, put in Thu Oct 22, is dripping at a fitting.",
+    "Alex M.'s wedding party, done Thu Oct 22: one bridesmaid's lashes are lifting."
+   ],
+   [
+    "Your water heater is under warranty, so this visit is free.",
+    "Your wedding party is inside the free touch-up, so this visit is free."
+   ],
+   [
+    "Kitchen drain · Thu Oct 22",
+    "Classic full set · Thu Oct 22"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Diego left lash tape on the sofa."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Diego do a new full set next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Diego's next times for a full set at home."
+   ],
+   [
+    "Tips for your drain: run hot water for a minute after washing dishes, and skip store-bought drain cleaners.",
+    "Lash aftercare: keep them dry for 24 hours, then wash them daily with a lash cleanser. No oil-based products or mascara on them."
+   ],
+   [
+    "Tips for your water heater: keep the space around it clear, and check for drips this week.",
+    "Lash aftercare for the party: keep them dry until tomorrow, and don't rub or pull them."
+   ],
+   [
+    "If you see water or lose hot water, reply here.",
+    "If your eyes itch or swell, reply here."
+   ],
+   [
+    "Here, it's Jordan's $640 quote from photos for Morgan P.'s water heater.",
+    "Here, it's Diego's $640 quote for Morgan P.'s wedding party."
+   ],
+   [
+    "With times to pick, all with Jordan, since only Jordan replaces water heaters here.",
+    "With times to pick, all with Diego, since only Diego does wedding parties here."
+   ],
+   [
+    "Lee Home Services can replace your water heater for $640.",
+    "Lee Mobile Lash can do your wedding party's lashes for $640."
+   ],
+   [
+    "Your water heater quote is with the owner.",
+    "Your wedding party quote is with the owner."
+   ],
+   [
+    "It's a leak under the sink, today 3 to 5pm with Jordan.",
+    "It's a full set at home, today at 3:00pm with Diego."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the wedding party quote before booking."
+   ],
+   [
+    "Flushes already booked stay paid in full.",
+    "Trials already booked keep their $89 hold."
+   ],
+   [
+    "Flushes already booked keep their $40 deposit.",
+    "Trials already booked keep their $89 hold."
+   ],
+   [
+    "Here, Jordan quotes $190 for Morgan P.'s two shutoff valves.",
+    "Here, Diego quotes $190 for Morgan P.'s bridal touch-ups."
+   ],
+   [
+    "About an inch.",
+    "Natural, not too long."
+   ],
+   [
+    "Keep it as a haircut",
+    "Keep just the tint"
+   ],
+   [
+    "like a beard oil",
+    "like a lash cleanser"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "Lashes could mean a studio or an artist who comes to you"
+   ],
+   [
+    "like a burst pipe",
+    "like lashes before an event tonight"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Lash lift and tint"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "lash lift and tint"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Lash and brow, Makeup, Lash studio"
+   ],
+   [
+    "the kitchen drain at 42 Oak St",
+    "the full set at 15 Juniper Ln"
+   ],
+   [
+    "The landlord confirms and pays",
+    "A parent confirms and pays"
+   ],
+   [
+    "Texts the landlord the bill",
+    "Texts the parent the bill"
+   ],
+   [
+    "A water heater replacement",
+    "A wedding party"
+   ],
+   [
+    "a water heater replacement",
+    "a wedding party"
+   ],
+   [
+    "Water heater replacement",
+    "Wedding party lashes"
+   ],
+   [
+    "water heater replacement",
+    "wedding party lashes"
+   ],
+   [
+    "Sewer camera inspection",
+    "Bridal lash set"
+   ],
+   [
+    "sewer camera inspection",
+    "bridal lash set"
+   ],
+   [
+    "Signature cut and shave",
+    "Lash lift and tint"
+   ],
+   [
+    "signature cut and shave",
+    "lash lift and tint"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Classic full set at home"
+   ],
+   [
+    "kitchen drain clearing",
+    "classic full set at home"
+   ],
+   [
+    "credited to the repair",
+    "counts toward the service"
+   ],
+   [
+    "replaces water heaters",
+    "does wedding parties"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Lash LLC"
+   ],
+   [
+    "Plumbing + electrical",
+    "Lash and brow + makeup"
+   ],
+   [
+    "replace water heaters",
+    "do wedding parties"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Lash Studio LLC"
+   ],
+   [
+    "Yard drain clearing",
+    "Wedding party lashes"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilelash.com"
+   ],
+   [
+    "Water heater flush",
+    "Bridal lash trial"
+   ],
+   [
+    "water heater flush",
+    "bridal lash trial"
+   ],
+   [
+    "signs the estimate",
+    "signs the contract"
+   ],
+   [
+    "the kitchen drain",
+    "the full set"
+   ],
+   [
+    "The landlord pays",
+    "A parent pays"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Lash"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "written estimate",
+    "contract"
+   ],
+   [
+    "changed estimate",
+    "changed contract"
+   ],
+   [
+    "Changed estimate",
+    "Changed contract"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Lash Studio"
+   ],
+   [
+    "Groom's packages",
+    "Classic full sets"
+   ],
+   [
+    "Drain clearings",
+    "Full sets at home"
+   ],
+   [
+    "signed estimate",
+    "signed contract"
+   ],
+   [
+    "Groom's package",
+    "Classic full set"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 full set"
+   ],
+   [
+    "Drain clearing",
+    "Classic full set"
+   ],
+   [
+    "drain clearing",
+    "full set at home"
+   ],
+   [
+    "the landlord's",
+    "the parent's"
+   ],
+   [
+    "The landlord's",
+    "The parent's"
+   ],
+   [
+    "an electrician",
+    "a makeup artist"
+   ],
+   [
+    "A leak repair",
+    "A lash fill at home"
+   ],
+   [
+    "Kitchen drain",
+    "Classic full set"
+   ],
+   [
+    "your landlord",
+    "your parent"
+   ],
+   [
+    "signature cut",
+    "lash lift"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "the landlord",
+    "the parent"
+   ],
+   [
+    "Jordan Price",
+    "Diego Ruiz"
+   ],
+   [
+    "1200 Main St",
+    "900 Harbor Blvd"
+   ],
+   [
+    "water heater",
+    "wedding party"
+   ],
+   [
+    "Leak repair",
+    "Lash fill at home"
+   ],
+   [
+    "leak repair",
+    "lash fill at home"
+   ],
+   [
+    "electrician",
+    "makeup artist"
+   ],
+   [
+    "Casey Moore",
+    "Luis Moreno"
+   ],
+   [
+    "Yard drain",
+    "Wedding party"
+   ],
+   [
+    "Electrical",
+    "Makeup"
+   ],
+   [
+    "electrical",
+    "makeup"
+   ],
+   [
+    "Riley Chen",
+    "Kayla Nguyen"
+   ],
+   [
+    "Avery Diaz",
+    "Lina Park"
+   ],
+   [
+    "the facial",
+    "the lash bath"
+   ],
+   [
+    "Beard trim",
+    "Brow wax"
+   ],
+   [
+    "beard trim",
+    "brow wax"
+   ],
+   [
+    "barbershop",
+    "lash studio"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ave"
+   ],
+   [
+    "42 Oak St",
+    "15 Juniper Ln"
+   ],
+   [
+    "Skin fade",
+    "Brow tint"
+   ],
+   [
+    "skin fade",
+    "brow tint"
+   ],
+   [
+    "barbering",
+    "lash and brow work"
+   ],
+   [
+    "JP031552",
+    "EL031552"
+   ],
+   [
+    "MP045210",
+    "ES045210"
+   ],
+   [
+    "Plumbing",
+    "Lash and brow"
+   ],
+   [
+    "plumbing",
+    "lash and brow"
+   ],
+   [
+    "plumbers",
+    "lash artists"
+   ],
+   [
+    "BS20981",
+    "SL20981"
+   ],
+   [
+    "EC22871",
+    "MK22871"
+   ],
+   [
+    "JE30417",
+    "MK30417"
+   ],
+   [
+    "BR41862",
+    "EL41862"
+   ],
+   [
+    "plumber",
+    "lash artist"
+   ],
+   [
+    "barbers",
+    "lash artists"
+   ],
+   [
+    "Jordan",
+    "Diego"
+   ],
+   [
+    "Elm St",
+    "Willow Ave"
+   ],
+   [
+    "Barber",
+    "Lash artist"
+   ],
+   [
+    "barber",
+    "lash artist"
+   ],
+   [
+    "Labor",
+    "On-site touch-ups"
+   ],
+   [
+    "Riley",
+    "Kayla"
+   ],
+   [
+    "Avery",
+    "Lina"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "2-hour windows, or a set start time",
+    "A set start time for every visit"
+   ],
+   [
+    "Each service starts in an arrival window or at a set start time, like a class at home. The plug-in suggests which.",
+    "Every lash and brow service starts at a set time, as the plug-in suggests."
+   ],
+   [
+    "With 2, when the lash artist texts DONE, Rosfield charges the saved card the agreed price, or the agreed rate times the hours.",
+    "With 2, when the artist texts DONE, Rosfield charges the saved card the agreed price, or the agreed rate times the hours."
+   ],
+   [
+    "and one for each lash artist sent out.",
+    "and one for each artist sent out."
+   ],
+   [
+    "Lash and brow, makeup and lash and brow work license each person, so Sam's four are checked.",
+    "Lash and brow work and makeup license each person, so Sam's four are not checked."
+   ],
+   [
+    "Lash and brow, makeup and lash and brow work need one, so Sam's three take the license step.",
+    "Lash and brow work, makeup and the studio all need one, so Sam's three take the license step."
+   ],
+   [
+    "Only Kayla is cleared for house calls, so only Kayla is offered for them.",
+    "Only Diego and Luis are cleared for work away from the studio."
+   ],
+   [
+    "One calendar covers the studio and house calls, so Kayla is never booked twice.",
+    "One calendar covers every booking, so Kayla is never booked twice."
+   ],
+   [
+    "At the studio, and house calls",
+    "At the studio"
+   ],
+   [
+    "at the studio and for house calls",
+    "at the studio"
+   ],
+   [
+    "May the haircut be done at the customer's home?",
+    "May studio work be done at a customer's home?"
+   ],
+   [
+    "Now your people. Who goes out on lash and brow and makeup jobs, and who cuts hair? Send contact cards, or add them later.",
+    "Now your people. Who goes out on lash and makeup jobs, and who works at the studio? Send contact cards, or add them later."
+   ],
+   [
+    "Kayla Nguyen and Lina Park cut hair. Kayla also does color and house calls",
+    "Kayla Nguyen and Lina Park work at the studio. Kayla also does volume sets"
+   ],
+   [
+    "Kayla Nguyen: lash artist, color and house calls",
+    "Kayla Nguyen: lash artist, volume sets"
+   ],
+   [
+    "Kayla: lash artist, color and house calls",
+    "Kayla: lash artist, volume sets"
+   ],
+   [
+    "Every studio service, color and house calls",
+    "Every studio service, and volume sets"
+   ],
+   [
+    "Every studio service, color, house calls",
+    "Every studio service, and volume sets"
+   ],
+   [
+    "Every studio service but color",
+    "Every studio service but volume sets"
+   ],
+   [
+    "Only Kayla does color, so color services offer only Kayla's times.",
+    "Only Kayla does volume sets, so a volume set offers only Kayla's times."
+   ],
+   [
+    "At the studio, prices are the same whichever lash artist cuts.",
+    "At the studio, prices are the same whichever lash artist does the work."
+   ],
+   [
+    "Jules rents a chair at the studio",
+    "Jules rents a lash bed at the studio"
+   ],
+   [
+    "Jules K. rents a chair here",
+    "Jules K. rents a lash bed here"
+   ],
+   [
+    "who rents a chair",
+    "who rents a lash bed"
+   ],
+   [
+    "Booking rules; color quotes need Sam's OK",
+    "Booking rules; flagged eye forms go to Sam"
+   ],
+   [
+    "Panel upgrade",
+    "Group makeup"
+   ],
+   [
+    "The customer pays at the chair, the studio's own way: a card reader or cash.",
+    "The customer pays at the desk, the studio's own way: a card reader or cash."
+   ],
+   [
+    "Anything added at the chair, like a brow wax, is priced first and paid there.",
+    "Anything added at the visit, like a brow wax, is priced first and paid at the desk."
+   ],
+   [
+    "A tip at the chair is the studio's own way, and Rosie never asks for one.",
+    "A tip at the desk is the studio's own way, and Rosie never asks for one."
+   ],
+   [
+    "Haircuts",
+    "Lash fills"
+   ],
+   [
+    "haircuts",
+    "lash fills"
+   ],
+   [
+    "Haircut",
+    "Lash fill"
+   ],
+   [
+    "haircut",
+    "lash fill"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "$35",
+    "$70"
+   ],
+   [
+    "Sam raises the lash fill to $40 for visits from Mon Nov 2.",
+    "Sam raises the lash fill to $75 for visits from Mon Nov 2."
+   ],
+   [
+    "Here, lash fill plans go to $40 from Sat Nov 21.",
+    "Here, lash fill plans go to $75 from Sat Nov 21."
+   ],
+   [
+    "Saved: lash fill $40 for visits from Mon Nov 2. Lash fills already booked keep $70. Lash fill plans go to $40 from Sat Nov 21, after 30 days' notice.",
+    "Saved: lash fill $75 for visits from Mon Nov 2. Lash fills already booked keep $70. Lash fill plans go to $75 from Sat Nov 21, after 30 days' notice."
+   ],
+   [
+    "Lash fill $70 ($40 from Nov 2)",
+    "Lash fill $70 ($75 from Nov 2)"
+   ],
+   [
+    "Ben's AI asks for a brow tint at $70, an old price.",
+    "Ben's AI asks for a brow tint at $35, an old price."
+   ],
+   [
+    "A brow tint at Lee Lash Studio is $40, not $70.",
+    "A brow tint at Lee Lash Studio is $40, not $35."
+   ],
+   [
+    "Sorry, Tess. The lash part of your Sat 2:00pm visit can't be done. Keep it as a shorter fill for $70, or pick a new time, with no fee. If you paid ahead, the $20 difference comes back.",
+    "Sorry, Tess. The lash lamp is out, so the lift part of your Sat 2:00pm visit can't be done. Keep just the tint for $40, or pick a new time, with no fee."
+   ],
+   [
+    "After your patch test, Lee Lash Studio can't go ahead with your Sat Oct 31 color.",
+    "After your patch test, Lee Lash Studio can't go ahead with your Sat Oct 31 lash extensions."
+   ],
+   [
+    "Your lash fill is part of a plan with Kayla, every 4 weeks.",
+    "Your lash fill is part of a plan with Kayla, every 3 weeks."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero un relleno de pestañas el sábado."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a lash fill on Saturday."
+   ],
+   [
+    "Alex needs a cut within the hour, for an interview.",
+    "Alex wants a fill within the hour, before an event tonight."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a fill every 3 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a fill every 3 weeks, so every visit stays a fill."
+   ],
+   [
+    "Alex asks for a perm, which the studio doesn't do.",
+    "Alex asks for permanent eyeliner, which the studio doesn't do."
+   ],
+   [
+    "Lee Lash Studio doesn't do perms. Other businesses nearby may.",
+    "Lee Lash Studio doesn't do permanent makeup. Other businesses nearby may."
+   ],
+   [
+    "A lash studio books kids cuts with a parent.",
+    "A lash studio books teens 13 to 17 with a parent, who stays."
+   ],
+   [
+    "A parent books a kids cut",
+    "A parent books a teen brow wax"
+   ],
+   [
+    "A kids cut is for 12 and under. Alex picked one for a son before the times, so the times fit it.",
+    "A teen brow wax is for 13 to 17. Alex picked one for a daughter before the times, so the times fit it."
+   ],
+   [
+    "The kids cut is for your son, who's 9. Are you his parent or guardian?",
+    "The teen brow wax is for your daughter, who's 15. Are you her parent or guardian?"
+   ],
+   [
+    "Yes, I'm his parent.",
+    "Yes, I'm her parent."
+   ],
+   [
+    "Alex books a cut for an adult brother, and pays for it.",
+    "Alex books a lash lift for an adult sister, and pays for it."
+   ],
+   [
+    "It's a gift for my brother. Can I pay for it?",
+    "It's a gift for my sister. Can I pay for it?"
+   ],
+   [
+    "If Alex gives the brother's mobile, the brother gets the code and the reminder.",
+    "If Alex gives the sister's mobile, the sister gets the code and the reminder."
+   ],
+   [
+    "The brother gets texts only once Alex says he agreed to them.",
+    "The sister gets texts only once Alex says she agreed to them."
+   ],
+   [
+    "Books it for a brother",
+    "Books it for a sister"
+   ],
+   [
+    "A what-if: Alex's employer pays for a staff cut.",
+    "A what-if: Alex's employer pays for a lash lift as a staff gift."
+   ],
+   [
+    "Uses a cut from Alex's package",
+    "Uses a fill from Alex's package"
+   ],
+   [
+    "Alex bought a package of cuts at the studio. This booking uses one of them, so the cut itself is already paid.",
+    "Alex bought a package of fills at the studio. This booking uses one of them, so the fill itself is already paid."
+   ],
+   [
+    "Alex's page shows the cuts left.",
+    "Alex's page shows the fills left."
+   ],
+   [
+    "A package cut, or a credit from a pack, skips the deposit or full price.",
+    "A package fill, or a credit from a pack, skips the deposit or full price."
+   ],
+   [
+    "With a package cut, this step is skipped.",
+    "With a package fill, this step is skipped."
+   ],
+   [
+    "Here it books right away: Alex has had cuts at the studio before, and it isn't for today.",
+    "Here it books right away: Alex has had sets at the studio before, and it isn't for today."
+   ],
+   [
+    "Alex picked Kayla, so Kayla's next times show. Color always stays with Kayla.",
+    "Alex picked Kayla, so Kayla's next times show. Alex's lash map stays with Kayla."
+   ],
+   [
+    "Any scalp trouble Kayla should know about?",
+    "Any eye trouble Kayla should know about?"
+   ],
+   [
+    "Can my son wait in the studio during my cut?",
+    "Can my son wait in the studio during my fill?"
+   ],
+   [
+    "Say Alex has a scalp rash that gets worse before the visit.",
+    "Say one of Alex's eyes turns red and itchy before the visit."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My left eye is red and itchy. Can I still come in?"
+   ],
+   [
+    "The plug-in says who may take each booking. Lina does every studio service but color.",
+    "The plug-in says who may take each booking. Lina does every studio service but volume sets."
+   ],
+   [
+    "Alex M. hasn't picked a new time for the color Kayla can't do Saturday.",
+    "Alex M. hasn't picked a new time for the volume set Kayla can't do Saturday."
+   ],
+   [
+    "Say Alex's visit were a color, which only Kayla does at the studio.",
+    "Say Alex's visit were a volume set, which only Kayla does at the studio."
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else, like volume"
+   ],
+   [
+    "A what-if: Kayla did the cut, but entered no code and no DONE.",
+    "A what-if: Kayla did the fill, but entered no code and no DONE."
+   ],
+   [
+    "If Kayla says the cut was done, a person at Rosie reviews it first, and no fee is asked.",
+    "If Kayla says the visit was done, a person at Rosie reviews it first, and no fee is asked."
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped Alex M.'s fill and took the lashes off. I put a note on the page."
+   ],
+   [
+    "Kayla stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Kayla stopped Alex M.'s fill and removed the lashes. The note is on the secure page."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The lash glue left a spot on my shirt collar."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says lash glue left a spot on a shirt collar today."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "A few lashes came loose on my left eye."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says a few lashes from Saturday's fill came loose on the left eye."
+   ],
+   [
+    "A cut paid at the chair is disputed through the studio's own card reader.",
+    "A visit paid at the desk is disputed through the studio's own card reader."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do brows for teens? My daughter is 15."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a teen brow wax (13 to 17) is $25, and a parent stays. Want a time?"
+   ],
+   [
+    "How to care for your skin and hair",
+    "How to care for your new lashes"
+   ],
+   [
+    "A cut at the studio has no cancel period.",
+    "A lash visit at the studio has no cancel period."
+   ],
+   [
+    "No: a cut at the chair",
+    "No: a visit at the studio"
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the studio takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A lash visit is rated, so the studio takes the first branch."
+   ],
+   [
+    "Yes, like a cut",
+    "Yes, like a fill"
+   ],
+   [
+    "Each kind of work handles a late customer its own way. A cut is shortened, so the studio takes the first branch.",
+    "Each kind of work handles a late customer its own way. A fill is shortened, so the studio takes the first branch."
+   ],
+   [
+    "Offers a shorter cut or a later time",
+    "Offers a shorter fill or a later time"
+   ],
+   [
+    "No problem. Kayla can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "No problem. Kayla can do a shorter fill in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Just a trim on top.",
+    "The same look as last time, please."
+   ],
+   [
+    "May the studio show photos of your hair?",
+    "May the studio show photos of your lashes?"
+   ],
+   [
+    "Card payments cost the studio Stripe's own card fee, paid to Stripe. Rosfield takes no cut of them.",
+    "Card payments cost the studio Stripe's own card fee, paid to Stripe. Rosfield takes no share of them."
+   ],
+   [
+    "Shows Alex the cut; fixes first",
+    "Shows Alex the lashes; fixes first"
+   ],
+   [
+    "Before Alex pays, Kayla shows the cut in the mirror.",
+    "Before Alex pays, Kayla hands Alex a mirror to see the lashes."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens on the lash bed?"
+   ],
+   [
+    "Kayla says Alex M. felt faint at the chair.",
+    "Kayla says Alex M. felt faint on the lash bed."
+   ],
+   [
+    "Rosie finds chairs side by side across Kayla and Lina.",
+    "Rosie finds lash beds side by side across Kayla and Lina."
+   ],
+   [
+    "They fit everything asked before: each service's length, the room or gear, and the group's chairs.",
+    "They fit everything asked before: each service's length, the lash bed, and the group's beds."
+   ],
+   [
+    "Some bookings name a person, like Kayla's chair.",
+    "Some bookings name a person, like Kayla's lash bed."
+   ],
+   [
+    "Booked by name, like a chair",
+    "Booked by name, like a fill"
+   ],
+   [
+    "At the studio, Alex is already in the chair, so there's no door check.",
+    "At the studio, Alex is already on the lash bed, so there's no door check."
+   ],
+   [
+    "At the chair, Alex is already there, so the studio takes the first branch.",
+    "On the lash bed, Alex is already there, so the studio takes the first branch."
+   ],
+   [
+    "No: Alex stays in the chair",
+    "No: Alex stays on the lash bed"
+   ],
+   [
+    "The long services show how much time they take, so the chair is saved for all of it.",
+    "The long services show how much time they take, so the lash bed is saved for all of it."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair.",
+    "It's 11:00am, and Alex is at the desk."
+   ],
+   [
+    "Kayla sees a bigger job and mentions it at the chair.",
+    "Kayla sees something more Alex may want and mentions it."
+   ],
+   [
+    "Alex texts STOP. Rosie stops texting, but the visit stays booked. At the chair, Alex gives the code from an earlier text, or Kayla marks it done.",
+    "Alex texts STOP. Rosie stops texting, but the visit stays booked. At the desk, Alex gives the code from an earlier text, or Kayla marks it done."
+   ],
+   [
+    "Next come the before notes, the price or the OK, and the work, as at the chair.",
+    "Next come the before notes, the price or the OK, and the work, as on the lash bed."
+   ],
+   [
+    "A lash fill for Alex and a kids cut for a child work the same way.",
+    "A lash fill for Alex and a teen brow wax for a daughter work the same way."
+   ],
+   [
+    "At the studio, a parent stays for a kids cut, so nothing more happens.",
+    "At the studio, a parent stays for a teen's whole visit, so nothing more happens."
+   ],
+   [
+    "The Classic full set at Lee Lash Studio is $140: a $40 deposit now, and the $100 rest charged Fri Oct 23 at 11am.",
+    "The Classic full set is $140: a $40 deposit now, and the $100 rest charged Fri Oct 23 at 11am."
+   ],
+   [
+    "A color quote needs Sam's OK",
+    "A price over Sam's limit"
+   ],
+   [
+    "Sends Nia the price and times",
+    "Sends Morgan the price and times"
+   ],
+   [
+    "Tells Nia it's with the owner",
+    "Tells Morgan it's with the owner"
+   ],
+   [
+    "A service priced at the chair gets its price now.",
+    "A service priced at the visit gets its price now."
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the desk"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "pays at the chair",
+    "pays at the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "A skin problem stops the work",
+    "An eye problem stops the work"
+   ],
+   [
+    "barbershops",
+    "lash studios"
+   ],
+   [
+    "barbershop",
+    "lash studio"
+   ],
+   [
+    "Barbershop",
+    "Lash studio"
+   ],
+   [
+    "color correction",
+    "lash lift"
+   ],
+   [
+    "Color correction",
+    "Lash lift"
+   ],
+   [
+    "color and cut",
+    "lash lift and tint"
+   ],
+   [
+    "kids cut",
+    "child's lash fill"
+   ],
+   [
+    "Kids cut",
+    "Child's lash fill"
+   ],
+   [
+    "hot towel shave",
+    "lash fill"
+   ],
+   [
+    "hot towel",
+    "lash fill"
+   ],
+   [
+    "shave",
+    "lash fill"
+   ],
+   [
+    "Shave",
+    "Lash fill"
+   ],
+   [
+    "water heater",
+    "lash tint"
+   ],
+   [
+    "Water heater",
+    "Lash tint"
+   ],
+   [
+    "heater",
+    "lash tint"
+   ],
+   [
+    "trim",
+    "tint"
+   ],
+   [
+    "perm",
+    "lash lift"
+   ],
+   [
+    "skin fade",
+    "lash tint"
+   ],
+   [
+    "Skin fade",
+    "Lash tint"
+   ],
+   [
+    "Makeup",
+    "Brow shaping"
+   ],
+   [
+    "makeup",
+    "brow shaping"
+   ],
+   [
+    "Color and cut",
+    "Lash lift and tint"
+   ],
+   [
+    "color and cut",
+    "lash lift and tint"
+   ],
+   [
+    "shaves",
+    "lash fills"
+   ],
+   [
+    "Shaves",
+    "Lash fills"
+   ],
+   [
+    "water heaters",
+    "lash tints"
+   ],
+   [
+    "Water heaters",
+    "Lash tints"
+   ],
+   [
+    "perms",
+    "lash lifts"
+   ],
+   [
+    "skin fades",
+    "lash tints"
+   ],
+   [
+    "Skin fades",
+    "Lash tints"
+   ],
+   [
+    "Shave",
+    "Lash fill"
+   ],
+   [
+    "Perm",
+    "Lash lift"
+   ],
+   [
+    "Heater",
+    "Lash tint"
+   ],
+   [
+    "heaters",
+    "lash tints"
+   ]
+  ],
+  "B": [
+   [
+    "with space for a lash bed and a plug?",
+    "with space for a bed?"
+   ],
+   [
+    "the building's limits, the plug-in's job questions and anything",
+    "any entry limits, job questions and anything"
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here",
+    "Questions that don't change the time or price go here"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I wear mascara before you come?"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said glue got in their eye."
+   ],
+   [
+    "A gas smell at the home",
+    "Glue in the eye now"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to rinse the eye with running water, then get care"
+   ],
+   [
+    "Offer Alex M. Thu Oct 22 with Jordan, the old heater hauled away Fri?",
+    "Offer Alex M. Thu Oct 22 with Diego, with strip lashes, not clusters?"
+   ],
+   [
+    "without the estimate visit first",
+    "without the patch test first"
+   ],
+   [
+    "The estimate visit found the job can't be done as planned.",
+    "The first step found the job can't be done as planned."
+   ],
+   [
+    "like an overflowing drain",
+    "like lashes before an event tonight"
+   ],
+   [
+    "A what-if: say Kim's yard drain were a two-person job, for Jordan and Casey.",
+    "A what-if: say Kim's wedding party of 8 were a two-artist job, for Diego and Luis."
+   ],
+   [
+    "Barbering pays the $2, so the shop gets its own monthly bill.",
+    "Lash and brow work pays the $2 too, so the studio gets its own monthly bill."
+   ],
+   [
+    "Do your plumbers or barbers go to one place on set days, like an apartment building or a care home?",
+    "Do your lash artists go to one place on set days, like an office or a care home?"
+   ],
+   [
+    "Alex's kitchen drain has a set time.",
+    "Alex's full set has a set time."
+   ],
+   [
+    "A clogged drain that's overflowing may be. A water heater replacement never is.",
+    "Lash and brow work never is: every visit has a set start."
+   ],
+   [
+    "The $179 drain and the $150 flush need no notice here.",
+    "The $179 full set and the $150 trial need no notice here."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 wedding party is over the plug-in's amount, so it gets a contract."
+   ],
+   [
+    "The $179 drain and the $150 flush are under that amount, so they need none.",
+    "The $179 full set and the $150 trial are under that amount, so they need none."
+   ],
+   [
+    "A leak priced at the visit has no price yet.",
+    "Every mobile lash price is set before the visit."
+   ],
+   [
+    "Alex's drain is booked with Jordan by name.",
+    "Alex's full set is booked with Diego by name."
+   ],
+   [
+    "Casey is free then and does drain work.",
+    "Luis is free then and does full sets."
+   ],
+   [
+    "Casey does drain work, so Casey can stand in.",
+    "Luis does full sets, so Luis can stand in."
+   ],
+   [
+    "Kim L.'s yard drain was for Jordan and Casey.",
+    "Kim L.'s wedding party was for Diego and Luis."
+   ],
+   [
+    "Jordan's estimate visit found that the new water heater can't go in as planned.",
+    "Diego's lash trial found that the bride's eyes react to lash glue, so the wedding party can't be done as planned."
+   ],
+   [
+    "like a move-out day",
+    "like a wedding day"
+   ],
+   [
+    "The plug-in says when the place's owner matters, like a renter's new water heater. Plumbing in a home asks it. A tow, a car in a lot or a venue skips it.",
+    "The plug-in says when the place matters. Mobile lash work asks where the lashes are done, since a venue may need to OK it."
+   ],
+   [
+    "1 Yes: own or rent is asked",
+    "1 Yes: home or venue"
+   ],
+   [
+    "Rosie texts the landlord only after that yes on the page.",
+    "Rosie texts the venue only after that yes on the page."
+   ],
+   [
+    "The time stays saved up to 30 minutes for the landlord.",
+    "The time stays saved up to 30 minutes for that yes."
+   ],
+   [
+    "Does the landlord OK it in 30 minutes?",
+    "Does the venue OK it in 30 minutes?"
+   ],
+   [
+    "The landlord OKs it",
+    "The venue OKs it"
+   ],
+   [
+    "The landlord said no, or didn't OK the job in 30 minutes.",
+    "The venue said no, or didn't OK the job in 30 minutes."
+   ],
+   [
+    "Your landlord didn't OK this job, so nothing was booked or charged.",
+    "Your venue didn't OK this job, so nothing was booked or charged."
+   ],
+   [
+    "A landlord's or a parent's yes keeps it saved up to 30 minutes.",
+    "A venue's or a parent's yes keeps it saved up to 30 minutes."
+   ],
+   [
+    "Only where the plug-in says the place's owner matters, and Alex rents. The landlord's yes to texts came from the secure page.",
+    "Only where a parent pays. The parent's yes to texts came from the secure page."
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $2,400 wedding weekend"
+   ],
+   [
+    "Reads back plumbing's money, service by service",
+    "Reads back the money, service by service"
+   ],
+   [
+    "He sends photos, and prices a new one from them at $640, over Sam's $500 limit.",
+    "He reads the party's answers and photo, and prices it at $640, over Sam's $500 limit."
+   ],
+   [
+    "Its rating plate",
+    "The party's list"
+   ],
+   [
+    "Building rules, like a homeowners' group's work hours or proof of insurance, go to Sam to check.",
+    "Building or venue rules, like set-up hours or proof of insurance, go to Sam to check."
+   ],
+   [
+    "Each kind of work can have its own trade name, like Lee Plumbing and Lee Electric.",
+    "Each kind of work can have its own trade name, like Lee Mobile Lash and Lee Makeup."
+   ],
+   [
+    "Before DONE, Jordan runs the water with Alex and checks for drips.",
+    "Before DONE, Diego hands Alex a mirror, and they check the set together."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Mobile Lash does lash, brow and makeup work, not nails."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a nail tech near you."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "I have an event tonight. Can someone come today?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a wedding planner books lashes for a bride and 4 bridesmaids at one hotel."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's notes go to the lash artist, one line each."
+   ],
+   [
+    "Here's the price for a new one, from his photos, as its own visit.",
+    "Here's the price, from the photos, as its own visit."
+   ],
+   [
+    "Here's the price to fix it, as its own visit.",
+    "Here's the price, as its own visit."
+   ],
+   [
+    "Only Jordan does replacements, so Alex will pick a new day.",
+    "Only Diego does wedding parties, so Alex will pick a new day."
+   ],
+   [
+    "A what-if: Jordan cracks the cabinet floor and texts a photo.",
+    "A what-if: Diego spills lash glue on the sofa and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE glue spot on the sofa"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Glue spot on the sofa"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Diego left a glue spot on Alex M.'s sofa."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The lash plug-in adds its own: glue or a chemical in the eye, or eyes or a face swelling fast."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the lash map, the glue used and a patch-test date."
+   ],
+   [
+    "Nobody on Sam's team needs one: every plumber and barber holds their own license.",
+    "Nobody on Sam's team needs one: every lash artist and makeup artist holds their own license."
+   ],
+   [
+    "Free estimate, then a quote",
+    "Free consult, then a quote"
+   ],
+   [
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Any promise the plug-in sets comes first, like a free touch-up within 3 days."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien está herido? ¿Puede ver bien?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Can you see all right?"
+   ],
+   [
+    "No. No huele a gas.",
+    "Sí, veo bien. Pero me arde el ojo."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "Yes, I can see. But my eye stings."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Enjuáguese el ojo con agua limpia y corriente por 15 minutos. Si no puede ver o le duele mucho, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rinse your eye with clean running water for 15 minutes. If you can't see or it hurts a lot, call 911."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to rinse her eye with clean running water for 15 minutes, and to call 911 if she can't see."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For lash work, glue or a chemical in the eye now stops the booking, and so does a face swelling fast."
+   ],
+   [
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Rinse your eye with clean running water for 15 minutes. If you can't see, call 911 now."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: glue or a chemical in the eye, or eyes or a face swelling fast."
+   ],
+   [
+    "If Alex named a warranty plan before the times, Sam checks it here.",
+    "Lash and brow work bills no plan, so Sam has nothing to check here."
+   ],
+   [
+    "Does Alex own or rent the home?",
+    "Who pays, and does a venue OK it?"
+   ],
+   [
+    "The page asks if Alex owns or rents.",
+    "The page asks where the lashes are done and who pays."
+   ],
+   [
+    "A renter may need the landlord's OK, or the landlord may pay.",
+    "A venue may need to OK an outside lash artist, or a parent may pay."
+   ],
+   [
+    "Owns the home",
+    "At Alex's home; Alex pays"
+   ],
+   [
+    "Rents, and pays",
+    "At a venue; Alex pays"
+   ],
+   [
+    "Gets the landlord's OK when needed",
+    "Gets the venue's OK when needed"
+   ],
+   [
+    "The plug-in says some jobs need the landlord's OK first, like a new water heater. Alex forwards a link. On it the landlord OKs the job, adds a mobile and says yes to texts.",
+    "The plug-in says some venues must OK an outside lash artist first, like a hotel suite. Alex forwards a link. On it the venue OKs it, adds a mobile and says yes to texts."
+   ],
+   [
+    "Say Alex rents, and the landlord pays.",
+    "Say Alex's parent pays."
+   ],
+   [
+    "Alex still gets the code, since Alex will be home.",
+    "Alex still gets the code, since Alex will be there."
+   ],
+   [
+    "A what-if: Alex rents, and the landlord agreed at booking to pay.",
+    "A what-if: Alex's parent agreed at booking to pay."
+   ],
+   [
+    "The plug-in says if this work needs a first step: an estimate visit, a permit, a form or a waiver.",
+    "The plug-in says if this work needs a first step: a patch test, a lash trial, a consent form or a waiver."
+   ],
+   [
+    "Before this visit, Lee Home Services needs a free estimate visit.",
+    "Before this visit, Lee Mobile Lash needs a 15-minute glue patch test, 1 to 2 days before."
+   ],
+   [
+    "Alex M. hasn't picked a time for the estimate visit.",
+    "Alex M. hasn't picked a time for the patch test."
+   ],
+   [
+    "Some visits have a first step tied to a date, like a permit or an estimate visit.",
+    "Some visits have a first step tied to a date, like a patch test or a lash trial."
+   ],
+   [
+    "The plug-in names which notices: a cancel notice, a lead-safe paper, a written estimate.",
+    "The plug-in names which notices: a cancel notice, a notice for lash work outside a studio, a contract."
+   ],
+   [
+    "Before Jordan starts, please read and sign the lead-safe work notice for your home.",
+    "Before Diego starts, please read and sign the notice for lash work at your home."
+   ],
+   [
+    "Lead-safe work notice",
+    "Notice for lash work at home"
+   ],
+   [
+    "For older homes, where the rules require it",
+    "Where the state's rules require it"
+   ],
+   [
+    "Say Alex's job needs a permit, and it isn't back yet.",
+    "Say Alex's set needs a patch test first, and it isn't done yet."
+   ],
+   [
+    "The permit for Alex M.'s job (Thu 8–10am) isn't back yet.",
+    "Alex M. hasn't had the patch test for the Thu 8:30am set yet."
+   ],
+   [
+    "Your permit isn't ready yet, so Lee Home Services needs to move your visit.",
+    "Your patch test isn't done yet, so Lee Mobile Lash needs to move your visit."
+   ],
+   [
+    "Examples: an ID for an 18+ service, a permit or a warranty card, a parking pass, a signed form.",
+    "Examples: an ID for an 18+ service, a venue pass, a parking pass, a signed form."
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Diego needs a sensitive glue from the studio."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting a sensitive glue, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Diego went to get a sensitive glue and will be back about 9:30am."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the outlet checked before using it"
+   ],
+   [
+    "A warranty claim",
+    "Asks for a free touch-up"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free touch-up lasts."
+   ],
+   [
+    "Texts the receipt and warranty",
+    "Texts the receipt and the free touch-up"
+   ],
+   [
+    "with the plug-in's warranty",
+    "with the plug-in's free touch-up"
+   ],
+   [
+    "The $89 service call and labor at $120 an hour aren't booked alone.",
+    "The $89 trip fee and on-site touch-ups at $120 an hour aren't booked alone."
+   ],
+   [
+    "The $150 flush takes a $40 deposit too, with the $110 rest later.",
+    "The $150 trial holds $89 too, and is billed after."
+   ],
+   [
+    "A water heater quote from photos at $640 is over $500, so it comes to Sam.",
+    "A wedding party quote at $640 is over $500, so it comes to Sam."
+   ],
+   [
+    "Outlet or switch replaced",
+    "Event makeup"
+   ],
+   [
+    "Ceiling fan installed",
+    "Bridal makeup"
+   ],
+   [
+    "The panel upgrade is a free estimate visit, then a quote.",
+    "Group makeup starts with a free consult, then a quote."
+   ],
+   [
+    "Groom's package (cut, shave, facial)",
+    "Classic full set"
+   ],
+   [
+    "The plug-in says where barbering outside a shop is allowed, and who may go.",
+    "The plug-in says where lash work outside a studio is allowed, and who may go."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: many lash artists, nail techs and groomers must work in a licensed place."
+   ],
+   [
+    "Drains, leaks, water heater flushes",
+    "Full sets, fills and trials at home"
+   ],
+   [
+    "Sam says some people charge differently: Jordan's labor, and Sam's own camera inspections.",
+    "Sam says some people charge differently: Diego's on-site touch-ups, and Sam's own bridal lash sets."
+   ],
+   [
+    "The camera inspection is 249 if I go myself",
+    "The bridal lash set is 249 if I do it myself"
+   ],
+   [
+    "Labor is $140 an hour with Jordan, and $120 with anyone else.",
+    "On-site touch-ups are $140 an hour with Diego, and $120 with anyone else."
+   ],
+   [
+    "The camera inspection is $249 when Sam goes.",
+    "The bridal lash set is $249 when Sam does it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A lash example: glue in the eye gets 'rinse it with clean running water for 15 minutes'."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's lash fill needs none, so nothing is sent here."
+   ],
+   [
+    "How long is your beard now? A long beard takes longer.",
+    "When was your last set or fill? After 3 weeks, it's booked as a full set."
+   ],
+   [
+    "Books the groom's party together",
+    "Books the bride's party together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A bride books lash lifts for herself and four friends on one morning."
+   ],
+   [
+    "Keep the beard short.",
+    "I wear contact lenses."
+   ],
+   [
+    "The towel steamer breaks, so each booking that needs it is offered a change, with no fee.",
+    "The lash lamp breaks, so each booking that needs it is offered a change, with no fee."
+   ],
+   [
+    "Alex's booking gets the same offer if it needs the steamer.",
+    "Alex's booking gets the same offer if it needs the lamp."
+   ],
+   [
+    "Towel steamer broken until Mon",
+    "Lash lamp broken until Mon"
+   ],
+   [
+    "The hot towel part of your Sat 2:00pm visit can't be done.",
+    "The lash part of your Sat 2:00pm visit can't be done."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: classic, C curl, 10 to 12 mm, sensitive glue"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I want a classic full set of lash extensions at home."
+   ],
+   [
+    "Can a plumber flush my water heater Thursday morning?",
+    "Can a lash artist do my bridal lash trial Thursday morning?"
+   ],
+   [
+    "My water heater is old and rusty. Can a plumber replace it this week?",
+    "I'm getting married Thursday. Can a lash artist do lashes for me and 4 friends at home?"
+   ],
+   [
+    "Sale agua del calentador.",
+    "Me entró pegamento de pestañas en el ojo."
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "Lash glue got in my eye."
+   ],
+   [
+    "Call summary: Rosa, in Spanish. Water is leaking from the water heater, and the valve is shut.",
+    "Call summary: Rosa, in Spanish. Lash glue got in her eye at home, and she rinsed it."
+   ],
+   [
+    "Leak at the gas water heater · safety steps given",
+    "Lash glue in the eye · safety steps given"
+   ],
+   [
+    "We got your voicemail about a dripping faucet.",
+    "We got your voicemail about lashes at home."
+   ],
+   [
+    "Voicemail from a new caller about a dripping kitchen faucet.",
+    "Voicemail from a new caller about a lash fill at home."
+   ],
+   [
+    "Wants the faucet looked at this week",
+    "Wants a fill at home this week"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a lash artist do lashes for my wedding party of 8 this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa full set Thu 1pm Luis"
+   ],
+   [
+    "Book Tessa for a clogged drain, Thu Oct 22, arriving 12 to 2pm, with Casey?",
+    "Book Tessa for a full set at home, Thu Oct 22, starting 1:00pm, with Luis?"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My eye has been red since my last set. Is it safe to get a fill?"
+   ],
+   [
+    "Rosie can't answer safety questions about gas appliances. If you smell gas, leave and call 911.",
+    "Rosie can't answer health questions about your eyes. If your eye hurts or your sight changes, see a doctor today."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Mobile Lash doesn't do, like a manicure."
+   ],
+   [
+    "The plug-in can name the kind of work to suggest, like a roofer for a roof leak.",
+    "The plug-in can name the kind of work to suggest, like a nail tech for a manicure."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: a first set or not, when the last set was, and contact lenses."
+   ],
+   [
+    "Its first steps: none for a drain.",
+    "Its first steps: a glue patch test before a first set."
+   ],
+   [
+    "A leak is quoted on site, and a water heater from photos.",
+    "A wedding party is priced from the party's answers and a photo of the look."
+   ],
+   [
+    "Lee Home Services asks: which drain is clogged, and is water backing up anywhere else?",
+    "Lee Mobile Lash asks: is this your first set of lash extensions, and when was your last one?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Not my first. My last set was 5 weeks ago."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric?",
+    "Lee Mobile Lash asks: when is the wedding, and what look do you want?"
+   ],
+   [
+    "Electric.",
+    "Sat Nov 14. A natural look."
+   ],
+   [
+    "Lee Home Services asks: is your water heater gas or electric, and is it leaking?",
+    "Lee Mobile Lash asks: how many people, and where will you get ready?"
+   ],
+   [
+    "Gas. It's rusty, but it isn't leaking.",
+    "Five of us, at my home."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a wedding party is priced from the party's answers and a photo, so Rosie's first text asks for them."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add a photo of the look you want and the party's list, and a lash artist will price it."
+   ],
+   [
+    "Alex M. sent photos of a water heater.",
+    "Alex M. sent a photo and the party's list."
+   ],
+   [
+    "Water heater · Alex M.",
+    "Wedding party · Alex M."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your wedding party price is with Lee Mobile Lash."
+   ],
+   [
+    "Lee Home Services can replace your water heater for $640, priced by Jordan from your photos.",
+    "Lee Mobile Lash can do your wedding party's lashes for $640, priced by Diego from your answers."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a fill at home every 3 weeks."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come for a fill every 3 weeks, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Mobile Lash has a fill plan every 3 weeks, $110 a visit."
+   ],
+   [
+    "Want it every 12 months?",
+    "Want it every 3 weeks?"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 3 weeks"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks for a brow wax."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Diego also wax my brows?"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "A brow wax is $25 on the list, so it's added to the visit."
+   ],
+   [
+    "All are with Jordan, the one who replaces water heaters here.",
+    "All are with Diego, the one who does wedding parties here."
+   ],
+   [
+    "Casey does drains, leaks and flushes, not water heater replacements.",
+    "Luis does full sets, fills and trials, not wedding parties."
+   ],
+   [
+    "Casey doesn't do water heater replacements here, so only Jordan's times show:",
+    "Luis doesn't do wedding parties here, so only Diego's times show:"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a quiet room for a bed?"
+   ],
+   [
+    "Yes, it won't drain at all.",
+    "Yes, the living room."
+   ],
+   [
+    "Where is the water heater: a garage, a closet or a basement?",
+    "Where will everyone get ready: a living room, a bedroom or a hotel suite?"
+   ],
+   [
+    "In the garage.",
+    "In the living room."
+   ],
+   [
+    "The plug-in adds its own questions, like where the main water shut-off is.",
+    "The plug-in adds its own questions, like a quiet room for a lash bed."
+   ],
+   [
+    "A drain clearing needs no landlord's OK.",
+    "A full set at Alex's home needs no venue's OK."
+   ],
+   [
+    "Alex M. signed the water heater contract.",
+    "Alex M. signed the wedding party contract."
+   ],
+   [
+    "Lee Home Services signed your water heater contract.",
+    "Lee Mobile Lash signed your wedding party contract."
+   ],
+   [
+    "Lee Home Services didn't sign your water heater contract in time, so nothing was booked or charged.",
+    "Lee Mobile Lash didn't sign your wedding party contract in time, so nothing was booked or charged."
+   ],
+   [
+    "Alex M.'s water heater contract wasn't signed in 24 hours, so nothing was booked.",
+    "Alex M.'s wedding party contract wasn't signed in 24 hours, so nothing was booked."
+   ],
+   [
+    "Both have signed, so a 25% deposit on the $640 water heater: $160.",
+    "Both have signed, so a 25% deposit on the $640 wedding party: $160."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Diego's times show: he's the one who does wedding parties."
+   ],
+   [
+    "Note: the sink is full and won't drain.",
+    "Note: not a first set; the last one was 5 weeks ago. Wears contacts."
+   ],
+   [
+    "Note: Gas water heater, in the garage.",
+    "Note: five people, getting ready in the living room."
+   ],
+   [
+    "The plug-in adds any way to get ready, like clearing the cabinet under the sink.",
+    "The plug-in adds any way to get ready, like clean eyes, no mascara, and contact lenses out."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please come with clean eyes, no mascara, and contact lenses out."
+   ],
+   [
+    "Please clear a path to the water heater.",
+    "Please have a room ready with space for five, and clean eyes for everyone."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that one eye is red and itchy since the last set."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like glue in the eye or a swelling face, gets the safety steps first."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "One eye is red and itchy since my last set."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Don't rub it or pull at the lashes. If your eye hurts or your sight changes, see a doctor today."
+   ],
+   [
+    "Alex texts that the water heater is now leaking onto the floor.",
+    "Alex texts that one eye is red and itchy since the last set."
+   ],
+   [
+    "Only Jordan replaces water heaters, and he has no earlier time.",
+    "Only Diego does wedding parties, and he has no earlier time."
+   ],
+   [
+    "The water heater is leaking onto the floor now.",
+    "One eye is red and itchy since my last set."
+   ],
+   [
+    "Turn off the cold-water valve on top of the heater, and keep away from any outlet the water reaches.",
+    "Don't rub it or pull at the lashes. If your eye hurts or your sight changes, see a doctor today."
+   ],
+   [
+    "Nobody who does replacements is free sooner",
+    "Nobody who does wedding parties is free sooner"
+   ],
+   [
+    "Casey does drains, leaks and flushes, so he isn't offered for a replacement.",
+    "Luis does full sets, fills and trials, so he isn't offered for a wedding party."
+   ],
+   [
+    "Only Jordan replaces water heaters here, so nobody stands in.",
+    "Only Diego does wedding parties here, so nobody stands in."
+   ],
+   [
+    "He's the one who replaces water heaters here.",
+    "He's the one who does wedding parties here."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Diego also wax my brows?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a fill at home every 3 weeks."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's fill?"
+   ],
+   [
+    "Here, the water jetter for Kim's yard drain is in for repair until Monday.",
+    "Here, the lash bed for Kim's wedding party is in for repair until Monday."
+   ],
+   [
+    "Jetter in the shop until Mon",
+    "Lash bed in for repair until Mon"
+   ],
+   [
+    "The tool for your yard drain visit tomorrow is in for repair.",
+    "The lash bed for your visit tomorrow is in for repair."
+   ],
+   [
+    "A what-if: say Alex's job is the water heater replacement priced from photos, with an estimate visit first.",
+    "A what-if: say Alex's job is the wedding party priced from photos, with a lash trial first."
+   ],
+   [
+    "Alex M.: the vent pipe needs replacing too.",
+    "Alex M.: the trial added a sixth person, the bride's mother."
+   ],
+   [
+    "Old vent pipe",
+    "The trial look"
+   ],
+   [
+    "Jordan's new price for Alex M.'s water heater: $700, was $640.",
+    "Diego's new price for Alex M.'s wedding party: $700, was $640."
+   ],
+   [
+    "Jordan's estimate visit found that the vent pipe needs replacing too.",
+    "Diego's lash trial found that the bride's mother joins the party too."
+   ],
+   [
+    "Was $640: the new vent pipe adds $60",
+    "Was $640: the bride's mother adds $60"
+   ],
+   [
+    "Each job shows what to bring, from the plug-in, like a drain snake and a camera.",
+    "Each job shows what to bring, from the plug-in, like the lash bed, a lamp and a sensitive glue."
+   ],
+   [
+    "The plug-in names the checks, like the pipes under the sink and the cabinet floor.",
+    "The plug-in names the checks, like the natural lashes, the lids and any redness."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE natural lashes, a few gaps on the left"
+   ],
+   [
+    "Under the sink, before",
+    "Left eye, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Right eye, before"
+   ],
+   [
+    "BEFORE rust at the base of the water heater",
+    "BEFORE each person's lashes, as they are"
+   ],
+   [
+    "Water heater, before",
+    "The party's lashes, before"
+   ],
+   [
+    "Floor around it, before",
+    "The room, before"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks Diego for a fuller look, a volume set."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 upgrade to a volume set"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: upgrade to a volume set, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Upgrade to a volume set · $160"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 volume upgrade quote is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to upgrading to a volume set for $160."
+   ],
+   [
+    "Jordan sees the water heater leaking at the base.",
+    "Alex asks Diego about lashes for the wedding party."
+   ],
+   [
+    "QUOTE 640 water heater leaking at the base, replace",
+    "QUOTE 640 wedding party lashes, five people"
+   ],
+   [
+    "Old heater, leaking at the base",
+    "The look Alex wants"
+   ],
+   [
+    "Jordan quotes a new water heater for Alex M. from his photos: $640.",
+    "Diego quotes the wedding party's lashes for Alex M.: $640."
+   ],
+   [
+    "Jordan finds the main water line cracked.",
+    "Alex asks Diego about a bridal weekend: a bridal set, party lashes and touch-ups."
+   ],
+   [
+    "QUOTE 900 main water line cracked, repair",
+    "QUOTE 900 bridal weekend: bridal set, party lashes, touch-ups"
+   ],
+   [
+    "Jordan quotes a main water line repair for Alex M.: $900.",
+    "Diego quotes a bridal weekend for Alex M.: $900."
+   ],
+   [
+    "Main water line repair · $900",
+    "Bridal weekend · $900"
+   ],
+   [
+    "Found at Thu's water heater visit",
+    "Asked about at Thu's visit"
+   ],
+   [
+    "Jordan found that your water heater is leaking.",
+    "Diego priced your wedding party's lashes."
+   ],
+   [
+    "Jordan found that your main water line is cracked.",
+    "Diego priced your bridal weekend."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Diego finds the outlet by the lash bed sparks."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD outlet sparks, stopped using it"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Outlet by the lash bed"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Diego found the outlet by the lash bed sparks, so he stopped using it and works by daylight."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the outlet by the lash bed sparks"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the bottom lashes, which need the lamp"
+   ],
+   [
+    "A what-if for a drain job: the clog is in the main line, so Jordan clears it from the outside cleanout.",
+    "A what-if for a full set: Alex's lashes are too fine for 12 mm, so Diego uses 9 to 10 mm."
+   ],
+   [
+    "CHANGE cleared the main line from the outside cleanout, same price",
+    "CHANGE shorter lashes, 9 to 10 mm, same price"
+   ],
+   [
+    "Jordan cleared the clog from the outside cleanout. It was in the main line.",
+    "Diego used shorter lashes, 9 to 10 mm, to keep your natural lashes healthy."
+   ],
+   [
+    "Only Jordan replaces water heaters here, so he finishes another day.",
+    "Only Diego does wedding parties here, so he finishes another day."
+   ],
+   [
+    "Here: the drain runs clear, and nothing drips.",
+    "Here: no lashes are stuck together, and Alex likes the look."
+   ],
+   [
+    "Before DONE, Jordan and Alex check the water heater together.",
+    "Before DONE, Diego and Alex check each person's lashes together."
+   ],
+   [
+    "Here: the heater runs, the hot water is hot, and nothing drips.",
+    "Here: every set is even, comfortable and ready for photos."
+   ],
+   [
+    "The drain runs clear.",
+    "The full set is done."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE classic, C curl, 10 to 12 mm. Sensitive glue next time."
+   ],
+   [
+    "NOTE new 50-gallon heater in the garage. Old one hauled away.",
+    "NOTE five sets done, the bride's in a soft cat-eye."
+   ],
+   [
+    "NOTE new 50-gallon heater in the garage.",
+    "NOTE five sets done, the bride's in a soft cat-eye."
+   ],
+   [
+    "Nothing more is owed for the flush.",
+    "Nothing more is owed for the trial."
+   ],
+   [
+    "DONE 160 valves",
+    "DONE 160 volume upgrade"
+   ],
+   [
+    "Done: the $160 for the shutoff valves is refunded.",
+    "Done: the $160 for the volume upgrade is refunded."
+   ],
+   [
+    "the shutoff valves",
+    "the volume upgrade"
+   ],
+   [
+    "like the $160 valves.",
+    "like the $160 volume upgrade."
+   ],
+   [
+    "Alex M.: $640 for the water heater",
+    "Alex M.: $640 for the wedding party"
+   ],
+   [
+    "the rest of the water heater job",
+    "the rest of the wedding party"
+   ],
+   [
+    "the rest of the water heater at 42 Oak St",
+    "the rest of the wedding party at 15 Juniper Ln"
+   ],
+   [
+    "$480 left for your water heater",
+    "$480 left for your wedding party"
+   ],
+   [
+    "the $480 left on your water heater",
+    "the $480 left on your wedding party"
+   ],
+   [
+    "the $640 water heater bill",
+    "the $640 wedding party bill"
+   ],
+   [
+    "the $480 left on the water heater bill",
+    "the $480 left on the wedding party bill"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your bridal weekend"
+   ],
+   [
+    "Your new water heater is in. 1-year labor warranty: if anything leaks, reply here.",
+    "Your wedding party is all set. Free touch-up within 3 days: if lashes come loose, reply here."
+   ],
+   [
+    "1-year labor warranty: if it clogs again, reply here.",
+    "Free touch-up within 3 days: if lashes come loose, reply here."
+   ],
+   [
+    "Kitchen drain cleared · $179",
+    "Classic full set at home · $179"
+   ],
+   [
+    "1-year labor warranty: if anything leaks, reply here.",
+    "Free touch-up within 3 days: if lashes come loose, reply here."
+   ],
+   [
+    "Alex cancels the $160 valve work on the page.",
+    "Alex cancels the $160 volume upgrade on the page."
+   ],
+   [
+    "Replace both shutoff valves",
+    "Upgrade to a volume set"
+   ],
+   [
+    "Alex M. cancelled the $160 valve work.",
+    "Alex M. cancelled the $160 volume upgrade."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A few lashes come loose 2 days later."
+   ],
+   [
+    "It's inside the 1-year labor warranty, so Sam OKs a free return visit.",
+    "It's inside the 3-day free touch-up, so Sam OKs a free return visit."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A few lashes came loose on my left eye."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s full set, done Thu Oct 22, has a few loose lashes."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It's inside the 3-day free touch-up."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your set is inside the free touch-up, so this visit is free."
+   ],
+   [
+    "The new water heater drips at a fitting 2 weeks later.",
+    "A bridesmaid's lashes lift at one corner 2 days later."
+   ],
+   [
+    "My new water heater is dripping at a fitting.",
+    "My sister's lashes are lifting at one corner."
+   ],
+   [
+    "Alex M.'s new water heater, put in Thu Oct 22, is dripping at a fitting.",
+    "Alex M.'s wedding party, done Thu Oct 22: one bridesmaid's lashes are lifting."
+   ],
+   [
+    "Your water heater is under warranty, so this visit is free.",
+    "Your wedding party is inside the free touch-up, so this visit is free."
+   ],
+   [
+    "Kitchen drain · Thu Oct 22",
+    "Classic full set · Thu Oct 22"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Diego left lash tape on the sofa."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Diego do a new full set next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Diego's next times for a full set at home."
+   ],
+   [
+    "Tips for your drain: run hot water for a minute after washing dishes, and skip store-bought drain cleaners.",
+    "Lash aftercare: keep them dry for 24 hours, then wash them daily with a lash cleanser. No oil-based products or mascara on them."
+   ],
+   [
+    "Tips for your water heater: keep the space around it clear, and check for drips this week.",
+    "Lash aftercare for the party: keep them dry until tomorrow, and don't rub or pull them."
+   ],
+   [
+    "If you see water or lose hot water, reply here.",
+    "If your eyes itch or swell, reply here."
+   ],
+   [
+    "Here, it's Jordan's $640 quote from photos for Morgan P.'s water heater.",
+    "Here, it's Diego's $640 quote for Morgan P.'s wedding party."
+   ],
+   [
+    "With times to pick, all with Jordan, since only Jordan replaces water heaters here.",
+    "With times to pick, all with Diego, since only Diego does wedding parties here."
+   ],
+   [
+    "Lee Home Services can replace your water heater for $640.",
+    "Lee Mobile Lash can do your wedding party's lashes for $640."
+   ],
+   [
+    "Your water heater quote is with the owner.",
+    "Your wedding party quote is with the owner."
+   ],
+   [
+    "It's a leak under the sink, today 3 to 5pm with Jordan.",
+    "It's a full set at home, today at 3:00pm with Diego."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the wedding party quote before booking."
+   ],
+   [
+    "Flushes already booked stay paid in full.",
+    "Trials already booked keep their $89 hold."
+   ],
+   [
+    "Flushes already booked keep their $40 deposit.",
+    "Trials already booked keep their $89 hold."
+   ],
+   [
+    "Here, Jordan quotes $190 for Morgan P.'s two shutoff valves.",
+    "Here, Diego quotes $190 for Morgan P.'s bridal touch-ups."
+   ],
+   [
+    "About an inch.",
+    "Natural, not too long."
+   ],
+   [
+    "Keep it as a haircut",
+    "Keep just the tint"
+   ],
+   [
+    "like a beard oil",
+    "like a lash cleanser"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop",
+    "Lashes could mean a studio or an artist who comes to you"
+   ],
+   [
+    "like a burst pipe",
+    "like lashes before an event tonight"
+   ],
+   [
+    "Lee Home Services · Water heater leak",
+    "Lee Mobile Lash · Lash glue in the eye"
+   ],
+   [
+    "Say Alex needs the water heater fast. A replacement priced from photos is never sent now",
+    "Say Alex needs the wedding party's lashes fast. A wedding party priced from photos is never sent now"
+   ],
+   [
+    "The landlord said no",
+    "The parent said no"
+   ],
+   [
+    "Your landlord didn't OK this visit.",
+    "Your parent didn't OK this visit."
+   ],
+   [
+    "water heater contract",
+    "wedding party contract"
+   ],
+   [
+    "the yearly flush plan's terms",
+    "the fill plan's terms"
+   ],
+   [
+    "Only Jordan replaces water heaters, so here the change is in the job.",
+    "Only Diego does wedding parties, so here the change is in the job."
+   ],
+   [
+    "Old heater hauled away Fri, not Thu",
+    "Strip lashes for the party, not clusters"
+   ],
+   [
+    "The old heater is hauled away Fri, not Thu",
+    "The party gets strip lashes, not clusters"
+   ],
+   [
+    "Can you reach the water shut-off valve?",
+    "Is there a quiet room with space for a lash bed?"
+   ],
+   [
+    "Casey will do your yard drain tomorrow",
+    "Luis will do your wedding party tomorrow"
+   ],
+   [
+    "Your drain cleaning plan's price is changing.",
+    "Your fill plan's price is changing."
+   ],
+   [
+    "The $160 valves go over your landlord's OK, so they went to your landlord first.",
+    "The $160 upgrade goes over your parent's OK, so it went to your parent first."
+   ],
+   [
+    "for your new water heater",
+    "for your wedding party's lashes"
+   ],
+   [
+    "Is water backing up into the sink?",
+    "Is this your first set of lash extensions?"
+   ],
+   [
+    "A what-if: Alex rents, and the landlord set the most they OK at booking.",
+    "A what-if: Alex's parent pays, and set the most they OK at booking."
+   ],
+   [
+    "How soon can someone replace it?",
+    "How soon can someone do the party's lashes?"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Lash lift and tint"
+   ],
+   [
+    "signature cut and hot towel shave",
+    "lash lift and tint"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Lash and brow, Makeup, Lash studio"
+   ],
+   [
+    "the kitchen drain at 42 Oak St",
+    "the full set at 15 Juniper Ln"
+   ],
+   [
+    "The landlord confirms and pays",
+    "A parent confirms and pays"
+   ],
+   [
+    "Texts the landlord the bill",
+    "Texts the parent the bill"
+   ],
+   [
+    "A water heater replacement",
+    "A wedding party"
+   ],
+   [
+    "a water heater replacement",
+    "a wedding party"
+   ],
+   [
+    "Water heater replacement",
+    "Wedding party lashes"
+   ],
+   [
+    "water heater replacement",
+    "wedding party lashes"
+   ],
+   [
+    "Sewer camera inspection",
+    "Bridal lash set"
+   ],
+   [
+    "sewer camera inspection",
+    "bridal lash set"
+   ],
+   [
+    "Signature cut and shave",
+    "Lash lift and tint"
+   ],
+   [
+    "signature cut and shave",
+    "lash lift and tint"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Classic full set at home"
+   ],
+   [
+    "kitchen drain clearing",
+    "classic full set at home"
+   ],
+   [
+    "credited to the repair",
+    "counts toward the service"
+   ],
+   [
+    "replaces water heaters",
+    "does wedding parties"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Lash LLC"
+   ],
+   [
+    "Plumbing + electrical",
+    "Lash and brow + makeup"
+   ],
+   [
+    "replace water heaters",
+    "do wedding parties"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Lash Studio LLC"
+   ],
+   [
+    "Yard drain clearing",
+    "Wedding party lashes"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilelash.com"
+   ],
+   [
+    "Water heater flush",
+    "Bridal lash trial"
+   ],
+   [
+    "water heater flush",
+    "bridal lash trial"
+   ],
+   [
+    "signs the estimate",
+    "signs the contract"
+   ],
+   [
+    "the kitchen drain",
+    "the full set"
+   ],
+   [
+    "The landlord pays",
+    "A parent pays"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Lash"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "written estimate",
+    "contract"
+   ],
+   [
+    "changed estimate",
+    "changed contract"
+   ],
+   [
+    "Changed estimate",
+    "Changed contract"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Lash Studio"
+   ],
+   [
+    "Groom's packages",
+    "Classic full sets"
+   ],
+   [
+    "Drain clearings",
+    "Full sets at home"
+   ],
+   [
+    "signed estimate",
+    "signed contract"
+   ],
+   [
+    "Groom's package",
+    "Classic full set"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 full set"
+   ],
+   [
+    "Drain clearing",
+    "Classic full set"
+   ],
+   [
+    "drain clearing",
+    "full set at home"
+   ],
+   [
+    "the landlord's",
+    "the parent's"
+   ],
+   [
+    "The landlord's",
+    "The parent's"
+   ],
+   [
+    "an electrician",
+    "a makeup artist"
+   ],
+   [
+    "A leak repair",
+    "A lash fill at home"
+   ],
+   [
+    "Kitchen drain",
+    "Classic full set"
+   ],
+   [
+    "your landlord",
+    "your parent"
+   ],
+   [
+    "signature cut",
+    "lash lift"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "the landlord",
+    "the parent"
+   ],
+   [
+    "Jordan Price",
+    "Diego Ruiz"
+   ],
+   [
+    "1200 Main St",
+    "900 Harbor Blvd"
+   ],
+   [
+    "water heater",
+    "wedding party"
+   ],
+   [
+    "Leak repair",
+    "Lash fill at home"
+   ],
+   [
+    "leak repair",
+    "lash fill at home"
+   ],
+   [
+    "electrician",
+    "makeup artist"
+   ],
+   [
+    "Casey Moore",
+    "Luis Moreno"
+   ],
+   [
+    "Yard drain",
+    "Wedding party"
+   ],
+   [
+    "Electrical",
+    "Makeup"
+   ],
+   [
+    "electrical",
+    "makeup"
+   ],
+   [
+    "Riley Chen",
+    "Kayla Nguyen"
+   ],
+   [
+    "Avery Diaz",
+    "Lina Park"
+   ],
+   [
+    "the facial",
+    "the lash bath"
+   ],
+   [
+    "Beard trim",
+    "Brow wax"
+   ],
+   [
+    "beard trim",
+    "brow wax"
+   ],
+   [
+    "barbershop",
+    "lash studio"
+   ],
+   [
+    "88 Elm St",
+    "27 Willow Ave"
+   ],
+   [
+    "42 Oak St",
+    "15 Juniper Ln"
+   ],
+   [
+    "Skin fade",
+    "Brow tint"
+   ],
+   [
+    "skin fade",
+    "brow tint"
+   ],
+   [
+    "barbering",
+    "lash and brow work"
+   ],
+   [
+    "JP031552",
+    "EL031552"
+   ],
+   [
+    "MP045210",
+    "ES045210"
+   ],
+   [
+    "Plumbing",
+    "Lash and brow"
+   ],
+   [
+    "plumbing",
+    "lash and brow"
+   ],
+   [
+    "plumbers",
+    "lash artists"
+   ],
+   [
+    "BS20981",
+    "SL20981"
+   ],
+   [
+    "EC22871",
+    "MK22871"
+   ],
+   [
+    "JE30417",
+    "MK30417"
+   ],
+   [
+    "BR41862",
+    "EL41862"
+   ],
+   [
+    "plumber",
+    "lash artist"
+   ],
+   [
+    "barbers",
+    "lash artists"
+   ],
+   [
+    "Jordan",
+    "Diego"
+   ],
+   [
+    "Elm St",
+    "Willow Ave"
+   ],
+   [
+    "Barber",
+    "Lash artist"
+   ],
+   [
+    "barber",
+    "lash artist"
+   ],
+   [
+    "Labor",
+    "On-site touch-ups"
+   ],
+   [
+    "Riley",
+    "Kayla"
+   ],
+   [
+    "Avery",
+    "Lina"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "2-hour windows, or a set start time",
+    "A set start time for every visit"
+   ],
+   [
+    "Each service starts in an arrival window or at a set start time, like a class at home. The plug-in suggests which.",
+    "Every lash and brow service starts at a set time, as the plug-in suggests."
+   ],
+   [
+    "With 2, when the lash artist texts DONE, Rosfield charges the saved card the agreed price, or the agreed rate times the hours.",
+    "With 2, when the artist texts DONE, Rosfield charges the saved card the agreed price, or the agreed rate times the hours."
+   ],
+   [
+    "and one for each lash artist sent out.",
+    "and one for each artist sent out."
+   ],
+   [
+    "Lash and brow, makeup and lash and brow work license each person, so Sam's four are checked.",
+    "Lash and brow work and makeup license each person, so Sam's four are not checked."
+   ],
+   [
+    "Lash and brow, makeup and lash and brow work need one, so Sam's three take the license step.",
+    "Lash and brow work, makeup and the studio all need one, so Sam's three take the license step."
+   ],
+   [
+    "Only Kayla is cleared for house calls, so only Kayla is offered for them.",
+    "Only Diego and Luis are cleared for work away from the studio."
+   ],
+   [
+    "One calendar covers the studio and house calls, so Kayla is never booked twice.",
+    "One calendar covers every booking, so Kayla is never booked twice."
+   ],
+   [
+    "At the studio, and house calls",
+    "At the studio"
+   ],
+   [
+    "at the studio and for house calls",
+    "at the studio"
+   ],
+   [
+    "May the haircut be done at the customer's home?",
+    "May studio work be done at a customer's home?"
+   ],
+   [
+    "Now your people. Who goes out on lash and brow and makeup jobs, and who cuts hair? Send contact cards, or add them later.",
+    "Now your people. Who goes out on lash and makeup jobs, and who works at the studio? Send contact cards, or add them later."
+   ],
+   [
+    "Kayla Nguyen and Lina Park cut hair. Kayla also does color and house calls",
+    "Kayla Nguyen and Lina Park work at the studio. Kayla also does volume sets"
+   ],
+   [
+    "Kayla Nguyen: lash artist, color and house calls",
+    "Kayla Nguyen: lash artist, volume sets"
+   ],
+   [
+    "Kayla: lash artist, color and house calls",
+    "Kayla: lash artist, volume sets"
+   ],
+   [
+    "Every studio service, color and house calls",
+    "Every studio service, and volume sets"
+   ],
+   [
+    "Every studio service, color, house calls",
+    "Every studio service, and volume sets"
+   ],
+   [
+    "Every studio service but color",
+    "Every studio service but volume sets"
+   ],
+   [
+    "Only Kayla does color, so color services offer only Kayla's times.",
+    "Only Kayla does volume sets, so a volume set offers only Kayla's times."
+   ],
+   [
+    "At the studio, prices are the same whichever lash artist cuts.",
+    "At the studio, prices are the same whichever lash artist does the work."
+   ],
+   [
+    "Jules rents a chair at the studio",
+    "Jules rents a lash bed at the studio"
+   ],
+   [
+    "Jules K. rents a chair here",
+    "Jules K. rents a lash bed here"
+   ],
+   [
+    "who rents a chair",
+    "who rents a lash bed"
+   ],
+   [
+    "Booking rules; color quotes need Sam's OK",
+    "Booking rules; flagged eye forms go to Sam"
+   ],
+   [
+    "Panel upgrade",
+    "Group makeup"
+   ],
+   [
+    "The customer pays at the chair, the studio's own way: a card reader or cash.",
+    "The customer pays at the desk, the studio's own way: a card reader or cash."
+   ],
+   [
+    "Anything added at the chair, like a brow wax, is priced first and paid there.",
+    "Anything added at the visit, like a brow wax, is priced first and paid at the desk."
+   ],
+   [
+    "A tip at the chair is the studio's own way, and Rosie never asks for one.",
+    "A tip at the desk is the studio's own way, and Rosie never asks for one."
+   ],
+   [
+    "Haircuts",
+    "Lash fills"
+   ],
+   [
+    "haircuts",
+    "lash fills"
+   ],
+   [
+    "Haircut",
+    "Lash fill"
+   ],
+   [
+    "haircut",
+    "lash fill"
+   ],
+   [
+    "Visit fee",
+    "Trip fee"
+   ],
+   [
+    "visit fee",
+    "trip fee"
+   ],
+   [
+    "$35",
+    "$70"
+   ],
+   [
+    "Fri 8am",
+    "Fri 8:30am"
+   ],
+   [
+    "Reading it back: accept the lash fill at home for today, 3 to 5pm, with Diego.",
+    "Reading it back: accept the full set at home for today, at 3:00pm, with Diego."
+   ],
+   [
+    "Fixing it is $900, over Sam's $500 limit.",
+    "The quote is $900, over Sam's $500 limit."
+   ],
+   [
+    "Sam raises the lash fill to $40 for visits from Mon Nov 2.",
+    "Sam raises the lash fill to $75 for visits from Mon Nov 2."
+   ],
+   [
+    "Here, lash fill plans go to $40 from Sat Nov 21.",
+    "Here, lash fill plans go to $75 from Sat Nov 21."
+   ],
+   [
+    "Saved: lash fill $40 for visits from Mon Nov 2. Lash fills already booked keep $70. Lash fill plans go to $40 from Sat Nov 21, after 30 days' notice.",
+    "Saved: lash fill $75 for visits from Mon Nov 2. Lash fills already booked keep $70. Lash fill plans go to $75 from Sat Nov 21, after 30 days' notice."
+   ],
+   [
+    "Lash fill $70 ($40 from Nov 2)",
+    "Lash fill $70 ($75 from Nov 2)"
+   ],
+   [
+    "Say another customer, Lin W., wasn't home for her Fri 10am to 12pm bridal lash trial with Luis.",
+    "Say another customer, Lin W., and her wedding party weren't there for her Fri 10:00am wedding party lashes with Diego."
+   ],
+   [
+    "Lin paid the $40 deposit, and the $110 rest was charged when free cancel ended.",
+    "Lin paid the $160 deposit, and the $480 rest was charged when free cancel ended."
+   ],
+   [
+    "Keep the $40 deposit?",
+    "Keep the $160 deposit?"
+   ],
+   [
+    "The $110 rest is refunded either way",
+    "The $480 rest is refunded either way"
+   ],
+   [
+    "Keep $40",
+    "Keep $160"
+   ],
+   [
+    "The business keeps Lin's $40 deposit, and the $110 rest is refunded.",
+    "The business keeps Lin's $160 deposit, and the $480 rest is refunded."
+   ],
+   [
+    "Kept · $40",
+    "Kept · $160"
+   ],
+   [
+    "Bridal lash trial · nobody home",
+    "Wedding party lashes · nobody there"
+   ],
+   [
+    "$110 rest refunded",
+    "$480 rest refunded"
+   ],
+   [
+    "A refund of all she paid: the $40 deposit and the $110 rest.",
+    "A refund of all she paid: the $160 deposit and the $480 rest."
+   ],
+   [
+    "Refund · $150",
+    "Refund · $640"
+   ],
+   [
+    "Lin gets all $150 back.",
+    "Lin gets all $640 back."
+   ],
+   [
+    "Diego says no. Please wait until the job is done.",
+    "Diego says no. Please come with clean lashes and no mascara."
+   ],
+   [
+    "Rosie tells Alex the new arrival time.",
+    "Rosie tells Alex the new start time."
+   ],
+   [
+    "MOVE Alex to Thu 12pm",
+    "MOVE Alex to Thu 1pm"
+   ],
+   [
+    "Nothing is ordered until both sign.",
+    "Nothing changes until both sign."
+   ],
+   [
+    "Nothing is ordered until you do.",
+    "Nothing changes until you do."
+   ],
+   [
+    "Lee Mobile Lash'",
+    "Lee Mobile Lash's"
+   ],
+   [
+    "The job should be done by 10am.",
+    "Your set should be done by about 11:30am."
+   ],
+   [
+    "so Diego will reach Kim about 10:30am",
+    "so Diego will reach Kim about 11:50am"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows a clean sofa."
+   ],
+   [
+    "Diego found more work at 15 Juniper Ln.",
+    "Alex asked Diego for more work at 15 Juniper Ln."
+   ],
+   [
+    "Diego found more work.",
+    "Here's the price for what you asked Diego."
+   ],
+   [
+    "Diego finds more work",
+    "Alex asks for more work"
+   ],
+   [
+    "If it slows again, reply here.",
+    "If your eyes itch or swell, reply here."
+   ],
+   [
+    "Thu Nov 5 · arriving 8–10am · Diego",
+    "Mon Oct 26 · starting 8:30am · Diego"
+   ],
+   [
+    "Fri Nov 6 · arriving 8–10am · Diego",
+    "Tue Oct 27 · starting 8:30am · Diego"
+   ],
+   [
+    "Diego is running about 20 minutes late, but still inside your 8–10am window",
+    "Diego is running about 20 minutes late, so your 8:30am set starts about 8:50am"
+   ],
+   [
+    "Diego from Lee Mobile Lash is running behind and expects to reach you about 10:30am, still inside your 10am–12pm window",
+    "Diego from Lee Mobile Lash is running behind, so your 11:30am start moves to about 11:50am"
+   ],
+   [
+    "That's still inside Kim's window, so Kim just hears the new time",
+    "A short delay just moves Kim's start, so Kim hears the new time"
+   ],
+   [
+    "If it falls after the window, the text says so plainly",
+    "If the start moves a lot, the text says so plainly"
+   ],
+   [
+    "If the new time falls after the window, the text says so plainly",
+    "If the new start is much later, the text says so plainly"
+   ],
+   [
+    "Can't make the window at all: Sam is asked who goes, or Kim gets new times with no fee",
+    "Can't make it at all: Sam is asked who goes, or Kim gets new times with no fee"
+   ],
+   [
+    "It now takes about 3 hours: arriving 10am, done by about 1pm",
+    "It now takes about 3 hours: starting 11:30am, done by about 2:30pm"
+   ],
+   [
+    "Gemini hears right away that the 10am to 12pm window was just taken",
+    "Gemini hears right away that the 10:00am start was just taken"
+   ],
+   [
+    "Nora can ask to be next for that window",
+    "Nora can ask to be next for that time"
+   ],
+   [
+    "Then only Luis's windows show, at Luis's price",
+    "Then only Luis's times show, at Luis's price"
+   ],
+   [
+    "So the soonest window shows first",
+    "So the soonest start shows first"
+   ],
+   [
+    "Lash and brow books a 2-hour window.",
+    "A lash visit starts at a set time."
+   ],
+   [
+    "Every mobile lash price is set before the visit. If its quote is over the amount, it's signed at the visit.",
+    "Every mobile lash price is set before the visit, so nothing waits to be signed there."
+   ],
+   [
+    "A lash fill at home is priced at the visit: only the $89 trip fee was promised.",
+    "Every mobile lash service has its price before the visit."
+   ],
+   [
+    "Most show only for the money choices that use them. Harper's stage bills show on every path.",
+    "Most show only for the money choices that use them."
+   ],
+   [
+    "Back to Alex, Thu 9:15am: the money is in.",
+    "Back to Alex, Thu 10:35am: the money is in."
+   ],
+   [
+    "Your 1 to 3pm arrival stays saved",
+    "Your 1:00pm start stays saved"
+   ],
+   [
+    "Her arrival time stays saved until then.",
+    "Her start time stays saved until then."
+   ],
+   [
+    "her arrival time stays saved until the call",
+    "her start time stays saved until the call"
+   ],
+   [
+    "Lee Mobile Lash runs no live line, so its customers pick an arrival time.",
+    "Lee Mobile Lash runs no live line, so its customers pick a start time."
+   ],
+   [
+    "Tells Kim the new arrival time",
+    "Tells Kim the new start time"
+   ],
+   [
+    "arriving 10am–12pm",
+    "starting 11:30am"
+   ],
+   [
+    "10am–12pm",
+    "11:30am"
+   ],
+   [
+    "arriving 10am to 12pm",
+    "starting 10:00am"
+   ],
+   [
+    "arriving 8–10am",
+    "starting 8:30am"
+   ],
+   [
+    "arriving 8 to 10am",
+    "starting 8:30am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starting 1:00pm"
+   ],
+   [
+    "arriving 12 to 2pm",
+    "starting 1:00pm"
+   ],
+   [
+    "arriving 2–4pm",
+    "starting 2:00pm"
+   ],
+   [
+    "arriving 4–5pm",
+    "starting 4:00pm"
+   ],
+   [
+    "arriving 8–9am",
+    "starting 8:00am"
+   ],
+   [
+    "arriving 1 to 3pm",
+    "starting 1:00pm"
+   ],
+   [
+    "arriving 3 to 5pm",
+    "starting 3:00pm"
+   ],
+   [
+    "Checked in: Alex M., 8–10.",
+    "Checked in: Alex M., 8:30am."
+   ],
+   [
+    "A booked window stays right when the clocks change",
+    "A booked start time stays right when the clocks change"
+   ],
+   [
+    "10am to 12pm",
+    "10:00am"
+   ],
+   [
+    "1 to 3pm",
+    "1:00pm"
+   ],
+   [
+    "8–10am",
+    "8:30am"
+   ],
+   [
+    "8 to 10am",
+    "8:30am"
+   ],
+   [
+    "12–2pm",
+    "1:00pm"
+   ],
+   [
+    "12 to 2pm",
+    "1:00pm"
+   ],
+   [
+    "starts at 8:00am",
+    "starts at 8:30am"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no venue OK for an outside artist"
+   ],
+   [
+    "Diego can't start today: we need proof that you may have this work done at the home, like the owner's OK.",
+    "Diego can't start today: we need the venue's OK for an outside lash artist."
+   ],
+   [
+    "the proof Alex was asked to have ready is missing",
+    "the venue's OK Alex was asked to have ready is missing"
+   ],
+   [
+    "Alex was to have the proof ready",
+    "Alex was to have the venue's OK ready"
+   ],
+   [
+    "Alex can book again once the proof is ready.",
+    "Alex can book again once the venue OKs it."
+   ],
+   [
+    "Diego couldn't start at Alex M.'s: the permit isn't in. Nothing was charged.",
+    "Diego couldn't start at Alex M.'s: the sensitive glue Alex needs isn't in. Nothing was charged."
+   ],
+   [
+    "Diego can't start today: the permit for this work isn't in yet.",
+    "Diego can't start today: the sensitive glue your lashes need isn't in yet."
+   ],
+   [
+    "A what-if: the problem is on the business's side, like a permit it needed that isn't in.",
+    "A what-if: the problem is on the business's side, like a sensitive glue it ordered that isn't in."
+   ],
+   [
+    "or a permit the business needed.",
+    "or a product the business needed."
+   ],
+   [
+    "The landlord",
+    "The parent"
+   ],
+   [
+    "Landlord's card",
+    "Parent's card"
+   ],
+   [
+    "Own or rent?",
+    "Where, and who pays?"
+   ],
+   [
+    "Written estimate and terms",
+    "Contract and terms"
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A first set needs a glue patch test 1 to 2 days before, so the first open times start in 2 days."
+   ],
+   [
+    "Say the plug-in sets a first step with a lead time, like a permit that takes 5 days.",
+    "Say the plug-in sets a first step with a lead time, like a patch test before a first set."
+   ],
+   [
+    "heating and cooling",
+    "spray tanning"
+   ],
+   [
+    "Heating and cooling",
+    "Spray tanning"
+   ],
+   [
+    "A service priced at the chair gets its price now.",
+    "A service priced at the visit gets its price now."
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the desk"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "pays at the chair",
+    "pays at the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "Anything held for Kim is released, and Luis is told.",
+    "Anything held for Kim is released, and Diego is told."
+   ],
+   [
+    "water heater",
+    "lash tint"
+   ],
+   [
+    "Water heater",
+    "Lash tint"
+   ],
+   [
+    "heater",
+    "lash tint"
+   ],
+   [
+    "barbershop",
+    "lash studio"
+   ],
+   [
+    "hot towel",
+    "lash fill"
+   ],
+   [
+    "shave",
+    "lash fill"
+   ],
+   [
+    "sink",
+    "lash tray"
+   ],
+   [
+    "Sink",
+    "Lash tray"
+   ],
+   [
+    "pipe",
+    "lash tray"
+   ],
+   [
+    "Pipe",
+    "Lash tray"
+   ],
+   [
+    "drain",
+    "tint"
+   ],
+   [
+    "Drain",
+    "Tint"
+   ],
+   [
+    "water line",
+    "lash tray"
+   ],
+   [
+    "cabinet",
+    "lash tray"
+   ],
+   [
+    "valve",
+    "tint"
+   ],
+   [
+    "Valve",
+    "Tint"
+   ],
+   [
+    "shutoff",
+    "tint"
+   ],
+   [
+    "Makeup",
+    "Brow shaping"
+   ],
+   [
+    "makeup",
+    "brow shaping"
+   ],
+   [
+    "Color and cut",
+    "Lash lift and tint"
+   ],
+   [
+    "color and cut",
+    "lash lift and tint"
+   ],
+   [
+    "shaves",
+    "lash fills"
+   ],
+   [
+    "Shaves",
+    "Lash fills"
+   ],
+   [
+    "water heaters",
+    "lash tints"
+   ],
+   [
+    "Water heaters",
+    "Lash tints"
+   ],
+   [
+    "perms",
+    "lash lifts"
+   ],
+   [
+    "skin fades",
+    "lash tints"
+   ],
+   [
+    "Skin fades",
+    "Lash tints"
+   ],
+   [
+    "Shave",
+    "Lash fill"
+   ],
+   [
+    "Perm",
+    "Lash lift"
+   ],
+   [
+    "Heater",
+    "Lash tint"
+   ],
+   [
+    "heaters",
+    "lash tints"
+   ],
+   [
+    "barbershops",
+    "lash studios"
+   ],
+   [
+    "Makeup",
+    "Brow shaping"
+   ],
+   [
+    "makeup",
+    "brow shaping"
+   ]
+  ]
+ },
+ "keep": [
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a lash fill with Kayla at Lee Lash Studio, for Sat Oct 24 at 11:00am. A first full set needs a glue patch test first and takes a deposit, and a fill counts as a fill only within 3 weeks. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Lash at home, 15 Juniper Ln, and Diego starts Thu Oct 22 at 8:30am. The service depends on the money choice you pick: a classic full set at home, or wedding party lashes priced from the party's answers."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $70 lash fill with Kayla, 3 weeks or less after the last set. A card is saved for the studio's $20 fee. Alex pays at the desk.",
+    "list|deposit|counter": "The $140 Classic full set (2½ hours). A $40 deposit now, and $100 at the desk. A free glue patch test comes 1 to 2 days before a first set."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Lash fill"
+    },
+    "list|card|*": {
+     "price": "$70",
+     "fee": "$20",
+     "name": "Lash fill"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Classic full set"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Lash lift and tint",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$95",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "photos|deposit|card"
+   ],
+   "labels": {
+    "price": {
+     "photos": "Priced from the party's answers first"
+    }
+   },
+   "examples": {
+    "list|card|bill": "The main story: a $179 Classic full set at Alex's home with Diego. A card is saved for the $89 trip fee. Rosie texts the bill after, with a tip line.",
+    "photos|deposit|card": "Wedding party lashes for Alex and 4 friends, priced from the party's answers and a photo at $640, OK'd by Sam. A contract, a $160 deposit now, and the $480 rest charged to the saved card when Diego texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Classic full set at home"
+    },
+    "list|card|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Classic full set at home"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "Wedding party lashes"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Classic full set at home",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$179",
+      "fee": "$89"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where lash work outside a studio is allowed, and who may go. Rosie checks it before any service is set at a customer's place.",
+    "more": [
+     "Sam keeps every studio service at the studio, so here it only confirms that.",
+     "Some states allow work away from a studio only for some services, like strip lashes or brow shaping.",
+     "Some allow it only for a person with more years, a background check or insurance.",
+     "Times at the customer's place offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-01",
+    "does": "No danger, so the booking goes on. Each service is set at sign-up: at the studio, at the customer's place, or both. A lash fill is offered only at the studio, so nothing is asked.",
+    "more": [
+     "At the studio, no address or travel check is needed. The studio's address goes in the confirmation.",
+     "A visit at the customer's place follows the other flow: the business goes to the customer.",
+     "Lee Lash Studio does all its work at the studio. Lash work at a home or venue is Lee Mobile Lash's, where the state's rules allow it."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A lash fill is done at the studio: 27 Willow Ave, Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "more": [
+     "It comes from the customer's words, or one question.",
+     "Lee Lash Studio sets two. A first full set needs a free glue patch test first. A fill needs a set or fill in the last 3 weeks.",
+     "Here, Alex asks for a fill and is a returning customer, so fill times show.",
+     "It's checked again when the mobile is found. If they disagree, the times are offered again.",
+     "A later move offers only times of the same length."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "more": [
+     "A glue patch test is a few test lashes at each outer corner, to check for a reaction to the glue.",
+     "It comes 1 to 2 days before a first full set. A tint, lift or lamination product is tested the same way.",
+     "A fill needs none: Alex's test from the first set is on file."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Before this visit, Lee Lash Studio needs a free 15-minute glue patch test, 1 to 2 days before. Pick a time:",
+      {
+       "times": [
+        "Thu Oct 22 · 10:15am",
+        "Thu Oct 22 · 12:30pm"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "more": [
+     "The new pick is saved for 10 minutes instead.",
+     "Kayla stays the lash artist, since Alex picked her."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "No problem. Here are later visits, each with a patch test 1 to 2 days before:",
+      {
+       "times": [
+        "Tue Oct 27 · 11:00am · Kayla",
+        "Wed Oct 28 · 2:00pm · Kayla"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A7-02",
+    "branch": {
+     "label": "Fewer than half left",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A7-x02",
+       "line": [
+        "7.14"
+       ],
+       "who": "cust",
+       "to": "san",
+       "via": "msg",
+       "t": "Fri Oct 23, 10:20am",
+       "title": "Alex says fewer than half are left",
+       "does": "Alex taps 'Fewer than half left'. A fill with fewer than half the lashes left is priced as a full set: $140, 2½ hours.",
+       "more": [
+        "Both prices showed when Alex booked, so this is no surprise price.",
+        "Kayla's next booking starts at 12:00pm, so Saturday 11:00am has room only for a fill."
+       ],
+       "say": [
+        [
+         "cust",
+         "san",
+         "Fewer than half left"
+        ]
+       ],
+       "needs": [
+        "booked",
+        "pf.services"
+       ],
+       "tells": []
+      },
+      {
+       "id": "A7-x03",
+       "line": [
+        "7.14",
+        "7.2"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Fri Oct 23, 10:21am",
+       "title": "Offers a full set's time, or the fill",
+       "does": "Rosie offers 2½-hour times for a Classic full set at $140, or keeping Saturday as a fill. Alex picks Lina at 12:30pm, and Kayla and Lina are told.",
+       "more": [
+        "The card stays saved for the $20 fee. No deposit is taken for a switch the day before.",
+        "Lina gets Kayla's lash map with the booking.",
+        "Keep the fill: Kayla fills what's there for $70. If her time after is free, she can offer the full set at the bed.",
+        "No reply in 2 hours: Saturday stays as booked.",
+        "The visit is still in free cancel, so a move costs nothing."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Then it's a Classic full set: $140, 2½ hours. Saturday at 11:00am only has room for a fill. Pick a full set time, or keep the fill:",
+         {
+          "times": [
+           "Sat Oct 24 · 12:30pm · Lina",
+           "Tue Oct 27 · 11:00am · Kayla"
+          ],
+          "buttons": [
+           [
+            "C",
+            "Keep the fill"
+           ]
+          ]
+         }
+        ],
+        [
+         "cust",
+         "san",
+         "A"
+        ],
+        [
+         "san",
+         "cust",
+         "Moved: Classic full set with Lina, Sat Oct 24 at 12:30pm, $140. Your saved card covers the $20 fee. Give this code at the desk.",
+         {
+          "code": "5160"
+         }
+        ],
+        [
+         "san",
+         "staff",
+         "Change: Alex M. is now a Classic full set, Sat 12:30pm, with Lina. Kayla's 11:00am is free.",
+         {
+          "as": "Lina"
+         }
+        ]
+       ],
+       "needs": [
+        "booked",
+        "pf.services"
+       ],
+       "tells": [
+        "cust",
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "A7-03",
+    "more": [
+     "Example: a first full set needs its glue patch test 1 to 2 days before.",
+     "A first step that's still good counts for the new time, even with another lash artist.",
+     "If no time keeps the gap, Alex gets a new pair of times, another service, or a free cancel.",
+     "Both visits move with one 'Moved' text, and Kayla is told."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A7-74",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "line": [
+       "7.16"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Fri Oct 30, 10:15am",
+      "title": "Asks Dana how the test lashes feel",
+      "as": "Dana",
+      "does": "24 hours after Dana's glue patch test, Rosie asks how the test lashes look and feel. Dana answers on the secure page, never by text.",
+      "more": [
+       "Itching, redness or swelling at the test lashes: Kayla calls Dana that day and decides.",
+       "Kayla may retest with a sensitive glue and move the set, with no fee. Or she calls off the extensions, with a full refund.",
+       "No answer by the visit: Kayla checks the test lashes before she starts.",
+       "Eyes or a face swelling fast, or trouble breathing, get the safety message first: call 911."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "It's been a day since your glue patch test. How do the test lashes look and feel? Tell us on the secure page.",
+        {
+         "as": "Dana",
+         "card": {
+          "title": "Patch test check",
+          "lines": [
+           "For your Sat Oct 31 full set with Kayla",
+           "Answer on the page, not by text"
+          ],
+          "button": "Check the test lashes",
+          "link": "rosfield.com/n/d48"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.messages",
+       "pf.safety"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At the studio, Kayla reads Dana's answer on the page, and calls if anything is off, before she texts the result."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Sat Oct 24 at Lee Lash Studio:",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Service"
+        ],
+        "rows": [
+         [
+          "10:00am",
+          "Ben T.",
+          "Brow tint"
+         ],
+         [
+          "11:00am",
+          "Alex M.",
+          "Lash fill"
+         ],
+         [
+          "12:00pm",
+          "Dana R.",
+          "Brow wax"
+         ],
+         [
+          "2:00pm",
+          "Tess L.",
+          "Lash lift and tint"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open them",
+        "link": "rosfield.com/d/r24"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "Fewer than half left",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.8",
+        "8.12"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "title": "Finds fewer than half left; Alex picks",
+       "does": "A what-if: Kayla finds fewer than half of Alex's lashes left, so a fill can't hold them well. Both prices showed at booking, and Alex picks what's done today.",
+       "more": [
+        "A Classic full set is $140 and needs 2½ hours. It's done today only if Kayla's time after is free.",
+        "Here, Kayla's 12:00pm is booked, so she fills what's there for $70, and Alex books a full set for later.",
+        "Nothing more is done without Alex's yes, and the price shows first."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "SWITCH Alex M.: about 40% left. Full set?"
+        ],
+        [
+         "san",
+         "cust",
+         "Kayla says about 40% of your lashes are left, so a full set would be best: $140, 2½ hours. Her next client is at 12:00pm, so today she can do a fill for $70.",
+         {
+          "buttons": [
+           "Fill today",
+           "Full set another day"
+          ]
+         }
+        ],
+        [
+         "cust",
+         "san",
+         "1"
+        ]
+       ],
+       "needs": [
+        "pf.services",
+        "pf.visit"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "more",
+    "at": "A8-35",
+    "more": [
+     "For lashes: stinging or swelling during the set means Kayla stops at once, removes what's on and rinses. The removal is free."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Lash and brow work is licensed: the company, the studio and each artist, where the state's rules require it."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Lash, brow and makeup work pay Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Lash and brow work adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Lash and brow work books an artist's time, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each lash artist holds their own license where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Lash and brow work is never sent now: every visit is booked for a set time."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "2 At my home",
+    "why": "Lee Lash Studio does all its work at the studio. Work at a home or venue is Lee Mobile Lash's, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Lash and brow work is done in person."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Lash and brow work bills no plan or insurance."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lash and brow work is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The studio runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A studio visit needs nothing brought: the patch test and the consent come first, before the time is booked."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a teen's whole visit, as the plug-in's who-may-book says."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio: the customer is on the lash bed."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "Lash and brow work bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The studio sends no proposals for more work; a next visit is booked at the desk."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Lash and brow work has no results that come later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A studio visit is rated."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The studio's fill plans are paid at the desk after each visit, never charged to a saved card."
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "The plug-in says how this work takes walk-ins. Each branch is one way. A lash studio takes no walk-ins: every visit is booked with an artist."
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 15"
+     ],
+     [
+      "san",
+      "cust",
+      "Kayla is running about 15 minutes behind. Your 12:00pm brow wax will start about 12:15pm.",
+      {
+       "as": "Dana",
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "a form is always named for a lash service (the consent and patch-test form on the secure page)"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where lash work outside a studio is allowed, and who may go. Rosie checks it before any service is set at a customer's place.",
+    "more": [
+     "Sam keeps every studio service at the studio, so here it only confirms that.",
+     "Some states allow work away from a studio only for some services, like strip lashes or brow shaping.",
+     "Some allow it only for a person with more years, a background check or insurance.",
+     "Times at the customer's place offer only people cleared for it.",
+     "Each state's own rule comes from its own form, never one rule for all."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-01",
+    "more": [
+     "Away from the studio, it's full sets, fills, strip lashes and brow shaping. Tints, lifts and lamination stay at the studio.",
+     "Lash work away from a studio is offered only where the state's rules allow it, and only by artists cleared for it."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "more": [
+     "Each answer is checked for danger too.",
+     "Lee Mobile Lash asks two things first. A first set needs a glue patch test. A set more than 3 weeks old gets a full set, not a fill.",
+     "Here, Alex's last set was 5 weeks ago, so it's a full set. Alex had a patch test before, so none is needed."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Thu Oct 22. Text OMW when you leave.",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Job"
+        ],
+        "rows": [
+         [
+          "8:30am",
+          "Alex M. · 15 Juniper Ln",
+          "Classic full set"
+         ],
+         [
+          "11:30am",
+          "Kim L.",
+          "Wedding party, with Luis"
+         ],
+         [
+          "3:00pm",
+          "Drew",
+          "Bridal lash trial"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers, photos and gate codes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open the day",
+        "link": "rosfield.com/d/j22"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-02",
+    "more": [
+     "Where the state's rules require it, the text also shows Diego's license number."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 10:30am"
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Diego for a bridal lash trial next fall, before Alex's wedding. Diego texts NEXT. It's past the 60 days Sam books ahead, so Rosie saves it as a reminder.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: bridal lash trial, fall 2027"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Mobile Lash books up to 60 days ahead. We'll text you times for the bridal lash trial in late Aug 2027.",
+      {
+       "buttons": [
+        "Sounds good",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "t": "Thu Oct 22, 10:32am"
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "t": "Thu Oct 22, 10:35am"
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 12:30pm"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Lash and brow work is licensed: the company, the studio and each artist, where the state's rules require it."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Lash, brow and makeup work pay Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Lash and brow work adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Lash and brow work books an artist's time, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Neither company runs classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each lash artist holds their own license where the state's rules require one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Lash and brow work is never sent now: every visit is booked for a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Lee Mobile Lash works only at the customer's place. The studio is its own company, booked in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Lash and brow work is done in person."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "Lash and brow work bills no plan or warranty."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A lash visit starts at a set time, so the customer is ready on the lash bed."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Lash and brow work is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Lee Mobile Lash sells no seats in a session: each booking has its own artist."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Lash and brow work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Lash and brow work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Lash and brow work is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Lash and brow work always needs the customer there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "Lash and brow work always needs the customer there."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A teen is never left in the artist's care: a parent or guardian stays (B8-09)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Lash and brow work is paid once for each booking, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "Each lash visit gets its own bill."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "Lash and brow work bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Lee Mobile Lash sends no proposals for more work; a next visit is booked at checkout."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Lash and brow work has no report that comes later."
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Lash. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Mobile Lash · Lash fill at home",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa, in Spanish. A fill at home, booked a few days out. The details are on the portal.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "A fill at home · safety steps given",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE getting supplies from the studio, back 9:30"
+     ],
+     [
+      "san",
+      "cust",
+      "Diego went to get supplies from the studio and will be back about 9:30am. Your set should be done by about 11:30am."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "The fill plan at home is billed visit by visit (B5-21), never charged to a saved card."
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "form": [
+     [
+      "Parking",
+      "In the driveway"
+     ],
+     [
+      "Room for the lash bed",
+      "The living room, with a plug"
+     ],
+     [
+      "Pets",
+      "A dog, kept inside"
+     ],
+     [
+      "Gate or door code",
+      "None"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "not a named-only trade: the rating is asked"
+   },
+   {
+    "op": "words",
+    "at": "B4-07",
+    "does": "The price, {{price:$179}}, comes straight from Lash Studio's list. List prices never need the owner's OK."
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "does": "On the page, Alex adds how to get in, any entry limits and anything Diego should know. None of it changes the time or price."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ },
+ "notes": "From: the hair pilot (work/prof/hair.json). Why: a lash and brow studio runs like a salon chair: booked with a chosen artist, services by length, a patch test before a first set, and fills that come back on a schedule. What hair lacks is added: the fill rule (a fill only within 3 weeks with half the lashes left, else a full set) and the switch to a full set before or at the visit.\nNames: Sam Lee's main company is Lee Mobile Lash LLC (lash and brow work at a home or venue, with makeup as its second kind of work); his second company is Lee Lash Studio LLC (the studio). Flow A's story is at the studio, flow B's at the main company, as in the master.\nArtists: Kayla and Lina at the studio (the master's Riley and Avery); Diego and Luis travel (Jordan and Casey, kept as 'he'). Addresses: the studio 27 Willow Ave, the main company 900 Harbor Blvd, Alex's home 15 Juniper Ln. License numbers get this work's letters (EL, ES, SL, MK).\nPrices are the example studio's own, not a standard. The master's numbers are kept where the flow does sums: the $20 fee, the $40 deposit and $100 rest of the $140 full set, the $25 removal, the $179 set at home with $89 held, the $640 wedding party with a $160 deposit and $480 rest. The fill is $70, as in the old flowchart (the master's $35 haircut becomes $70; the lift is $95).\nMoney: flow A saves a card for fills, lifts, tints and brows, and takes a $40 deposit for full sets; both are paid at the desk (the old flowchart's own rules). Flow B holds the $89 trip fee on a set at home, with the bill after and a tip line; a wedding party is priced from the party's answers and a photo (the photos path, labeled 'Priced from the party's answers first'), with a contract, a 25% deposit and the rest charged to the saved card when the artist texts DONE. No path is listed only because the master's sign-up example uses it: the sign-up words (S1-12 to S1-16, S1-41 to S1-47) say how this work is really paid, with every lit money variant flattened to them.\nTimes: a lash visit starts at a set time (B4-83 keeps '2 A set start time'), so flow B reads 'starts at 8:30am', not a window. A fill takes 1 hour (11:00am to 12:00pm); a full set 2½ hours at the studio and 2 hours at home (8:30 to 10:30am, DONE 10:30am, bill 10:32am, receipt 10:35am). The day lists, the next booking (Dana's 12:00pm brow wax) and Kim's 11:30am wedding party follow from that.\nFree cancel: 24 hours before at the studio; away from the studio, the master's 7am on the day is kept as Sam's setting. The wedding is Thu Oct 22, booked Mon Oct 19 (a small wedding on short notice), so the master's dates stay.\nKept words: makeup and makeup artist (the main company's second kind of work: makeup for brides is a lash artist's own second trade).\nStudio services are done only at the studio (the old flowchart: extensions, lifts, tints and lamination never off-site), so A4-01 takes 'Only at the shop' and the studio sets no house call. Work at a home or venue is Lee Mobile Lash's, only where the state allows it (a switch in pf.license and pf.rules); flow B's 'Both places' branch is off since the studio is its own company.\nFlow A's running-the-business quote what-ifs (S11-08 to S11-11, S11-19, S11-40) use the main company's wedding party, since nothing at the studio is priced for one customer and Sam runs both companies.\nOff: walk-ins (the studio books set appointments), plans and insurance (lash work bills none), drop-offs, stays, spaces, classes, damage holds, day-before holds at the studio (it never holds), results later, items left or rented, proposals, a visit over several days, weather, ordered parts, sent-now work (every lash visit has a set start), emergency price limits (no lash service is covered), stages, monthly bills and parts at cost.\nsplitsKept: A7-61 (a stand-in for most work, nobody for volume sets, which only Kayla does); B4-57 (a wedding party needs a contract, a set at home none).\nOwn steps: A7-x01, the patch-test check by the customer on the secure page; A7-x02 and A7-x03 (a branch on A7-02), the fill that becomes a full set after the reminder's one question; A8-x01 (a branch on A8-32), the same found at the lash bed. Both are listed as gaps.\nPlug-in splits kept as the master's own branch elsewhere: a license for the company, the studio and each artist; the $2; nobody sent now; booked by name; children with a parent who stays; a rating asked; the lash consent on the secure page, signed when booking.\nReview (Oct 23): Rosa's call is now an irritated eye on a fill booking (glue in the eye now books nothing); no reaction, patch-test result or sensitivity goes in a text (B7-59, A7-35, B8-61, B8-32); the first full set's patch test shows on the link, the confirmation and Kayla's job; fill plans run every 3 weeks and are paid at the desk or billed (the plan-charge branches are off); Dana's 12:00pm, Tess's lamp, S11-20, S11-41, S12-26, S11-09, S11-54, B4-34, B7-53 (Luis out, Diego goes), S2-15, B8-27 and the wedding rest's wording were fixed.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "Any warranty the plug-in sets comes first, like a year on a repair.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop has none, so nothing is sent here.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Electric.",
+    "A haircut could mean a salon or a barbershop",
+    "like a burst pipe",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Lee's Barbershop LLC",
+    "Lee Home Services",
+    "written estimate",
+    "Lee's Barbershop",
+    "Groom's package",
+    "Drain clearing",
+    "signature cut",
+    "Jordan Price",
+    "1200 Main St",
+    "water heater",
+    "Casey Moore",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "Beard trim",
+    "beard trim",
+    "barbershop",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "JP031552",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "plumber",
+    "barbers",
+    "Jordan",
+    "Elm St",
+    "Barber",
+    "barber",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "Shop",
+    "shop",
+    "Panel upgrade",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "visit fee",
+    "$35",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "It's a gift for my brother. Can I pay for it?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "What happens at the chair?",
+    "It's 11:00am, and Alex is at the chair.",
+    "Next come the before notes, the price or the OK, and the work, as at the chair.",
+    "A service priced at the chair gets its price now.",
+    "Paid at the chair",
+    "Priced at the chair",
+    "paid at the chair",
+    "pays at the chair",
+    "at the chair",
+    "barbershops",
+    "barbershop",
+    "Barbershop",
+    "color correction",
+    "Color correction",
+    "color and cut",
+    "kids cut",
+    "Kids cut",
+    "hot towel shave",
+    "hot towel",
+    "shave",
+    "water heater",
+    "heater",
+    "trim",
+    "perm",
+    "skin fade",
+    "Skin fade",
+    "Color and cut",
+    "color and cut",
+    "shaves",
+    "water heaters",
+    "perms",
+    "skin fades",
+    "heaters"
+   ],
+   "B": [
+    "the building's limits, the plug-in's job questions and anything",
+    "The plug-in's questions that don't change the time or price go here",
+    "Can I run the dishwasher before you come?",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "like an overflowing drain",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "like a move-out day",
+    "Harper J.'s $2,400 repipe",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "You can look for a roofer near you.",
+    "It's overflowing. Can someone come tonight?",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes go to the plumber, one line each.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Jordan needs a part from the supply house.",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Call a mold cleanup company first",
+    "The plug-in says how long the warranty lasts.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "My kitchen drain is clogged.",
+    "Sale agua del calentador.",
+    "Water is coming out of the water heater.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Just the kitchen sink.",
+    "Electric.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Your water heater price is with Lee Home Services.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Want it every 12 months?",
+    "Yes, every year",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The faucet is a leak repair, quoted at the visit.",
+    "Is the sink still full of water?",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "stage 2 of your repipe",
+    "Replace both shutoff valves",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "It's under the 1-year labor warranty.",
+    "Your drain is under warranty, so this visit is free.",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "A haircut could mean a salon or a barbershop",
+    "like a burst pipe",
+    "water heater contract",
+    "a water heater replacement",
+    "Water heater replacement",
+    "water heater replacement",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Kitchen drain clearing",
+    "credited to the repair",
+    "replaces water heaters",
+    "Lee Home Services LLC",
+    "leehomeservices.com",
+    "Water heater flush",
+    "water heater flush",
+    "the kitchen drain",
+    "Lee Home Services",
+    "Service call fee",
+    "service call fee",
+    "written estimate",
+    "Lee's Barbershop",
+    "Drain clearings",
+    "DONE 179 drain",
+    "Drain clearing",
+    "drain clearing",
+    "A leak repair",
+    "Kitchen drain",
+    "Service call",
+    "service call",
+    "Jordan Price",
+    "1200 Main St",
+    "water heater",
+    "Leak repair",
+    "leak repair",
+    "Casey Moore",
+    "Yard drain",
+    "Electrical",
+    "electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "beard trim",
+    "barbershop",
+    "88 Elm St",
+    "42 Oak St",
+    "JP031552",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "plumber",
+    "barbers",
+    "Jordan",
+    "Elm St",
+    "Barber",
+    "barber",
+    "Labor",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "Shop",
+    "shop",
+    "Panel upgrade",
+    "Haircut",
+    "haircut",
+    "visit fee",
+    "$35",
+    "Fri 8am",
+    "MOVE Alex to Thu 12pm",
+    "The job should be done by 10am.",
+    "The before photo shows no crack.",
+    "Nora can ask to be next for that window",
+    "arriving 10am–12pm",
+    "10am–12pm",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "arriving 2–4pm",
+    "A booked window stays right when the clocks change",
+    "8–10am",
+    "12–2pm",
+    "starts at 8:00am",
+    "CANT START no proof Alex may have this work done",
+    "Written estimate and terms",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "heating and cooling",
+    "Heating and cooling",
+    "paid at the chair",
+    "at the chair",
+    "water heater",
+    "Water heater",
+    "heater",
+    "barbershop",
+    "hot towel",
+    "shave",
+    "sink",
+    "pipe",
+    "drain",
+    "Drain",
+    "water line",
+    "cabinet",
+    "valve",
+    "shutoff",
+    "shaves",
+    "water heaters",
+    "heaters",
+    "barbershops"
+   ]
+  },
+  "A": {
+   "S1-43": "9775f13de8",
+   "A4-01": "9d65299834",
+   "A4-50": "6f43775326",
+   "A4-43": "c17d56f766",
+   "A4-14": "e8360fe491",
+   "A4-15": "db5792db95",
+   "A7-02": "987e1a14cd",
+   "A7-03": "13bfc32bcb",
+   "A7-74": "b3ec278ce4",
+   "A8-01": "750bd94ee4",
+   "A8-32": "632f2b5b40",
+   "A8-35": "a67e890a5b",
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-29": "fb61245096",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A8-03": "7fe61cccf5",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A7-94": "6490d5d8e6",
+   "A3-20": "b8251d2535",
+   "A7-14": "6a57738a17"
+  },
+  "B": {
+   "S1-43": "2197eac59a",
+   "B4-01": "826f4058c2",
+   "B4-05": "fb3a9061c8",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-41": "6e8e9825b2",
+   "B10-18": "3d7ba16539",
+   "B9-06": "f091432f2d",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-29": "592bd8f1a2",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B4-83": "93095f28e5",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B9-19": "b97bfbf0d2",
+   "B10-38": "867fe1ab7c",
+   "B3-25": "4413e58bcb",
+   "B3-22": "19f64ba1ba",
+   "B8-32": "1cfd4f7afa",
+   "B7-91": "7132851ec1",
+   "B4-34": "74ff52d83d",
+   "B10-32": "7713bff255",
+   "B4-07": "9d0dbc90ad"
+  }
+ }
+}

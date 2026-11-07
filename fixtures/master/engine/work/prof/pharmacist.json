@@ -1,0 +1,5694 @@
+{
+ "id": "pharmacist",
+ "name": "Pharmacist, vaccines & consults",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "primary-care",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each pharmacist holds their own active license from the state where the patient is during the visit; the pharmacy holds the state's pharmacy permit; whether a pharmacist needs extra vaccine training or a certificate, and whether trained technicians or interns may give shots, comes from the state's form (a switch)",
+   "who": "each person, and the pharmacy",
+   "ask": "each pharmacist's license number in their invite reply (or the owner sends it); the pharmacy's permit number from the owner; each person's vaccine training certificate where the state's form asks for one",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "ages": "the youngest age a pharmacist may vaccinate, vaccine by vaccine, comes from the state's form (a switch); Rosie never offers a shot to someone younger",
+   "prescription": "which vaccines need a prescriber's order, and for which ages, comes from the state's form (a switch); such a shot is booked only once the order is on file at the pharmacy",
+   "video": "a video medicine review only with a pharmacist licensed (or otherwise allowed by the state's rules) in the state where the patient will be during the call; nobody allowed there: no video times, and a review at the pharmacy is offered instead",
+   "away": "home visits and shot clinics away from the pharmacy only where the state's rules allow them, with any registration the state's form asks for (a switch)",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "registry": "where the state's rules require it, the pharmacy is enrolled with the state's immunization registry and reports each shot from its own records (a switch); Rosie never sends to the registry",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance where the state's form asks for it"
+  },
+  "pf.services": {
+   "shape": "short shot visits of a set length, booked with a pharmacist by name or with whoever is on, with a 15-minute wait after every shot built into the booking; two or three shots fit in one visit and one wait; a shot is offered only while it's in stock, and its doses are set aside when the visit is booked; walk-ins are welcome when a pharmacist is free; medicine reviews at the pharmacy or by video; Rosie books shots and medicine reviews only, never prescriptions, refills or transfers",
+   "examples": "the example pharmacy's own prices (Lee Pharmacy and Lee Mobile Pharmacy), not a standard; a health or drug plan pays its own fee, and the patient's share is an estimate, often nothing for a shot the plan covers; nothing is ever promised as free",
+   "list": [
+    {
+     "name": "Flu shot",
+     "price": "billed to the patient's health plan, often nothing to pay; self-pay $45, or $85 for the stronger kind for people 65 and older",
+     "kind": "one price",
+     "length": "15 min, then a 15-minute wait",
+     "where": "at the pharmacy",
+     "before": "nothing taken",
+     "after": "any share at the counter, the pharmacy's own way"
+    },
+    {
+     "name": "COVID-19 shot",
+     "price": "billed to the health plan; self-pay $160",
+     "kind": "one price",
+     "length": "15 min, then a 15-minute wait",
+     "where": "at the pharmacy",
+     "before": "nothing taken",
+     "after": "any share at the counter"
+    },
+    {
+     "name": "Shingles shot (2 doses, 2 to 6 months apart)",
+     "price": "billed to the drug plan or health plan; self-pay $230 a dose",
+     "kind": "one price per dose",
+     "length": "15 min, then a 15-minute wait",
+     "where": "at the pharmacy",
+     "before": "nothing taken",
+     "after": "any share at the counter",
+     "note": "dose 2 is booked by the pharmacist at checkout, inside its window"
+    },
+    {
+     "name": "RSV shot",
+     "price": "billed to the drug plan or health plan; self-pay $310",
+     "kind": "one price",
+     "length": "15 min, then a 15-minute wait",
+     "where": "at the pharmacy",
+     "before": "nothing taken",
+     "after": "any share at the counter",
+     "note": "the pharmacist checks it fits the patient, from the screening answers"
+    },
+    {
+     "name": "Tdap shot",
+     "price": "billed to the plan; self-pay $75",
+     "kind": "one price",
+     "length": "15 min, then a 15-minute wait",
+     "where": "at the pharmacy",
+     "before": "nothing taken",
+     "after": "any share at the counter"
+    },
+    {
+     "name": "Two or three shots at one visit",
+     "price": "each shot's own price",
+     "kind": "one price per shot",
+     "length": "one 15-minute visit and one 15-minute wait",
+     "where": "at the pharmacy",
+     "before": "nothing taken",
+     "after": "any share at the counter"
+    },
+    {
+     "name": "Medicine review",
+     "price": "nothing to pay when the patient's drug plan includes them in its review program (the plan decides); otherwise $45",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the pharmacy, or by video (counted as at the pharmacy)",
+     "before": "nothing taken",
+     "after": "any price at the counter, or taken by the counter's own phone line after a video review",
+     "note": "a review of the medicines someone takes, never a prescription or a refill"
+    },
+    {
+     "name": "Home shot visit (for a patient who can't easily leave home)",
+     "price": "each shot's price, plus a $40 home visit charge; billed to the patient's plans where they pay, or self-pay",
+     "kind": "one price plus the shots",
+     "length": "45 min, including the 15-minute wait, in a 2-hour arrival window",
+     "where": "at the patient's home, or at a care home with its OK",
+     "before": "nothing taken",
+     "after": "the pharmacy bills the plans its own way; self-pay: Rosfield's bill after DONE"
+    },
+    {
+     "name": "Shot clinic at a workplace or care home",
+     "price": "$35 a flu shot for each person, or billed to each person's plan; booked by the host",
+     "kind": "one price per person",
+     "length": "a half day on a set date",
+     "where": "at the host's place, with its OK",
+     "before": "nothing taken",
+     "after": "each person's plan billed the pharmacy's own way; self-pay people get Rosfield's bill",
+     "note": "each person books their own slot and answers their own screening questions"
+    }
+   ],
+   "capacity": "one pharmacist gives one patient's shots at a time; the 15-minute wait happens in the chairs by the counter, where staff can see the patient, so the pharmacist's next shot visit can start",
+   "nobodyHome": "never: the patient is always there",
+   "online": "medicine reviews by video, counted as at the pharmacy, with the check-in code read out at the start; shots are never online",
+   "notOffered": "prescriptions, refills and transfers are never booked: Rosie points the person to the pharmacy's own line; shots for ages or kinds the state's form doesn't allow are never offered; the example pharmacy lists anything else it doesn't do and points the person elsewhere"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which shots, or a medicine review: the pharmacy's own list only",
+    "for a shot in a series, like shingles: first or second dose",
+    "the patient's age group, since the state's age rules and some shot kinds depend on it",
+    "a health plan, a drug plan (names only), or self-pay",
+    "for a video review: which state the patient will be in",
+    "who the shots are for: the person booking, a child, or another adult"
+   ],
+   "afterTime": [
+    "anything the pharmacy should know to help, like needing an interpreter or a step-free door",
+    "the name and mobile of the person booking"
+   ],
+   "securePage": [
+    "the patient's legal name, birth date and home address",
+    "each plan's member ID and a photo of each plan card",
+    "the screening questions: feeling sick today, allergies (to food, latex or a past shot), any past reaction to a shot, fainting with shots, pregnancy or a chance of it, a weakened immune system or treatment that weakens it, recent shots",
+    "for a medicine review: the list of medicines, which stays only on the page",
+    "a prescriber's order, where the state's form says this shot needs one",
+    "the consent, the privacy notice and the vaccine information sheet for each shot to read ahead",
+    "'I'm 18 or older, booking for myself', or how the person booking is related to the patient",
+    "the OK to texts and email"
+   ],
+   "whoMayBook": "an adult books for themselves; a parent or legal guardian books for a child, only from the youngest age the state's form allows for that shot (a switch); another adult (a grown child, a caregiver) only with the patient's own OK on the secure page, or as the patient's guardian or health care agent; someone under 18 never books alone",
+   "whoMayBring": "a parent or legal guardian brings a child and stays for the whole visit and the wait; another adult brings a child only with the parent's signed OK on the secure page, where the state's rules allow it; an adult patient may bring anyone they like",
+   "neverAsked": "health details, reactions, medicines and symptoms are never asked or typed in the AI chat: only on the secure page"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "signs of a severe allergic reaction: trouble breathing, swelling of the face, lips or throat, hives spreading fast, or fainting after a shot",
+     "say": "Call 911 now. If you have an epinephrine pen, use it. Don't wait for a booking.",
+     "booking": "no booking; the same words in a later text get 911 again, and any visit stays booked until the pharmacy calls"
+    },
+    {
+     "words": "chest pain, signs of a stroke (a drooping face, a weak arm, slurred speech, a sudden severe headache), or very heavy bleeding",
+     "say": "Call 911 or go to the emergency room now. Don't wait for a booking.",
+     "booking": "no booking"
+    },
+    {
+     "words": "an overdose, or swallowed medicine or a chemical",
+     "say": "Call Poison Help now at 1-800-222-1222. If the person isn't breathing or won't wake up, call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "pharmacistLine": [
+    {
+     "words": "a question about a medicine, a missed dose, a side effect that isn't an emergency, or a refill",
+     "say": "A pharmacist answers that. Please call the pharmacy at (555) 010-0177. If it's an emergency, call 911.",
+     "booking": "no answer from Rosie; a shot or review can still be booked if the person asks for one"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "someone who feels a little unwell and wants a shot",
+     "what": "booked as asked; the screening questions ask about feeling sick, and only the pharmacist decides on the day if the shot should wait"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about suicide or self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "The screening questions and the consent",
+     "when": "on the secure page while booking, within the saved time, never by text; a booking the pharmacy makes by phone or at the counter: due the day before, at an hour the pharmacy sets, with one reminder",
+     "who": "every patient, for every shot visit",
+     "result": "a pharmacist reads the answers the working day before; answers not in: the patient answers on the secure page at the counter, and the pharmacist reads them before any shot"
+    },
+    {
+     "name": "The pharmacist's review of the answers",
+     "when": "the working day before the visit",
+     "who": "every shot booking",
+     "result": "nothing stands out; or the pharmacist calls the patient first; or a shot isn't right at a pharmacy, and the visit is cancelled with nothing charged"
+    },
+    {
+     "name": "The vaccine count",
+     "when": "before any time is offered, and again when the visit is booked",
+     "who": "every shot",
+     "result": "in stock: the doses are set aside for the visit; out of stock: only times after the next delivery are offered"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the pharmacy, by hand or by a trial claim; checked again the working day before",
+     "who": "every patient who names a plan",
+     "result": "covered, some shots only, not covered, or can't check now (the pharmacy checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day (the example pharmacy's rule), or sooner where the rules require it",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the pharmacy, with its due date"
+    },
+    {
+     "name": "A prescriber's order",
+     "when": "before the visit, only for a shot the state's form says needs one",
+     "who": "those patients",
+     "result": "a to-do for the pharmacy; not on file by the visit: that shot waits, with no fee"
+    }
+   ],
+   "prep": "bring a photo ID and each plan card; wear a short-sleeved or loose top; eat something first if shots make you light-headed; plan to stay 15 minutes after the shot; at home: have the plan cards ready and a chair to sit in"
+  },
+  "pf.visit": {
+   "checkIn": "at the pharmacy: the check-in code at the counter, then the pharmacist checks the photo ID and the plan cards against the secure page; a video review: the code read out at the start; at home: the code from the patient at the door",
+   "beforeWork": "the pharmacist goes over the screening answers with the patient, asks how they feel today, and gives the vaccine information sheet for each shot before it's given",
+   "changes": "another shot is added only with the patient's yes, if it's in stock and the screening answers cover it, with any self-pay price first; a shot waits for another day if the patient is sick or the pharmacist says so",
+   "wait": "every patient stays 15 minutes after the shot (longer if the pharmacist says so), seated where staff can see them; signs of a severe allergic reaction: the emergency plan and 911 right away",
+   "done": "the check-in code or DONE; the shots, lot numbers and any reaction go in the pharmacy's own records, never in Rosie or a text",
+   "records": "where the state's rules require it, the pharmacy reports each shot to the state's immunization registry from its own records; the patient gets a printed or portal record of each shot",
+   "away": "at home: the pharmacist brings the vaccines in a cooler, the emergency kit and the information sheets, and stays for the 15-minute wait",
+   "childLeft": "never: the adult who brings a child stays for the whole visit and the wait"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking: no card, no hold, no deposit; at home: nothing taken",
+   "plans": "the plans the pharmacy takes (its own list); a flu or COVID-19 shot is usually billed to the health plan, other shots often to the drug plan; the pharmacy checks each plan by hand or by a trial claim and records it; the share is an estimate, not a promise",
+   "selfPay": "a self-pay patient sees the price before saying yes, is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "fees": "none: no cancel fee and no missed-visit fee, ever",
+   "feeFree": "every patient is fee-free; texts say 'No fee to cancel or miss'",
+   "after": "at the pharmacy: any share or self-pay price at the counter, the pharmacy's own way; a video review's price taken by the counter's own phone line; at home or at a clinic: the pharmacy bills the plans its own way, or Rosie texts a self-pay patient the bill after DONE",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form (no deposits are taken); price limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the pharmacy's name, the date, the time, the address and a secure link: never a shot's name, a medicine, a screening answer, a reaction or a health detail",
+   "staff": "texts to the owner and staff carry no health detail either: the patient's initials, the time and a link; which shots and any notes are on the secure page",
+   "languages": "English and Spanish; the secure page asks if the patient needs an interpreter, and the pharmacy is told",
+   "minors": "texts about a child go to the parent or guardian, never to the child",
+   "medical": "a medical or medicine question is never answered, saved or passed on by Rosie: 911 if it's an emergency, then the pharmacy's own line, where a pharmacist answers"
+  },
+  "pf.staff": {
+   "licenses": "each pharmacist's own license, per state, plus any vaccine training certificate the state's form asks for",
+   "skills": "pharmacists: shots, medicine reviews, home shot visits and shot clinics; only people cleared for home visits go to homes; trained technicians or interns give shots only where the state's form allows it, under a pharmacist (a switch)",
+   "supervision": "a technician or intern who gives shots works under a pharmacist on site, where the state's form allows it at all",
+   "oks": "the owner OKs a shot clinic's date and host, a home visit on a day nobody is cleared for, and anything a pharmacist flags",
+   "standIn": "a pharmacist out: another pharmacist may take the visit, with the patient's yes; nobody is moved without it",
+   "away": "the home visit team is the pharmacists cleared for home visits, with the vaccine cooler and the emergency kit"
+  },
+  "pf.rules": {
+   "noPrescriptions": "Rosie books shots and medicine reviews only; it never fills, refills or transfers a prescription, and points those requests to the pharmacy's own line",
+   "ages": "the youngest age a pharmacist may vaccinate, shot by shot, from the state's form (a switch); a child is booked only by a parent or guardian, and never below that age",
+   "prescription": "the shots that need a prescriber's order, and for which ages, from the state's form (a switch)",
+   "infoSheet": "the vaccine information sheet for each shot is given before that shot, every time",
+   "wait": "a 15-minute wait after every shot, built into each booking",
+   "registry": "each shot reported to the state's immunization registry where the state's rules require it, by the pharmacy from its own records, with the patient's consent where the state asks for it (a switch)",
+   "reactions": "a serious reaction after a shot is reported by the pharmacist to the federal vaccine safety system, as the federal rules require",
+   "records": "the pharmacy keeps its records as long as the state's rules require; a delete request removes only Rosie's own booking details, never the pharmacy's records",
+   "copies": "a patient's copy of their shot record within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "the permit and licenses shown where the state asks: posted at the pharmacy, and at a clinic or visit away from it",
+   "proxies": "an adult booking for another adult needs that patient's OK, or papers that show they're the guardian or health care agent, where the state's rules ask for them",
+   "estimate": "a written price estimate for self-pay patients, by the deadline the federal rules set (a switch keeps the pharmacy's own faster rule)",
+   "host": "a workplace's or care home's clinic day only under the host's written OK and its sign-in rules",
+   "privacy": "health privacy rules for every message and form",
+   "cancelRight": "no cancel period for shots or care given at a visit, at the pharmacy or at home; where a state's rules give one for something sold at the home, it goes in writing (a switch)"
+  },
+  "pf.edges": {
+   "outOfStock": "a shot runs out: only times after the next delivery are offered; a booked dose that's lost (a late delivery, a fridge alarm) is told to the patient on the secure page, with the other shots kept and new times offered, no fee",
+   "lateArrival": "up to 10 minutes late: still seen; later, the pharmacist fits the patient in or offers a new time (the pharmacy decides; Rosie never changes the booking itself)",
+   "pharmacyLate": "when the pharmacy runs late, a new time costs nothing",
+   "standIn": "a pharmacist out: another pharmacist, with the patient's yes, or new times with no fee",
+   "forms": "screening questions not done by their due date (a booking the pharmacy made by phone): one reminder, then the patient answers them at the counter before the shot",
+   "sickToday": "a patient who feels sick on the day: the pharmacist decides if the shot waits; a new time is booked with no fee, and the doses stay set aside",
+   "planChange": "the plan check comes back not covered: self-pay with the price and the estimate notice, or a free cancel; a plan that changes on a new year: the page asks for the new card before a later dose",
+   "seriesDue": "a second dose is booked at checkout inside its window; if it can't be, Rosie reminds the patient once when the window opens",
+   "twoBookings": "a patient with two visits open (a shot and a medicine review): Rosie asks which one before any change",
+   "worse": "someone feels unwell before the visit: the 911 or Poison Help words if they match; anything else goes to the pharmacist on the secure page; Rosie never judges it, and the visit stays booked",
+   "healthQuestion": "a question about a shot or a medicine: never answered by Rosie; 911 if it's an emergency, then the pharmacy's own line",
+   "refill": "a refill or prescription request by text, chat or call: Rosie says the pharmacy handles it on its own line and books nothing",
+   "homebound": "a home visit that can't happen as booked: the soonest open window comes first, with no fee",
+   "other": "all other edge cases the generic way",
+   "urgent": "no shot is sent now and nobody is on call: the soonest times show first; the danger words get 911"
+  },
+  "pf.facts": [
+   "children",
+   "documents",
+   "extrawork",
+   "firststeps",
+   "forms",
+   "planbill",
+   "video"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Pharmacy",
+   "staff": "Leo and Mei (pharmacists)",
+   "cust": "Alex M. (a patient) · other patients",
+   "other": "Others (a bank, a parent or guardian, a grown child who helps, a plan)"
+  },
+  "B": {
+   "business": "Lee Mobile Pharmacy",
+   "staff": "Priya and Tomas (pharmacists), who visit with a vaccine cooler",
+   "cust": "Alex M. (a patient who can't easily leave home) · other patients",
+   "other": "Others (a bank, a grown child or caregiver, a care home's nurse, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Leo"
+  },
+  "B": {
+   "staff": "Priya"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "It's Sat 10:56am, and Alex is at the counter. Alex reads the code from the confirmation or the reminder, and Leo enters it."
+   ],
+   [
+    "For the color and cut, it's charged only for the shop's $20 fee, and only after Sam says yes.",
+    "For a shot, nothing is charged until the pharmacy says so."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the home vaccines plug-in now, and the others when Sam gets to them."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Priya's phone, you said yes to the shots for $160."
+   ],
+   [
+    "Plumbing, electrical and barbering license each person, so Sam's four are checked.",
+    "Pharmacists are each licensed, so Sam's four are checked."
+   ],
+   [
+    "An apprentice is offered only while a pharmacist who may supervise them is working",
+    "A trained technician is offered only while a pharmacist who may supervise them is working"
+   ],
+   [
+    "Why: many pharmacists, salons and groomers are licensed to their pharmacy.",
+    "Why: in many states, shots away from a pharmacy have their own rules."
+   ],
+   [
+    "Goes on as a house call in the other flow: Riley at Alex's home, $75.",
+    "Goes on in the other flow: a home visit with Lee Mobile Pharmacy."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Travel vaccines for Lee Mobile Pharmacy: is it the same company?"
+   ],
+   [
+    "A cut is one barber, so the shop takes the first branch.",
+    "A shot visit is one pharmacist at a time, so the pharmacy takes the first branch."
+   ],
+   [
+    "A cut is shortened, so the shop takes the first branch.",
+    "A late patient is seen in the time left, so the pharmacy takes the first branch."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Travel vaccines for Lee Pharmacy: is it the same company?"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pharmacies start."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a lab test, which isn't on the pharmacy's list."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pharmacies set it."
+   ],
+   [
+    "Reads back home vaccines's money, service by service",
+    "Reads back the home vaccines money"
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Shots already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Haircuts already booked keep only their saved card.",
+    "Shots already booked keep their terms."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a kids' shot is $25. Want a time?"
+   ],
+   [
+    "A cut has none, so the shop takes the first branch.",
+    "A shot visit has none, so the pharmacy takes the first branch."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A shot visit is rated, so the pharmacy takes the first branch."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds travel vaccines to Lee Mobile Pharmacy."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's pharmacy work takes no jobs sent now, at the pharmacy or away."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Priya also give a second shot today?"
+   ],
+   [
+    "Leo replies YES with a pharmacist license number",
+    "Leo replies YES with his pharmacist license number"
+   ],
+   [
+    "Keep it at $120 self-pay, or cancel with no fee.",
+    "Keep it at $230 self-pay, or cancel with no fee."
+   ],
+   [
+    "Electrical is set up; waits for its electrician",
+    "Shot clinics are set up; wait for Priya"
+   ],
+   [
+    "May the haircut be done at the customer's home?",
+    "May pharmacy shots be given at a patient's home?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A flu shot could mean a doctor's office or a pharmacy."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE a rash on the arm"
+   ],
+   [
+    "You're checked in at Lee Pharmacy with Leo.",
+    "You're checked in at Lee Pharmacy."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pharmacies often set."
+   ],
+   [
+    "Booking rules; color quotes need Sam's OK",
+    "Booking rules; shots book without an OK"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 shot quote is good for 7 days."
+   ],
+   [
+    "Plumbing is live; offers electrical next",
+    "Home vaccines are live; shot clinics next"
+   ],
+   [
+    "Sam gives the company's plumbing license",
+    "Sam gives his own pharmacist license"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds travel vaccines to Lee Pharmacy."
+   ],
+   [
+    "Does it work like pre-approval calls?",
+    "Does it work like shots?"
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Shots at the pharmacy work like this:"
+   ],
+   [
+    "Checks where house calls are allowed",
+    "Checks where home shots are allowed"
+   ],
+   [
+    "Reminds Alex before free cancel ends",
+    "Reminds Alex the day before"
+   ],
+   [
+    "Offers a shorter cut or a later time",
+    "Offers a shorter visit or a later time"
+   ],
+   [
+    "Leo did the cut, but entered no code",
+    "Leo gave the shots, but entered no code"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Flu shot and COVID-19 shot · $540"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Flu shot and COVID-19 shot · $160"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Pharmacy doesn't do lab tests."
+   ],
+   [
+    "Keeps the haircut at the shop only",
+    "Keeps pharmacy shots at the pharmacy only"
+   ],
+   [
+    "Notes what's there before the work",
+    "Goes over the answers before the shots"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Flu shot and COVID-19 shot"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you give kids' shots? My son is 8."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next dose at the counter"
+   ],
+   [
+    "1 Yes, $2 a booking (Sam's three)",
+    "1 Yes, $2 a booking (other work)"
+   ],
+   [
+    "The shop's side, like a conflict",
+    "The pharmacy's side, a conflict"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a flu shot and a shingles shot"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Home vaccines, Shot clinics, Pharmacy"
+   ],
+   [
+    "Sam switches the drain clearing",
+    "Sam switches the shot"
+   ],
+   [
+    "2 Some charge differently (Sam)",
+    "2 Some charge differently"
+   ],
+   [
+    "A broken tool stops one service",
+    "A fridge alarm stops one shot"
+   ],
+   [
+    "Shows Alex the cut; fixes first",
+    "Goes over the visit with Alex"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "A skin problem stops the work",
+    "A shot must wait for another day"
+   ],
+   [
+    "Next visit booked at checkout",
+    "Next dose booked at checkout"
+   ],
+   [
+    "Welcome to Lee's Barbershop!",
+    "Welcome to Lee Pharmacy!"
+   ],
+   [
+    "Booked by name, like a chair",
+    "Booked by name, like a pharmacist"
+   ],
+   [
+    "If Leo says the cut was done",
+    "If Leo says the shots were given"
+   ],
+   [
+    "What happens at the counter?",
+    "What happens at the visit?"
+   ],
+   [
+    "Saves the color station too",
+    "Saves the private room too"
+   ],
+   [
+    "No: Alex stays in the chair",
+    "No: Alex stays for the visit"
+   ],
+   [
+    "Riley says an order is late",
+    "Leo says a vaccine delivery is late"
+   ],
+   [
+    "Alex M. asked for a person.",
+    "A.M. asked for a person."
+   ],
+   [
+    "Alex M. had to leave early.",
+    "A.M. had to leave early."
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $179 shot needs none."
+   ],
+   [
+    "Keeps the time, with Avery",
+    "Holds the time; Sam calls Alex"
+   ],
+   [
+    "a step-free door on Elm St",
+    "a step-free door on Willow Ave"
+   ],
+   [
+    "A parent books a kids cut",
+    "A parent books for a child"
+   ],
+   [
+    "Something ordered is late",
+    "A vaccine delivery is late"
+   ],
+   [
+    "A cut paid at the counter",
+    "A shot paid at the counter"
+   ],
+   [
+    "Books it as a house call",
+    "Books it as a home visit"
+   ],
+   [
+    "No: a cut at the counter",
+    "No: a shot at the pharmacy"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW travel vaccines"
+   ],
+   [
+    "Sewer camera inspection",
+    "Second shot"
+   ],
+   [
+    "sewer camera inspection",
+    "second shot"
+   ],
+   [
+    "Nobody else, like color",
+    "Nobody else has the skill"
+   ],
+   [
+    "Sends Riley back to $90",
+    "Keeps the flu shot at $45"
+   ],
+   [
+    "Riley finishes the work",
+    "Leo gives the shots"
+   ],
+   [
+    "plumbing and electrical",
+    "home vaccines and shot clinics"
+   ],
+   [
+    "Books it for a brother",
+    "Books it for Alex's father"
+   ],
+   [
+    "One person, like a cut",
+    "One person, like a shot visit"
+   ],
+   [
+    "No minimum, like a cut",
+    "No minimum, like a shot visit"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home shot visit"
+   ],
+   [
+    "Barber license number",
+    "Pharmacist license number"
+   ],
+   [
+    "Haircut at home · $75",
+    "Flu shot at home · $45"
+   ],
+   [
+    "Haircuts never pause.",
+    "Shots never pause."
+   ],
+   [
+    "Cabinet floor, before",
+    "Arm, before"
+   ],
+   [
+    "A tool or room is out",
+    "The vaccine fridge fails"
+   ],
+   [
+    "1 Yes: plumbing (Sam)",
+    "1 Yes: jobs sent now"
+   ],
+   [
+    "Plumbing + electrical",
+    "Home shots + clinics"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Pharmacy LLC"
+   ],
+   [
+    "heating and cooling",
+    "travel vaccines"
+   ],
+   [
+    "priced at the chair",
+    "priced at the counter"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the counter"
+   ],
+   [
+    "Items held for it",
+    "Vaccines set aside for it"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Pharmacy"
+   ],
+   [
+    "Color correction",
+    "Shot review"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pharmacy"
+   ],
+   [
+    "color correction",
+    "shot review"
+   ],
+   [
+    "No (Sam's three)",
+    "No, for other kinds of work"
+   ],
+   [
+    "Groom's package",
+    "vaccine package"
+   ],
+   [
+    "drain clearings",
+    "shots"
+   ],
+   [
+    "1 Yes, the same",
+    "1 Yes, the same (Sam)"
+   ],
+   [
+    "Yes, like a cut",
+    "Yes, like any visit"
+   ],
+   [
+    "is at the chair",
+    "is at the counter"
+   ],
+   [
+    "Keep it at $120",
+    "Keep it at $230"
+   ],
+   [
+    "NO SHOW Alex M.",
+    "NO SHOW A.M."
+   ],
+   [
+    "Barber license",
+    "Pharmacist license"
+   ],
+   [
+    "drain clearing",
+    "shot"
+   ],
+   [
+    "Drain clearing",
+    "Shot"
+   ],
+   [
+    "Alex, an adult",
+    "A patient 18 or older"
+   ],
+   [
+    "Color and cut",
+    "COVID-19 shot"
+   ],
+   [
+    "color and cut",
+    "COVID-19 shot"
+   ],
+   [
+    "color and cut",
+    "shot and review"
+   ],
+   [
+    "water heaters",
+    "shots"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "Service call",
+    "Home visit"
+   ],
+   [
+    "service call",
+    "home visit"
+   ],
+   [
+    "1200 Main St",
+    "1200 Oak Ave"
+   ],
+   [
+    "water heater",
+    "shot"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "NEW massage",
+    "NEW travel vaccines"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "overflowing",
+    "urgent"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "barbershop",
+    "pharmacy"
+   ],
+   [
+    "water line",
+    "refill"
+   ],
+   [
+    "dishwasher",
+    "fridge"
+   ],
+   [
+    "electrical",
+    "shot clinics"
+   ],
+   [
+    "Electrical",
+    "Shot clinics"
+   ],
+   [
+    "Barbershop",
+    "Pharmacy"
+   ],
+   [
+    "beard trim",
+    "COVID-19 shot"
+   ],
+   [
+    "Visit fee",
+    "Home visit fee"
+   ],
+   [
+    "hot towel",
+    "shot"
+   ],
+   [
+    "{{price}}",
+    "{{price:$45}}"
+   ],
+   [
+    "88 Elm St",
+    "260 Willow Ave"
+   ],
+   [
+    "skin fade",
+    "Tdap shot"
+   ],
+   [
+    "Skin fade",
+    "Tdap shot"
+   ],
+   [
+    "power cut",
+    "power outage"
+   ],
+   [
+    "Kids cut",
+    "Kids' shot"
+   ],
+   [
+    "kids cut",
+    "kids' shot"
+   ],
+   [
+    "Haircuts",
+    "Flu shots"
+   ],
+   [
+    "haircuts",
+    "flu shots"
+   ],
+   [
+    "plumbing",
+    "home vaccines"
+   ],
+   [
+    "Plumbing",
+    "Home vaccines"
+   ],
+   [
+    "Haircut",
+    "Flu shot"
+   ],
+   [
+    "haircut",
+    "flu shot"
+   ],
+   [
+    "haircut",
+    "medicine review"
+   ],
+   [
+    "massage",
+    "vaccine clinic"
+   ],
+   [
+    "cabinet",
+    "fridge"
+   ],
+   [
+    "shutoff",
+    "dose"
+   ],
+   [
+    "plumber",
+    "pharmacist"
+   ],
+   [
+    "Plumber",
+    "Pharmacist"
+   ],
+   [
+    "barbers",
+    "pharmacists"
+   ],
+   [
+    "Barber",
+    "Pharmacist"
+   ],
+   [
+    "shaves",
+    "shots"
+   ],
+   [
+    "barber",
+    "pharmacist"
+   ],
+   [
+    "heater",
+    "shot"
+   ],
+   [
+    "faucet",
+    "dose"
+   ],
+   [
+    "Jordan",
+    "Priya"
+   ],
+   [
+    "beard",
+    "flu shot"
+   ],
+   [
+    "Beard",
+    "Flu shot"
+   ],
+   [
+    "shave",
+    "shot"
+   ],
+   [
+    "drain",
+    "visit"
+   ],
+   [
+    "valve",
+    "dose"
+   ],
+   [
+    "flush",
+    "booster"
+   ],
+   [
+    "sewer",
+    "flu"
+   ],
+   [
+    "Riley",
+    "Leo"
+   ],
+   [
+    "Avery",
+    "Mei"
+   ],
+   [
+    "Casey",
+    "Tomas"
+   ],
+   [
+    "shops",
+    "pharmacies"
+   ],
+   [
+    "cape",
+    "gown"
+   ],
+   [
+    "sink",
+    "counter"
+   ],
+   [
+    "pipe",
+    "shot"
+   ],
+   [
+    "clog",
+    "question"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "shop",
+    "pharmacy"
+   ],
+   [
+    "Shop",
+    "Pharmacy"
+   ]
+  ],
+  "B": [
+   [
+    "Examples: an ID for an 18+ service, a permit or a warranty card, a parking pass, a signed form.",
+    "Examples: a photo ID and the plan cards, or the signed screening questions."
+   ],
+   [
+    "For the color and cut, it's charged only for the shop's $20 fee, and only after Sam says yes.",
+    "For a shot, nothing is charged until the pharmacy says so."
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the home vaccines plug-in now, and the others when Sam gets to them."
+   ],
+   [
+    "This job needs nothing, so the $89 hold is released now, or at DONE if no code was entered.",
+    "This visit needs the photo ID and plan cards. Both are here, so the $89 hold is released now, or at DONE if no code was entered."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Priya's phone, you said yes to the shots for $160."
+   ],
+   [
+    "Plumbing, electrical and barbering license each person, so Sam's four are checked.",
+    "Pharmacists are each licensed, so Sam's four are checked."
+   ],
+   [
+    "Before Priya starts, please read and sign the lead-safe work notice for your home.",
+    "Before Priya starts, please read and sign the consent for today's visit."
+   ],
+   [
+    "Why: many pharmacists, salons and groomers are licensed to their pharmacy.",
+    "Why: in many states, shots away from a pharmacy have their own rules."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Travel vaccines for Lee Mobile Pharmacy: is it the same company?"
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises the shot price to $199 for visits from Mon Nov 2."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Travel vaccines for Lee Pharmacy: is it the same company?"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most pharmacies start."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a lab test, which isn't on the pharmacy's list."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most pharmacies set it."
+   ],
+   [
+    "Reads back home vaccines's money, service by service",
+    "Reads back the home vaccines money"
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Shots already booked keep their price, even after Nov 2."
+   ],
+   [
+    "Haircuts already booked keep only their saved card.",
+    "Shots already booked keep their terms."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a kids' shot is $25. Want a time?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds travel vaccines to Lee Mobile Pharmacy."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's pharmacy work takes no jobs sent now, at the pharmacy or away."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Priya also give a second shot today?"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Electrical is set up; waits for its electrician",
+    "Shot clinics are set up; wait for Priya"
+   ],
+   [
+    "May the haircut be done at the customer's home?",
+    "May pharmacy shots be given at a patient's home?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE the room is set up"
+   ],
+   [
+    "Alex's drain is booked with Jordan by name.",
+    "Alex's visit is booked with Priya by name."
+   ],
+   [
+    "For older homes, where the rules require it",
+    "Where the rules require it"
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules pharmacies often set."
+   ],
+   [
+    "Booking rules; color quotes need Sam's OK",
+    "Booking rules; shots book without an OK"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Shots already booked keep their price"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 shot quote is good for 7 days."
+   ],
+   [
+    "Plumbing is live; offers electrical next",
+    "Home vaccines are live; shot clinics next"
+   ],
+   [
+    "Sam gives the company's plumbing license",
+    "Sam gives his own pharmacist license"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds travel vaccines to Lee Pharmacy."
+   ],
+   [
+    "Does it work like pre-approval calls?",
+    "Does it work like shots?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Shots at the pharmacy work like this:"
+   ],
+   [
+    "Checks where house calls are allowed",
+    "Checks where home shots are allowed"
+   ],
+   [
+    "Alex's kitchen drain has a set time.",
+    "Alex's home visit has a set time."
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Flu shot and COVID-19 shot · $540"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Flu shot and COVID-19 shot · $160"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Pharmacy doesn't do lab tests."
+   ],
+   [
+    "Keeps the haircut at the shop only",
+    "Keeps pharmacy shots at the pharmacy only"
+   ],
+   [
+    "like a permit or an estimate visit",
+    "like a prescriber's order"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Flu shot and COVID-19 shot"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you give kids' shots? My son is 8."
+   ],
+   [
+    "Checks the part is in stock first",
+    "Checks the vaccines are in stock first"
+   ],
+   [
+    "1 Yes, $2 a booking (Sam's three)",
+    "1 Yes, $2 a booking (other work)"
+   ],
+   [
+    "Plumbing, Electrical, Barbershop",
+    "Home vaccines, Shot clinics, Pharmacy"
+   ],
+   [
+    "Only a teen is home at Alex M.'s",
+    "Only a teen is home at A.M.'s"
+   ],
+   [
+    "Sam switches the drain clearing",
+    "Sam switches the shot"
+   ],
+   [
+    "2 Some charge differently (Sam)",
+    "2 Some charge differently"
+   ],
+   [
+    "Shows only that plumber's times",
+    "Shows only that pharmacist's times"
+   ],
+   [
+    "Notes the condition before work",
+    "Goes over the answers before the shots"
+   ],
+   [
+    "Does it, with a right to cancel",
+    "Gives the shot; no cancel period"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Over the landlord's top amount",
+    "Over the payer's top amount"
+   ],
+   [
+    "Waits out the right to cancel",
+    "Checks for a cancel period"
+   ],
+   [
+    "Welcome to Lee's Barbershop!",
+    "Welcome to Lee Pharmacy!"
+   ],
+   [
+    "Tells Alex the part is late",
+    "Tells Alex a vaccine delivery is late"
+   ],
+   [
+    "Saved: drain clearing $199",
+    "Saved: shot $199"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $179 shot needs none."
+   ],
+   [
+    "Shows Alex his share first",
+    "Shows Alex's share first"
+   ],
+   [
+    "Keeps the time, with Casey",
+    "Holds the time; Sam calls Alex"
+   ],
+   [
+    "Sends Jordan back to $160",
+    "Keeps the home visit charge at $40"
+   ],
+   [
+    "A hazard stops part of it",
+    "Something stops part of it"
+   ],
+   [
+    "your home vaccines visit",
+    "your visit"
+   ],
+   [
+    "corroded shutoff valves",
+    "corroded doses"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW travel vaccines"
+   ],
+   [
+    "Sewer camera inspection",
+    "Second shot"
+   ],
+   [
+    "sewer camera inspection",
+    "second shot"
+   ],
+   [
+    "Plumbing has none here.",
+    "Home shots: the screening questions and the consent, due the day before."
+   ],
+   [
+    "to have the proof ready",
+    "to have the consent signed"
+   ],
+   [
+    "once the proof is ready",
+    "once the consent is signed"
+   ],
+   [
+    "plumbing and electrical",
+    "home vaccines and shot clinics"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Jordan finds more work",
+    "Alex asks for one more shot"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home shot visit"
+   ],
+   [
+    "kitchen drain clearing",
+    "home shot visit"
+   ],
+   [
+    "Haircut at home · $75",
+    "Flu shot at home · $45"
+   ],
+   [
+    "Haircuts never pause.",
+    "Shots never pause."
+   ],
+   [
+    "Cabinet floor, before",
+    "Room, before"
+   ],
+   [
+    "Alex files any claim.",
+    "The pharmacy sends the claim itself."
+   ],
+   [
+    "1 Yes: plumbing (Sam)",
+    "1 Yes: jobs sent now"
+   ],
+   [
+    "Plumbing + electrical",
+    "Home shots + clinics"
+   ],
+   [
+    "Lead-safe work notice",
+    "Consent for today's visit"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 shot quote"
+   ],
+   [
+    "Asks for one plumber",
+    "Asks for one pharmacist"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Pharmacy LLC"
+   ],
+   [
+    "heating and cooling",
+    "travel vaccines"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Pharmacy's"
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Pharmacy"
+   ],
+   [
+    "The landlord pays",
+    "A family member pays"
+   ],
+   [
+    "the kitchen drain",
+    "the home visit"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Pharmacy"
+   ],
+   [
+    "color correction",
+    "shot review"
+   ],
+   [
+    "A warranty claim",
+    "A free check or adjustment"
+   ],
+   [
+    "No (Sam's three)",
+    "No, for other kinds of work"
+   ],
+   [
+    "Drain clearings",
+    "Shots"
+   ],
+   [
+    "Groom's package",
+    "vaccine package"
+   ],
+   [
+    "drain clearings",
+    "shots"
+   ],
+   [
+    "1 Yes, the same",
+    "1 Yes, the same (Sam)"
+   ],
+   [
+    "NO SHOW Alex M.",
+    "NO SHOW A.M."
+   ],
+   [
+    "shutoff valves",
+    "doses"
+   ],
+   [
+    "Shutoff valves",
+    "Doses"
+   ],
+   [
+    "Drain clearing",
+    "Shot"
+   ],
+   [
+    "drain clearing",
+    "shot"
+   ],
+   [
+    "drain clearing",
+    "home shot visit"
+   ],
+   [
+    "A part is late",
+    "A vaccine delivery is late"
+   ],
+   [
+    "shutoff valve",
+    "dose"
+   ],
+   [
+    "Shutoff valve",
+    "Dose"
+   ],
+   [
+    "Color and cut",
+    "COVID-19 shot"
+   ],
+   [
+    "color and cut",
+    "COVID-19 shot"
+   ],
+   [
+    "color and cut",
+    "shot and review"
+   ],
+   [
+    "water heaters",
+    "shots"
+   ],
+   [
+    "warranty plan",
+    "health plan"
+   ],
+   [
+    "Service call",
+    "Home visit"
+   ],
+   [
+    "service call",
+    "home visit"
+   ],
+   [
+    "1200 Main St",
+    "1200 Oak Ave"
+   ],
+   [
+    "water heater",
+    "shot"
+   ],
+   [
+    "1200 Main St",
+    "610 Main St"
+   ],
+   [
+    "service call",
+    "visit charge"
+   ],
+   [
+    "valve quote",
+    "shot quote"
+   ],
+   [
+    "NEW massage",
+    "NEW travel vaccines"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "overflowing",
+    "urgent"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "barbershop",
+    "pharmacy"
+   ],
+   [
+    "water line",
+    "refill"
+   ],
+   [
+    "dishwasher",
+    "fridge"
+   ],
+   [
+    "electrical",
+    "shot clinics"
+   ],
+   [
+    "Electrical",
+    "Shot clinics"
+   ],
+   [
+    "Barbershop",
+    "Pharmacy"
+   ],
+   [
+    "beard trim",
+    "COVID-19 shot"
+   ],
+   [
+    "Visit fee",
+    "Home visit fee"
+   ],
+   [
+    "hot towel",
+    "shot"
+   ],
+   [
+    "{{price}}",
+    "{{price:$45}}"
+   ],
+   [
+    "88 Elm St",
+    "260 Willow Ave"
+   ],
+   [
+    "42 Oak St",
+    "19 Aspen Ct"
+   ],
+   [
+    "Kids cut",
+    "Kids' shot"
+   ],
+   [
+    "kids cut",
+    "kids' shot"
+   ],
+   [
+    "Haircuts",
+    "Flu shots"
+   ],
+   [
+    "haircuts",
+    "flu shots"
+   ],
+   [
+    "plumbing",
+    "home vaccines"
+   ],
+   [
+    "Plumbing",
+    "Home vaccines"
+   ],
+   [
+    "Haircuts",
+    "Pharmacy shots"
+   ],
+   [
+    "Haircut",
+    "Flu shot"
+   ],
+   [
+    "haircut",
+    "flu shot"
+   ],
+   [
+    "haircut",
+    "medicine review"
+   ],
+   [
+    "massage",
+    "vaccine clinic"
+   ],
+   [
+    "cabinet",
+    "fridge"
+   ],
+   [
+    "shutoff",
+    "dose"
+   ],
+   [
+    "plumber",
+    "pharmacist"
+   ],
+   [
+    "Plumber",
+    "Pharmacist"
+   ],
+   [
+    "barbers",
+    "pharmacists"
+   ],
+   [
+    "valves",
+    "doses"
+   ],
+   [
+    "Valves",
+    "Doses"
+   ],
+   [
+    "shaves",
+    "shots"
+   ],
+   [
+    "barber",
+    "pharmacist"
+   ],
+   [
+    "heater",
+    "shot"
+   ],
+   [
+    "faucet",
+    "dose"
+   ],
+   [
+    "Jordan",
+    "Priya"
+   ],
+   [
+    "valve",
+    "dose"
+   ],
+   [
+    "beard",
+    "flu shot"
+   ],
+   [
+    "Beard",
+    "Flu shot"
+   ],
+   [
+    "shave",
+    "shot"
+   ],
+   [
+    "drain",
+    "visit"
+   ],
+   [
+    "flush",
+    "booster"
+   ],
+   [
+    "sewer",
+    "flu"
+   ],
+   [
+    "Riley",
+    "Leo"
+   ],
+   [
+    "Avery",
+    "Mei"
+   ],
+   [
+    "Casey",
+    "Tomas"
+   ],
+   [
+    "cape",
+    "gown"
+   ],
+   [
+    "sink",
+    "counter"
+   ],
+   [
+    "pipe",
+    "shot"
+   ],
+   [
+    "clog",
+    "question"
+   ],
+   [
+    "shop",
+    "pharmacy"
+   ],
+   [
+    "Shop",
+    "Pharmacy"
+   ]
+  ]
+ },
+ "keep": [
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee, a pharmacist, signs up two companies by text. Then on Wed Oct 21, Alex asks an AI to book a flu shot and a first shingles shot at Lee Pharmacy, for Sat Oct 24 at 11:00am with Leo. The doses are set aside when it's booked, the screening questions stay on the secure page, and Leo reads them the day before. Alex's plans pay for both shots, so nothing is due at the counter. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, home after a hip operation and unable to get out, books a home visit with Lee Mobile Pharmacy for a flu shot and a COVID-19 shot. Priya, a pharmacist, comes Thu Oct 22, arriving 8 to 10am, with the vaccines in a cooler, and stays for the 15-minute wait. The pharmacy bills Alex's plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: Alex's flu shot and first shingles shot with Leo, billed to Alex's health and drug plans, so nothing is due. Nothing is taken when booking. A share a plan leaves, a self-pay price ($45 for the flu shot, $230 a shingles dose) and a medicine review ($45, or nothing when the drug plan includes it) are all paid at the counter."
+   },
+   "amounts": {
+    "list|*|*": {
+     "price": "$45",
+     "name": "Flu shot (self-pay price; the plan may pay)"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: Priya's home visit for Alex's flu shot and COVID-19 shot. Nothing is taken. The pharmacy bills Alex's plan its own way, often with nothing for Alex to pay.",
+    "list|none|bill": "The same home visit, paid by Alex: nothing is taken, and Rosie texts the $245 bill (flu $45, COVID-19 $160, home visit $40) when Priya texts DONE."
+   },
+   "amounts": {
+    "list|none|own": {
+     "price": "$45",
+     "name": "Flu shot at home (self-pay price; the plan may pay)"
+    },
+    "list|none|bill": {
+     "price": "$245",
+     "name": "Flu and COVID-19 shots at home"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-80",
+   "A7-15",
+   "A8-02",
+   "A4-43"
+  ],
+  "B": []
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's health companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Shot records stay with the pharmacy as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Pharmacy work always needs a license: each pharmacist's, and the pharmacy's permit.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Health care books people (a pharmacist or a pharmacist), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Health care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each pharmacist and pharmacist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No health care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit books a person's time.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit books a person's time.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit books a person's time, never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left at the pharmacy: the patient is there for the whole visit.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A parent or guardian stays for a child's shot and the wait (pf.visit).",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "words",
+    "at": "A3-30",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Did A.M. agree to get texts from Rosie? With no yes, A.M. gets no texts.",
+      {
+       "buttons": [
+        "Yes, A.M. agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Sat 3pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Sat Oct 24 at 3:00pm with Leo?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 20"
+     ],
+     [
+      "san",
+      "cust",
+      "The pharmacy is running about 20 minutes late, so your 11:00am starts about 11:20am.",
+      {
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: A.M., Sat 11:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "You're checked in at Lee Pharmacy. Thanks, Alex!"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-05",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5106"
+     ],
+     [
+      "san",
+      "staff",
+      "That isn't A.M.'s code. Check it with A.M. and send it again."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-08",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE A.M."
+     ],
+     [
+      "san",
+      "staff",
+      "Done: A.M., Sat 11:00am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Lee Pharmacy you're here."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says they're here for the 11:00am. Check A.M. in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 15"
+     ],
+     [
+      "san",
+      "cust",
+      "The pharmacy is running about 15 minutes behind. Your 11:15am visit will start about 11:30am.",
+      {
+       "as": "Dana",
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-14",
+    "say": [
+     [
+      "cust",
+      "san",
+      "I waited 25 minutes past my time."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. has a complaint about Saturday's visit: \"I waited 25 minutes past my time.\"",
+      {
+       "buttons": [
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks for telling us. We've passed it to the owner."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-17",
+    "say": [
+     [
+      "san",
+      "owner",
+      "What do you need from D.W. first?",
+      {
+       "buttons": [
+        "One question",
+        "A call first"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-13",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BLOCK Thu 2-5"
+     ],
+     [
+      "san",
+      "owner",
+      "Block which business?",
+      {
+       "buttons": [
+        [
+         "A",
+         "Lee Pharmacy"
+        ],
+        [
+         "B",
+         "Lee Mobile Pharmacy"
+        ]
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "A"
+     ],
+     [
+      "san",
+      "owner",
+      "Block Thu Oct 29, 2 to 5pm at Lee Pharmacy? B.T. is booked at 3:00.",
+      {
+       "buttons": [
+        "Block; offer new times",
+        "Block around it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No repeat plan: each shot or series is booked on its own, and a second dose is booked at checkout (A10-07).",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The example pharmacy sells no plans, packs or memberships: shots are billed to a plan or paid at the counter.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "No repeat plan here (A4-28): a second dose is its own booking.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "No repeat plan here (A4-28): a second dose is its own booking.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "No repeat plan here (A4-28): a second dose is its own booking.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in gives the state's form: what to ask, and what stops home vaccines from going live. Here it's each pharmacist's own license, and any vaccine training the form asks for.",
+    "more": [
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state asks for liability insurance, the form asks for it here too.",
+     "Each person's own license comes later, with their invite reply.",
+     "Home shot visits go live only where the state's rules allow them."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses each pharmacist who gives shots, and may ask for vaccine training too. What's your pharmacist license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, EX-RPH-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "A kind of work goes live once it's set up. Each person is offered once Sam says yes.",
+    "more": [
+     "Sam doesn't run the shot clinics himself, so shot clinics wait for Priya, who does.",
+     "Whose papers count comes from the state's form: the company's, each person's, or both."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state's form for shot clinics asks for each pharmacist's license and vaccine training. It may also ask for a notice for each clinic site."
+     ],
+     [
+      "san",
+      "owner",
+      "Shot clinics is set up. AI assistants can book it now. You'll add your people at the end. Next, Lee Pharmacy: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in says the state licenses each pharmacist and gives the pharmacy a permit. Sam may give the pharmacy's permit number. It's optional, and Rosie doesn't check it.",
+    "more": [
+     "Each pharmacist sends their own license number with their invite reply.",
+     "Each pharmacist can link their own calendar when they join."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state licenses each pharmacist, and gives the pharmacy a permit. What's the pharmacy's permit number?"
+     ],
+     [
+      "owner",
+      "san",
+      "EX-PHY-2098"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Pharmacy",
+       "At the patient's home",
+       "Pharmacist license EX-RPH-1042",
+       "Yes"
+      ],
+      [
+       "Priya Price",
+       "Lee Mobile Pharmacy",
+       "At the patient's home, and at clinics",
+       "Pharmacist EX-RPH-3155, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Tomas Moore",
+       "Lee Mobile Pharmacy",
+       "At the patient's home",
+       "Pharmacist, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Pharmacy",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Leo Chen",
+       "Lee Pharmacy",
+       "At the pharmacy, and by video",
+       "Pharmacist EX-RPH-2187, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Mei Diaz",
+       "Lee Pharmacy",
+       "At the pharmacy, and by video",
+       "Pharmacist, as given, not checked",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "more": [
+     "The example follows the money choice at the top. Here, a flu shot and a first shingles shot, billed to Alex's plans.",
+     "Only Alex's words pass through the AI: no birth date, plan number or health detail."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Book me a flu shot and my first shingles shot at Lee Pharmacy on Saturday morning."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on as usual.",
+    "more": [
+     "A question about a medicine, a side effect or a refill gets the pharmacy's own line, where a pharmacist answers.",
+     "Rosie never judges how sick someone is. A patient who feels a little unwell can still book: the pharmacist decides on the day.",
+     "Alex's words had none of these, so nothing is sent here."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "For a question about a medicine or a refill, a pharmacist can help: call Lee Pharmacy at (555) 010-0177. If it's an emergency, call 911. I can still book a shot or a medicine review."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "more": [
+     "The plug-in's 911 words: trouble breathing, a swelling face or throat, hives spreading fast, or fainting after a shot.",
+     "Chest pain, stroke signs and heavy bleeding get 911 too.",
+     "An overdose or a swallowed poison gets Poison Help, 1-800-222-1222, or 911 if the person won't wake up."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If there's trouble breathing, swelling of the face or throat, or chest pain, call 911 now. Use an epinephrine pen if there is one. Don't wait for a booking."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-01",
+    "does": "No danger, so the booking goes on. Each service is set at sign-up: at the pharmacy, at the patient's home, or both. Shots at Lee Pharmacy are given at the pharmacy.",
+    "more": [
+     "At the pharmacy, no address or travel check is needed. The pharmacy's address goes in the confirmation.",
+     "A home visit for someone who can't easily leave home is Lee Mobile Pharmacy's work, in the other flow.",
+     "A medicine review can also be by video, where the plug-in allows it. That's a third place to pick."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "The shots are given at the pharmacy: Lee Pharmacy, 260 Willow Ave, Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "does": "Rosie learns new or returning first, so the booking can find Alex's record later. Shots take the same time either way.",
+    "more": [
+     "It comes from Alex's words, or one question.",
+     "Alex has never been to Lee Pharmacy, so Alex is a new patient. A record is made once the visit is booked.",
+     "It's checked again when the mobile is found. If they disagree, nothing about the times changes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-80",
+    "more": [
+     "Rosie never texts the parent itself.",
+     "From here it's the parent's booking. Texts go only to the parent's phone.",
+     "With no parent in 30 minutes, the time is let go. That's the saved time's one exception.",
+     "Someone under 18 never books a shot alone.",
+     "A child under 13 who writes in gets no link and no text. The AI hears only 'Please ask a parent to book'.",
+     "Nothing about a child under 13 is kept."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in names the first steps for a shot: the screening questions and the consent, on the secure page. A prescriber's order comes first only where the state's form says that shot needs one.",
+    "more": [
+     "Rosie checks before the secure link, so the page knows what to ask.",
+     "Alex's shots need no prescriber's order, so Alex's booking takes 'A form signed on the secure page'."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "Rosie checks before the secure link, so the page knows what to ask.",
+       "Alex's shots need no prescriber's order, so Alex's booking takes 'A form signed on the secure page'."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "does": "On the secure page, Alex answers one short question: are texts to this phone safe? The pharmacy never shows photos of patients, so nothing is asked about photos.",
+    "more": [
+     "Texts aren't safe, like a shared phone: Alex picks this page, email or a call. Rosie then reaches Alex only that way.",
+     "Here, Alex says texts are safe."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "One quick question.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-64",
+    "more": [
+     "The page asks them to confirm they may act for the adult.",
+     "Where the state's rules require it, the page asks for the paper that shows it.",
+     "The plug-in says if a guardian may book this work.",
+     "They answer the screening questions and sign the consent on the secure page.",
+     "The code goes to whoever brings the patient to the pharmacy."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The example pharmacy sells no plans, packs or memberships: shots are billed to a plan or paid at the counter.",
+    "label": "A package or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The example pharmacy sells no plans, packs or memberships: shots are billed to a plan or paid at the counter.",
+    "label": "Buys a pack or membership"
+   },
+   {
+    "op": "words",
+    "at": "A7-03",
+    "does": "A shot visit has no first-step visit, so only the visit moves. The doses set aside move with it.",
+    "more": [
+     "The screening answers carry over to the new time.",
+     "A second dose only moves to times inside its window.",
+     "The visit moves with one 'Moved' text, and Leo is told."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "t": "Sat Oct 24, 11:00am",
+    "does": "Back to Alex in the private room at 11:00am. Leo goes over Alex's screening answers with Alex, and asks how Alex feels today.",
+    "more": [
+     "Feeling sick today: Leo decides if the shots wait (A8-35).",
+     "Notes stay in the pharmacy's own record, never in Rosie or a text.",
+     "The plug-in names the checks before a shot."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE checked: A.M."
+     ],
+     [
+      "san",
+      "staff",
+      "Noted. The details stay in the pharmacy's record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "Say someone with a patient slips and is hurt at the counter. Leo helps first, and calls 911 in an emergency. Sam is told at once, with no health detail in the text.",
+    "more": [
+     "A record is kept on the secure page, never in a text.",
+     "A patient who feels unwell after a shot is the 15-minute wait's own step (A8-x02).",
+     "The plug-in says what staff must do for this work."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Someone was hurt at the counter. Details on the page."
+     ],
+     [
+      "san",
+      "owner",
+      "Leo reports someone was hurt at the pharmacy during a visit. Leo is with them. Details: rosfield.com/i/a8"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "why": "Nothing sold at a pharmacy visit comes with a cancel period.",
+    "label": "Yes: a contract signed today"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "A pharmacy sends no proposals: more care is booked as its own visit (A8-34).",
+    "label": "The business sends a proposal"
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "why": "A shot has no free-fix visit: a worry after a shot goes to the pharmacy's own line, or 911 (A10-25).",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "A shot visit has no results to send later. The shot record is given at the visit (A8-52).",
+    "label": "Results ready later"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "why": "Nothing is left at a pharmacy visit.",
+    "label": "An item isn't picked up"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "The pharmacy runs no classes.",
+    "label": "A class: names on a roster"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "Nothing is left at the pharmacy: the patient is there.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "The state's lookup doesn't find license EX-RPH-1042 under Sam's name. Sam sends a photo of the license, and Rosie checks it again right away.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We couldn't find pharmacist license EX-RPH-1042 for Sam Lee on the state's lookup. Check the number and the name as printed on the license. Or send a photo of it here."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Pharmacist license"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Home vaccines goes live at 2:16pm, and Sam can be booked on his own pharmacist license."
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The pharmacy plug-in loads the same way, for the pharmacy's own company.",
+     "Calls to (555) 010-0177 can use the voice AI the same way, if Sam turns it on.",
+     "Questions only a pharmacist should answer go to the pharmacy's own line, (555) 010-0177.",
+     "Sam's calendar, linked for home vaccines, now blocks his hours at the pharmacy too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where shots outside a pharmacy are allowed, and who may give them. Rosie checks before any visit away from the pharmacy is offered."
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The pharmacy's permit EX-PHY-2098 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way shot clinics was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Home vaccines",
+          "Now"
+         ],
+         [
+          "Shot clinics",
+          "Once Priya is confirmed and you say yes"
+         ],
+         [
+          "Lee Pharmacy",
+          "Its registration is on file as given, not checked. It shows once you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Tomas Moore"
+     ],
+     [
+      "Company",
+      "Lee Mobile Pharmacy"
+     ],
+     [
+      "Kinds of work",
+      "Home vaccines"
+     ],
+     [
+      "Visits",
+      "Home shot visit"
+     ],
+     [
+      "Hours",
+      "Mon–Sat 7:30am–5pm"
+     ],
+     [
+      "Tomas agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-31",
+    "more": [
+     "Jobs sent now are never offered.",
+     "The owner can set who's on call later on the Team page, if the plug-in allows it.",
+     "Someone who wants a shot today gets the soonest same-day time, or walks in at the pharmacy."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone who works with you have their own business? Like a nurse who runs her own clinic, or a dietitian who rents a room.",
+      {
+       "buttons": [
+        "No",
+        "Yes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pharmacy can book you from now on, at the pharmacy and by video. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Leo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pharmacy can book you from now on, at the pharmacy and by video. Your day list comes at the time you picked.",
+      {
+       "as": "Mei"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Pharmacy can book you for home vaccines and shot clinics from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Priya"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Shot clinics and Lee Pharmacy now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-63",
+    "form": [
+     [
+      "Each charge",
+      "Who paid, what for, and the exact words they agreed to"
+     ],
+     [
+      "Its costs",
+      "Stripe's card fee, and Rosfield's $2 per booking"
+     ],
+     [
+      "Fees waiting on you",
+      "None: neither business charges fees"
+     ],
+     [
+      "Refunds",
+      "Any amount, here"
+     ],
+     [
+      "Payouts",
+      "Shown by Stripe; Rosie never pays out"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Home vaccines, shot clinics and the pharmacy's visits need one, so Sam's three take the license step."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero una vacuna contra la gripe el sábado.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like a flu shot on Saturday."
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Pharmacy. Esta llamada se graba. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Pharmacy. This call is recorded. How can I help?"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-12",
+    "does": "Someone calls for a vet: a wrong number. Rosie says whose line this is, once. A sales caller or a robocall is ended politely.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Is this Elm Street Vet? I need to move my dog's shots.",
+      {
+       "as": "a wrong number"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "This is Lee Pharmacy's booking line, so I can't reach Elm Street Vet. Please check their number. Goodbye.",
+      {
+       "as": "a wrong number"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-14",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Hi, you've reached Lee Pharmacy. This is Rosie, an automated assistant, and this message is recorded. Leave your name and what you need, and say if a text back is OK."
+     ],
+     [
+      "cust",
+      "san",
+      "Hi, it's Alex. I'd like a flu shot and a shingles shot, Saturday morning if you can. A text is fine."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-05",
+    "say": [
+     [
+      "agent",
+      "san",
+      "Hi, I'm an automated assistant from Google, calling for a customer, Alex. Can Lee Pharmacy give a flu shot and a shingles shot on Saturday morning? Do you take Alex's plans?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-19",
+    "does": "Alex asks at the counter in person about Saturday. Sam, a pharmacist or the office manager can book a patient by text or on the portal.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BOOK Alex M., 2 shots, Sat 11am Leo"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-22",
+    "more": [
+     "The general check looks for danger to life, fire, gas, a medical emergency or self-harm.",
+     "Every answer later in the booking is checked the same way.",
+     "On a call, the voice AI says any safety words out loud.",
+     "The pharmacy plug-in adds its own: signs of a severe allergic reaction, chest pain, stroke signs, heavy bleeding or an overdose."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "more": [
+     "Sam set this line at sign-up: the pharmacy's own number, where a pharmacist answers.",
+     "911 or 988 come first when they're needed.",
+     "The plug-in lists which words go to this line: a medicine question, a missed dose, a mild side effect, or a refill.",
+     "Rosie never fills, refills or transfers a prescription. The pharmacy has its own system for that.",
+     "A shot or a medicine review can still be booked if the person asks for one."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "I can't answer medicine questions or handle refills. A pharmacist can: call Lee Pharmacy at (555) 010-0177. If it's an emergency, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-02",
+    "does": "Someone who can't easily leave home can have a home shot visit, with Lee Mobile Pharmacy. From here, that follows the other flow, where the business goes to the patient."
+   },
+   {
+    "op": "words",
+    "at": "A4-30",
+    "does": "Some shots come in a series, like the 2 shingles doses, 2 to 6 months apart. Only the first dose is booked here.",
+    "more": [
+     "The pharmacist books dose 2 at checkout, inside its window (A10-07).",
+     "If dose 2 can't be booked then, Rosie reminds the patient once when its window opens.",
+     "Each dose gets its own code when it's booked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-32",
+    "does": "Say a family books flu shots for three people on one morning. Rosie finds times side by side with Leo and Mei. Each person answers their own questions on the secure page."
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "does": "Some visits need a room as well as a person. A medicine review uses the pharmacy's private room, so two reviews can't overlap."
+   },
+   {
+    "op": "words",
+    "at": "A4-85",
+    "does": "Alex asks the AI to refill a prescription too. Rosie never fills, refills or transfers prescriptions: the pharmacy keeps its own system for that. It says so plainly and books nothing for it.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Pharmacy handles refills and prescriptions itself. Please call the pharmacy at (555) 010-0177. I can book shots and medicine reviews."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-16",
+    "more": [
+     "A patient often asks for the pharmacist who gave them shots before.",
+     "If Leo can't take it, the AI says so. It offers Leo's next open day, or another pharmacist."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-23",
+    "does": "The AI sends Rosie only Alex's name and mobile. The mobile isn't on file, so Alex is new to Lee Pharmacy, as Alex said.",
+    "more": [
+     "Alex is added to the pharmacy's list once the visit is booked.",
+     "If the record turns up later, it's joined to this booking on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-80",
+    "does": "The plug-in says if this work books children, from what age, and who must come along. A pharmacy books a child with a parent or guardian, only from the youngest age the state's form allows for each shot."
+   },
+   {
+    "op": "words",
+    "at": "A4-83",
+    "does": "Say Alex uses a wheelchair. The AI shares the pharmacy's own access details: the entrance and the parking. The pharmacist is told what helps."
+   },
+   {
+    "op": "words",
+    "at": "A6-01",
+    "more": [
+     "Rosie checked this before the secure page too.",
+     "Here it books right away: shots book without an OK.",
+     "A booking waits for Sam only if its answers need a pharmacist's look first, like a serious reaction to a past shot.",
+     "Pat, the office manager, never answers those. Only a pharmacist does."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my partner come into the private room with me?"
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. asks: Can my partner come into the private room with me?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "The pharmacy says yes."
+     ]
+    ],
+    "more": [
+     "No answer in 10 minutes: it goes to Sam, and Alex hears the pharmacy was asked.",
+     "At night, Alex is told it waits for the morning. Sam is texted at 8am.",
+     "A question about a shot or a medicine gets the pharmacy's own line, where a pharmacist answers. It isn't saved or passed on."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-15",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Sick, can't come in Saturday"
+     ],
+     [
+      "san",
+      "owner",
+      "Leo is out Sat Oct 24. A.M. is booked at 11:00am. Mei works the afternoon, but can come in early to stand in.",
+      {
+       "buttons": [
+        "Ask Mei in early",
+        "I'll call them"
+       ]
+      }
+     ]
+    ],
+    "more": [
+     "With no reply by 10:50am, Rosie asks Mei to come in early, and offers Alex that.",
+     "The plug-in says who may take each booking. Any pharmacist here may give these shots.",
+     "Mei works Saturday afternoons, and comes in to stand in when asked."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-21",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M. hasn't picked a new time for the visit Leo can't do Saturday. Please call A.M. The number is on the booking."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-07",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Leo couldn't enter A.M.'s check-in code after 3 tries. The visit goes on, and it counts once Leo texts DONE."
+     ],
+     [
+      "san",
+      "cust",
+      "The pharmacy couldn't enter your check-in code. That's OK: your visit goes on."
+     ],
+     [
+      "staff",
+      "san",
+      "DONE A.M."
+     ]
+    ],
+    "more": [
+     "At the pharmacy, Alex is already at the counter, so there's no door check.",
+     "Sam can look into it on the portal."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-67",
+    "does": "The plug-in says if a child may be left without a parent, like at a class or a camp. At the pharmacy, the parent or the adult they named stays for the shot and the wait, so nothing more happens."
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "t": "Sat Oct 24, 11:08am",
+    "does": "Leo gives the two shots, one in each arm, from the doses set aside. Each shot's lot number goes in the pharmacy's own record.",
+    "more": [
+     "Next: the 15-minute wait, then the record, then any share at the counter.",
+     "The doses come off the count as they're given."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "A shot visit at the pharmacy has no cancel period. A shot given can't be undone, and only a contract the state's rules cover gets one."
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Pharmacy",
+          "6 bookings · Leo 3, Mei 3"
+         ],
+         [
+          "Lee Mobile Pharmacy",
+          "3 visits"
+         ],
+         [
+          "Waiting on you",
+          "D.W.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Hi Sam, it's Rosie, recording as always. One request waits for Lee Pharmacy. It's a shot visit today at 2:00pm with Mei. The answers are on the secure page. Accept it?"
+     ],
+     [
+      "owner",
+      "san",
+      "Yeah, take it."
+     ],
+     [
+      "san",
+      "owner",
+      "Reading it back: accept the shot visit today at 2:00pm with Mei. Say yes to go ahead."
+     ],
+     [
+      "owner",
+      "san",
+      "Yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "t": "Sat Oct 24, 10:56am"
+   },
+   {
+    "op": "words",
+    "at": "A4-28",
+    "does": "Before the times, anything that changes which times can be offered. A shot always needs its vaccine in stock, so Alex's booking takes 'Vaccines set aside for it'."
+   },
+   {
+    "op": "more",
+    "at": "A4-21",
+    "more": [
+     "The flu dose and the shingles dose stay set aside with the saved time."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-10",
+    "more": [
+     "The vaccine count is checked once more, and the doses are set aside for this visit."
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "type": "split",
+      "line": [
+       "7.16"
+      ],
+      "who": "staff",
+      "via": "page",
+      "t": "Fri Oct 23, 9:00am",
+      "title": "Leo reads Alex's screening answers",
+      "q": "What does Leo decide?",
+      "does": "The working day before, Leo reads Alex's answers on the secure page. Only the pharmacist judges if a shot is right for a patient.",
+      "more": [
+       "Rosie never judges the answers, and never cancels on its own.",
+       "Answers that came in later are read before the shot, at the counter.",
+       "Here, nothing stands out."
+      ],
+      "rule": "Rosie's rule: only a pharmacist decides if a shot is right for a patient, and Rosie never reads or judges the answers. Why: screening is a pharmacist's work, and health details stay on the secure page.",
+      "needs": [
+       "booked",
+       "pf.first_steps"
+      ],
+      "branches": [
+       {
+        "label": "Nothing stands out",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Needs to talk first",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A7-x02",
+          "line": [
+           "7.16",
+           "7.5"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "call",
+          "title": "Leo calls Alex about one answer",
+          "does": "Say one answer needs a word first. Leo calls Alex, and notes what they decided in the pharmacy's own record. Rosie isn't part of the call.",
+          "more": [
+           "No answer by phone: they talk at the counter before any shot.",
+           "The visit stays booked either way."
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Not right at a pharmacy",
+        "end": "end",
+        "endText": "Cancelled after Leo's call. The doses go back, and nothing is charged.",
+        "steps": [
+         {
+          "id": "A7-x03",
+          "line": [
+           "7.16",
+           "7.12"
+          ],
+          "who": "staff",
+          "to": "san",
+          "via": "msg",
+          "title": "Leo calls, then cancels the visit",
+          "does": "Say a shot isn't right at a pharmacy for this patient. Leo calls Alex, explains, and suggests Alex's own doctor. Then Leo texts CANCEL, and the doses go back.",
+          "more": [
+           "Alex's text gives no reason: Leo said it on the call.",
+           "Nothing was taken, so nothing is charged."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "CANCEL A.M. Sat 11:00am, after my call"
+           ],
+           [
+            "san",
+            "cust",
+            "As Leo said on the phone, your Sat Oct 24 visit is cancelled. Nothing is charged."
+           ]
+          ],
+          "needs": [
+           "pf.messages"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.3",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "t": "Sat Oct 24, 11:03am",
+      "title": "Gives the vaccine information sheets",
+      "does": "Leo gives Alex the vaccine information sheet for each shot, before it's given, and answers Alex's questions.",
+      "more": [
+       "Every shot, every time, even when the patient read it on the secure page.",
+       "Alex can keep a printed copy, or read it again on the secure page.",
+       "Rosie never answers questions about a shot."
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.rules"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-37",
+    "does": "Say Alex has to leave right after the shots, before the 15-minute wait is over. Leo asks Alex to stay and says why. If Alex goes, Leo notes it in the pharmacy's record.",
+    "more": [
+     "Only what was given is billed.",
+     "A shot that wasn't given yet isn't given, and isn't billed.",
+     "Nothing more is done without Alex's yes."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "A.M. had to leave early. Noted on the page."
+     ],
+     [
+      "san",
+      "staff",
+      "Noted. If a shot wasn't given, text PART, and only what was given is billed."
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-43",
+    "steps": [
+     {
+      "id": "A8-x02",
+      "type": "split",
+      "line": [
+       "8.20",
+       "8.12"
+      ],
+      "who": "staff",
+      "via": "visit",
+      "t": "Sat Oct 24, 11:10am",
+      "title": "Watches Alex for 15 minutes",
+      "q": "How does Alex feel during the wait?",
+      "does": "Alex waits 15 minutes in the chairs by the counter, where staff can see Alex. Leo checks on Alex before Alex goes.",
+      "more": [
+       "Every patient waits after every shot. The pharmacist can ask for longer.",
+       "Fainting and serious reactions usually happen within minutes.",
+       "Leo's next shot visit can start while Alex waits."
+      ],
+      "rule": "Rosie's rule: a shot booking always includes a 15-minute wait after, and signs of a severe allergic reaction mean 911 right away. Why: fainting and serious reactions usually come within minutes.",
+      "needs": [
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "Feels fine",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Feels faint",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A8-x03",
+          "line": [
+           "8.20"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "visit",
+          "title": "Has Alex lie down; waits 15 more minutes",
+          "does": "Say Alex feels faint. Leo has Alex lie down with feet up, and Alex feels fine in a few minutes. Alex stays 15 more minutes.",
+          "more": [
+           "Leo notes it in the pharmacy's own record, never in a text.",
+           "Nobody is texted about it."
+          ],
+          "needs": [
+           "pf.visit"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Signs of a severe reaction",
+        "end": "end",
+        "endText": "Alex went to the hospital. Sam was told, and the reaction is reported.",
+        "steps": [
+         {
+          "id": "A8-x04",
+          "line": [
+           "8.20",
+           "8.6"
+          ],
+          "who": "staff",
+          "to": "san",
+          "via": "msg",
+          "title": "Follows the emergency plan; calls 911",
+          "does": "Say Alex has trouble breathing after the shot. Leo follows the pharmacy's emergency plan at once, including epinephrine, and calls 911. Sam is told, with no health detail.",
+          "more": [
+           "Leo stays with Alex until help comes.",
+           "Leo reports the reaction to the federal vaccine safety system, as the federal rules require.",
+           "The details stay in the pharmacy's own record, never in a text."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "EMERGENCY at the counter. 911 called. Details on the page."
+           ],
+           [
+            "san",
+            "owner",
+            "Leo called 911 during A.M.'s visit and is with A.M. now. Details: rosfield.com/i/a9"
+           ]
+          ],
+          "needs": [
+           "pf.visit",
+           "pf.safety"
+          ],
+          "tells": [
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-83",
+    "does": "Details that don't change the times come now, once the time is saved. Alex named plans, so Alex's booking takes 'The plan's benefit check'."
+   },
+   {
+    "op": "off",
+    "at": "S11-22",
+    "why": "Lee Pharmacy charges no one a fee (pf.money): every patient is fee-free, so the question is skipped.",
+    "label": "Yes: a fee may be asked"
+   },
+   {
+    "op": "more",
+    "at": "A8-14",
+    "more": [
+     "The doses set aside go back to the count."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's health companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "A home visit always needs the patient there.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Shot records stay with the pharmacy as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Home vaccines takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "A home visit always needs the patient there, so there's no visit with nobody home.",
+    "label": "The way in fails"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never left alone with the pharmacist at home: an adult on the booking is there (B8-09).",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Pharmacy work always needs a license: each pharmacist's, and the pharmacy's permit.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Health care books people (a pharmacist or a pharmacist), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Health care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each pharmacist and pharmacist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No health care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Home vaccines books a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A home visit is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Home vaccines sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "No home visit is sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "No home visit is sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Fri 8am"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Fri Oct 23, arriving 8 to 10am, with Priya?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-07",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sure. Pick a new time:",
+      {
+       "times": [
+        "Fri Oct 23 · arriving 8–10am · Priya",
+        "Mon Oct 26 · arriving 8–10am · Priya",
+        "Tue Oct 27 · arriving 8–10am · Priya"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "A"
+     ],
+     [
+      "san",
+      "cust",
+      "Moved: Fri Oct 23, arriving 8–10am, with Priya."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. moved to Fri Oct 23, arriving 8–10am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Priya from Lee Mobile Pharmacy is on the way, about 15 minutes. When Priya arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in.",
+      {
+       "photos": [
+        "Priya, from Lee Mobile Pharmacy"
+       ],
+       "photoLink": "rosfield.com/m/r4",
+       "code": "3906",
+       "buttons": [
+        [
+         "2",
+         "It isn't Priya"
+        ]
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "At the door, ask A.M. for their check-in code and text it here."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3906"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: A.M., 8–10."
+     ],
+     [
+      "san",
+      "cust",
+      "Priya from Lee Mobile Pharmacy is checked in for your 8–10am visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-05",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3960"
+     ],
+     [
+      "san",
+      "staff",
+      "That isn't A.M.'s code. Check it with A.M. and send it again."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-06",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Priya couldn't enter A.M.'s check-in code after 3 tries. The visit goes on, and it counts once Priya texts DONE."
+     ],
+     [
+      "san",
+      "cust",
+      "Priya couldn't enter your code. If the person at your door isn't Priya, don't let them in.",
+      {
+       "buttons": [
+        [
+         "2",
+         "It isn't Priya"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Priya you're home."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says they're home. Try the door again, and check in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-47",
+    "say": [
+     [
+      "cust",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. says Priya didn't visit on Thu Oct 22, and nothing was entered. Nothing is billed. Please check with Priya.",
+      {
+       "buttons": [
+        "Priya didn't go",
+        "A.M. wasn't home"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-47",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nothing was entered for A.M.'s Thu Oct 22 visit, and A.M. didn't answer. Nothing is billed until you check with Priya.",
+      {
+       "buttons": [
+        "Priya did it",
+        "It didn't happen"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-29",
+    "say": [
+     [
+      "san",
+      "owner",
+      "What do you need from N.S. first?",
+      {
+       "buttons": [
+        "One question",
+        "A call first"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-13",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BLOCK Thu 12-5"
+     ],
+     [
+      "san",
+      "owner",
+      "Block which business?",
+      {
+       "buttons": [
+        [
+         "A",
+         "Lee Pharmacy"
+        ],
+        [
+         "B",
+         "Lee Mobile Pharmacy"
+        ]
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "B"
+     ],
+     [
+      "san",
+      "owner",
+      "Block Thu Oct 29, 12 to 5pm at Lee Mobile Pharmacy? L.W. is booked, arriving 12 to 2pm.",
+      {
+       "buttons": [
+        "Block; offer new times",
+        "Block around it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-23",
+    "does": "The plug-in gives the state's form: what to ask, and what stops home vaccines from going live. Here it's each pharmacist's own license, and any vaccine training the form asks for.",
+    "more": [
+     "Where a state has no data feed, a person on Rosie's team checks the state's own site and keeps a screenshot.",
+     "Where the state asks for liability insurance, the form asks for it here too.",
+     "Each person's own license comes later, with their invite reply.",
+     "Home shot visits go live only where the state's rules allow them."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state licenses each pharmacist who gives shots, and may ask for vaccine training too. What's your pharmacist license number?"
+     ],
+     [
+      "owner",
+      "san",
+      "Mine, EX-RPH-1042"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it. Let's keep going."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "A kind of work goes live once it's set up. Each person is offered once Sam says yes.",
+    "more": [
+     "Sam doesn't run the shot clinics himself, so shot clinics wait for Priya, who does.",
+     "Whose papers count comes from the state's form: the company's, each person's, or both."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Where you work, the state's form for shot clinics asks for each pharmacist's license and vaccine training. It may also ask for a notice for each clinic site."
+     ],
+     [
+      "san",
+      "owner",
+      "Shot clinics is set up. AI assistants can book it now. You'll add your people at the end. Next, Lee Pharmacy: about 5 minutes.",
+      {
+       "buttons": [
+        "Start"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "does": "The plug-in says the state licenses each pharmacist and gives the pharmacy a permit. Sam may give the pharmacy's permit number. It's optional, and Rosie doesn't check it.",
+    "more": [
+     "Each pharmacist sends their own license number with their invite reply.",
+     "Each pharmacist can link their own calendar when they join."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "The state licenses each pharmacist, and gives the pharmacy a permit. What's the pharmacy's permit number?"
+     ],
+     [
+      "owner",
+      "san",
+      "EX-PHY-2098"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's optional, and I show it as you gave it; I don't check it."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Pharmacy",
+       "At the patient's home",
+       "Pharmacist license EX-RPH-1042",
+       "Yes"
+      ],
+      [
+       "Priya Price",
+       "Lee Mobile Pharmacy",
+       "At the patient's home, and at clinics",
+       "Pharmacist EX-RPH-3155, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Tomas Moore",
+       "Lee Mobile Pharmacy",
+       "At the patient's home",
+       "Pharmacist, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Pharmacy",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Leo Chen",
+       "Lee Pharmacy",
+       "At the pharmacy, and by video",
+       "Pharmacist EX-RPH-2187, as given, not checked",
+       "Once Sam says yes"
+      ],
+      [
+       "Mei Diaz",
+       "Lee Pharmacy",
+       "At the pharmacy, and by video",
+       "Pharmacist, as given, not checked",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "does": "Alex uses any AI assistant, like ChatGPT, Claude or Gemini. The AI passes on the shots, the area and the day. No name, phone or street address yet.",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I can't get out of the house since my hip operation. Can a pharmacist from Lee Mobile Pharmacy give me a flu shot and a COVID-19 shot at home Thursday morning? I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety words come first. Then the booking goes on. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "Rosa asks about taking her medicines before a shot. Rosie never answers medicine questions.",
+     "It gives the pharmacy's own line, where a pharmacist answers, then offers the soonest visit."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "¿Puedo tomar mis pastillas antes de la vacuna? Y quiero una visita en casa.",
+      {
+       "lang": "es",
+       "en": "Can I take my pills before the shot? And I'd like a home visit.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Esa pregunta la contesta un farmacéutico: llame a la farmacia al (555) 010-0177. Si es una emergencia, llame al 911. Puedo reservar su visita.",
+      {
+       "lang": "es",
+       "en": "A pharmacist answers that: call the pharmacy at (555) 010-0177. If it's an emergency, call 911. I can book your visit.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "Gracias. Quiero la primera visita.",
+      {
+       "lang": "es",
+       "en": "Thanks. I want the first visit.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No repeat plan: each follow-up home visit is booked on its own, at the visit.",
+    "label": "Repeat visits: a plan"
+   },
+   {
+    "op": "words",
+    "at": "B4-27",
+    "does": "Say Alex's daughter will let the pharmacist in. Her name and mobile go on the secure page. She gets the visit texts and the code. Alex gets a copy without the code.",
+    "more": [
+     "Rosie texts her only on Alex's word that she agreed to texts.",
+     "Alex is still the patient: Alex's answers stay on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-69",
+    "does": "Where the plug-in says the business may show customers' photos, the page asks once. A health practice never shows patients' photos, so this isn't asked.",
+    "more": [
+     "A no never changes the booking."
+    ],
+    "say": [],
+    "form": [
+     [
+      "May Lee Mobile Pharmacy show photos?",
+      "Not asked: a health practice never shows them"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "No home visit needs a written contract.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "more": [
+     "The offer comes first when the plug-in or Sam says a new person needs an OK.",
+     "It also comes first when Alex asked for Priya by name.",
+     "No reply by 8pm Wed: Sam is asked to call, since nobody new comes without the patient's yes.",
+     "Tomas is a pharmacist, so he can do Alex's home visit."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "why": "No repeat plan here (B4-43): a second dose is its own booking.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "No repeat plan here (B4-43): a second dose is its own booking.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "No repeat plan here (B4-43): a second dose is its own booking.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "t": "Thu Oct 22, 8:48am",
+    "does": "After the wait, Priya goes over the visit with Alex in person: what to expect, and any next dose. Anything Alex asks about is answered before DONE.",
+    "more": [
+     "The plug-in names what's checked: how Alex feels after the wait, and the shot record.",
+     "Questions after the visit go to the pharmacy's own line, where a pharmacist answers."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "does": "Priya adds notes for next time on the secure page. They go in Alex's private record, never in a text to Alex.",
+    "more": [
+     "Whoever sees Alex next sees them, a stand-in too.",
+     "Alex can get a copy with the other records.",
+     "Any text says only 'notes added'. The shot details stay in the pharmacy's own records."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE added for A.M. on the secure page"
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to A.M.'s private record."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "No home vaccines are billed in stages."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No repeat plan here (B4-43), so there's no monthly bill for visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "A plan visit is billed the pharmacy's own way. Rosfield's bill is only for a self-pay patient.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam set cards only (S1-57), and no bill here is that big."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Nobody else pays at booking here (B4-78)."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "why": "A shot has no free-fix visit: a worry after a shot goes to the pharmacy's own line, or 911 (B10-22).",
+    "label": "Alex asks for a fix"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "No proposals: more care is booked as its own visit (B10-18).",
+    "label": "The business sends a proposal"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "A shot visit has no results to send later. The shot record is given at the visit (B8-56).",
+    "label": "Results ready later"
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "The state's lookup doesn't find license EX-RPH-1042 under Sam's name. Sam sends a photo of the license, and Rosie checks it again right away.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We couldn't find pharmacist license EX-RPH-1042 for Sam Lee on the state's lookup. Check the number and the name as printed on the license. Or send a photo of it here."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Pharmacist license"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Home vaccines goes live at 2:16pm, and Sam can be booked on his own pharmacist license."
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "more": [
+     "The pharmacy plug-in loads the same way, for the pharmacy's own company.",
+     "Calls to (555) 010-0177 can use the voice AI the same way, if Sam turns it on.",
+     "Questions only a pharmacist should answer go to the pharmacy's own line, (555) 010-0177.",
+     "Sam's calendar, linked for home vaccines, now blocks his hours at the pharmacy too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The plug-in says where shots outside a pharmacy are allowed, and who may give them. Rosie checks before any visit away from the pharmacy is offered."
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The pharmacy's permit EX-PHY-2098 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way shot clinics was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Home vaccines",
+          "Now"
+         ],
+         [
+          "Shot clinics",
+          "Once Priya is confirmed and you say yes"
+         ],
+         [
+          "Lee Pharmacy",
+          "Its registration is on file as given, not checked. It shows once you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Tomas Moore"
+     ],
+     [
+      "Company",
+      "Lee Mobile Pharmacy"
+     ],
+     [
+      "Kinds of work",
+      "Home vaccines"
+     ],
+     [
+      "Visits",
+      "Home shot visit"
+     ],
+     [
+      "Hours",
+      "Mon–Sat 7:30am–5pm"
+     ],
+     [
+      "Tomas agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-31",
+    "more": [
+     "Jobs sent now are never offered.",
+     "The owner can set who's on call later on the Team page, if the plug-in allows it.",
+     "Someone who wants a shot today gets the soonest same-day time, or walks in at the pharmacy."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone who works with you have their own business? Like a nurse who runs her own clinic, or a dietitian who rents a room.",
+      {
+       "buttons": [
+        "No",
+        "Yes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Pharmacy can book you for home vaccines and shot clinics from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Priya"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pharmacy can book you from now on, at the pharmacy and by video. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Leo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Pharmacy can book you from now on, at the pharmacy and by video. Your day list comes at the time you picked.",
+      {
+       "as": "Mei"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Shot clinics and Lee Pharmacy now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-63",
+    "form": [
+     [
+      "Each charge",
+      "Who paid, what for, and the exact words they agreed to"
+     ],
+     [
+      "Its costs",
+      "Stripe's card fee, and Rosfield's $2 per booking"
+     ],
+     [
+      "Fees waiting on you",
+      "None: neither business charges fees"
+     ],
+     [
+      "Refunds",
+      "Any amount, here"
+     ],
+     [
+      "Payouts",
+      "Shown by Stripe; Rosie never pays out"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "more": [
+     "Home vaccines, shot clinics and the pharmacy's visits need one, so Sam's three take the license step."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-01",
+    "does": "Every way in reaches the same booking desk, with the same rules. The main story: Alex asks an AI for a home visit on Mon Oct 19, 6:40pm."
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero una visita a casa.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like a home visit.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Mobile Pharmacy. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Mobile Pharmacy. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-13",
+    "does": "Someone calls for a vet: a wrong number. Rosie says whose line this is, once. Only the call log keeps it.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Is this Oak Street Vet? I need to move my cat's shots.",
+      {
+       "as": "a wrong number"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "This is Lee Mobile Pharmacy's booking line, so I can't reach Oak Street Vet. Please check their number. Goodbye.",
+      {
+       "as": "a wrong number"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Should I keep taking my blood pressure pills before the shots?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't answer medicine questions. A pharmacist can: call the pharmacy at (555) 010-0177. If it's an emergency, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "does": "The request turns out to be a prescription refill. Rosie never fills, refills or transfers prescriptions, so it says so plainly. Nothing is saved.",
+    "more": [
+     "The pharmacy keeps its own system for prescriptions.",
+     "The AI can still book a shot or a medicine review, if Alex asks."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Mobile Pharmacy books shots and medicine reviews only. For a refill, call the pharmacy at (555) 010-0177. Nothing was saved."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-77",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Mobile Pharmacy comes to you in Springfield. Is the visit at a home, or somewhere else?"
+     ],
+     [
+      "cust",
+      "agent",
+      "At my home."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-31",
+    "does": "Say another customer's AI asks for a visit in Riverton, 40 miles away. Rosie says so before any times. Nothing is saved, and the AI can look elsewhere."
+   },
+   {
+    "op": "words",
+    "at": "B4-44",
+    "does": "Some shots come in a series, like the 2 shingles doses. Only the first is booked here. The pharmacist books dose 2 at the visit, inside its window."
+   },
+   {
+    "op": "words",
+    "at": "B4-62",
+    "does": "Say Alex names a plan only now. Before the times, the AI asks only the plan's name, since a plan can limit which pharmacy may give a shot."
+   },
+   {
+    "op": "words",
+    "at": "B4-23",
+    "more": [
+     "Rosie checks again before it writes the booking.",
+     "A visit Sam adds by hand, or an event on Priya's phone calendar, could still take it.",
+     "The flu dose and the COVID-19 dose stay set aside with the saved time."
+    ],
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "Rosie checks again before it writes the booking.",
+       "A visit Sam adds by hand, or an event on Priya's phone calendar, could still take it.",
+       "The flu dose and the COVID-19 dose stay set aside with the saved time."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Anything that helps the visit, like pets or stairs?"
+     ],
+     [
+      "cust",
+      "agent",
+      "I use a walker for now, so please knock and give me a minute. The dog will be in another room."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-25",
+    "more": [
+     "A returning patient's record shows past visits and notes for the pharmacist.",
+     "New or returning is checked again here, where it matters."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-26",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Will you be home to let the pharmacist in?",
+      {
+       "buttons": [
+        "Yes, I'll be there",
+        "Someone else will"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "form": [
+     [
+      "Form",
+      "Screening questions and consent"
+     ],
+     [
+      "Due",
+      "Now, while booking"
+     ],
+     [
+      "Answered by",
+      "Alex M."
+     ]
+    ],
+    "more": [
+     "The questions: feeling sick today, allergies, and any past reaction or fainting with a shot.",
+     "Then pregnancy, a weak immune system, and recent shots.",
+     "The vaccine information sheets are on the page to read ahead. Priya gives them again at the door.",
+     "Only the pharmacist reads the answers. They never go in a text."
+    ],
+    "does": "The plug-in puts the screening questions and the consent on the secure page that comes next. Alex answers them now, within the saved time.",
+    "vary": {
+     "booking:shop": {
+      "more": [
+       "The questions: feeling sick today, allergies, and any past reaction or fainting with a shot.",
+       "Then pregnancy, a weak immune system, and recent shots.",
+       "The vaccine information sheets are on the page to read ahead. Priya gives them again at the door.",
+       "Only the pharmacist reads the answers. They never go in a text."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "more": [
+     "Building rules, like a homeowners' group's work hours or proof of insurance, go to Sam to check.",
+     "The plug-in adds its own questions, like who meets the pharmacist."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "If Alex named a plan before the times, it's checked here. The time is saved and the secure page is open, so Alex can get texts. Most patients name one."
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "4"
+     ],
+     [
+      "san",
+      "owner",
+      "What's the change?"
+     ],
+     [
+      "owner",
+      "san",
+      "Tomas instead of Priya, same time"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Thu Oct 22, arriving 8–10am, with Tomas?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another change"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "does": "Sam says yes with one change, like another pharmacist or a shorter visit. Rosie reads it back, and nothing goes to Alex until Sam says send it."
+   },
+   {
+    "op": "words",
+    "at": "B6-11",
+    "more": [
+     "Priya's and Tomas's times both show: either can do a home visit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-19",
+    "does": "Rosie offers only a stand-in with the skill for the job, from Sam's team list. Tomas does home vaccines, so Tomas can stand in."
+   },
+   {
+    "op": "words",
+    "at": "B7-27",
+    "say": [
+     [
+      "cust",
+      "san",
+      "I'm on my way back from the doctor, and my ride is running late. I'll be home 30 minutes late, sorry!"
+     ],
+     [
+      "san",
+      "cust",
+      "Priya can come 30 minutes later if the next visit allows, or you can pick another time.",
+      {
+       "buttons": [
+        "Come later",
+        "Another time"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-10",
+    "does": "Rosie checks the calendars and the vaccine count once more, then saves the booking. The doses are set aside. The visit shows on Priya's phone calendar too."
+   },
+   {
+    "op": "words",
+    "at": "B8-24",
+    "does": "Priya gives the shingles shot too. A right to cancel goes in writing only where the state's rules give one for care sold at the home. A shot given can't be undone.",
+    "more": [
+     "Here, the plug-in's rules give none, so no notice goes.",
+     "The 15-minute wait covers every shot.",
+     "Dose 2 is booked before Priya leaves (B10-18)."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE getting a form from the car, back 8:35"
+     ],
+     [
+      "san",
+      "cust",
+      "Priya went to the car for a form and will be back about 8:35am."
+     ]
+    ],
+    "does": "Priya steps out to the car for a form. Rosie tells Alex in the business's name, inside text hours, with the time she'll be back."
+   },
+   {
+    "op": "words",
+    "at": "B7-18",
+    "does": "Say Alex's visit runs long, so Priya will reach Kim about 10:30am. That's still inside Kim's window, so Kim just hears the new time."
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Pharmacy",
+          "6 bookings"
+         ],
+         [
+          "Lee Mobile Pharmacy",
+          "3 visits · Priya 2, Tomas 1"
+         ],
+         [
+          "Waiting on you",
+          "N.S.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-15",
+    "say": [
+     [
+      "owner",
+      "san",
+      "PAUSE"
+     ],
+     [
+      "san",
+      "owner",
+      "Pause which business?",
+      {
+       "buttons": [
+        [
+         "A",
+         "Lee Pharmacy"
+        ],
+        [
+         "B",
+         "Lee Mobile Pharmacy"
+        ],
+        [
+         "C",
+         "Both"
+        ]
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "B"
+     ],
+     [
+      "san",
+      "owner",
+      "Paused: Lee Mobile Pharmacy takes no new bookings until you text RESUME. You still have 3 visits today.",
+      {
+       "buttons": [
+        "Keep them",
+        "Move them"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Hi Sam, it's Rosie, recording as always. One request waits for Lee Mobile Pharmacy. It's a home shot visit today, arriving 3 to 5pm, with Priya. Accept it?"
+     ],
+     [
+      "owner",
+      "san",
+      "Yeah, take it."
+     ],
+     [
+      "san",
+      "owner",
+      "Reading it back: accept the home shot visit for today, arriving 3 to 5pm, with Priya. Say yes to go ahead."
+     ],
+     [
+      "owner",
+      "san",
+      "Yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-41",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Today, Fri Oct 23, for each business:",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Pharmacy",
+          "1 missed visit · nothing waits on you · first tomorrow: 10:00am"
+         ],
+         [
+          "Lee Mobile Pharmacy",
+          "1 missed visit · nothing waits on you · next visit: Mon 8 to 10am, Priya"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-43",
+    "does": "Rosie checks the day, finds the visits it touches, and pauses new ones for Tomas that day.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OFF Fri Oct 30",
+      {
+       "as": "Tomas"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Off all day Fri Oct 30: that touches 3 visits. I've asked Sam.",
+      {
+       "as": "Tomas"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-44",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Tomas asks for Fri Oct 30 off, all day. 3 visits that day.",
+      {
+       "buttons": [
+        "OK",
+        "Say no"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-79",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Still waiting on you: Tomas asks for Fri Oct 30 off, all day. 3 visits that day.",
+      {
+       "buttons": [
+        "OK",
+        "Say no"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 visits at Lee Mobile Pharmacy this week under different names, and nobody was home for any of them. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-28",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Mobile Pharmacy can't take this booking online today. Please call (555) 010-0142."
+     ],
+     [
+      "san",
+      "owner",
+      "Flag: one address tried to book more visits today than the plug-in allows. Nothing was booked. Rosie's team will check it within 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "No home visit is sent now, and nobody is on call.",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Care already given can't be cancelled; the plug-in's rules give no cancel period for it."
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "The plug-in says if a shot needs a first step. Here: the screening questions and the consent on the secure page, so Alex's booking takes 'A form signed on the secure page'."
+   },
+   {
+    "op": "before",
+    "at": "B7-55",
+    "steps": [
+     {
+      "id": "B7-x01",
+      "type": "split",
+      "line": [
+       "7.16"
+      ],
+      "who": "staff",
+      "via": "page",
+      "t": "Wed Oct 21, 9:00am",
+      "title": "Priya reads Alex's screening answers",
+      "q": "What does Priya decide?",
+      "does": "The working day before, Priya reads Alex's answers on the secure page. Only the pharmacist judges if a shot is right for a patient.",
+      "more": [
+       "Rosie never judges the answers, and never cancels on its own.",
+       "Answers that came in later are read at the door, before any shot.",
+       "Here, nothing stands out."
+      ],
+      "rule": "Rosie's rule: only a pharmacist decides if a shot is right for a patient, and Rosie never reads or judges the answers. Why: screening is a pharmacist's work, and health details stay on the secure page.",
+      "needs": [
+       "booked",
+       "pf.first_steps"
+      ],
+      "branches": [
+       {
+        "label": "Nothing stands out",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Needs to talk first",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B7-x02",
+          "line": [
+           "7.16",
+           "7.5"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "call",
+          "title": "Priya calls Alex about one answer",
+          "does": "Say one answer needs a word first. Priya calls Alex, and notes what they decided in the pharmacy's own record. Rosie isn't part of the call.",
+          "more": [
+           "No answer by phone: they talk at the door before any shot.",
+           "The visit stays booked either way."
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Not right at home",
+        "end": "end",
+        "endText": "Cancelled after Priya's call. The doses go back, and nothing is charged.",
+        "steps": [
+         {
+          "id": "B7-x03",
+          "line": [
+           "7.16",
+           "7.12"
+          ],
+          "who": "staff",
+          "to": "san",
+          "via": "msg",
+          "title": "Priya calls, then cancels the visit",
+          "does": "Say a shot isn't right for this patient outside a doctor's office. Priya calls Alex, explains, and suggests Alex's own doctor. Then Priya texts CANCEL.",
+          "more": [
+           "Alex's text gives no reason: Priya said it on the call.",
+           "Nothing was taken, so nothing is charged. The doses go back to the count."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "CANCEL A.M. Thu 8-10am, after my call"
+           ],
+           [
+            "san",
+            "cust",
+            "As Priya said on the phone, your Thu Oct 22 visit is cancelled. Nothing is charged."
+           ]
+          ],
+          "needs": [
+           "pf.messages"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-18",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.3",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "t": "Thu Oct 22, 8:25am",
+      "title": "Gives the vaccine information sheets",
+      "does": "Priya gives Alex the vaccine information sheet for each shot, before it's given, and answers Alex's questions.",
+      "more": [
+       "Every shot, every time, even when the patient read it on the secure page.",
+       "Alex can keep a printed copy, or read it again on the secure page.",
+       "Rosie never answers questions about a shot."
+      ],
+      "needs": [
+       "pf.visit",
+       "pf.rules"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-19",
+    "steps": [
+     {
+      "id": "B8-x02",
+      "line": [
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "t": "Thu Oct 22, 8:30am",
+      "title": "Priya gives the shots",
+      "does": "Priya gives the flu shot and the COVID-19 shot, one in each arm, from the doses she brought. Each lot number goes in the pharmacy's own record.",
+      "more": [
+       "The doses come off the count as they're given.",
+       "Next: the 15-minute wait, with Priya there."
+      ],
+      "needs": [
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "before",
+    "at": "B8-39",
+    "steps": [
+     {
+      "id": "B8-x03",
+      "type": "split",
+      "line": [
+       "8.20",
+       "8.12"
+      ],
+      "who": "staff",
+      "via": "visit",
+      "t": "Thu Oct 22, 8:32am",
+      "title": "Waits 15 minutes with Alex",
+      "q": "How does Alex feel during the wait?",
+      "does": "Priya stays with Alex for 15 minutes after the shots, with Alex seated. She checks on Alex before she goes.",
+      "more": [
+       "Every patient waits after every shot, at home too. The pharmacist can ask for longer.",
+       "Fainting and serious reactions usually happen within minutes.",
+       "Priya's next window allows for the wait."
+      ],
+      "rule": "Rosie's rule: a shot booking always includes a 15-minute wait after, and signs of a severe allergic reaction mean 911 right away. Why: fainting and serious reactions usually come within minutes.",
+      "needs": [
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "Feels fine",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Feels faint",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "line": [
+           "8.20"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "visit",
+          "title": "Has Alex lie down; stays 15 more minutes",
+          "does": "Say Alex feels faint. Priya has Alex lie down with feet up, and Alex feels fine in a few minutes. Priya stays 15 more minutes.",
+          "more": [
+           "Priya notes it in the pharmacy's own record, never in a text.",
+           "If the next visit runs late, that patient is told the new time (B8-33)."
+          ],
+          "needs": [
+           "pf.visit"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Signs of a severe reaction",
+        "end": "end",
+        "endText": "Alex went to the hospital. Sam was told, and the reaction is reported.",
+        "steps": [
+         {
+          "id": "B8-x05",
+          "line": [
+           "8.20",
+           "8.6"
+          ],
+          "who": "staff",
+          "to": "san",
+          "via": "msg",
+          "title": "Follows the emergency plan; calls 911",
+          "does": "Say Alex has trouble breathing after the shots. Priya follows the pharmacy's emergency plan at once, including epinephrine, and calls 911. Sam is told, with no health detail.",
+          "more": [
+           "Priya stays with Alex until help comes.",
+           "Priya reports the reaction to the federal vaccine safety system, as the federal rules require.",
+           "Her next visits are moved by Sam, with no fee."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "EMERGENCY at a visit. 911 called. Details on the page."
+           ],
+           [
+            "san",
+            "owner",
+            "Priya called 911 at A.M.'s visit and is with A.M. now. Details: rosfield.com/i/b9"
+           ]
+          ],
+          "needs": [
+           "pf.visit",
+           "pf.safety"
+          ],
+          "tells": [
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-22",
+    "why": "Lee Mobile Pharmacy charges no one a fee (pf.money): every patient is fee-free, so the question is skipped.",
+    "label": "Yes: a fee may be asked"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   },
+   {
+    "op": "off",
+    "at": "B4-14",
+    "why": "A shot is priced by the plan or self-pay list, not at a visit: nothing is promised as a visit fee."
+   }
+  ]
+ },
+ "notes": "From: primary-care (the current, reviewed family-practice overlay, itself from pediatrician and the dentist pilot). Why: a pharmacy's shots run like a clinic's booked visits, not a walk-in line (urgent-care): short visits of a set length booked with a named pharmacist, the plan checked by hand at booking, health answers only on the secure page, nothing taken at booking, any share paid at the counter, no $2 for a health practice. Its flow B (a house call for someone who can't easily leave home, plan billed the business's own way, or Rosfield's bill for self-pay) is exactly a pharmacy's home shot visit. What it lacked is added: the vaccine count (A4-40, A4-x03, A4-x04, B4-51), the pharmacist's review of the screening answers the working day before (A7-x01, B7-x01), the information sheet before each shot (A8-x01, B8-x01), the 15-minute watched wait with a 911 path (A8-x02, B8-x03), the registry record (A8-52, B8-56), and dose 2 booked at checkout (A10-07, B10-18). Dropped from the pilot: new patients needing Sam's OK, the teen's private visit, the $20 no-show fee and its card path, the nurse line.\nNames: Sam Lee, a pharmacist, owns Lee Mobile Pharmacy LLC (the master's main company: home vaccines, plus workplace and care home shot clinics as its second kind of work, 610 Main St) and Lee Pharmacy LLC (the second company: the pharmacy, 260 Willow Ave, (555) 010-0177). Pat stays the office manager and never answers anything a pharmacist must. Riley and Avery became Leo and Mei (pharmacists at the pharmacy); Jordan and Casey became Priya and Tomas (pharmacists for home visits; Priya also runs shot clinics). Alex M. is the patient in both flows (no pronoun). Nora is a master name in B, so it isn't used for staff. License numbers use an obviously fake format (EX-RPH-1042, EX-PHY-2098).\nFlow A story: Wed Oct 21 7:15pm Alex asks an AI for a flu shot and a first shingles shot on Saturday; link 7:18, yes 7:24, booked 7:25 with both doses set aside; Leo reads the screening answers Fri 9:00am, reminder Fri 10:00am; day list Sat 8:00am, at the counter 10:55, code 10:56, answers and how Alex feels 11:00, information sheets 11:03, shots 11:08, the wait 11:10 to 11:25, record 11:27, $0 at the counter 11:30, dose 2 booked for Sat Jan 23 at checkout, rating 4pm.\nFlow B story: Mon Oct 19 6:40pm Alex, home after a hip operation, asks for a flu shot and a COVID-19 shot at home; booked 6:48 with the doses set aside; Priya reads the answers Wed 9:00am, reminder Wed 10:00am; day list Thu 7:00am, OMW 8:05, check-in 8:20, answers 8:22, sheets 8:25, shots 8:30, the wait 8:32 to 8:47, goes over the visit 8:48, record 8:52, DONE 8:55; self-pay bill 8:57 ($245 = $45 + $160 + the $40 home visit charge), receipt 9:00, rating 11:00am.\nPrices are the example pharmacy's own, from the old flowchart: flu shot $45 ($85 for the 65+ kind), COVID-19 $160, shingles $230 a dose, RSV $310, Tdap $75, medicine review $45 or free when the drug plan includes the patient; home visit charge $40 plus each shot; workplace clinic flu shot $35 a person. A plan pays its own fee, often leaving nothing for the patient; never promised.\nMoney A: list|none|counter only. Nothing is ever taken before; any share, a self-pay price or a review's price is paid at the counter (a video review's by the counter's own phone line). No card path: no fee to cancel or miss, ever, so every patient is fee-free (S11-22's fee branch off). Left out: holds, deposits, full price, photos and visit pricing, Rosfield's bill, the saved card.\nMoney B: list|none|own is the main path (the pharmacy bills the plans its own way); list|none|bill is a self-pay home visit with Rosfield's bill at DONE. Left out: cards, holds, deposits, full price, photos and visit pricing. Sign-up words (S1-12 to S1-18, S1-41 to S1-51) follow these paths; Lee Pharmacy's Stripe is only for a bill Sam might have Rosie text.\nScreening: the questions (feeling sick, allergies, past reactions or fainting with a shot, pregnancy, a weak immune system, recent shots) and the consent are answered on the secure page while booking, within the saved time, like the old chart's 15-minute hold; a booking the pharmacy makes by phone gets them by a set hour the day before (A7-74, B7-61). Only the pharmacist reads and judges them; Rosie never cancels on its own.\nStock: a shot is offered only while it's in stock; the doses are set aside with the saved time, checked again when booked, and go back on a lapse, cancel or no-show. A late delivery (A7-37, B7-34) or a fridge alarm (A7-38) finds every booking it touches; texts never name the shot.\nSafety: signs of a severe allergic reaction, chest pain, stroke signs and heavy bleeding get 911 at once; an overdose gets Poison Help; crisis words get 988 (master). A medicine question, a side effect or a refill gets the pharmacy's own line, where a pharmacist answers. Rosie never fills, refills or transfers prescriptions (A3-26, A4-38, B4-03, pf.rules.noPrescriptions).\nState switches only: the youngest age a pharmacist may vaccinate and which shots need a prescriber's order (A4-24, A4-25, A4-48, A4-70, B4-42), extra vaccine training, technicians giving shots, home visits and clinics away from the pharmacy, registry reporting and any consent for it. Nothing names a state or city.\nTexts: a customer text carries only the business, date, time and place (B keeps the pharmacist's name for the door check); never a shot's name, a medicine or an answer. Owner and staff texts use initials and a link. A8-38 is someone else hurt at the counter; feeling faint after a shot is the wait's own branch, with no texts.\nPlug-in splits: A4-70 kept (children: the state's form and the pharmacy's own setting decide, so both branches stay), A7-61 kept (Mei may stand in, or nobody), A8-02 kept (all here, or something missing). Walk-ins: 'A line for the next person' only. Every other plug-in split has its unused branches off.\nStand-ins: nobody is moved to another pharmacist without the patient's yes (A7-21, B7-22 hold the time and ask Sam to call).\nFlow B what-ifs: a building manager's flu clinic for 20 staff (B4-46), Brookside care home's monthly shot day (S1-59, B4-66), an extra shingles dose from the cooler with dose 2 saved as a reminder past the 14-day books-ahead (B8-23, B10-18). Lee Pharmacy books doses up to 6 months ahead (S1-47).\nB8-24: a shot given at the home can't be undone, so no cancel period applies; B10-05's 'Cancels' branch is off, as in the pilot. B7-05 'Alex cancels late' is off: any cancel is free.\nS2-16: prices are the same whoever goes, so the story takes '1 Yes, the same (Sam)'; S2-17 is a what-if ($50 vs $40).\nKept words: none. Pilot words left: none (check-prof clean). Ops on branches turned off were removed; the pilot's words for money paths this work doesn't list were dropped.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "For the color and cut, it's charged only for the shop's $20 fee, and only after Sam says yes.",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Each service starts the way most barbershops set it.",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Haircuts already booked keep only their saved card.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A haircut could mean a salon or a barbershop.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Haircuts at the shop work like this:",
+    "Reminds Alex before free cancel ends",
+    "Lee's Barbershop doesn't do perms.",
+    "Notes what's there before the work",
+    "Signature cut and hot towel shave",
+    "Do you do kids cuts? My son is 8.",
+    "Books the next visit at the chair",
+    "Books a haircut and a beard trim",
+    "like a burst pipe or a lockout",
+    "Next visit booked at checkout",
+    "Welcome to Lee's Barbershop!",
+    "Riley finishes the work",
+    "plumbing and electrical",
+    "Barber license number",
+    "Haircut at home · $75",
+    "Haircuts never pause.",
+    "Lee's Barbershop LLC",
+    "priced at the chair",
+    "Priced at the chair",
+    "Lee Home Services",
+    "Color correction",
+    "Lee's Barbershop",
+    "color correction",
+    "Groom's package",
+    "is at the chair",
+    "Barber license",
+    "Drain clearing",
+    "Color and cut",
+    "color and cut",
+    "color and cut",
+    "water heaters",
+    "groom's party",
+    "1200 Main St",
+    "water heater",
+    "shop's board",
+    "at the chair",
+    "At the chair",
+    "NEW massage",
+    "House calls",
+    "house calls",
+    "price board",
+    "barbershop",
+    "electrical",
+    "Electrical",
+    "Barbershop",
+    "beard trim",
+    "hot towel",
+    "88 Elm St",
+    "skin fade",
+    "Skin fade",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "plumbing",
+    "Plumbing",
+    "Haircut",
+    "haircut",
+    "haircut",
+    "massage",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Barber",
+    "shaves",
+    "barber",
+    "heater",
+    "Jordan",
+    "beard",
+    "Beard",
+    "shave",
+    "valve",
+    "Riley",
+    "Avery",
+    "Casey",
+    "shops",
+    "cape",
+    "pipe",
+    "Lena",
+    "shop",
+    "Shop"
+   ],
+   "B": [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Its money card is set the way most barbershops start.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "CANT START no proof Alex may have this work done",
+    "BEFORE old water stain on the cabinet floor",
+    "Here are the rules barbershops often set.",
+    "Drain clearings already booked keep $179",
+    "The $160 valve quote is good for 7 days.",
+    "Willow Home Warranty, the basic plan.",
+    "Which home warranty plan should pay?",
+    "Shutoff valve and wall pipe · $540",
+    "Replace both shutoff valves · $160",
+    "Sam switches the drain clearing",
+    "like a burst pipe or a lockout",
+    "Saved: drain clearing $199",
+    "The $179 drain needs none.",
+    "corroded shutoff valves",
+    "NEW heating and cooling",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "plumbing and electrical",
+    "A plan or warranty pays",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "The $160 valve quote",
+    "heating and cooling",
+    "Lee Home Services'",
+    "home warranty plan",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Drain clearings",
+    "shutoff valves",
+    "Drain clearing",
+    "drain clearing",
+    "drain clearing",
+    "shutoff valve",
+    "Shutoff valve",
+    "water heaters",
+    "warranty plan",
+    "Service call",
+    "service call",
+    "1200 Main St",
+    "water heater",
+    "1200 Main St",
+    "service call",
+    "valve quote",
+    "House calls",
+    "house calls",
+    "overflowing",
+    "barbershop",
+    "water line",
+    "dishwasher",
+    "electrical",
+    "Electrical",
+    "Barbershop",
+    "beard trim",
+    "hot towel",
+    "{{price}}",
+    "88 Elm St",
+    "42 Oak St",
+    "plumbing",
+    "Plumbing",
+    "Haircut",
+    "haircut",
+    "haircut",
+    "cabinet",
+    "shutoff",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "valves",
+    "shaves",
+    "barber",
+    "heater",
+    "faucet",
+    "Jordan",
+    "valve",
+    "beard",
+    "shave",
+    "drain",
+    "flush",
+    "sewer",
+    "Riley",
+    "Avery",
+    "Casey",
+    "sink",
+    "pipe",
+    "clog",
+    "shop",
+    "Shop"
+   ]
+  },
+  "A": {
+   "S1-29": "fb61245096",
+   "A10-21": "08514557c8",
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A3-30": "b53a513069",
+   "A6-04": "fe10e3d360",
+   "A7-14": "6a57738a17",
+   "A8-04": "8caf7636f3",
+   "A8-05": "bcf176bdb3",
+   "A8-08": "3662e9ea04",
+   "A8-16": "90a6202deb",
+   "A10-14": "b60c13af2d",
+   "A6-17": "63319c6f2d",
+   "S11-13": "f3a4b561e4",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "S1-23": "6a6fbdc2ec",
+   "S1-38": "d9fefa619c",
+   "S2-21": "33b162a0e0",
+   "A3-02": "223044a79d",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A4-01": "9d65299834",
+   "A4-50": "6f43775326",
+   "A4-80": "624ec2e303",
+   "A4-43": "c17d56f766",
+   "A4-65": "fa7ec0389d",
+   "A4-64": "b98f95b738",
+   "A7-03": "13bfc32bcb",
+   "A8-23": "e3a35f7f9e",
+   "A8-38": "5e48b74f3a",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A8-03": "7fe61cccf5",
+   "S1-33": "eeaadba298",
+   "S1-35": "6d2b8e871b",
+   "S1-43": "9775f13de8",
+   "S1-50": "432271ddf0",
+   "S11-48": "421e6559d4",
+   "S2-31": "320ac5e4cb",
+   "S2-02": "b2094081ee",
+   "S2-24": "0acce38d9e",
+   "S11-63": "d0a8038e67",
+   "A3-07": "6b005cf195",
+   "A3-12": "d473270a08",
+   "A3-14": "e9a30c1b15",
+   "A3-05": "ec1662d32f",
+   "A3-19": "85065db5d4",
+   "A3-22": "0057d8fc9f",
+   "A3-26": "9e3630dc0b",
+   "A4-02": "433e3cd172",
+   "A4-30": "59603c2ded",
+   "A4-32": "d5a284a416",
+   "A4-14": "e8360fe491",
+   "A4-85": "f164e7b264",
+   "A4-16": "b1837f2760",
+   "A4-23": "9f76d7b6f5",
+   "A4-83": "1650b2dafd",
+   "A6-01": "df3c5778ea",
+   "A7-12": "05f64179a4",
+   "A7-15": "0b8ca02693",
+   "A7-21": "996ff87f58",
+   "A8-07": "f5c27acdfa",
+   "A8-43": "7b0f73c701",
+   "S11-02": "d0b2cf9f6c",
+   "S11-38": "1fd6962e5d",
+   "A4-21": "5929c47e48",
+   "A6-10": "64c2a9642a",
+   "A7-01": "afb51b5e1b",
+   "A8-37": "0a30466995",
+   "S11-22": "03a7b7ff95",
+   "A8-14": "5b54026a9c",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "S1-29": "592bd8f1a2",
+   "B8-03": "ac9d404766",
+   "B10-17": "b5f4aef51b",
+   "B4-16": "37cd99137d",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B6-06": "1d676278da",
+   "B7-07": "954270db4b",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-05": "90f94e0f1e",
+   "B8-06": "3155d50758",
+   "B8-12": "7e627afb46",
+   "B8-47": "68f3caef07",
+   "B6-29": "f9c7deba8d",
+   "S11-13": "4e5f75b209",
+   "S1-23": "51cfaf83fd",
+   "S1-38": "d71e979b67",
+   "S2-21": "33b162a0e0",
+   "B3-02": "74ad1f98f2",
+   "B3-18": "a4b81ea9b3",
+   "B4-43": "fc9855955a",
+   "B4-27": "4b45128d2c",
+   "B4-69": "350fbaf90a",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B7-20": "364245afef",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-39": "aa75251207",
+   "B8-44": "3847104a93",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "S1-33": "2b5d1fa4ab",
+   "S1-35": "034a48edf1",
+   "S1-43": "2197eac59a",
+   "S1-50": "37ef99bc07",
+   "S11-48": "a5e2e806b6",
+   "S2-31": "320ac5e4cb",
+   "S2-02": "b2094081ee",
+   "S2-24": "593cd0d5cf",
+   "S11-63": "f700ce25a4",
+   "B3-01": "06b59bb8f3",
+   "B3-11": "e459daf83c",
+   "B3-13": "7427fd216d",
+   "B3-21": "ad48326ac5",
+   "B4-03": "1126d68737",
+   "B4-77": "67ff953065",
+   "B4-31": "9100d39354",
+   "B4-44": "514c8ab30c",
+   "B4-62": "9769228e39",
+   "B4-23": "3bbc0f30df",
+   "B4-34": "74ff52d83d",
+   "B4-25": "004f66a272",
+   "B4-26": "912686f788",
+   "B4-38": "9539521dc7",
+   "B4-63": "49ce39c037",
+   "B6-11": "e154e43035",
+   "B7-19": "29f802aa4d",
+   "B7-27": "0f5f9883ff",
+   "B6-10": "e8d4060d1b",
+   "B8-24": "bd5fb0ef0b",
+   "B8-32": "1cfd4f7afa",
+   "B7-18": "d53cef58f7",
+   "S11-02": "b5be5f9aa7",
+   "S11-15": "ad27d43cf7",
+   "S11-38": "58d27fc71e",
+   "S11-41": "b9894f01ce",
+   "S11-43": "5590dd350b",
+   "S11-44": "6836975dd7",
+   "S11-79": "dda2a4de6b",
+   "S12-24": "7514a15e65",
+   "S12-28": "6e7a9bf25f",
+   "B6-03": "dcc1eb310c",
+   "B10-05": "a326ea3c0b",
+   "B8-18": "530038d2b8",
+   "B8-19": "11e79a26d8",
+   "S11-22": "d83ca09a76",
+   "B10-32": "7713bff255",
+   "B4-14": "bea6443957"
+  }
+ }
+}

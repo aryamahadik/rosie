@@ -1,0 +1,5302 @@
+{
+ "id": "vehicle-wrap",
+ "name": "Vehicle wrap",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "auto-body",
+ "plugin": {
+  "pf.license": {
+   "need": "if: no state license for wrapping vehicles by default; the business registration; a garage or shop registration only where the state's rules require one for a shop that holds customers' vehicles",
+   "ask": [
+    "The business registration number, where the state gave one",
+    "A garage or shop registration number, only where the state's rules require one"
+   ],
+   "who": "the business; installers need no license of their own unless the state's form says so",
+   "check": "the state's business or registration lookup; where there is none, a person on Rosie's team checks within 1 business day",
+   "blocks": "a registration the state requires that the owner says the business lacks keeps that kind of work offline",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "garage-keepers insurance for customers' vehicles, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'"
+  },
+  "pf.services": {
+   "pattern": "drop-off: the vehicle is left at the shop for 3 to 5 working days and picked up when it is READY; lettering and fleet graphics can also be done at a business's lot",
+   "list": [
+    {
+     "name": "Full color-change wrap",
+     "price": "priced from photos: the vehicle's size, the film chosen and the paint's condition; the example sedan: $3,800",
+     "length": "3 to 5 working days",
+     "place": "at the shop: a drop-off",
+     "before": "a 50% deposit ($1,900 in the example) once the price is OK'd, credited to the bill; the film is cut and ordered for the vehicle",
+     "after": "the rest at pick-up, at the counter, or the bill Rosie texts with READY"
+    },
+    {
+     "name": "Hood wrap",
+     "price": "one price from the board: $700 in the example",
+     "length": "1 to 2 days",
+     "place": "at the shop",
+     "before": "nothing taken; a $350 deposit if the owner turns one on",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Mirror caps wrap",
+     "price": "$55 in the example (a door handle set is $40, a fuel door $20)",
+     "length": "1 hour",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Chrome delete, per piece",
+     "price": "$25 in the example",
+     "place": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Door lettering",
+     "price": "one price: $90 in the example at the shop, $179 by the van (the $89 trip fee is in it)",
+     "length": "1 hour",
+     "place": "at the shop; at a business's lot by the van",
+     "before": "nothing taken at the shop; a card saved for the trip fee for the van",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Fleet vans and trucks, lettering and graphics",
+     "price": "priced from photos of the vehicles and the design proof: $640 for three vans in the example",
+     "length": "a day or more",
+     "place": "at the business's lot, by the van",
+     "before": "a 25% deposit once the quote is OK'd ($160 in the example)",
+     "after": "the bill Rosie texts after DONE"
+    },
+    {
+     "name": "Paint protection film, front end",
+     "price": "priced from photos, from $1,400 in the example",
+     "length": "2 to 3 working days",
+     "place": "at the shop",
+     "before": "a 50% deposit once the price is OK'd",
+     "after": "the rest at pick-up"
+    },
+    {
+     "name": "Wrap or film removal",
+     "price": "$60 a panel in the example; found on a vehicle and added only with the customer's yes",
+     "place": "at the shop, or by the van"
+    },
+    {
+     "name": "Design proof",
+     "price": "free: the first two proofs; after that $120 an hour, with the owner's OK",
+     "length": "within 2 business days",
+     "place": "online, before the film is ordered"
+    },
+    {
+     "name": "Free 30-day re-check",
+     "price": "free, within 30 days of any job: lifting edges, bubbles (the example shop's own promise)",
+     "length": "30 minutes",
+     "place": "at the shop"
+    },
+    {
+     "name": "Mirror caps wrap, at the lot",
+     "price": "$144 by the van in the example (the $55 shop price and the $89 trip fee)",
+     "place": "at a business's lot, by the van"
+    },
+    {
+     "name": "Chrome delete, 4 pieces, at the lot",
+     "price": "$199 by the van in the example, the trip fee in it",
+     "place": "at a business's lot, by the van"
+    },
+    {
+     "name": "Trip fee for the van",
+     "price": "one fee, part of each mobile job's price (the example: $89)",
+     "place": "at a business's lot"
+    }
+   ],
+   "never": "a wrap over the plate, the lights or the glass the state's rules protect is never done; the wrap shop sells no vehicles",
+   "capacity": "3 install bays; one vehicle per booking; the clean room and the plotter are saved like equipment; drop-off slots name no installer",
+   "drop_off_window": "drop-off times by the shop's daily number, with no installer named",
+   "nobody_home": "no: an adult on the booking hands over the keys and meets the installer",
+   "online": "no: a vehicle is wrapped in person; the design proof is online"
+  },
+  "pf.questions": {
+   "before_times": [
+    "Year, make, model and color of the vehicle",
+    "What you want: a full color change, a partial wrap, lettering, chrome delete, paint protection film or a removal",
+    "Is the paint original? Any repainted panels, peeling clear coat or rust?",
+    "Is the vehicle leased or financed?",
+    "For a business: how many vehicles, and do you have the logo files?",
+    "For lettering at your lot: where the vehicle is parked, and if there is a covered space"
+   ],
+   "after_time": [
+    "The film brand, color and finish you like (the shop shows swatches)",
+    "Anything to take off first, like roof racks or tow hooks?"
+   ],
+   "secure_page_only": [
+    "4 to 8 photos of the vehicle, front, back, sides and any damage",
+    "The VIN and the plate",
+    "Logo files and design notes",
+    "A lot or gate code, and where the keys are left"
+   ],
+   "paint_check": "paint that is repainted, peeling or rusted can lift with the film; the shop checks it at drop-off and the customer signs the paint-condition note before any film goes on",
+   "who_may_book": "an adult: the vehicle's owner, or someone the owner lets bring it in; a leased vehicle needs the lessor's OK where the lease says so; for a business, a person who may sign for it; for a teen's vehicle, a parent books and says yes to prices"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "someone hurt, or a crash that just happened",
+    "a fire, or smoke from the vehicle",
+    "someone dizzy or sick from fumes in the shop"
+   ],
+   "stop_action": "'If anyone is hurt or feels sick from fumes, get away from the vehicle and call 911 now'; no booking",
+   "dont_drive_words": [
+    "a fuel leak, or a strong smell of fuel",
+    "brakes that don't work",
+    "a windshield cracked in the driver's view"
+   ],
+   "dont_drive_action": "Rosie says: don't drive it. The booking goes on once it is safe to bring it in, or it comes by tow.",
+   "mobile_stops": "rain, wind or dust, cold below the film maker's limit, or no covered, clean place at the lot: the installer stops, and offers a new time (no fee) or the shop",
+   "can_continue": "yes, after the don't-drive steps"
+  },
+  "pf.first_steps": {
+   "required": "none before booking; the design proof is approved before the film is ordered; the paint-condition note is signed at drop-off",
+   "design_proof": "the first two proofs are free and come within 2 business days; the film is ordered when free cancel ends",
+   "prep_for_reminder": [
+    "Wash the vehicle the day before",
+    "Take out valuables and personal items",
+    "Bring every key",
+    "Tell us about any repainted panels"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "a drop-off: the check-in code at the counter; at a lot: the code at the vehicle",
+   "intake": "a walk-around with the customer: photos of every panel, the paint's condition, the odometer and the keys; the paint-condition note signed",
+   "the_work": "panels cleaned and prepared, film applied, edges trimmed and sealed; 3 to 5 working days for a full wrap",
+   "added_work": "old film or damaged paint found is priced and texted; nothing extra is done without the customer's yes",
+   "status_words": [
+    "IN",
+    "WRAPPING",
+    "READY"
+   ],
+   "ready": "READY texts what was done, anything due, the pick-up hours and the care notes: no wash for 7 days, no pressure wash, no wax",
+   "done_proof": "the drop-off code checks the vehicle in; READY and the pick-up close it. At a lot: the code at the vehicle, then DONE with photos",
+   "late": "a late drop-off is checked in until the shop closes; the start may move a day",
+   "aftercare": "a free 30-day re-check for lifting edges and bubbles; the shop's 1-year workmanship promise and the film maker's warranty are on the receipt",
+   "unclaimed": "not picked up: reminders; storage after the free working days that follow READY, only once the owner confirms (the example: 3 working days free, then $45 a day)"
+  },
+  "pf.money": {
+   "before": "nothing taken for small jobs from the board; a color-change wrap, a hood wrap or paint protection film takes a 50% deposit once the price is OK'd (the example: $1,900 of $3,800), credited to the bill, because the film is cut and ordered for the vehicle; the film is ordered when free cancel ends, so a cancel before then returns the deposit",
+   "after": "at pick-up, at the counter; or the bill Rosie texts with READY",
+   "mobile": "lettering at a lot: a card saved for the trip fee, and the bill after DONE; a fleet job priced from photos takes a 25% deposit once the quote is OK'd",
+   "deposit": "deposit cap: from the state form; never more than the price known before the visit",
+   "fees": "at the shop with nothing taken, no cancel or no-show fee; a late cancel of a wrap after the film is ordered: the deposit may be kept, only if the owner confirms (the example: $1,900); the lot visit: the trip fee on the saved card (the example: $89), only with the owner's yes; the owner confirms every fee",
+   "price_shown": "the price with every charge that always comes with it; film removal is added only with the customer's yes; the tax from the state form",
+   "storage": "a daily storage fee only after the free working days that follow READY, told before drop-off, and only once the owner confirms; storage limits: from the state form",
+   "tips": "no tip line",
+   "tax": "the state's sales tax on film and labor, where the state has one",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies; a free re-check adds none"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "The VIN or the plate",
+    "Logo files and design notes",
+    "A lot or gate code, or where the keys are left"
+   ],
+   "languages": "English and Spanish",
+   "minors": "texts about a teen's vehicle go to the parent who booked"
+  },
+  "pf.staff": {
+   "skills": [
+    "vinyl wrap install",
+    "paint protection film",
+    "lettering and decals",
+    "design proofs",
+    "wrap removal"
+   ],
+   "licenses": "none by default; a registration only where the state's rules require one",
+   "supervision": "a trainee works only beside an installer who may supervise, where the state's rules require it",
+   "who_oks": "the owner OKs any price over $500 made for one customer, design changes after two proofs, and removal over repainted paint",
+   "stand_in": "only an installer with the skill; a job only one person can do waits, and the ready date moves"
+  },
+  "pf.rules": {
+   "plate_lights_glass": "a wrap never covers the plate, the lights or glass the state's rules protect; film on windows follows the state form",
+   "shop_registration": "switch: the shop's registration on estimates and receipts: from the state form",
+   "written_terms": "switch: a signed note of the paint's condition and the terms, before film goes on: from the state form",
+   "lessor_ok": "switch: a leased or financed vehicle needs the lessor's OK where the lease says so: asked, never checked by Rosie",
+   "storage_notice": "switch: storage terms told before drop-off, and the free days after READY: from the state form",
+   "unclaimed_vehicle": "switch: the state's abandoned-vehicle steps; the owner runs them, and Rosie sends only the notices the owner OKs",
+   "home_sale_cancel": "switch: a written cancel period for work sold at the customer's place: from the state form",
+   "film_warranty": "the film maker's warranty and the shop's workmanship promise are on the receipt",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "Paint that is repainted, peeling or rusted: the customer signs the paint-condition note, or that panel is left out",
+    "The design proof is not approved by the date: nothing moves on silence; Sam calls and the drop-off can move with no fee",
+    "A late cancel after the film is ordered: the deposit may be kept, only if the owner confirms",
+    "Old film or damaged paint found at the bay: priced first, added only with a yes",
+    "A film backorder: a new ready date",
+    "An installer out on the drop-off day: the drop-off stays, the work starts a day later",
+    "A vehicle that isn't safe to drive: the don't-drive steps, then a tow-in",
+    "Rain, wind or no covered space at the lot: a new time, no fee",
+    "Lifting edges or bubbles: the free 30-day re-check",
+    "A vehicle not picked up: storage after the free days, only once the owner confirms"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "photos",
+   "extrawork",
+   "multiday",
+   "documents",
+   "aftercare"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": {
+     "window": 2
+    }
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Mateo and Sasha (installers)",
+   "other": "Others (a bank, a parent, the film supplier)"
+  },
+  "B": {
+   "staff": "Felix and Brooke (installers)",
+   "other": "Others (a bank, a fleet manager, the film supplier)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Mateo"
+  },
+  "B": {
+   "staff": "Felix"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex sends photos of a sedan to Lee's Wraps and asks for a satin black color change. Mateo prices it from the photos at $3,800, Sam OKs it, and Alex pays a $1,900 deposit and drops the car off Sat Oct 24. The wrap takes 3 to 5 working days. READY comes Thu Oct 29, and Alex pays the $1,900 rest at the counter. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex asks Lee Mobile Wraps to letter three work vans at the business lot, 21 Birch Ct. Felix prices it from photos at $640, Sam OKs it, a $160 deposit follows, and Felix comes Thu Oct 22 between 8 and 10am. Rosie texts the bill when Felix texts DONE."
+ },
+ "money": {
+  "A": {
+   "main": "photos|deposit|counter",
+   "combos": [
+    "photos|deposit|counter",
+    "photos|deposit|bill",
+    "list|none|counter",
+    "list|none|bill"
+   ],
+   "examples": {
+    "photos|deposit|counter": "The main story: a satin black color change for a sedan, priced from Alex's photos at $3,800. Sam OKs the price, and Alex pays a $1,900 deposit (half, because the film is cut and ordered for the car). Alex pays the $1,900 rest at the counter at pick-up.",
+    "photos|deposit|bill": "The same color change, with the $1,900 rest on the bill Rosie texts with READY, so Alex can pay before pick-up.",
+    "list|none|counter": "A $90 door lettering from the shop's board. Nothing is taken: a YES books the drop-off, and Alex pays at the counter the same day.",
+    "list|none|bill": "The same $90 lettering with the vehicle left at the shop. Rosie texts the bill with READY."
+   },
+   "labels": {
+    "price": {
+     "photos": "Priced from your photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "free",
+     "name": "Door lettering"
+    },
+    "photos|*|*": {
+     "price": "$3,800",
+     "name": "Full color-change wrap"
+    },
+    "photos|deposit|*": {
+     "price": "$3,800",
+     "deposit": "$1,900",
+     "rest": "$1,900",
+     "fee": "$1,900",
+     "name": "Full color-change wrap"
+    },
+    "list|*|*": {
+     "price": "$90",
+     "name": "Door lettering"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "visit|card|bill",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: lettering on a work van at Alex's lot, $179 with the $89 trip fee in it. A card is saved for the trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after Felix texts DONE.",
+    "visit|card|bill": "A look at a fleet of vans at the lot, priced at the visit. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE.",
+    "photos|deposit|bill": "Lettering and graphics for three vans, priced from photos at $640. Sam OKs it, a $160 deposit orders the film, and the $480 rest is on the bill after DONE."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Door lettering"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Door lettering"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Fleet look at the lot"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Fleet vans, lettering and graphics"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "Fleet vans, lettering and graphics"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "color",
+  "trip fee",
+  "Grace",
+  "valve",
+  "wrap",
+  "storage"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": []
+ },
+ "rename": {
+  "A": [
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither the van nor the shop takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a tow or a lockout. The plug-in says which services. Wraps are never sent now, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Wrap work takes no jobs sent now: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Does any wrap job get sent now? No: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An installer's example: a fuel leak gets 'don't drive it; it can come in by tow'."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a person hurt or a fire, gets the safety steps first."
+   ],
+   [
+    "Thanks. The state licenses the shop and each barber. What's the shop's license number?",
+    "Thanks. Wrap work needs no state license where you work, so I'll check the business registration. What's the shop's registration number?"
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most wrap shops start. Is it right? Send only what's different."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules wrap shops often set. Your call: keep them, or change any. They become the shop's own rules."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most wrap shops set it."
+   ],
+   [
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "Its money card is set the way most mobile wrap services start. Is it right? Send only what's different."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood wrap shop on Warehouse Row. Color changes, lettering and film, in 3 bays."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lettering and fleet graphics at your lot in Springfield, within 25 miles."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Jordan and Casey do lettering at lots; Jordan does fleet graphics too. Riley and Avery wrap cars in the shop; Riley also does paint protection film. Pat is my office manager, for prices over $500. Jules rents a bay, with their own customers."
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: lettering and fleet graphics"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A wrap shop always takes drop-offs: the vehicle stays for days."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Free 30-day re-check: lifting edges or bubbles, reply here."
+   ],
+   [
+    "BS20981",
+    "REG-20981"
+   ],
+   [
+    "EC22871",
+    "REG-22871"
+   ],
+   [
+    "MP045210",
+    "REG-45210"
+   ],
+   [
+    "color and house calls",
+    "paint protection film and lot visits"
+   ],
+   [
+    "color, house calls",
+    "paint protection film, lot visits"
+   ],
+   [
+    "does color",
+    "does paint protection film"
+   ],
+   [
+    "Color always stays",
+    "Paint protection film always stays"
+   ],
+   [
+    "cut hair",
+    "wrap cars"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A wrap shop's plug-in adds vehicle danger words, like a fuel leak or brakes that fail."
+   ],
+   [
+    "The color and cut can take a $20 deposit once Riley's photo quote is OK'd, like $20 of $90. The rest is paid at the visit, or on the bill after.",
+    "The color-change wrap can take a $1,900 deposit once Riley's photo quote is OK'd, like $1,900 of $3,800. The rest is paid at the visit, or on the bill after."
+   ],
+   [
+    "The color and cut can be paid in full once Riley's photo quote is OK'd, like $90. Nothing more is owed after.",
+    "The color-change wrap can be paid in full once Riley's photo quote is OK'd, like $3,800. Nothing more is owed after."
+   ],
+   [
+    "Color and cut · $90, from photos",
+    "Full color-change wrap · $3,800, from photos"
+   ],
+   [
+    "Color and cut, priced from Alex's photos at $90. Booked once it's OK'd.",
+    "Color-change wrap, priced from Alex's photos at $3,800. Booked once it's OK'd."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $3,800 wrap quote. Sam taps Call, and the call goes out from the shop's number."
+   ],
+   [
+    "Send Alex M. the color and cut at $85, not $90?",
+    "Send Alex M. the color change at $3,600, not $3,800?"
+   ],
+   [
+    "The $70 rest is refunded",
+    "The $1,900 rest is refunded"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken; a color change, a 50% deposit"
+   ],
+   [
+    "Every plumbing service",
+    "Every lot job"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a repaint, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do repaints."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The film left a bubble on my door."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the film left a bubble on the door today"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: wants the mirrors in matte black next time."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do chrome delete? I have a truck."
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: chrome delete is $25 a piece. Want a time?"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a wrap for a son's car before the times, so they fit."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "You told us the wrap is for your son's car, and that you're his parent."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The paint-condition note isn't signed."
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Say Alex M. left the car at Lee's Wraps. Staff text READY when the work is done. Alex hears what was done, the pick-up hours, and anything due."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your car is ready for pick-up at Lee's Wraps."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Mon to Fri, 8am to 5pm"
+   ],
+   [
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A barbershop books a person's time.",
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A wrap shop books a drop-off slot."
+   ],
+   [
+    "A what-if: for a table, a court or a room, the times show the space and its size, never a person. A space shows only if it's free and big enough for the group.",
+    "A what-if: for a bay, the times show the bay, never a person. A bay shows only if it's free and long enough for the job."
+   ],
+   [
+    "Sat Oct 24 · 6:00pm · Table for 4",
+    "Sat Oct 24 · 11:00am · Bay 1"
+   ],
+   [
+    "Sat Oct 24 · 7:30pm · Table for 6",
+    "Sat Oct 24 · 2:00pm · Bay 2"
+   ],
+   [
+    "A table for six has one code, not six.",
+    "A vehicle has one code."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Alex wants it at the business's lot: a lot visit, $179, with a card saved for the $89 trip fee. From here it's the other flow, where the business goes to the customer."
+   ],
+   [
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Offer Alex M. a Sat Oct 24 drop-off at 3:00pm?"
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Alex wants it at home: a van visit, $179, with a card saved for the $89 trip fee. From here it's the other flow, where the business goes to the customer."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The hood wrap can take a $350 deposit when booked. The other $350 is paid at the counter."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The hood wrap can take a $350 deposit when booked. The other $350 is on the bill after the visit."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The hood wrap can take a $350 deposit when booked. The other $350 is on the bill after the visit."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the hood wrap takes a $350 deposit; the $350 rest is paid after the visit."
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: no fee with nothing taken; once the film is ordered, the deposit may be kept, only if you say yes; the van's $89 trip fee, only if a card was saved and you say yes"
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $90 door lettering can work this way."
+   ],
+   [
+    "Haircut · $35",
+    "Door lettering · $90"
+   ],
+   [
+    "Skin fade · $40",
+    "Door handle wrap, set · $40"
+   ],
+   [
+    "Beard trim · $20",
+    "Fuel door wrap · $20"
+   ],
+   [
+    "Haircut at home · $75",
+    "Door lettering at home · $179"
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Mirror caps wrap · $55"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Hood wrap · $350 deposit"
+   ],
+   [
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "a fuel door wrap is on the price board: $20. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a fuel door wrap. Rosie finds one time long enough for both, with one installer, and adds the prices: $90 and $20."
+   ],
+   [
+    "'Adding a beard trim, +$20? Say so.'",
+    "'Adding a fuel door wrap, +$20? Say so.'"
+   ],
+   [
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "One request waits for Lee's Barbershop. It's a fuel door wrap today at 2:00pm with Avery, for a new customer. It's $20. Accept it?"
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Reading it back: accept a fuel door wrap today at 2:00pm with Avery. Say yes to go ahead."
+   ],
+   [
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Accepted: the fuel door wrap today at 2:00pm with Avery."
+   ],
+   [
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the door lettering goes to $100 for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the door lettering to $100 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Door letterings already booked keep $90, even after Nov 2."
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $100 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $90."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: door lettering $100 for visits from Mon Nov 2. Door letterings already booked keep $90. Door lettering plans go to $100 from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Door lettering $90 ($100 from Nov 2) · Door handle wrap, set $40 · Fuel door wrap $20"
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the door lettering from nothing taken to a $50 deposit. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "Nothing taken when they book · paid after the visit"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a door handle wrap at $30, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A door handle wrap at Lee's Barbershop is $40, not $30. Here are the open times at $40."
+   ],
+   [
+    "Refund · $20",
+    "Refund · $350"
+   ],
+   [
+    "Dee W.'s $20 payment through Rosie was charged twice.",
+    "Dee W.'s $350 deposit was charged twice."
+   ],
+   [
+    "Haircut (pack)",
+    "Door lettering (pack)"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Quotes for a wrap come to you first. Board prices never need one"
+   ],
+   [
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Someone with their own customers, like an installer, gets their own sign-up link instead."
+   ],
+   [
+    "Access, like a step-free chair: only times and places that fit show.",
+    "Access, like a step-free entrance: only times and places that fit show."
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's employer for a staff van. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this wrap."
+   ],
+   [
+    "The plug-in's plain questions are optional, like 'How would you like it on top?'",
+    "The plug-in's plain questions are optional, like 'Which finish do you like?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Which finish do you like? (optional)"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of your vehicle? Yes / No"
+   ],
+   [
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it a fade' goes back to the times.",
+    "A yes with a 'but' isn't a yes yet. 'Yes, add the mirrors' goes back to the times."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Riley can do a shorter job in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter job."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during the wrap?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring every key and a clean car on Saturday."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please bring every key and a clean car."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the shop, the customer is already at the counter, so there's no door check."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s job."
+   ],
+   [
+    "stopped Alex M.'s cut.",
+    "stopped Alex M.'s job."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Riley shows the work, like the finished panels in the light. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A job is rated, so the shop takes the first branch."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The film is lifting on one edge."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the film is lifting on one edge"
+   ],
+   [
+    "1 color quote",
+    "1 quote"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'Put my logo on the door' fits a door lettering."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $3,800 wrap quote. Sam taps Call, and the call goes out from the shop's number."
+   ],
+   [
+    "{{name.staff:Nia K.}} would like to talk about the color quote before booking.",
+    "{{name.staff:Nia K.}} would like to talk about the quote before booking."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book me a color change at Lee's Barbershop on Saturday."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Color changes, lettering and film, in 3 bays."
+   ],
+   [
+    "A water heater job",
+    "A lettering job at a lot"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most wrap shops start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules wrap shops often set."
+   ],
+   [
+    "like a chair renter",
+    "like an installer with their own customers"
+   ],
+   [
+    "A chair renter asked for by name",
+    "An installer with their own customers, asked for by name"
+   ],
+   [
+    "A chair, ready",
+    "A finished wrap"
+   ],
+   [
+    "The chairs",
+    "The install bays"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Wrap quotes come to you first."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A wrap's example: 'A wrap here needs the paint checked first."
+   ],
+   [
+    "like a step-free chair",
+    "like a step-free entrance"
+   ],
+   [
+    "would like to see your hair before pricing it.",
+    "would like to see the vehicle before pricing it."
+   ],
+   [
+    "sees the hair.",
+    "sees the vehicle."
+   ],
+   [
+    "How would you like it on top?",
+    "Anything else to cover, like the mirrors?"
+   ],
+   [
+    "please come with dry hair.",
+    "please bring every key and a clean car."
+   ],
+   [
+    "two skin fades",
+    "two door handle wraps"
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "$20 deposit",
+    "$1,900 deposit"
+   ],
+   [
+    "Bills the plan first; Alex pays a share",
+    "Alex pays the deposit, then the rest"
+   ],
+   [
+    "Takes the plan's name first",
+    "Takes the vehicle first"
+   ],
+   [
+    "Sat 11:00am visit with Riley",
+    "Sat 11:00am drop-off"
+   ],
+   [
+    "11:00am visit with Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "Casey: plumbing",
+    "Brooke: lettering and fleet graphics"
+   ],
+   [
+    "Casey for plumbing",
+    "Brooke for lettering and fleet graphics"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds window tint to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Window tint for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW window tint"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Lettering and Lee Fleet Graphics."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero un presupuesto para un golpe en mi carro."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A wrap shop books a drop-off slot."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Wraps · drop-off"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like the paint protection film Riley noted, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Wraps sent you a proposal: the paint protection film Riley noted."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Paint protection film"
+   ],
+   [
+    "3 visits with Riley",
+    "One drop-off · about 2 hours"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The work is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a drop-off time for the hood wrap:"
+   ],
+   [
+    "Sat 11am Riley",
+    "Sat 11am drop-off"
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday drop-off"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a door lettering and a fuel door wrap"
+   ],
+   [
+    "Drain clearing",
+    "Door lettering"
+   ],
+   [
+    "a package of cuts",
+    "a package of door letterings"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many states license a wrap shop at one address"
+   ],
+   [
+    "patch test",
+    "paint check"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A wrap could mean a color change or a lettering job."
+   ],
+   [
+    "A barbershop's services need none.",
+    "A wrap shop's photo estimate is read before booking, so it needs none here."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a fleet's cars together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A delivery company books lettering for four vans on one morning. Rosie finds bays side by side across Riley and Avery."
+   ],
+   [
+    "Riley looks, then prices it",
+    "Mateo looks, then writes the estimate"
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the design proof; the price stays open"
+   ],
+   [
+    "Checks in a drop-off or mail-in",
+    "Checks in a vehicle left at the shop"
+   ],
+   [
+    "Follows up on an item left behind",
+    "Follows up on a car left behind"
+   ],
+   [
+    "Electric.",
+    "Two vans: the white and the blue."
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Chrome delete, per piece"
+   ],
+   [
+    "a skin-test result",
+    "a paint check note"
+   ],
+   [
+    "Consult only",
+    "Design proof only"
+   ],
+   [
+    "photos of your hair",
+    "photos of the vehicle"
+   ],
+   [
+    "a cut on Saturday",
+    "a lettering job on Saturday"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a fleet check every 4 weeks"
+   ],
+   [
+    "a cut every 4 weeks",
+    "a fleet check every 4 weeks"
+   ],
+   [
+    "for a staff cut",
+    "for a work van's door"
+   ],
+   [
+    "during my cut",
+    "during my wrap"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s wrap"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Wraps"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Wraps'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Wraps"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Lettering and Lee Fleet Graphics"
+   ],
+   [
+    "electrical license",
+    "fleet graphics registration"
+   ],
+   [
+    "Electrical",
+    "Fleet graphics"
+   ],
+   [
+    "electrical",
+    "fleet graphics"
+   ],
+   [
+    "plumber",
+    "installer"
+   ],
+   [
+    "Plumber",
+    "Installer"
+   ],
+   [
+    "Plumbing",
+    "Lettering"
+   ],
+   [
+    "plumbing",
+    "lettering"
+   ],
+   [
+    "Barbershop",
+    "Wrap shop"
+   ],
+   [
+    "barbershop",
+    "wrap shop"
+   ],
+   [
+    "Barber license",
+    "Installer certificate"
+   ],
+   [
+    "barbers",
+    "installers"
+   ],
+   [
+    "Barbers",
+    "Installers"
+   ],
+   [
+    "barber",
+    "installer"
+   ],
+   [
+    "Barber",
+    "Installer"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "READY Sofia G. Photo added.",
+    "READY Alex M."
+   ],
+   [
+    "4471",
+    "5160"
+   ],
+   [
+    "Sofia",
+    "Alex"
+   ],
+   [
+    "Riley",
+    "Mateo"
+   ],
+   [
+    "Avery",
+    "Sasha"
+   ],
+   [
+    "Jordan",
+    "Felix"
+   ],
+   [
+    "Casey",
+    "Brooke"
+   ],
+   [
+    "88 Elm St",
+    "55 Warehouse Row"
+   ],
+   [
+    "Elm St",
+    "Warehouse Row"
+   ],
+   [
+    "1200 Main St",
+    "88 Harbor Ln"
+   ],
+   [
+    "Haircuts",
+    "Door letterings"
+   ],
+   [
+    "haircuts",
+    "door letterings"
+   ],
+   [
+    "A haircut",
+    "A door lettering"
+   ],
+   [
+    "a haircut",
+    "a door lettering"
+   ],
+   [
+    "Haircut",
+    "Door lettering"
+   ],
+   [
+    "haircut",
+    "door lettering"
+   ],
+   [
+    "kids cuts",
+    "chrome deletes"
+   ],
+   [
+    "a kids cut",
+    "a chrome delete"
+   ],
+   [
+    "Kids cut",
+    "Chrome delete, per piece"
+   ],
+   [
+    "kids cut",
+    "chrome delete"
+   ],
+   [
+    "Skin fade",
+    "Door handle wrap, set"
+   ],
+   [
+    "skin fade",
+    "door handle wrap"
+   ],
+   [
+    "fade",
+    "door handle wrap"
+   ],
+   [
+    "Beard trim",
+    "Fuel door wrap"
+   ],
+   [
+    "beard trim",
+    "fuel door wrap"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Mirror caps wrap"
+   ],
+   [
+    "Signature cut and shave",
+    "Mirror caps wrap"
+   ],
+   [
+    "Signature cut",
+    "Mirror caps wrap"
+   ],
+   [
+    "signature cut",
+    "mirror caps wrap"
+   ],
+   [
+    "Groom's package",
+    "Hood wrap"
+   ],
+   [
+    "Color and cut",
+    "Full color-change wrap"
+   ],
+   [
+    "color and cut",
+    "full color-change wrap"
+   ],
+   [
+    "Color correction",
+    "Fleet look at the lot"
+   ],
+   [
+    "color correction",
+    "fleet look at the lot"
+   ],
+   [
+    "color quote",
+    "wrap quote"
+   ],
+   [
+    "$25 consult",
+    "design proof"
+   ],
+   [
+    "Only the consult",
+    "Only the design proof"
+   ],
+   [
+    "the consult",
+    "the design proof"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens in the bay?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the shop"
+   ],
+   [
+    "priced at the chair",
+    "priced at the shop"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "chairs",
+    "bays"
+   ],
+   [
+    "House calls",
+    "Lot visits"
+   ],
+   [
+    "house calls",
+    "lot visits"
+   ],
+   [
+    "a house call",
+    "a lot visit"
+   ],
+   [
+    "House call",
+    "Lot visit"
+   ],
+   [
+    "house call",
+    "lot visit"
+   ],
+   [
+    "Water heater flush",
+    "Hood wrap"
+   ],
+   [
+    "Water heater",
+    "Hood wrap"
+   ],
+   [
+    "water heater",
+    "hood wrap"
+   ],
+   [
+    "Panel upgrade",
+    "Fleet graphics"
+   ],
+   [
+    "like a burst pipe",
+    "like a fuel leak"
+   ],
+   [
+    "Style consult",
+    "Design proof"
+   ],
+   [
+    "style consult",
+    "design proof"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "a installer",
+    "an installer"
+   ],
+   [
+    "A installer",
+    "An installer"
+   ],
+   [
+    "Wraps's",
+    "Wraps'"
+   ],
+   [
+    "$35",
+    "$90"
+   ],
+   [
+    "$40 deposit",
+    "$350 deposit"
+   ],
+   [
+    "$100 rest",
+    "$350 rest"
+   ],
+   [
+    "$140",
+    "$700"
+   ],
+   [
+    "$75",
+    "$179"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Style consult",
+    "Design proof"
+   ],
+   [
+    "style consult",
+    "design proof"
+   ],
+   [
+    "Elm St",
+    "Warehouse Row"
+   ]
+  ],
+  "B": [
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither the van nor the shop takes jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a tow or a lockout. The plug-in says which services. Wraps are never sent now, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Wrap work takes no jobs sent now: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Does any wrap job get sent now? No: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An installer's example: a fuel leak gets 'don't drive it; it can come in by tow'."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a person hurt or a fire, gets the safety steps first."
+   ],
+   [
+    "The license can stop the work and cut what may be offered, so it comes before prices and money. The state licenses the barbershop itself, and each barber.",
+    "The license can stop the work and cut what may be offered, so it comes before prices and money. Wrap work needs none by default."
+   ],
+   [
+    "The state licenses the shop itself, and each barber. What's the shop's license number?",
+    "Wrap work needs no state license where you work. What's the shop's registration number?"
+   ],
+   [
+    "Thanks. The state licenses plumbing for the company and each plumber. What's the license number Lee Home Services works under?",
+    "Thanks. The business registration is optional; I show it as you give it and don't check it. What's the registration number Lee Mobile Wraps works under?"
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most wrap shops start. Is it right? Send only what's different."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules wrap shops often set. Your call: keep them, or change any. They become the shop's own rules."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most wrap shops set it."
+   ],
+   [
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "Its money card is set the way most mobile wrap services start. Is it right? Send only what's different."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood wrap shop on Warehouse Row. Color changes, lettering and film, in 3 bays."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Lettering and fleet graphics at your lot in Springfield, within 25 miles."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Jordan and Casey do lettering at lots; Jordan does fleet graphics too. Riley and Avery wrap cars in the shop; Riley also does paint protection film. Pat is my office manager, for prices over $500. Jules rents a bay, with their own customers."
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: lettering and fleet graphics"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A wrap shop always takes drop-offs: the vehicle stays for days."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Free 30-day re-check: lifting edges or bubbles, reply here."
+   ],
+   [
+    "BS20981",
+    "REG-20981"
+   ],
+   [
+    "EC22871",
+    "REG-22871"
+   ],
+   [
+    "MP045210",
+    "REG-45210"
+   ],
+   [
+    "color and house calls",
+    "paint protection film and lot visits"
+   ],
+   [
+    "color, house calls",
+    "paint protection film, lot visits"
+   ],
+   [
+    "does color",
+    "does paint protection film"
+   ],
+   [
+    "Color always stays",
+    "Paint protection film always stays"
+   ],
+   [
+    "cut hair",
+    "wrap cars"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero rotular mis camionetas, y una tiene fuga de gasolina."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I want my vans lettered, and one has a fuel leak."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told not to drive the van with a fuel leak. She is told to call 911 if anyone is hurt."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido o mareado por los gases?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt or dizzy from fumes?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está herido ni mareado."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is hurt or dizzy."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No maneje la camioneta con una fuga de gasolina. Puede venir en grúa. Si alguien está herido, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't drive the van with a fuel leak. It can come in by tow. If anyone is hurt, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For wrap work, someone hurt, a fire, or someone dizzy or sick from fumes stops the booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hurt, a fire, or someone dizzy or sick from fumes."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurt or feels sick from fumes, get away from the vehicle and call 911 now."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can the film go over my cracked windshield?"
+   ],
+   [
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "The plug-in's questions that don't change the time or price go here, like 'Is there a covered space?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a covered space?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, in the garage"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I wash the vans before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "Alex texts that the van's fuel leak is worse. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The fuel leak under the van is worse now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Don't drive it. It can come in by tow. Casey can come sooner, at the same price."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old lettering peeling on the driver's door"
+   ],
+   [
+    "Under the sink, before",
+    "Driver's door, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Rear door, before"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 old graphics 165 truck lettering 80"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Vans and trucks, 8 vehicles"
+   ],
+   [
+    "Shutoff valve",
+    "Old graphics removal"
+   ],
+   [
+    "shutoff valve only",
+    "old graphics removal only"
+   ],
+   [
+    "Supply line",
+    "Truck lettering"
+   ],
+   [
+    "fixes the shutoff valve today",
+    "removes the old graphics today"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan counts the vehicles and texts the price with its lines."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "Say Jordan scratches a van's paint and texts a photo. It's checked against the before photos, and Sam decides how to make it right."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the van door"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched van door"
+   ],
+   [
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "Jordan finds old graphics on the van. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 remove old graphics"
+   ],
+   [
+    "Extra for {{alex.staff}}: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for {{alex.staff}}: remove old graphics, $160. Sent to Alex."
+   ],
+   [
+    "$160 valve quote",
+    "$160 removal quote"
+   ],
+   [
+    "$160 valve work",
+    "$160 removal"
+   ],
+   [
+    "replace both shutoff valves",
+    "remove the old graphics"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Remove the old graphics"
+   ],
+   [
+    "replacing both shutoff valves",
+    "removing the old graphics"
+   ],
+   [
+    "the shutoff valves",
+    "the old graphics"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 lettering"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE old glue on the door. Use more heat next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A lifting edge shows 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A corner of the lettering is lifting."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your lettering is inside the free re-check"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left glue marks on the van door."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I need three vans lettered."
+   ],
+   [
+    "a roof leak",
+    "a repaint"
+   ],
+   [
+    "Reading it back: accept the leak repair for today,",
+    "Reading it back: accept the fleet look for today,"
+   ],
+   [
+    "A leak repair from $89, priced at the visit. The $89 service call is paid up front as the deposit, counted toward the bill.",
+    "A fleet look, priced at the visit. A card is saved for the $89 trip fee, counted toward the bill."
+   ],
+   [
+    "A leak repair, priced at the visit. Only the $89 service call is promised, and a card is saved for it.",
+    "A fleet look, priced at the visit. Only the $89 trip fee is promised, and a card is saved for it."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A fleet look is priced at the visit: only the $89 trip fee was promised."
+   ],
+   [
+    "The work is priced at the visit, like a leak repair. Only the {{fee}} service call is promised now. Jordan quotes it there, and Alex says yes before any work.",
+    "The work is priced at the visit, like a fleet look. Only the {{fee}} trip fee is promised now. Jordan quotes it there, and Alex says yes before any work."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 fleet lettering is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 lettering needs none."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can letter your door at the shop for $90, or at your lot for $179. Where would you like it?"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can do your door lettering at the shop for $90, or at your home for $179. Where would you like it?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Chrome delete, 4 pieces · $199"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said someone feels sick from fumes."
+   ],
+   [
+    "A gas smell at the home",
+    "Someone sick from fumes at the shop"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to get away from the vehicle and call 911"
+   ],
+   [
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Someone with their own customers, like an installer, gets their own sign-up link instead."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. The shop's counter is in the other flow."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's counter is in the other flow."
+   ],
+   [
+    "Overflowing kitchen drain",
+    "A van with a fuel leak"
+   ],
+   [
+    "Every plumbing service",
+    "Every lot job"
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the fleet quote before booking."
+   ],
+   [
+    "Work like towing or a lockout is sent now (B4-16)",
+    "No work is sent now (B4-16): every lot job is booked ahead"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about lettering my work vans. A text back is fine."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds rust under the old lettering. The plug-in says an installer stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD rust under the old lettering, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Rust under the old lettering"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found rust under the old lettering on one van and stopped that part of the work."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: rust under the old lettering"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the new lettering on that door"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found the old lettering peeling this morning."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for a door lettering."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a lettering job, today,"
+   ],
+   [
+    "accept the leak repair for today,",
+    "accept the fleet look for today,"
+   ],
+   [
+    "Accepted: the leak repair today,",
+    "Accepted: the fleet look today,"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks about a second van's door. Both jobs go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also letter the second van's door?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The second door is a small job, priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: how many vehicles, the logo files, and whether there is a covered space."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A wrap could mean a color change or a lettering job."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee's Barbershop for a door lettering instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services asks: is the vehicle at a lot, a home or somewhere else? And how many vehicles, and is there a covered space?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my lot. Three white vans, in the garage."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can an installer letter a van this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa lettering Thu 12-2 Casey"
+   ],
+   [
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Say Kim L.'s lettering needs nobody home."
+   ],
+   [
+    "Jordan lets himself in the agreed way, with no check-in code.",
+    "Jordan works on the van at the lot, with no check-in code."
+   ],
+   [
+    "the $89 service call",
+    "the $89 trip fee"
+   ],
+   [
+    "The $89 service call",
+    "The $89 trip fee"
+   ],
+   [
+    "he's the one who replaces water heaters",
+    "Felix is the one who does fleet graphics"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Color changes, lettering and film, in 3 bays."
+   ],
+   [
+    "A water heater job",
+    "A fleet lettering job"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, no card saved"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most wrap shops start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules wrap shops often set."
+   ],
+   [
+    "like a chair renter",
+    "like an installer with their own customers"
+   ],
+   [
+    "A chair renter asked for by name",
+    "An installer with their own customers, asked for by name"
+   ],
+   [
+    "A chair, ready",
+    "A finished wrap"
+   ],
+   [
+    "The chairs",
+    "The install bays"
+   ],
+   [
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "When they book: nothing taken"
+   ],
+   [
+    "Water pressure check",
+    "Design proof"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about lettering for my work vans."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Put our logo on the vans' fits a fleet lettering."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like lettering a van that isn't yours, unasked."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a fuel door wrap? Say so.'"
+   ],
+   [
+    "like new pipes put in one day and finished another.",
+    "like a fleet lettered one day and finished another."
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 lettering needs none."
+   ],
+   [
+    "cracks the cabinet floor",
+    "scratches the van's paint"
+   ],
+   [
+    "two drain clearings",
+    "two door letterings"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds window tint to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Window tint for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW window tint"
+   ],
+   [
+    "a water heater is priced from photos",
+    "fleet lettering is priced from photos"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the vans, and an installer will price the job."
+   ],
+   [
+    "Your water heater price",
+    "Your fleet lettering price"
+   ],
+   [
+    "price your water heater",
+    "price your fleet lettering"
+   ],
+   [
+    "replaces water heaters",
+    "does fleet graphics"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount",
+    "The $640 fleet lettering is over the plug-in's amount"
+   ],
+   [
+    "water heater contract",
+    "fleet lettering estimate"
+   ],
+   [
+    "the water heater quote",
+    "the fleet lettering quote"
+   ],
+   [
+    "Jordan found the leak.",
+    "Felix looked at the vans."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can letter your door at the shop for $90, or at your lot for $179."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 fleet of 12 vans, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Mobile Wraps' quote for your fleet wrap."
+   ],
+   [
+    "Repipe · $2,400",
+    "Fleet wrap, 12 vans · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the roof is done, $800 at the finish"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both work vans' visits go on one bill on the 1st."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the paint protection film Jordan noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Mobile Wraps sent you a proposal for paint protection film, from Felix's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Paint protection film"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 truck lettering stays good until Thu Oct 29."
+   ],
+   [
+    "shutoff valve",
+    "old graphics removal"
+   ],
+   [
+    "Casey: plumbing",
+    "Brooke: lettering and fleet graphics"
+   ],
+   [
+    "Casey for plumbing",
+    "Brooke for lettering and fleet graphics"
+   ],
+   [
+    "the on-call plumber",
+    "the on-call installer"
+   ],
+   [
+    "a plumber on call",
+    "an installer on call"
+   ],
+   [
+    "no plumber on call",
+    "no installer on call"
+   ],
+   [
+    "245 valve 165 supply line 80",
+    "245 old graphics 165 truck lettering 80"
+   ],
+   [
+    "supply line",
+    "truck lettering"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Lettering and Lee Fleet Graphics."
+   ],
+   [
+    "like towing or a lockout",
+    "like a tow or a lockout"
+   ],
+   [
+    "Leak repair",
+    "Fleet look at the lot"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The second door is a small job, quoted at the visit."
+   ],
+   [
+    "leak repair",
+    "fleet look"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan letter my other van next week?"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just one, about the size of a coin."
+   ],
+   [
+    "a leak under the sink",
+    "a fleet to letter"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please park the vans in a covered space, clean and dry."
+   ],
+   [
+    "a drain cleaning at two rentals",
+    "a lettering job for two lots"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's lettering"
+   ],
+   [
+    "clear a yard drain",
+    "letter a parked van"
+   ],
+   [
+    "Yard drain",
+    "Parked van"
+   ],
+   [
+    "yard drain",
+    "parked car"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa lettering"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Door lettering"
+   ],
+   [
+    "Kitchen drain",
+    "Door lettering"
+   ],
+   [
+    "Drain clearing",
+    "Door lettering"
+   ],
+   [
+    "drain clearing",
+    "door lettering"
+   ],
+   [
+    "clear the drain",
+    "letter the van"
+   ],
+   [
+    "your new pipes are in",
+    "your lettering is done"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Jordan's notes"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds a second ding on the trunk lid."
+   ],
+   [
+    "shutoff valves",
+    "trunk lid ding"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a fleet manager books the same job for 4 vans at one lot."
+   ],
+   [
+    "Each unit's notes",
+    "Each car's notes"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Fleet Insurance, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "fleet policy"
+   ],
+   [
+    "home warranty",
+    "fleet insurance"
+   ],
+   [
+    "supply house",
+    "parts supplier"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 fleet wrap"
+   ],
+   [
+    "of your repipe",
+    "of your fleet wrap"
+   ],
+   [
+    "Rental 1",
+    "Van 1"
+   ],
+   [
+    "Rental 2",
+    "Van 2"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan scratched the paint on Alex M.'s van door. The before photo shows no scratch."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the van's fuel leak is worse."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Please don't drive the car until the windshield is checked."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s lettering, done Thu Oct 22, has a lifting edge."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It's urgent. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also remove the old lettering?"
+   ],
+   [
+    "a bathroom drain",
+    "your other car"
+   ],
+   [
+    "Drain clearings",
+    "Door letterings"
+   ],
+   [
+    "kitchen drain",
+    "door lettering"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many states license a wrap shop at one address"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how many vehicles, and is there a covered space?"
+   ],
+   [
+    "Electric.",
+    "Two vans: the white and the blue."
+   ],
+   [
+    "1-year labor warranty:",
+    "Free 30-day re-check:"
+   ],
+   [
+    "1-year labor warranty",
+    "lifetime warranty"
+   ],
+   [
+    "a dripping faucet",
+    "a second van's door"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Wraps"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Wraps'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Wraps"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilewraps.com"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Lettering and Lee Fleet Graphics"
+   ],
+   [
+    "plumbing license",
+    "lettering registration"
+   ],
+   [
+    "Plumbing license",
+    "Lettering registration"
+   ],
+   [
+    "electrical license",
+    "fleet graphics registration"
+   ],
+   [
+    "Electrical license",
+    "Fleet graphics registration"
+   ],
+   [
+    "Electrical",
+    "Fleet graphics"
+   ],
+   [
+    "electrical",
+    "fleet graphics"
+   ],
+   [
+    "plumber",
+    "installer"
+   ],
+   [
+    "Plumber",
+    "Installer"
+   ],
+   [
+    "Plumbing",
+    "Lettering"
+   ],
+   [
+    "plumbing",
+    "lettering"
+   ],
+   [
+    "Barbershop",
+    "Wrap shop"
+   ],
+   [
+    "barbershop",
+    "wrap shop"
+   ],
+   [
+    "barbers",
+    "installers"
+   ],
+   [
+    "Barbers",
+    "Installers"
+   ],
+   [
+    "barber",
+    "installer"
+   ],
+   [
+    "Barber",
+    "Installer"
+   ],
+   [
+    "Riley",
+    "Mateo"
+   ],
+   [
+    "Avery",
+    "Sasha"
+   ],
+   [
+    "Jordan",
+    "Felix"
+   ],
+   [
+    "Casey",
+    "Brooke"
+   ],
+   [
+    "88 Elm St",
+    "55 Warehouse Row"
+   ],
+   [
+    "Elm St",
+    "Warehouse Row"
+   ],
+   [
+    "42 Oak St",
+    "21 Birch Ct"
+   ],
+   [
+    "Oak St",
+    "Birch Ct"
+   ],
+   [
+    "1200 Main St",
+    "88 Harbor Ln"
+   ],
+   [
+    "A haircut",
+    "A door lettering"
+   ],
+   [
+    "a haircut",
+    "a door lettering"
+   ],
+   [
+    "Haircut",
+    "Door lettering"
+   ],
+   [
+    "haircut",
+    "door lettering"
+   ],
+   [
+    "fade",
+    "door handle wrap"
+   ],
+   [
+    "Beard trim",
+    "Fuel door wrap"
+   ],
+   [
+    "beard trim",
+    "fuel door wrap"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Mirror caps wrap"
+   ],
+   [
+    "Signature cut",
+    "Mirror caps wrap"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the shop"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "House calls",
+    "Mobile visits"
+   ],
+   [
+    "house calls",
+    "mobile visits"
+   ],
+   [
+    "House call",
+    "Lot visit"
+   ],
+   [
+    "house call",
+    "lot visit"
+   ],
+   [
+    "Water heater flush",
+    "Mirror caps wrap, at the lot"
+   ],
+   [
+    "water heater flush",
+    "mirror caps wrap, at the lot"
+   ],
+   [
+    "Water heater replacement",
+    "Fleet vans, lettering and graphics"
+   ],
+   [
+    "water heater replacement",
+    "fleet lettering"
+   ],
+   [
+    "water heaters",
+    "vans"
+   ],
+   [
+    "Water heater",
+    "Fleet lettering"
+   ],
+   [
+    "water heater",
+    "fleet lettering"
+   ],
+   [
+    "the heater",
+    "the wrap"
+   ],
+   [
+    "Sewer camera inspection",
+    "Chrome delete, 4 pieces"
+   ],
+   [
+    "sewer camera inspection",
+    "chrome delete, 4 pieces"
+   ],
+   [
+    "Sewer camera report",
+    "Wrap check report"
+   ],
+   [
+    "sewer camera report",
+    "wrap check report"
+   ],
+   [
+    "camera inspection",
+    "wrap check"
+   ],
+   [
+    "camera report",
+    "wrap check report"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Panel upgrade",
+    "Fleet graphics"
+   ],
+   [
+    "under my sink",
+    "on my car"
+   ],
+   [
+    "under the sink",
+    "on the car"
+   ],
+   [
+    "like a burst pipe",
+    "like a fuel leak"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · fleet job"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 fleet wrap"
+   ],
+   [
+    "drain clearings",
+    "door letterings"
+   ],
+   [
+    "at the door",
+    "at the van"
+   ],
+   [
+    "a installer",
+    "an installer"
+   ],
+   [
+    "A installer",
+    "An installer"
+   ],
+   [
+    "Wraps's",
+    "Wraps'"
+   ],
+   [
+    "Travel fee",
+    "Trip fee"
+   ],
+   [
+    "travel fee",
+    "trip fee"
+   ],
+   [
+    "1-year labor warranty",
+    "free 30-day re-check"
+   ],
+   [
+    "leak repair",
+    "fleet look"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "$150",
+    "$144"
+   ],
+   [
+    "Labor",
+    "Design changes after two proofs"
+   ],
+   [
+    "service-call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Elm St",
+    "Warehouse Row"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Vehicle wrap needs no state license by default. The company gives its registration, and a shop registration only where the state's rules require one.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Both companies pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The wrap shop's plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "The shop is booked by drop-off slot, not by a named space.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Wrap work runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Installers need no license of their own unless the state's form says so.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Every wrap job is booked ahead: nothing is sent now.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "why": "A vehicle is wrapped in person. Nothing is done by video or phone.",
+    "label": "By video or phone"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No insurance or plan pays for a wrap.",
+    "label": "A plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Lee's Wraps books a drop-off slot, not a seat.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Lee's Wraps books a drop-off slot, not a named space.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "Wrap work has no stays.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "why": "Drop-off times name no installer. A wish for one goes in the notes.",
+    "label": "Asks for one person by name"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "why": "No form is signed at booking: the design proof and the paint note come later (own steps).",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The shop sells no packages or memberships.",
+    "label": "A package or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The shop sells no packages or memberships.",
+    "label": "Buys a pack or membership"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "why": "The shop sells no plan of repeat visits.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "A child is never left at a wrap shop.",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "A wrap takes days: the vehicle is always left.",
+    "label": "No: the customer stays"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "A wrap is paid in one go, never in stages.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "No insurance pays for a wrap.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "why": "Each wrap is billed on its own.",
+    "label": "One bill for many visits"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "A wrap is rated like any visit.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "why": "The shop books no next visit at pick-up.",
+    "label": "Next visit booked at checkout"
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "why": "A wrap is booked by an adult; a teen's vehicle is booked by a parent.",
+    "label": "A child"
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Mobile Wraps is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The van's door"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Mobile Wraps is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Mobile wrap service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Mobile wrap price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most mobile wrap services start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Mobile Wraps, to start",
+        "lines": [
+         "Every van job",
+         "Where: at the customer's home or office",
+         "When they book: a card saved for the $89 trip fee",
+         "After the job: Rosie sends the bill"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules mobile wrap services often set. Your call: keep them, or change any. They become its own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Mobile Wraps: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Mobile Wraps will look to customers and AI assistants. I drafted it from your website and Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Lettering and fleet graphics at your lot in Springfield, within 25 miles."
+        ]
+       },
+       "photos": [
+        "The van",
+        "The team",
+        "A van being lettered"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Mobile Wraps the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Mobile Wraps · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s01"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ],
+     [
+      "san",
+      "owner",
+      "Fleet graphics next: same company, so only what's new. It needs no state license where you work, so I've set it like mobile wrap service. Send only what's different.",
+      {
+       "card": {
+        "title": "Fleet graphics, set like mobile wrap service",
+        "lines": [
+         "At the customer's place, money as for mobile wrap service",
+         "Counted and priced from photos or at the visit",
+         "It goes live once the team member who letters fleets joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the van team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Felix Price and Brooke Moore run the van. Felix does fleet graphics too. Mateo Chen and Sasha Diaz work the shop's bays. Mateo also does film and lot visits"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Felix Price: the van and fleet graphics",
+         "Brooke Moore: the van",
+         "Mateo Chen: the shop, film and lot visits",
+         "Sasha Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Wraps. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Mateo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Wraps. Sam Lee added you to the team for van and fleet graphics jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Felix"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Mateo replies YES, then checks what Sam set. One reply covers everything Mateo does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Mateo Chen · my profile",
+        "lines": [
+         "Every shop service, film and lot visits",
+         "The shop's hours"
+        ]
+       },
+       "as": "Mateo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Mateo"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the shop and lot visits, so Mateo is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Mateo picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Sasha, Felix and Brooke set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Wraps",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Felix Price",
+       "Lee Mobile Wraps",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Brooke Moore",
+       "Lee Mobile Wraps",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Wraps",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Mateo Chen",
+       "Lee's Wraps",
+       "At the shop, and lot visits",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Sasha Diaz",
+       "Lee's Wraps",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Felix: the van and fleet graphics",
+         "Brooke: the van",
+         "Mateo: the shop, film and lot visits",
+         "Sasha: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, fleet graphics and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Sasha at the shop, Brooke for the van.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Wraps can book you from now on, at the shop and for lot visits. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Mateo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Wraps can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Sasha"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Wraps can book you for the van and fleet graphics from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Felix"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Fleet graphics and Lee's Wraps now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on van and fleet graphics jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The shop's registration EX-1187 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way fleet graphics was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile wrap service",
+          "Now"
+         ],
+         [
+          "Fleet graphics",
+          "Once your fleet installer joins and you say yes"
+         ],
+         [
+          "Lee's Wraps",
+          "Its registration is on file as given, not checked. It shows once a installer joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "Even with the photo, the registration can't be confirmed. Mobile wrap service waits, saved, and the other kinds of work can still go live.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We still can't confirm registration EX-0451, so mobile wrap service stays offline.",
+      {
+       "card": {
+        "title": "Mobile wrap service · offline, saved",
+        "lines": [
+         "Everything is saved",
+         "Fleet graphics and the wrap shop can still go live",
+         "I'll remind you once in 3 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Mobile wrap service goes live at 2:16pm, and Sam can be booked now.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile wrap service is live! AI assistants can book you now.",
+      {
+       "card": {
+        "title": "Mobile wrap service · live now",
+        "lines": [
+         "You can be booked now",
+         "Your people come next, once the rest is set up",
+         "Next, fleet graphics: about 5 minutes"
+        ]
+       },
+       "buttons": [
+        "Start now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Sam sends a photo of the shop's price board and checks what Rosie read. Nothing is typed from scratch.",
+    "more": [
+     "A color change or a hood wrap is priced from the vehicle's photos, so it shows 'from photos' and a deposit.",
+     "The film is cut and ordered for the vehicle, which is why those services take a deposit.",
+     "A wrap is never put over the plate, the lights or glass the state's rules protect."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the shop's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Door lettering",
+          "$90 · 1 hour"
+         ],
+         [
+          "Door handle wrap, set",
+          "$40"
+         ],
+         [
+          "Fuel door wrap",
+          "$20"
+         ],
+         [
+          "Chrome delete, per piece",
+          "$25"
+         ],
+         [
+          "Mirror caps wrap",
+          "$55"
+         ],
+         [
+          "Hood wrap",
+          "$700 · $350 deposit"
+         ],
+         [
+          "Full color-change wrap",
+          "From photos · half as a deposit"
+         ],
+         [
+          "Paint protection film, front end",
+          "From photos"
+         ],
+         [
+          "Design proof",
+          "Free"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-81",
+    "does": "Sam lists the shop's 3 install bays and which services use each one. Customers pick a drop-off slot, never a person.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The shop is booked by the bay. List each one, and which services use it.",
+      {
+       "card": {
+        "title": "Your bays",
+        "lines": [
+         "Its name, like Bay 1",
+         "How many vehicles it fits",
+         "Which services use it",
+         "Its hours"
+        ]
+       },
+       "buttons": [
+        "List them now",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1 Bay 1 and Bay 2, any wrap. Bay 3 is the clean room for film. All the shop's hours"
+     ],
+     [
+      "san",
+      "owner",
+      "Set.",
+      {
+       "list": {
+        "head": [
+         "Bay",
+         "Services",
+         "Hours"
+        ],
+        "rows": [
+         [
+          "Bay 1",
+          "Every wrap",
+          "The shop's hours"
+         ],
+         [
+          "Bay 2",
+          "Every wrap",
+          "The shop's hours"
+         ],
+         [
+          "Bay 3",
+          "Every wrap, and paint protection film",
+          "The shop's hours"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "before",
+    "at": "A7-01",
+    "steps": [
+     {
+      "id": "A7-x01",
+      "type": "split",
+      "line": [
+       "7.1",
+       "7.2"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 4:00pm",
+      "title": "Sends the design proof",
+      "q": "Does Alex approve the proof?",
+      "does": "For a wrap priced from photos, the shop sends a design proof: the color, the finish and where the film goes. The film is ordered only after Alex approves it, and after free cancel ends.",
+      "more": [
+       "The first two proofs are free. Changes after that are $120 an hour, and Sam OKs them.",
+       "No answer: nothing moves. Sam calls Alex, and the drop-off can move with no fee."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee's Wraps: here is your design proof for the satin black color change. Nothing is ordered until you approve it.",
+        {
+         "card": {
+          "title": "Design proof · Color change",
+          "lines": [
+           "Satin black, hood to trunk",
+           "Mirrors in black, same finish",
+           "First two proofs are free"
+          ],
+          "button": "See the proof",
+          "link": "rosfield.com/p/a7"
+         },
+         "buttons": [
+          "Approve",
+          "Ask for changes"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "A wrap with a proof",
+        "when": {
+         "before": [
+          "deposit"
+         ]
+        },
+        "steps": [
+         {
+          "id": "A7-x02",
+          "type": "split",
+          "line": [
+           "7.1",
+           "7.2"
+          ],
+          "who": "cust",
+          "to": "san",
+          "via": "msg",
+          "title": "Alex answers the proof",
+          "q": "Approve or ask for changes?",
+          "does": "Alex approves the proof, or asks for changes. Nothing is ordered before a clear approval.",
+          "more": [
+           "A change after the second proof needs Sam's OK first."
+          ],
+          "needs": [
+           "pf.first_steps"
+          ],
+          "branches": [
+           {
+            "label": "1 Approve",
+            "steps": [],
+            "end": "merge"
+           },
+           {
+            "label": "2 Ask for changes",
+            "end": "merge",
+            "steps": [
+             {
+              "id": "A7-x03",
+              "line": [
+               "7.1",
+               "7.2"
+              ],
+              "who": "san",
+              "to": "cust",
+              "via": "msg",
+              "title": "Sends a new proof",
+              "does": "Say Alex wants the mirrors in matte black. A new proof comes in 2 business days. The first two proofs are free.",
+              "say": [
+               [
+                "san",
+                "cust",
+                "Got it. A new proof with matte black mirrors comes within 2 business days. The first two proofs are free."
+               ]
+              ],
+              "tells": [
+               "cust"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No proof: lettering from the board",
+        "when": {
+         "before": [
+          "none",
+          "card",
+          "full"
+         ]
+        },
+        "steps": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.3",
+       "8.21"
+      ],
+      "who": "cust",
+      "to": "staff",
+      "via": "page",
+      "t": "Sat Oct 24, 11:05am",
+      "title": "Alex signs the paint-condition note",
+      "does": "On the counter tablet, Alex reads and signs a note of the paint's condition. Repainted or peeling panels are listed. Film can lift paint that was repainted or is peeling, and Alex hears that first.",
+      "more": [
+       "The note is typed on the tablet and kept on the secure page.",
+       "A panel Alex doesn't want wrapped is left out."
+      ],
+      "form": [
+       [
+        "Panels checked",
+        "All, with photos"
+       ],
+       [
+        "Repainted or peeling",
+        "Hood: repainted"
+       ],
+       [
+        "Alex agrees",
+        "Signed on the tablet"
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A10-05",
+    "steps": [
+     {
+      "id": "A10-x01",
+      "line": [
+       "10.14",
+       "10.10"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Sun Nov 1, 9:00am",
+      "title": "Books the free 30-day re-check",
+      "does": "New film can show a lifting edge or a bubble in the first weeks. Three days after pick-up, Rosie texts Alex once: if anything shows, pick a time for the free re-check.",
+      "more": [
+       "It's a 30-minute stop at the shop, with its own check-in code.",
+       "It's a second visit on the wrap's booking: no fee, and no second $2 for Rosie.",
+       "No reply: nothing is booked. The re-check stays free for 30 days.",
+       "It's the job's own aftercare, not a sale."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee's Wraps: if any edge is lifting or a bubble shows, your free re-check is open for 30 days. It takes 30 minutes. Pick a time:",
+        {
+         "times": [
+          "Tue Nov 3 · 8:00am · Bay 1",
+          "Wed Nov 4 · 8:00am · Bay 1"
+         ]
+        }
+       ],
+       [
+        "cust",
+        "san",
+        "A"
+       ],
+       [
+        "san",
+        "cust",
+        "Booked: your free re-check. Give this code at the counter.",
+        {
+         "card": {
+          "title": "Lee's Wraps · Free re-check",
+          "lines": [
+           "Tue Nov 3 · 8:00am · Bay 1 · 30 minutes",
+           "Free: part of the wrap"
+          ]
+         },
+         "code": "3907"
+        }
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "Vehicle wrap needs no state license by default. The company gives its registration, and a shop registration only where the state's rules require one.",
+    "label": "1 A license"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Both companies pay Rosfield's $2 a booking.",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "why": "The wrap shop's plug-in adds no agreement before going live.",
+    "label": "2 Left unsigned"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "The van books people, not spaces.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Wrap work runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Installers need no license of their own unless the state's form says so.",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "Every wrap job is booked ahead: nothing is sent now.",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "why": "A vehicle is lettered in person. Nothing is done by video or phone.",
+    "label": "A video or phone session"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "The van sells no plan of repeat visits.",
+    "label": "Repeat visits: a plan"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "The van arrives in a 2-hour window (the first branch).",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "why": "No form is signed first for lettering.",
+    "label": "A form signed on the secure page"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "why": "The van sells no plan of repeat visits.",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "why": "The van sells no plan of repeat visits.",
+    "label": "A plan is skipped, paused or ended"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "The van sells no plan of repeat visits.",
+    "label": "A plan's price changes"
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "why": "The van sells no plan of repeat visits.",
+    "label": "A plan charge is due"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "Every wrap job is booked ahead: nothing is sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "Every wrap job is booked ahead: nothing is sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "An installer never minds a child.",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "An adult at the lot hands over the vehicle and the keys.",
+    "label": "1 Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "A lot job is paid in one go, never in stages.",
+    "label": "Paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "Each lot job is billed on its own.",
+    "label": "One bill for many visits"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "why": "No landlord pays for a lot job, so no bill goes to one.",
+    "label": "Someone else pays"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Each van job is rated.",
+    "label": "No: named-only work"
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Fleet graphics next: same company, so only what's new. It needs no state license where you work. Send your fleet graphics prices."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Fleet graphics price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like mobile wrap service. Send only what's different.",
+      {
+       "card": {
+        "title": "Fleet graphics, set like mobile wrap service",
+        "lines": [
+         "At the customer's place, money as for mobile wrap service",
+         "Counted and priced from photos or at the visit",
+         "It goes live once the team member who letters fleets joins"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee's Wraps is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Shop front"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the shop is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. A wrap shop needs no state license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most wrap shops start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee's Wraps, to start",
+        "lines": [
+         "Every shop service",
+         "At your shop, paid at the counter, your own way",
+         "When they book: nothing taken; a color change, a 50% deposit"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules wrap shops often set. Your call: keep them, or change any. They become the shop's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for the shop, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price and pack services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee's Wraps will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "A neighborhood wrap shop on Warehouse Row. Color changes, lettering and film, in 3 bays."
+        ]
+       },
+       "photos": [
+        "The shop front",
+        "The bays",
+        "A car in the bay"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee's Wraps the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee's Wraps · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the van team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Felix Price and Brooke Moore run the van. Felix does fleet graphics too. Mateo Chen and Sasha Diaz work the shop's bays. Mateo also does film and lot visits"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Felix Price: the van and fleet graphics",
+         "Brooke Moore: the van",
+         "Mateo Chen: the shop, film and lot visits",
+         "Sasha Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Wraps. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Mateo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Wraps. Sam Lee added you to the team for van and fleet graphics jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Felix"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Mateo replies YES, then checks what Sam set. One reply covers everything Mateo does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Mateo Chen · my profile",
+        "lines": [
+         "Every shop service, film and lot visits",
+         "The shop's hours"
+        ]
+       },
+       "as": "Mateo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Mateo"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the shop and lot visits, so Mateo is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Mateo picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Sasha, Felix and Brooke set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None needed for this work"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Wraps",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Felix Price",
+       "Lee Mobile Wraps",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Brooke Moore",
+       "Lee Mobile Wraps",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Wraps",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Mateo Chen",
+       "Lee's Wraps",
+       "At the shop, and lot visits",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Sasha Diaz",
+       "Lee's Wraps",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Felix: the van and fleet graphics",
+         "Brooke: the van",
+         "Mateo: the shop, film and lot visits",
+         "Sasha: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, fleet graphics and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Sasha at the shop, Brooke for the van.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Wraps can book you from now on, at the shop and for lot visits. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Mateo"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Wraps can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Sasha"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Wraps can book you for the van and fleet graphics from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Felix"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Fleet graphics and Lee's Wraps now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on van and fleet graphics jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The shop's registration EX-1187 is on file as given by the business, not checked.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way fleet graphics was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Mobile wrap service",
+          "Now"
+         ],
+         [
+          "Fleet graphics",
+          "Once your fleet installer joins and you say yes"
+         ],
+         [
+          "Lee's Wraps",
+          "Its registration is on file as given, not checked. It shows once a installer joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-33",
+    "does": "Even with the photo, the registration can't be confirmed. Mobile wrap service waits, saved, and the other kinds of work can still go live.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "We still can't confirm registration EX-0451, so mobile wrap service stays offline.",
+      {
+       "card": {
+        "title": "Mobile wrap service · offline, saved",
+        "lines": [
+         "Everything is saved",
+         "Fleet graphics and the wrap shop can still go live",
+         "I'll remind you once in 3 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-35",
+    "does": "Back to the main path: the checks came back in minutes. Mobile wrap service goes live at 2:16pm, and Sam can be booked now.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mobile wrap service is live! AI assistants can book you now.",
+      {
+       "card": {
+        "title": "Mobile wrap service · live now",
+        "lines": [
+         "You can be booked now",
+         "Your people come next, once the rest is set up",
+         "Next, fleet graphics: about 5 minutes"
+        ]
+       },
+       "buttons": [
+        "Start now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Sam sends a photo of the van's price list and checks what Rosie read. Nothing is typed from scratch.",
+    "more": [
+     "Each van price has the $89 trip fee in it. A fleet job is priced from photos, with a 25% deposit once the quote is OK'd.",
+     "A look at a fleet of vans is priced at the visit."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the van's price list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Van price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Door lettering, at your lot",
+          "$179 · trip fee in it"
+         ],
+         [
+          "Mirror caps wrap, at your lot",
+          "$144"
+         ],
+         [
+          "Chrome delete, 4 pieces, at your lot",
+          "$199"
+         ],
+         [
+          "Fleet vans, lettering and graphics",
+          "From photos · 25% deposit"
+         ],
+         [
+          "Fleet look at your lot",
+          "Priced at the visit"
+         ],
+         [
+          "Design proof",
+          "Free"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-81",
+    "does": "The van books people, not bays, so Sam lists no spaces for Lee Mobile Wraps. The shop's 3 bays are listed in the other flow."
+   },
+   {
+    "op": "after",
+    "at": "B4-69",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "title": "Says what lettering at a lot needs",
+      "does": "Before anything is taken, Rosie tells Alex what the install needs. The vehicle must be clean, dry and in a covered place, and above the film maker's cold limit. If not, the visit moves with no fee.",
+      "more": [
+       "An adult must be there to hand over the vehicle and the keys.",
+       "The logo files go on the secure page, not in a text."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lettering needs the vans clean, dry and in a covered place. If the day is too cold, wet or windy, Felix moves the visit with no fee. An adult must be there with the keys."
+       ]
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-01",
+    "more": [
+     "The receipt says a free 30-day re-check is at the shop: lifting edges and bubbles."
+    ]
+   }
+  ]
+ },
+ "notes": "Built on the REDESIGN 2 master (Tue Oct 27, batch D4). Parent: the refitted auto-body overlay (a drop-off priced from photos, worked over days); not edited. Its insurance, teardown, supplement and calibration steps are not used: a wrap is paid by the customer, no claim. No old flowchart existed (a new profession), so the plug-in is the trade's norm and every price says 'example'. The sign-up people and company examples come from the tires overlay's text, re-worded.\nTwo companies: Lee's Wraps (flow A, 55 Warehouse Row, 3 bays) and Lee Mobile Wraps (flow B, the van to a business's lot; kinds of work: Lee Lettering and Lee Fleet Graphics). Staff: Mateo and Sasha (shop), Felix and Brooke (van). Alex's lot is 21 Birch Ct.\nMoney A: photos|deposit|counter (main: a satin black color change for a sedan, priced from photos at $3,800; Sam OKs the price; a $1,900 deposit, half, because the film is cut and ordered for the vehicle; the $1,900 rest at the counter), photos|deposit|bill (the same, the rest on the bill with READY), list|none|counter and list|none|bill (a $90 door lettering from the board, nothing taken). The film is ordered when free cancel ends (24 hours before the drop-off), so a cancel before then returns the deposit; a later cancel may keep it only if Sam confirms. Money B: list|card|bill (main: door lettering at a business lot, $179 with the $89 trip fee in it; a card saved for the trip fee), visit|card|bill (a fleet look, priced at the visit), photos|deposit|bill (fleet vans, lettering and graphics, priced from photos at $640 with a $160 deposit once the quote is OK'd).\nThe master's numbers are kept where they fit: $90 door lettering and $179 at the lot ($90 + the $89 trip fee), $40 door handle wrap, $20 fuel door wrap, $25 chrome delete, $55 mirror caps wrap, $245 visit quote in B, $640 / $160 / $480 and $160 extra work (removing old graphics).\nOwn steps: the design proof (A7-x01 to A7-x03, only on paths with a deposit), the paint-condition note at drop-off (A8-x01), the free 30-day re-check (A10-x01; B10-01 says it too), what lettering at a lot needs (B4-x01).\nLicenses: none by default; business registration; a shop registration only where the state's rules require one. Nothing names a state. A wrap is never put over the plate, the lights or glass the state's rules protect (pf.rules).\nSafety: stop words are someone hurt or a crash, a fire or smoke, someone dizzy or sick from fumes (911, no booking). A fuel leak, brakes that fail and a windshield cracked in the driver's view are don't-drive words (the booking goes on; it comes by tow). None is used as an everyday booking example.\nWho must not be booked: an adult books; a leased or financed vehicle needs the lessor's OK where the lease says so (asked, never checked by Rosie); repainted, peeling or rusted paint needs the signed paint note, or that panel is left out.\nNever sent now. Off as work this trade never has: video or phone, seats, stays, plans, packs, insurance, stage payments, a child left, named-only work.\nNot sure (for the verifier): the 50% deposit and keeping it only on Sam's yes after the film is ordered are the example shop's terms; the film order when free cancel ends is my choice so the deposit rule is clean; the S1-13 and S1-14 per-path lines still show the master's example (paid in full, a $20 fee card) that no overlay can change without money words per path (MASTER line in the log).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Each service starts the way most barbershops set it.",
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "BS20981",
+    "EC22871",
+    "MP045210",
+    "color and house calls",
+    "color, house calls",
+    "does color",
+    "Color always stays",
+    "cut hair",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The color and cut can take a $20 deposit once Riley's photo quote is OK'd, like $20 of $90. The rest is paid at the visit, or on the bill after.",
+    "The color and cut can be paid in full once Riley's photo quote is OK'd, like $90. Nothing more is owed after.",
+    "Color and cut · $90, from photos",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Send Alex M. the color and cut at $85, not $90?",
+    "The $70 rest is refunded",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Every plumbing service",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A barbershop books a person's time.",
+    "A what-if: for a table, a court or a room, the times show the space and its size, never a person. A space shows only if it's free and big enough for the group.",
+    "Sat Oct 24 · 6:00pm · Table for 4",
+    "Sat Oct 24 · 7:30pm · Table for 6",
+    "A table for six has one code, not six.",
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Offer Alex M. Sat Oct 24 at 3:00pm with Riley?",
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Haircut · $35",
+    "Skin fade · $40",
+    "Beard trim · $20",
+    "Haircut at home · $75",
+    "Signature cut and hot towel shave · $55",
+    "Groom's package · $40 deposit",
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "'Adding a beard trim, +$20? Say so.'",
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "A card saved for the $20 fee · paid after the visit",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Refund · $20",
+    "Dee W.'s $20 payment through Rosie was charged twice.",
+    "Color quotes come to you first. Board prices never need one",
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Access, like a step-free chair: only times and places that fit show.",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "My employer pays for this cut.",
+    "The plug-in's plain questions are optional, like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "May the shop show photos of your hair? Yes / No",
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it a fade' goes back to the times.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Stopped Alex M.'s cut.",
+    "stopped Alex M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "1 color quote",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Classic cuts, fades and hot towel shaves.",
+    "A water heater job",
+    "like a chair renter",
+    "A chair renter asked for by name",
+    "A chair, ready",
+    "The chairs",
+    "Color quotes come to you first.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "like a step-free chair",
+    "would like to see your hair before pricing it.",
+    "sees the hair.",
+    "How would you like it on top?",
+    "please come with dry hair.",
+    "two skin fades",
+    "Today · 3:00pm · Avery",
+    "$20 deposit",
+    "Bills the plan first; Alex pays a share",
+    "Takes the plan's name first",
+    "Sat 11:00am visit with Riley",
+    "11:00am visit with Riley",
+    "Casey: plumbing",
+    "Casey for plumbing",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "like Lee Plumbing and Lee Electric.",
+    "Quiero un corte el sábado.",
+    "A barbershop books a person's time.",
+    "Lee's Barbershop · with Riley",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Pick a time for your first color plan visit:",
+    "Sat 11am Riley",
+    "Wants Saturday morning, with Riley",
+    "Books a haircut and a beard trim",
+    "Drain clearing",
+    "a package of cuts",
+    "many barbers, salons and groomers are licensed to their shop",
+    "patch test",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's services need none.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Riley looks, then prices it",
+    "Texts Alex the price",
+    "Only the consult; the price stays open",
+    "Checks in a drop-off or mail-in",
+    "Follows up on an item left behind",
+    "Electric.",
+    "Kids cut (12 and under)",
+    "a skin-test result",
+    "Consult only",
+    "photos of your hair",
+    "a cut on Saturday",
+    "Books a cut every 4 weeks",
+    "a cut every 4 weeks",
+    "for a staff cut",
+    "during my cut",
+    "Alex M.'s cut",
+    "in the chair",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershop",
+    "Barber license",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "READY Sofia G. Photo added.",
+    "4471",
+    "Sofia",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "1200 Main St",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "fade",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "$25 consult",
+    "Only the consult",
+    "the consult",
+    "What happens at the chair?",
+    "Priced at the chair",
+    "priced at the chair",
+    "Paid at the chair",
+    "At the chair",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "a house call",
+    "House call",
+    "house call",
+    "water heater",
+    "Panel upgrade",
+    "like a burst pipe",
+    "Style consult",
+    "style consult",
+    "$35",
+    "$40 deposit",
+    "$100 rest",
+    "$140",
+    "$75",
+    "At the chair",
+    "Style consult",
+    "style consult",
+    "Elm St"
+   ],
+   "B": [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "BS20981",
+    "EC22871",
+    "MP045210",
+    "color and house calls",
+    "color, house calls",
+    "does color",
+    "cut hair",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "The plug-in's questions that don't change the time or price go here, like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing. Rosie runs the plug-in's danger check again, then asks the pro. Casey can come sooner, so that's offered.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe",
+    "Shutoff valve",
+    "shutoff valve only",
+    "Supply line",
+    "fixes the shutoff valve today",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Say Jordan cracks the cabinet floor and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan finds corroded shutoff valves. The customer hears the price and says yes before it's done.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "$160 valve quote",
+    "$160 valve work",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "the shutoff valves",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "a roof leak",
+    "Reading it back: accept the leak repair for today,",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "The work is priced at the visit, like a leak repair. Only the {{fee}} service call is promised now. Jordan quotes it there, and Alex says yes before any work.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Sewer camera inspection · $199",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "The shop's chair is in the other flow.",
+    "Overflowing kitchen drain",
+    "Every plumbing service",
+    "would like to talk about the water heater quote before booking.",
+    "Work like towing or a lockout is sent now (B4-16)",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "I found water damage under the sink this morning.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today,",
+    "Accepted: the leak repair today,",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "A haircut could mean a salon or a barbershop.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Say Kim L.'s yard drain needs nobody home.",
+    "Jordan lets himself in the agreed way, with no check-in code.",
+    "the $89 service call",
+    "The $89 service call",
+    "he's the one who replaces water heaters",
+    "Classic cuts, fades and hot towel shaves.",
+    "A water heater job",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "like a chair renter",
+    "A chair, ready",
+    "The chairs",
+    "When they book: a card saved for the $89 service-call fee you OK",
+    "Water pressure check",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "like new pipes put in one day and finished another.",
+    "The $179 drain needs none.",
+    "cracks the cabinet floor",
+    "two drain clearings",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "a water heater is priced from photos",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Your water heater price",
+    "price your water heater",
+    "replaces water heaters",
+    "The $640 water heater is over the plug-in's amount",
+    "water heater contract",
+    "the water heater quote",
+    "Jordan found the leak.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Both rentals' visits go on one bill on the 1st.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "shutoff valve",
+    "Casey: plumbing",
+    "Casey for plumbing",
+    "the on-call plumber",
+    "a plumber on call",
+    "no plumber on call",
+    "245 valve 165 supply line 80",
+    "supply line",
+    "like Lee Plumbing and Lee Electric.",
+    "like towing or a lockout",
+    "Leak repair",
+    "The faucet is a leak repair, quoted at the visit.",
+    "leak repair",
+    "Can Jordan look at my bathroom sink next week?",
+    "Just the kitchen sink.",
+    "a leak under the sink",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals",
+    "next week's drain cleaning",
+    "clear a yard drain",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "your new pipes are in",
+    "Video and Jordan's notes",
+    "Jordan finds corroded shutoff valves.",
+    "shutoff valves",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "supply house",
+    "a $2,400 repipe",
+    "of your repipe",
+    "Rental 1",
+    "Rental 2",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Alex texts that the sink is now overflowing.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also run a camera down my sewer line?",
+    "a bathroom drain",
+    "Drain clearings",
+    "kitchen drain",
+    "many barbers, salons and groomers are licensed to their shop",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Electric.",
+    "1-year labor warranty:",
+    "1-year labor warranty",
+    "a dripping faucet",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing and Lee Electric",
+    "plumbing license",
+    "Plumbing license",
+    "electrical license",
+    "Electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "Oak St",
+    "1200 Main St",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "fade",
+    "beard trim",
+    "at the chair",
+    "rents a chair",
+    "House calls",
+    "house calls",
+    "House call",
+    "house call",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "the heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "camera inspection",
+    "camera report",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Panel upgrade",
+    "under my sink",
+    "under the sink",
+    "like a burst pipe",
+    "Rental 1",
+    "Rental 2",
+    "Right to cancel · repipe",
+    "$2,400 repipe",
+    "drain clearings",
+    "at the door",
+    "travel fee",
+    "1-year labor warranty",
+    "leak repair",
+    "$150",
+    "Labor",
+    "service-call fee",
+    "service call",
+    "Elm St"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A4-24": "0a292df05b",
+   "S1-38": "b50b0bd4e8",
+   "S2-02": "b2094081ee",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S1-70": "3961b1f903",
+   "S1-50": "3167049ceb",
+   "S1-33": "eeaadba298",
+   "S1-35": "39adfc0799",
+   "S1-12": "41b86c1e72",
+   "S1-81": "c286d15ba2",
+   "A7-01": "afb51b5e1b",
+   "A8-23": "e3a35f7f9e",
+   "A10-05": "63c3536c7a"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B5-01": "841c417586",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-32": "7713bff255",
+   "S1-38": "6301c86637",
+   "S2-02": "b2094081ee",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "S1-70": "34e952eac5",
+   "S1-50": "daa9091585",
+   "S1-33": "2b5d1fa4ab",
+   "S1-35": "1b680a4c71",
+   "S1-12": "0bea92643b",
+   "S1-81": "c286d15ba2",
+   "B4-69": "350fbaf90a",
+   "B10-01": "814aa1fde7"
+  }
+ }
+}

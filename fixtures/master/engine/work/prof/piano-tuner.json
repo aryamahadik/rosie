@@ -1,0 +1,2896 @@
+{
+ "id": "piano-tuner",
+ "name": "Piano tuner",
+ "style": "Home visit",
+ "pattern": "fix",
+ "from": "appliance",
+ "plugin": {
+  "pf.license": {
+   "need": "Most states don't license piano tuning or repair. Some register repair businesses, and some cities want a business license: the state's or city's form says. Safe default: the business registration on file, shown on the listing.",
+   "who it's held by": "The company, where the state or city asks. A tuner holds no license of their own for tuning. A voluntary certificate (an RPT from a piano technicians' guild) is proof of training, not a license.",
+   "what to ask": [
+    "The company's business registration or license number, where the state's or city's form asks for one",
+    "A tuner's training certificate (an RPT, for example), if the owner wants it shown on the listing",
+    "General liability insurance (a tuner works in customers' homes and around heavy instruments)"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "Where the state or city requires a registration, the listing goes live once it's set up. Otherwise the business registration only.",
+   "renewals": "Reminders before a license, registration or insurance date; a lapse pauses new bookings",
+   "background checks": "Only where the state's form asks",
+   "at the studio": "A small piano studio with pianos to try: the state's or city's form says if it needs a registration. Safe default: the business registration on file."
+  },
+  "pf.services": {
+   "pattern": "Home visit at a set price (a tuning), or a visit to look and then a quote (a repair or a regulation). The tuner comes to the piano: a piano is never moved for these.",
+   "B": [
+    {
+     "service": "Piano tuning (upright, spinet or grand, to standard pitch)",
+     "price kind": "one price",
+     "price": "$179",
+     "length": "about 90 minutes",
+     "place": "at the customer's home, school or studio",
+     "before": "a card saved for the $89 late-cancel and no-show fee",
+     "after": "Rosie texts the bill",
+     "note": "Recommended once or twice a year. A new or just-moved piano needs more. The piano should be in a quiet room, at room temperature."
+    },
+    {
+     "service": "Yearly tuning (the yearly plan's visit)",
+     "price kind": "one price",
+     "price": "$150 a visit, a plan customer's price",
+     "length": "about 90 minutes",
+     "place": "at the customer's home",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "service": "Pitch raise (a piano flat by more than a quarter tone)",
+     "price kind": "priced at the visit, before any work",
+     "price": "the example: $160, added to the tuning",
+     "length": "adds about an hour",
+     "place": "at the customer's home",
+     "note": "Needs the customer's yes first. A second tuning 2 to 4 weeks later holds the pitch; it is booked at the list price."
+    },
+    {
+     "service": "Piano repair (sticking keys, a squeak, a loose pedal, a broken string)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 visit is promised, counted toward the repair (example: $245)",
+     "length": "60 to 90 minutes",
+     "place": "at the customer's home",
+     "before": "nothing, or a card saved for the $89 fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Regulation and voicing (a grand or an upright, over several days)",
+     "price kind": "quoted after a visit; a written contract above the plug-in's amount",
+     "price": "its own quote (the example: $2,400, billed in three stages)",
+     "length": "1 to 3 days; a grand's action may go to the workshop",
+     "place": "at the customer's home, or the workshop",
+     "before": "a deposit only after the contract is signed",
+     "after": "stage bills, the last after a walk-through"
+    },
+    {
+     "service": "Humidity-control system install (a heater bar and a humidistat inside the piano)",
+     "price kind": "priced from photos",
+     "price": "the quote (the example: $640; over $500, Sam OKs it)",
+     "length": "about 2 hours",
+     "place": "at the customer's home",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill",
+     "note": "Needs a free outlet near the piano"
+    },
+    {
+     "service": "Pre-purchase piano check (for a used piano the customer is thinking of buying)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "about 60 minutes",
+     "place": "at the seller's place or the buyer's",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill; written notes the same day"
+    },
+    {
+     "service": "Piano appraisal (for insurance or a sale)",
+     "price kind": "one price",
+     "price": "$199, with a written report",
+     "length": "about 60 minutes",
+     "place": "at the customer's home",
+     "before": "nothing, or a card saved for the $89 fee",
+     "after": "Rosie texts the bill; the report comes the same day or the next"
+    },
+    {
+     "service": "Recital or venue tuning (a school, a church, a hall)",
+     "price kind": "quoted by the owner; the organization books and pays",
+     "price": "the owner's own price",
+     "place": "at the venue, at a set time before the event",
+     "note": "A venue contact meets the tuner and opens the room"
+    },
+    {
+     "service": "Labor",
+     "price kind": "per hour",
+     "price": "$120 an hour, 1-hour minimum",
+     "place": "at the customer's home",
+     "note": "Goes on quoted repairs; not booked alone"
+    }
+   ],
+   "A": [
+    {
+     "service": "Piano buying consult",
+     "price kind": "one price",
+     "price": "$35, 30 minutes",
+     "place": "at the studio; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the studio counter",
+     "note": "Try the pianos on the floor with a studio tech and hear what to look for. No piano is sold through Rosie."
+    },
+    {
+     "service": "Quick piano chat",
+     "price kind": "free",
+     "price": "free, 15 minutes",
+     "place": "at the studio",
+     "before": "nothing taken",
+     "after": "nothing more"
+    },
+    {
+     "service": "Written notes (a one-page summary of the consult, sent the same day)",
+     "price kind": "one price",
+     "price": "$20, an add-on to a consult",
+     "place": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Video check of a piano",
+     "price kind": "one price",
+     "price": "$55, 60 minutes, by video",
+     "place": "at the business (a video session)",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "The customer shows the piano on video; the tech says what to check or whether a visit is needed"
+    },
+    {
+     "service": "Full piano plan (buying advice, three pianos tried, written notes)",
+     "price kind": "one price",
+     "price": "$140, 2½ hours",
+     "place": "at the studio",
+     "before": "a card saved for the $40 fee (over 2 hours), or a $40 deposit",
+     "after": "paid at the studio counter"
+    },
+    {
+     "service": "Part repair at the workshop (a pedal, a key set, a music desk)",
+     "price kind": "quoted at the counter",
+     "price": "only the $25 bench check is promised, credited to the repair",
+     "length": "30 min, or left until it's ready",
+     "place": "at the studio's bench",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "The part stays at the studio until it is ready"
+    }
+   ],
+   "capacity": "One tuner per booking; a regulation or an install on a grand may need two people to lift. The studio's bench takes a few small parts a day.",
+   "skills each needs": "Tuning: any tuner. Regulation, voicing and string work: a technician cleared for it. Humidity systems: the installing tech.",
+   "nobody home": "Never: an adult (18 or older) is home for the whole visit, since the tuner works in a room with the instrument. At the studio, a small part can be left.",
+   "online": "A video check of a piano only. No tuning or repair is done by video.",
+   "extras": "Travel inside the service area only (the example: 25 miles). Parts at the owner's price, shown on the quote. No tax line unless the owner sets a rate. A moved piano: the tuner does not move pianos; a piano mover is another kind of business."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What kind of piano: an upright, a spinet, a grand or a baby grand? Acoustic only (digital pianos are not tuned)",
+    "The brand, and about how old it is",
+    "When was it last tuned? (more than a year can mean a pitch raise)",
+    "Was it moved lately? (a moved piano needs about 2 weeks to settle)",
+    "Is anything wrong: sticking keys, a buzz, a broken string?"
+   ],
+   "after a time is picked": [
+    "Who will be home: the customer, or another adult (their name and mobile go on the secure page)",
+    "Is the piano in a quiet room, away from a heater, a vent or a sunny window?",
+    "Pets, children and parking",
+    "Own or rent, and who pays: the customer, a school, or a landlord"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "A photo of the piano's nameboard and the plate inside (brand and serial)",
+    "Gate or lock codes",
+    "The organization's contact, for a venue",
+    "The card"
+   ],
+   "who may book": "An adult. A renter books, and the owner OKs it where they pay. A school, church or hall books as an organization and names who meets the tuner.",
+   "studio": [
+    "Which pianos the customer wants to try, and their budget (optional)",
+    "At the studio's bench: which part, and what it is doing"
+   ]
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A piano that tipped over or fell, or anyone hurt or pinned by one",
+     "says": "Get everyone away from the piano, and call 911 now if anyone is hurt or trapped. Don't try to lift it.",
+     "booking": "No booking until everyone is safe; the customer can come back."
+    },
+    {
+     "words": "Smoke, flames, sparks or a burning smell from the piano's humidity heater, a lamp or an outlet; or a gas smell",
+     "says": "Get everyone out now. Once outside, call 911. Don't go back in.",
+     "booking": "No booking until it's safe."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "A string snapped with a bang, or a loose wire sticking out",
+     "says": "Close the lid and keep children and pets away. Don't touch the wire: it can cut and spring back.",
+     "booking": "Goes on, marked urgent; the soonest tuning or repair time is offered first."
+    },
+    {
+     "words": "Water spilled or flooded onto the piano or under it",
+     "says": "Keep away from wet outlets and cords. Don't play it. Unplug a humidity system only if the outlet is dry.",
+     "booking": "Goes on, marked urgent."
+    },
+    {
+     "words": "The piano is leaning, a leg is cracked, or it rocks",
+     "says": "Don't lean on it or let children climb on it. Keep people out from in front of it.",
+     "booking": "Goes on, marked urgent."
+    }
+   ],
+   "business_line": "Questions about whether a piano is safe to play or to move go to the business's own line",
+   "never": "Customers are told never to tighten a string or open the piano themselves, and never to let a child climb on an upright"
+  },
+  "pf.first_steps": {
+   "at the start of the visit": "A pitch check with the tuning device, before the price and the work: passed, the tuning goes ahead; flat by more than a quarter tone, a pitch raise is priced first and needs the customer's yes; a piano that can't hold a tuning (cracked pinblock, loose pins) stops there with a written note",
+   "before the first visit": "A piano moved in the last 2 weeks needs about 2 weeks to settle before a tuning, so the first open times start after that. The tuner asks when it was moved.",
+   "after the quote": [
+    "A written contract above the plug-in's amount, signed before a regulation starts",
+    "A humidity system: a free outlet near the piano, checked from the photos"
+   ],
+   "prep": [
+    "Clear a path to the piano and keep the room quiet during the visit: no vacuum, TV or music",
+    "Keep the piano away from heat, a vent or a sunny window for a day before, and don't set drinks or plants on it",
+    "Keep children and pets away from the piano while the tuner works"
+   ],
+   "studio prep": [
+    "Bring a list of pianos you've seen, if any",
+    "At the bench, bring the part and its screws"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "At the home: the check-in code at the door, with an adult home for the whole visit. At the studio: the code at the counter.",
+   "at_the_visit": "The tuner checks the pitch, then tunes every string. The piano is left playable. A sticking key, a squeak or a broken string is shown and priced before it is fixed.",
+   "changes": "A pitch raise, a broken string or a sticking key found at the visit is priced first and needs the customer's yes. Work done is billed; work declined is not.",
+   "done": "The tuner plays the piano through with the customer, notes the pitch, then DONE",
+   "studio done": "DONE after the consult, or READY when a part is fixed and waiting at the counter",
+   "before photos": "The piano's front, its nameboard and plate, and any damage the customer pointed out"
+  },
+  "pf.money": {
+   "tuning": "A tuning is a list price; a repair is quoted at the visit, and only the $89 visit is promised. The $89 is the late-cancel and no-show fee, and counts toward a repair.",
+   "pitch raise": "A pitch raise is priced at the visit and added only after the customer's yes; the second tuning is booked at the list price.",
+   "yearly plan": "A yearly tuning is $150 a visit, paid in full when booked; each visit is booked and paid like a single one.",
+   "deposit": "A humidity system takes a 25% deposit after the quote is OK'd; a regulation takes a deposit only after the contract is signed. The deposit cap comes from the state's form.",
+   "balance": "The rest on the bill after the visit, or at the last stage; never ahead of the work",
+   "rosfield_fee": "Rosfield's $2 follows the plug-in's choice at sign-up; counted at the first check-in",
+   "big_bills": "Bank transfer through the company's own Stripe, for bills over the owner's amount (the example: $500); paid once it clears. A check or cash also works: the tuner texts 'paid check' or 'paid cash'.",
+   "tips": "No tip line",
+   "tax": "Tax on parts and labor follows the state's form",
+   "studio": "A buying consult's $35 is the studio's; a video check is paid in full when booked; a $20 fee on a consult or a bench check only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate or lock codes",
+    "The street address (the secure page has it)",
+    "Contract and change-order papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home never lets the tuner in, and is kept away from the piano"
+  },
+  "pf.staff": {
+   "roles": "Tuners and technicians (Anton, Mei): tunings, repairs and installs. Studio techs (Luca, Joan): the consults and the bench.",
+   "licenses": "None for tuning. A training certificate is shown as given if the owner lists it.",
+   "who_oks": "Sam OKs quotes over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another tuner may take a tuning; a regulation keeps its technician unless Sam moves it",
+   "on_call": "None: every job is booked ahead",
+   "lifting": "A grand's lid, action or leg work needs two people; the tuner never lifts a piano alone"
+  },
+  "pf.rules": {
+   "contract": "A written contract above the plug-in's amount (the example: $500) for a regulation or an install, signed before work starts",
+   "pitch": "A pitch raise and any repair found at the visit needs the customer's yes first, with its price",
+   "guarantee": "A 30-day touch-up on a tuning: notes that drift get a free fix, except after a pitch raise or a big humidity swing (the example's)",
+   "repair_warranty": "90 days on repairs (the example's)",
+   "records": "The piano's make, serial and last pitch are kept for the next visit; 7 years",
+   "cancel": "A change inside 24 hours may owe the $89 fee, only if a card was saved and Sam says yes",
+   "moving": "The business does not move pianos; it says so plainly and points to the kind of business that does"
+  },
+  "pf.edges": {
+   "weather": "A big swing in humidity or heat just before the visit: the tuner may advise a later time; a weather move never costs the customer",
+   "too_flat": "A piano flat by more than a quarter tone: a pitch raise first, priced at the visit, then a second tuning in 2 to 4 weeks",
+   "cannot_hold": "A cracked pinblock or soundboard, or loose pins: the tuner says so, tunes as far as is safe, and quotes the repair; only what was done is billed",
+   "just_moved": "A piano moved in the last 2 weeks waits to settle; the AI offers times after that",
+   "digital": "A digital piano or keyboard is not offered; the AI says so plainly",
+   "pests": "A mouse nest or moths in the felts: the tuner stops that part, the customer gets a written note, and pest control comes first",
+   "venue": "A recital or venue tuning is booked by the organization at a set time, with a contact who opens the room",
+   "nobody_home": "Never; an adult is home for the whole visit",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "documents",
+   "photos",
+   "extrawork",
+   "firststeps",
+   "multiday",
+   "video",
+   "dropoff",
+   "banktransfer"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Luca and Joan (studio techs)"
+  },
+  "B": {
+   "staff": "Anton and Mei (piano tuners)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Luca"
+  },
+  "B": {
+   "staff": "Anton"
+  }
+ },
+ "keep": [
+  "leak",
+  "drips",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings a worn pedal to Lee Piano Studio, Sam's small piano studio, and Luca looks at it on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Piano Tuning to tune an upright piano at 22 Maple Ct. Anton comes Thu Oct 22 between 8 and 10am. A piano that is flat or has a sticking key gets a price first, and a bigger job gets a written quote. The job depends on the money choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 piano buying consult at the studio. A card is saved for the studio's $20 fee. Alex pays at the counter.",
+    "list|none|counter": "A $35 piano buying consult. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|full|none": "The $55 video check of a piano, paid in full when booking.",
+    "list|deposit|counter": "The $140 full piano plan. A $40 deposit now, and $100 at the counter.",
+    "visit|card|counter": "A worn pedal, priced at the counter. Only the $25 bench check is promised; a card is saved; Alex pays at the counter."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Piano buying consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Piano buying consult"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Full piano plan"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Video check of a piano"
+    },
+    "visit|*|*": {
+     "name": "Pedal repair"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "visit|card|bill",
+    "visit|none|bill",
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 piano tuning from the price list. A card is saved for the $89 late-cancel and no-show fee. Rosie texts the bill after the visit.",
+    "list|none|bill": "The same $179 tuning for a returning customer. Nothing is taken before. Rosie texts the bill after the visit.",
+    "visit|card|bill": "A piano with sticking keys, priced at the visit. A card is saved; the $89 visit is owed even after a no to the price, and counts toward the repair. Rosie texts the bill.",
+    "visit|none|bill": "The same piano repair, priced at the visit. Nothing is taken before. Rosie texts the bill after the job.",
+    "photos|deposit|bill": "A humidity-control system, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+    "list|full|none": "A $150 yearly tuning (the plan's visit), paid in full when booking."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Piano tuning"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Piano tuning"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Yearly tuning"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Humidity-control system"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Humidity-control system"
+    },
+    "visit|*|*": {
+     "name": "Piano repair"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-59",
+   "A7-15",
+   "A8-02",
+   "A8-53",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-38",
+   "B5-34",
+   "B8-72"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most piano studios set it."
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop front",
+    "Studio front"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A small piano studio on Reed St. Pianos to try, buying advice, and part repairs at the bench."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks to fix a digital keyboard, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Piano Studio doesn't fix digital keyboards."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A repair is rated, so the studio takes the first branch."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Lee Piano Studio prices a part repair at the counter, once Luca sees it on the bench."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A piano studio takes small parts to repair: Alex leaves a pedal, and picks it up when it's ready."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Piano Studio sent you a proposal: Luca's repair plan."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The piano studio's plug-in adds its own: a tipped piano, smoke, sparks or a burning smell."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Organ tuning for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Piano tuning and the studio take no jobs sent now. An urgent ask gets the soonest time."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A studio has none, so nothing is sent here."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A piano tuning could mean a tuner or a piano mover."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A registration for the studio, where the state or city asks. No license for each studio tech."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I leave the pedal and come back later?"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, bench work and home visits"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the studio show photos of your piano?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds organ tuning to Lee Piano Studio."
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Studio services work like this:"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "The piano studio books a tech's time, or a bench slot."
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "At the piano studio, a small part left for repair is a drop-off: the studio takes a few a day."
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Piano Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Piano Studio"
+   ],
+   [
+    "the barbershop's",
+    "the studio's"
+   ],
+   [
+    "the shop's board",
+    "the studio's price list"
+   ],
+   [
+    "the barbershop",
+    "the studio"
+   ],
+   [
+    "A barbershop",
+    "A piano studio"
+   ],
+   [
+    "Barbershop",
+    "Piano studio"
+   ],
+   [
+    "barbershop",
+    "piano studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "$89 service-call fee",
+    "$89 visit fee"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Piano tuning and repair for homes in Springfield. Uprights, grands and spinets, within 25 miles."
+   ],
+   [
+    "Drain clearing",
+    "Piano tuning"
+   ],
+   [
+    "Water heater flush",
+    "Yearly tuning"
+   ],
+   [
+    "Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Quotes already sent keep their price."
+   ],
+   [
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Nia K.'s refund for a cancelled repair was due yesterday."
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Repair quotes come to you first. List prices never need one"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A part repair's example: 'A repair here needs a quick bench check first. Had one at Lee Piano in the last 3 months?'"
+   ],
+   [
+    "A water heater job",
+    "A piano tuning"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7",
+    "Ben T. books a piano buying consult for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7",
+    "you now have two piano buying consults on Sat Nov 7"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A piano teacher brings in five worn pedals on one morning. Rosie finds bench spots side by side across Luca and Joan."
+   ],
+   [
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Luca's price for your pedal repair is with the owner. You can wait for it, or have the bench check only today. No reply: just the bench check today, and the price comes once it's OK'd."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like Luca's repair plan after a bench check, or a lawyer's engagement letter."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two pedals from one studio work the same way. Both are asked before the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Luca can still fit the consult if you're here by 11:20, or you can move to a later time."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included.",
+    "Alex M.'s price: $110 pedal repair and a $15 pedal felt, $125 in all, the $25 bench check included."
+   ],
+   [
+    "The color correction alone is the $110 starting price, so no choice comes in under it.",
+    "The pedal repair alone is the $110 starting price, so no choice comes in under it."
+   ],
+   [
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "Done. Today: the pedal repair, $110. The $15 pedal felt price is good until Sat Oct 31."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A piano tuner's example: a string that snaps with a bang gets 'keep children and pets away, and don't touch the wire'."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Luca stopped Alex M.'s repair. The note and photo are on the secure page."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Add photos of your pedal, and a studio tech will price your part repair."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the pitch it was tuned to."
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Luca suggests moving your visit until it clears, with no fee."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: upright, A440, two sticking keys in the top octave"
+   ],
+   [
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Alex M. OK'd the pedal repair only, $110. No pedal felt today."
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped Alex M.'s repair. I put a note and a photo on the page."
+   ],
+   [
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Signed, thanks! Pick a time for your first repair plan visit:"
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a pedal fixed on Saturday."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the bench vise scratched the pedal's finish today."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "A big storm is forecast for Saturday morning. Can I still come in?"
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's pedal still squeaks a little."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Some work takes jobs sent now, like a lockout."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero afinar el piano el sábado."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 repair quote."
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "Some parts of the pedal are missing."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 bench check, then a price"
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 pedal repair + 15 pedal felt Alex M."
+   ],
+   [
+    "Riley's price for Alex M., at the chair now.",
+    "Luca's price for Alex M., at the counter now."
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "Written notes are on the price list: $20."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Registration EX-1042 · RPT certificate EX-3041"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the bench check; the price stays open"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench vise scratched my pedal's finish."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Luca: studio tech, bench work and home visits"
+   ],
+   [
+    "The $25 consult is part of the $110.",
+    "The $25 bench check is part of the $110."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex runs a music school, and asks for a studio piano tuning every 4 months."
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Video check of a piano"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Pedal repair $110 · pedal felt $15"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you fix music desks too?"
+   ],
+   [
+    "Books the groom's party together",
+    "Books the teacher's five pedals together"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a music desk repair is $25"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of a piano"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Bench work always stays with Luca."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The pedal still squeaks a little."
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Piano buying consult, video check and pedal felt"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like the studio's other services?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a tuning every 4 months"
+   ],
+   [
+    "A haircut needs nothing.",
+    "Alex brought the pedal with all its parts."
+   ],
+   [
+    "Signature cut and shave",
+    "Video check of a piano"
+   ],
+   [
+    "Haircuts work like this",
+    "Studio services work like this"
+   ],
+   [
+    "Color correction · $125",
+    "Pedal repair · $125"
+   ],
+   [
+    "Color correction · $110",
+    "Pedal repair · $110"
+   ],
+   [
+    "Haircuts never pause.",
+    "The studio's other services never pause."
+   ],
+   [
+    "Gloss to finish · $15",
+    "Pedal felt · $15"
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Repair plan"
+   ],
+   [
+    "color and house calls",
+    "bench work and home visits"
+   ],
+   [
+    "pays for the consult",
+    "pays for the bench check"
+   ],
+   [
+    "the Groom's package",
+    "the full piano plan"
+   ],
+   [
+    "The Groom's package",
+    "The full piano plan"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Piano Tuning's"
+   ],
+   [
+    "a color correction",
+    "a pedal repair"
+   ],
+   [
+    "color, house calls",
+    "bench work, home visits"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Piano Tuning"
+   ],
+   [
+    "Color correction",
+    "Pedal repair"
+   ],
+   [
+    "color correction",
+    "pedal repair"
+   ],
+   [
+    "Groom's package",
+    "Full piano plan"
+   ],
+   [
+    "a color and cut",
+    "a photo piano plan"
+   ],
+   [
+    "Shorter is fine",
+    "I'll be there"
+   ],
+   [
+    "Panel upgrade",
+    "Regulation"
+   ],
+   [
+    "signature cut",
+    "video check of a piano"
+   ],
+   [
+    "Color and cut",
+    "Photo piano plan"
+   ],
+   [
+    "color and cut",
+    "photo piano plan"
+   ],
+   [
+    "1 color quote",
+    "1 repair quote"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Piano Tuning"
+   ],
+   [
+    "Lee Electric",
+    "Lee Piano Repair"
+   ],
+   [
+    "Jordan Price",
+    "Anton Berg"
+   ],
+   [
+    "1200 Main St",
+    "615 Bell St"
+   ],
+   [
+    "a beard trim",
+    "written notes"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "Consult only",
+    "Bench check only"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Casey Moore",
+    "Mei Tanaka"
+   ],
+   [
+    "A skin fade",
+    "A piano buying consult"
+   ],
+   [
+    "a skin fade",
+    "a piano buying consult"
+   ],
+   [
+    "$25 consult",
+    "$25 bench check"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "NEW massage",
+    "NEW organ tuning"
+   ],
+   [
+    "Riley Chen",
+    "Luca Ferri"
+   ],
+   [
+    "Avery Diaz",
+    "Joan Ruiz"
+   ],
+   [
+    "Electrical",
+    "Repair"
+   ],
+   [
+    "electrical",
+    "repair"
+   ],
+   [
+    "Beard trim",
+    "Written notes"
+   ],
+   [
+    "beard trim",
+    "written notes"
+   ],
+   [
+    "patch test",
+    "part check"
+   ],
+   [
+    "88 Elm St",
+    "40 Reed St"
+   ],
+   [
+    "Barbering",
+    "Studio services"
+   ],
+   [
+    "Skin fade",
+    "Piano buying consult"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "Plumbing",
+    "Piano tuning"
+   ],
+   [
+    "plumbing",
+    "piano tuning"
+   ],
+   [
+    "a barber",
+    "a studio tech"
+   ],
+   [
+    "A barber",
+    "A studio tech"
+   ],
+   [
+    "Kids cut",
+    "Music desk repair"
+   ],
+   [
+    "kids cut",
+    "music desk repair"
+   ],
+   [
+    "Haircuts",
+    "Piano buying consults"
+   ],
+   [
+    "haircuts",
+    "piano buying consults"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "BS20981",
+    "EX-3098"
+   ],
+   [
+    "plumber",
+    "piano tuner"
+   ],
+   [
+    "Plumber",
+    "Piano tuner"
+   ],
+   [
+    "barbers",
+    "studio techs"
+   ],
+   [
+    "Haircut",
+    "Piano buying consult"
+   ],
+   [
+    "haircut",
+    "piano buying consult"
+   ],
+   [
+    "the cut",
+    "the repair"
+   ],
+   [
+    "Jordan",
+    "Anton"
+   ],
+   [
+    "Elm St",
+    "Reed St"
+   ],
+   [
+    "barber",
+    "studio tech"
+   ],
+   [
+    "Barber",
+    "Studio tech"
+   ],
+   [
+    "chairs",
+    "bench spots"
+   ],
+   [
+    "Casey",
+    "Mei"
+   ],
+   [
+    "Riley",
+    "Luca"
+   ],
+   [
+    "Avery",
+    "Joan"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "gloss",
+    "pedal felt"
+   ],
+   [
+    "cuts",
+    "repairs"
+   ]
+  ],
+  "B": [
+   [
+    "A tip line · bank transfer over $500",
+    "Bank transfer over $500"
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "has no screens for this job, and no first step.",
+    "rules out a digital piano, and asks when the piano was moved."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For piano tuning, a tipped piano, smoke, sparks, a burning smell or a gas smell stops the booking."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. The piano didn't tip and I don't smell gas."
+   ],
+   [
+    "No. No huele a gas.",
+    "No. El piano no se cayó y no huele a gas."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Did the piano tip over, or do you smell gas?"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Se cayó el piano o huele a gas?"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT pinched my finger, need to stop"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 pitch raise"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Urgent piano job"
+   ],
+   [
+    "like an overflowing drain",
+    "like a lockout"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my house."
+   ],
+   [
+    "shop-added",
+    "business-added"
+   ],
+   [
+    "Tells Alex it's with the shop",
+    "Tells Alex it's with the company"
+   ],
+   [
+    "Gives the shop's own line",
+    "Gives the company's own line"
+   ],
+   [
+    "Alex books on the shop's booking page",
+    "Alex books on the company's booking page"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most piano studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules piano studios often set."
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "Shop front",
+    "Studio front"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A piano tuning could mean a tuner or a piano mover."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A small piano studio on Reed St. Pianos to try, buying advice, and part repairs at the bench."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Piano Studio can do your buying consult at the studio for $35, or at your home for $75. Where would you like it?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Piano tuning and the studio take no jobs sent now. An urgent ask gets the soonest time."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the studio's techs does home visits."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A registration for the studio, where the state or city asks. No license for each studio tech."
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Piano Studio"
+   ],
+   [
+    "the barbershop's",
+    "the studio's"
+   ],
+   [
+    "the barbershop",
+    "the studio"
+   ],
+   [
+    "Barbershop",
+    "Piano studio"
+   ],
+   [
+    "barbershop",
+    "piano studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Anton's tool case scratches the hardwood floor, and Anton texts a photo."
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like tuning a neighbor's piano without asking."
+   ],
+   [
+    "$89 service-call fee",
+    "$89 visit fee"
+   ],
+   [
+    "Service call",
+    "Visit fee"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Video check of a piano"
+   ],
+   [
+    "Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Piano tuning"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Piano tuning and repair for homes in Springfield. Uprights, grands and spinets, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A piano tuning"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Piano Tuning. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my upright piano. It sounds out of tune. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My piano sounds off' fits a piano tuning."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a second piano? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And what kind of piano is it, and when was it last tuned?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Piano Tuning can tune your piano:"
+   ],
+   [
+    "Alex M. · water heater",
+    "Alex M. · humidity system"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount",
+    "The $640 humidity-control system is over the plug-in's amount"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, plenty"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 piano tuning needs none."
+   ],
+   [
+    "Your water heater contract",
+    "Your humidity-control contract"
+   ],
+   [
+    "Your water heater visit",
+    "Your humidity-control visit"
+   ],
+   [
+    "the water heater contract",
+    "the humidity-control contract"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Key repair and pedal parts · $540"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a new crack in the piano's finish this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a piano that sounds off, this week"
+   ],
+   [
+    "you have two drain clearings on Mon Nov 9",
+    "you have two piano tunings on Mon Nov 9"
+   ],
+   [
+    "Jordan cuts a hand",
+    "Anton pinches a finger in the lid"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Anton finds a mouse nest and chewed felts inside the piano. The plug-in says a piano tuner stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Anton fixes the sticking keys today, $165. The $80 pedal work stays good until Thu Oct 29."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a humidity-control system is priced from photos, so Rosie's first text asks for them. No time is saved while it's priced."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This piano was just moved, so it needs about 2 weeks to settle. The first open times are the week after next."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep children and pets away from the piano and not to touch the wire. If it tipped, she gets everyone out and calls 911."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the piano's type and age, when it was last tuned, if it was moved lately, and any sticking keys."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantenga a los niños y a las mascotas lejos del piano y no toque el alambre. Si se cayó, saque a todos y llame al 911."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Close the lid and keep children and pets away from the piano. Don't touch the loose wire."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Anton's times show: he installs humidity systems."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My piano sounds off. Can a tuner come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep children and pets away from the piano, and don't touch the wire. If it tipped, get everyone out and call 911."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Anton found a mouse nest and chewed felts inside your piano and stopped that part of the work."
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Anton's tool case scratched the hardwood floor at Alex M.'s. The before photo shows no scratch."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A piano tuning"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Piano Tuning sent you a proposal for a new pedal assembly, from Anton's notes."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A piano tuner's example: a string that snaps with a bang gets 'keep children and pets away, and don't touch the wire'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A string just snapped in my piano."
+   ],
+   [
+    "not roofing. Nothing was saved. You can look for a roofer near you.",
+    "not digital pianos. Nothing was saved. You can look for a keyboard technician near you."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to play the piano after water got on it?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a tuner come this Thursday? What does a tuning cost?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a tipped piano, smoke, sparks or a burning smell, or a gas smell."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your piano and the room, and a piano tuner will price the job."
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the sticking keys only, $165. Leave the pedal work."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE pitch 20 cents flat, tuned to A440. A second tuning in 3 weeks would hold better."
+   ],
+   [
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Anton's estimate visit at Harper J.'s is for a $2,400 grand piano regulation."
+   ],
+   [
+    "would like to talk about the water heater quote before booking",
+    "would like to talk about the humidity system quote before booking"
+   ],
+   [
+    "Lee Home Services couldn't price your water heater this time.",
+    "Lee Piano Tuning couldn't price your humidity system this time."
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the action is back in, $800 at the finish"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Anton finds the problem and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Anton found the problem: two keys stick. Here's the price to fix it today."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Anton's next times for a piano tuning."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The second piano is a tuning at the list price. Both fit in the same arrival window."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s piano, tuned Thu Oct 22, has three notes that drifted."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Anton says no. Please leave the lid closed until Anton is there."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your humidity system price is with Lee Piano Tuning."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Some work takes jobs sent now, like a lockout."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Anton also write an appraisal for my insurer?"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Piano Tuning's quote for your grand piano regulation."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Se rompió una cuerda del piano."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 pitch raise, piano a half step flat"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you tune it every year, too?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a piano tuning at two rentals every 6 months"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Anton look at the piano at my school next week?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a string just snapped with a loud bang."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My piano is badly out of tune before tomorrow's recital. Can someone come tonight?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a second piano."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "A string just snapped with a loud bang."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE two sticking keys, pitch about 20 cents flat"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Anton also tune the second piano?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I vacuum inside the piano before you come?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD mouse nest and chewed felts inside the piano, stopped"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the new pedal assembly Anton noted"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear a path to the piano, and keep children and pets away."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 pitch raise quote is good for 7 days."
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every tuning, and repair jobs"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Registration EX-1042 · RPT certificate EX-3041"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next month's piano tuning?"
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a part it needed that isn't in"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Anton finds the piano a half step flat."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Luca: studio tech, bench work and home visits"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Three notes drift out of tune 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Three notes have drifted out of tune."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 sticking keys 165 pedal work 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the cleaning inside the piano"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Anton left tuning wedges on the piano."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call a pest control company first"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there room around the piano?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a mouse nest and chewed felts inside the piano"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE tool case scratched the hardwood floor"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · New pedal assembly"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa piano tuning Thu 12-2 Mei"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly tuning plan"
+   ],
+   [
+    "replacing both shutoff valves",
+    "the pitch raise"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Piano buying consult, video check and pedal felt"
+   ],
+   [
+    "Your drain is under warranty",
+    "Your tuning is under warranty"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 grand piano regulation, 3 stages"
+   ],
+   [
+    "replace both shutoff valves",
+    "do the pitch raise"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Pitch raise before tuning"
+   ],
+   [
+    "a water heater replacement",
+    "a humidity-control system install"
+   ],
+   [
+    "for the water heater flush",
+    "for the yearly tuning"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mouse nest and chewed felts inside the piano"
+   ],
+   [
+    "Harper J.'s $2,400 repipe",
+    "Harper J.'s $2,400 grand piano regulation"
+   ],
+   [
+    "the 1-year labor warranty",
+    "the 30-day tuning guarantee"
+   ],
+   [
+    "Water heater replacement",
+    "Humidity-control system"
+   ],
+   [
+    "water heater replacement",
+    "humidity-control system"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Anton's notes"
+   ],
+   [
+    "Sewer camera inspection",
+    "Piano appraisal"
+   ],
+   [
+    "sewer camera inspection",
+    "piano appraisal"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Piano tuning"
+   ],
+   [
+    "Just the kitchen sink.",
+    "An upright, in the living room."
+   ],
+   [
+    "Under the sink, before",
+    "Piano front, before"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your grand piano regulation"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Piano Tuning LLC"
+   ],
+   [
+    "Cabinet floor, before",
+    "Hardwood floor, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched hardwood floor"
+   ],
+   [
+    "1-year labor warranty",
+    "30-day tuning guarantee"
+   ],
+   [
+    "color and house calls",
+    "bench work and home visits"
+   ],
+   [
+    "a water heater flush",
+    "a tuning"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Sticking keys · $165"
+   ],
+   [
+    "leehomeservices.com",
+    "leepianotuning.com"
+   ],
+   [
+    "heating and cooling",
+    "organ tuning"
+   ],
+   [
+    "Heating and cooling",
+    "Organ tuning"
+   ],
+   [
+    "Sewer camera report",
+    "Appraisal report"
+   ],
+   [
+    "sewer camera report",
+    "appraisal report"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Piano Tuning's"
+   ],
+   [
+    "Water heater flush",
+    "Yearly tuning"
+   ],
+   [
+    "water heater flush",
+    "yearly tuning"
+   ],
+   [
+    "the shutoff valves",
+    "the pitch raise"
+   ],
+   [
+    "color, house calls",
+    "bench work, home visits"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Piano Tuning"
+   ],
+   [
+    "camera inspection",
+    "appraisal"
+   ],
+   [
+    "yearly flush plan",
+    "yearly tuning plan"
+   ],
+   [
+    "Supply line · $80",
+    "Pedal work · $80"
+   ],
+   [
+    "the kitchen drain",
+    "the piano tuning"
+   ],
+   [
+    "A drain clearing",
+    "A piano tuning"
+   ],
+   [
+    "a drain clearing",
+    "a piano tuning"
+   ],
+   [
+    "like a roof leak",
+    "like a digital keyboard"
+   ],
+   [
+    "Drain clearings",
+    "Piano tunings"
+   ],
+   [
+    "Repipe · $2,400",
+    "Grand piano regulation · $2,400"
+   ],
+   [
+    "plumbing visit",
+    "tuning visit"
+   ],
+   [
+    "Drain clearing",
+    "Piano tuning"
+   ],
+   [
+    "drain clearing",
+    "piano tuning"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 piano tuning"
+   ],
+   [
+    "Panel upgrade",
+    "Regulation"
+   ],
+   [
+    "A leak repair",
+    "A piano repair"
+   ],
+   [
+    "a leak repair",
+    "a piano repair"
+   ],
+   [
+    "camera report",
+    "appraisal report"
+   ],
+   [
+    "Kitchen drain",
+    "Piano tuning"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Piano Tuning"
+   ],
+   [
+    "Lee Electric",
+    "Lee Piano Repair"
+   ],
+   [
+    "Jordan Price",
+    "Anton Berg"
+   ],
+   [
+    "1200 Main St",
+    "615 Bell St"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "Casey Moore",
+    "Mei Tanaka"
+   ],
+   [
+    "Leak repair",
+    "Piano repair"
+   ],
+   [
+    "leak repair",
+    "piano repair"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "Riley Chen",
+    "Luca Ferri"
+   ],
+   [
+    "Avery Diaz",
+    "Joan Ruiz"
+   ],
+   [
+    "Electrical",
+    "Repair"
+   ],
+   [
+    "electrical",
+    "repair"
+   ],
+   [
+    "Yard drain",
+    "Piano tuning"
+   ],
+   [
+    "yard drain",
+    "piano tuning"
+   ],
+   [
+    "88 Elm St",
+    "40 Reed St"
+   ],
+   [
+    "42 Oak St",
+    "22 Maple Ct"
+   ],
+   [
+    "a plumber",
+    "a piano tuner"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "Plumbing",
+    "Piano tuning"
+   ],
+   [
+    "plumbing",
+    "piano tuning"
+   ],
+   [
+    "a barber",
+    "a studio tech"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "EC22871",
+    "EX-2287"
+   ],
+   [
+    "BS20981",
+    "EX-3098"
+   ],
+   [
+    "plumber",
+    "piano tuner"
+   ],
+   [
+    "Plumber",
+    "Piano tuner"
+   ],
+   [
+    "haircut",
+    "piano buying consult"
+   ],
+   [
+    "Jordan",
+    "Anton"
+   ],
+   [
+    "barber",
+    "studio tech"
+   ],
+   [
+    "Barber",
+    "Studio tech"
+   ],
+   [
+    "Casey",
+    "Mei"
+   ],
+   [
+    "Riley",
+    "Luca"
+   ],
+   [
+    "Avery",
+    "Joan"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "cuts",
+    "repairs"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "A video check shows the piano on the call. Luca says what to check, or if a tuner should come to the home."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-11",
+    "more": [
+     "A part on order: the part stays at the studio. Luca texts PARTS with the due date, and Alex is told.",
+     "The part comes late: Alex gets the new ready date, or takes it back, owing only what was agreed."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Piano tuning needs no license of its own; the studio and tuning take the business registration only, where the state's or city's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "A tuner holds no license of their own for tuning; a training certificate is kept on either branch."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Piano tuning and the studio pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Piano tuning books tuners and techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Piano tuning runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Piano tuning sends nobody now: an urgent ask, like a string that snapped before a recital, gets the soonest times first."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at the studio is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Studio visits are rated, like every visit."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "Lee Piano Studio bills no plan or insurance: the customer pays at the counter, and a small piano under the maker's warranty goes to the maker (A4-38). A home warranty plan is checked only on a home visit (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "Lee Piano Studio bills no plan or insurance: the customer pays at the counter, and a small piano under the maker's warranty goes to the maker (A4-38). A home warranty plan is checked only on a home visit (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A shop repair has no later result: the item is READY and picked up (A10-22 says the shop has none)."
+   },
+   {
+    "op": "off",
+    "at": "A4-37",
+    "why": "Lee Piano Studio bills no plan: a home warranty is checked only on a home visit (flow B)."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A shop repair needs no document signed before booking: a written estimate, where the state's rules require one, is given at the counter."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "The piano studio sends no proposals: the item is READY and picked up."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The shop's plug-in names no form to sign. Its first steps are a warranty check or a part check."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "Piano tuning is booked by the adult who owns the piano, never for a child."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.18",
+       "8.19"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 11:15am",
+      "title": "Offers a second tuning after a pitch raise",
+      "does": "Anton raised the pitch today, so the piano will hold it better with a second tuning in 2 to 4 weeks. Rosie offers the next times on the same job, at the list price.",
+      "more": [
+       "The second tuning is the list price, $179. Nothing is booked or charged without Alex's yes.",
+       "Alex can say no. Today's pitch raise and tuning stand either way.",
+       "No answer: nothing is booked, and Anton adds a note for the next visit."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Anton raised the pitch today. A second tuning in 2 to 4 weeks helps it hold. Want to book one?",
+        {
+         "times": [
+          "Thu Nov 5 · arriving 8–10am · Anton",
+          "Thu Nov 12 · arriving 8–10am · Anton"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.edges"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "For a repair or a humidity system, the page also asks for a photo of the nameboard and plate. It tells Anton the age and which parts fit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "The nameboard photo is on the job's page, so Anton brings the parts that fit that piano."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "more": [
+     "Here it books right away: it isn't for today, and the price is from the list or already OK'd.",
+     "A recital or venue tuning asks Sam first: it needs a set time and a venue contact.",
+     "Piano tuning is never sent now, so no job skips Sam's same-day OK."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-20",
+    "more": [
+     "A piano that can't hold a tuning: Anton says so, and only the $89 visit is owed."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "A pitch raise, a string or a key part is priced first. Repair, rebuild or replace is Alex's call. Rosie gives the price, never advice."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-30",
+    "more": [
+     "A piano that has tipped or rocks: Anton stops, keeps everyone clear, and calls 911 if anyone is hurt."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-39",
+    "more": [
+     "Anton plays the piano through with Alex, and notes the pitch for the next visit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-58",
+    "more": [
+     "Piano tuning is never sent now, so every visit gets the day list and an on-my-way text."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Piano tuning needs no license of its own; the company takes the business registration only, where the state's or city's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "A tuner holds no license of their own for tuning; a training certificate is kept on either branch."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Piano tuning is never sent now, so no job goes to a tech on call."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Piano tuning and the studio pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Piano tuning books tuners and techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Piano tuning runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Piano tuning sends nobody now: an urgent ask, like a string that snapped before a recital, gets the soonest times first."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Piano tuning books a tuner in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in piano tuning is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A home visit books a tuner in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Piano tuning is never sent now, so every visit has a set time and a reminder."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Piano tuning is never sent now, so every visit starts with the day list and OMW."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A piano visit is never left with a child: the tuner waits for an adult on the booking."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "An adult is home for every piano visit: the tuner works inside, with the instrument out."
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "Piano tuning is booked by the adult who owns the piano, never for a child. An adult is home for the whole visit."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Piano visits are rated, like every visit."
+   }
+  ]
+ },
+ "notes": "New profession on the REDESIGN 2 master (batch P4, Tue Oct 27 2026), built from appliance (refitted that morning, check-prof 0/0). Why appliance: a piano tuner works like an appliance tech: a home visit in an arrival window with an adult home, a set price for the common job and a price at the visit for a repair, the bill after, and a small studio as the second side. Unlike appliance: the tuning is a list price (the main path is the list), nothing is sent now, no license (S1-60 and S2-28 take their no-license branches), and no maker's warranty step.\nFlow B main path (list|card|bill): a $179 piano tuning at 22 Maple Ct, Thu Oct 22, 8-10am with Anton; a card is saved for the $89 late-cancel and no-show fee; Rosie texts the bill after. Other B paths: list|none|bill (a returning customer), visit|card|bill and visit|none|bill (a repair priced at the visit: sticking keys $165 + pedal work $80 = $245; only the $89 visit is promised and counts toward the repair), photos|deposit|bill (a humidity-control system, $640 from photos, over $500 so Sam OKs it, 25% deposit $160), list|full|none (the yearly tuning, $150 a visit, paid in full when booked: this is the master's yearly plan).\nA pitch raise ($160, the master's added-work example) is priced at the visit and needs Alex's yes; own step B8-x01 then offers a second tuning in 2 to 4 weeks at the list price. The first-step mechanism carries two real rules: a piano moved in the last 2 weeks waits to settle (B4-97 lead time: the first open times are the week after next), and a pitch check at the start of the visit decides whether a pitch raise comes first (B8-89 / B8-90). A bigger job is the master's estimate path (Harper J.'s $2,400 grand piano regulation, three stages of $800).\nStop words: a tipped or fallen piano; smoke, flames, sparks or a burning smell (a humidity heater, a lamp, an outlet) or a gas smell. A snapped string, water on the piano and a leaning piano get the safety steps, then the booking goes on, marked urgent. B8-30's hazard is a mouse nest and chewed felts inside the piano (stop that part, written note, pest control first). Digital pianos are not offered (B4-03 says so plainly). The business does not move pianos.\nWho is not booked: a minor; a visit with no adult home (the tuner works in a room with the instrument); a renter without the owner's OK where the owner pays; a digital piano. A school, church or hall books as an organization and names who meets the tuner (a recital tuning has a set time and a venue contact).\nLicenses: none for tuning in most states; a business registration or city license where the state's or city's form asks; a training certificate (an RPT) is optional and checked by a photo within 1 business day. No state, city or law is named; license numbers use the EX- format.\nMoney: the $89 is the visit fee, the late-cancel and no-show fee, and it is owed after a no to a repair price. Deposits only for the humidity system (25%) and for a regulation after its contract. No tip line is in the plug-in. Added work is paid with the rest at the visit (D91). The tuning guarantee is 30 days (a free touch-up for notes that drift, not after a pitch raise or a humidity swing); repairs 90 days (the example's). The $89 fee also sits on the $179 tuning and $150 yearly tuning (97 master steps hard-code $89); the owner may set a smaller fee.\nFlow A is the studio (Lee Piano Studio, Sam's second company, studio techs Luca and Joan, a few pianos to try): piano buying consult $35 (card saved for the $20 missed-consult fee; or at home for $75), written notes $20, a quick chat (free), a video check of a piano $55 paid in full (fact video), a full piano plan $140 with a $40 deposit, and a part repair at the bench (a pedal, a key set, a music desk) priced at the counter after a $25 bench check (fact dropoff). Times are set starts.\nThe second kind of work at sign-up is piano repair; the NEW kind of work added later is organ tuning.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Each service starts the way most barbershops set it.",
+    "shops",
+    "Shop front",
+    "Shop",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A barbershop has none, so nothing is sent here.",
+    "A haircut could mean a salon or a barbershop.",
+    "A license for the shop and for each barber.",
+    "Can my son wait in the shop during my cut?",
+    "Every shop service, color and house calls",
+    "May the shop show photos of your hair?",
+    "Sam adds massage to Lee's Barbershop.",
+    "Haircuts at the shop work like this:",
+    "A barbershop books a person's time.",
+    "A barbershop's plug-in has none.",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "the barbershop's",
+    "the shop's board",
+    "the barbershop",
+    "A barbershop",
+    "Barbershop",
+    "barbershop",
+    "shop",
+    "$89 service-call fee",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Drain clearing",
+    "Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Nia K.'s refund for the cancelled membership was due yesterday.",
+    "Color quotes come to you first. Board prices never need one",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A water heater job",
+    "Ben T. books a skin fade for Sat Nov 7",
+    "you now have two skin fades on Sat Nov 7",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Riley's price for your color correction is with the owner. You can wait for it, or have the consult only today.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included.",
+    "The color correction alone is the $110 starting price, so no choice comes in under it.",
+    "Done. Today: the color correction, $110. The $15 gloss price is good until Sat Oct 31.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Alex M. OK'd the color correction only, $110. No gloss today.",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Signed, thanks! Pick a time for your first color plan visit:",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "The signed form this service needs is missing.",
+    "Promises the $25 consult; priced at the chair",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Riley's price for Alex M., at the chair now.",
+    "A beard trim is on the price board: $20.",
+    "Plumbing JP031552 · electrical JE30417",
+    "Only the consult; the price stays open",
+    "The cape clip ripped my shirt collar.",
+    "Riley: barber, color and house calls",
+    "The $25 consult is part of the $110.",
+    "Alex asks for a cut every 4 weeks.",
+    "Signature cut and hot towel shave",
+    "Color correction $110 · gloss $15",
+    "Do you do kids cuts? My son is 8.",
+    "Books the groom's party together",
+    "a Kids cut (12 and under) is $25",
+    "like a 15-minute style consult",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Haircut, fade and beard trim",
+    "Does it work like haircuts?",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "Signature cut and shave",
+    "Haircuts work like this",
+    "Color correction · $125",
+    "Color correction · $110",
+    "Haircuts never pause.",
+    "Gloss to finish · $15",
+    "Proposal · Color plan",
+    "color and house calls",
+    "pays for the consult",
+    "the Groom's package",
+    "The Groom's package",
+    "Lee Home Services'",
+    "a color correction",
+    "color, house calls",
+    "Lee Home Services",
+    "Color correction",
+    "color correction",
+    "Groom's package",
+    "a color and cut",
+    "Shorter is fine",
+    "Panel upgrade",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "1 color quote",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "a beard trim",
+    "a house call",
+    "Consult only",
+    "at the chair",
+    "Casey Moore",
+    "A skin fade",
+    "a skin fade",
+    "$25 consult",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "NEW massage",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "88 Elm St",
+    "Barbering",
+    "Skin fade",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "a barber",
+    "A barber",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "EC22871",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Jordan",
+    "Elm St",
+    "barber",
+    "Barber",
+    "chairs",
+    "Casey",
+    "Riley",
+    "Avery",
+    "chair",
+    "gloss",
+    "cuts"
+   ],
+   "B": [
+    "A tip line · bank transfer over $500",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "has no screens for this job, and no first step.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "No. It doesn't smell like gas.",
+    "No. No huele a gas.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "HURT cut my hand, need to stop",
+    "the $160 valve work",
+    "Overflowing kitchen drain",
+    "like an overflowing drain",
+    "Me, and yes. It's my kitchen.",
+    "shop-added",
+    "Tells Alex it's with the shop",
+    "Gives the shop's own line",
+    "Alex books on the shop's booking page",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "shops",
+    "Shop front",
+    "Shop",
+    "A haircut could mean a salon or a barbershop.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "One of the shop's barbers does house calls.",
+    "A license for the shop and for each barber.",
+    "Lee's Barbershop",
+    "the barbershop's",
+    "the barbershop",
+    "Barbershop",
+    "barbershop",
+    "shop",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Service call fee",
+    "service call fee",
+    "Like tapping a neighbor's water line without asking.",
+    "$89 service-call fee",
+    "Service call",
+    "service call",
+    "Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Alex M. · water heater",
+    "The $640 water heater is over the plug-in's amount",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Your water heater contract",
+    "Your water heater visit",
+    "the water heater contract",
+    "Shutoff valve and wall pipe · $540",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "you have two drain clearings on Mon Nov 9",
+    "Jordan cuts a hand",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "not roofing. Nothing was saved. You can look for a roofer near you.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "would like to talk about the water heater quote before booking",
+    "Lee Home Services couldn't price your water heater this time.",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Jordan says no. Please wait until the job is done.",
+    "Your water heater price is with Lee Home Services.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "a drain cleaning at two rentals every 3 months",
+    "Can Jordan look at my bathroom sink next week?",
+    "Alex texts that the sink is now overflowing.",
+    "It's overflowing. Can someone come tonight?",
+    "Say Alex also asks about a dripping faucet.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Can Jordan also look at a dripping faucet?",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "like replacing the old pipes Jordan noted",
+    "Please clear the cabinet under the sink.",
+    "The $160 valve quote is good for 7 days.",
+    "Every plumbing job, and electrical jobs",
+    "Plumbing JP031552 · electrical JE30417",
+    "Can I skip next week's drain cleaning?",
+    "like a permit it needed that isn't in",
+    "Jordan finds corroded shutoff valves.",
+    "Riley: barber, color and house calls",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "DAMAGE cracked the cabinet floor",
+    "Proposal · Replace the old pipes",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Yearly water heater flush plan",
+    "replacing both shutoff valves",
+    "Haircut, fade and beard trim",
+    "Your drain is under warranty",
+    "QUOTE 2400 repipe, 3 stages",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "a water heater replacement",
+    "for the water heater flush",
+    "Mold behind the sink wall",
+    "Harper J.'s $2,400 repipe",
+    "the 1-year labor warranty",
+    "Water heater replacement",
+    "water heater replacement",
+    "Video and Jordan's notes",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Kitchen drain clearing",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "stage 2 of your repipe",
+    "Lee Home Services LLC",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "1-year labor warranty",
+    "color and house calls",
+    "a water heater flush",
+    "Shutoff valve · $165",
+    "leehomeservices.com",
+    "heating and cooling",
+    "Heating and cooling",
+    "Sewer camera report",
+    "sewer camera report",
+    "Lee Home Services'",
+    "Water heater flush",
+    "water heater flush",
+    "the shutoff valves",
+    "color, house calls",
+    "Lee Home Services",
+    "camera inspection",
+    "yearly flush plan",
+    "Supply line · $80",
+    "the kitchen drain",
+    "A drain clearing",
+    "a drain clearing",
+    "like a roof leak",
+    "Drain clearings",
+    "Repipe · $2,400",
+    "plumbing visit",
+    "Drain clearing",
+    "drain clearing",
+    "DONE 179 drain",
+    "Panel upgrade",
+    "A leak repair",
+    "a leak repair",
+    "camera report",
+    "Kitchen drain",
+    "rents a chair",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Jordan Price",
+    "1200 Main St",
+    "at the chair",
+    "Casey Moore",
+    "Leak repair",
+    "leak repair",
+    "house calls",
+    "House calls",
+    "Price board",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Yard drain",
+    "yard drain",
+    "88 Elm St",
+    "42 Oak St",
+    "a plumber",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "a barber",
+    "cut hair",
+    "EC22871",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "haircut",
+    "Jordan",
+    "barber",
+    "Barber",
+    "Casey",
+    "Riley",
+    "Avery",
+    "chair",
+    "cuts"
+   ]
+  },
+  "A": {
+   "A4-36": "f261af1660",
+   "A8-11": "d5522790d9",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A4-37": "4ee9e74e71",
+   "A5-19": "5d5db6f3c1",
+   "A4-43": "c17d56f766",
+   "A8-67": "e9fd748fc5",
+   "A4-24": "0a292df05b"
+  },
+  "B": {
+   "B8-37": "3ce85cf051",
+   "B4-29": "9234c5ed40",
+   "B6-14": "dfd03ee673",
+   "B6-03": "dcc1eb310c",
+   "B8-20": "53903a8275",
+   "B8-23": "dd780a2ec8",
+   "B8-30": "a1ef4983e4",
+   "B8-39": "aa75251207",
+   "B8-58": "6a101417a1",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B4-32": "fcfe092e37",
+   "B10-32": "7713bff255"
+  }
+ }
+}

@@ -1,0 +1,6818 @@
+{
+ "id": "dentist",
+ "name": "Dentist",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each dentist and each dental hygienist holds their own active license from the state's dental board",
+   "who": "each person; the practice too where the state's form registers dental offices or their owners",
+   "ask": "each person's license number in their invite reply (or the owner sends it); the practice's registration and any mobile permit number from the owner",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "away": "visits at a care home, a school or a home only where the state's rules allow mobile or portable dental work; a mobile or portable dental permit or registration where the state's form asks for one (a switch)",
+   "sedation": "sedation visits only with the dentist's own sedation permit from the state; none at the example offices, so sedation isn't offered",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance where the state's form asks for it"
+  },
+  "pf.services": {
+   "shape": "visit types in a chair, each with a set length; a new patient's first visit has two parts (the hygienist's X-rays and cleaning, then the dentist's exam); treatment found at the exam is booked later as its own visit; every visit needs a free chair",
+   "examples": "the example offices' own prices (Lee Family Dental and Lee Mobile Dental), not a standard; a plan pays its own in-network fee, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "Checkup (exam and cleaning, returning patient)",
+     "price": "$35",
+     "kind": "one price; the plan's estimate is shown when a plan pays",
+     "length": "30 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "the patient's share at the front desk"
+    },
+    {
+     "name": "New patient visit (X-rays and cleaning, then the dentist's exam)",
+     "price": "the office's own price; the plan's estimate is shown",
+     "kind": "one price",
+     "length": "90 min: 60 with the hygienist, then 30 with the dentist",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "the patient's share at the front desk",
+     "note": "new-patient times are kept apart (Sam's booking rules)"
+    },
+    {
+     "name": "Checkup with X-rays",
+     "price": "$40",
+     "kind": "one price",
+     "length": "40 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "X-rays only as often as the plan allows; the desk checks the last date"
+    },
+    {
+     "name": "Fluoride treatment",
+     "price": "$20",
+     "kind": "one price",
+     "length": "10 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "with the visit",
+     "note": "often added to a checkup"
+    },
+    {
+     "name": "Child's checkup (12 and under)",
+     "price": "$25",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "at the front desk, or billed to the plan",
+     "note": "a parent or guardian books, signs the consent and comes (or signs the school's consent form)"
+    },
+    {
+     "name": "Checkup and whitening",
+     "price": "$55",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the office",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "cosmetic: no plan pays it"
+    },
+    {
+     "name": "Deep cleaning",
+     "price": "$140",
+     "kind": "one price",
+     "length": "2½ hours, one whole block",
+     "where": "at the office",
+     "before": "the $40 fee held (or a $40 deposit), where the office takes one",
+     "after": "the rest at the front desk",
+     "note": "from the treatment plan, after an exam"
+    },
+    {
+     "name": "Whitening trays",
+     "price": "priced from photos of the smile (the example: $90)",
+     "kind": "quoted from photos first",
+     "length": "2 visits",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk"
+    },
+    {
+     "name": "Tooth pain visit (emergency exam)",
+     "price": "the $25 exam is promised; any treatment is priced at the chair (the example: $110 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min, same day",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "at the front desk, or the office's own way at a care home",
+     "note": "the owner OKs same-day times first"
+    },
+    {
+     "name": "Filling, crown and other treatment",
+     "price": "from the treatment plan, with the plan's estimate first",
+     "kind": "quoted at the visit",
+     "length": "set by the treatment plan",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "booked as its own visit, only if the patient asks"
+    },
+    {
+     "name": "Checkup and cleaning at a care home",
+     "price": "$179",
+     "kind": "one price",
+     "length": "60 min, with a portable chair",
+     "where": "at the customer's place (a care home or a home)",
+     "before": "nothing taken when a plan pays; the $89 visit fee held for private pay",
+     "after": "the office bills the plan and the patient its own way"
+    },
+    {
+     "name": "Visit fee",
+     "price": "$89",
+     "kind": "one price",
+     "length": "each visit away from the office",
+     "where": "at the customer's place",
+     "before": "held for private pay",
+     "after": "counts toward the bill"
+    },
+    {
+     "name": "Denture reline",
+     "price": "$150",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the care home or the office",
+     "before": "paid in full when booking (private pay)",
+     "after": "nothing more"
+    },
+    {
+     "name": "New denture",
+     "price": "priced from photos of the old denture and the mouth (the example: $640)",
+     "kind": "quoted from photos first",
+     "length": "3 visits",
+     "where": "at the care home or the office",
+     "before": "a 25% deposit",
+     "after": "the rest on the bill, or the office's own way",
+     "note": "a signed treatment consent; Sam OKs quotes over $500"
+    },
+    {
+     "name": "School dental day",
+     "price": "set with the school: free to families, or billed to each child's plan",
+     "kind": "one price per child",
+     "length": "a whole morning, one portable chair",
+     "where": "at the school (the host's place)",
+     "before": "nothing taken",
+     "after": "the office bills plans its own way",
+     "note": "each child needs a parent's or guardian's signed consent on the secure page"
+    }
+   ],
+   "capacity": "one patient per chair; the office's chairs and the portable chair are booked like people",
+   "nobodyHome": "never: the patient is always there",
+   "online": "a video check of a tooth or a denture can be a short consult, counted as at the office"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, your child, or someone you help (a care home resident)",
+    "new or returning patient",
+    "which visit: the office's own visit types only, never a symptom typed into the AI",
+    "a dental plan (its name only) or paying yourself",
+    "early morning, midday or afternoon"
+   ],
+   "afterTime": [
+    "anything the office should know to help, like a wheelchair or needing an interpreter",
+    "for a care home or school visit: the place's name, the room, and who meets the dentist"
+   ],
+   "securePage": [
+    "birth date",
+    "plan member ID, the plan holder and a photo of the plan card",
+    "health history: medicines, allergies, conditions, pregnancy",
+    "consent and the privacy notice",
+    "a parent's or guardian's consent for anyone under 18, or the consent of the person who decides for an adult who can't"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18; a guardian or health care agent for an adult who can't consent; the care home's staff for a resident, with the decider's consent on the secure page; a minor alone only where the state's rules let minors consent to dental care (a switch)",
+   "neverAsked": "symptoms, reasons or results are never asked or typed in the AI chat"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "face or jaw swelling with a fever, or trouble breathing or swallowing",
+     "say": "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a dental visit.",
+     "booking": "no booking; the same words are repeated if a same-day request is declined"
+    },
+    {
+     "words": "a knocked-out adult tooth, or bleeding that won't stop",
+     "say": "Call the office's own line now, or go to the emergency room. Keep a knocked-out tooth in milk.",
+     "booking": "no booking by the AI; the office's own line"
+    },
+    {
+     "words": "swallowed something poisonous, or too much of a medicine",
+     "say": "Call Poison Help now at 1-800-222-1222, or 911 if they're not awake or not breathing.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "tooth pain with nothing else",
+     "what": "matched to the office's own tooth pain visit; Rosie never judges how urgent it is"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history, consent and the dental plan's papers",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+     "who": "every new patient; returning patients once a year, or when their health changes",
+     "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or the door, before any work), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day (the example office's rule), or sooner where the rules require it",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "An exam before whitening",
+     "when": "at least 48 hours before",
+     "who": "anyone booking whitening without an exam in the last 6 months",
+     "goodFor": "6 months (the example office's rule)",
+     "result": "the dentist OKs whitening, suggests another plan, or calls it off with a full refund"
+    },
+    {
+     "name": "The care home's or school's OK",
+     "when": "before any visit there",
+     "who": "the host place agrees to host the visit days",
+     "result": "no OK: no times at that place"
+    }
+   ],
+   "prep": "arrive 15 minutes early; bring a photo ID and the plan card; at a care home: the resident's medicine list ready with the nurse"
+  },
+  "pf.visit": {
+   "checkIn": "at the office: the check-in code at the front desk; at a care home or school: the code from the patient, or from the nurse or staff member named on the booking",
+   "beforeWork": "the hygienist or dentist reads the health history and checks for changes before any X-ray or cleaning",
+   "changes": "X-rays and a gum check first; gum disease means no regular cleaning that day, and a deep cleaning goes on the treatment plan; the plan shows the dental plan's estimate; treatment is booked as its own visit only if the patient asks",
+   "done": "the check-in code or DONE; the dentist's notes and any X-rays stay in the office's own records, never in Rosie or a text",
+   "away": "a portable chair and its own light and suction; the care home's nurse is told when the visit is done"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking for a checkup (the office bills dental plans); a card saved only where the office turns on its missed-visit fee; the deep cleaning: a card saved for its $40 fee; whitening paid in full when booking (no plan pays it); whitening kits priced from photos, nothing taken; at a care home: nothing taken when a plan pays, a card saved for the $89 visit fee for private pay, a reline paid in full, a new denture from photos with a 25% deposit",
+   "plans": "the plans the office takes (its own list); the front desk checks each plan by hand and records it: active or not, what's left this year, how often cleanings and X-rays are covered; the patient's share is an estimate, not a promise",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "fees": "the missed-visit or late-cancel fee: $20 at the example office ($40 for the deep cleaning), only when the owner confirms it; the same fee for every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "claims sent by the office; the patient pays their share at the front desk, its own way; a balance after the plan pays is billed by the office, not by Rosie's text; at a care home, the office bills its own way",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form; fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the results or the dentist's name (when the dentist comes to a care home, school or home, the dentist's name stays, for the door check); X-rays and results never go through Rosie",
+   "staff": "texts to the owner and staff use the patient's initials only (A.M., never Alex M.)",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian; a minor who may consent alone gets texts only on their own phone, with no visit type",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the dentist"
+  },
+  "pf.staff": {
+   "licenses": "each dentist's and each hygienist's own license, per state",
+   "skills": "dentists: exams, treatment, dentures; hygienists: X-rays, cleanings, fluoride and sealants; only people cleared for mobile visits go to care homes and schools",
+   "supervision": "a hygienist works only while a dentist is working, or as the state's rules allow (a switch: some states let hygienists work alone at schools and care homes)",
+   "oks": "the owner OKs same-day tooth pain times, quotes over $500, and anything a hygienist flags",
+   "standIn": "a hygienist out: a dentist takes the cleaning, or new times; a dentist out: a hygienist does the cleaning and the exam moves, or new times",
+   "away": "the team at a care home or school is the people cleared for mobile visits, with the portable chair"
+  },
+  "pf.rules": {
+   "records": "dental records are kept by the office for as long as the state's rules require (a child's records may be kept longer); a delete request removes only Rosie's own booking details, never the office's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "the license shown where the state asks: posted at the office, and on a visit away from it",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "host": "a visit at a care home or school only under the host's written OK, and the host's sign-in rules; visit days at a host's place (S1-58) need the host's standing OK on file; the example's care home visits are booked one resident at a time under the care home's OK, so no visit days are set",
+   "ads": "no free-visit or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "more than 15 minutes late: still seen, but part of the visit may move to another day (the office decides; Rosie never changes the booking itself)",
+   "standIn": "a hygienist or dentist out: a stand-in who may do that part, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any work), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "twoBookings": "a patient with a treatment visit and a checkup both open: Rosie asks which one before any change",
+   "healthQuestion": "a question about medicine or care before the visit goes to the dentist; Rosie gives no advice",
+   "gumDisease": "gum disease found: no regular cleaning that day, and the price changes only with the patient's yes",
+   "careHome": "the resident is out (at the hospital, or asleep): the nurse says so, and the visit moves with no fee",
+   "other": "all other edge cases the generic way",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): tooth pain gets the soonest same-day time, with the owner's OK; swelling with a fever, or trouble breathing or swallowing, gets the 911 words"
+  },
+  "pf.facts": [
+   "plans",
+   "planbill",
+   "forms",
+   "children",
+   "incare",
+   "photos",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Family Dental",
+   "staff": "Mei (dentist) and Lena (hygienist)",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Mobile Dental",
+   "staff": "Daniel (dentist) and Eli (hygienist), who travel with a portable chair",
+   "cust": "Alex M. (patient, lives at Maple Grove care home) · other patients",
+   "other": "Others (the care home's nurse, a school nurse, a parent or guardian, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Mei"
+  },
+  "B": {
+   "staff": "Daniel"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Alex picked a kids cut for a son before the times",
+    "Alex picked a child's exam for a son first"
+   ],
+   [
+    "the way most barbershops set it",
+    "the way most dental offices set it"
+   ],
+   [
+    "the way most barbershops start",
+    "the way most dental offices start"
+   ],
+   [
+    "the rules barbershops often set",
+    "the rules dental offices often set"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Checkups, cleanings, fillings and whitening."
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken; a $20 missed-visit fee only where you turn it on"
+   ],
+   [
+    "asks for a perm",
+    "asks for braces"
+   ],
+   [
+    "books a skin fade for",
+    "books a cleaning for"
+   ],
+   [
+    "skin fades",
+    "cleanings"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Orthodontics for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds orthodontics to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW orthodontics"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A checkup is rated, so the shop takes the first branch."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a checkup plan with Riley, every 6 months."
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat May 1 · 10:00am"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show photos of your smile?"
+   ],
+   [
+    "photos of your hair",
+    "photos of your smile"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's dental work takes no jobs sent now, at the office or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Checkup plan · every 6 months"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Sensitivity gel · $15"
+   ],
+   [
+    "gloss",
+    "sensitivity gel"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Family Dental LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Dental's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Family Dental"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Dental"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile Dentistry and Lee Dentures"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile dentistry and denture care"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile dentistry and denture care"
+   ],
+   [
+    "1200 Main St",
+    "300 Main St"
+   ],
+   [
+    "88 Elm St",
+    "250 Cedar Ave"
+   ],
+   [
+    "Riley Chen",
+    "Mei Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Lena Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Daniel Price"
+   ],
+   [
+    "Casey Moore",
+    "Eli Moore"
+   ],
+   [
+    "Riley",
+    "Mei"
+   ],
+   [
+    "Avery",
+    "Lena"
+   ],
+   [
+    "Jordan",
+    "Daniel"
+   ],
+   [
+    "Casey",
+    "Eli"
+   ],
+   [
+    "electrical",
+    "denture care"
+   ],
+   [
+    "Electrical",
+    "Denture care"
+   ],
+   [
+    "plumber",
+    "dentist"
+   ],
+   [
+    "plumbing",
+    "mobile dentistry"
+   ],
+   [
+    "Plumbing",
+    "Mobile dentistry"
+   ],
+   [
+    "barbershop",
+    "dental office"
+   ],
+   [
+    "Barbershop",
+    "Dental office"
+   ],
+   [
+    "barbers",
+    "dentists"
+   ],
+   [
+    "barber",
+    "dentist"
+   ],
+   [
+    "Barber",
+    "Dentist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Checkup and whitening"
+   ],
+   [
+    "Signature cut and shave",
+    "Checkup and whitening"
+   ],
+   [
+    "hot towel",
+    "whitening"
+   ],
+   [
+    "signature cut",
+    "checkup and whitening"
+   ],
+   [
+    "Groom's package",
+    "Deep cleaning"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "whitening kit"
+   ],
+   [
+    "Color and cut",
+    "Whitening kit"
+   ],
+   [
+    "color correction",
+    "tooth pain visit"
+   ],
+   [
+    "Color correction",
+    "Tooth pain visit"
+   ],
+   [
+    "kids cuts",
+    "child's checkups"
+   ],
+   [
+    "Kids cut",
+    "Child's checkup"
+   ],
+   [
+    "kids cut",
+    "child's checkup"
+   ],
+   [
+    "skin fade",
+    "checkup with X-rays"
+   ],
+   [
+    "Skin fade",
+    "Checkup with X-rays"
+   ],
+   [
+    "beard trim",
+    "fluoride treatment"
+   ],
+   [
+    "Beard trim",
+    "Fluoride treatment"
+   ],
+   [
+    "haircuts",
+    "checkups"
+   ],
+   [
+    "Haircuts",
+    "Checkups"
+   ],
+   [
+    "haircut",
+    "checkup"
+   ],
+   [
+    "Haircut",
+    "Checkup"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "whitening"
+   ],
+   [
+    "Color",
+    "Whitening"
+   ],
+   [
+    "a patch test",
+    "an exam"
+   ],
+   [
+    "patch test",
+    "exam"
+   ],
+   [
+    "a consult",
+    "an exam"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "Consult",
+    "Exam"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "priced at the chair",
+    "priced in the chair"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the chair"
+   ],
+   [
+    "set at the chair",
+    "set in the chair"
+   ],
+   [
+    "quote at the chair",
+    "quote in the chair"
+   ],
+   [
+    "visit at the chair, once",
+    "visit in the chair, once"
+   ],
+   [
+    "is at the chair",
+    "is in the chair"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "Checkup and cleaning"
+   ],
+   [
+    "water heaters",
+    "dentures"
+   ],
+   [
+    "water heater",
+    "denture"
+   ],
+   [
+    "Panel upgrade",
+    "Implant-held denture"
+   ],
+   [
+    "A dentist's example: water near outlets gets 'shut off the main valve'.",
+    "A dentist's example: tooth pain gets 'a swollen face with a fever: call 911'."
+   ],
+   [
+    "home warranty plan",
+    "dental plan"
+   ],
+   [
+    "labor",
+    "chair time"
+   ],
+   [
+    "Lee Family Dental · Checkup with X-rays",
+    "Lee Family Dental · 250 Cedar Ave"
+   ],
+   [
+    "Lee Family Dental · Checkup",
+    "Lee Family Dental · 250 Cedar Ave"
+   ],
+   [
+    "Lee Family Dental · with Mei",
+    "Lee Family Dental · 250 Cedar Ave"
+   ],
+   [
+    "Lee Family Dental · with Lena",
+    "Lee Family Dental · 250 Cedar Ave"
+   ],
+   [
+    "Sat Oct 24 · 11:00am · Mei",
+    "Sat Oct 24 · 11:00am"
+   ],
+   [
+    "Sat Oct 24 · 3:00pm · Mei",
+    "Sat Oct 24 · 3:00pm"
+   ],
+   [
+    "Today · 3:00pm · Lena",
+    "Today · 3:00pm"
+   ],
+   [
+    "Tooth pain visit · $110",
+    "Today's treatment · $110"
+   ],
+   [
+    "Mei · Sat Oct 24",
+    "Your Sat Oct 24 visit"
+   ],
+   [
+    "Mei marked you as not here",
+    "The office marked you as not here"
+   ],
+   [
+    "How was your visit with Mei?",
+    "How was your visit?"
+   ],
+   [
+    "Book this checkup?",
+    "Book this visit?"
+   ],
+   [
+    "Why: many dentists, salons and groomers are licensed to their office.",
+    "Why: in many states, dental work away from an office needs its own permit."
+   ],
+   [
+    "Lena: dentist",
+    "Lena: hygienist"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a checkup on Saturday."
+   ],
+   [
+    "A checkup could mean a salon or a dental office.",
+    "A checkup could mean a doctor or a dentist."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a checkup every 6 months"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a checkup every 6 months."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A parent books checkups for three children on one morning."
+   ],
+   [
+    "once Mei sees the hair",
+    "once Mei sees the tooth"
+   ],
+   [
+    "staff cut",
+    "staff checkup"
+   ],
+   [
+    "Can my son wait in the office during my cut?",
+    "Can my son wait in the waiting room during my checkup?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My sore gum got worse. Can I still come in?"
+   ],
+   [
+    "Mei can do a shorter cut in the time left",
+    "Mei can do a shorter visit in the time left"
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped A.M.'s regular cleaning. I put a note on the page."
+   ],
+   [
+    "Mei stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Mei stopped A.M.'s regular cleaning. The note is on the secure page."
+   ],
+   [
+    "like a skin-test result",
+    "like the date of the last X-rays"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: next checkup in 6 months, mornings best"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "My tooth has been sore since the cleaning."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says a tooth has been sore since Saturday's cleaning."
+   ],
+   [
+    "Do you do child's checkups? My son is 8.",
+    "Do you see children? My son is 8."
+   ],
+   [
+    "A dental office's plug-in adds no danger words of its own.",
+    "The dental plug-in adds its own: a swollen face or jaw with a fever, or trouble breathing or swallowing."
+   ],
+   [
+    "A dental office bills no plans, so this never happens at Lee Family Dental.",
+    "Lee Family Dental bills dental plans, so the desk checks every plan a patient names."
+   ],
+   [
+    "A dental office's plug-in has none.",
+    "The dental plug-in has none: the dentist reads the health history at the visit."
+   ],
+   [
+    "A dental office bills no insurance.",
+    "Lee Family Dental bills dental plans, so most patients pay only a share."
+   ],
+   [
+    "The state licenses the office itself, and each dentist. What's the office's license number?",
+    "The state licenses each dentist and hygienist, and registers the office. What's the office's number?"
+   ],
+   [
+    "That's a question for the dentists themselves.",
+    "That's a question for the dentist."
+   ],
+   [
+    "with one dentist, and adds the prices",
+    "with one person, and adds the prices"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una revisión dental el sábado."
+   ],
+   [
+    "A dental office has none, so nothing is sent here.",
+    "Alex's words had none of these, so nothing is sent here."
+   ],
+   [
+    "like a tooth pain visit done in two steps",
+    "like a crown, done in two visits"
+   ],
+   [
+    "Lee Family Dental doesn't do perms.",
+    "Lee Family Dental doesn't do braces."
+   ],
+   [
+    "A step-free door on Elm St",
+    "A step-free door on Cedar Ave"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Cedar Ave"
+   ],
+   [
+    "visit with Mei? It's free.",
+    "visit? It's free."
+   ],
+   [
+    "Your checkup is part of a plan with Mei, every 4 weeks.",
+    "Your checkup is part of a plan with Mei, every 6 months."
+   ],
+   [
+    "Checkup every 4 weeks · Mei",
+    "Checkup every 6 months"
+   ],
+   [
+    "A checkup needs nothing.",
+    "A checkup needs a photo ID and the plan card, from the reminder."
+   ],
+   [
+    "It's 11:00am, and Alex is in the chair. Alex reads the code from the confirmation or the reminder, and Mei texts it in.",
+    "It's Sat 11:00am, and Alex is at the front desk. Alex reads the code from the confirmation or the reminder, and the desk enters it."
+   ],
+   [
+    "What happens at the front desk?",
+    "What happens in the chair?"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bib clip ripped my shirt collar."
+   ],
+   [
+    "says the cape clip ripped",
+    "says the bib clip ripped"
+   ],
+   [
+    "Lee Family Dental will fix it for free.",
+    "Lee Family Dental will check it for free."
+   ],
+   [
+    "a Child's checkup (12 and under)",
+    "a child's checkup (12 and under)"
+   ],
+   [
+    "Mobile dentistry JP031552 · denture care JE30417",
+    "Dental license DN031552 · mobile dentistry and dentures"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "Mei's price for your tooth pain visit is with the owner.",
+    "Mei's price for today's treatment is with the owner."
+   ],
+   [
+    "at the front desk now",
+    "in the chair now"
+   ],
+   [
+    "repair office",
+    "repair shop"
+   ],
+   [
+    "skin fade",
+    "cleaning"
+   ],
+   [
+    "Skin fade",
+    "Cleaning"
+   ]
+  ],
+  "B": [
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also clean my partial denture?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Denture cleaning · $60"
+   ],
+   [
+    "added a camera inspection to",
+    "added a denture cleaning to"
+   ],
+   [
+    "can clear the drain",
+    "can come for a checkup and cleaning"
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can start the visit at a set time"
+   ],
+   [
+    "the way most barbershops set it",
+    "the way most dental offices set it"
+   ],
+   [
+    "the way most barbershops start",
+    "the way most dental offices start"
+   ],
+   [
+    "the rules barbershops often set",
+    "the rules dental offices often set"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Checkups, cleanings, fillings and whitening."
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken; a $20 missed-visit fee only where you turn it on"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a dental visit at my care home."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My denture rubs' fits a checkup and cleaning."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like pulling a tooth with no exam first."
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And any tooth pain, or a loose denture?"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Can the resident sit up in a chair?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, with help"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 checkup needs none."
+   ],
+   [
+    "like new pipes put in one day and finished another",
+    "like a denture fitted over two visits"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Filling and crown prep · $540"
+   ],
+   [
+    "cracks the cabinet floor",
+    "scuffs the wall by the bed with the chair"
+   ],
+   [
+    "$160 valve work",
+    "$160 filling"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The filling chips 2 weeks later."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "My gum is sore this morning."
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a tooth pain visit, today"
+   ],
+   [
+    "two drain clearings",
+    "two checkups"
+   ],
+   [
+    "At my home.",
+    "At my care home."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Teeth whitening for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds teeth whitening to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW teeth whitening"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "does the filling today, $165. The $80 X-ray stays good until Thu Oct 29."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 full denture job, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your full denture job"
+   ],
+   [
+    "Repipe · $2,400",
+    "Full denture job · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the try-in is done, $800 at the finish"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your full denture job"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a crown for the cracked tooth Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a crown, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A crown for the cracked tooth"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's dental work takes no jobs sent now, at the office or away."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "like a move-out day",
+    "like a move to another home"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the filling only, $165. Leave the X-ray."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Dental LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Dental's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Family Dental"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Dental"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Mobile Dentistry and Lee Dentures"
+   ],
+   [
+    "plumbing and electrical",
+    "mobile dentistry and denture care"
+   ],
+   [
+    "Plumbing and electrical",
+    "Mobile dentistry and denture care"
+   ],
+   [
+    "1200 Main St",
+    "300 Main St"
+   ],
+   [
+    "88 Elm St",
+    "250 Cedar Ave"
+   ],
+   [
+    "42 Oak St",
+    "120 Grove Rd"
+   ],
+   [
+    "Riley Chen",
+    "Mei Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Lena Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Daniel Price"
+   ],
+   [
+    "Casey Moore",
+    "Eli Moore"
+   ],
+   [
+    "Riley",
+    "Mei"
+   ],
+   [
+    "Avery",
+    "Lena"
+   ],
+   [
+    "Jordan",
+    "Daniel"
+   ],
+   [
+    "Casey",
+    "Eli"
+   ],
+   [
+    "electrical",
+    "denture care"
+   ],
+   [
+    "Electrical",
+    "Denture care"
+   ],
+   [
+    "plumbing license",
+    "mobile dental permit"
+   ],
+   [
+    "Plumbing license",
+    "Mobile dental permit"
+   ],
+   [
+    "plumber",
+    "dentist"
+   ],
+   [
+    "plumbing",
+    "mobile dentistry"
+   ],
+   [
+    "Plumbing",
+    "Mobile dentistry"
+   ],
+   [
+    "barbershop",
+    "dental office"
+   ],
+   [
+    "barbers",
+    "dentists"
+   ],
+   [
+    "barber",
+    "dentist"
+   ],
+   [
+    "Barber",
+    "Dentist"
+   ],
+   [
+    "hot towel",
+    "whitening"
+   ],
+   [
+    "haircut",
+    "checkup"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "color",
+    "whitening"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the chair"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Checkup and cleaning"
+   ],
+   [
+    "drain clearing",
+    "checkup and cleaning"
+   ],
+   [
+    "Drain clearing",
+    "Checkup and cleaning"
+   ],
+   [
+    "Water heater replacement",
+    "New denture"
+   ],
+   [
+    "water heater replacement",
+    "new denture"
+   ],
+   [
+    "Water heater flush",
+    "Denture reline"
+   ],
+   [
+    "water heater flush",
+    "denture reline"
+   ],
+   [
+    "water heaters",
+    "dentures"
+   ],
+   [
+    "water heater",
+    "denture"
+   ],
+   [
+    "Water heater",
+    "Denture"
+   ],
+   [
+    "leak repair",
+    "tooth pain visit"
+   ],
+   [
+    "Leak repair",
+    "Tooth pain visit"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "Service call",
+    "Visit fee"
+   ],
+   [
+    "Sewer camera inspection",
+    "Full X-ray set"
+   ],
+   [
+    "sewer camera inspection",
+    "full X-ray set"
+   ],
+   [
+    "Panel upgrade",
+    "Implant-held denture"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "My kitchen drain is clogged. Can a dentist come Thursday morning? I'm in Springfield.",
+    "I live at Maple Grove care home in Springfield. Can a dentist come Thursday morning for a checkup?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me duele mucho una muela."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the denture.",
+    "Hello, do you speak Spanish? A back tooth hurts a lot."
+   ],
+   [
+    "Can a dentist clear a yard drain this Thursday? What does it cost?",
+    "Can a dentist see a care home resident this Thursday? What does it cost?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Eli",
+    "BOOK Tessa cleaning Thu 12-2 Eli"
+   ],
+   [
+    "A dentist's example: water near outlets gets 'shut off the main valve'.",
+    "A dentist's example: tooth pain gets 'a swollen face with a fever: call 911'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if the face swells with a fever."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene la cara hinchada o fiebre?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face swollen, or do you have a fever?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tengo fiebre."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. I don't have a fever."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se le hincha la cara con fiebre, vaya a urgencias o llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If your face swells with a fever, go to the emergency room or call 911."
+   ],
+   [
+    "For mobile dentistry, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For dental work, a swollen face or jaw with a fever, or trouble breathing or swallowing, stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a dental visit."
+   ],
+   [
+    "My gas denture got wet in a flood. Is it safe to turn back on?",
+    "Should I stop my blood thinner before the visit?"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like braces"
+   ],
+   [
+    "Lee Mobile Dental does mobile dentistry and denture care work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Mobile Dental does mobile dentistry and denture care, not braces. Nothing was saved. You can look for an orthodontist near you."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face or jaw with a fever, or trouble breathing or swallowing."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Can you flush my denture every year, too?",
+    "Can you check my denture every year, too?"
+   ],
+   [
+    "Lee Mobile Dental has a yearly flush plan, $150 a visit.",
+    "Lee Mobile Dental has a yearly reline plan, $150 a visit."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a loose denture."
+   ],
+   [
+    "Can Daniel also look at a dripping faucet?",
+    "Can Daniel also look at my loose denture?"
+   ],
+   [
+    "Yes. The faucet is a tooth pain visit, quoted at the visit.",
+    "Yes. The denture check is priced at the visit."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Which room are you in at Maple Grove?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which dental plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Dental, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "dental plan"
+   ],
+   [
+    "home warranty",
+    "dental plan"
+   ],
+   [
+    "the warranty company",
+    "the plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A dental plan pays"
+   ],
+   [
+    "Alex says yes before any work",
+    "Alex says yes first"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and plan card ready."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the bleeding is worse now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "My gums are bleeding more now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Eli can come sooner, at the same price.",
+    "If your face or jaw swells with a fever, go to the emergency room or call 911. Eli can come sooner for your cleaning, at the same price."
+   ],
+   [
+    "Can Daniel also run a camera down my sewer line?",
+    "Can Daniel also take a full set of X-rays?"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan runs Pine Court care home, with a repeat plan: cleanings for two residents every 6 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's cleanings?"
+   ],
+   [
+    "Rental 1",
+    "Resident 1"
+   ],
+   [
+    "Rental 2",
+    "Resident 2"
+   ],
+   [
+    "Kitchen drain",
+    "Checkup and cleaning"
+   ],
+   [
+    "Yard drain",
+    "Dental van visit"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "Daniel finds the leak and texts the price with its lines.",
+    "Daniel finds a cavity and texts the price with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 filling 165 X-ray 80"
+   ],
+   [
+    "Daniel found the leak. Here's the price to fix it today.",
+    "Daniel found a cavity. Here's the price to fix it today."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Filling · $165"
+   ],
+   [
+    "Supply line · $80",
+    "X-ray · $80"
+   ],
+   [
+    "Daniel finds corroded shutoff valves.",
+    "Daniel finds two loose fillings."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace two loose fillings"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "replace two loose fillings, $160"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Replace two loose fillings · $160"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace two loose fillings"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 filling quote"
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "replacing two loose fillings for $160"
+   ],
+   [
+    "Daniel finds mold behind the sink wall. The plug-in says a dentist stops there",
+    "Daniel finds no safe outlet for the portable chair. The plug-in says a dentist stops there"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD no safe outlet for the chair, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Daniel found mold behind the wall under your sink and stopped that part of the work.",
+    "Daniel found no safe outlet for the portable chair, so Daniel stopped the cleaning."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: no safe outlet for the chair"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the cleaning"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Ask the care home to fix the outlet first"
+   ],
+   [
+    "Daniel needs a part from the supply house.",
+    "Daniel needs supplies from the van."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "Daniel went to get a part and will be back about 9:30am.",
+    "Daniel went to the van for supplies and will be back about 9:30am."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the wall by the bed"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed wall"
+   ],
+   [
+    "Daniel cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Daniel's chair scuffed the wall in Alex M.'s room. The before photo shows no scuff."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 checkup and cleaning"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M.: next cleaning in 6 months. Bring the X-ray unit then."
+   ],
+   [
+    "the shutoff valves",
+    "the fillings"
+   ],
+   [
+    "the kitchen drain",
+    "the checkup and cleaning"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My gum has been sore since the cleaning."
+   ],
+   [
+    "with the store's receipt",
+    "with the lab's receipt"
+   ],
+   [
+    "Alex's dental plan covers part of the repair.",
+    "Alex's dental plan covers part of the visit."
+   ],
+   [
+    "your share of today's repair. Your dental plan covers the rest.",
+    "your share of today's visit. Your dental plan covers the rest."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "A.M. asks for a check after the Thu Oct 22 cleaning. A check within 30 days is free."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. A check within 30 days is free, so this visit is free."
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Daniel left a mess under the sink.",
+    "Daniel rushed and didn't explain anything."
+   ],
+   [
+    "Can Daniel look at my bathroom sink next week?",
+    "Can Daniel check my other denture next week?"
+   ],
+   [
+    "Sure. Here are Daniel's next times for a bathroom drain.",
+    "Sure. Here are Daniel's next times for a denture check."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the X-ray report is ready"
+   ],
+   [
+    "Sewer camera report",
+    "X-ray report"
+   ],
+   [
+    "Video and Daniel's notes",
+    "Daniel goes over it with you in person"
+   ],
+   [
+    "Drain clearings already booked",
+    "Checkups and cleanings already booked"
+   ],
+   [
+    "The repair price",
+    "The treatment price"
+   ],
+   [
+    "the repair price",
+    "the treatment price"
+   ],
+   [
+    "Book the repair",
+    "Book the treatment"
+   ],
+   [
+    "labor",
+    "chair time"
+   ],
+   [
+    "Labor",
+    "Chair time"
+   ],
+   [
+    "can cut your hair at the office",
+    "can do your checkup at the office"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It hurts a lot. Can someone come tonight?"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the dentist in.",
+    "Say Maple Grove's nurse books checkups for 4 residents on one morning. It's one booking with one code, given by the nurse who meets the dentist."
+   ],
+   [
+    "Each unit's notes go to the dentist, one line each.",
+    "Each resident's notes go to the dentist, one line each. Each resident, or the person who decides for them, signs the consent."
+   ],
+   [
+    "Lee Mobile Dental · Checkup and cleaning",
+    "Lee Mobile Dental · Maple Grove"
+   ],
+   [
+    "Lee Mobile Dental · Full X-ray set",
+    "Lee Mobile Dental · Your visit"
+   ],
+   [
+    "your mobile dentistry visit",
+    "your dental visit"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "Daniel says no. Please wait until the job is done.",
+    "Daniel says no. Please wait until after the visit."
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back in my room 30 minutes late, sorry!"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 full denture job"
+   ],
+   [
+    "faucet",
+    "denture"
+   ],
+   [
+    "Why: many dentists, salons and groomers are licensed to their office.",
+    "Why: in many states, dental work away from an office needs its own permit."
+   ],
+   [
+    "Lena: dentist",
+    "Lena: hygienist"
+   ],
+   [
+    "A checkup could mean a salon or a dental office.",
+    "A checkup could mean a doctor or a dentist."
+   ],
+   [
+    "a mobile dental permit for the company, and one for each dentist sent out",
+    "a mobile dental permit for the company, and a license for each dentist sent out"
+   ],
+   [
+    "Mobile dentistry JP031552 · denture care JE30417",
+    "Dental license DN031552 · mobile dentistry and dentures"
+   ],
+   [
+    "A office",
+    "An office"
+   ]
+  ]
+ },
+ "keep": [
+  "leak"
+ ],
+ "story": {
+  "A": "Sam Lee, a dentist, signs up two companies by text. Then Alex books a checkup with Mei, a dentist at Lee Family Dental, for Sat Oct 24 at 11:00am. The office checks Alex's dental plan by hand, keeps the health forms on the secure page, and takes Alex's share at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who lives at Maple Grove care home, books a checkup and cleaning there with Lee Mobile Dental. Daniel brings a portable chair Thu Oct 22, arriving 8 to 10am. The office bills Alex's plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "visit|none|counter",
+    "list|full|none",
+    "photos|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 checkup with Mei. Nothing is taken. The desk checks Alex's plan, and Alex pays the share at the front desk.",
+    "list|card|counter": "The same checkup where the office turns on its $20 missed-visit fee. A card is saved for it, never for a fee-free patient.",
+    "visit|none|counter": "A tooth pain visit the same day. Only the $25 exam is promised. Any treatment is priced in the chair, with Alex's yes first.",
+    "list|full|none": "A $55 checkup and whitening, paid in full when booking: no plan pays for whitening.",
+    "photos|none|counter": "A whitening kit, priced by Mei from photos of Alex's smile at $90. Nothing is taken, and Alex pays at the front desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Checkup"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Checkup"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Checkup and whitening"
+    },
+    "visit|*|*": {
+     "name": "Tooth pain visit"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Whitening trays"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Child's checkup",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$25",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Checkup and whitening",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Checkup (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|card|bill",
+    "visit|none|own",
+    "list|full|none",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a $179 checkup and cleaning at Maple Grove care home. Nothing is taken. The office bills Alex's plan its own way.",
+    "list|card|bill": "The same visit, paid privately: a card is saved for the $89 visit fee, and Rosie texts the bill when Daniel texts DONE.",
+    "visit|none|own": "Tooth pain at the care home. Only the $89 visit fee is promised. Daniel prices any treatment at the visit, with Alex's yes first.",
+    "list|full|none": "A $150 denture reline at Maple Grove, paid privately in full when booking.",
+    "photos|deposit|bill": "A new denture, priced by Daniel from photos at $640. A $160 deposit when booking, and Rosie texts the bill for the rest."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Checkup and cleaning"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Checkup and cleaning"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Denture reline"
+    },
+    "visit|*|*": {
+     "name": "Tooth pain visit"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "New denture"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "New denture"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Cleaning for a second resident",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$179",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Denture reline",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Checkup (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's dental companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "more": [
+     "Only Sam sets who takes bookings and who may OK them.",
+     "A skill or OK someone adds later waits for Sam's OK.",
+     "Supervisor needed: the plug-in can mark someone who may work only while a supervisor is working.",
+     "Booking then offers that person only at times when their supervisor is working too.",
+     "Lena and Eli are hygienists: the plug-in has them work only while a dentist is working, where the state's rules require it.",
+     "Only Mei is cleared for home visits, so only Mei is offered for them.",
+     "Only Mei does whitening, so whitening services offer only Mei's times.",
+     "Pat takes no visits. Pat may OK only Lee Mobile Dental prices over $500.",
+     "Fees, refunds and what a business keeps are Sam's alone. Pat answers only requests and those prices.",
+     "Video checks: the Team page keeps each dentist's video link, or says the dentist calls the patient's mobile."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's your team, as you set it. Change anything here or on the Team page.",
+      {
+       "list": {
+        "head": [
+         "Person",
+         "Takes",
+         "May OK"
+        ],
+        "rows": [
+         [
+          "Sam",
+          "Every mobile dentistry job",
+          "May OK: everything; your answer wins"
+         ],
+         [
+          "Daniel",
+          "Every mobile dentistry job, and denture care",
+          "May OK: nothing"
+         ],
+         [
+          "Eli",
+          "Cleanings, fluoride and sealants",
+          "May OK: nothing"
+         ],
+         [
+          "Pat",
+          "No visits",
+          "May OK: Lee Mobile Dental prices over $500"
+         ],
+         [
+          "Mei",
+          "Every office service, whitening, home visits",
+          "May OK: nothing"
+         ],
+         [
+          "Lena",
+          "Every office service but whitening",
+          "May OK: nothing"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "The plug-in says a hygienist works while a dentist is working, where the state's rules require it. Set that for Lena and Eli?",
+      {
+       "buttons": [
+        "Yes, set it",
+        "Nobody needs one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "does": "Where the owner sets a different length or price for new patients, Rosie learns this first. Lee Family Dental does: a new patient gets the new patient visit.",
+    "more": [
+     "It comes from the patient's words, or one question.",
+     "The new patient visit takes 90 minutes: 60 with the hygienist, then 30 with the dentist.",
+     "New-patient times are kept apart in Sam's booking rules.",
+     "Alex is a returning patient, so a checkup is offered.",
+     "It's checked again when the mobile is found. If they disagree, the times are offered again.",
+     "A later move offers only times of the same length."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-37",
+    "more": [
+     "The desk also notes how often the plan pays for cleanings and X-rays, and when Alex last had them.",
+     "The share is the plan's estimate, not a promise. The office bills the plan after the visit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-41",
+    "more": [
+     "Alex named a dental plan, so no notice is due here.",
+     "A self-pay patient hears they can get a written price estimate before saying yes.",
+     "The office sends it within 1 business day, or sooner where the rules say so.",
+     "The booking records that the notice was said.",
+     "Any paper owed after booking becomes a to-do for the office, with its due date. Sam is reminded once before it's late."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-42",
+    "more": [
+     "For a dental visit, the page also asks the birth date, the plan's member ID and a photo of the card.",
+     "The health history and consent forms are on it too. Alex can finish them later, and the reminder asks again."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "The health history, the consent and the dental plan's papers are signed on the secure page, never by text.",
+     "They're due the day before. A returning patient's forms stay on file for a year."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-14",
+    "more": [
+     "The AI gets the same details and a booking number, but not the code.",
+     "The code is new for each visit. Giving it at the front desk shows Alex really came.",
+     "The card shows the office's way in, from Sam's access details.",
+     "Any notice said at booking, and any fact the state's rules require, like a license number, is on it too.",
+     "If a text fails, it goes by email.",
+     "Dental texts name only the office, the date, the time and the address. The visit type and the dentist stay on the secure page.",
+     "A video or phone session: the card carries the video link, or says who calls whom, in place of the way in."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-18",
+    "more": [
+     "Lena is a hygienist who does the cleaning, and Sam does the exam."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-33",
+    "more": [
+     "Rosie never offers it on its own.",
+     "Nothing extra is done today without Alex's yes.",
+     "It's priced its own way: from photos, or at the front desk.",
+     "Here: Mei finds a cavity. A filling is booked as its own visit, only if Alex asks."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT A.M. wants the filling. Own visit."
+     ],
+     [
+      "san",
+      "cust",
+      "You asked the dentist about more work. It's its own visit. You'll see its price and your plan's share before you book.",
+      {
+       "card": {
+        "title": "Your next visit",
+        "lines": [
+         "Its own visit · price and share first"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/b/a9"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-35",
+    "more": [
+     "Here: Mei finds gum disease, so there's no regular cleaning today. A deep cleaning goes on the treatment plan.",
+     "Alex pays only for what was done, like the exam and the X-rays."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-20",
+    "more": [
+     "Lee Family Dental sends the claim itself. Alex pays the estimated share at the front desk.",
+     "A balance after the plan pays is billed by the office, never by Rosie's text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A9-21",
+    "more": [
+     "Card payments cost only Stripe's own card fee."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Dental records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-22",
+    "more": [
+     "Dental X-rays and results never go through Rosie.",
+     "The text says only that the office will go over them in person, or call."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-14",
+    "more": [
+     "A new patient visit shows a time only when a hygienist is free for 60 minutes, then a dentist for 30."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For a dental visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever brings the patient to the office."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "more": [
+     "It goes on the secure link Alex gets next.",
+     "Due now: the booking waits for it, within the saved time. Not signed by then, the time is let go.",
+     "Due by a date: one reminder before it. Not done by then, the owner decides: keep, move, or cancel with no fee.",
+     "A signed form stays on file for the plug-in's time, so a later booking skips it.",
+     "Its answers stay on the page, never in a text.",
+     "Dental forms: the health history, the consent and the dental plan's papers, due the day before.",
+     "A returning patient's forms stay on file for a year, unless their health changes."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Family Dental, the forms are the health history, the consent and the dental plan's papers.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "Kept: the patient signs on the secure page at the front desk, before any X-ray or cleaning."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "Tooth pain gets the soonest same-day time instead, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Dental work always needs a license: each dentist and hygienist, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Dental work books people (a dentist or a hygienist), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Dental work runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each dentist and hygienist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No dental work is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A dental visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A dental visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A dental visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the office: the patient is in the chair."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's dental visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A dental visit is rated, like any visit."
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex in the chair, Sat 11:00am. If the plug-in asks for it, Mei notes what's already there before any work. For a checkup, that's any chipped or broken teeth, in the office's own chart.",
+    "more": [
+     "At a drop-off, before photos of the item are the record.",
+     "Dental notes, photos and X-rays stay in the office's own chart, never in Rosie or a text.",
+     "A damage claim or a later complaint is checked against the office's chart.",
+     "The plug-in names the checks, and which services need them."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE noted in the chart: A.M."
+     ],
+     [
+      "san",
+      "staff",
+      "Noted. The details stay in the office's chart."
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-24",
+    "more": [
+     "For a swollen face or jaw with a fever, the plug-in's words: go to the emergency room or call 911. Don't wait for a dental visit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're next! Please come in and give this code at the front desk.",
+      {
+       "code": "2718",
+       "buttons": [
+        "On my way",
+        "Leave the line"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Next from the line: O., checkup.",
+      {
+       "as": "Mei"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: A.M. called at 7:15pm to book for Saturday.",
+      {
+       "card": {
+        "title": "Call · A.M. · 4 min",
+        "lines": [
+         "Wants Saturday morning, with Mei",
+         "Booked · Sat Oct 24, 11:00am · checkup with Mei",
+         "English · recorded"
+        ],
+        "button": "Hear the call",
+        "link": "rosfield.com/k/a1"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:list+before:card": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Call summary: A.M. called at 7:15pm to book for Saturday.",
+        {
+         "card": {
+          "title": "Call · A.M. · 4 min",
+          "lines": [
+           "Wants Saturday morning, with Mei",
+           "Booked · Sat Oct 24, 11:00am · Deep cleaning with Mei",
+           "English · recorded"
+          ],
+          "button": "Hear the call",
+          "link": "rosfield.com/k/a1"
+         }
+        }
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Call summary: A.M. called at 7:15pm to book for Saturday.",
+        {
+         "card": {
+          "title": "Call · A.M. · 4 min",
+          "lines": [
+           "Wants Saturday morning, with Mei",
+           "Booked · Sat Oct 24, 11:00am · checkup and whitening",
+           "English · recorded"
+          ],
+          "button": "Hear the call",
+          "link": "rosfield.com/k/a1"
+         }
+        }
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Call summary: A.M. called at 7:15pm to book for Saturday.",
+        {
+         "card": {
+          "title": "Call · A.M. · 4 min",
+          "lines": [
+           "Wants Saturday morning, with Mei",
+           "Whitening kit · photos asked for, not booked yet",
+           "English · recorded"
+          ],
+          "button": "Hear the call",
+          "link": "rosfield.com/k/a1"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Call summary: A.M. called at 7:15pm to book for Saturday.",
+        {
+         "card": {
+          "title": "Call · A.M. · 4 min",
+          "lines": [
+           "Wants Saturday morning, with Mei",
+           "Booked · Sat Oct 24, 11:00am · tooth pain visit, $25 exam",
+           "English · recorded"
+          ],
+          "button": "Hear the call",
+          "link": "rosfield.com/k/a1"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A3-31",
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Lee Family Dental. Our call dropped. Here's the link to add your photos. No time is saved until the dentist prices it.",
+        {
+         "card": {
+          "title": "Lee Family Dental · 250 Cedar Ave",
+          "lines": [
+           "Priced from your photos",
+           "Your answers so far are kept"
+          ],
+          "button": "Add photos",
+          "link": "rosfield.com/q/a7"
+         },
+         "stop": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A3-15",
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Lee Family Dental. Thanks for your message. Add your photos on this link, and the dentist will price it. No time is saved until then.",
+        {
+         "card": {
+          "title": "Lee Family Dental · 250 Cedar Ave",
+          "lines": [
+           "Priced from your photos"
+          ],
+          "button": "Add photos",
+          "link": "rosfield.com/q/a7"
+         },
+         "stop": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A3-17",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Family Dental. Google's assistant asked about a visit for you. Pick a time and book on this link. Nothing is booked until you do.",
+      {
+       "card": {
+        "title": "Lee Family Dental · 250 Cedar Ave",
+        "lines": [
+         "$35 · Saturday times open"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/c/g1"
+       },
+       "stop": true
+      }
+     ]
+    ],
+    "vary": {
+     "price:list+before:card": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Lee Family Dental. Google's assistant asked about a visit for you. Pick a time and book on this link. Nothing is booked until you do.",
+        {
+         "card": {
+          "title": "Lee Family Dental · 250 Cedar Ave",
+          "lines": [
+           "$140 · Saturday times open"
+          ],
+          "button": "See times",
+          "link": "rosfield.com/c/g1"
+         },
+         "stop": true
+        }
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Lee Family Dental. Google's assistant asked about a visit for you. Pick a time and book on this link. Nothing is booked until you do.",
+        {
+         "card": {
+          "title": "Lee Family Dental · 250 Cedar Ave",
+          "lines": [
+           "$55 · Saturday times open"
+          ],
+          "button": "See times",
+          "link": "rosfield.com/c/g1"
+         },
+         "stop": true
+        }
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Lee Family Dental. Google's assistant asked about a visit for you. Add your photos on this link, and a dentist will price it. No time is saved until you have the price.",
+        {
+         "card": {
+          "title": "Lee Family Dental · 250 Cedar Ave",
+          "lines": [
+           "Priced from your photos"
+          ],
+          "button": "Add photos",
+          "link": "rosfield.com/q/a7"
+         },
+         "stop": true
+        }
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "This is Rosie, the automated booking assistant for Lee Family Dental. Google's assistant asked about a visit for you. Pick a time and book on this link. Nothing is booked until you do.",
+        {
+         "card": {
+          "title": "Lee Family Dental · 250 Cedar Ave",
+          "lines": [
+           "$25 visit fee · priced in the chair"
+          ],
+          "button": "See times",
+          "link": "rosfield.com/c/g1"
+         },
+         "stop": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A4-07",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Family Dental. Add your photos on this link, and a dentist will price your visit. Texts are about this request only.",
+      {
+       "card": {
+        "title": "Lee Family Dental · 250 Cedar Ave",
+        "lines": [
+         "Priced from your photos"
+        ],
+        "button": "Add photos",
+        "link": "rosfield.com/q/a7"
+       },
+       "stop": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-09",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mei's whitening quote needs your OK.",
+      {
+       "card": {
+        "title": "Whitening kit · $90",
+        "lines": [
+         "For N.K. · priced from photos",
+         "Lee Family Dental"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-10",
+    "say": [
+     [
+      "owner",
+      "san",
+      "80"
+     ],
+     [
+      "san",
+      "owner",
+      "Send N.K. $80 for the whitening kit?",
+      {
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-11",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your price is with the office's owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-51",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry, Lee Family Dental couldn't price your request this time. Nothing was booked."
+     ],
+     [
+      "san",
+      "owner",
+      "Mei's price for A.M. wasn't sent in 4 hours, so A.M. was told it couldn't be priced."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-60",
+    "say": [
+     [
+      "san",
+      "cust",
+      "A spot opened at Lee Family Dental. It's yours if you want it.",
+      {
+       "card": {
+        "title": "Sat Oct 24 · 10:00am",
+        "lines": [
+         "Take it within 30 minutes",
+         "Within 24 hours of the visit: no free cancel",
+         "After that, it goes to the next person"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-02",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Reminder: D.W. is still waiting for an answer.",
+      {
+       "buttons": [
+        "Accept",
+        "Another time",
+        "Decline",
+        "Yes, with a change",
+        "Need more first"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Family Dental. The office hasn't answered your request yet. We'll text you by 12:00pm either way.",
+      {
+       "stop": true,
+       "as": "Dee W."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Mei instead of Lena"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer D.W. the checkup with X-rays today at 3:00pm with Mei, not Lena?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another change"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Family Dental. The office can take your request, with one change:",
+      {
+       "card": {
+        "title": "Lee Family Dental · $40",
+        "lines": [
+         "Today · 3:00pm, with someone else on the team",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ],
+       "stop": true,
+       "as": "Dee W."
+      }
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "owner",
+        "san",
+        "Mei, but 30 minutes longer"
+       ],
+       [
+        "san",
+        "owner",
+        "Offer A.M. Sat Oct 24 at 11:00am with Mei, 30 minutes longer?",
+        {
+         "buttons": [
+          "Send it",
+          "Type another change"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "owner",
+        "san",
+        "Mei, but 30 minutes longer"
+       ],
+       [
+        "san",
+        "owner",
+        "Offer A.M. Sat Oct 24 at 11:00am with Mei, 30 minutes longer?",
+        {
+         "buttons": [
+          "Send it",
+          "Type another change"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A7-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "STOP"
+     ],
+     [
+      "san",
+      "cust",
+      "Texts from Lee Family Dental are off. Your Sat 11:00am visit is still booked. To cancel it, reply START, or call the office."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. opted out of texts. The Sat 11:00am visit stands. For any change, call A.M."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. opted out of texts. The visit stays. Check A.M. in with the code at the front desk."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my son wait in the waiting room during my checkup?"
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. asks: Can my son wait in the waiting room during my checkup?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "The office says yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "say": [
+     [
+      "cust",
+      "san",
+      "My sore gum got worse. Can I still come in?"
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. (Sat 11:00am) sent an update before the visit. It's on the secure page. Can the visit go ahead?",
+      {
+       "card": {
+        "title": "A.M.'s update",
+        "lines": [
+         "On the secure page"
+        ]
+       },
+       "buttons": [
+        "Yes, come in",
+        "Better to move it",
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "The dentist suggests moving your visit until it clears, with no fee. Pick a new time:",
+      {
+       "times": [
+        "Sat Oct 31 · 11:00am",
+        "Tue Nov 3 · 11:00am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 15"
+     ],
+     [
+      "san",
+      "cust",
+      "The office is running about 15 minutes behind. Your 11:30am visit will start about 11:45am.",
+      {
+       "as": "Dana",
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-15",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Sick, can't come in Saturday"
+     ],
+     [
+      "san",
+      "owner",
+      "Mei is out Sat Oct 24. A.M. is booked at 11:00am. Lena works the afternoon, but can come in early to stand in.",
+      {
+       "buttons": [
+        "Ask Lena in early",
+        "I'll call them"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "Sick, can't come in Saturday"
+       ],
+       [
+        "san",
+        "owner",
+        "Mei is out Sat Oct 24. A.M. is booked at 11:00am for whitening, and only Mei does whitening.",
+        {
+         "buttons": [
+          "Offer new times",
+          "I'll call them"
+         ]
+        }
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "Sick, can't come in Saturday"
+       ],
+       [
+        "san",
+        "owner",
+        "Mei is out Sat Oct 24. A.M. is booked at 11:00am for whitening, and only Mei does whitening.",
+        {
+         "buttons": [
+          "Offer new times",
+          "I'll call them"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "A7-17",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry, your dentist can't be in Saturday. Someone else on the team can do your visit, at the same time and price.",
+      {
+       "card": {
+        "title": "Lee Family Dental · 250 Cedar Ave",
+        "lines": [
+         "Sat Oct 24 · 11:00am"
+        ]
+       },
+       "buttons": [
+        "Another time",
+        "Cancel, no fee",
+        "Someone else"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-19",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Pick a new time with the same dentist, with no fee:",
+      {
+       "times": [
+        "Tue Oct 27 · 11:00am",
+        "Wed Oct 28 · 3:00pm"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "A"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-18",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Done. Your Sat 11:00am visit is now with someone else on the team. Give this code at the front desk.",
+      {
+       "code": "5160"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Confirmed: come in early Sat Oct 24 for A.M. at 11:00am, moved from Mei.",
+      {
+       "as": "Lena"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-21",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M. hasn't picked a new time for the whitening Mei can't do Saturday. Please call A.M. The number is on the booking."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-70",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Running 15 minutes late, sorry!"
+     ],
+     [
+      "san",
+      "cust",
+      "No problem. The office can do a shorter visit in the time left, at the same price. Or you can move to a later time.",
+      {
+       "buttons": [
+        "Shorter is fine",
+        "A later time"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. (11:00am) is about 15 minutes late."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "say": [
+     [
+      "san",
+      "cust",
+      "After your last visit, Lee Family Dental can't go ahead with your Sat Oct 31 visit. It's cancelled, with no fee. Anything you paid is refunded in full.",
+      {
+       "as": "Dana"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-31",
+    "say": [
+     [
+      "san",
+      "cust",
+      "After your last visit, the dentist suggests a change for Sat Oct 31. See it, with its price, before you say yes.",
+      {
+       "as": "Dana",
+       "card": {
+        "title": "The suggested change",
+        "lines": [
+         "Sat Oct 31 · 2:00pm"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/c/a6"
+       },
+       "buttons": [
+        "Yes, change it",
+        "Cancel, no fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-32",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I skip this one? I'll be away.",
+      {
+       "as": "Owen"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your Sat Oct 31 visit is one of your repeating visits, every 6 months. What would you like?",
+      {
+       "as": "Owen",
+       "card": {
+        "title": "Repeating visits · every 6 months",
+        "lines": [
+         "This one: Sat Oct 31 · 10:00am",
+         "Next: Sat May 1 · 10:00am"
+        ]
+       },
+       "buttons": [
+        "Skip this one",
+        "Pause the plan",
+        "End the plan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-54",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Family Dental: your saved card is charged tomorrow for your repeating visit.",
+      {
+       "as": "Owen",
+       "card": {
+        "title": "Plan charge · $35",
+        "lines": [
+         "Sat Oct 31 · 10:00am",
+         "Charged Sat Oct 31, after the visit"
+        ]
+       },
+       "buttons": [
+        "Skip this one",
+        "Pause the plan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-55",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Family Dental is changing the price of your repeating visits.",
+      {
+       "as": "Owen",
+       "card": {
+        "title": "Repeating visits · every 6 months",
+        "lines": [
+         "Now $35 a visit",
+         "$40 a visit from Sat Nov 21",
+         "Your Sat Oct 31 visit stays $35"
+        ]
+       },
+       "buttons": [
+        "Keep the plan",
+        "End the plan"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Sat Oct 24 at Lee Family Dental:",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Service"
+        ],
+        "rows": [
+         [
+          "10:00am",
+          "B.T.",
+          "Checkup with X-rays"
+         ],
+         [
+          "11:00am",
+          "A.M.",
+          "Checkup"
+         ],
+         [
+          "11:30am",
+          "D.R.",
+          "Fluoride treatment"
+         ],
+         [
+          "2:00pm",
+          "T.L.",
+          "Checkup and whitening"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers and notes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open them",
+        "link": "rosfield.com/d/r24"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: A.M., Sat 11:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "You're checked in at Lee Family Dental. Thanks, Alex!"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-05",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5106"
+     ],
+     [
+      "san",
+      "staff",
+      "That isn't A.M.'s code. Check it with A.M. and send it again."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-07",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mei couldn't enter A.M.'s check-in code after 3 tries. The visit goes on, and it counts once Mei texts DONE."
+     ],
+     [
+      "san",
+      "cust",
+      "The desk couldn't enter your check-in code. That's OK: your visit goes on."
+     ],
+     [
+      "staff",
+      "san",
+      "DONE Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-08",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE Alex M."
+     ],
+     [
+      "san",
+      "staff",
+      "Done: A.M., Sat 11:00am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-47",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M. says they weren't at Sat's 11:00am with Mei, and nothing was entered.",
+      {
+       "card": {
+        "title": "Charge the $20 no-show fee?",
+        "lines": [
+         "It goes on A.M.'s saved card",
+         "No answer in 24 hours: no fee"
+        ]
+       },
+       "buttons": [
+        "Charge $20",
+        "No fee"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Lee Family Dental you're here."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says they're here for the 11:00am. Check A.M. in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-25",
+    "say": [
+     [
+      "staff",
+      "san",
+      "quote 110 tooth pain visit + 15 sensitivity gel Alex M."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M.'s price: $110 tooth pain visit and $15 sensitivity gel, $125 in all, the $25 exam included. It goes to Sam first."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-26",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Mei's price for A.M., in the chair now.",
+      {
+       "card": {
+        "title": "Tooth pain visit · $125",
+        "lines": [
+         "Tooth pain visit $110 · sensitivity gel $15",
+         "The $25 exam included",
+         "Sat Oct 24 · Mei"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-28",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Today's price is with the owner. You can wait for it, or keep today to the $25 visit only.",
+      {
+       "buttons": [
+        "Wait for it",
+        "$25 visit only"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-29",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Here's today's price. Nothing is done until you say yes. Each line is on the secure page.",
+      {
+       "card": {
+        "title": "Today's price · $125",
+        "lines": [
+         "Today's work, line by line, on the secure page",
+         "The $25 visit fee included"
+        ],
+        "button": "See the lines",
+        "link": "rosfield.com/q/a8t"
+       },
+       "buttons": [
+        "Yes, do it",
+        "Not today",
+        "OK some lines"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-30",
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Today's $125 price is good for 7 days. Book it as its own visit here.",
+      {
+       "card": {
+        "title": "Your price · $125",
+        "lines": [
+         "Good until Sat Oct 31"
+        ],
+        "button": "Pick a time",
+        "link": "rosfield.com/q/a8"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "say": [
+     [
+      "staff",
+      "san",
+      "Stopped A.M.'s regular cleaning. I put a note on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "The dentist left you a note about today's visit.",
+      {
+       "card": {
+        "title": "A note from Lee Family Dental",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Mei stopped A.M.'s regular cleaning. The note is on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT Alex M. Helping now. Details on the page."
+     ],
+     [
+      "san",
+      "owner",
+      "Urgent: call Mei about a patient at 11:00am. Details on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-39",
+    "say": [
+     [
+      "cust",
+      "san",
+      "The bib clip ripped my shirt collar."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. says the bib clip ripped a shirt collar today.",
+      {
+       "card": {
+        "title": "Damage report · A.M.",
+        "lines": [
+         "Sat Oct 24 · with Mei",
+         "Before record and photos saved"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/d/a10"
+       },
+       "buttons": [
+        "Pay for it",
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks for telling us. We've passed it to the owner, who will reply."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE A.M.: next checkup in 6 months, mornings best"
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to A.M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-04",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M. rated the visit 2 stars.",
+      {
+       "card": {
+        "title": "Rating · 2 of 5",
+        "lines": [
+         "Your Sat Oct 24 visit",
+         "Only you see this"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-32",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Family Dental sent you a proposal. Read it, then sign or decline on the secure page.",
+      {
+       "card": {
+        "title": "Proposal · Lee Family Dental",
+        "lines": [
+         "3 visits",
+         "Good until Sat Nov 7"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/p/a15"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-33",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Signed, thanks! Pick a time for your first visit:",
+      {
+       "times": [
+        "Sat Nov 14 · 11:00am",
+        "Sat Nov 21 · 11:00am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-08",
+    "say": [
+     [
+      "cust",
+      "san",
+      "My tooth has been sore since the cleaning."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. says a tooth has been sore since Saturday's cleaning.",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Family Dental will check it for free. Pick a time:",
+      {
+       "times": [
+        "Tue Oct 27 · 11:00am",
+        "Wed Oct 28 · 3:00pm"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-09",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I get my money back for Saturday?"
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. asked for money back for Saturday's visit.",
+      {
+       "buttons": [
+        "Refund it",
+        "Keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Reminder: A.M. asked for money back.",
+      {
+       "buttons": [
+        "Refund it",
+        "Keep it"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Family Dental hasn't answered, so the payment stays as it is for now. You can call them at (555) 010-0177."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-14",
+    "say": [
+     [
+      "cust",
+      "san",
+      "I waited 25 minutes past my time."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. has a complaint about Saturday's visit: \"I waited 25 minutes past my time.\"",
+      {
+       "buttons": [
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks for telling us. We've passed it to the owner."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-16",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M.'s bank opened a dispute about a payment for Sat Oct 24. Rosie's record is ready.",
+      {
+       "card": {
+        "title": "Dispute · Sat Oct 24 visit",
+        "lines": [
+         "The booking, the check-in and every text"
+        ],
+        "button": "See the record",
+        "link": "rosfield.com/d/a12"
+       },
+       "buttons": [
+        "Send the record",
+        "Let A.M. keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-27",
+    "say": [
+     [
+      "san",
+      "owner",
+      "OK. Nothing is sent, and the bank keeps the payment with A.M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-19",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Reminder: A.M.'s dispute is due soon. Nothing is sent without you.",
+      {
+       "buttons": [
+        "Send the record",
+        "Let A.M. keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-42",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Family Dental: your notes for after today's visit are ready.",
+      {
+       "card": {
+        "title": "After your visit",
+        "lines": [
+         "Read it on the secure page"
+        ],
+        "button": "Read it",
+        "link": "rosfield.com/a/a14"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Family Dental",
+          "6 bookings · Mei 3, Lena 3"
+         ],
+         [
+          "Lee Mobile Dental",
+          "3 jobs"
+         ],
+         [
+          "Waiting on you",
+          "D.W.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-03",
+    "say": [
+     [
+      "san",
+      "owner",
+      "New request from D.W., a new customer.",
+      {
+       "card": {
+        "title": "Checkup with X-rays · $40",
+        "lines": [
+         "Today · 3:00pm",
+         "Lee Family Dental"
+        ]
+       },
+       "buttons": [
+        "Accept",
+        "Another time",
+        "Decline",
+        "Yes, with a change",
+        "Need more first"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-03",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Family Dental. You're booked! Give this code at the front desk when you arrive.",
+      {
+       "card": {
+        "title": "Lee Family Dental · 250 Cedar Ave",
+        "lines": [
+         "Today · 3:00pm"
+        ]
+       },
+       "code": "2715",
+       "stop": true,
+       "as": "Dee W."
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "New booking for you: D.W., checkup with X-rays, today at 3:00pm.",
+      {
+       "as": "Lena"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-13",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BLOCK Thu 2-5"
+     ],
+     [
+      "san",
+      "owner",
+      "Block which business?",
+      {
+       "buttons": [
+        [
+         "A",
+         "Lee Family Dental"
+        ],
+        [
+         "B",
+         "Lee Mobile Dental"
+        ]
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "A"
+     ],
+     [
+      "san",
+      "owner",
+      "Block Thu Oct 29, 2 to 5pm at Lee Family Dental? B.T. is booked at 3:00.",
+      {
+       "buttons": [
+        "Block; offer new times",
+        "Block around it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-14",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Family Dental had to block Thu Oct 29, 2 to 5pm, so your 3:00 visit can't go ahead then. Pick a new time:",
+      {
+       "times": [
+        "Thu Oct 29 · 5:30pm",
+        "Fri Oct 30 · 10:00am"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Cancel, no fee"
+        ]
+       ],
+       "as": "Ben T."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-35",
+    "say": [
+     [
+      "san",
+      "owner",
+      "B.T. missed the Fri 1:00 with Mei. B.T. is fee-free, so no fee is asked."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your dentist is out on Fri Oct 30, so someone else on the team can take your 10:00am visit instead.",
+      {
+       "buttons": [
+        "Someone else",
+        "New times",
+        "Cancel, no fee"
+       ],
+       "as": "Dee W."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-49",
+    "say": [
+     [
+      "san",
+      "cust",
+      "There's a change to your Mon Nov 30 visit: someone else on the team will see you. The time and price stay the same.",
+      {
+       "buttons": [
+        "That's fine",
+        "Another time",
+        "Cancel, no fee"
+       ],
+       "as": "each customer"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "N.K.'s refund for the cancelled membership was due yesterday. A person from Rosie's team will call you today.",
+      {
+       "buttons": [
+        "It's done",
+        "Call me now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Family Dental: your card was charged twice for the same payment. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $55",
+        "lines": [
+         "Lee Family Dental · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Dee W."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "D.W.'s $55 checkup and whitening, paid at booking, was charged twice. The second charge is refunded, and D.W. is told."
+     ]
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's dental companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "more": [
+     "Only Sam sets who takes bookings and who may OK them.",
+     "A skill or OK someone adds later waits for Sam's OK.",
+     "Supervisor needed: the plug-in can mark someone who may work only while a supervisor is working.",
+     "Booking then offers that person only at times when their supervisor is working too.",
+     "Lena and Eli are hygienists: the plug-in has them work only while a dentist is working, where the state's rules require it.",
+     "Only Mei is cleared for home visits, so only Mei is offered for them.",
+     "Only Mei does whitening, so whitening services offer only Mei's times.",
+     "Pat takes no visits. Pat may OK only Lee Mobile Dental prices over $500.",
+     "Fees, refunds and what a business keeps are Sam's alone. Pat answers only requests and those prices.",
+     "Video checks: the Team page keeps each dentist's video link, or says the dentist calls the patient's mobile."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's your team, as you set it. Change anything here or on the Team page.",
+      {
+       "list": {
+        "head": [
+         "Person",
+         "Takes",
+         "May OK"
+        ],
+        "rows": [
+         [
+          "Sam",
+          "Every mobile dentistry job",
+          "May OK: everything; your answer wins"
+         ],
+         [
+          "Daniel",
+          "Every mobile dentistry job, and denture care",
+          "May OK: nothing"
+         ],
+         [
+          "Eli",
+          "Cleanings, fluoride and sealants",
+          "May OK: nothing"
+         ],
+         [
+          "Pat",
+          "No visits",
+          "May OK: Lee Mobile Dental prices over $500"
+         ],
+         [
+          "Mei",
+          "Every office service, whitening, home visits",
+          "May OK: nothing"
+         ],
+         [
+          "Lena",
+          "Every office service but whitening",
+          "May OK: nothing"
+         ]
+        ],
+        "plain": true
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "The plug-in says a hygienist works while a dentist is working, where the state's rules require it. Set that for Lena and Eli?",
+      {
+       "buttons": [
+        "Yes, set it",
+        "Nobody needs one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-27",
+    "more": [
+     "At a care home, the code can go to the nurse who meets the dentist, when a mobile is given for them."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-28",
+    "more": [
+     "For a self-pay patient, the dental notice is the right to a written price estimate. Alex's plan pays, so none is due here."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-29",
+    "more": [
+     "For a dental visit, the page also asks the birth date, the plan's member ID and a photo of the card.",
+     "The health history and consent forms are on it too. Alex can finish them before the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-13",
+    "more": [
+     "Dental texts name only the office, the date, the time and the place. The visit type stays on the secure page.",
+     "The dentist's name stays in visit texts: it's how Alex knows who to let in."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-20",
+    "more": [
+     "Eli is a hygienist who does the cleaning, and the exam waits for Daniel's next day at Maple Grove."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-10",
+    "more": [
+     "At a care home, Daniel asks the nurse first. If Alex is out, like at the hospital, the visit moves with no fee."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A dental visit always needs the patient there."
+   },
+   {
+    "op": "more",
+    "at": "B9-17",
+    "more": [
+     "Here, the office bills Alex's dental plan, then Alex for any share. Rosie sends nothing about money."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-18",
+    "more": [
+     "Card payments cost only Stripe's own card fee."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-19",
+    "more": [
+     "Dental X-rays and results never go through Rosie.",
+     "The text says only that the report is ready. Daniel goes over it in person, or the office calls."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your report from Thursday is ready. Daniel will go over it with you at the next visit, or the office will call.",
+      {
+       "card": {
+        "title": "Report ready",
+        "lines": [
+         "Lee Mobile Dental · Thu Oct 22",
+         "Shared in person, never by text"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Dental records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a dental visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever meets the dentist, like the care home's nurse."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-61",
+    "more": [
+     "For mobile dentistry, the forms are the health history, the consent and the dental plan's papers.",
+     "Kept: the patient, or the person who decides, signs them on the secure page at the door before any work."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Mobile dentistry takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for dental work (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A dental visit always needs the patient there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the dentist's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "Tooth pain gets the soonest same-day time instead, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Dental work always needs a license: each dentist and hygienist, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Dental work books people (a dentist or a hygienist), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Dental work runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each dentist and hygienist holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No dental work is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Mobile dentistry books a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A dental visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Mobile dentistry sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No dental visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No dental visit is sent now (S2-30)."
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Dental. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Mobile Dental · Your visit",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: R., in Spanish. Rosa wants a visit soon.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "R. · speaks Spanish",
+         "Wants a visit soon · safety steps given",
+         "Booking link sent"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/m20"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Dental. We got your voicemail. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Mobile Dental · Your visit",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about a loose denture. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants the denture looked at this week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Booked, with no texts to T. Please tell T. the details yourself.",
+      {
+       "card": {
+        "title": "T. · Checkup and cleaning",
+        "lines": [
+         "Thu Oct 22 · arriving 12–2pm · Eli",
+         "Add the address on the Today page"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/b8"
+       },
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-08",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Dental. Add your photos on this link, and a dentist will price the job. Texts are about this request only.",
+      {
+       "card": {
+        "title": "Lee Mobile Dental · Your request",
+        "lines": [
+         "Priced from your photos"
+        ],
+        "button": "Add photos",
+        "link": "rosfield.com/q/r3"
+       },
+       "stop": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-10",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Daniel's quote is over your $500 limit.",
+      {
+       "card": {
+        "title": "New denture · $640",
+        "lines": [
+         "For M.P. · priced from photos",
+         "Lee Mobile Dental"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-11",
+    "say": [
+     [
+      "owner",
+      "san",
+      "600"
+     ],
+     [
+      "san",
+      "owner",
+      "Send M.P. $600 for the new denture?",
+      {
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-12",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your price is with the owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Morgan P."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-80",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Dental couldn't price your request this time. Nothing was booked or charged."
+     ],
+     [
+      "san",
+      "staff",
+      "Sam didn't OK your $640 price for A.M. in time, so it wasn't sent."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M. wants a dental plan to pay for this visit. Check it, then pick one.",
+      {
+       "card": {
+        "title": "Plan check · A.M.",
+        "lines": [
+         "Thu Oct 22 · arriving 8–10am · Daniel",
+         "The plan's name and number are on the secure page"
+        ],
+        "button": "See the plan",
+        "link": "rosfield.com/w/am"
+       },
+       "buttons": [
+        "Covered",
+        "A.M. pays part",
+        "Not covered",
+        "Can't check now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-36",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your contract is waiting for your signature. Your Thu time is saved until 7:45pm today.",
+      {
+       "card": {
+        "title": "Contract · Lee Mobile Dental · $640",
+        "lines": [
+         "Not signed yet"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/r3"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your contract wasn't signed in time, so nothing was booked or charged."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. didn't sign the denture contract in 24 hours, so nothing was booked."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-35",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Dental signed your contract. Your copy is on the page. Finish booking there.",
+      {
+       "card": {
+        "title": "Contract signed by both",
+        "lines": [
+         "Your price · $640",
+         "Thu Oct 22 · arriving 8–10am · Daniel"
+        ],
+        "button": "Finish booking",
+        "link": "rosfield.com/c/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-04",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Reminder: N.S. is still waiting for an answer.",
+      {
+       "buttons": [
+        "Accept",
+        "Another time",
+        "Decline",
+        "Yes, with a change",
+        "Need more first"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Dental. The business hasn't answered your request yet. We'll text you by 12:00pm either way.",
+      {
+       "stop": true,
+       "as": "Nora S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Daniel instead of Eli"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer N.S. the checkup and cleaning today, arriving 1 to 3pm, with Daniel, not Eli?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another change"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Dental. It can take your request, with one change:",
+      {
+       "card": {
+        "title": "Lee Mobile Dental · $179",
+        "lines": [
+         "Today · arriving 1 to 3pm · Daniel, not Eli",
+         "Reply within 2 hours"
+        ]
+       },
+       "buttons": [
+        "Take it",
+        "No thanks"
+       ],
+       "stop": true,
+       "as": "Nora S."
+      }
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "owner",
+        "san",
+        "4"
+       ],
+       [
+        "san",
+        "owner",
+        "What's the change?"
+       ],
+       [
+        "owner",
+        "san",
+        "Fit check Fri, not Thu"
+       ],
+       [
+        "san",
+        "owner",
+        "Offer A.M. Thu Oct 22 with Daniel, the fit check Fri?",
+        {
+         "buttons": [
+          "Send it",
+          "Type another change"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B7-15",
+    "say": [
+     [
+      "cust",
+      "san",
+      "STOP"
+     ],
+     [
+      "san",
+      "cust",
+      "You won't get more texts from Rosie for Lee Mobile Dental. Your visit stays booked."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. opted out of texts. The visit stays. Call A.M. instead of texting when you head over."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. opted out of texts. The Thu 8–10am visit stands. For any change, call A.M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I drink coffee right before the visit?"
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. asks: Can I drink coffee right before the visit?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Daniel says no. Please wait until after the visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "say": [
+     [
+      "cust",
+      "san",
+      "My gums are bleeding more now."
+     ],
+     [
+      "san",
+      "cust",
+      "If your face or jaw swells with a fever, go to the emergency room or call 911. Eli can come sooner, at the same price.",
+      {
+       "times": [
+        "Wed Oct 21 · arriving 2–4pm · Eli"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep Thursday"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-19",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Daniel can't work Thu. A.M. is booked 8–10am. Eli is free then and does cleanings.",
+      {
+       "buttons": [
+        "Offer Eli first",
+        "I'll call A.M. myself"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "owner",
+        "Daniel can't work Thu. A.M.'s new denture is booked 8–10am, and only Daniel does those.",
+        {
+         "buttons": [
+          "Offer Daniel's times",
+          "I'll call A.M. myself"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B7-22",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry, Daniel can't make your visit tomorrow, and nobody else here does this work. Pick a new time with Daniel, or cancel with no fee:",
+      {
+       "times": [
+        "Fri Oct 23 · arriving 8–10am · Daniel",
+        "Mon Oct 26 · arriving 8–10am · Daniel"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Cancel, no fee"
+        ]
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "A"
+     ],
+     [
+      "san",
+      "cust",
+      "Moved: Fri Oct 23, arriving 8–10am, with Daniel."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M.'s visit moved to Fri Oct 23, arriving 8–10am.",
+      {
+       "as": "Daniel"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-51",
+    "say": [
+     [
+      "san",
+      "cust",
+      "The price of your residents' repeating visits is changing.",
+      {
+       "card": {
+        "title": "Plan price · from Mon Nov 23",
+        "lines": [
+         "$189 a visit (now $179)",
+         "Visits before Nov 23 stay $179"
+        ],
+        "button": "See your plan",
+        "link": "rosfield.com/c/m10"
+       },
+       "as": "Morgan"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-61",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Daniel's first visit found that the job can't go ahead as planned. Lee Mobile Dental has cancelled it, with no fee. Anything held or paid comes back in full."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-01",
+    "say": [
+     [
+      "san",
+      "staff",
+      "Your Thu Oct 22. Text OMW when you leave.",
+      {
+       "list": {
+        "head": [
+         "Time",
+         "Customer",
+         "Job"
+        ],
+        "rows": [
+         [
+          "8–10am",
+          "A.M. · 120 Grove Rd",
+          "Checkup and cleaning"
+         ],
+         [
+          "10am–12pm",
+          "K.L.",
+          "Dental van visit"
+         ],
+         [
+          "12–2pm",
+          "D.",
+          "Denture reline"
+         ]
+        ]
+       },
+       "card": {
+        "title": "Answers, photos and gate codes",
+        "lines": [
+         "Opens only on your signed-in phone"
+        ],
+        "button": "Open the day",
+        "link": "rosfield.com/d/j22"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Daniel from Lee Mobile Dental is on the way, about 15 minutes. When Daniel arrives, give your check-in code. We'll text you as soon as it's entered. If someone else comes, don't let them in.",
+      {
+       "photos": [
+        "Daniel, from Lee Mobile Dental"
+       ],
+       "photoLink": "rosfield.com/m/r4",
+       "code": "3906",
+       "buttons": [
+        [
+         "2",
+         "It isn't Daniel"
+        ]
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "At the door, ask A.M. for their check-in code and text it here."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3906"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: A.M., 8–10."
+     ],
+     [
+      "san",
+      "cust",
+      "Daniel from Lee Mobile Dental is checked in for your 8–10am visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-05",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3960"
+     ],
+     [
+      "san",
+      "staff",
+      "That isn't A.M.'s code. Check it with A.M. and send it again."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-06",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Daniel couldn't enter A.M.'s check-in code after 3 tries. The visit goes on, and it counts once Daniel texts DONE."
+     ],
+     [
+      "san",
+      "cust",
+      "Daniel couldn't enter your code. If the person at your door isn't Daniel, don't let them in.",
+      {
+       "buttons": [
+        [
+         "2",
+         "It isn't Daniel"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. says the person at the door isn't Daniel. Call A.M. now.",
+      {
+       "card": {
+        "title": "Safety check · A.M.",
+        "lines": [
+         "Thu 8–10am · 120 Grove Rd",
+         "A.M. was told to keep the door closed"
+        ]
+       }
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says the person at the door isn't you. Please wait: Sam is calling A.M."
+     ],
+     [
+      "san",
+      "cust",
+      "Keep your door closed. If you feel unsafe, call 911. Sam will call you now.",
+      {
+       "buttons": [
+        [
+         "1",
+         "It was Daniel after all"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Daniel you're home."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says they're home. Try the door again, and check in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE old mark on the wall by the bed",
+      {
+       "photos": [
+        "The room, before",
+        "Wall by the bed, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with A.M.'s job."
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "BEFORE a crack at the base of the denture",
+        {
+         "photos": [
+          "Denture, before",
+          "Floor around it, before"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with A.M.'s job."
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "BEFORE a crack at the base of the denture",
+        {
+         "photos": [
+          "Denture, before",
+          "Floor around it, before"
+         ]
+        }
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with A.M.'s job."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 245 filling 165 X-ray 80"
+     ],
+     [
+      "san",
+      "cust",
+      "Daniel has a price for today's work. Each line is on the secure page.",
+      {
+       "card": {
+        "title": "Today's price · $245",
+        "lines": [
+         "Each line on the secure page",
+         "The $89 visit fee is included",
+         "On the bill we text you after"
+        ],
+        "button": "See the lines",
+        "link": "rosfield.com/q/r4p"
+       },
+       "buttons": [
+        "Yes, fix it",
+        "Not today",
+        "OK some lines"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Today's visit is the $89 visit fee. The price for the rest is good for 7 days.",
+      {
+       "card": {
+        "title": "Today's price · $245",
+        "lines": [
+         "Good until Thu Oct 29"
+        ],
+        "button": "Book it",
+        "link": "rosfield.com/q/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Reminder: Daniel is waiting on your OK for today's price, $245.",
+      {
+       "buttons": [
+        "Yes, fix it",
+        "Not today"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. hasn't answered Daniel's $245 tooth pain visit quote in 30 minutes. Daniel is at 120 Grove Rd.",
+      {
+       "buttons": [
+        "I'll call A.M. myself",
+        "Don't do it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CHANGE cleaning done in bed, same price"
+     ],
+     [
+      "san",
+      "cust",
+      "Daniel saw you in bed today. Your price doesn't change."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. The $160 price is good for 7 days.",
+      {
+       "card": {
+        "title": "More work · $160",
+        "lines": [
+         "Good until Thu Oct 29"
+        ],
+        "button": "Book it",
+        "link": "rosfield.com/q/r4v"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD no safe outlet for the chair, stopped",
+      {
+       "photos": [
+        "The outlet by the bed"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Daniel found no safe outlet for the portable chair, so Daniel stopped the visit.",
+      {
+       "card": {
+        "title": "Safety note · 120 Grove Rd",
+        "lines": [
+         "Found: no safe outlet for the chair",
+         "Not done: today's visit",
+         "Ask the care home to fix the outlet first"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-34",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT cut my hand, need to stop"
+     ],
+     [
+      "san",
+      "owner",
+      "Daniel is hurt at A.M.'s visit (120 Grove Rd) and needs to stop. Call Daniel now.",
+      {
+       "buttons": [
+        "Send Eli",
+        "Find A.M. a new time"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam is told. If you need care, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-35",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DAMAGE scuffed the wall by the bed",
+      {
+       "photos": [
+        "Scuffed wall"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Daniel's chair scuffed the wall in A.M.'s room. The before photo shows no scuff.",
+      {
+       "photos": [
+        "Before",
+        "After"
+       ],
+       "buttons": [
+        "Fix it, no charge",
+        "Take money off",
+        "I'll call A.M. myself"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "say": [
+     [
+      "staff",
+      "san",
+      "TAKEN denture to the lab, back Mon",
+      {
+       "photos": [
+        "Denture, as taken"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Daniel took the item you agreed on to be repaired. Please check the photo and sign for it.",
+      {
+       "card": {
+        "title": "Taken for repair · Lee Mobile Dental",
+        "lines": [
+         "Back Mon Oct 26 · arriving 8–10am · Daniel"
+        ],
+        "button": "Sign for it",
+        "link": "rosfield.com/s/r4f"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 179 cleaning, parts 38 liner",
+      {
+       "photos": [
+        "Lab receipt"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "A.M.: $179 cleaning + $38 parts = $217. That's what A.M. pays today."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-47",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nothing was entered for A.M.'s Thu Oct 22 visit, and A.M. didn't answer. Nothing is billed until you check with Daniel.",
+      {
+       "buttons": [
+        "Daniel did it",
+        "It didn't happen"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE A.M.: next cleaning in 6 months. Bring the X-ray unit then."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to A.M.'s private record."
+     ]
+    ],
+    "vary": {
+     "price:list+before:full": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE A.M.: denture fits well now. Reline again in 12 months."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to A.M.'s private record."
+       ]
+      ]
+     },
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE A.M.: new denture fits. The old one went back to A.M."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to A.M.'s private record."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE A.M.: filling done. Check it at the next visit."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to A.M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry to hear that. What went wrong?"
+     ],
+     [
+      "cust",
+      "san",
+      "Daniel was late and rushed."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. rated the visit 2 stars: \"Daniel was late and rushed.\"",
+      {
+       "card": {
+        "title": "Rating · 2 of 5",
+        "lines": [
+         "Thu Oct 22 visit with Daniel",
+         "Only you see this"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "say": [
+     [
+      "cust",
+      "san",
+      "My gum has been sore since the cleaning."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. asks for a check after the Thu Oct 22 cleaning. A check within 30 days is free.",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call A.M. now"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Sorry about that. A check within 30 days is free, so this visit is free.",
+      {
+       "times": [
+        "Thu Nov 5 · arriving 8–10am · Daniel",
+        "Fri Nov 6 · arriving 8–10am · Daniel"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-09",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I get some money back? Daniel came late and rushed."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. asked for money back for the Thu Oct 22 visit.",
+      {
+       "buttons": [
+        "Refund it",
+        "Keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Reminder: A.M. asked for money back for the Thu Oct 22 visit.",
+      {
+       "buttons": [
+        "Refund it",
+        "Keep it"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your request is still with Lee Mobile Dental. We've asked Sam to get back to you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-13",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Daniel rushed and didn't explain anything."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. isn't happy with the Thu Oct 22 visit: \"Daniel rushed and didn't explain anything.\"",
+      {
+       "buttons": [
+        "Book a free fix",
+        "Call A.M. now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-14",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M.'s bank opened a dispute about the Thu Oct 22 payment. Rosie's record is ready.",
+      {
+       "card": {
+        "title": "Dispute · A.M.",
+        "lines": [
+         "The booking, the check-in and every text"
+        ],
+        "button": "See the record",
+        "link": "rosfield.com/d/r4"
+       },
+       "buttons": [
+        "Send the record",
+        "Let A.M. keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-23",
+    "say": [
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "OK. Nothing is sent, and the bank keeps the payment with A.M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Daniel check my other denture next week?"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. Here are Daniel's next times:",
+      {
+       "times": [
+        "Tue Nov 24 · arriving 8–10am · Daniel",
+        "Wed Nov 25 · arriving 10am–12pm · Daniel"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT Alex M. asks: denture reline, 12 months"
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Mobile Dental books up to 60 days ahead. We'll text you times for the visit you asked Daniel about in late Aug 2027.",
+      {
+       "buttons": [
+        "Sounds good",
+        "No thanks"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-30",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your report from Thu Oct 22 is ready.",
+      {
+       "card": {
+        "title": "Your report",
+        "lines": [
+         "Daniel goes over it with you in person",
+         "Thu Oct 22 · 120 Grove Rd"
+        ],
+        "button": "See it",
+        "link": "rosfield.com/v/r4c"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-35",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Dental: your tips for after today's visit are on the secure page: rosfield.com/a/r4t. If anything worries you, reply here."
+     ]
+    ],
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Mobile Dental: your tips for after today's visit are on the secure page: rosfield.com/a/r4t. If anything worries you, reply here."
+       ]
+      ]
+     },
+     "price:list+before:full": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Mobile Dental: your tips for after today's visit are on the secure page: rosfield.com/a/r4t. If anything worries you, reply here."
+       ]
+      ]
+     },
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Mobile Dental: your tips for after today's visit are on the secure page: rosfield.com/a/r4t. If anything worries you, reply here."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Family Dental",
+          "6 bookings"
+         ],
+         [
+          "Lee Mobile Dental",
+          "3 jobs · Daniel 2, Eli 1"
+         ],
+         [
+          "Waiting on you",
+          "N.S.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-03",
+    "say": [
+     [
+      "san",
+      "owner",
+      "New request from N.S., a new customer.",
+      {
+       "card": {
+        "title": "Checkup and cleaning · $179",
+        "lines": [
+         "Today · arriving 1 to 3pm · Eli",
+         "Lee Mobile Dental"
+        ]
+       },
+       "buttons": [
+        "Accept",
+        "Another time",
+        "Decline",
+        "Yes, with a change",
+        "Need more first"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-05",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Dental. You're booked! Give this code to Eli at the door.",
+      {
+       "card": {
+        "title": "Lee Mobile Dental · Maple Grove",
+        "lines": [
+         "Today · arriving 1 to 3pm · Eli"
+        ]
+       },
+       "code": "2715",
+       "stop": true,
+       "as": "Nora S."
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "New job for you: N.S., checkup and cleaning, today, arriving 1 to 3pm.",
+      {
+       "as": "Eli"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-13",
+    "say": [
+     [
+      "owner",
+      "san",
+      "BLOCK Thu 12-5"
+     ],
+     [
+      "san",
+      "owner",
+      "Block which business?",
+      {
+       "buttons": [
+        [
+         "A",
+         "Lee Family Dental"
+        ],
+        [
+         "B",
+         "Lee Mobile Dental"
+        ]
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "B"
+     ],
+     [
+      "san",
+      "owner",
+      "Block Thu Oct 29, 12 to 5pm at Lee Mobile Dental? L.W. is booked, arriving 12 to 2pm.",
+      {
+       "buttons": [
+        "Block; offer new times",
+        "Block around it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-14",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Dental had to block Thu Oct 29, 12 to 5pm. So your 12 to 2pm visit can't go ahead then. Pick a new time:",
+      {
+       "times": [
+        "Mon Nov 2 · arriving 8 to 10am",
+        "Tue Nov 3 · arriving 10am to 12pm"
+       ],
+       "buttons": [
+        [
+         "C",
+         "Cancel, no fee"
+        ]
+       ],
+       "as": "Lin W."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-35",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Nobody was home for L.W.'s Fri 10am to 12pm visit. L.W. is fee-free, so no fee is asked."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "M.P.'s refund for the cancelled extra work was due yesterday. A person from Rosie's team will call you today.",
+      {
+       "buttons": [
+        "It's done",
+        "Call me now"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Mobile Dental: your card was charged twice for the same payment. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $150",
+        "lines": [
+         "Lee Mobile Dental · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Nora S."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "N.S.'s $150 denture reline, paid at booking, was charged twice. The second charge is refunded, and N.S. is told."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A dental visit is rated, like any visit."
+   }
+  ]
+ },
+ "notes": "Names: Sam Lee, a dentist, owns Lee Mobile Dental LLC (the master's main company: mobile dentistry and denture care at care homes, schools and homes, 300 Main St) and Lee Family Dental LLC (the second company: the clinic, 250 Cedar Ave). Flow A's story is at the clinic; flow B's at Maple Grove care home, 120 Grove Rd, where Alex lives.\nThe same rename pairs run in both flows, so sign-up and the team read the same in each.\nPeople: Riley and Avery became Mei (dentist) and Lena (hygienist) at the clinic; Jordan and Casey became Daniel (dentist, who also makes dentures) and Eli (hygienist) on the mobile team. Sam, Pat and Alex M. stay.\nKinds of work: plumbing became mobile dentistry, electrical became denture care (it waits for Daniel's license), the barbershop became the dental office. The licenses are each dentist's and hygienist's own, plus the company's mobile dental permit, a dental lab registration and the office's registration, each only where the state's form asks.\nPrices: the master's numbers are kept as the example offices' own prices, so every sum, deposit, refund and card fee stays right: checkup $35, checkup with X-rays $40, fluoride $20, child's checkup $25, checkup and whitening $55, deep cleaning $140, whitening kit from photos $90, tooth pain visit $25 exam ($110 in all); at the care home: checkup and cleaning $179, the $89 visit fee, denture reline $150, new denture from photos $640, tooth pain priced at the visit ($245). The missed-visit fee is $20 ($40 for the deep cleaning). They're examples, not a standard.\nMoney A: list|none|counter is the main path (nothing taken, the desk checks the plan, the share at the front desk). list|card|counter only where the office turns on its missed-visit fee; visit|none|counter is tooth pain; list|full|none is whitening (no plan pays it); list|hold|counter the deep cleaning's held $40 fee; photos|none|counter the whitening kit priced from photos (review, Oct 22: added so the money paths match pf.services). Left out: deposits at the office, and Rosfield's bill or card charge (the clinic has a front desk).\nMoney B: list|none|own is the main path (the office bills Alex's plan its own way). list|hold|bill is private pay (the $89 visit fee held, Rosie texts the bill to Alex or his daughter); visit|none|own is tooth pain at the care home; list|full|none a private-pay denture reline; photos|deposit|bill the new denture from photos with a 25% deposit (review, Oct 22: added so the money paths match pf.services). Left out: the saved card charged at DONE. The tip branch (B9-19) is off: pf.money.tips is none.\nNo $2: the plug-in allows no fee per booking for health practices until Rosie's counsel clears it. S1-25, S1-26, A9-21, B9-18 and S11-66 say so.\nNo $2 anywhere else either (fix, Oct 22): every master sentence about the $2 has a rename pair, first in both lists, on the master's own words. Money lands 'less Stripe's card fee only'; a cancel, no-show or refund says 'Rosfield takes nothing for dental work' or 'Rosie took nothing from the deposit'; check-in just 'confirms the visit'; sign-up, the Money page and the monthly bill say plainly that dental work pays no $2, so there is no monthly bill for it. S11-66 now sends no bill (no text), S1-25's detail lines are a words op, and S2-15's Pat line no longer counts a $2.\nTexts: the clinic's customer cards, confirmation and reminder carry the office, the date, the time and the address, not the visit type or the dentist's name (rename pairs and the A6-14 and A7-01 ops). Flow B keeps the dentist's name in visit texts, since the door check needs it (Rosie's check-in rule wins).\nOwner and staff texts keep the master's 'Alex M.' in most examples; the plug-in's initials rule applies when it runs, and the dental-only texts use A.M.\nThe master's 10 minutes to finish stays (the old flow's 15 is dropped): the health forms are on the secure page, due the day before the visit.\nThe old $50 fee by pay link, with nothing saved, isn't the master's way: with nothing taken, no fee can be charged. A fee comes only from a card saved where the office turns the fee on, and never from a fee-free patient (S11-22, S11-35).\nFlow B is a care home: B4-35's landlord branches became the care home's OK and a family member who pays, B4-46 the nurse booking 4 residents, B4-66 a school dental day (on B4-47 before the v1.1 re-fit), and B8-03's 'Nobody needs to be home' branch is off (the patient is always there).\nX-rays and results never go through Rosie (A10-22 and B10-19 changed).\nThe master's what-if examples were renamed to fit and stay only as examples: a staged implant job, a temporary denture with a damage hold, a dental van for weather and a broken van, lab and parts receipts.\nKept words: none.\nRe-fit to master v1.1 (refit v1.1, Oct 22): the master now does the dentist's three gaps. G14 people in turns: A4-14 (a more op for the new patient visit). G13 a guardian for an adult: A4-64 and B4-74 (more ops; the guardian line left B4-27). G15 visit days at a host's place: S1-58, S1-59, B4-66; the school dental day moved from a words op on B4-47 to a more op on B4-66, and B4-47 is the master's class seats again ('Lee Mobile Dental has no classes').\nNo jobs sent now: mobile dentistry keeps no one on call (S2-27 words op, B4-19 words op: the soonest window, same day with Sam's OK). The sent-now branches are off: B4-16, B6-03, B7-05.\nAlso off for the dentist: B8-03's 'Nobody home; the gate code fails' (the patient is always there), B7-19's 'the crew, longer', the outside check B8-50, and B10-07's permit inspection.\nThe master's new example words got dental words by rename pairs on the master's own sentences, placed first in the list: Pine Court for the host-day care home (Morgan's, as in B7-32), the daughter who pays instead of the landlord (B4-37, B4-75, B8-57), the filling and X-ray lines (B8-48), a signed consent as what's missing (B8-54), sensitivity gel as the $15 add-on (A8-25 to A8-48), a checkup plan every 6 months (A5-21, A7-55).\nRe-fit to master v1.2 (Oct 22, evening): at each plug-in split the dentist keeps its own branch and turns the rest off.\nOff: the $2 branches (S1-62, S1-65, S11-92, S11-94). The master's no-$2 steps S1-26 and S11-93 take over, so the S1-25 and S11-66 words ops are gone; S1-26 keeps the lawyer line as a more op, and a rename gives 'Sam's three are all dental'.\nOff: registration only (S1-60, S1-63, S2-28), no agreement (S1-29), spaces and classes (S2-25, S2-32), sent now (S2-30, B4-81, B7-55, B8-58). S2-31 and B4-82 replace the S2-27 and B4-19 words ops; S2-31 keeps the tooth pain line.\nOff: walk-ins other than a line (A3-32), anything but a person's time (A4-66, A7-59, S11-87, S11-90, B7-56), adults only (A4-70), damage holds (A5-24, B5-26), a crew, a date that can't move and a minimum (A7-62, A7-63, A7-67, B7-56, B7-64), running late other than shorter (A7-70), drop-off (A8-53), named-only (A10-34), set starts and stays (B4-83), the outside check (B8-65), the permit inspection (B10-29), and B4-78's 'nobody asks' (B4-35 always asks about a care home).\nOn (final, Oct 22): the form signed on the secure page (A4-43, B4-38) and its 'not done by its due date' (A7-02, B7-05). The health history, the consent and the dental plan's papers are signed on the secure page, never by text, due the day before. Not done: one reminder, then Sam keeps the visit (signed on the secure page at the desk or door first), moves it, or cancels with no fee (pf.first_steps, pf.edges.forms). A4-72 has a words op for the dental forms; the master's form example customer Lena is Grace here, since Lena is a hygienist.\nKept: the video branch (A4-01, B4-01: a short video check, pf.services.online), both A7-61 branches (whitening is Mei's only), the reaction and the paper from someone else at A4-43, and B4-57's contract split (the new denture's signed consent).\nThe A6-14 and A7-01 words ops now start from the master's v1.2 cards (the price line, what a no costs, the private-text and video lines) and add only the prep line and the health forms link.\nv1.2 renames, first in both lists: the $2 sentences the master reworded (S1-15, A4-31, A5-13, A5-16, A7-66, A8-51, A9-10, A9-24, S11-63, S11-64, B5-12, B5-14, B7-46, B8-04, B8-37, B8-46, B8-60, B8-63); 'a cut' in the new splits (A7-62, A7-67, A7-70, A10-34, A7-33); the care home and the daughter who pays (B4-23, B4-36, B4-37, B4-75, B4-78, B4-79, B8-57, B8-64, B9-12); the signed consent missing at the door (B8-45, B8-54, B8-60); the staged implant job (B8-62, B9-21); a crown proposal (B10-31); drain words (B4-28, B4-57, B4-81, B7-19, B7-55, B7-56, B7-58).\nOne name, one place: the master's new host-day building, Birch Tower, is Willow House care home here, so Pine Court stays only Morgan's care home (B4-71, B7-32).\nFinal (Oct 22): splitsKept A: A4-43 (every first-step kind is used), A7-61, A8-02; B: B4-57, B8-71 and B8-72 (a new denture is delivered and fitted, a denture can go to the lab; a checkup has neither). Off: A8-67's child left without a parent; B4-83's seats and no-person times; B8-67's child in the pro's care.\nReview (Oct 22, evening): leftover hair and plumbing notes renamed (A4-22, A6-15 'Short on the sides', 'brassy'; B6-27 'old heater'); A8-41 and B8-46 no longer read as if a $2 is paid; A7-66's doubled line fixed; B4-50 says the office sends the claim; B4-05 no longer asks new or returning; the staged what-if job is a full denture job (no implants placed at a care home); A8-23 keeps the before check in the office's chart (pf.visit.done); A3-24 carries the dental ER words.\nReview (Oct 22, evening), more: S11-58 adds orthodontics (flow A) and teeth whitening (flow B), not massage or heating; A9-04 says deep cleaning, not a grooms package; B8-18 notes a crack, not rust; the barbershop price board is the price list.\nTemplate fix (Oct 22, private texts): every customer text in both flows now carries only the business, the date, the time and the place (S13-22, pf.messages.never). The visit type, the work found, the plan and the care tips moved to the secure page: cards say 'Lee Family Dental · 250 Cedar Ave' or 'Your price · $90', not 'Checkup' or 'New denture'; the $25 exam is 'the $25 visit fee'; a quote in the chair lists its lines on the secure page. Flow A's texts drop the dentist's name too ('the office', 'someone else on the team'); flow B keeps Daniel's and Eli's names for the door check. Left as they are: the patient's own words, the safety words (go to the emergency room), and S1-59's visit days to a care home (no patient in it). Owner and staff texts use the patient's initials (A.M., D.W., B.T.; a first name alone becomes its initial). Done as words ops on each step's texts, generated from the joined flows.\nRefit Oct 27 (REDESIGN 2, R06): no holds since D66 (the deep cleaning's $40 hold path is gone; the $89 visit fee is a card saved); money words come from the record; see work/phase4/log/refit-massage.md.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Alex picked a kids cut for a son before the times",
+    "the way most barbershops set it",
+    "Classic cuts, fades and hot towel shaves.",
+    "When they book: a card saved, for a $20 fee you OK",
+    "asks for a perm",
+    "books a skin fade for",
+    "skin fades",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Next: Sat Nov 28 · 10:00am",
+    "May the shop show photos of your hair?",
+    "photos of your hair",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Gloss to finish · $15",
+    "gloss",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel",
+    "signature cut",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "a consult",
+    "consult",
+    "Consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "set at the chair",
+    "quote at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "home warranty plan",
+    "labor",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "like a skin-test result",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cut is uneven on one side.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Quiero un corte el sábado.",
+    "A step-free door on Elm St",
+    "Step-free door on Elm St",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped",
+    "skin fade",
+    "Skin fade"
+   ],
+   "B": [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "added a camera inspection to",
+    "can clear the drain",
+    "can start the sewer camera inspection at a set time",
+    "the way most barbershops start",
+    "the rules barbershops often set",
+    "Classic cuts, fades and hot towel shaves.",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "like new pipes put in one day and finished another",
+    "Shutoff valve and wall pipe · $540",
+    "cracks the cabinet floor",
+    "$160 valve work",
+    "The drain clogs again 2 weeks later.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today",
+    "two drain clearings",
+    "At my home.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "like a move-out day",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "hot towel",
+    "haircut",
+    "house calls",
+    "color",
+    "consult",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "water heater",
+    "Water heater",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Panel upgrade",
+    "credited to the repair",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "the warranty company",
+    "A plan or warranty pays",
+    "Alex says yes before any work",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "Kitchen drain",
+    "Yard drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Supply line · $80",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote",
+    "replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "the kitchen drain",
+    "The kitchen drain is clogged again.",
+    "with the store's receipt",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "Drain clearings already booked",
+    "The repair price",
+    "the repair price",
+    "Book the repair",
+    "labor",
+    "Labor",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "$2,400 repipe",
+    "faucet"
+   ]
+  },
+  "A": {
+   "S1-29": "ed36650e05",
+   "S2-15": "4a64408afc",
+   "A4-50": "6f43775326",
+   "A4-37": "4ee9e74e71",
+   "A4-41": "15813954ee",
+   "A4-42": "7f259bddbf",
+   "A4-43": "c17d56f766",
+   "A6-14": "b17b52115e",
+   "A7-18": "b98d7c1744",
+   "A8-33": "561bc291a5",
+   "A8-35": "a67e890a5b",
+   "A9-20": "0cfe0e1776",
+   "A9-21": "1f49aad1e9",
+   "A10-21": "08514557c8",
+   "A10-22": "c891ad7af1",
+   "A4-14": "95c7ffcfab",
+   "A4-64": "b98f95b738",
+   "A7-74": "b3ec278ce4",
+   "S1-26": "155e1542cc",
+   "S2-31": "320ac5e4cb",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A8-23": "e3a35f7f9e",
+   "A3-24": "78e61fd50f",
+   "A3-20": "b8251d2535",
+   "A3-13": "1717178183",
+   "A3-31": "1e97c77c46",
+   "A3-15": "7455c706a3",
+   "A3-17": "7d951f08c8",
+   "A4-07": "25d6b63204",
+   "A4-09": "b215034fb7",
+   "A4-10": "d3655b97dd",
+   "A4-11": "2983f72b69",
+   "A4-51": "34d7f42558",
+   "A4-60": "7f7f0f1e66",
+   "A6-02": "d7d5a3ecf5",
+   "A6-04": "fe10e3d360",
+   "A7-11": "cba3283efb",
+   "A7-12": "05f64179a4",
+   "A7-13": "e41528a397",
+   "A7-14": "6a57738a17",
+   "A7-15": "7ca3e4c467",
+   "A7-17": "37186ae0aa",
+   "A7-19": "850f8173d8",
+   "A7-21": "996ff87f58",
+   "A7-70": "da4cede3e2",
+   "A7-31": "65a8abd6c4",
+   "A7-32": "0f63100be0",
+   "A7-54": "1c3b16257d",
+   "A7-55": "6f2143030d",
+   "A8-01": "750bd94ee4",
+   "A8-04": "8caf7636f3",
+   "A8-05": "bcf176bdb3",
+   "A8-07": "f5c27acdfa",
+   "A8-08": "3662e9ea04",
+   "A8-47": "7fc94278bf",
+   "A8-16": "90a6202deb",
+   "A8-25": "a79292eae2",
+   "A8-26": "1e164bc165",
+   "A8-28": "ce2597e46a",
+   "A8-29": "6b776f2a37",
+   "A8-30": "c0f4d7c935",
+   "A8-38": "5e48b74f3a",
+   "A8-39": "c64da36bdb",
+   "A8-45": "6589a6b4d4",
+   "A10-04": "a716e16e38",
+   "A10-32": "9f84638bce",
+   "A10-33": "9db84a576a",
+   "A10-08": "b60e30f285",
+   "A10-09": "f211279325",
+   "A10-13": "b06dc7e545",
+   "A10-14": "b60c13af2d",
+   "A10-16": "9d654e2a1d",
+   "A10-27": "a4118d32ac",
+   "A10-19": "9c57a93e3c",
+   "A10-42": "4f28189298",
+   "S11-02": "d0b2cf9f6c",
+   "S11-03": "004f4f5fea",
+   "A6-03": "7171a00636",
+   "S11-13": "f3a4b561e4",
+   "S11-14": "8a7a6c24ec",
+   "S11-35": "3c96cb8869",
+   "S11-46": "ed1e14ee9c",
+   "S11-49": "7ecff02163",
+   "S11-70": "d2b2cf0360",
+   "S12-26": "7b7e6af034"
+  },
+  "B": {
+   "S1-29": "69d8f12a68",
+   "S2-15": "4a64408afc",
+   "B4-27": "4b45128d2c",
+   "B4-28": "506d267aaf",
+   "B4-29": "9234c5ed40",
+   "B6-13": "ed1f412f7d",
+   "B7-20": "364245afef",
+   "B8-10": "5c9d4b937f",
+   "B8-03": "ac9d404766",
+   "B9-17": "24b5acdf89",
+   "B9-18": "9126ad2c72",
+   "B10-19": "4806f6eed8",
+   "B10-17": "b5f4aef51b",
+   "B4-74": "bae5529af9",
+   "B7-61": "342b55fd9b",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-26": "155e1542cc",
+   "S2-31": "320ac5e4cb",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B3-25": "4413e58bcb",
+   "B3-22": "19f64ba1ba",
+   "B3-04": "31447caa31",
+   "B3-24": "a31b436ff1",
+   "B4-08": "0c0f0e8d03",
+   "B4-10": "c21b3d3450",
+   "B4-11": "982f2084f8",
+   "B4-12": "e6d956ac70",
+   "B4-80": "641ed5b94f",
+   "B4-63": "49ce39c037",
+   "B5-36": "456a1159d6",
+   "B5-35": "1de0d2312d",
+   "B6-04": "6d888abcaa",
+   "B6-06": "1d676278da",
+   "B7-15": "a00f0c64fb",
+   "B7-16": "3177c3701b",
+   "B7-17": "ac1fd212f3",
+   "B7-19": "59d20c8e66",
+   "B7-22": "c8a4abe80b",
+   "B7-51": "7910e2fa9f",
+   "B8-01": "df9177b059",
+   "B8-02": "024afae342",
+   "B8-04": "6c9782920d",
+   "B8-05": "90f94e0f1e",
+   "B8-06": "3155d50758",
+   "B8-07": "4589d04c44",
+   "B8-12": "7e627afb46",
+   "B8-18": "530038d2b8",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-49": "4fcfdeb80b",
+   "B8-23": "dd780a2ec8",
+   "B8-25": "3f7d0c2f58",
+   "B8-30": "a1ef4983e4",
+   "B8-34": "643812e26f",
+   "B8-35": "93207824c7",
+   "B8-37": "3ce85cf051",
+   "B8-41": "6e8e9825b2",
+   "B8-47": "8b91635433",
+   "B8-44": "3847104a93",
+   "B10-04": "b25044fa47",
+   "B10-08": "01bac94fd8",
+   "B10-09": "b0bde2b7fe",
+   "B10-12": "ded576c8bc",
+   "B10-13": "584c827fda",
+   "B10-14": "b0840c40ca",
+   "B10-23": "eea2f1cde7",
+   "B10-16": "c7a47a391c",
+   "B10-18": "3d7ba16539",
+   "B10-30": "5ecd3ded96",
+   "B10-35": "5ed99b23b3",
+   "S11-02": "b5be5f9aa7",
+   "S11-03": "ff8e999c10",
+   "B6-05": "32fad5e5ab",
+   "S11-13": "4e5f75b209",
+   "S11-14": "5a5607d715",
+   "S11-35": "dc9b9897a3",
+   "S11-70": "e3cd4d5dcd",
+   "S12-26": "8368479b9d",
+   "B10-32": "7713bff255"
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ }
+}

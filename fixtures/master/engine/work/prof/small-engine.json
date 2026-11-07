@@ -1,0 +1,3402 @@
+{
+ "id": "small-engine",
+ "name": "Small engine and lawn mower repair",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "repair-shop",
+ "plugin": {
+  "pf.license": {
+   "need": "none for repair itself; the business registration, where the city or state asks for one; a brand's own warranty work only if the shop is that brand's authorized dealer",
+   "ask": [
+    "The business registration number, where the city or state gave one",
+    "The brands the shop is an authorized dealer for, if any (for their warranty work)"
+   ],
+   "who": "the business. Mechanics need no license of their own",
+   "check": "the state's or city's business lookup; where there's none, a person on Rosie's team checks within 1 business day",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance and cover for customers' machines in the shop, as the business says; shown as given by the business, not checked by Rosie",
+   "otherwise": "identity checked, and 'license: what the business says'; customers see no license claim"
+  },
+  "pf.services": {
+   "pattern": "drop-off: the machine is left at the shop and picked up when it's READY; or a mobile mechanic comes to the yard or garage",
+   "list": [
+    {
+     "name": "Blade sharpening and balance",
+     "price": "one price (the example shop: $35)",
+     "length": "about 30 minutes while you wait, or left for the day",
+     "place": "at the shop, or at the customer's place",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up"
+    },
+    {
+     "name": "Oil change, spark plug and air filter",
+     "price": "one price for each",
+     "length": "about 1 hour while you wait, when the part is in stock",
+     "place": "at the shop, or at the customer's place",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Mower tune-up (push or self-propelled)",
+     "price": "one price",
+     "length": "left 1 to 3 days; spring is slower",
+     "place": "at the shop"
+    },
+    {
+     "name": "Riding mower tune-up",
+     "price": "one price (the example: $179 at the customer's place)",
+     "length": "about 2 hours",
+     "place": "at the customer's place, or at the shop",
+     "before": "a card saved for the trip fee",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    },
+    {
+     "name": "Won't start or runs rough",
+     "price": "quoted after a bench check (the example: $45, counted toward the repair): a written estimate with parts and labor lines, OK'd before any work",
+     "length": "the bench check is about 30 minutes; more time needs a new yes",
+     "place": "at the shop, or at the customer's place",
+     "before": "nothing taken at the shop",
+     "after": "at the counter, or the bill Rosie texts with READY"
+    },
+    {
+     "name": "Chainsaw, trimmer and blower repair",
+     "price": "tune-ups at one price; a carburetor rebuild or other repair quoted after a bench check",
+     "place": "at the shop"
+    },
+    {
+     "name": "Generator and pressure washer service",
+     "price": "one price; repairs quoted after a bench check",
+     "place": "at the shop, or at the customer's place"
+    },
+    {
+     "name": "Spring start-up and winterizing",
+     "price": "one price",
+     "length": "left 1 to 2 days",
+     "place": "at the shop, or at the customer's place"
+    },
+    {
+     "name": "Part ordered in (starter, battery, deck belt, engine)",
+     "price": "priced from the shop's list; a riding mower deck rebuild priced from photos of the deck and the model plate",
+     "place": "at the shop, or at the customer's place",
+     "before": "a deposit orders the part: the example shop takes $40 toward a $140 battery and starter, and 25% toward a deck rebuild",
+     "after": "the rest at the counter, or on the bill"
+    },
+    {
+     "name": "On-site visit at a yard or garage",
+     "price": "the trip fee (the example: $89), counted toward the repair",
+     "place": "at the customer's place",
+     "before": "a card saved for the trip fee",
+     "after": "Rosie texts the bill, or the saved card is charged at DONE"
+    }
+   ],
+   "capacity": "drop-off slots every 30 minutes in open hours; one mechanic per machine; the shop's one lift is saved like equipment",
+   "parts": "a common part (plug, filter, belt, blade) is in stock and set aside for each booking; any other is ordered once the customer says yes, 1 to 5 business days",
+   "warranty": "on the receipt (the example: 90 days on parts and labor); never for bad fuel, misuse or a machine that was never serviced; a brand's own warranty work only if the shop is its authorized dealer",
+   "nobody_home": "no: someone must be there to show the machine and OK the work",
+   "online": "no: a machine is fixed in hand"
+  },
+  "pf.questions": {
+   "before_times": [
+    "The machine: push mower, riding mower, chainsaw, trimmer, blower, generator or other; make and model, picked from a list",
+    "What's wrong: won't start, runs rough, smokes, leaks, won't cut, or a tune-up",
+    "Is there gas in it? Old gas can spoil.",
+    "For a visit at the customer's place: the address, and where the machine is kept"
+   ],
+   "after_time": [
+    "Any other problems, like a bent blade, a loose wheel or a worn belt",
+    "Leave it, or wait for a quick fix like a blade sharpening or a filter",
+    "The old parts back? Yes or no"
+   ],
+   "secure_page_only": [
+    "The yard gate or garage code: never asked in chat",
+    "The model and serial number from the machine's plate",
+    "Proof of purchase, if a brand's warranty is claimed",
+    "Someone else who may pick it up, named in writing"
+   ],
+   "who_may_book": "an adult: the machine's owner, or someone they let bring it in; a child never books"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "fire",
+    "smoke from the engine",
+    "a carbon monoxide alarm",
+    "someone cut or hurt"
+   ],
+   "stop_action": "'Call 911' and the generic emergency steps; no booking",
+   "safety_words": [
+    "a strong gas smell or a fuel leak",
+    "a generator that was run indoors or in a closed garage",
+    "a blade or part that came loose"
+   ],
+   "safety_action": "Rosie says: don't start or run it, keep it away from flames and sparks, and don't carry it in a car. Open the garage door for fresh air. Then the booking goes on, marked urgent, soonest times first.",
+   "during_work": "a fuel leak or a cracked tank found during a repair: the work stops, the machine goes outside, and the customer gets a written note",
+   "can_continue": "yes, after the safety steps"
+  },
+  "pf.first_steps": {
+   "required": "none before the visit",
+   "at_check_in": [
+    "The fuel check: is there gas in it, and does it leak?",
+    "Notes and photos of the machine's condition",
+    "For an on-site visit: the gate or garage code, only if the customer agrees"
+   ],
+   "prep_for_reminder": [
+    "Carry the machine upright with the gas cap tight, or drained if you can",
+    "Bring the key, and any bag or attachment that goes with it",
+    "For an on-site visit: clear the way to the machine, and unlock the gate"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "a drop-off: the check-in code at the counter when the machine is left. On-site: the code at the door or gate.",
+   "intake": "the machine and its condition, with photos; the fuel check; the problem in the customer's words",
+   "diagnosis": "the OK'd bench check covers about 30 minutes; more time needs a new yes; no answer is never a yes",
+   "estimate": "written, with parts and labor lines, OK'd before any work; an OK on some lines does only those",
+   "added_work": "anything over the OK'd estimate needs a new yes first, logged with the time",
+   "status_words": [
+    "IN",
+    "CHECKING",
+    "WAITING ON A PART",
+    "IN REPAIR",
+    "READY"
+   ],
+   "part_test": "every repair is test-run before READY; a faulty part is sent back and another ordered, at no extra charge",
+   "updates": "by text",
+   "ready": "READY says what was done, the total and the pick-up hours",
+   "pick_up": "the machine goes only to the customer, or someone they named; it's started at the counter first",
+   "done_proof": "the drop-off code checks it in; READY and the pick-up close it; on-site, the code at the door and DONE",
+   "late_drop_off": "dropped off any time before closing, and looked at next in line",
+   "unclaimed": "held 90 days, with reminders at 30 and 60 days; then written notice and the state's waiting period; any old fuel is drained and logged before any disposal",
+   "items_to_the_shop": "on-site: a riding mower or tractor that needs shop repair goes to the shop and comes back on a booked return"
+  },
+  "pf.money": {
+   "before": "the starting answer is nothing taken; the bench check is OK'd on the booking page, not charged",
+   "deposit": "only for a part ordered in for a set price: the example shop takes $40 toward a $140 riding mower battery and starter at the shop, and 25% toward a deck rebuild priced from photos on-site; deposit cap: from the state form",
+   "after": "paid at the counter at pick-up, the shop's own way; or the bill Rosie texts with READY, if the owner turns it on",
+   "on_site": "a card saved for the trip fee; the bill after DONE, or the saved card",
+   "after_a_no": "after a no to the estimate, only the OK'd bench check is owed",
+   "fees": "at the shop: no cancel or no-show fee to start, but a deposit for a part ordered in may be kept on a late cancel or a no-show, only if the owner says so; on-site: the saved card may be charged the trip fee for a late cancel or nobody there, only if the owner confirms",
+   "storage": "no storage fee to start; an unclaimed machine follows the state's notice and waiting rules: from the state form",
+   "tips": "no tip line to start",
+   "tax": "the shop's tax rate on parts",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never_in_text": [
+    "A gate or garage code",
+    "The machine's serial number",
+    "Proof of purchase or warranty papers"
+   ],
+   "languages": "English and Spanish",
+   "minors": "a minor never books; an adult does"
+  },
+  "pf.staff": {
+   "skills": [
+    "push and riding mower service",
+    "engine rebuilds",
+    "chainsaw, trimmer and blower repair",
+    "generator and pressure washer service",
+    "on-site visits"
+   ],
+   "licenses": "no person license for small engine repair",
+   "supervision": "none to start; a trainee works only while a lead mechanic is in, if the owner sets it",
+   "who_oks": "the owner OKs estimates over the owner's amount, added work and any fee",
+   "stand_in": "only someone with the skill for that machine; engine rebuilds only by a mechanic who does them"
+  },
+  "pf.rules": {
+   "written_estimate": "switch: a written estimate before any work over an amount: from the state form",
+   "show_registration": "switch: the shop's registration number on estimates and receipts: from the state form",
+   "parts_used": "switch: say whether parts are new, used or rebuilt, on the estimate and the receipt: from the state form",
+   "old_parts": "switch: offer the old parts back: from the state form",
+   "unclaimed_machines": "switch: how long a machine is held, what notice is sent, and the waiting period: from the state form",
+   "fuel_and_oil": "switch: how fuel is carried and stored, and where old oil and fuel go: from the city or state form",
+   "brand_warranty": "switch: warranty work for a brand only for an authorized dealer of that brand",
+   "records": "7 years"
+  },
+  "pf.edges": {
+   "applies": [
+    "A strong gas smell or a fuel leak before the visit: the safety steps first, then the soonest time",
+    "Old gas in the tank: drained, with the customer told",
+    "More bench time needed",
+    "No answer to the estimate",
+    "A no to the estimate",
+    "More work found",
+    "A part ordered, or late, or faulty when tested",
+    "A leak found during the repair",
+    "A brand's warranty claim at a shop that isn't that brand's dealer",
+    "The machine isn't picked up: reminders, written notice, then the state's rules",
+    "The problem comes back under warranty",
+    "A machine damaged at the shop",
+    "A generator that was run indoors"
+   ],
+   "handling": "each the generic way, with the plug-in's words; the owner confirms every fee"
+  },
+  "pf.facts": [
+   "dropoff",
+   "photos",
+   "extrawork"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Wes and Dana (mechanics)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Marcus and Tara (mechanics)",
+   "other": "Others (a bank, a grounds manager)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Wes"
+  },
+  "B": {
+   "staff": "Marcus"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "barbershop license",
+    "business registration"
+   ],
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Tune-ups have a set price. Engine repairs are priced at the visit. A fire or smoke stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Mowers and engines are dropped off at the shop and picked up when ready. A mower can also be tuned up at the customer's place."
+   ],
+   [
+    "MP045210",
+    "REG-2020-0471"
+   ],
+   [
+    "BS20981",
+    "REG-2020-0533"
+   ],
+   [
+    "BS20918",
+    "REG-2020-0353"
+   ],
+   [
+    "A chair, ready",
+    "A mower, ready"
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Wes can still take the mower in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the time left."
+   ],
+   [
+    "please come with dry hair on Saturday.",
+    "please bring the key on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring the key."
+   ],
+   [
+    "would like to see your hair before pricing it",
+    "would like to see the machine before pricing it"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this repair."
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s repair"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A mower's example: 'Old gas needs a quick fuel check first. Was it run in the last 3 months?'"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Engine repair quotes come to you first. Board prices never need one"
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "An engine shop takes drop-offs, as a tailor or a groomer does."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: new plug gapped, air filter replaced, blades sharpened"
+   ],
+   [
+    "When they book: a card saved, for a $20 fee you OK",
+    "When they book: nothing taken, or a deposit for a part ordered in"
+   ],
+   [
+    "Style consult",
+    "Quick look at the mower"
+   ],
+   [
+    "style consult",
+    "quick look at the mower"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "My push mower won't start. Can Lee's Engine Shop look at it on Saturday?"
+   ],
+   [
+    "once Riley sees the hair.",
+    "once Wes sees the mower."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a car oil change, which isn't on the shop's list."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Wes use a premium plug instead?"
+   ],
+   [
+    "asks for a toner instead of the gloss. What's the new price?",
+    "asks for a premium plug instead. What's the new price?"
+   ],
+   [
+    "two skin fades on",
+    "two blade sharpenings on"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood engine shop on Elm St. Mowers, trimmers and generators fixed."
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "a beard trim today at 2:00pm with Avery",
+    "a filter change today at 2:00pm"
+   ],
+   [
+    "the beard trim today at 2:00pm with Avery",
+    "the filter change today at 2:00pm"
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: a 10:00am drop-off"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken when they book"
+   ],
+   [
+    "haircut with Riley",
+    "blade sharpening"
+   ],
+   [
+    "Sat 11am Riley",
+    "Sat 11am drop-off"
+   ],
+   [
+    "at 11:20am on Riley's phone",
+    "at 12:25pm on Wes's phone"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Spark plug · $15"
+   ],
+   [
+    "Riley quotes the rest at the chair, before any work.",
+    "Wes writes an estimate before any repair."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was your visit with Wes?"
+   ],
+   [
+    "Sun Oct 25 · 11:00am · Riley",
+    "Mon Oct 26 · 11:00am drop-off"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Do I need to drain the gas first?"
+   ],
+   [
+    "Walk-in for a haircut",
+    "Walk-in for a blade sharpening"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: an oil change is $25."
+   ],
+   [
+    "Your item is still waiting for pick-up.",
+    "Your mower is still waiting for pick-up."
+   ],
+   [
+    "A drop-off item isn't picked up.",
+    "A drop-off machine isn't picked up."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $45 bench check first"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds bike repair to Lee's Engine Shop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Bike repair for Lee's Engine Shop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW bike repair"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Engine Shop doesn't fix cars."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Mobile Mower and Lee Generator Service."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero que revisen mi cortadora de césped el sábado."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "An engine shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no mechanic. A day shows only if a mechanic with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Engine Shop · drop-off"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like the new carburetor Wes noted, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Engine Shop sent you a proposal: the new carburetor Wes noted."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · New carburetor"
+   ],
+   [
+    "3 visits with Riley",
+    "One drop-off · about 3 days"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The work is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Drain clearing",
+    "Riding mower tune-up"
+   ],
+   [
+    "home warranty plan",
+    "equipment protection plan"
+   ],
+   [
+    "a package of cuts",
+    "a package of tune-ups"
+   ],
+   [
+    "patch test",
+    "fuel check"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A mower tune-up could mean a dealer or an engine shop."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "An engine shop's plug-in adds fuel and fire danger words, like a gas leak."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An engine shop's example: a fuel leak gets 'don't start it, and keep it away from flames and sparks'."
+   ],
+   [
+    "A barbershop's services need none.",
+    "An engine shop needs none at booking: the fuel check is done at drop-off."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a crew's mowers together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A lawn crew manager books tune-ups for five mowers on one morning. Rosie finds bench time side by side across Wes and Dana."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "There's a new dent in the mower deck."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says there's a new dent in the mower deck"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The mower still cuts unevenly."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the mower cuts unevenly since the repair"
+   ],
+   [
+    "Riley looks, then prices it",
+    "Wes checks it, then writes the estimate"
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the bench check; the estimate stays open"
+   ],
+   [
+    "Follows up on an item left behind",
+    "Follows up on a machine left behind"
+   ],
+   [
+    "a skin-test result",
+    "a test result"
+   ],
+   [
+    "color and house calls",
+    "carburetor rebuilds and on-site visits"
+   ],
+   [
+    "color, house calls",
+    "carburetor rebuilds, on-site visits"
+   ],
+   [
+    "Consult only",
+    "Bench check only"
+   ],
+   [
+    "photos of your hair",
+    "photos of the machine"
+   ],
+   [
+    "a cut on Saturday",
+    "a tune-up on Saturday"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a tune-up every spring"
+   ],
+   [
+    "a cut every 4 weeks",
+    "a tune-up every spring"
+   ],
+   [
+    "for a staff cut",
+    "for a crew mower"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Engine Shop"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Mower's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Mower"
+   ],
+   [
+    "Electrical",
+    "Generator service"
+   ],
+   [
+    "electrical",
+    "generator service"
+   ],
+   [
+    "plumber",
+    "mechanic"
+   ],
+   [
+    "Plumber",
+    "Mechanic"
+   ],
+   [
+    "Plumbing",
+    "Mower repair"
+   ],
+   [
+    "plumbing",
+    "mower repair"
+   ],
+   [
+    "A barbershop",
+    "An engine shop"
+   ],
+   [
+    "a barbershop",
+    "an engine shop"
+   ],
+   [
+    "Barbershop",
+    "Engine shop"
+   ],
+   [
+    "barbershops",
+    "engine shops"
+   ],
+   [
+    "barbershop",
+    "engine shop"
+   ],
+   [
+    "barbers",
+    "mechanics"
+   ],
+   [
+    "barber",
+    "mechanic"
+   ],
+   [
+    "Barber",
+    "Mechanic"
+   ],
+   [
+    "cut hair",
+    "fix engines"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Wes texts READY when Alex's mower is done. Alex hears what was done, the pick-up hours, and anything due."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your mower is ready for pick-up at Lee's Engine Shop."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Mon to Sat, 8am to 5pm"
+   ],
+   [
+    "4471",
+    "5160"
+   ],
+   [
+    "Sofia",
+    "Alex"
+   ],
+   [
+    "Riley",
+    "Wes"
+   ],
+   [
+    "Avery",
+    "Dana"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey",
+    "Tara"
+   ],
+   [
+    "88 Elm St",
+    "310 Mill Rd"
+   ],
+   [
+    "Elm St",
+    "Mill Rd"
+   ],
+   [
+    "Oak St",
+    "Birch Ln"
+   ],
+   [
+    "1200 Main St",
+    "75 Ridge Rd"
+   ],
+   [
+    "Haircuts",
+    "Blade sharpenings"
+   ],
+   [
+    "haircuts",
+    "blade sharpenings"
+   ],
+   [
+    "A haircut",
+    "A blade sharpening"
+   ],
+   [
+    "a haircut",
+    "a blade sharpening"
+   ],
+   [
+    "Haircut",
+    "Blade sharpening"
+   ],
+   [
+    "haircut",
+    "blade sharpening"
+   ],
+   [
+    "kids cuts",
+    "oil changes"
+   ],
+   [
+    "a kids cut",
+    "an oil change"
+   ],
+   [
+    "Kids cut",
+    "Oil change"
+   ],
+   [
+    "kids cut",
+    "oil change"
+   ],
+   [
+    "Skin fade",
+    "Spark plug change"
+   ],
+   [
+    "skin fade",
+    "spark plug change"
+   ],
+   [
+    "fade",
+    "spark plug change"
+   ],
+   [
+    "Beard trim",
+    "Filter change"
+   ],
+   [
+    "beard trim",
+    "filter change"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Oil change and blade sharpening"
+   ],
+   [
+    "Signature cut and shave",
+    "Oil change and blade sharpening"
+   ],
+   [
+    "signature cut",
+    "oil change and blade sharpening"
+   ],
+   [
+    "Groom's package",
+    "Riding mower battery and starter"
+   ],
+   [
+    "Color and cut",
+    "Deck belt replacement"
+   ],
+   [
+    "color and cut",
+    "deck belt replacement"
+   ],
+   [
+    "Color correction",
+    "Carburetor rebuild"
+   ],
+   [
+    "color correction",
+    "carburetor rebuild"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "$25 consult",
+    "$45 bench check"
+   ],
+   [
+    "Only the consult",
+    "Only the bench check"
+   ],
+   [
+    "the consult",
+    "the bench check"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the repair?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once checked"
+   ],
+   [
+    "priced at the chair",
+    "priced once checked"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "a house call",
+    "an on-site visit"
+   ],
+   [
+    "water heaters",
+    "riding mowers"
+   ],
+   [
+    "water heater",
+    "riding mower"
+   ],
+   [
+    "Panel upgrade",
+    "Generator install"
+   ],
+   [
+    "like a burst pipe",
+    "like a gas leak"
+   ],
+   [
+    "$75",
+    "$124"
+   ],
+   [
+    "Gloss",
+    "Spark plug"
+   ],
+   [
+    "gloss",
+    "spark plug"
+   ],
+   [
+    "Toner",
+    "Premium plug"
+   ],
+   [
+    "toner",
+    "premium plug"
+   ]
+  ],
+  "B": [
+   [
+    "EC22871",
+    "No, the same company"
+   ],
+   [
+    "BS20981",
+    "REG-2020-0533"
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "No license where the state asks none. Tune-ups have a set price. Engine repairs are priced at the visit. A fire or smoke stops the booking."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Mowers and engines are dropped off at the shop and picked up when ready. A mower can also be tuned up at the customer's place."
+   ],
+   [
+    "MP045210",
+    "REG-2020-0471"
+   ],
+   [
+    "MP045201",
+    "REG-2020-0417"
+   ],
+   [
+    "A chair, ready",
+    "A mower, ready"
+   ],
+   [
+    "water is off on Main St after 2pm",
+    "Main St is closed after 2pm"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about my riding mower. It won't start. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My mower needs its yearly service' fits a riding mower tune-up."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like starting a neighbor's mower without asking."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it won't start"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 riding mower tune-up needs none."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "'s mower, tuned up Thu Oct 22, won't start again."
+   ],
+   [
+    "Drain clearings",
+    "Riding mower tune-ups"
+   ],
+   [
+    "drain clearings",
+    "riding mower tune-ups"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Carburetor and fuel line · $540"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a blade sharpening? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the riding mower."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Marcus dents the garage door and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE dented the garage door"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Dented garage door"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "dented the garage door at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no dent."
+   ],
+   [
+    "heating and cooling",
+    "snow blower service"
+   ],
+   [
+    "Heating and cooling",
+    "Snow blower service"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood engine shop on Elm St. Mowers, trimmers and generators fixed."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the mower deck and the model plate, and a mechanic will price the job."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does mower repair and generator service, not car repair."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a car mechanic near you."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you service my riding mower every spring, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Home Services has a yearly mower service plan, $150 a visit."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a mower tune-up every spring."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly mower service plan"
+   ],
+   [
+    "water heater contract",
+    "mower service contract"
+   ],
+   [
+    "replaces water heaters",
+    "replaces riding mower engines"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Marcus found the problem. Here's the price to fix it today."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Marcus finds the problem and texts the price with its lines."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the machine is, what's wrong, and whether there's gas in it."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I mow before you come?"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Mobile Mower and Lee Generator Service."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Engine Shop can sharpen your blades at the shop for $35, or at your home for $75."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's counter is in the other flow."
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both properties' visits go on one bill on the 1st."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the new carburetor Marcus noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Home Services sent you a proposal for a new carburetor, from Marcus's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · New carburetor"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Marcus look at my chainsaw next week?"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Marcus left oil spots on the driveway."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My riding mower won't start."
+   ],
+   [
+    "Just the kitchen sink.",
+    "A 42-inch riding mower. It cranks but won't start."
+   ],
+   [
+    "a leak under the sink",
+    "a mower that won't start"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please move the mower out of the garage."
+   ],
+   [
+    "a drain cleaning at two rentals",
+    "a mower tune-up at two properties"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's mower tune-up"
+   ],
+   [
+    "clear a yard drain",
+    "tune up a mower"
+   ],
+   [
+    "Yard drain",
+    "Mower tune-up"
+   ],
+   [
+    "yard drain",
+    "mower tune-up"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa mower"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Riding mower tune-up"
+   ],
+   [
+    "Kitchen drain",
+    "Riding mower"
+   ],
+   [
+    "Drain clearing",
+    "Riding mower tune-up"
+   ],
+   [
+    "drain clearing",
+    "riding mower tune-up"
+   ],
+   [
+    "clear the drain",
+    "tune up the mower"
+   ],
+   [
+    "your new pipes are in",
+    "your new engine is in"
+   ],
+   [
+    "a roof leak",
+    "a broken car"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Marcus's notes"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Marcus finds a cracked fuel line."
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "replace the fuel line, cracked"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace the fuel line"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace the fuel line"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing the fuel line"
+   ],
+   [
+    "shutoff valves",
+    "fuel line"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a grounds manager books the same job for 4 mowers at one address."
+   ],
+   [
+    "Each unit's notes",
+    "Each mower's notes"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Equipment Protection, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "equipment protection plan"
+   ],
+   [
+    "home warranty",
+    "equipment protection"
+   ],
+   [
+    "supply house",
+    "parts counter"
+   ],
+   [
+    "Rental 1",
+    "Property 1"
+   ],
+   [
+    "Rental 2",
+    "Property 2"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the mower is now leaking gas."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The mower is leaking gas onto the garage floor now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Don't start the mower, and keep it away from flames and sparks. Open the garage door for fresh air."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a fuel leak or a strong gas smell, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The mower stalls again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The mower stalls again."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your mower is under warranty"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It won't stop leaking. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Marcus also look at my chainsaw?"
+   ],
+   [
+    "$160 valve quote",
+    "$160 fuel line quote"
+   ],
+   [
+    "$160 valve work",
+    "$160 fuel line work"
+   ],
+   [
+    "a bathroom drain",
+    "your chainsaw"
+   ],
+   [
+    "kitchen drain",
+    "riding mower"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The chainsaw is an engine repair, quoted at the visit."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A mower tune-up could mean a dealer or an engine shop."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An engine shop's example: a fuel leak gets 'don't start it, and keep it away from flames and sparks'."
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi cortadora tiene una fuga de gasolina."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mower has a gasoline leak."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told not to start it and to keep it away from flames, and to call 911 if there's a fire."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Hay fuego?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is there a fire?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No hay fuego."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no fire."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No la encienda y manténgala lejos de llamas y chispas. Si hay fuego, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't start it, and keep it away from flames and sparks. If there's a fire, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For mower repair, a fire, smoke, a carbon monoxide alarm or an injury stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Move away from the machine now, and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My generator got wet in a flood. Is it safe to start?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "which machine is it, and does it start at all?"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there still gas in the tank?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE small dent in the deck, blades dull"
+   ],
+   [
+    "Under the sink, before",
+    "Mower deck, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Tank and engine, before"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 tune-up"
+   ],
+   [
+    "245 valve 165 supply line 80",
+    "245 carburetor 165 fuel line 80"
+   ],
+   [
+    "Shutoff valve",
+    "Carburetor rebuild"
+   ],
+   [
+    "Supply line",
+    "Fuel line"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE belt worn. Offer a new belt next time."
+   ],
+   [
+    "1-year labor warranty",
+    "90-day warranty"
+   ],
+   [
+    "a dripping faucet",
+    "a trimmer that won't start"
+   ],
+   [
+    "color and house calls",
+    "carburetor rebuilds and on-site visits"
+   ],
+   [
+    "color, house calls",
+    "carburetor rebuilds, on-site visits"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Engine Shop"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Mower's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Mower"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilemower.com"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Electrical",
+    "Generator service"
+   ],
+   [
+    "electrical",
+    "generator service"
+   ],
+   [
+    "plumber",
+    "mechanic"
+   ],
+   [
+    "Plumber",
+    "Mechanic"
+   ],
+   [
+    "Plumbing",
+    "Mower repair"
+   ],
+   [
+    "plumbing",
+    "mower repair"
+   ],
+   [
+    "A barbershop",
+    "An engine shop"
+   ],
+   [
+    "a barbershop",
+    "an engine shop"
+   ],
+   [
+    "Barbershop",
+    "Engine shop"
+   ],
+   [
+    "barbershops",
+    "engine shops"
+   ],
+   [
+    "barbershop",
+    "engine shop"
+   ],
+   [
+    "barbers",
+    "mechanics"
+   ],
+   [
+    "barber",
+    "mechanic"
+   ],
+   [
+    "Barber",
+    "Mechanic"
+   ],
+   [
+    "cut hair",
+    "fix engines"
+   ],
+   [
+    "Riley",
+    "Wes"
+   ],
+   [
+    "Avery",
+    "Dana"
+   ],
+   [
+    "Jordan",
+    "Marcus"
+   ],
+   [
+    "Casey",
+    "Tara"
+   ],
+   [
+    "88 Elm St",
+    "310 Mill Rd"
+   ],
+   [
+    "Elm St",
+    "Mill Rd"
+   ],
+   [
+    "42 Oak St",
+    "27 Birch Ln"
+   ],
+   [
+    "1200 Main St",
+    "75 Ridge Rd"
+   ],
+   [
+    "a haircut",
+    "a blade sharpening"
+   ],
+   [
+    "Haircut",
+    "Blade sharpening"
+   ],
+   [
+    "fade",
+    "spark plug change"
+   ],
+   [
+    "beard trim",
+    "filter change"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once diagnosed"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "On-site visits"
+   ],
+   [
+    "house calls",
+    "on-site visits"
+   ],
+   [
+    "Water heater flush",
+    "Generator service"
+   ],
+   [
+    "water heater flush",
+    "generator service"
+   ],
+   [
+    "Water heater replacement",
+    "Deck rebuild"
+   ],
+   [
+    "water heater replacement",
+    "deck rebuild"
+   ],
+   [
+    "water heaters",
+    "mower decks"
+   ],
+   [
+    "Water heater",
+    "Mower deck"
+   ],
+   [
+    "water heater",
+    "mower deck"
+   ],
+   [
+    "Sewer camera inspection",
+    "Mower health check"
+   ],
+   [
+    "sewer camera inspection",
+    "mower health check"
+   ],
+   [
+    "Sewer camera report",
+    "Mower health report"
+   ],
+   [
+    "sewer camera report",
+    "mower health report"
+   ],
+   [
+    "camera inspection",
+    "mower health check"
+   ],
+   [
+    "camera report",
+    "mower health report"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Panel upgrade",
+    "Generator install"
+   ],
+   [
+    "under my sink",
+    "on my mower"
+   ],
+   [
+    "under the sink",
+    "on the mower"
+   ],
+   [
+    "like a burst pipe",
+    "like a gas leak"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 fuel line stays good until Thu Oct 29."
+   ],
+   [
+    "shutoff valve",
+    "carburetor"
+   ],
+   [
+    "$75",
+    "$124"
+   ],
+   [
+    "A leak repair",
+    "An engine repair"
+   ],
+   [
+    "a leak repair",
+    "an engine repair"
+   ],
+   [
+    "Leak repair",
+    "Engine repair"
+   ],
+   [
+    "leak repair",
+    "engine repair"
+   ],
+   [
+    "supply line",
+    "fuel line"
+   ]
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books an 11:00am drop-off at Lee's Engine Shop, Sat Oct 24, for a push mower that won't start. Wes checks it, orders the carburetor kit once Alex OKs the written estimate, and texts READY when it's done. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Mower to tune up a riding mower at home, at 27 Birch Ln, and Marcus comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: the riding mower tune-up, a mower priced at the visit, or a deck rebuild priced from photos."
+ },
+ "money": {
+  "A": {
+   "main": "visit|none|counter",
+   "combos": [
+    "visit|none|counter",
+    "list|none|counter",
+    "visit|none|bill",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "visit|none|counter": "The main story: a push mower that won't start. Only the $45 bench check is promised. Wes's written estimate is OK'd before any work, the part is ordered, and Alex pays at the counter at pick-up.",
+    "list|none|counter": "A $35 blade sharpening from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "visit|none|bill": "The same mower repair, with the bill texted once it's ready, so Alex can pay before pick-up.",
+    "list|deposit|counter": "A $140 riding mower battery and starter, ordered in. A $40 deposit orders it, and the $100 rest is paid at the counter."
+   },
+   "amounts": {
+    "*": {
+     "name": "Blade sharpening"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Blade sharpening",
+     "fee": "$0"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "name": "Riding mower battery and starter",
+     "fee": "$40"
+    },
+    "visit|*|*": {
+     "name": "Won't-start repair",
+     "fee": "$0"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "visit|card|bill",
+    "list|card|card",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|card|bill": "The main story: a $179 riding mower tune-up at Alex's home. A card is saved for the $89 trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after.",
+    "visit|card|bill": "A mower that won't start, priced at the visit. A card is saved for the $89 trip fee.",
+    "list|card|card": "The $179 riding mower tune-up. A card is saved, and charged when Marcus texts DONE.",
+    "photos|deposit|bill": "A riding mower deck rebuild, priced from photos of the deck and its model plate at $640. Sam OKs it. A $160 deposit orders the parts, and the rest is on the bill."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Riding mower tune-up"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Riding mower tune-up"
+    },
+    "visit|*|*": {
+     "name": "Engine repair"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Deck rebuild"
+    },
+    "photos|deposit|*": {
+     "deposit": "$160",
+     "rest": "$480",
+     "name": "Deck rebuild"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "drain"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "A8-53"
+  ],
+  "B": [
+   "S1-38"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every repair and on-site visit booked through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The engine shop plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "An engine shop books drop-off slots and mechanics, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Engine repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Engine repair is never sent now: a gas leak gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A machine is fixed in hand. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The shop sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The shop bills no plan or insurance. A customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee's Engine Shop books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee's Engine Shop books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee's Engine Shop books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no mechanic. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "Engine repair needs no form first: the fuel check is done at drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "An engine shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "An engine shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "An engine shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A machine waits in its drop-off slot, so a mechanic running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child never leaves a machine at the shop: an adult drops off and picks up."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A repair is paid once: at pick-up, or by the bill."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The shop bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A repair is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "An engine shop books no next visit at pick-up: each repair is booked when it's needed."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A repair at the shop needs no contract before booking: the written estimate comes before any work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "The shop sells no plans: each repair is paid at its own pick-up, or by its own bill."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The shop sells no plans or contracts, so nothing signed at the shop has a cancel period."
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Mower",
+       "At the customer's place",
+       "None needed · registration on file",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Marcus Price",
+       "Lee Mobile Mower",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Tara Moore",
+       "Lee Mobile Mower",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Mower",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Wes Chen",
+       "Lee's Engine Shop",
+       "At the shop, and on-site visits",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Dana Diaz",
+       "Lee's Engine Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Marcus: mower repair and generator service",
+         "Tara: mower repair",
+         "Wes: carburetor rebuilds and on-site visits",
+         "Dana: blade sharpening and tune-ups"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee's Engine Shop. Quinn gets one invite, and replies YES. This work needs no license, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Engine Shop. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "A license problem",
+    "why": "This work has no mechanic license, so none can have a problem."
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "The license holder leaves",
+    "why": "This work has no mechanic license, so there is no license holder to leave."
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Wes replies YES, then checks what Sam set. This work needs no license, so no number is asked. One reply covers everything Wes does for Lee's Engine Shop.",
+    "more": [
+     "No license number is asked: this work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Dana joins the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Wes"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee's Engine Shop! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t02"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Wes"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 8am",
+      {
+       "as": "Wes"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Wes Chen · Lee's Engine Shop",
+        "lines": [
+         "Every shop service, carburetor rebuilds and on-site visits",
+         "Hours: the shop's hours",
+         "Languages: English and Spanish",
+         "Day list: 8am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Wes"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Wes"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A mower is never served as a child: an adult books and brings it in."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Engine repair needs no state license: the company gives its business registration (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Engine repair licenses nobody, so no mechanic takes a license check."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. A gate code and a machine's serial number never go in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A3-20",
+    "more": [
+     "For a machine, the counter takes the machine, its condition and the problem in the customer's words.",
+     "The fuel check is done at the counter: gas in the tank, and any leak."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A6-14",
+    "more": [
+     "For a drop-off, Alex gives the code at the counter when leaving the machine.",
+     "The reminder says to carry it upright with the gas cap tight, and to bring the key."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A8-54",
+    "more": [
+     "For a machine, it's started at the counter before it's handed over."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-01",
+    "more": [
+     "The shop's warranty, 90 days on parts and labor here, is on its receipt."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent, with the soonest drop-off first.",
+    "more": [
+     "An engine shop's example: a fuel leak or a strong gas smell.",
+     "It gets 'don't start it, and keep it away from flames and sparks'."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "A fuel leak can catch fire. Please don't start the machine, keep it away from flames and sparks, and open the garage door for fresh air. The soonest drop-off times are next."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-15",
+    "does": "Alex picks a drop-off time. No mechanic is named: once the machine is in, the shop gives it to a mechanic with the skill.",
+    "more": [
+     "A wish for one mechanic goes in the notes, and the shop follows it where it can."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-23",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.3",
+       "8.21"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Sat Oct 24, 11:05am",
+      "title": "Wes checks the fuel and the tank",
+      "does": "Before any work, Wes looks at the tank. Is there gas in it, is it old, and does anything leak? Old gas is drained into a safe can. A leak is fixed or noted first.",
+      "more": [
+       "Wes notes the fuel level and any leak with the before photos.",
+       "Gas goes only into a labeled can, away from the bench.",
+       "A leak found now is noted, and the estimate says so.",
+       "It's kept with the booking, and Alex can see it on the secure page."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "FUEL CHECKED Alex M. Tank half full of old gas, no leak. Drained."
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s mower as the fuel check."
+       ]
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.visit"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex brings the mower to the shop. The reminder said to carry it upright with the gas cap tight, and to bring the key.",
+    "more": [
+     "A riding mower can't be started or tested without its key. A missing one stops that work (the next branch).",
+     "The reminder already said what to bring.",
+     "The code is taken only once nothing required is missing."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-51",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START Alex M. No key, so the riding mower can't be started or tested."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-23",
+    "does": "Alex's mower is ready, but it isn't picked up. The shop holds a machine 90 days. Rosie reminds Alex at 30 and 60 days, then Sam decides what's next.",
+    "more": [
+     "Rosie never starts a fee on its own. It's always Sam's call.",
+     "Two reminders only, inside text hours. No nudges after that."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: blade sharpening $40 for visits from Mon Nov 2. Blade sharpenings already booked keep $35."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A registration shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. Any deposit sits right next to it.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee's Engine Shop",
+      "310 Mill Rd, Springfield · (555) 010-0177"
+     ],
+     [
+      "Prices",
+      "Blade sharpening $35 ($40 from Nov 2) · Spark plug change $40 · Filter change $20"
+     ],
+     [
+      "To book",
+      "Nothing taken, or a deposit for a part ordered in · no cancel or no-show fee"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee Mobile Mower",
+      "Mower repair and generator service · within 25 miles of 75 Ridge Rd, Springfield"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam turns on the bill Rosie texts with READY for blade sharpenings, for new bookings only. Each change is read back first.",
+    "more": [
+     "Blade sharpenings already booked are still paid at the counter.",
+     "The customer can still pay at the counter, the shop's own way.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "The tip line on the bills Rosie texts is turned on or off here too."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every repair and on-site visit booked through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The engine shop plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "An engine shop books drop-off slots and mechanics, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Engine repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Engine repair is never sent now: a gas leak gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A machine is fixed in hand, where Alex is. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty is billed: a customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "On-site repair arrives in a 2-hour window, with a named mechanic (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "On-site repair arrives in a 2-hour window, with a named mechanic (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "On-site repair arrives in a 2-hour window, with a named mechanic (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "On-site repair needs no first step."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Engine repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Engine repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Engine repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A mechanic never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone must be there to show the machine and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for this work."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance is billed."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Engine repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Engine repair is never sent now (S2-30), so there's no such button."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Someone must be there to show the machine and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "Someone must be there to show the machine and OK the work."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A repair is rated, like any job."
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Mower",
+       "At the customer's place",
+       "None needed · registration on file",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Marcus Price",
+       "Lee Mobile Mower",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Tara Moore",
+       "Lee Mobile Mower",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Mower",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Wes Chen",
+       "Lee's Engine Shop",
+       "At the shop, and on-site visits",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Dana Diaz",
+       "Lee's Engine Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license where Sam works, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Marcus: mower repair and generator service",
+         "Tara: mower repair",
+         "Wes: carburetor rebuilds and on-site visits",
+         "Dana: blade sharpening and tune-ups"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "does": "Sam adds Quinn S. to Lee's Engine Shop. Quinn gets one invite, and replies YES. This work needs no license, so none is asked.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Engine Shop. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Quinn S."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Quinn S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "A license problem",
+    "why": "This work has no mechanic license, so none can have a problem."
+   },
+   {
+    "op": "off",
+    "at": "S11-42",
+    "label": "The license holder leaves",
+    "why": "This work has no mechanic license, so there is no license holder to leave."
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Marcus replies YES, then checks what Sam set. This work needs no license, so no number is asked. One reply covers everything Marcus does for Lee Mobile Mower.",
+    "more": [
+     "No license number is asked: this work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Tara joins the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Marcus"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Mobile Mower! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t02"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time"
+       ],
+       "as": "Marcus"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 8am",
+      {
+       "as": "Marcus"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Marcus Price · Lee Mobile Mower",
+        "lines": [
+         "Every mower repair job, and generator service jobs",
+         "Hours: Mon–Fri 7:30am–5:30pm",
+         "Languages: English and Spanish",
+         "Day list: 7am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Marcus"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Marcus"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "A repair priced at the visit is done as part of this job, never as its own project."
+   },
+   {
+    "op": "words",
+    "at": "B8-54",
+    "say": [
+     [
+      "staff",
+      "san",
+      "CANT START the gate is locked and nobody answers"
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-32",
+    "label": "A child",
+    "why": "A mower is never served as a child: an adult books and is there."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Engine repair needs no state license: the company gives its business registration (the next branch)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Engine repair licenses nobody, so no mechanic takes a license check."
+   },
+   {
+    "op": "more",
+    "at": "S13-22",
+    "more": [
+     "Here, no service name is private. A gate code and a machine's serial number never go in a text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B3-17",
+    "more": [
+     "The engine shop plug-in adds fuel danger words, like a fuel leak, a strong gas smell or a generator run indoors."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-34",
+    "more": [
+     "The plug-in asks Alex to clear the way to the mower and unlock the gate. The machine is fixed where Alex can see it."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-18",
+    "more": [
+     "Marcus checks the fuel and starts the mower with Alex. A leak or old gas is dealt with first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. For engine repair, a fire, smoke, a carbon monoxide alarm or an injury stops the booking.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. Move away from the machine now, and call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their generator is on fire. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "Fire at a generator at the home",
+         "Told to step away and call 911"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Marcus opens the engine and finds the fuel tank cracked and leaking. The plug-in says to stop there, so Alex gets a written note and the photo.",
+    "more": [
+     "The note says what was found, what wasn't done and why, and what to do next.",
+     "A leaking tank isn't safe to work on at a home. The mower goes to the shop on the truck, with the tank empty.",
+     "Only the work done is charged.",
+     "Sam is told, and the note and photos stay with the job."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD tank cracked and leaking, stopped. Mower moved outside.",
+      {
+       "photos": [
+        "Cracked tank"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Marcus found the mower's fuel tank cracked and stopped, to keep you safe. Please don't start it.",
+      {
+       "card": {
+        "title": "Safety note · 27 Birch Ln",
+        "lines": [
+         "Found: a cracked, leaking fuel tank",
+         "Not done: the tune-up, for now",
+         "Next: a new tank at the shop"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: riding mower tune-up $199 for visits from Mon Nov 2. Riding mower tune-ups already booked keep $179."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-57",
+    "more": [
+     "A registration shows as the business gave it, never as 'checked by Rosie'.",
+     "The first price shows every fee the customer must pay. Any deposit sits right next to it.",
+     "Bookings already made keep the words their customers agreed to."
+    ],
+    "form": [
+     [
+      "Lee Mobile Mower",
+      "Mower repair and generator service · within 25 miles of 75 Ridge Rd, Springfield · (555) 010-0142"
+     ],
+     [
+      "Prices",
+      "Riding mower tune-up $179 ($199 from Nov 2) · Generator service $150"
+     ],
+     [
+      "To book",
+      "A card saved for the $89 trip fee, charged only for a late cancel or a no-show"
+     ],
+     [
+      "Registration",
+      "As given by the business, not checked by Rosie"
+     ],
+     [
+      "Lee's Engine Shop",
+      "Mowers and engines dropped off · 310 Mill Rd, Springfield"
+     ]
+    ]
+   }
+  ]
+ },
+ "notes": "From repair-shop (from: repair-shop), refitted Tue Oct 27 and merged on the REDESIGN 2 master (frozen 9:17am). A small engine shop runs like a device repair shop: the machine is dropped off, a bench check is OK'd, a written estimate is OK'd before any work, a part is ordered, and READY comes before the pick-up. No base plug-in or old flowchart existed (new profession); the plug-in is built from the trade's norm.\nTwo companies: Lee's Engine Shop (the master's barbershop, flow A: the shop) and Lee Mobile Mower (the master's Lee Home Services, flow B: a mobile mechanic at yards and garages). Kinds of work: plumbing became mower repair, electrical became generator service, the later NEW kind is snow blower service (B) and bike repair (A). People: Riley and Avery became Wes and Dana (the shop); Jordan and Casey became Marcus and Tara (mobile), so the master's pronouns still fit (Jordan he, Casey she). Addresses: 310 Mill Rd (the shop), 27 Birch Ln (Alex), 75 Ridge Rd (the second site).\nNo license: small engine repair needs no person license; the business gives its registration where the city or state asks (S1-60 '1 A license' and S2-28 '1 Yes, each one' are off; S11-42's two license branches are off). The sign-up license sentences (S1-38's loop, S1-60, S2-06, S2-21's table, S2-22, S11-48) are reworded as registration only. A brand's own warranty work is only for an authorized dealer of that brand (pf.rules.brand_warranty, a switch).\nFlow A money: main visit|none|counter (a push mower that won't start: the $45 bench check is promised, Wes's written estimate is $110 carburetor rebuild + $15 spark plug = $125 with the check included), list|none|counter ($35 blade sharpening), visit|none|bill (the bill goes with READY), list|deposit|counter ($140 riding mower battery and starter: $40 deposit orders it, $100 at the counter). The shop saves no card and takes no full price: no cancel or no-show fee at the shop.\nFlow B money: main list|card|bill ($179 riding mower tune-up at the customer's place; a card is saved for the $89 trip fee, which is the late-cancel and no-show fee, charged only on Sam's yes, and owed after a no to a visit price: B4-14), visit|card|bill (a mower that won't start, priced at the visit), list|card|card (the saved card charged at DONE), photos|deposit|bill (a riding mower deck rebuild priced from photos of the deck and model plate: $640, $160 deposit, $480 on the bill). No full price anywhere. All amounts have names per path.\nFacts: dropoff (a machine left at the shop), photos (a deck rebuild priced from photos), extrawork (a part found at the bench, OK'd first). No documents fact: the written estimate is the visit path's own price OK (A8-29 / B8-93), so B8-93's 'An estimate becomes its own job' branch is off. No switches. Settings: A a set start (drop-off slots), B a 2-hour window; cutoff 24 hours before.\nSafety: fire, smoke from the engine, a carbon monoxide alarm or someone cut stops the booking; a fuel leak or strong gas smell, a generator run indoors or a loose blade gets the safety steps, then the booking goes on, marked urgent. Fuel leaks found at the bench or at a home stop the work (A8-35 / B8-30). A child is never the person served (A4-24 / B4-32 'A child' off).\nOwn step: A8-x01, the fuel check at the counter (gas in the tank, old gas drained, any leak), a real first step of this trade. Reminder lines: carry the machine upright with the gas cap tight, bring the key.\nOffs for work this shop never has: video or phone (A4-01, B4-01), plans and insurance, packages, a person by name, plan steps, rented items, 'too few booked', a child left, stage billing, next visit at checkout, a signed contract, nobody-home branches and sent-now steps.\nKept: 'leak' (a fuel leak is this trade's own word) and 'drain' (draining old gas).\nNot sure (for the verifier): S1-13's sign-up example card still lists 'Paid in full' lines and a $20 fee for services this shop never prepays (master text, not an overlay word); A8-02 keeps the 'something required is missing' branch for a riding mower with no key; the engine health check (B) is a free list|none|none example in the master's amounts that no listed path uses.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "barbershop license",
+    "EC22871",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "MP045210",
+    "BS20981",
+    "BS20918",
+    "A chair, ready",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "would like to see your hair before pricing it",
+    "My employer pays for this cut.",
+    "Alex M.'s cut",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "Color quotes come to you first. Board prices never need one",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "When they book: a card saved, for a $20 fee you OK",
+    "Style consult",
+    "style consult",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "once Riley sees the hair.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Could Riley use a toner instead of the gloss?",
+    "asks for a toner instead of the gloss. What's the new price?",
+    "two skin fades on",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Today · 3:00pm · Avery",
+    "a beard trim today at 2:00pm with Avery",
+    "the beard trim today at 2:00pm with Avery",
+    "first tomorrow: 10:00am, Riley",
+    "A card saved for the $20 fee",
+    "haircut with Riley",
+    "Sat 11am Riley",
+    "at 11:20am on Riley's phone",
+    "Gloss to finish · $15",
+    "Riley quotes the rest at the chair, before any work.",
+    "Wants Saturday morning, with Riley",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "How was your visit with Riley?",
+    "Sun Oct 25 · 11:00am · Riley",
+    "Can my son wait in the shop during my cut?",
+    "Walk-in for a haircut",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Your item is still waiting for pick-up.",
+    "A drop-off item isn't picked up.",
+    "Promises the $25 consult; priced at the chair",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "like Lee Plumbing and Lee Electric.",
+    "Quiero un corte el sábado.",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Drain clearing",
+    "home warranty plan",
+    "a package of cuts",
+    "patch test",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A barbershop's services need none.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "Riley looks, then prices it",
+    "Texts Alex the price",
+    "Only the consult; the price stays open",
+    "Follows up on an item left behind",
+    "a skin-test result",
+    "color and house calls",
+    "color, house calls",
+    "Consult only",
+    "photos of your hair",
+    "a cut on Saturday",
+    "Books a cut every 4 weeks",
+    "a cut every 4 weeks",
+    "for a staff cut",
+    "in the chair",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "A barbershop",
+    "a barbershop",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "4471",
+    "Sofia",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "fade",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "$25 consult",
+    "Only the consult",
+    "the consult",
+    "What happens at the chair?",
+    "Priced at the chair",
+    "priced at the chair",
+    "Paid at the chair",
+    "At the chair",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "a house call",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "like a burst pipe",
+    "$75",
+    "Gloss",
+    "gloss",
+    "Toner",
+    "toner"
+   ],
+   "B": [
+    "EC22871",
+    "BS20981",
+    "A license behind the company, and one for each plumber where the state asks. Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "MP045210",
+    "MP045201",
+    "A chair, ready",
+    "water is off on Main St after 2pm",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "Drain clearings",
+    "drain clearings",
+    "Shutoff valve and wall pipe · $540",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "heating and cooling",
+    "Heating and cooling",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "You can look for a roofer near you.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "water heater contract",
+    "replaces water heaters",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Can I run the dishwasher before you come?",
+    "like Lee Plumbing and Lee Electric.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "The shop's chair is in the other flow.",
+    "Both rentals' visits go on one bill on the 1st.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "Just the kitchen sink.",
+    "a leak under the sink",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals",
+    "next week's drain cleaning",
+    "clear a yard drain",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "your new pipes are in",
+    "a roof leak",
+    "Video and Jordan's notes",
+    "Jordan finds corroded shutoff valves.",
+    "replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "shutoff valves",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "supply house",
+    "Rental 1",
+    "Rental 2",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also run a camera down my sewer line?",
+    "$160 valve quote",
+    "$160 valve work",
+    "a bathroom drain",
+    "kitchen drain",
+    "The faucet is a leak repair, quoted at the visit.",
+    "A haircut could mean a salon or a barbershop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Texts Alex the price",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Is the sink still full of water?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "DONE 179 drain",
+    "245 valve 165 supply line 80",
+    "Shutoff valve",
+    "Supply line",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "1-year labor warranty",
+    "a dripping faucet",
+    "color and house calls",
+    "color, house calls",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "plumbing license",
+    "Plumbing license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "a barbershop",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "a haircut",
+    "Haircut",
+    "fade",
+    "beard trim",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "camera inspection",
+    "camera report",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Panel upgrade",
+    "under my sink",
+    "under the sink",
+    "like a burst pipe",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "shutoff valve",
+    "$75",
+    "A leak repair",
+    "a leak repair",
+    "Leak repair",
+    "leak repair",
+    "supply line"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A5-19": "5d5db6f3c1",
+   "A10-05": "63c3536c7a",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-42": "fde535c99e",
+   "S2-06": "6b01a08c94",
+   "A4-24": "0a292df05b",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S13-22": "5324c9a041",
+   "A3-20": "b8251d2535",
+   "A6-14": "b17b52115e",
+   "A8-54": "bc2f9467fd",
+   "A10-01": "77ff9c7550",
+   "A3-23": "4a8b7c72a2",
+   "A8-23": "e3a35f7f9e",
+   "A8-02": "15f418fec4",
+   "A8-51": "71142aa1fa",
+   "A10-23": "105d7f426a",
+   "S11-54": "ce20fc799b",
+   "S11-57": "a3996ae84e",
+   "S11-56": "bd841a4732"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B9-06": "f091432f2d",
+   "B9-19": "b97bfbf0d2",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B8-03": "ac9d404766",
+   "B10-32": "7713bff255",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-42": "8f63c529f7",
+   "S2-06": "b78d25d6e2",
+   "B8-93": "c1406fd6bc",
+   "B8-54": "0f180048ca",
+   "B4-32": "fcfe092e37",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S13-22": "9c91065dc1",
+   "B3-17": "3eb7d7f259",
+   "B4-34": "74ff52d83d",
+   "B8-18": "530038d2b8",
+   "B3-19": "2f53161fb2",
+   "B8-30": "a1ef4983e4",
+   "S11-54": "f2d479cd60",
+   "S11-57": "2f34f23d8a"
+  }
+ }
+}

@@ -1,0 +1,2790 @@
+{
+ "id": "planner",
+ "name": "Wedding & event planner",
+ "style": "Event",
+ "pattern": "event",
+ "from": "photographer",
+ "plugin": {
+  "pf.license": {
+   "need": "No state license for planning or coordinating weddings and events in most places. A local business license where the city or county asks for one: from the state form.",
+   "travel": "A planner who sells or books guests' travel or lodging may need a seller-of-travel registration where the state's rules require it: a switch from the state form. The example sells no travel.",
+   "alcohol": "A planner never serves or sells alcohol. The venue or a licensed bar does, under its own license.",
+   "who holds it": "The business holds any business license or registration. Planners need no license of their own.",
+   "what to ask": [
+    "The business license or registration number, where the place asks for one",
+    "A seller-of-travel registration number, only if the business books guests' travel and the state's form asks"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "Nothing, unless the state's form makes a registration a must for a service the business offers. Then only that service waits.",
+   "renewals": "A reminder 30 days before a registration or the insurance runs out.",
+   "insurance or bond": "Liability insurance on file, with its end date. Many venues ask for a certificate that names them.",
+   "background checks": "Only where the state's form or a venue asks, like for an event at a school."
+  },
+  "pf.services": {
+   "at the business (the example: Lee Planning Studio's own list, at the studio or by video)": [
+    {
+     "service": "Free first call (45 min)",
+     "price kind": "free",
+     "price": "$0",
+     "length": "45 min",
+     "place": "at the studio or by video",
+     "before": "nothing",
+     "after": "nothing",
+     "note": "Always with the planner who would lead the wedding, by name. It's how full and partial planning get their quote."
+    },
+    {
+     "service": "Full planning",
+     "price kind": "quoted after the free first call",
+     "price": "the quote (the example: $8,500)",
+     "length": "about 8 to 18 months: 10 planning meetings, the venue and vendor search, the budget and design, the final walkthrough, the rehearsal, and the day with 2 planners",
+     "place": "meetings at the studio or by video; the walkthrough, rehearsal and day at the venue",
+     "before": "a signed contract, then a 30% retainer that holds the date",
+     "after": "the rest in two set payments: 35% due six months before, 35% due 30 days before, each billed by text a week ahead",
+     "note": "One wedding a date per lead planner. The owner OKs every quote."
+    },
+    {
+     "service": "Partial planning",
+     "price kind": "quoted after the free first call",
+     "price": "the quote (the example: $4,800)",
+     "length": "from 6 months out: 4 planning meetings, the final walkthrough, the rehearsal and the day",
+     "place": "as full planning",
+     "before": "a signed contract, then a 30% retainer",
+     "after": "the rest in set payments, billed by text"
+    },
+    {
+     "service": "Planning consult (1 hour)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "60 min",
+     "place": "at the studio or by video",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "For couples who plan it themselves: a checklist, a budget plan or vendor ideas."
+    },
+    {
+     "service": "Extra planning meeting (1 hour)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "60 min",
+     "place": "at the studio or by video",
+     "before": "nothing",
+     "after": "Rosie texts the bill",
+     "note": "Only after a contract's included meetings are used, and only if the couple asks."
+    },
+    {
+     "service": "Welcome party or brunch, planned and run",
+     "price kind": "quoted",
+     "price": "from $900 (the example)",
+     "length": "3 hours on site",
+     "place": "at the venue",
+     "before": "added to the contract, signed",
+     "after": "with the planning's payments"
+    }
+   ],
+   "at the customer's place (the example: Lee Weddings & Events' own list)": [
+    {
+     "service": "Free first call (45 min)",
+     "price kind": "free",
+     "price": "$0",
+     "length": "45 min",
+     "place": "by video, at the office, or at the couple's venue",
+     "before": "nothing",
+     "after": "nothing",
+     "note": "With the planner who would lead the day. It's how month-of coordination, full planning and party coordination get their quote."
+    },
+    {
+     "service": "Month-of coordination",
+     "price kind": "quoted after the free first call",
+     "price": "the quote (the example: $2,400)",
+     "length": "from 8 weeks out: 2 planning meetings by video, the final walkthrough, the rehearsal, and the day with 2 planners (up to 11 hours)",
+     "place": "at the couple's venue",
+     "before": "a signed contract, then a 25% retainer that holds the date",
+     "after": "the rest charged to the saved card when the day is done",
+     "note": "The couple has planned it and booked their own vendors. The owner OKs every quote."
+    },
+    {
+     "service": "Full planning at the venue",
+     "price kind": "quoted after the free first call",
+     "price": "the quote",
+     "length": "as the studio's full planning",
+     "place": "at the couple's venue",
+     "before": "a signed contract, then a 30% retainer",
+     "after": "the rest billed in stages, each when the planner texts DONE for it"
+    },
+    {
+     "service": "Corporate event planning (Lee Corporate Events)",
+     "price kind": "quoted after a first call",
+     "price": "the quote",
+     "length": "set by the event",
+     "place": "at the company's venue",
+     "before": "a signed contract, then a retainer",
+     "after": "the rest on the bill after the event, or on the company's invoice"
+    },
+    {
+     "service": "Party coordination (an engagement party or a shower)",
+     "price kind": "quoted after a free first call",
+     "price": "the quote",
+     "length": "set by the party, a few hours on the day",
+     "place": "at the host's home or venue",
+     "before": "a signed contract, then a 25% retainer",
+     "after": "the rest charged to the saved card when the party is done",
+     "note": "An outdoor party moves, with no fee, when the forecast is over the weather limit."
+    },
+    {
+     "service": "Extra hour on the day",
+     "price kind": "per hour, per planner",
+     "price": "$150 an hour for each planner (the example)",
+     "length": "1 hour",
+     "place": "at the event",
+     "before": "nothing: asked on the night",
+     "after": "one pay link after",
+     "note": "Only with the couple's written yes by text, at the rate shown before booking."
+    },
+    {
+     "service": "Travel",
+     "price kind": "travel fee",
+     "price": "free within 40 miles; beyond, $1 a mile round trip (the example)",
+     "length": "",
+     "place": "at the venue",
+     "before": "added to the quote",
+     "after": "with the rest"
+    }
+   ],
+   "capacity": "One wedding a date for each lead planner, with an associate planner on the day. Meetings book the planner's own time.",
+   "what Rosie never books": "Other vendors. The couple signs and pays each vendor (venue, caterer, photographer, florist, DJ) directly. Rosie books and takes money only for the planner's own time and work.",
+   "nobody needs to be home": "Never: a planner works with the couple or at the event.",
+   "online": "The free first call, planning meetings and consults can be video calls. Consults are held only at the studio or by video."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What it is: a wedding, an engagement party, a corporate event or another party",
+    "The date, or a season if there's no date yet",
+    "The area, and the venue's name and town if there is one (for travel)",
+    "About how many guests",
+    "Which service: full planning, partial planning, month-of coordination, a consult, or not sure",
+    "Indoors, outdoors or both"
+   ],
+   "after a time is picked": [
+    "What matters most to the couple, in a few words",
+    "A venue contact, if there is one",
+    "Who else should be on the booking, like a partner who will co-sign"
+   ],
+   "only on the secure page": [
+    "The budget, and any budget per vendor",
+    "The guest list, and any guest's names",
+    "Family details, like divorced parents or people who must be kept apart",
+    "Access or health needs of the couple or a guest",
+    "The venue's gate or access codes",
+    "The card, and each signature"
+   ],
+   "who may book": "An adult. Either partner may book, and both may sign the contract. A parent may book and pay for a child's wedding or party; the couple or the host still gets the texts they agree to."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "Someone hurt, a fire, or danger at the venue right now",
+     "says": "If anyone is hurt or in danger, call 911 now.",
+     "booking": "No booking until it's safe; the customer can come back."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "Thunder or lightning near an outdoor event",
+     "says": "Guests go into a large enclosed building, never a tent or porch, until 30 minutes after the last thunder.",
+     "booking": "Goes on; the planner moves the timeline."
+    },
+    {
+     "words": "A guest who is very drunk, or a fight at the event",
+     "says": "The venue's staff and security handle it. Call 911 if anyone is in danger.",
+     "booking": "Goes on; the planner tells the venue's manager at once."
+    }
+   ],
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The free first call (45 min) with the planner who would lead it, at the studio or by video",
+     "for": "Full planning, partial planning and month-of coordination",
+     "timing": "Before the quote. The quote is good for 5 days after it."
+    },
+    {
+     "step": "The signed contract",
+     "for": "Every planning or coordination booking",
+     "timing": "Before any money is taken, on the secure page. The date stays saved for 2 days while both partners sign."
+    },
+    {
+     "step": "The planning questionnaire: the budget, the guest count, family notes and the vendors booked",
+     "for": "Full planning, partial planning and month-of coordination",
+     "timing": "On the secure page, due before the first planning meeting, or 8 weeks before the day for month-of."
+    },
+    {
+     "step": "The final walkthrough at the venue (60 min), with the couple and the venue's manager",
+     "for": "Every wedding the business runs on the day",
+     "timing": "4 to 6 weeks before the day, booked at booking with its own code."
+    },
+    {
+     "step": "The rehearsal (60 min) at the venue",
+     "for": "Weddings that have one",
+     "timing": "The day before, at the venue's time."
+    },
+    {
+     "step": "The insurance certificate the venue asks for",
+     "for": "Venues that ask",
+     "timing": "A to-do for the owner, before the venue's date."
+    }
+   ],
+   "prep for the reminder": [
+    "The final timeline is on the secure page 1 week before",
+    "Bring the rings, the vows and the vendor tip envelopes to the rehearsal",
+    "Come to the studio 5 minutes early, or join the video link"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the studio": "The code at the desk, or read out at the start of a video meeting.",
+   "check-in at the venue": "The code, given to the lead planner on arrival by the couple or a person named on the booking.",
+   "work changes at the event": "An extra hour only with the couple's written yes by text, at the rate shown before booking. No yes in 10 minutes: the planners leave at the time booked.",
+   "vendors": "The planner checks each vendor in against the timeline with their own tools. Rosie never texts, books or pays a vendor.",
+   "weather": "Outdoor plans name a rain spot and a large enclosed building. The planner and the couple make the rain call by a set time on the day.",
+   "proof it's done": "The lead planner texts DONE at the end of the meeting, or after the send-off and the wrap-up on the day.",
+   "results later": "None: the planner's notes and timeline stay on the secure page and in the planner's own tools."
+  },
+  "pf.money": {
+   "starting answers": [
+    "Full and partial planning: a signed contract, a 30% retainer when booking, and the rest billed in stages, each when the planner texts DONE for it (the example: two stages of 35%); Rosie never bills on a date by itself",
+    "Month-of coordination: a signed contract, a 25% retainer, and the rest charged to the saved card when the day is done",
+    "Consults, at the studio or by video: paid in full when booking. An extra planning meeting: billed by text after. The free first call: nothing taken",
+    "An extra hour on the day: priced first, only with a written yes, paid with the rest"
+   ],
+   "limits": [
+    "Deposit or retainer cap: from the state form",
+    "Free to cancel for a set time after signing (the example: until 24 hours before the first planning meeting, or 3 days after signing for month-of)",
+    "After that, a cancel keeps only what the contract's dated schedule says, credited toward the work done, and the owner confirms it. No answer, nothing kept",
+    "A late payment gets one pay link and a note to the owner. Rosie never cancels a wedding over a late payment; the owner decides",
+    "The business cancels, or the couple says no to a stand-in planner: everything paid is refunded"
+   ],
+   "vendors": "Rosie never takes, holds or passes on money for other vendors. Only the planner's own fee goes through, into the planner's own Stripe.",
+   "extras": "An extra planning meeting or an extra hour is billed only with the couple's yes.",
+   "travel": "Free within 40 miles; the example's $1 a mile round trip beyond.",
+   "tips": "Off. The couple's tips for vendors are handed out by the planner, in envelopes the couple gives; they never go through Rosie.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the service.",
+   "Rosfield's $2": "Applies: the business pays $2 per confirmed booking."
+  },
+  "pf.messages": {
+   "never in a text": "The budget, the guest list, family details, access or health needs and gate codes stay on the secure page. Texts to the owner, the planners or the couple carry none of them: only names, dates, times, places and the planner's fee.",
+   "languages": "English and Spanish.",
+   "minors": "A child in the wedding party (a flower girl or ring bearer) stays with a parent or a named adult. A planner never looks after a child alone."
+  },
+  "pf.staff": {
+   "roles": [
+    "Lead planner",
+    "Associate planner",
+    "Corporate events lead",
+    "Office manager"
+   ],
+   "skills": [
+    "Full planning (leads only)",
+    "Month-of coordination",
+    "Planning consults",
+    "Corporate events",
+    "Design and rentals"
+   ],
+   "supervision": "None by state rule. An associate planner works with a lead on the day.",
+   "who OKs what": "The owner OKs every planning quote, every amount kept on a cancel and any stand-in lead. The office manager may OK meeting changes if the owner sets it.",
+   "stand-ins": "A lead planner the owner trusts, even from outside the team, only if the couple agrees. On no reply, nobody is swapped in: the owner calls the couple."
+  },
+  "pf.rules": {
+   "written contract": "The business's own contract, filled in from the booking, signed by each partner named and the business before money is taken, for every planning or coordination booking. Any parts the state's rules add come from the state form.",
+   "date hold": "The date stays saved for 2 days while the contract is signed (the owner's setting), with a next-in-line list.",
+   "one a date": "One wedding a date per lead planner, booked up to 24 months ahead (the owner's settings).",
+   "cancel schedule": "Free to cancel for a set time after signing. After that, a dated schedule from the contract, never the whole fee. One free date move 6 months or more ahead, if a planner is free (the owner's setting).",
+   "meetings": "Each planning meeting is its own booking under the contract. A meeting missed without 24 hours' notice counts as used only with the owner's OK.",
+   "vendors": "Each vendor contract is between the couple and the vendor. The planner may suggest vendors, but never takes a payment from a vendor through Rosie.",
+   "venue rules": "Load-in times, the end time, noise limits and insurance certificates come from the venue: switches the planner sets for each venue.",
+   "records": "Contracts and payments kept 7 years, as for every kind of work.",
+   "weather limit": "A small outdoor party is checked against the forecast the day before (the owner's setting: heavy rain). A wedding has a rain plan instead, called on the day."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for planners:",
+   "planning and events": [
+    "A late payment: one pay link and the owner decides; Rosie never cancels a wedding over it",
+    "The couple cancels: only what the dated schedule says is kept, with the owner's OK",
+    "The couple moves the date: one free move 6 months or more ahead, if a planner is free",
+    "The lead planner can't come on the day: a trusted stand-in if the couple agrees, or a full refund",
+    "A planning meeting missed without notice: counts as used only with the owner's OK",
+    "Rain or lightning at an outdoor event: the rain spot, and guests indoors until 30 minutes after the last thunder",
+    "A vendor runs late or doesn't come: the planner handles it on the day; Rosie never contacts the vendor",
+    "Asked to stay longer: an extra hour only with a written yes",
+    "A parent pays: the bill goes to them by a link the couple forwards",
+    "The couple opts out of texts: the booking stays, and the planner calls or emails"
+   ]
+  },
+  "pf.facts": [
+   "photos",
+   "documents",
+   "video",
+   "stages"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Nadia and Elena (planners at the studio)"
+  },
+  "B": {
+   "staff": "Julian and Gabe (planners on the day)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Nadia"
+  },
+  "B": {
+   "staff": "Julian"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Wedding planning, from the first call to the day."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Weddings and events at your venue, within 40 miles."
+   ],
+   [
+    "A water heater job",
+    "A month-of wedding"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Nadia and Elena plan weddings; Nadia also meets couples at their venue."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Nadia: planner, full planning, venue meetings"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nadia: planner, full planning and venue meetings"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, full planning and venue meetings"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and at venues"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Planning Studio can book you from now on, at the studio and at venues."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A venue's example: a fire alarm gets 'leave the building now'."
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you an emergency contact."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most planning studios set it."
+   ],
+   [
+    "House calls: allowed where you are, for those cleared",
+    "Meetings at the venue: allowed where you are, for those cleared"
+   ],
+   [
+    "So is a house call, $75.",
+    "So is a meeting at the venue, $150."
+   ],
+   [
+    "Color quotes come to you first.",
+    "Planning quotes come to you first."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a DJ, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Planning Studio doesn't book DJs."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking.",
+    "Alex wants it at the venue: a venue meeting, $150, paid in full when booking."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A studio's example: 'Full planning needs the signed contract first."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Full planning always stays with Nadia."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: wants a garden ceremony, 120 guests"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you plan a teen's party too?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a planning call for a teen's party is $150. Want a time?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds corporate events to Lee Planning Studio."
+   ],
+   [
+    "NEW massage",
+    "NEW corporate events"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Corporate events for Lee Planning Studio: is it the same company?"
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Lee Planning Studio: you now have two planning consults on Sat Nov 7."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a teen's party call before the times."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "You told us the call is for your teen's party, and that you're their parent. Their details go on the secure page."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book us a first planning meeting at Lee Planning Studio on Saturday."
+   ],
+   [
+    "Alex M. · Haircut",
+    "Alex M. · Planning meeting"
+   ],
+   [
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "Lee Planning Studio · Planning meeting: your 3:00pm"
+   ],
+   [
+    "A haircut at Lee's Barbershop:",
+    "{{name}} at Lee Planning Studio:"
+   ],
+   [
+    "Lee's Barbershop · Haircut",
+    "Lee Planning Studio · {{name}}"
+   ],
+   [
+    "Takes the fee; tells Ben",
+    "Settles it; tells Ben"
+   ],
+   [
+    "Riley texts 'paid cash'",
+    "Nadia texts 'paid check'"
+   ],
+   [
+    "color quote",
+    "planning quote"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books planning and a welcome party"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'coordinator' could mean a planner or a venue's own staff."
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "the shop's board",
+    "the studio's list"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "At my home",
+    "At our venue"
+   ],
+   [
+    "Asks Alex for photos",
+    "Sets up a free first call"
+   ],
+   [
+    "From the list, from photos, or at the visit?",
+    "From the list, after a first call, or at the visit?"
+   ],
+   [
+    "Quoted from photos first",
+    "Quoted after a free first call"
+   ],
+   [
+    "Shop front",
+    "Studio front"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many salons, groomers and tattoo artists are licensed to their own place"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like full planning at the studio or at the couple's venue"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Give this code at the chair",
+    "Give this code at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Riley finishes the work",
+    "Nadia finishes the meeting"
+   ],
+   [
+    "Alex adds a beard trim",
+    "Alex adds more time"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "Priced from your photos",
+    "Quoted after a free first call"
+   ],
+   [
+    "priced from photos",
+    "quoted after a free first call"
+   ],
+   [
+    "Add photos",
+    "Pick a call time"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Planning consult"
+   ],
+   [
+    "Signature cut and shave",
+    "Planning consult"
+   ],
+   [
+    "Signature cut",
+    "Planning consult"
+   ],
+   [
+    "signature cut",
+    "planning consult"
+   ],
+   [
+    "color and cut",
+    "full planning"
+   ],
+   [
+    "Color and cut",
+    "Full planning"
+   ],
+   [
+    "A haircut",
+    "An extra planning meeting"
+   ],
+   [
+    "a haircut",
+    "an extra planning meeting"
+   ],
+   [
+    "Haircut",
+    "Extra planning meeting"
+   ],
+   [
+    "haircut",
+    "extra planning meeting"
+   ],
+   [
+    "Skin fade · $40",
+    "Planning consult · $150"
+   ],
+   [
+    "Groom's package",
+    "planning intensive"
+   ],
+   [
+    "kids cut",
+    "planning call for a teen's party"
+   ],
+   [
+    "Kids cut",
+    "Planning call for a teen's party"
+   ],
+   [
+    "skin fade",
+    "planning consult"
+   ],
+   [
+    "Skin fade",
+    "Planning consult"
+   ],
+   [
+    "beard trim",
+    "planning meeting"
+   ],
+   [
+    "Beard trim",
+    "Planning meeting"
+   ],
+   [
+    "$90",
+    "$8,500"
+   ],
+   [
+    "$70",
+    "$5,950"
+   ],
+   [
+    "$55",
+    "$150"
+   ],
+   [
+    "$35",
+    "$150"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Weddings & Events'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Weddings & Events"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Weddings and Lee Corporate Events"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Planning Studio LLC"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Planning Studio's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Planning Studio"
+   ],
+   [
+    "1200 Main St",
+    "410 Market St"
+   ],
+   [
+    "88 Elm St",
+    "64 Rose St"
+   ],
+   [
+    "the barbershop's",
+    "the studio's"
+   ],
+   [
+    "the barbershop",
+    "the studio"
+   ],
+   [
+    "a barbershop",
+    "a planning studio"
+   ],
+   [
+    "A barbershop",
+    "A planning studio"
+   ],
+   [
+    "barbershop",
+    "planning studio"
+   ],
+   [
+    "Barbershop",
+    "Planning studio"
+   ],
+   [
+    "Barbering",
+    "Planning"
+   ],
+   [
+    "barbers",
+    "planners"
+   ],
+   [
+    "Barbers",
+    "Planners"
+   ],
+   [
+    "barber",
+    "planner"
+   ],
+   [
+    "Barber",
+    "Planner"
+   ],
+   [
+    "plumber",
+    "planner"
+   ],
+   [
+    "Plumber",
+    "Planner"
+   ],
+   [
+    "plumbing's",
+    "event coordination's"
+   ],
+   [
+    "plumbing",
+    "event coordination"
+   ],
+   [
+    "Plumbing",
+    "Event coordination"
+   ],
+   [
+    "electrical's",
+    "corporate events'"
+   ],
+   [
+    "electrical",
+    "corporate events"
+   ],
+   [
+    "Electrical",
+    "Corporate events"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shop's",
+    "studio's"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Riley's",
+    "Nadia's"
+   ],
+   [
+    "Riley",
+    "Nadia"
+   ],
+   [
+    "Avery's",
+    "Elena's"
+   ],
+   [
+    "Avery",
+    "Elena"
+   ],
+   [
+    "Jordan",
+    "Julian"
+   ],
+   [
+    "Casey",
+    "Gabe"
+   ],
+   [
+    "Color correction",
+    "Partial planning"
+   ],
+   [
+    "color correction",
+    "partial planning"
+   ],
+   [
+    "Color touch-up",
+    "Vendor check-in call"
+   ],
+   [
+    "color touch-up",
+    "vendor check-in call"
+   ],
+   [
+    "Color plan",
+    "Planning package"
+   ],
+   [
+    "color plan",
+    "planning package"
+   ],
+   [
+    "Haircuts",
+    "Extra planning meetings"
+   ],
+   [
+    "haircuts",
+    "extra planning meetings"
+   ],
+   [
+    "a house call",
+    "a venue meeting"
+   ],
+   [
+    "House calls",
+    "Venue meetings"
+   ],
+   [
+    "house calls",
+    "venue meetings"
+   ],
+   [
+    "house call",
+    "venue meeting"
+   ]
+  ],
+  "B": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Wedding planning, from the first call to the day."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Weddings and events at your venue, within 40 miles."
+   ],
+   [
+    "A water heater job",
+    "A month-of wedding"
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Nadia and Elena plan weddings; Nadia also meets couples at their venue."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Nadia: planner, full planning, venue meetings"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Nadia: planner, full planning and venue meetings"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, full planning and venue meetings"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the studio, and at venues"
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Planning Studio can book you from now on, at the studio and at venues."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A venue's example: a fire alarm gets 'leave the building now'."
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you an emergency contact."
+   ],
+   [
+    "We'd share only where they're working, only after a missed check.",
+    "We'd share only where they're working, after a missed check."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most planning studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules planning studios often set."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about our wedding day. A text back is fine."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a planning consult, today,"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the date, the venue, and how many guests."
+   ],
+   [
+    "Priced by Jordan, from your photos",
+    "Quoted by Julian, after your first call"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "We need someone to run our wedding day."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a planner run a rehearsal this Thursday?"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa rehearsal Thu 12pm Gabe"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "The venue's power is out on our wedding day."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to leave the building, and to call 911 if anyone is hurt."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Leave the building by the nearest exit."
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Our venue flooded in the storm."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A 'planner' could mean a wedding planner or a party planner."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Someone to run our day' fits month-of coordination."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like booking a venue that isn't theirs."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead.",
+    "Say Alex had asked Lee Planning Studio for a meeting instead."
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "One of the studio's planners meets couples at their venue."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding rehearsal coordination? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And when is the wedding, and how many guests?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At our venue, Cedar Hill Farm. About 120 guests."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about an extra hour on the night."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Julian also stay an extra hour on the night?"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. An extra hour is $150, with Julian. Both fit in the same day."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says month-of coordination is quoted after a free first call, so Rosie's first text sets up the call."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Pick a time for a free first call, and a planner will quote the job."
+   ],
+   [
+    "Price needed: Alex M., water heater replacement.",
+    "Quote needed: Alex M., month-of coordination."
+   ],
+   [
+    "Alex M. · water heater",
+    "Alex M. · month-of coordination"
+   ],
+   [
+    "Alex M.: water heater replacement",
+    "Alex M.: month-of coordination"
+   ],
+   [
+    "Jordan priced a water heater replacement for Alex M.",
+    "Julian quoted month-of coordination for Alex M."
+   ],
+   [
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Send Alex M. $2,200 for month-of coordination, not $2,400?"
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your coordination quote is with Lee Weddings & Events."
+   ],
+   [
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos.",
+    "Lee Weddings & Events: Julian quoted month-of coordination at {{price:$90}}, after your first call."
+   ],
+   [
+    "Sorry, Lee Home Services couldn't price your water heater this time.",
+    "Sorry, Lee Weddings & Events couldn't quote your wedding this time."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $2,400 coordination is over the plug-in's amount, so it gets a contract to sign."
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Contract · Month-of coordination · $2,400"
+   ],
+   [
+    "Water heater replacement · $640",
+    "Month-of coordination · $2,400"
+   ],
+   [
+    "Your water heater contract is waiting for your signature.",
+    "Your coordination contract is waiting for your signature."
+   ],
+   [
+    "Your water heater visit wasn't booked, since the document wasn't signed in time.",
+    "Your wedding day wasn't booked, since the contract wasn't signed in time."
+   ],
+   [
+    "Alex M. didn't sign the water heater contract in time, so nothing was booked.",
+    "Alex M. didn't sign the coordination contract in time, so nothing was booked."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the quoted path, only Julian's times show: Julian leads month-of weddings."
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Weddings & Events · {{name}}"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · {{name}}"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Where should the planners park?"
+   ],
+   [
+    "Yes, it won't drain",
+    "By the barn"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $500 rehearsal needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the timeline and vendor list on your page."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the barn door"
+   ],
+   [
+    "Under the sink, before",
+    "Barn door, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Dance floor, before"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "The couple asks Julian for an extra hour."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 150 one more hour on the night"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: one more hour, $150."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more hour · $150"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $150 extra-hour price is good for 7 days."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Julian's phone, you said yes to one more hour for $150."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Julian finds a loose railing on the barn loft."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD loose loft railing, closed off"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Loose loft railing"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Julian found a loose railing on the barn loft and closed the loft to guests."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a loose loft railing"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: photos in the loft"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Julian's cart scratches the barn door, and Julian texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the barn door"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched barn door"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Julian's cart scratched the barn door at Alex M.'s venue."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 2400 coordination"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE the toasts ran long. Keep speeches to 3 minutes next time."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Julian left the gift table in the barn."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "We found the card box missing this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Julian plan our anniversary party next month?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Julian's next times for a planning call."
+   ],
+   [
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "At DONE, Alex asks Julian to plan a first-anniversary party next fall."
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: anniversary party, 12 months"
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the anniversary party you asked Julian about in late Aug 2027."
+   ],
+   [
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted.",
+    "Say Sam sends a proposal for more work after the day, like the anniversary party Julian noted."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Weddings & Events sent you a proposal for an anniversary party, from Julian's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Anniversary party"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Julian also run our rehearsal the day before?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Rehearsal coordination · $500"
+   ],
+   [
+    "Change: Alex M. added a camera inspection to the Thu visit.",
+    "Change: Alex M. added rehearsal coordination to the Thu booking."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can the florist arrive before you come?"
+   ],
+   [
+    "Good morning! Nora S. asked overnight for a drain clearing today.",
+    "Good morning! Nora S. asked overnight for a planning consult today."
+   ],
+   [
+    "Drain clearing · $179",
+    "Planning consult · $150"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise month-of coordination to 2600"
+   ],
+   [
+    "Reading it back: drain clearing goes to $199 for new bookings.",
+    "Reading it back: month-of coordination goes to $2,600 for new bookings."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Sam raises month-of coordination to $2,600 for bookings from Mon Nov 2."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Weddings already booked keep $2,400, even after Nov 2."
+   ],
+   [
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "Saved: month-of coordination $2,600 from Mon Nov 2. Weddings already booked keep $2,400."
+   ],
+   [
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $2,600 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $2,400."
+   ],
+   [
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Sam switches the planning consult from paid in full to a $50 deposit."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Consults already booked keep what they paid."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Month-of coordination $2,400 ($2,600 from Nov 2) · Rehearsal coordination $500"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds corporate events to Lee Weddings & Events."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW corporate events"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Corporate events for Lee Weddings & Events: is it the same company?"
+   ],
+   [
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Ivy C. books a planning consult for Mon Nov 9 in the morning."
+   ],
+   [
+    "Lee Home Services: you have two drain clearings on Mon Nov 9.",
+    "Lee Weddings & Events: you have two planning consults on Mon Nov 9."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for month-of coordination at $2,200, an old price. Rosie answers with the real price, $2,400. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Month-of coordination with Lee Home Services is $2,400, not $2,200. Here are the open dates at $2,400."
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the full planning quote before booking."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Reply here, and it goes to Sam. How was the day with Jordan?"
+   ],
+   [
+    "The quote stays open 7 days",
+    "The planners leave at the time booked"
+   ],
+   [
+    "25-mile",
+    "40-mile"
+   ],
+   [
+    "and nobody was home for any of them",
+    "and never came to any of them"
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code on arrival"
+   ],
+   [
+    "The door stayed shut.",
+    "The code wasn't given."
+   ],
+   [
+    "Nothing booked. The price stays good for 7 days.",
+    "Nothing booked. The quote stays good for 5 days."
+   ],
+   [
+    "Thu Oct 22 · arriving 8–10am",
+    "Sat May 22, 2027 · from 12:00pm"
+   ],
+   [
+    "At my home",
+    "At our venue"
+   ],
+   [
+    "Asks Alex for photos",
+    "Sets up a free first call"
+   ],
+   [
+    "Quoted from photos first",
+    "Quoted after a free first call"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "plumbing license MP045210",
+    "business registration 2019-0451"
+   ],
+   [
+    "license MP045210",
+    "registration 2019-0451"
+   ],
+   [
+    "Plumbing license",
+    "Registration certificate"
+   ],
+   [
+    "Shop front",
+    "Studio front"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "many salons, groomers and tattoo artists are licensed to their own place"
+   ],
+   [
+    "like a haircut at the shop or at home",
+    "like full planning at the studio or at the couple's venue"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Weddings & Events LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Weddings & Events'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Weddings & Events"
+   ],
+   [
+    "leehomeservices.com",
+    "leeweddings.com"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Weddings and Lee Corporate Events"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Planning Studio"
+   ],
+   [
+    "1200 Main St",
+    "410 Market St"
+   ],
+   [
+    "88 Elm St",
+    "64 Rose St"
+   ],
+   [
+    "the barbershop's",
+    "the studio's"
+   ],
+   [
+    "the barbershop",
+    "the studio"
+   ],
+   [
+    "a barbershop",
+    "a planning studio"
+   ],
+   [
+    "barbershop",
+    "planning studio"
+   ],
+   [
+    "Barbershop",
+    "Planning studio"
+   ],
+   [
+    "barbers",
+    "planners"
+   ],
+   [
+    "Barbers",
+    "Planners"
+   ],
+   [
+    "barber",
+    "planner"
+   ],
+   [
+    "Barber",
+    "Planner"
+   ],
+   [
+    "plumber",
+    "planner"
+   ],
+   [
+    "Plumber",
+    "Planner"
+   ],
+   [
+    "plumbing's",
+    "event coordination's"
+   ],
+   [
+    "plumbing",
+    "event coordination"
+   ],
+   [
+    "Plumbing",
+    "Event coordination"
+   ],
+   [
+    "electrical's",
+    "corporate events'"
+   ],
+   [
+    "electrical",
+    "corporate events"
+   ],
+   [
+    "Electrical",
+    "Corporate events"
+   ],
+   [
+    "the shop's",
+    "the studio's"
+   ],
+   [
+    "The shop's",
+    "The studio's"
+   ],
+   [
+    "the shop",
+    "the studio"
+   ],
+   [
+    "The shop",
+    "The studio"
+   ],
+   [
+    "shop's",
+    "studio's"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Riley",
+    "Nadia"
+   ],
+   [
+    "Avery",
+    "Elena"
+   ],
+   [
+    "Jordan's",
+    "Julian's"
+   ],
+   [
+    "Jordan",
+    "Julian"
+   ],
+   [
+    "Casey's",
+    "Gabe's"
+   ],
+   [
+    "Casey",
+    "Gabe"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Day-of coordination"
+   ],
+   [
+    "Drain clearings",
+    "Day-of weddings"
+   ],
+   [
+    "drain clearings",
+    "day-of weddings"
+   ],
+   [
+    "Drain clearing",
+    "Day-of coordination"
+   ],
+   [
+    "drain clearing",
+    "day-of coordination"
+   ],
+   [
+    "Water heater flush",
+    "Rehearsal coordination"
+   ],
+   [
+    "water heater flush",
+    "rehearsal coordination"
+   ],
+   [
+    "Water heater replacement",
+    "Month-of coordination"
+   ],
+   [
+    "water heater replacement",
+    "month-of coordination"
+   ],
+   [
+    "Priced from your photos",
+    "Quoted after a free first call"
+   ],
+   [
+    "Add photos",
+    "Pick a call time"
+   ],
+   [
+    "Sewer camera inspection",
+    "Day-of timeline review"
+   ],
+   [
+    "sewer camera inspection",
+    "day-of timeline review"
+   ],
+   [
+    "Service call",
+    "First call"
+   ],
+   [
+    "the kitchen drain",
+    "the wedding day"
+   ],
+   [
+    "Kitchen drain",
+    "Wedding day"
+   ],
+   [
+    "Yard drain",
+    "Rehearsal"
+   ],
+   [
+    "42 Oak St",
+    "18 Ridge Rd"
+   ],
+   [
+    "water heater",
+    "wedding"
+   ],
+   [
+    "Water heater",
+    "Wedding"
+   ]
+  ]
+ },
+ "keep": [
+  "visit fee",
+  "leak",
+  "travel fee",
+  "studio",
+  "wedding",
+  "session",
+  "running late",
+  "backup"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex M. and Robin, who marry on Sat Jun 12, 2027, ask Alex's AI for a planner who can run everything. Nadia at Lee Planning Studio holds a free first call and quotes full planning. Both sign the contract and pay the retainer on the secure page, and their first planning meeting is at the studio on Sat Oct 24 at 11:00am. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex M. and Robin, who planned their own wedding at Cedar Hill Farm, book Lee Weddings & Events to run it. Julian quotes month-of coordination after a free first call, both sign the contract, and a retainer holds Thu Oct 22. Julian and Gabe run the day at the farm, from 8:00am setup to the end of the night. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "photos|deposit|bill",
+   "combos": [
+    "photos|deposit|bill",
+    "list|full|none",
+    "list|none|bill",
+    "list|none|none"
+   ],
+   "labels": {
+    "price": {
+     "photos": "Quoted after a free first call"
+    }
+   },
+   "examples": {
+    "photos|deposit|bill": "The main story: full planning for Alex and Robin's wedding, quoted at $8,500 after Nadia's free first call (over $500, so Sam OKs it). Both sign the contract, and a $2,550 retainer holds the date. The $5,950 rest is billed in stages, each one when Nadia texts DONE for it (two stages of $2,975 in the example); Rosie never bills on a date by itself.",
+    "list|full|none": "A $150 planning consult (1 hour) for a couple who plans it themselves, paid in full when booking.",
+    "list|none|bill": "An extra planning meeting (1 hour) after the contract's 10 are used: $150, nothing taken to book, and Rosie texts the bill after.",
+    "list|none|none": "The free first call (45 minutes) with the planner who would lead the wedding: nothing taken, nothing after."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$150",
+     "name": "Planning consult (1 hour)"
+    },
+    "photos|*|*": {
+     "price": "$8,500",
+     "name": "Full planning"
+    },
+    "photos|deposit|*": {
+     "price": "$8,500",
+     "deposit": "$2,550",
+     "rest": "$5,950",
+     "fee": "$2,550",
+     "name": "Full planning"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "name": "Extra planning meeting (1 hour)"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$150",
+     "name": "Planning consult (1 hour)"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Free first call (45 min)"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Extra planning meeting (1 hour)",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$150",
+      "fee": "$150"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Planning consult (1 hour)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$150"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Planning meeting (from the contract's 10)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "photos|deposit|card",
+   "combos": [
+    "photos|deposit|card"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted after a free first call"
+    }
+   },
+   "examples": {
+    "photos|deposit|card": "The main story: month-of coordination for Alex and Robin's wedding at Cedar Hill Farm, Thu Oct 22, quoted at $2,400 after Julian's free first call (over $500, so Sam OKs it). Both partners and Sam sign the contract, a $600 retainer holds the date, and the $1,800 rest is charged to the saved card when Julian texts DONE after the day. An extra hour on the night is priced first and needs a yes."
+   },
+   "amounts": {
+    "*": {
+     "price": "$2,400",
+     "deposit": "$600",
+     "rest": "$1,800",
+     "fee": "$600",
+     "name": "Month-of coordination"
+    },
+    "photos|deposit|*": {
+     "price": "$2,400",
+     "deposit": "$600",
+     "rest": "$1,800",
+     "fee": "$600",
+     "name": "Month-of coordination"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Extra hour on the night",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$150",
+      "fee": "$600"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Rehearsal coordination",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$500",
+      "paid": "$500",
+      "fee": "$500"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Month-of coordination (a credit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43"
+  ],
+  "B": [
+   "B5-34"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "A8-23",
+    "why": "A planning meeting touches nothing of the couple's, so there's nothing to note before it."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Planning and coordinating need no state license in most places; the company gives its business registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A planner pays Rosfield's $2 for each confirmed booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The planner's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Planners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: calls, meetings and events."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Planners need no license of their own (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Planning is booked ahead and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books a planner's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books a planner's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The studio books a planner's time."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A meeting has no minimum to run."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "A planning meeting needs nothing brought; the questionnaire is on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A planner never looks after a child."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "No repeat plans: each meeting is booked on its own."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A group or party",
+    "why": "A planning booking is the couple's own; the wedding party is never booked as a group."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for planning."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A discount code",
+    "why": "The studio sells no gift cards; a discount is part of the quote."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "No packages or memberships: the contract sets what's included."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "No packs or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "Planning has no problem that gets worse; a change goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A8-86",
+    "label": "A finding stops the work",
+    "why": "Planning has no skin or health check."
+   },
+   {
+    "op": "off",
+    "at": "A8-32",
+    "label": "Something of Alex's is damaged",
+    "why": "Nothing of the couple's is handled at a meeting."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "Each payment is billed on its own date."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for planning."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Planning has no free fix; a complaint or a refund ask goes to Sam."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing is made after a meeting; the notes are on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A planning booking is rated, once, after the wedding."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "A planning studio takes new couples."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "branch",
+    "at": "B7-05",
+    "branch": {
+     "label": "The rehearsal, the day before",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B7-x01",
+       "line": [
+        "7.1"
+       ],
+       "who": "staff",
+       "to": "cust",
+       "via": "visit",
+       "t": "Wed Oct 21, 5:00pm",
+       "title": "Julian runs the rehearsal at the farm",
+       "does": "The day before, Julian runs the one-hour rehearsal at Cedar Hill Farm. Julian covers the walk-in order, the music cues and the rain spot in the barn.",
+       "more": [
+        "It's part of month-of coordination, booked with the day. A couple with no rehearsal skips it.",
+        "That morning at 10am, Rosie texts the reminder with the plug-in's tips.",
+        "Julian meets the vendors with the planners' own tools. Rosie never texts or pays a vendor.",
+        "The final timeline is on the secure page, never in a text."
+       ],
+       "say": [
+        [
+         "san",
+         "cust",
+         "Reminder: your rehearsal is today at 5:00pm at Cedar Hill Farm, and your wedding is tomorrow. Bring the rings, the vows and the vendor tip envelopes.",
+         {
+          "card": {
+           "title": "Lee Weddings & Events · Rehearsal",
+           "lines": [
+            "Wed Oct 21 · 5:00pm · Julian",
+            "Tomorrow: Thu Oct 22 · from 8:00am · Julian and Gabe",
+            "Your final timeline is on the secure page"
+           ],
+           "button": "See the timeline",
+           "link": "rosfield.com/t/r4"
+          }
+         }
+        ]
+       ],
+       "needs": [
+        "pf.first_steps",
+        "pf.visit",
+        "pf.messages"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody home",
+    "why": "A wedding has no no-show: the planners check in with the couple or a named adult, or Julian texts DONE at the end."
+   },
+   {
+    "op": "off",
+    "at": "B8-45",
+    "label": "Something required is missing",
+    "why": "Nothing the couple forgets stops a wedding day; the planners note it and work around it."
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "Storms near the ceremony",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.12"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 2:00pm",
+       "title": "Julian and Alex make the rain call",
+       "does": "Storms are likely near the 4:00pm lawn ceremony. Julian and Alex make the rain call by 2pm, so the farm can set the chairs in the barn.",
+       "more": [
+        "The rain spot and the large building were set at the walkthrough.",
+        "Julian tells the vendors in person. Rosie never texts a vendor.",
+        "The price doesn't change."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "RAIN CALL ceremony in the barn at 4:00pm",
+         {
+          "as": "Julian"
+         }
+        ],
+        [
+         "san",
+         "staff",
+         "Rain call for Alex M.: the ceremony is in the barn at 4:00pm. The timeline on the secure page is updated.",
+         {
+          "as": "Gabe"
+         }
+        ]
+       ],
+       "needs": [
+        "pf.visit"
+       ],
+       "tells": [
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A vendor runs late",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.12"
+       ],
+       "who": "staff",
+       "via": "visit",
+       "t": "Thu Oct 22, 2:45pm",
+       "title": "Gabe covers for a late vendor",
+       "does": "The florist's van breaks down 20 minutes away. Gabe drives the ceremony flowers back by 3:30pm, and the ceremony starts on time.",
+       "more": [
+        "Vendors are the couple's own: Rosie never texts, books or pays them.",
+        "Julian handles vendors with the planners' own tools, and notes what happened for Alex."
+       ],
+       "needs": [
+        "pf.visit"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "The extra hour is given right away, so it has no cancel period."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Planning and coordinating need no state license in most places; the company gives its business registration (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "A planner pays Rosfield's $2 for each confirmed booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The planner's plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Planners are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: calls, meetings and events."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Planners need no license of their own (S2-29)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Planning is booked ahead and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "The planners arrive at a set time on the day."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Planning is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A planner's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Planning is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Planning is never sent now, and nobody is on call."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Planning is never sent now, so no booking skips the reminder."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "No group sign-ups."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Planning is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A planner never looks after a child; a parent or a named adult stays with them."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "A planner always works with the couple or at the event."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A group at one address",
+    "why": "A wedding is booked by the couple, never as a group of bookings."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for planning."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "Planning has no problem that gets worse; a changed plan goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Only a child answers",
+    "why": "At a venue, the lead planner meets the couple or an adult named on the booking."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Month-of coordination is paid by the retainer and the rest when the day is done."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Planning has no warranty visit; a complaint or a refund ask goes to Sam."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing is made after the day; the timeline stays on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A planner asks for a rating after the day."
+   }
+  ]
+ },
+ "notes": "Refit Tue Oct 27 2026 (R14) to the REDESIGN 2 master: plug-in facts (photos: quoted after a free first call, documents: the planning contract, video: meetings by video, stages: the rest billed in stages, each when the planner texts DONE for it, A9-16), no switches, settings (set start; free cancel until 24 hours before), money facts per path with names, rename pairs, few ops. The master never bills or charges on a set date by itself (D66 #7): full planning's two set payments are now stages billed at DONE (A9-16), and month-of's rest is charged to the saved card at DONE after the day. A's free first call is now its own free path (list|none|none). Flow B's wedding now follows the master's calendar (Thu Oct 22 at Cedar Hill Farm; rehearsal Wed Oct 21). Every old say/vary words op is gone (the record words retainers, fees and refunds now). Kept: valid off ops, own branches (the rehearsal, the rain call, a late vendor; 'his own tools' -> the planners').\nPilot: from photographer. Wedding planning runs like event photography on the day: a date held while a contract is signed, a retainer, the rest before the event, venue rules and an insurance certificate, an extra hour agreed on the night, and a stand-in for a date that can't move. The coach's free intro call (a first call with a named professional) was the model for the free first call; caterer, DJ and makeup were read for event words. The renames were rebuilt from the master: the planner's paths differ from the photographer's (flow A's main path is quoted, not from a list).\nCast: Sam Lee's main company is Lee Weddings & Events LLC (410 Market St; the master's Lee Home Services): event coordination, with corporate events as its second kind of work (trade names Lee Weddings and Lee Corporate Events). His second company is Lee Planning Studio LLC (64 Rose St; the master's barbershop): wedding planning at the studio or by video. Planners Nadia (lead, full planning) and Elena (associate) are the studio's (Riley, Avery); Julian (lead planner, also leads corporate events) and Gabe (associate) run event days (Jordan, Casey). Carmen Ruiz is a lead planner Sam trusts from outside the team. Alex M.'s partner is Robin (the master's Jamie). Sam and Pat are kept.\nFlow A, the usual side for the booking itself: Alex and Robin (wedding Sat Jun 12, 2027) ask for a planner who can run everything. A4-07 sets up a free 45-minute first call with Nadia (Thu Oct 22, 12:00pm, at the studio or by video); Nadia quotes full planning at $8,500 after it (A4-08), Sam OKs every planning quote (A4-09), both partners and Sam sign the contract on the secure page (A5-20), a $2,550 retainer (30%) holds the date (A5-13). The visit in flow A is the first planning meeting at the studio, Sat Oct 24, 11:00am (code 5160). The rest comes in two set payments of $2,975, each billed by text a week before its date: Sat Dec 12, 2026 (six months before) and Thu May 13, 2027 (30 days before) (A9-05, A9-16). The rating comes once, after the wedding (A10-02).\nFlow B, the other side: Alex and Robin planned their own wedding at Cedar Hill Farm (14 Orchard Rd) and book month-of coordination. Julian holds a free first call (Tue Oct 20, 12:00pm by video), quotes $2,400 (B4-09), Sam OKs it, all three sign (B4-61, B4-58), a $600 retainer (25%) holds Sat May 22, 2027 (B5-11), the final walkthrough at the farm is booked as the first step (B4-40; result B7-37), the $1,800 rest is charged on the set day, Thu Apr 22, 2027 (B7-24), the rehearsal is the day before (own branch B7-x01), and Julian and Gabe run the day from 12:00pm (B8). An extra hour on the night ($150 a planner, $300) is asked by text and paid by one pay link the next morning (B8-23, B9-04).\nMoney paths. A: photos|deposit|bill (main: full planning quoted after the free first call, retainer, set payments billed by text), list|full|none (a $150 planning consult, paid in full, for couples planning it themselves), list|none|bill (an extra $150 planning meeting after a contract's included meetings are used, billed after). B: photos|deposit|none (month-of coordination: retainer, the rest charged on the set day, day-of overtime by one pay link). The price kind 'quoted from photos first' reads 'Quoted after a free first call' (labels). Left out: holds, the saved card charged at DONE, the business's own way, a counter, and A's photos|deposit|none (a set day before the first meeting isn't how planners take installments). B's on-site consult (list|full|none) was dropped: it's the same money way as A's consult, and its October dates can't share flow B's months-long what-ifs.\nThe free first call is the quote step (A4-07 to A4-12, B4-08 to B4-13), not a first step: no date is saved while it's quoted, and the quote is good for 5 days. A4-43 keeps 'No', 'Already on file' (a call in the last 3 months) and the planning questionnaire on the secure page (A4-72, B4-86).\nInstallments: the master has one set day. Flow A bills the two payments by text (after:bill), the second as A9-05's bill and the last as A9-16 (paid in stages); flow B charges one rest on the set day. Gap 'Several set payments before an event'.\nIncluded meetings: each planning meeting is booked on its own under the contract (A10-07). A missed meeting keeps no money: A8-14 to A8-22, A8-46 to A8-64 and S11-23 to S11-28 ask Sam to count it as one of the 10 (no answer: not counted). Gap 'Meetings included in a contract, counted down'.\nCancels: A free until 24 hours before the first meeting (Fri Oct 23, 11am); B free for 3 days after signing (until Fri Oct 23, 7pm, reminded by B7-01). After that, the contract's dated schedule, never the whole fee and always with Sam's OK: A keeps up to $1,500 before Dec 12, $4,250 before May 13, then $6,800; B keeps the $600 retainer, and from Apr 22 up to $1,800. These amounts are the example's own and become a state-form switch ('the state's rules on amounts kept').\nVendors: Rosie books and takes money only for the planner's own time and work. It never books, pays, texts or tracks other vendors (A4-38, B4-03, B7-x01, B8-x02); the old flowchart's vendor tracker is outdated.\nPrivacy: guest lists, budgets and family details only on the secure page. The AI never asks the budget (A4-50, B4-05). Texts to the couple, the owner and the planners carry only names, dates, times, places and the planner's fee (A6-15, B6-14, B8-01, B8-34, notes A8-45 and B8-44 on the page).\nLicenses: none for planners in most places, so S1-60 and S1-63 take 'registration only' (2019-0451, 2020-1187) and S2-28 'No person license'; a seller-of-travel registration for a business that books guests' travel is a state-form switch in pf.license. Venue rules (load-in, end time, insurance certificates) are B4-34 and B4-70/B4-71 (Cedar Hill Farm needs a certificate naming it). The $2 applies: both companies pay it (the no-$2 branches are off).\nSafety: the general danger check, plus the plug-in's: someone hurt or a fire at a venue stops a booking; thunder near an outdoor event gets 'everyone into a large building until 30 minutes after the last thunder' (B3-18, B8-30); a drunk guest or a fight goes to the venue's staff. The rain call on the day is own branch B8-x01; a late vendor is B8-x02.\nStand-ins: a wedding's date can't move. B7-56 keeps only 'A date that can't move' (B7-54: Carmen Ruiz with Gabe, or a full refund; no reply: nobody is swapped in and Sam calls; '2 New time' is off). In A, full planning stays with Nadia (A7-61 'Someone has it' off; A7-47 Sam calls).\nTimes: flow A keeps the master's Wed Oct 21 ask and Sat Oct 24, 11:00am visit (the first meeting); the call is Thu 12:00pm, the quote 1:00pm, signing 7:30 to 7:52pm, then Dec 5, 2026 and May 6, 2027 bills, the final receipt May 13, the rating Jun 14, 2027. Flow B: ask Mon Oct 19, call and quote Tue Oct 20, signed by 6:51pm, free-cancel reminder Fri Oct 23, the set day Apr 22, 2027, walkthrough Apr 17, rehearsal May 21, the day May 22 (DONE 12:20am), pay link and receipt Sun 9am, rating Mon May 24. Words ops set every step's time on the listed paths; sections 11 to 13 keep the master's business-day clock (Oct 22 to Nov 2), as other professions do.\nPrices are the example's own, not a standard: full planning $8,500, partial $4,800, month-of $2,400, a planning consult or an extra meeting $150, an extra hour $150 a planner, a welcome party from $900, travel free to 40 miles then $1 a mile. Sam OKs quotes over $500 (B) and every planning quote (A).\nOff (beyond the plug-in splits): walk-ins (the studio sees couples by booking), repeat plans, packages and gift cards, insurance and warranty plans, rushes, groups and seats, sent-now work, damage holds, crews, minimums, outside checks, permits, deliveries, items to the shop, rentals, aftercare, results later, free fixes, a 'problem that gets worse', late parts and tools, the 'nobody home' no-show at a wedding (B8-03), 'Missing: can't go ahead' (B8-45), the right-to-cancel refund for an extra hour given at once (B10-05), A8-23 (nothing of the couple's to note before a meeting) and the emergency higher-price branches (S12-20).\nRenames: about 190 pairs in A and 125 in B; sentences first, then names, then trade words. Off ops name master labels; the build renames them the same way. Words ops for flow A use per-path variants (the full price, before and after key), and the master's less specific variants on those paths get the same words. keep: none.\nhidden-words: 3 spots listed (A8-36 on the main path and the consult, A7-47 on the consult and the extra meeting); each reads right after the renames ('Your 1:30pm planning meeting will start about 1:45pm'; 'nobody else here does that service'), so none needed a change.\nNot sure (for the reviewer): flow A's visit is the first planning meeting, with the later payments as bills after it; the extra planning meeting path (list|none|bill) dated two days after signing assumes a different, long-running contract; the free cancel in A ends 24 hours before the first meeting (the old flow said 3 days after signing); the example's cancel amounts; month-of coordination at $2,400 with a 25% retainer while full planning takes 30%; the rehearsal as a what-if branch; section 10 of flow A mixes after-the-meeting what-ifs with the after-the-wedding rating and final receipt.\nReview (Oct 23): the installments read as due dates, each billed a week ahead (S1-42, S1-46, A6-14, plug-in). S11-56 in A no longer gives the consult a $75 deposit (partial planning 30% to 25%). No health or family detail in owner or staff texts (A8-38, B3-22). Section 10 of flow A starts back at meeting 1 (A10-05, A10-06). B7-37/B7-38: one more hour for both planners is $300. B4-30 40 miles; B4-28 every planning booking signs a contract; B8-69 no photographer example; B8-46 one button; B10-05 nothing waits; B4-71 the certificate is the business's own paper; B4-02 venue consults are the main company's; plug-in adds party coordination and a weather limit for Kim's backyard party.\nFollow-up (Oct 23, coordinator's call): the venue consult is out of flow B. Consults are flow A only (studio or video, $150 paid in full). Flow B's plug-in lists a free first call instead; Kim, Tessa and Nora book free first calls (nothing taken), Lin misses a walkthrough (no money kept; Sam decides if it counts), Sam's own price is the extra hour ($200), and the price raise is the extra hour ($175 a planner from Nov 2). \nMoney fix Oct 27 2026 (D65/D66): month-of coordination: the rest is charged to the saved card when the day is done; full planning: billed in stages, each when the planner texts DONE for it; party coordination: charged to the saved card when the party is done; corporate: on the bill after the event or the company's invoice. Any older wording above about a date or free-cancel moment for the rest is from the earlier pass and no longer applies.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "At the shop, and house calls",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sam named you their emergency contact.",
+    "We'd share only where they're working, only after a missed check.",
+    "Each service starts the way most barbershops set it.",
+    "House calls: allowed where you are, for those cleared",
+    "So is a house call, $75.",
+    "Color quotes come to you first.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Alex wants it at home: a house call, $75, paid in full when booking.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Color always stays with Riley.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Alex M. · Haircut",
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "A haircut at Lee's Barbershop:",
+    "Lee's Barbershop · Haircut",
+    "Takes the fee; tells Ben",
+    "Riley texts 'paid cash'",
+    "color quote",
+    "Books a haircut and a beard trim",
+    "A haircut could mean a salon or a barbershop.",
+    "shops",
+    "the shop's board",
+    "price board",
+    "At my home",
+    "Asks Alex for photos",
+    "From the list, from photos, or at the visit?",
+    "Quoted from photos first",
+    "Shop front",
+    "many barbers, salons and groomers are licensed to their shop",
+    "like a haircut at the shop or at home",
+    "like a burst pipe or a lockout",
+    "Give this code at the chair",
+    "At the chair",
+    "Riley finishes the work",
+    "Alex adds a beard trim",
+    "at the chair",
+    "Priced from your photos",
+    "priced from photos",
+    "Add photos",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "color and cut",
+    "Color and cut",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "Skin fade · $40",
+    "Groom's package",
+    "kids cut",
+    "Kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "$90",
+    "$70",
+    "$55",
+    "$35",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop's",
+    "Lee's Barbershop",
+    "1200 Main St",
+    "88 Elm St",
+    "the barbershop's",
+    "the barbershop",
+    "a barbershop",
+    "A barbershop",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "plumber",
+    "Plumber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "electrical's",
+    "electrical",
+    "Electrical",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shop's",
+    "shop",
+    "Shop",
+    "Riley's",
+    "Riley",
+    "Avery's",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "Color correction",
+    "color correction",
+    "Color touch-up",
+    "color touch-up",
+    "Color plan",
+    "color plan",
+    "Haircuts",
+    "haircuts",
+    "a house call",
+    "House calls",
+    "house calls",
+    "house call"
+   ],
+   "B": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "At the shop, and house calls",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Sam named you their emergency contact.",
+    "We'd share only where they're working, only after a missed check.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "It's a leak under the sink, today,",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Priced by Jordan, from your photos",
+    "My kitchen drain is clogged.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Water is coming out of the water heater.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Shut the cold-water valve, above the heater.",
+    "My gas water heater got wet in a flood.",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead.",
+    "One of the shop's barbers does house calls.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Price needed: Alex M., water heater replacement.",
+    "Alex M. · water heater",
+    "Alex M.: water heater replacement",
+    "Jordan priced a water heater replacement for Alex M.",
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Your water heater price is with Lee Home Services.",
+    "Lee Home Services: Jordan priced your water heater replacement at {{price:$90}}, from your photos.",
+    "Sorry, Lee Home Services couldn't price your water heater this time.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Contract · Water heater replacement · $640",
+    "Water heater replacement · $640",
+    "Your water heater contract is waiting for your signature.",
+    "Your water heater visit wasn't booked, since the document wasn't signed in time.",
+    "Alex M. didn't sign the water heater contract in time, so nothing was booked.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "At DONE, Alex asks Jordan to come back next fall for a water heater flush.",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Say Sam sends a proposal for more work after the visit, like replacing the old pipes Jordan noted.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Change: Alex M. added a camera inspection to the Thu visit.",
+    "Can I run the dishwasher before you come?",
+    "Good morning! Nora S. asked overnight for a drain clearing today.",
+    "Drain clearing · $179",
+    "raise drain clearing to 199",
+    "Reading it back: drain clearing goes to $199 for new bookings.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Saved: drain clearing $199 for visits from Mon Nov 2. Drain clearings already booked keep $179. Drain clearing plans go to $199 from Wed Nov 25, only for customers who say yes.",
+    "A plan goes to $199 from Wed Nov 25 only with that customer's yes.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $179.",
+    "Sam switches the drain clearing from a card saved for the $89 fee to a $40 deposit.",
+    "Drain clearings already booked keep only their saved card.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Ivy C. books a drain clearing for Mon Nov 9 in the morning.",
+    "Lee Home Services: you have two drain clearings on Mon Nov 9.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Service call fee",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "The quote stays open 7 days",
+    "25-mile",
+    "and nobody was home for any of them",
+    "Alex gives the code at the door",
+    "The door stayed shut.",
+    "Nothing booked. The price stays good for 7 days.",
+    "Thu Oct 22 · arriving 8–10am",
+    "At my home",
+    "Asks Alex for photos",
+    "Quoted from photos first",
+    "service call fee",
+    "service call",
+    "plumbing license MP045210",
+    "license MP045210",
+    "Plumbing license",
+    "Shop front",
+    "many barbers, salons and groomers are licensed to their shop",
+    "like a haircut at the shop or at home",
+    "like a burst pipe or a lockout",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing and Lee Electric",
+    "Lee's Barbershop",
+    "1200 Main St",
+    "88 Elm St",
+    "the barbershop's",
+    "the barbershop",
+    "a barbershop",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "Barbers",
+    "barber",
+    "Barber",
+    "plumber",
+    "Plumber",
+    "plumbing's",
+    "plumbing",
+    "Plumbing",
+    "electrical's",
+    "electrical",
+    "Electrical",
+    "the shop's",
+    "The shop's",
+    "the shop",
+    "The shop",
+    "shop's",
+    "shop",
+    "Shop",
+    "Riley",
+    "Avery",
+    "Jordan's",
+    "Jordan",
+    "Casey's",
+    "Casey",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "Priced from your photos",
+    "Add photos",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Service call",
+    "the kitchen drain",
+    "Kitchen drain",
+    "Yard drain",
+    "42 Oak St",
+    "water heater",
+    "Water heater"
+   ]
+  },
+  "A": {
+   "A8-23": "e3a35f7f9e",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A7-93": "46cca94e45",
+   "A8-02": "15f418fec4",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-96": "d540b91653",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-03": "7accda6f86",
+   "A8-86": "c989a99e52",
+   "A8-32": "632f2b5b40",
+   "A9-15": "bd2a17c3c5",
+   "A10-44": "50aad85ac2",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A4-43": "c17d56f766"
+  },
+  "B": {
+   "B7-05": "e28a131872",
+   "B8-03": "ac9d404766",
+   "B8-45": "09e62897a6",
+   "B8-22": "50d78f1af0",
+   "B10-05": "a326ea3c0b",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B4-43": "fc9855955a",
+   "B5-01": "841c417586",
+   "B7-93": "4d6f89e473",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-19": "b97bfbf0d2",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B10-32": "7713bff255"
+  }
+ }
+}

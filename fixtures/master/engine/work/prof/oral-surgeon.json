@@ -1,0 +1,2815 @@
+{
+ "id": "oral-surgeon",
+ "name": "Oral surgeon",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "dentist",
+ "plugin": {
+  "pf.license": {
+   "need": "each oral surgeon holds their own license from the state's dental board; a surgical assistant holds one only where the state licenses assistants",
+   "who": "each person; the practice too where the state's form registers dental or surgical offices or their owners",
+   "ask": "each person's license number in their invite reply, or the owner sends it; the practice's registration and any mobile permit number come from the owner. The owner may leave a number out",
+   "check": "Rosie does not look up, check or verify a license number. The owner gives it, and it is shown where the state asks",
+   "blocks": "no booking is held or refused because of a license: the owner states it, and that is the record",
+   "away": "visits at a care home, a school or a home only where the state's rules allow mobile or portable dental surgery; a mobile or portable dental permit where the state's form asks for one (a switch)",
+   "sedation": "no sedation or general anesthesia is booked by Rosie. The office plans any sedation itself, with the patient, by phone; Rosie never prices, confirms or moves it",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "if the owner records an expiry date, Rosie reminds the owner 30 days before it; Rosie does not check the license",
+   "insurance": "malpractice insurance where the state's form asks for it; the owner states it, and Rosie does not check it"
+  },
+  "pf.services": {
+   "shape": "visit types in a surgical chair, each with a set length; a tooth removal is a surgery visit with a set length and a recovery check after it; a post-surgery problem is booked the same day with the owner's OK; every visit needs a free chair",
+   "examples": "the example offices' own prices (Lee Oral Surgery and Lee Home Surgery), not a standard; a plan pays its own share for surgery, up to its yearly limit, and the patient's share is an estimate",
+   "list": [
+    {
+     "name": "New patient consult (X-rays and a scan, then the surgeon's exam)",
+     "price": "$35",
+     "kind": "one price; the plan's estimate is shown when a plan pays",
+     "length": "60 min: 30 with the assistant (X-rays and scan), then 30 with the surgeon",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "the patient's share at the front desk",
+     "note": "new-patient times are kept apart (Sam's booking rules)"
+    },
+    {
+     "name": "Tooth removal (simple, with local numbing only)",
+     "price": "$140 (the example office's price; a second tooth at the same visit is added)",
+     "kind": "one price",
+     "length": "45 min, with a recovery check after",
+     "where": "at the office",
+     "before": "a $40 deposit when booked",
+     "after": "the $100 rest at the chair, after the removal",
+     "note": "no sedation here: sedation is planned by phone and is never booked by Rosie"
+    },
+    {
+     "name": "Stitch removal and check",
+     "price": "$55",
+     "kind": "one price, paid in full when booked",
+     "length": "20 min",
+     "where": "at the office",
+     "before": "paid in full when booked",
+     "after": "nothing more",
+     "note": "no plan pays it"
+    },
+    {
+     "name": "Night guard or surgical splint, made from photos",
+     "price": "$90 (quoted from the photos first)",
+     "kind": "quoted from photos first",
+     "length": "2 visits: the photos, then the fitting",
+     "where": "at the office",
+     "before": "a $20 deposit once the surgeon's quote is OK'd",
+     "after": "the rest ($70) at the front desk, at the fitting",
+     "note": "the surgeon OKs the quote before any deposit"
+    },
+    {
+     "name": "Post-surgery problem (swelling, a dry socket, a sore spot)",
+     "price": "the $25 check is promised; any treatment is priced at the chair (the example: $110 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min, same day",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "the owner OKs same-day times first"
+    },
+    {
+     "name": "Second tooth removed at the same visit",
+     "price": "$140",
+     "kind": "one price",
+     "length": "+20 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "note": "only when the surgeon plans it with the patient's yes"
+    },
+    {
+     "name": "Surgery check at a care home",
+     "price": "$179",
+     "kind": "one price; the plan's share when a plan pays",
+     "length": "45 min, with a portable kit",
+     "where": "at the customer's place (a care home or a home)",
+     "before": "nothing taken when a plan pays; private pay gets Rosfield's bill after the visit",
+     "after": "the office bills the plan its own way; private pay: Rosie texts the bill"
+    },
+    {
+     "name": "Broken tooth or a loose stitch at a care home",
+     "price": "the $89 visit fee is promised; any repair is priced at the visit (the example: $245 in all)",
+     "kind": "quoted at the visit",
+     "length": "30 min",
+     "where": "at the customer's place",
+     "before": "nothing taken",
+     "after": "the office's own way"
+    },
+    {
+     "name": "Multi-tooth extraction plan at a care home, quoted from photos and X-rays",
+     "price": "$640 (the example office's price)",
+     "kind": "quoted from photos first",
+     "length": "2 visits: the plan, then the removal under local numbing only",
+     "where": "at the customer's place",
+     "before": "a $160 deposit when the plan is OK'd (25%)",
+     "after": "Rosie texts the bill for the $480 rest when the surgeon texts DONE"
+    },
+    {
+     "name": "School oral health screening day",
+     "price": "set with the school: free to families, or billed to each child's plan",
+     "kind": "one price per child",
+     "length": "a whole morning, one portable kit",
+     "where": "at the school (the host's place)",
+     "before": "nothing taken",
+     "after": "the office bills plans its own way",
+     "note": "each child needs a parent's or guardian's signed consent on the secure page"
+    }
+   ],
+   "capacity": "one patient per chair; the office's chairs and the portable kit are booked like people",
+   "nobodyHome": "never: the patient is always there",
+   "online": "none: a removal or a stitch check needs the chair; a question by video is answered by the office, not booked as a visit"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "for you, your child, or someone you help (a care home resident)",
+    "new or returning patient",
+    "which visit: the office's own visit types only (a new patient consult, a tooth removal, a stitch check, a night guard, or a post-surgery problem), never a symptom typed into the AI",
+    "a dental or medical plan (its name only) or paying yourself",
+    "early morning, midday or afternoon"
+   ],
+   "afterTime": [
+    "anything the office should know to help, like a wheelchair or needing an interpreter",
+    "for a care home visit: the place's name, the room, and who meets the surgeon"
+   ],
+   "securePage": [
+    "birth date",
+    "plan member ID, the plan holder and a photo of the plan card",
+    "health history: medicines, blood thinners, allergies, conditions, and past surgery",
+    "consent and the privacy notice",
+    "a parent's or guardian's consent for anyone under 18, or the consent of the person who decides for an adult who can't"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or guardian for anyone under 18; a guardian or health care agent for an adult who can't consent; the care home's staff for a resident, with the decider's consent on the secure page; a minor alone only where the state's rules let minors consent to dental surgery (a switch)",
+   "neverAsked": "symptoms, reasons or results are never asked or typed in the AI chat"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "face or jaw swelling with a fever, or trouble breathing or swallowing",
+     "say": "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a surgery visit.",
+     "booking": "no booking; the same words are repeated if a same-day request is declined"
+    },
+    {
+     "words": "bleeding after a tooth removal that won't stop, or a tooth knocked out",
+     "say": "Bite hard on clean gauze or a damp tea bag for 20 minutes. If it won't stop, go to the emergency room or call 911. For a knocked-out tooth, call the office's own line now.",
+     "booking": "no booking by the AI; the office's own line"
+    },
+    {
+     "words": "swallowed something poisonous, or too much of a medicine",
+     "say": "Call Poison Help now at 1-800-222-1222, or 911 if they're not awake or not breathing.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "a sore or swollen spot after a removal, with nothing else",
+     "what": "matched to the office's own post-surgery visit; Rosie never judges how urgent it is"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history, consent and the plan's papers",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+     "who": "every new patient; returning patients once a year, or when their health changes",
+     "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or the door, before any work), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every patient who names a plan",
+     "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day (the example office's rule), or sooner where the rules require it",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "A signed surgical consent",
+     "when": "on the secure page, before the surgery visit, with the price and the deposit shown first",
+     "who": "every surgery patient, and the parent or guardian for a child",
+     "result": "not signed by the surgery visit: the visit waits; Sam moves it or cancels with no fee"
+    },
+    {
+     "name": "The care home's OK",
+     "when": "before any visit there",
+     "who": "the host place agrees to host the visits",
+     "result": "no OK: no times at that place"
+    }
+   ],
+   "prep": "eat and drink as the surgeon's sheet says; arrive 15 minutes early; bring a photo ID, the plan card and the medicine list; a surgery visit needs an adult to take you home; at a care home: the resident's medicine list ready with the nurse"
+  },
+  "pf.visit": {
+   "checkIn": "at the office: the check-in code at the front desk; at a care home or school: the code from the patient, or from the nurse or staff member named on the booking",
+   "beforeWork": "the assistant takes the X-rays and reads the health history first; the surgeon checks for changes before any work",
+   "changes": "an extra tooth or a second step is priced and OK'd before it's done; the plan's estimate is shown first; a new step is booked as its own visit only with the patient's yes",
+   "done": "the check-in code or DONE; the surgeon's notes, X-rays and scans stay in the office's own records, never in Rosie or a text",
+   "away": "a portable kit (a light, a chair, suction and gauze); the care home's nurse is told when the visit is done"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking for a consult or a stitch check (the office bills dental and medical plans); a card saved only where the office turns on its missed-visit fee; a tooth removal: a $40 deposit when booked, and the rest at the chair; a night guard from photos: a $20 deposit once the quote is OK'd; at a care home: nothing taken when a plan pays, a $160 deposit when a multi-tooth plan is OK'd, the rest on Rosfield's bill",
+   "plans": "the plans the office takes (its own list); the front desk checks each plan by hand and records it: active or not, what it pays for surgery and up to what yearly limit; the patient's share is an estimate, not a promise",
+   "selfPay": "a self-pay patient is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "fees": "the missed-visit fee: $20 at the example office, only when the owner turns it on; a card is saved for it, and the same fee applies to every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "claims sent by the office; the patient pays their share at the front desk, its own way; a balance after the plan pays is billed by the office, not by Rosie's text; at a care home, the office bills its own way, and private pay gets the bill Rosie texts",
+   "rosfield": "the business pays Rosfield's $2 per confirmed booking, as every business does (the $2 is counted when the visit's check-in code is entered; no visit, no $2); card payments also cost Stripe's own card fee",
+   "caps": "deposit cap: from the state form; fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the results, the medicines or the surgeon's name (when the surgeon comes to a care home or home, the name stays, for the door check); X-rays and scans never go through Rosie",
+   "staff": "texts to the owner and staff use the patient's initials only (A.M., never Alex M.)",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian; a minor who may consent alone gets texts only on their own phone, with no visit type",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the surgeon"
+  },
+  "pf.staff": {
+   "licenses": "each oral surgeon's own license, per state; a surgical assistant's own license only where the state licenses assistants",
+   "skills": "oral surgeons: extractions, surgical consults, night guards and post-surgery care; surgical assistants: X-rays, scans, chair setup, recovery checks and the work the state allows; only people cleared for mobile visits go to care homes and homes",
+   "supervision": "an assistant works only while the surgeon is in the office or on the portable visit, as the state's rules allow (a switch: some states let assistants work alone at schools and care homes)",
+   "oks": "the owner OKs same-day post-surgery times, quotes over $500, and anything an assistant flags",
+   "standIn": "an assistant out: the surgeon does the recovery check, or new times; the surgeon out: another oral surgeon takes the visit, or new times with no fee",
+   "away": "the team at a care home or school is the people cleared for mobile visits, with the portable kit; sedation is never given at a care home or a home"
+  },
+  "pf.rules": {
+   "records": "surgical records are kept by the office for as long as the state's rules require (a child's records may be kept longer); a delete request removes only Rosie's own booking details, never the office's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "the license shown where the state asks: posted at the office, and on a visit away from it",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "host": "a visit at a care home or school only under the host's written OK, and the host's sign-in rules; visit days at a host's place (S1-58) need the host's standing OK on file; the example's care home visits are booked one resident at a time under the care home's OK, so no visit days are set",
+   "ads": "no free-consult or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form"
+  },
+  "pf.edges": {
+   "lateArrival": "more than 15 minutes late: still seen, but a surgery may move to another day (the office decides; Rosie never changes the booking itself)",
+   "standIn": "a surgeon or assistant out: a stand-in who may do that part, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any work), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "twoBookings": "a patient with a surgery and a check both open: Rosie asks which one before any change",
+   "healthQuestion": "a question about medicine, blood thinners or eating before a visit goes to the surgeon; Rosie gives no advice",
+   "careHome": "the resident is out (at the hospital, or asleep): the nurse says so, and the visit moves with no fee",
+   "other": "all other edge cases the generic way",
+   "urgent": "no service is sent now and nobody is on call (S2-30, S2-31): a post-surgery problem gets the soonest same-day time, with the owner's OK; swelling with a fever, or trouble breathing or swallowing, gets the 911 words"
+  },
+  "pf.facts": [
+   "planbill",
+   "forms",
+   "children",
+   "incare",
+   "photos",
+   "extrawork",
+   "documents",
+   "aftercare"
+  ],
+  "pf.switches": {
+   "sensitive": true
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Oral Surgery",
+   "staff": "Ruth (oral surgeon) and Marco (surgical assistant)",
+   "cust": "Alex M. (patient) · other patients"
+  },
+  "B": {
+   "business": "Lee Home Surgery",
+   "staff": "Jonah (oral surgeon) and Lucy (surgical assistant), who travel with a portable kit",
+   "cust": "Alex M. (patient, lives at Riverside care home) · other patients",
+   "other": "Others (the care home's nurse, a school nurse, a parent or guardian, a family member who pays, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Ruth"
+  },
+  "B": {
+   "staff": "Jonah"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "A card is saved when the customer books, and nothing is charged. For the clear aligners, it's charged only for the office's $20 fee, and only after Sam says yes.",
+    "A card is saved when the customer books, and nothing is charged. It's charged only for the office's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "A tooth removal can take a $40 deposit when booked. The other $100 is charged to the saved card after the removal."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Go to the emergency room or call 911 now."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "A tooth removal can take a $40 deposit when booked. The other $100 is on the bill after the removal."
+   ],
+   [
+    "Ben's AI asks for a clear aligner at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for a night guard at $85, an old price. Rosie answers with the real price, $90."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the tooth removal takes a $40 deposit; the $100 rest is paid after the removal."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "A tooth removal can take a $40 deposit when booked. The other $100 is paid at the chair, after the removal."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the bleeding is, if it's still bleeding, and if the swelling is spreading."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if her face is swollen with a fever."
+   ],
+   [
+    "The clear aligners can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90.",
+    "A night guard can take a $20 deposit once Ruth's photo quote is OK'd, like $20 of $90."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si tiene la cara hinchada con fiebre o le cuesta respirar, vaya a urgencias o llame al 911."
+   ],
+   [
+    "Saved: adjustment $40 for visits from Mon Nov 2. Adjustments already booked keep $35.",
+    "Saved: new patient consult $40 for visits from Mon Nov 2. Consults already booked keep $35."
+   ],
+   [
+    "A clear aligner at Lee Oral Surgery is $40, not $35. Here are the open times at $40.",
+    "A night guard at Lee Oral Surgery is $90, not $85. Here are the open times at $90."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If your face is swollen with a fever, or you can't breathe, go to the emergency room or call 911."
+   ],
+   [
+    "The clear aligners can be paid in full once Nina's photo quote is OK'd, like $90.",
+    "A night guard can be paid in full once Ruth's photo quote is OK'd, like $90."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "Prices: Adjustment $35 ($40 from Nov 2) · Clear aligner $40 · Retainer check $20",
+    "Prices: New patient consult $35 · Tooth removal $140 · Night guard $90"
+   ],
+   [
+    "Set. For a adjustment, the customer picks the place and sees both prices first.",
+    "Set. For a new patient consult, the customer picks the place and sees both prices first."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The stitch removal, $55, is paid in full when booked. So is a home visit, $75."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's exam for a son, so the times fit it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An oral surgeon's example: a swollen face with a fever gets 'call 911'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mouth is bleeding and won't stop."
+   ],
+   [
+    "Alex wants it at home: a home visit, $75, paid in full when booking.",
+    "Alex wants it at home: a care-home visit, $75, paid in full when booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face with a fever, or trouble breathing."
+   ],
+   [
+    "can cut your hair at the office for $35, or at your home for $75",
+    "can see you at the office for $35, or at your home for $179"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A visit is rated, so the office takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Oral surgery takes no jobs sent now. The office takes none."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times",
+    "Alex picked a child's exam for a son first"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me sangra la boca y no para."
+   ],
+   [
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "a swollen face with a fever, or trouble breathing"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a check plan with Ruth, every 6 months."
+   ],
+   [
+    "Reading it back: the adjustment goes to $40",
+    "Reading it back: the new patient consult goes to $40"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Tiene la cara hinchada con fiebre?"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Extractions, implants and night guards."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the face swollen with a fever?"
+   ],
+   [
+    "a $40 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show photos of your smile?"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Stitch removal and check"
+   ],
+   [
+    "Drain clearing and water heaters",
+    "Tooth removals and implants"
+   ],
+   [
+    "Sam raises the adjustment to $40",
+    "Sam raises the new patient consult to $40"
+   ],
+   [
+    "clear aligners at $85, not $90?",
+    "night guards at $85, not $90?"
+   ],
+   [
+    "Color quotes come to you first",
+    "Quotes come to you first"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly check plan"
+   ],
+   [
+    "Adjustment at the office · $35",
+    "New patient consult at the office · $35"
+   ],
+   [
+    "Adjustment at their home · $75",
+    "New patient consult at their home · $75"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no fever."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Surgery and Lee Oral Surgery"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Tooth removal · $40 deposit"
+   ],
+   [
+    "C $40 deposit when they book.",
+    "C $160 deposit when they book."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Check plan · every 6 months"
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Night guard · $20 deposit"
+   ],
+   [
+    "Adjustment plans go to $40",
+    "Check plans go to $40"
+   ],
+   [
+    "$40 taken when they book",
+    "$40 taken when they book"
+   ],
+   [
+    "Water heater replacement",
+    "Multi-tooth extraction plan"
+   ],
+   [
+    "water heater replacement",
+    "multi-tooth extraction plan"
+   ],
+   [
+    "plumbing and electrical",
+    "oral surgery and implants"
+   ],
+   [
+    "Plumbing and electrical",
+    "Oral surgery and implants"
+   ],
+   [
+    "Signature cut and shave",
+    "Stitch removal and check"
+   ],
+   [
+    "signature cut and shave",
+    "stitch removal and check"
+   ],
+   [
+    "Color always stays with",
+    "Night guard quotes always stay with"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute check"
+   ],
+   [
+    "the $40, if you confirm",
+    "the $20, if you confirm"
+   ],
+   [
+    "or at your home for $75",
+    "or at your home for $179"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Surgery LLC"
+   ],
+   [
+    "color and house calls",
+    "home visits"
+   ],
+   [
+    "1-year labor warranty",
+    "1-year warranty on the work"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Oral Surgery LLC"
+   ],
+   [
+    "$100 after the visit",
+    "$100 after the removal"
+   ],
+   [
+    "photos of your hair",
+    "photos of your smile"
+   ],
+   [
+    "The $110 rest after",
+    "The $480 rest after"
+   ],
+   [
+    "Clear aligner · $40",
+    "Night guard · $90"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tiene fiebre."
+   ],
+   [
+    "said they smell gas",
+    "said their face is swollen with a fever"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Surgery'"
+   ],
+   [
+    "color, house calls",
+    "home visits"
+   ],
+   [
+    "home warranty plan",
+    "dental plan"
+   ],
+   [
+    "Water heater flush",
+    "Dressing check"
+   ],
+   [
+    "water heater flush",
+    "dressing check"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Surgery"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Oral Surgery"
+   ],
+   [
+    "Lee Family Dental",
+    "Lee Oral Surgery"
+   ],
+   [
+    "can cut your hair",
+    "can see you"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Oral Surgery"
+   ],
+   [
+    "plumbing license",
+    "surgeon license"
+   ],
+   [
+    "Plumbing license",
+    "Surgeon license"
+   ],
+   [
+    "hot towel shaves",
+    "stitch checks"
+   ],
+   [
+    "Color correction",
+    "Post-surgery check"
+   ],
+   [
+    "color correction",
+    "post-surgery check"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do tooth pulls"
+   ],
+   [
+    "Service call fee",
+    "Emergency fee"
+   ],
+   [
+    "service call fee",
+    "emergency fee"
+   ],
+   [
+    "Gloss to finish",
+    "Stitch care"
+   ],
+   [
+    "gloss to finish",
+    "stitch care"
+   ],
+   [
+    "Groom's package",
+    "Tooth removal"
+   ],
+   [
+    "asks for a perm",
+    "asks for a tooth pull"
+   ],
+   [
+    "Drain clearing",
+    "Tooth removal"
+   ],
+   [
+    "drain clearing",
+    "tooth removal"
+   ],
+   [
+    "a oral surgeon",
+    "an oral surgeon"
+   ],
+   [
+    "A oral surgeon",
+    "An oral surgeon"
+   ],
+   [
+    "Color touch-up",
+    "Gum check"
+   ],
+   [
+    "color touch-up",
+    "gum check"
+   ],
+   [
+    "Groom's party",
+    "family"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "signature cut",
+    "stitch removal"
+   ],
+   [
+    "Color and cut",
+    "Night guard"
+   ],
+   [
+    "color and cut",
+    "night guard"
+   ],
+   [
+    "water heaters",
+    "implants"
+   ],
+   [
+    "Panel upgrade",
+    "Implant upgrade"
+   ],
+   [
+    "panel upgrade",
+    "implant upgrade"
+   ],
+   [
+    "home warranty",
+    "dental plan"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "Jordan Price",
+    "Jonah Ford"
+   ],
+   [
+    "water heater",
+    "implant"
+   ],
+   [
+    "Water heater",
+    "Implant"
+   ],
+   [
+    "service call",
+    "emergency visit"
+   ],
+   [
+    "Service call",
+    "Emergency visit"
+   ],
+   [
+    "a oral surge",
+    "an oral surge"
+   ],
+   [
+    "Casey Moore",
+    "Lucy Park"
+   ],
+   [
+    "electrician",
+    "surgical assistant"
+   ],
+   [
+    "barbershops",
+    "surgical offices"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "color quote",
+    "surgery quote"
+   ],
+   [
+    "Color quote",
+    "Surgery quote"
+   ],
+   [
+    "my cleaning",
+    "my visit"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Toner · $20",
+    "Gauze and rinse · $20"
+   ],
+   [
+    "drying fans",
+    "a portable kit"
+   ],
+   [
+    "Riley Chen",
+    "Ruth Adair"
+   ],
+   [
+    "Avery Diaz",
+    "Marco Vale"
+   ],
+   [
+    "Electrical",
+    "Implant care"
+   ],
+   [
+    "electrical",
+    "implant care"
+   ],
+   [
+    "Barbershop",
+    "Oral surgery office"
+   ],
+   [
+    "barbershop",
+    "oral surgery office"
+   ],
+   [
+    "skin fades",
+    "stitch checks"
+   ],
+   [
+    "Beard trim",
+    "Stitch removal"
+   ],
+   [
+    "beard trim",
+    "stitch removal"
+   ],
+   [
+    "patch test",
+    "numbing test"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color plan",
+    "surgery plan"
+   ],
+   [
+    "burst pipe",
+    "loose tooth"
+   ],
+   [
+    "88 Elm St",
+    "520 Harbor Ave"
+   ],
+   [
+    "42 Oak St",
+    "64 Linden Rd"
+   ],
+   [
+    "kids cuts",
+    "children's exams"
+   ],
+   [
+    "Skin fade",
+    "Stitch check"
+   ],
+   [
+    "skin fade",
+    "stitch check"
+   ],
+   [
+    "hot towel",
+    "numbing"
+   ],
+   [
+    "Cape clip",
+    "Bib clip"
+   ],
+   [
+    "cape clip",
+    "bib clip"
+   ],
+   [
+    "plumbers",
+    "oral surgeons"
+   ],
+   [
+    "Plumbing",
+    "Oral surgery"
+   ],
+   [
+    "plumbing",
+    "oral surgery"
+   ],
+   [
+    "Haircuts",
+    "Checks"
+   ],
+   [
+    "haircuts",
+    "checks"
+   ],
+   [
+    "this cut",
+    "this check"
+   ],
+   [
+    "Kids cut",
+    "Child's exam"
+   ],
+   [
+    "kids cut",
+    "child's exam"
+   ],
+   [
+    "cut hair",
+    "check teeth"
+   ],
+   [
+    "the leak",
+    "the bleeding"
+   ],
+   [
+    "plumber",
+    "oral surgeon"
+   ],
+   [
+    "barbers",
+    "oral surgeons"
+   ],
+   [
+    "Haircut",
+    "Check"
+   ],
+   [
+    "haircut",
+    "check"
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "Massage",
+    "Stitch care"
+   ],
+   [
+    "massage",
+    "stitch care"
+   ],
+   [
+    "dentist",
+    "oral surgeon"
+   ],
+   [
+    "Dentist",
+    "Oral surgeon"
+   ],
+   [
+    "Jordan",
+    "Jonah"
+   ],
+   [
+    "Barber",
+    "Oral surgeon"
+   ],
+   [
+    "barber",
+    "oral surgeon"
+   ],
+   [
+    "my cut",
+    "my check"
+   ],
+   [
+    "shaves",
+    "checks"
+   ],
+   [
+    "a pipe",
+    "a tooth"
+   ],
+   [
+    "Riley",
+    "Ruth"
+   ],
+   [
+    "Avery",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Lucy"
+   ],
+   [
+    "a cut",
+    "a check"
+   ],
+   [
+    "beard",
+    "stitch"
+   ],
+   [
+    "gloss",
+    "stitch care"
+   ],
+   [
+    "Gloss",
+    "Stitch care"
+   ],
+   [
+    "shave",
+    "check"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "toner",
+    "gauze and rinse"
+   ],
+   [
+    "cape",
+    "bib"
+   ],
+   [
+    "perm",
+    "tooth pull"
+   ],
+   [
+    "Perm",
+    "Tooth pull"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ]
+  ],
+  "B": [
+   [
+    "A card is saved when the customer books, and nothing is charged. For the clear aligners, it's charged only for the office's $20 fee, and only after Sam says yes.",
+    "A card is saved when the customer books, and nothing is charged. It's charged only for the office's $20 fee, and only after Sam says yes."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "A tooth removal can take a $40 deposit when booked. The other $100 is charged to the saved card after the removal."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Go to the emergency room or call 911 now."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "A tooth removal can take a $40 deposit when booked. The other $100 is on the bill after the removal."
+   ],
+   [
+    "Ben's AI asks for a clear aligner at $35, an old price. Rosie answers with the real price, $40.",
+    "Ben's AI asks for a night guard at $85, an old price. Rosie answers with the real price, $90."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the tooth removal takes a $40 deposit; the $100 rest is paid after the removal."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "A tooth removal can take a $40 deposit when booked. The other $100 is paid at the chair, after the removal."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: where the bleeding is, if it's still bleeding, and if the swelling is spreading."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to go to the emergency room or call 911 if her face is swollen with a fever."
+   ],
+   [
+    "The clear aligners can take a $20 deposit once Nina's photo quote is OK'd, like $20 of $90.",
+    "A night guard can take a $20 deposit once Ruth's photo quote is OK'd, like $20 of $90."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Si tiene la cara hinchada con fiebre o le cuesta respirar, vaya a urgencias o llame al 911."
+   ],
+   [
+    "Saved: adjustment $40 for visits from Mon Nov 2. Adjustments already booked keep $35.",
+    "Saved: new patient consult $40 for visits from Mon Nov 2. Consults already booked keep $35."
+   ],
+   [
+    "A clear aligner at Lee Oral Surgery is $40, not $35. Here are the open times at $40.",
+    "A night guard at Lee Oral Surgery is $90, not $85. Here are the open times at $90."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "If your face is swollen with a fever, or you can't breathe, go to the emergency room or call 911."
+   ],
+   [
+    "The clear aligners can be paid in full once Nina's photo quote is OK'd, like $90.",
+    "A night guard can be paid in full once Ruth's photo quote is OK'd, like $90."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "Prices: Adjustment $35 ($40 from Nov 2) · Clear aligner $40 · Retainer check $20",
+    "Prices: New patient consult $35 · Tooth removal $140 · Night guard $90"
+   ],
+   [
+    "Set. For a adjustment, the customer picks the place and sees both prices first.",
+    "Set. For a new patient consult, the customer picks the place and sees both prices first."
+   ],
+   [
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "The stitch removal, $55, is paid in full when booked. So is a home visit, $75."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a child's exam for a son, so the times fit it."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "An oral surgeon's example: a swollen face with a fever gets 'call 911'."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mouth is bleeding and won't stop."
+   ],
+   [
+    "Alex wants it at home: a home visit, $75, paid in full when booking.",
+    "Alex wants it at home: a care-home visit, $75, paid in full when booking."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face with a fever, or trouble breathing."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning?",
+    "My stitch came out. Can an oral surgeon come Thursday morning?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE stitch loose on the left side. Old X-rays: bring them next time."
+   ],
+   [
+    "can cut your hair at the office for $35, or at your home for $75",
+    "can see you at the office for $35, or at your home for $179"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "which tooth is loose, and is anything swollen anywhere else?"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like pulling a neighbor's tooth without asking."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A visit is rated, so the office takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Oral surgery takes no jobs sent now. The office takes none."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times",
+    "Alex picked a child's exam for a son first"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jonah also check my stitch?"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can an oral surgeon check a loose stitch this Thursday?"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Me sangra la boca y no para."
+   ],
+   [
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "a swollen face with a fever, or trouble breathing"
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a check plan with Ruth, every 6 months."
+   ],
+   [
+    "new pipes put in one day and finished another",
+    "a splint fitted over two visits"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a loose tooth at my care home."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My tooth won't stop bleeding' fits a broken tooth repair."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the bleeding is now heavy."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The bleeding is heavy now."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old stain on the chair floor"
+   ],
+   [
+    "Reading it back: the adjustment goes to $40",
+    "Reading it back: the new patient consult goes to $40"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Tiene la cara hinchada con fiebre?"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Extractions, implants and night guards."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I eat before you come?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the space in front of the chair."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the face swollen with a fever?"
+   ],
+   [
+    "a $40 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the office show photos of your smile?"
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The gum swells again 2 weeks later."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 repair 165 gauze 80"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Stitch removal and check"
+   ],
+   [
+    "Drain clearing and water heaters",
+    "Tooth removals and implants"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the bleeding still going?"
+   ],
+   [
+    "Sam raises the adjustment to $40",
+    "Sam raises the new patient consult to $40"
+   ],
+   [
+    "clear aligners at $85, not $90?",
+    "night guards at $85, not $90?"
+   ],
+   [
+    "Color quotes come to you first",
+    "Quotes come to you first"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly check plan"
+   ],
+   [
+    "Adjustment at the office · $35",
+    "New patient consult at the office · $35"
+   ],
+   [
+    "Adjustment at their home · $75",
+    "New patient consult at their home · $75"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. There's no fever."
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Surgery and Lee Oral Surgery"
+   ],
+   [
+    "an overflowing drain at night",
+    "a swollen gum at night"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Tooth removal · $40 deposit"
+   ],
+   [
+    "C $40 deposit when they book.",
+    "C $160 deposit when they book."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Check plan · every 6 months"
+   ],
+   [
+    "Shutoff valve and wall pipe",
+    "Stitch and tooth repair"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both stitches"
+   ],
+   [
+    "Color and cut · $20 deposit",
+    "Night guard · $20 deposit"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 check needs none."
+   ],
+   [
+    "Harper J.'s estimate visit",
+    "Harper J.'s extraction visit"
+   ],
+   [
+    "Adjustment plans go to $40",
+    "Check plans go to $40"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Swollen gum"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · extraction"
+   ],
+   [
+    "$40 taken when they book",
+    "$40 taken when they book"
+   ],
+   [
+    "Water heater replacement",
+    "Multi-tooth extraction plan"
+   ],
+   [
+    "water heater replacement",
+    "multi-tooth extraction plan"
+   ],
+   [
+    "plumbing and electrical",
+    "oral surgery and implants"
+   ],
+   [
+    "Plumbing and electrical",
+    "Oral surgery and implants"
+   ],
+   [
+    "Signature cut and shave",
+    "Stitch removal and check"
+   ],
+   [
+    "signature cut and shave",
+    "stitch removal and check"
+   ],
+   [
+    "Color always stays with",
+    "Night guard quotes always stay with"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute check"
+   ],
+   [
+    "Sewer camera inspection",
+    "Stitch check"
+   ],
+   [
+    "sewer camera inspection",
+    "stitch check"
+   ],
+   [
+    "the $40, if you confirm",
+    "the $20, if you confirm"
+   ],
+   [
+    "or at your home for $75",
+    "or at your home for $179"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Check and dressing change"
+   ],
+   [
+    "kitchen drain clearing",
+    "check and dressing change"
+   ],
+   [
+    "Under the sink, before",
+    "Under the chair, before"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Surgery LLC"
+   ],
+   [
+    "color and house calls",
+    "home visits"
+   ],
+   [
+    "1-year labor warranty",
+    "1-year warranty on the work"
+   ],
+   [
+    "Cabinet floor, before",
+    "Chair floor, before"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Oral Surgery LLC"
+   ],
+   [
+    "$100 after the visit",
+    "$100 after the removal"
+   ],
+   [
+    "photos of your hair",
+    "photos of your smile"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it's still bleeding"
+   ],
+   [
+    "Sewer camera report",
+    "X-ray report"
+   ],
+   [
+    "sewer camera report",
+    "X-ray report"
+   ],
+   [
+    "Heating and cooling",
+    "Night guard"
+   ],
+   [
+    "heating and cooling",
+    "night guard"
+   ],
+   [
+    "The $110 rest after",
+    "The $480 rest after"
+   ],
+   [
+    "Clear aligner · $40",
+    "Night guard · $90"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. No tiene fiebre."
+   ],
+   [
+    "said they smell gas",
+    "said their face is swollen with a fever"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Surgery'"
+   ],
+   [
+    "color, house calls",
+    "home visits"
+   ],
+   [
+    "home warranty plan",
+    "dental plan"
+   ],
+   [
+    "Water heater flush",
+    "Dressing check"
+   ],
+   [
+    "water heater flush",
+    "dressing check"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Surgery"
+   ],
+   [
+    "Elm Street Dental",
+    "Elm Street Oral Surgery"
+   ],
+   [
+    "Lee Family Dental",
+    "Lee Oral Surgery"
+   ],
+   [
+    "the cabinet floor",
+    "the chair floor"
+   ],
+   [
+    "a dripping faucet",
+    "a loose tooth"
+   ],
+   [
+    "can cut your hair",
+    "can see you"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Oral Surgery"
+   ],
+   [
+    "plumbing license",
+    "surgeon license"
+   ],
+   [
+    "Plumbing license",
+    "Surgeon license"
+   ],
+   [
+    "hot towel shaves",
+    "stitch checks"
+   ],
+   [
+    "Color correction",
+    "Post-surgery check"
+   ],
+   [
+    "color correction",
+    "post-surgery check"
+   ],
+   [
+    "doesn't do perms",
+    "doesn't do tooth pulls"
+   ],
+   [
+    "Service call fee",
+    "Emergency fee"
+   ],
+   [
+    "service call fee",
+    "emergency fee"
+   ],
+   [
+    "a drain cleaning",
+    "a stitch check"
+   ],
+   [
+    "Gloss to finish",
+    "Stitch care"
+   ],
+   [
+    "gloss to finish",
+    "stitch care"
+   ],
+   [
+    "Groom's package",
+    "Tooth removal"
+   ],
+   [
+    "asks for a perm",
+    "asks for a tooth pull"
+   ],
+   [
+    "the water valve",
+    "the gauze"
+   ],
+   [
+    "Repipe · $2,400",
+    "Extraction plan · $640"
+   ],
+   [
+    "Drain clearing",
+    "Tooth removal"
+   ],
+   [
+    "drain clearing",
+    "tooth removal"
+   ],
+   [
+    "shutoff valves",
+    "stitches"
+   ],
+   [
+    "drain cleaning",
+    "stitch check"
+   ],
+   [
+    "a oral surgeon",
+    "an oral surgeon"
+   ],
+   [
+    "A oral surgeon",
+    "An oral surgeon"
+   ],
+   [
+    "Color touch-up",
+    "Gum check"
+   ],
+   [
+    "color touch-up",
+    "gum check"
+   ],
+   [
+    "Groom's party",
+    "family"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "signature cut",
+    "stitch removal"
+   ],
+   [
+    "Color and cut",
+    "Night guard"
+   ],
+   [
+    "color and cut",
+    "night guard"
+   ],
+   [
+    "water heaters",
+    "implants"
+   ],
+   [
+    "Panel upgrade",
+    "Implant upgrade"
+   ],
+   [
+    "panel upgrade",
+    "implant upgrade"
+   ],
+   [
+    "home warranty",
+    "dental plan"
+   ],
+   [
+    "shutoff valve",
+    "stitch"
+   ],
+   [
+    "Shutoff valve",
+    "Stitch"
+   ],
+   [
+    "camera report",
+    "X-ray report"
+   ],
+   [
+    "cabinet floor",
+    "chair floor"
+   ],
+   [
+    "$2,400 repipe",
+    "$640 extraction plan"
+   ],
+   [
+    "1200 Main St",
+    "75 Mill Rd"
+   ],
+   [
+    "Jordan Price",
+    "Jonah Ford"
+   ],
+   [
+    "water heater",
+    "implant"
+   ],
+   [
+    "Water heater",
+    "Implant"
+   ],
+   [
+    "service call",
+    "emergency visit"
+   ],
+   [
+    "Service call",
+    "Emergency visit"
+   ],
+   [
+    "faucet check",
+    "stitch check"
+   ],
+   [
+    "a oral surge",
+    "an oral surge"
+   ],
+   [
+    "Casey Moore",
+    "Lucy Park"
+   ],
+   [
+    "electrician",
+    "surgical assistant"
+   ],
+   [
+    "barbershops",
+    "surgical offices"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "color quote",
+    "surgery quote"
+   ],
+   [
+    "Color quote",
+    "Surgery quote"
+   ],
+   [
+    "my cleaning",
+    "my visit"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Leak repair",
+    "Broken tooth repair"
+   ],
+   [
+    "leak repair",
+    "broken tooth repair"
+   ],
+   [
+    "Supply line",
+    "Gauze"
+   ],
+   [
+    "supply line",
+    "gauze"
+   ],
+   [
+    "overflowing",
+    "bleeding"
+   ],
+   [
+    "Toner · $20",
+    "Gauze and rinse · $20"
+   ],
+   [
+    "drying fans",
+    "a portable kit"
+   ],
+   [
+    "Riley Chen",
+    "Ruth Adair"
+   ],
+   [
+    "Avery Diaz",
+    "Marco Vale"
+   ],
+   [
+    "Electrical",
+    "Implant care"
+   ],
+   [
+    "electrical",
+    "implant care"
+   ],
+   [
+    "Barbershop",
+    "Oral surgery office"
+   ],
+   [
+    "barbershop",
+    "oral surgery office"
+   ],
+   [
+    "skin fades",
+    "stitch checks"
+   ],
+   [
+    "Beard trim",
+    "Stitch removal"
+   ],
+   [
+    "beard trim",
+    "stitch removal"
+   ],
+   [
+    "patch test",
+    "numbing test"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color plan",
+    "surgery plan"
+   ],
+   [
+    "burst pipe",
+    "loose tooth"
+   ],
+   [
+    "water line",
+    "gum"
+   ],
+   [
+    "88 Elm St",
+    "520 Harbor Ave"
+   ],
+   [
+    "42 Oak St",
+    "64 Linden Rd"
+   ],
+   [
+    "kids cuts",
+    "children's exams"
+   ],
+   [
+    "Skin fade",
+    "Stitch check"
+   ],
+   [
+    "skin fade",
+    "stitch check"
+   ],
+   [
+    "hot towel",
+    "numbing"
+   ],
+   [
+    "Cape clip",
+    "Bib clip"
+   ],
+   [
+    "cape clip",
+    "bib clip"
+   ],
+   [
+    "plumbers",
+    "oral surgeons"
+   ],
+   [
+    "Plumbing",
+    "Oral surgery"
+   ],
+   [
+    "plumbing",
+    "oral surgery"
+   ],
+   [
+    "Haircuts",
+    "Checks"
+   ],
+   [
+    "haircuts",
+    "checks"
+   ],
+   [
+    "this cut",
+    "this check"
+   ],
+   [
+    "Kids cut",
+    "Child's exam"
+   ],
+   [
+    "kids cut",
+    "child's exam"
+   ],
+   [
+    "cut hair",
+    "check teeth"
+   ],
+   [
+    "the leak",
+    "the bleeding"
+   ],
+   [
+    "plumber",
+    "oral surgeon"
+   ],
+   [
+    "barbers",
+    "oral surgeons"
+   ],
+   [
+    "Haircut",
+    "Check"
+   ],
+   [
+    "haircut",
+    "check"
+   ],
+   [
+    "the cut",
+    "the check"
+   ],
+   [
+    "Massage",
+    "Stitch care"
+   ],
+   [
+    "massage",
+    "stitch care"
+   ],
+   [
+    "dentist",
+    "oral surgeon"
+   ],
+   [
+    "Dentist",
+    "Oral surgeon"
+   ],
+   [
+    "cabinet",
+    "chair"
+   ],
+   [
+    "clogged",
+    "swollen"
+   ],
+   [
+    "shutoff",
+    "stitch"
+   ],
+   [
+    "Shutoff",
+    "Stitch"
+   ],
+   [
+    "Jordan",
+    "Jonah"
+   ],
+   [
+    "Barber",
+    "Oral surgeon"
+   ],
+   [
+    "barber",
+    "oral surgeon"
+   ],
+   [
+    "my cut",
+    "my check"
+   ],
+   [
+    "shaves",
+    "checks"
+   ],
+   [
+    "a pipe",
+    "a tooth"
+   ],
+   [
+    "valves",
+    "stitches"
+   ],
+   [
+    "faucet",
+    "tooth"
+   ],
+   [
+    "repipe",
+    "extraction"
+   ],
+   [
+    "heater",
+    "splint"
+   ],
+   [
+    "Heater",
+    "Splint"
+   ],
+   [
+    "Riley",
+    "Ruth"
+   ],
+   [
+    "Avery",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Lucy"
+   ],
+   [
+    "a cut",
+    "a check"
+   ],
+   [
+    "beard",
+    "stitch"
+   ],
+   [
+    "gloss",
+    "stitch care"
+   ],
+   [
+    "Gloss",
+    "Stitch care"
+   ],
+   [
+    "shave",
+    "check"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "valve",
+    "stitch"
+   ],
+   [
+    "pipes",
+    "teeth"
+   ],
+   [
+    "clogs",
+    "swells"
+   ],
+   [
+    "drain",
+    "gum"
+   ],
+   [
+    "Drain",
+    "Gum"
+   ],
+   [
+    "flush",
+    "check"
+   ],
+   [
+    "sewer",
+    "gum"
+   ],
+   [
+    "Sewer",
+    "Gum"
+   ],
+   [
+    "toner",
+    "gauze and rinse"
+   ],
+   [
+    "cape",
+    "bib"
+   ],
+   [
+    "perm",
+    "tooth pull"
+   ],
+   [
+    "Perm",
+    "Tooth pull"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "pipe",
+    "tooth"
+   ],
+   [
+    "Pipe",
+    "Tooth"
+   ],
+   [
+    "clog",
+    "swelling"
+   ],
+   [
+    "sink",
+    "chair"
+   ],
+   [
+    "Sink",
+    "Chair"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "Visit fee",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee, an oral surgeon, signs up two companies by text. Then Alex books a new patient consult with Ruth at Lee Oral Surgery for Sat Oct 24 at 11:00am. The desk checks Alex's plan by hand, keeps the health forms on the secure page, and takes Alex's share at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who lives at Riverside care home, books a check and dressing change there with Lee Home Surgery. Jonah brings a portable kit Thu Oct 22, arriving 8 to 10am. The office bills Alex's plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|deposit|counter",
+    "visit|none|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: a $35 new patient consult with X-rays and a scan. Nothing is taken. The desk checks Alex's plan, and Alex pays the share at the front desk.",
+    "list|card|counter": "The same consult where the office turns on its $20 missed-visit fee. A card is saved for it, never for a fee-free patient.",
+    "list|deposit|counter": "A tooth removal with local numbing, $140: a $40 deposit when booked, and the $100 rest paid at the chair after the removal.",
+    "list|full|none": "A $55 stitch removal and check, paid in full when booked. Nothing more is owed after.",
+    "photos|deposit|counter": "A night guard quoted from Alex's photos at $90. A $20 deposit once the quote is OK'd, and the $70 rest at the fitting.",
+    "visit|none|counter": "A sore spot after a removal the same day. Only the $25 check is promised; any treatment is priced first, with Alex's yes."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "New patient consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "New patient consult with X-rays and a scan"
+    },
+    "list|card|*": {
+     "price": "$35",
+     "fee": "$20",
+     "name": "New patient consult with X-rays and a scan"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$20",
+     "name": "Tooth removal (local numbing)"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Stitch removal and check"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Night guard, quoted from photos"
+    },
+    "photos|deposit|*": {
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "fee": "$20",
+     "name": "Night guard, quoted from photos"
+    },
+    "visit|*|*": {
+     "name": "Post-surgery problem"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Second tooth removed at the same visit",
+     "price": "list",
+     "before": "none",
+     "after": "counter",
+     "amounts": {
+      "price": "$140"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Stitch removal, paid in full when booked",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|none|bill",
+    "visit|none|own",
+    "photos|deposit|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a $179 check and dressing change at Riverside care home. Nothing is taken. The office bills Alex's plan its own way.",
+    "list|none|bill": "The same check, paid privately: nothing is taken when booking, and Rosie texts the bill when Jonah texts DONE.",
+    "visit|none|own": "A broken tooth or a loose stitch at the care home. Only the $89 visit fee is promised; the repair is priced at the visit, with Alex's yes first.",
+    "photos|deposit|bill": "A multi-tooth extraction plan, quoted by Jonah from the care-home photos and X-rays at $640. A $160 deposit once the plan is OK'd, and Rosie texts the bill for the $480 rest."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Check and dressing change at a care home"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Check and dressing change at a care home"
+    },
+    "visit|*|*": {
+     "name": "Broken tooth or loose stitch at a care home"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Multi-tooth extraction plan"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$40",
+     "name": "Multi-tooth extraction plan"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Second patient's check at the same care home",
+     "price": "list",
+     "before": "none",
+     "after": "bill",
+     "amounts": {
+      "price": "$179"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Stitch and dressing visit, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150"
+     }
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "A surgeon always holds a license: the owner states it, and Rosie doesn't check it. Registration-only is not this work.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Oral surgery pays the $2 like every business: no health exemption (D97).",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Oral surgery books people (a surgeon or an assistant), never spaces.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Oral surgery runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each surgeon and assistant holds their own license.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "No surgery is sent now, and nobody is on call (pf.edges.urgent).",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A surgery or a removal books a person's time.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A surgery or a removal books a person's time.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A surgery or a removal books a person's time, never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left at the office: the patient is in the chair.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "why": "An adult stays for a child's surgery visit (pf.questions.whoMayBook).",
+    "label": "Yes: a child may be left"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "why": "Health work is sensitive (the switch is on), so no rating is asked.",
+    "label": "Yes, a rating is asked"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "The patient is always there for a visit at a care home.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "why": "Mobile oral surgery takes no jobs sent now (S2-30), so this is never offered.",
+    "label": "Takes 'Send someone now'"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "Nobody is on call for oral surgery (S2-30).",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "A visit always needs the patient there, so there's no visit with nobody home.",
+    "label": "The way in fails"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never left in the surgeon's care at home: an adult on the booking is there (B8-09).",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "A surgeon always holds a license: the owner states it, and Rosie doesn't check it.",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "why": "Oral surgery pays the $2 like every business: no health exemption (D97).",
+    "label": "2 No $2, so no monthly bill"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "why": "Oral surgery books people, never spaces.",
+    "label": "Yes: spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "why": "Oral surgery runs no classes.",
+    "label": "2 Yes: classes on a timetable"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "Each surgeon and assistant holds their own license.",
+    "label": "2 No person license"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "No surgery is sent now, and nobody is on call (pf.edges.urgent).",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Mobile oral surgery books a 2-hour arrival window.",
+    "label": "2 A set start time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A surgery visit is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "Mobile oral surgery sells no seats in a session: each patient has their own visit.",
+    "label": "4 A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "No surgery visit is sent now (S2-30).",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "No surgery visit is sent now (S2-30).",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "why": "Health work is sensitive (the switch is on), so no rating is asked.",
+    "label": "Yes, a rating is asked"
+   }
+  ]
+ },
+ "notes": "Start: the dentist (clinic), refitted Oct 27. Names: Sam Lee, an oral surgeon, owns Lee Home Surgery LLC (the master's main company: mobile oral surgery at care homes and schools, 75 Mill Rd) and Lee Oral Surgery LLC (the second company: the office, 520 Harbor Ave). Flow A is at the office; flow B at Riverside care home, 64 Linden Rd, where Alex lives. Staff: Ruth (surgeon) and Marco (assistant) at the office; Jonah (surgeon) and Lucy (assistant) on the mobile team. Prices keep the master's own numbers: consult $35, fee $20, tooth removal $140 ($40 deposit, $100 rest), stitch removal $55 paid in full, night guard from photos $90 ($20 deposit, $70 rest), post-surgery check $25 ($110 in all), care-home check $179, care-home visit fee $89 ($245 in all), care-home extraction plan $640 ($160 deposit, $480 rest). Sedation and general anesthesia are never booked, priced or confirmed by Rosie: the office plans them by phone. Care-home visits are local numbing only. The $2 applies (D97): the 'No $2' branch of S1-62 is off. Licenses are optional and never checked (D96). Health work: sensitive on, so no rating is asked.",
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The signature cut, $55, is paid in full when booked. So is a house call, $75.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Alex picked a kids cut for a son before the times",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Classic cuts, fades and hot towel shaves.",
+    "May the shop show photos of your hair?",
+    "Signature cut and hot towel shave",
+    "Drain clearing and water heaters",
+    "Color quotes come to you first",
+    "Lee Plumbing and Lee Electric",
+    "Groom's package · $40 deposit",
+    "Haircut plan · every 4 weeks",
+    "Color and cut · $20 deposit",
+    "$40 taken when they book",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "Color always stays with",
+    "15-minute style consult",
+    "the $40, if you confirm",
+    "color and house calls",
+    "Lee's Barbershop LLC",
+    "$100 after the visit",
+    "photos of your hair",
+    "Lee Home Services'",
+    "color, house calls",
+    "home warranty plan",
+    "Lee Home Services",
+    "Elm Street Dental",
+    "Lee's Barbershop",
+    "hot towel shaves",
+    "Color correction",
+    "color correction",
+    "doesn't do perms",
+    "Gloss to finish",
+    "Groom's package",
+    "asks for a perm",
+    "Drain clearing",
+    "Color touch-up",
+    "color touch-up",
+    "groom's party",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "water heaters",
+    "Panel upgrade",
+    "home warranty",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Casey Moore",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "color quote",
+    "Color quote",
+    "my cleaning",
+    "Price board",
+    "price board",
+    "Toner · $20",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "house call",
+    "color plan",
+    "burst pipe",
+    "88 Elm St",
+    "kids cuts",
+    "Skin fade",
+    "skin fade",
+    "hot towel",
+    "cape clip",
+    "Plumbing",
+    "plumbing",
+    "Haircuts",
+    "haircuts",
+    "this cut",
+    "Kids cut",
+    "kids cut",
+    "cut hair",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "Massage",
+    "massage",
+    "dentist",
+    "Dentist",
+    "Jordan",
+    "Barber",
+    "barber",
+    "my cut",
+    "shaves",
+    "Riley",
+    "Avery",
+    "Casey",
+    "a cut",
+    "beard",
+    "gloss",
+    "Gloss",
+    "shave",
+    "shops",
+    "toner",
+    "cape",
+    "perm",
+    "shop",
+    "Shop"
+   ],
+   "B": [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Like tapping a neighbor's water line without asking.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "a gas smell, hissing or a carbon monoxide alarm",
+    "new pipes put in one day and finished another",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Classic cuts, fades and hot towel shaves.",
+    "Can I run the dishwasher before you come?",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "The drain clogs again 2 weeks later.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Drain clearing and water heaters",
+    "Is the sink still full of water?",
+    "Yearly water heater flush plan",
+    "No. It doesn't smell like gas.",
+    "Lee Plumbing and Lee Electric",
+    "an overflowing drain at night",
+    "C $40 deposit when they book.",
+    "Shutoff valve and wall pipe",
+    "Replace both shutoff valves",
+    "The $179 drain needs none.",
+    "Overflowing kitchen drain",
+    "Right to cancel · repipe",
+    "Water heater replacement",
+    "water heater replacement",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "or at your home for $75",
+    "Kitchen drain clearing",
+    "Under the sink, before",
+    "Lee Home Services LLC",
+    "color and house calls",
+    "1-year labor warranty",
+    "Cabinet floor, before",
+    "Yes, it won't drain",
+    "Sewer camera report",
+    "sewer camera report",
+    "Heating and cooling",
+    "heating and cooling",
+    "The $110 rest after",
+    "No. No huele a gas.",
+    "said they smell gas",
+    "Lee Home Services'",
+    "color, house calls",
+    "home warranty plan",
+    "Water heater flush",
+    "water heater flush",
+    "Lee Home Services",
+    "Elm Street Dental",
+    "the cabinet floor",
+    "a dripping faucet",
+    "can cut your hair",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "hot towel shaves",
+    "Service call fee",
+    "service call fee",
+    "a drain cleaning",
+    "the water valve",
+    "Repipe · $2,400",
+    "Drain clearing",
+    "drain clearing",
+    "shutoff valves",
+    "drain cleaning",
+    "water heaters",
+    "Panel upgrade",
+    "home warranty",
+    "shutoff valve",
+    "Shutoff valve",
+    "camera report",
+    "cabinet floor",
+    "$2,400 repipe",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Water heater",
+    "service call",
+    "Service call",
+    "faucet check",
+    "Casey Moore",
+    "barbershops",
+    "house calls",
+    "House calls",
+    "my cleaning",
+    "Price board",
+    "Leak repair",
+    "leak repair",
+    "Supply line",
+    "supply line",
+    "overflowing",
+    "drying fans",
+    "Riley Chen",
+    "Avery Diaz",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "beard trim",
+    "house call",
+    "burst pipe",
+    "water line",
+    "88 Elm St",
+    "42 Oak St",
+    "hot towel",
+    "Plumbing",
+    "plumbing",
+    "cut hair",
+    "the leak",
+    "plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "the cut",
+    "dentist",
+    "Dentist",
+    "cabinet",
+    "clogged",
+    "shutoff",
+    "Shutoff",
+    "Jordan",
+    "Barber",
+    "barber",
+    "shaves",
+    "valves",
+    "faucet",
+    "repipe",
+    "heater",
+    "Riley",
+    "Avery",
+    "Casey",
+    "beard",
+    "shave",
+    "shops",
+    "valve",
+    "pipes",
+    "clogs",
+    "drain",
+    "Drain",
+    "flush",
+    "sewer",
+    "Sewer",
+    "perm",
+    "shop",
+    "Shop",
+    "pipe",
+    "clog",
+    "sink"
+   ]
+  },
+  "A": {
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "B8-03": "ac9d404766",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B10-32": "7713bff255"
+  }
+ }
+}

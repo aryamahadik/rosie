@@ -1,0 +1,3696 @@
+{
+ "id": "speech-therapist",
+ "name": "Speech therapist",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "physical-therapist",
+ "plugin": {
+  "pf.license": {
+   "need": "always: each speech-language pathologist (a speech therapist) holds their own active license from the state's board; a speech therapy assistant or a clinical fellow works only with the credential the state's form asks for, if any",
+   "who": "each person; the practice too, where the state's form registers practices or their owners (a switch)",
+   "ask": "each person's license number in their invite reply (or the owner sends it); the practice's registration number from the owner, where the state's form asks for one",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "national": "a national certificate is shown only once checked, and never counts as a state license",
+   "remote": "a video session only with a speech therapist licensed in the state where the client is during the session, or holding a compact privilege where the state's form allows it; a family across a state line from the clinic is offered only therapists licensed in the family's state",
+   "hearing": "hearing tests need an audiologist's own license, held by each person who does them; a speech therapist does only a pass-or-fail hearing screening, where the state's form allows it",
+   "feeding": "feeding and swallowing work only by a speech therapist the owner marks as trained for it, plus any extra training the state's form asks for",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "malpractice insurance where the state's form asks for it"
+  },
+  "pf.services": {
+   "shape": "one client with one therapist at a time, each visit with a set length; every new client starts with an evaluation by a speech therapist; the evaluation sets the plan of care (how many sessions a week, for how many weeks), and those sessions are booked as a weekly plan with the parent's or client's own yes, or one at a time",
+   "examples": "the example practices' own prices (Lee Speech Therapy and Lee Home Speech), not a standard; with a health plan, the family pays the plan's share at each visit, like a copay, and the plan pays the rest",
+   "list": [
+    {
+     "name": "Speech and language evaluation (a child)",
+     "price": "$140 self-pay; with a plan, the plan's share (the example: a $35 copay)",
+     "kind": "one price",
+     "length": "75 min",
+     "where": "at the clinic, or at home",
+     "before": "nothing taken; a card saved only where the clinic turns on its late-cancel fee or keeps a card on file",
+     "after": "the share at the front desk, or the saved card charged when the therapist texts DONE where the clinic keeps a card on file",
+     "who": "a speech therapist only",
+     "note": "a parent or guardian books, signs the forms and stays for the whole visit"
+    },
+    {
+     "name": "Hearing screening (added to an evaluation)",
+     "price": "$20",
+     "kind": "one price, added to a visit",
+     "length": "15 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "with the visit",
+     "who": "a speech therapist",
+     "note": "pass or fail only; not passed: the therapist refers the child to an audiologist, and sessions can still start"
+    },
+    {
+     "name": "Therapy session (from the plan of care)",
+     "price": "$110 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the clinic, by video, or at home",
+     "before": "nothing taken",
+     "after": "at the front desk, or the saved card at DONE",
+     "who": "a speech therapist, or an assistant under the therapist's plan where the state allows"
+    },
+    {
+     "name": "Re-check (progress re-evaluation)",
+     "price": "$120 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic, or at home",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "who": "a speech therapist only, when the plan of care calls for it (often every 6 months)",
+     "note": "the practice sends the progress report to the doctor itself, never through Rosie"
+    },
+    {
+     "name": "Adult evaluation (voice, stuttering, or speech after a stroke)",
+     "price": "$140 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "who": "a speech therapist only"
+    },
+    {
+     "name": "Voice check (an adult's voice)",
+     "price": "$40",
+     "kind": "one price",
+     "length": "30 min, in the clinic's one recording room",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "who": "a speech therapist"
+    },
+    {
+     "name": "Feeding or swallowing evaluation",
+     "price": "$160 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the clinic, or at home",
+     "before": "nothing taken",
+     "after": "at the front desk, or the office's own way at home",
+     "who": "only a therapist trained for it (Iris at the clinic, Caleb at home)",
+     "note": "the owner OKs each one first; choking or trouble breathing now gets 911, never a booking"
+    },
+    {
+     "name": "Feeding therapy session",
+     "price": "$110 self-pay; with a plan, the plan's share",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the clinic",
+     "before": "nothing taken",
+     "after": "at the front desk",
+     "who": "only a therapist trained for it (Iris at the example clinic)"
+    },
+    {
+     "name": "Video therapy session",
+     "price": "$110 self-pay; with a plan, the plan's share where it pays for video",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "by video, counted as at the clinic",
+     "before": "a card saved",
+     "after": "the saved card charged when the therapist texts DONE",
+     "who": "a therapist licensed where the client is during the session",
+     "note": "only for a client who already has a plan of care; a parent stays with a child on the call"
+    },
+    {
+     "name": "Check-in session (after the weekly plan ends)",
+     "price": "$60 a visit at the clinic; $150 a visit at home",
+     "kind": "one price, every 4 weeks",
+     "length": "30 to 45 min",
+     "where": "both places",
+     "before": "nothing taken",
+     "after": "each visit paid when it happens, like a single visit",
+     "note": "only with the family's own yes on the secure page"
+    },
+    {
+     "name": "Home evaluation (a young child)",
+     "price": "$179 self-pay; with a plan, the office bills the plan",
+     "kind": "one price",
+     "length": "75 min",
+     "where": "at the client's home",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "the office bills the plan its own way; self-pay: the saved card charged when the therapist texts DONE",
+     "who": "a speech therapist only"
+    },
+    {
+     "name": "Home session",
+     "price": "$150 self-pay; with a plan, the office bills the plan",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the client's home",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "the office's own way, or the saved card at DONE",
+     "who": "a speech therapist, or an assistant under the therapist's plan"
+    },
+    {
+     "name": "Preschool or daycare session",
+     "price": "the same as a home session",
+     "kind": "one price",
+     "length": "45 min",
+     "where": "at the child's preschool or daycare, on the days the preschool OKs",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "the office's own way, or the saved card at DONE",
+     "who": "a speech therapist, or an assistant under the therapist's plan",
+     "note": "the parent signs an OK on the secure page and stays reachable by phone; the preschool OKs the days"
+    },
+    {
+     "name": "Mealtime visit (feeding at home)",
+     "price": "$160, with written tips on the secure page",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the client's home",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "with the visit",
+     "who": "only a therapist trained for feeding"
+    },
+    {
+     "name": "Adult evaluation at home (after a stroke)",
+     "price": "$199 ($249 when Sam does it)",
+     "kind": "one price",
+     "length": "75 min",
+     "where": "at the client's home, or on a host's visit day",
+     "before": "nothing taken when a plan pays; a card saved for self-pay",
+     "after": "with the visit",
+     "who": "a speech therapist"
+    },
+    {
+     "name": "Missed-visit or late-cancel fee",
+     "price": "$20 at the clinic; $89 for a home visit",
+     "kind": "a fee, never booked alone",
+     "where": "both places",
+     "note": "only with a card saved and the family's yes to the words when booking; free to cancel until 24 hours before at the clinic, and until 7am on the day for a home visit (the example's own); only when the owner confirms it; never for a fee-free family or a sick child"
+    },
+    {
+     "name": "Hearing screenings at a preschool (hearing tests)",
+     "price": "$120 an hour, 2-hour minimum (the example's own)",
+     "kind": "per hour",
+     "where": "at the customer's place (a preschool or daycare)",
+     "who": "a licensed audiologist",
+     "note": "its own kind of work, with its own license",
+     "before": "nothing taken, or a card saved for a self-pay school",
+     "after": "the business's own way, or the saved card at DONE"
+    }
+   ],
+   "notBooked": "school plan (IEP) services: the school district gives them; private therapy alongside them can be booked",
+   "capacity": "one client per therapist at a time; therapy rooms aren't booked, except the one recording room for voice checks; a loaner speech device (a talking device a child tries before the family gets one) is held for the visit that tries it, at the clinic or at home",
+   "nobodyHome": "never: the client, and for a child a parent or a named adult, is always there",
+   "online": "a video session for a client who already has a plan of care; a first evaluation is in person (the example clinic's rule)"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "who it's for: your child (and their age), or you",
+    "for a child: are you the parent or legal guardian (often clear from 'my daughter')",
+    "what it's about, in a few words: speech and language, stuttering, voice, or feeding and swallowing (it sets the evaluation and its length; never the details)",
+    "languages spoken at home (a therapist who speaks it, or an interpreter)",
+    "a school plan (IEP) for speech: none, has one and wants private too, or wants the school's services",
+    "a doctor's referral: yes, or not yet",
+    "a health plan (its name only), Medicaid, or paying yourself",
+    "for a video session: which state the client will be in during the session",
+    "days and times that suit you, like after preschool"
+   ],
+   "afterTime": [
+    "anything that helps at the visit, like a favorite toy or needing an interpreter",
+    "at home: who will be there, any pets, and where to park",
+    "at a preschool: the preschool's name and its contact for the visit day"
+   ],
+   "securePage": [
+    "the child's name and birth date; the parent's name, how they're related, and 'I'm 18 or older'",
+    "the home address",
+    "plan member ID, the plan holder and photos of both sides of the plan card",
+    "the child's doctor, and the parent's OK for the office to ask for a referral",
+    "a copy of the school plan (IEP), if there is one",
+    "intake, consent and health history forms",
+    "who else may bring the child, with the parent's signed OK",
+    "for a preschool session: the parent's signed OK and the preschool's contact"
+   ],
+   "whoMayBook": "a parent or legal guardian for anyone under 18 (Rosie's rule for speech therapy, labeled as such, until a state's form says otherwise); an adult for themselves; a guardian or health care agent for an adult who can't consent, like after a stroke; anyone else, like a grandparent or a sitter, is asked to have a parent book",
+   "whoMayBring": "a switch: the parent or guardian brings the child and stays, or an adult the parent names on the secure page with a signed OK; at a preschool or daycare session, the parent signs an OK and stays reachable by phone; a child is never with the therapist without the parent's OK",
+   "neverAsked": "the child's name, birth date, the reason in detail, test results, the member ID and the health history never go through the AI chat: only the kind of visit, the child's age, the plan's name and the days and times",
+   "publicPrograms": "said once, as information (Rosie's rule): a child under 3 may get services from the state's early intervention program, and a child 3 or older from the school district; private care stays the parent's choice"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "sudden trouble speaking or understanding, a drooping face, or weakness on one side (stroke signs), at any age",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "choking now, trouble breathing, turning blue, or a child who can't swallow at all",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "words about self-harm",
+     "say": "Call or text 988 now. If anyone is in danger right now, call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "coughing or gagging at meals, with no choking now",
+     "what": "the safety words first (choking or trouble breathing: call 911), then the booking goes on: a feeding or swallowing evaluation, once the owner OKs it"
+    },
+    {
+     "words": "a child who stopped using words they had",
+     "what": "booked as an evaluation, and the parent is told to let the child's doctor know too; Rosie never judges how serious anything is"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988; every message is checked, every time"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "The evaluation",
+     "when": "before any weekly sessions",
+     "who": "every new client",
+     "result": "it sets the plan of care; sessions are booked after it, with the family's own yes"
+    },
+    {
+     "name": "The referral",
+     "when": "asked before the times (yes, or not yet)",
+     "who": "where the state's form, the plan or Medicaid asks for a doctor's referral or prescription before therapy (a switch)",
+     "result": "the evaluation goes ahead either way where the state allows; the office asks the child's doctor itself, with the parent's OK on the secure page; weekly sessions wait for it where it's needed"
+    },
+    {
+     "name": "Intake, consent and health history forms",
+     "when": "on the secure page only, never by text; due the day before the visit; one reminder before it's due",
+     "who": "every new client",
+     "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or door first), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand",
+     "who": "every family that names a plan",
+     "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the family may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay families",
+     "when": "told while booking; sent on time, as the federal rules say",
+     "who": "every family paying for itself",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "The plan's OK for the sessions after the evaluation",
+     "when": "after the evaluation, asked by the desk on the plan's own website",
+     "who": "families whose plan asks for it",
+     "result": "OK'd: the weekly plan is booked within the sessions and dates OK'd; pending: only the next session is booked; no: self-pay, or stop"
+    }
+   ],
+   "prep": "come 10 minutes early to the first visit; bring a photo ID, the plan card, and any school plan or hearing test results; a parent stays for the whole visit"
+  },
+  "pf.visit": {
+   "checkIn": "at the clinic: the check-in code at the front desk, from the parent; by video: the code read out at the start, and the parent says which state the child is in that day; at home or at a preschool: the code at the door, from the parent or the adult named on the booking",
+   "beforeWork": "the therapist reads the intake forms, the school plan and any referral before starting",
+   "inside": "a pass-or-fail hearing screening first, where booked; not passed: the therapist refers the child to an audiologist, and sessions can still start",
+   "changes": "the evaluation sets the plan of care: goals, how many sessions a week, for how many weeks, and practice at home; any added service only with the parent's yes and its price first",
+   "done": "the check-in code or DONE; results are explained in person; the written report and the plan of care stay in the practice's own records, never in Rosie or a text",
+   "parent": "a parent or guardian stays for a child's session; at a preschool, the parent signed an OK and stays reachable by phone",
+   "home": "at home, the therapist works where the child plays, shows the parent the practice games, and leaves the written tips on the secure page"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking when a plan pays; a card saved only where the clinic turns on its late-cancel fee, keeps a card on file for the share, or for a video session; at home, a card saved for a self-pay family",
+   "plans": "the plans the practice takes (its own list); the front desk checks each plan by hand and records it: active or not, the copay, any deductible left, whether the plan must OK the sessions, and any yearly visit limit; the family's share is an estimate, not a promise",
+   "approvals": "where a plan must OK the sessions, the desk asks after the evaluation and records the sessions OK'd, used and left, and the end date; Rosie warns the desk before they run out and never contacts the plan",
+   "visitLimit": "a plan's yearly limit on therapy visits is counted for a weekly plan; the desk is warned before it runs out and tells the family the self-pay price in time",
+   "selfPay": "self-pay families pay the price list (the example clinic: $140 for an evaluation, $110 a session) at each visit; they're told while booking that they can get a written price estimate, and get it on time; a bill far above it can be disputed (the federal rules set how)",
+   "outOfNetwork": "where the practice doesn't take the family's plan, the family pays the self-pay price at each visit and gets a receipt on the secure page with what its plan asks for, to send to the plan itself; the practice never promises what the plan pays back",
+   "fees": "the late-cancel or missed-visit fee: $20 at the example clinic, free to cancel until 24 hours before; $89 for a self-pay home visit, free to cancel until 7am on the day; only with a card saved and the family's yes to those words when booking, and only when the owner confirms each one",
+   "feeFree": "a switch from the state's and the plan's rules: no fee ever for families a plan or the rules protect (like Medicaid, where that applies); for some plans, only if every client pays the same fee; the owner can mark any family fee-free, and names reasons that never carry a fee, like a sick child; their texts say 'No fee to cancel or miss'",
+   "after": "the share at the front desk at each visit, the clinic's own way, or the saved card charged at DONE where the clinic keeps a card on file (and for video sessions); a balance after the plan pays is the practice's own bill, never Rosie's text; home visits: the office bills the plan its own way, and a self-pay visit is charged to the saved card at DONE",
+   "video": "where the family's plan doesn't pay for video sessions, a session is offered at the clinic, or self-pay (a switch from the plan's rules)",
+   "weeklyPlan": "a weekly plan's sessions are each paid when they happen, like a single visit: nothing paid ahead and no monthly charge",
+   "rosfield": "the $2 per booking applies to this work, as to every kind of work (D97): a flat fee for each booking Rosie's AI makes, shown at sign-up for the owner's yes; a booking the business puts in itself carries no $2; card payments cost only Stripe's own card fee, paid to Stripe",
+   "caps": "fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)",
+   "packages": "where a clinic sells self-pay session packs, it sells them at the clinic only, never while booking; a booking can use a session from one; prepaid sessions follow the state's rules on prepaid care (a written cancel period, a refund of unused sessions): a switch",
+   "repeatPlans": "a check-in session every 4 weeks is paid when it happens, like a single visit; nothing paid ahead",
+   "publicPrograms": "early intervention and school services are paid by those programs and are never booked here"
+  },
+  "pf.messages": {
+   "never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the child's name, the visit type, the reason, the plan, test results or health details; at the clinic, no therapist's name in a family's texts; at home, the therapist's name stays, for the door check",
+   "staff": "texts to the owner and staff use initials only (L.M. for the child, A.M. for the parent), with the time and a link: never the reason, results or plan details",
+   "agent": "only the kind of visit, the child's age, the plan's name and the days and times pass through the AI: never names, birth dates, member IDs, health details or a street address",
+   "healthQuestions": "Rosie and the AI never answer health questions: 'the team will call you', with the secure link; asked at night, the call comes after the practice opens; the booking stays",
+   "results": "results and reports never go through Rosie",
+   "languages": "English and Spanish; a family's home language picks a therapist who speaks it, or an interpreter the practice sets up",
+   "minors": "a child's texts go only to the parent or guardian's phone",
+   "decider": "for an adult who can't consent, the texts go to the person who decides, and the code to whoever meets the therapist",
+   "staffReasons": "families never hear why a therapist is out"
+  },
+  "pf.staff": {
+   "licenses": "each speech therapist's own license, per state; an assistant's or a clinical fellow's credential where the state's form asks for one; an audiologist's own license for hearing tests",
+   "skills": "speech therapists: evaluations, re-checks, the plan of care, and every session; assistants: sessions only, under a speech therapist's plan of care, where the state allows; feeding and swallowing work only by a therapist trained for it (Iris, Caleb); each therapist's languages (Iris: Spanish); only people cleared for home visits go to homes and preschools; hearing tests only by an audiologist",
+   "supervision": "an assistant or a clinical fellow works only under a named supervising speech therapist, with the supervision the state's form sets (a switch: on site, or reachable by phone); how many of a plan's sessions an assistant may do, and how often the therapist comes back, is a switch from the state's form too",
+   "oks": "the owner OKs same-day times, feeding or swallowing evaluations, any custom price (at the clinic, every one; at home, over $500), and anything a therapist flags",
+   "standIn": "an evaluation or a re-check: only another speech therapist; a session: a speech therapist, or an assistant under the same plan; a video session: only someone licensed where the client is; the plug-in turns Rosie's no-reply default off: nobody, and never a child, is moved to another therapist without the family's yes",
+   "desk": "Pat, the office manager, runs the desk: plan checks, referrals, forms and estimates"
+  },
+  "pf.rules": {
+   "records": "therapy records are kept by the practice for as long as the state's rules require (a child's records may be kept longer); a delete request removes only Rosie's own booking details, never the practice's records",
+   "copies": "a client's or parent's copy of the records within the time the rules set; Rosie sends only booking and payment records",
+   "referral": "a switch from the state's form and the plan: whether a doctor's referral or prescription is needed before therapy; the office tracks it",
+   "planOfCare": "where a plan asks for it, the doctor signs the plan of care; the practice tracks the signature",
+   "showLicense": "the license shown where the state asks: posted at the clinic, and on a home visit",
+   "minors": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)",
+   "schools": "school plan services belong to the school district; private therapy alongside them is the parent's choice",
+   "estimate": "a written price estimate for self-pay families, on the timing the federal rules set",
+   "ads": "no free-visit or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form",
+   "homeSales": "a switch from the state's form: a written right to cancel care sold at a home visit but not yet given, like a pack of sessions paid ahead, where the state's rules give one; care already given at the visit, like a mealtime visit done that day, has no cancel period, and neither does the booked visit"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen, in the time left; later: the desk may move the visit, with no fee",
+   "sickChild": "a sick child on the day: cancelled with no fee, the owner's own rule, so the owner isn't asked",
+   "standIn": "a therapist out: another speech therapist for an evaluation, with the family's yes, or new times with no fee; families never hear why",
+   "crossState": "a family across a state line from the clinic: a video session only with a therapist licensed in the family's state; otherwise a clinic visit",
+   "hearing": "a hearing screening not passed: the therapist refers the child to an audiologist; sessions can still start",
+   "parentSteps": "a parent who must step out during a child's session: the session pauses until the parent or a named adult is back",
+   "forms": "a form not done by its due date: one reminder, then Sam keeps the visit (signed on the secure page before any work), moves it, or cancels with no fee (A7-74, B7-61)",
+   "planChange": "the plan check comes back not covered: self-pay, or a free cancel",
+   "approvalRunsOut": "the plan's OK'd sessions or its yearly limit are about to run out: the desk is warned before the last one, and asks for more or tells the family the self-pay price",
+   "twoBookings": "a parent with two children booked, or a weekly plan: Rosie asks which booking before any change",
+   "healthQuestion": "a question about a child's speech, eating or progress goes to the therapist; Rosie gives no advice",
+   "urgent": "no service is sent now and nobody is on call: the soonest time shows first, with the owner's OK for same day; the stroke and choking words get 911",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "planbill",
+   "forms",
+   "plans",
+   "video",
+   "children",
+   "firststeps",
+   "results"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Speech Therapy",
+   "staff": "Iris and Elise (speech therapists)",
+   "cust": "Alex M. (parent of Lily, 4) · other families and clients"
+  },
+  "B": {
+   "business": "Lee Home Speech",
+   "staff": "Caleb (speech therapist and audiologist) and Tia (speech therapy assistant)",
+   "cust": "Alex M. (parent of Max, 2, at home) · other families and clients",
+   "other": "Others (a grandparent, a preschool, a doctor's office, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Iris"
+  },
+  "B": {
+   "staff": "Caleb"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery do speech therapy; Riley also does feeding work and home visits."
+   ],
+   [
+    "like a color correction done in two steps",
+    "like the visits a plan of care sets"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most speech therapy clinics set it."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most speech therapy clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules speech therapy clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Evaluations, therapy sessions and hearing screenings."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Home speech therapy and hearing care, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A hearing care visit"
+   ],
+   [
+    "Groom's package",
+    "Feeding therapy package"
+   ],
+   [
+    "color and cut",
+    "voice evaluation"
+   ],
+   [
+    "Color and cut",
+    "Voice evaluation"
+   ],
+   [
+    "color correction",
+    "feeding evaluation"
+   ],
+   [
+    "Color correction",
+    "Feeding evaluation"
+   ],
+   [
+    "The chairs",
+    "The therapy rooms"
+   ],
+   [
+    "A chair, ready",
+    "A therapy room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a therapist who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own clients."
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free therapy room:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for tutoring, which isn't on the clinic's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do tutoring."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter session in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter session."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during Lily's session?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring a favorite small toy on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring a favorite small toy."
+   ],
+   [
+    "the customer is already in the chair",
+    "the client is already in the therapy room"
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped A.M.'s session."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the session and the home practice."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: practice the s sound 5 minutes a day"
+   ],
+   [
+    "A.M. says Saturday's cut is uneven on one side.",
+    "A.M. asks about the home practice after Saturday's session."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The home practice sheet is missing."
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached during care?"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a kids' session first, so the times fit it."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Any question about the session? Reply here. How was your visit with Jordan?"
+   ],
+   [
+    "Avery at the shop, Casey for plumbing.",
+    "Elise at the clinic, Caleb for home therapy and hearing care."
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "A tip goes the shop's own way.",
+    "Speech therapy takes no tips."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says an ice pack leaked on a jacket today"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The ice pack leaked on my jacket."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a pack of 6 self-pay sessions at the clinic."
+   ],
+   [
+    "A beard trim",
+    "A hearing screening"
+   ],
+   [
+    "a beard trim",
+    "a hearing screening"
+   ],
+   [
+    "Lena",
+    "Tara"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The speech therapy plug-in adds its own: stroke signs at any age, and choking or trouble breathing."
+   ],
+   [
+    "has a haircut plan with Riley, every 4 weeks.",
+    "has a check-in plan with Iris, every 4 weeks."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "Is this Elm Street Eye Care? I need to move my eye exam."
+   ],
+   [
+    "so I can't reach Elm Street Dental.",
+    "so I can't reach Elm Street Eye Care."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A speech therapy example: coughing at meals, with no choking now, gets the plug-in's words first. Then the booking goes on."
+   ],
+   [
+    "A haircut",
+    "An evaluation"
+   ],
+   [
+    "a haircut",
+    "an evaluation"
+   ],
+   [
+    "a kids cut",
+    "a child's session"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "MP045210",
+    "SP045210"
+   ],
+   [
+    "BS20981",
+    "PR20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states set their own rules for work done away from the business."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Accent coaching for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds accent coaching to Lee's Barbershop."
+   ],
+   [
+    "NEW massage",
+    "NEW accent coaching"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "15-minute style consult",
+    "15-minute video check"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "An evaluation is rated, so the shop takes the first branch."
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the clinic show photos of your smile?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's speech therapy takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Check-in plan · every 4 weeks"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Speech Therapy LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Speech's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Speech Therapy"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Speech"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Speech and Lee Hearing Care"
+   ],
+   [
+    "plumbing and electrical",
+    "home speech therapy and hearing care"
+   ],
+   [
+    "1200 Main St",
+    "520 Main St"
+   ],
+   [
+    "88 Elm St",
+    "30 Cedar Ave"
+   ],
+   [
+    "Riley Chen",
+    "Iris Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Elise Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Caleb Price"
+   ],
+   [
+    "Casey Moore",
+    "Tia Moore"
+   ],
+   [
+    "Riley",
+    "Iris"
+   ],
+   [
+    "Avery",
+    "Elise"
+   ],
+   [
+    "Jordan",
+    "Caleb"
+   ],
+   [
+    "Casey",
+    "Tia"
+   ],
+   [
+    "electrical",
+    "hearing care"
+   ],
+   [
+    "Electrical",
+    "Hearing care"
+   ],
+   [
+    "plumber",
+    "therapist"
+   ],
+   [
+    "Plumber",
+    "Therapist"
+   ],
+   [
+    "plumbing",
+    "home speech therapy"
+   ],
+   [
+    "Plumbing",
+    "Home speech therapy"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "Barbershop",
+    "Clinic"
+   ],
+   [
+    "barbers",
+    "therapists"
+   ],
+   [
+    "barber",
+    "therapist"
+   ],
+   [
+    "Barber",
+    "Therapist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Evaluation and hearing screening"
+   ],
+   [
+    "Signature cut and shave",
+    "Evaluation and hearing screening"
+   ],
+   [
+    "hot towel",
+    "feeding therapy"
+   ],
+   [
+    "signature cut",
+    "evaluation and hearing screening"
+   ],
+   [
+    "Groom's package",
+    "Work conditioning"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "color and cut",
+    "brace fitting"
+   ],
+   [
+    "Color and cut",
+    "Brace fitting"
+   ],
+   [
+    "color correction",
+    "injury visit"
+   ],
+   [
+    "Color correction",
+    "Injury visit"
+   ],
+   [
+    "kids cuts",
+    "children's sessions"
+   ],
+   [
+    "Kids cut",
+    "Child's session"
+   ],
+   [
+    "kids cut",
+    "child's session"
+   ],
+   [
+    "skin fade",
+    "voice check"
+   ],
+   [
+    "Skin fade",
+    "Voice check"
+   ],
+   [
+    "beard trim",
+    "hearing screening"
+   ],
+   [
+    "Beard trim",
+    "Hearing screening"
+   ],
+   [
+    "haircuts",
+    "evaluations"
+   ],
+   [
+    "Haircuts",
+    "Evaluations"
+   ],
+   [
+    "haircut",
+    "evaluation"
+   ],
+   [
+    "Haircut",
+    "Evaluation"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "feeding therapy"
+   ],
+   [
+    "Color",
+    "Feeding therapy"
+   ],
+   [
+    "a patch test",
+    "an exam"
+   ],
+   [
+    "patch test",
+    "exam"
+   ],
+   [
+    "a consult",
+    "an exam"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shops",
+    "clinics"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "is at the chair",
+    "is at the front desk"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "At the chair",
+    "At the front desk"
+   ],
+   [
+    "Drain clearing",
+    "Home evaluation"
+   ],
+   [
+    "Water heater flush",
+    "Home session"
+   ],
+   [
+    "labor",
+    "game coverage"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like an evaluation on Saturday."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a check-in visit every 4 weeks"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a check-in visit every 4 weeks, after the plan of care ends."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A coach books injury screens for three players on one morning."
+   ],
+   [
+    "staff cut",
+    "staff evaluation"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My knee is more swollen. Can I still come in?"
+   ],
+   [
+    "like a skin-test result",
+    "like the plan of care's goals"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "Can Iris go over my home practice again? I'm not sure I'm doing them right."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una evaluación el sábado."
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Cedar Ave"
+   ],
+   [
+    "says the cape clip ripped",
+    "says the bib clip ripped"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free check, if Sam says so"
+   ]
+  ],
+  "B": [
+   [
+    "Water heater replacement",
+    "Hearing aid fitting"
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "My son is choking and can't breathe."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa home session Thu 12-2 Casey"
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My son says only a few words' fits a home evaluation."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like treating a child whose parent never said yes."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check?",
+    "A commonly paired add-on is one line on the card: 'Adding a hearing screening?"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many words does Max say, and does Max follow simple requests?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some care takes more than one visit, like weekly home sessions."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every week, too?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a hearing screening."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Jordan also check Max's hearing?"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "The $640 hearing aid fitting is over the plug-in's amount, so it gets an estimate to sign."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, still only a few words"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 home evaluation needs none."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Jordan's times show: Jordan is the audiologist."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also do a hearing test?"
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "If Max is choking or can't breathe, call 911 now."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds Max also needs a feeding check."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 feeding check"
+   ],
+   [
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Extra for A.M.: a feeding check, $160."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Feeding check · $160"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 feeding check price is good for 7 days."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the feeding check for $160."
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "Jordan finds a sign that needs a doctor first."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan stopped part of today's visit for safety. The note is on your secure page."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: something to check first"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: that part of the session"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "See your child's doctor first"
+   ],
+   [
+    "Safety note · your home",
+    "Safety note · today's visit"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a sign to check first, stopped"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Jordan's bag scuffs the floor and Jordan texts a photo."
+   ],
+   [
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "Jordan's bag scuffed the floor at A.M.'s."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "Alex has a question about the home practice 2 weeks later."
+   ],
+   [
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "A.M. asks for a check-in after the Thu Oct 22 visit."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "A check-in within 30 days is free, so this visit is free."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan was rushed and didn't explain the home practice."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scuff on the floor this morning."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan see Max again next week?"
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Jordan's next times for a home session."
+   ],
+   [
+    "sewer camera report",
+    "hearing test report"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that Max coughs more when eating now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Max coughs more when eating now."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about my son's speech."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a feeding problem, today,"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The hearing screening is priced at the visit."
+   ],
+   [
+    "M.P. would like to talk about the water heater quote before booking.",
+    "M.P. would like to talk about the hearing aid quote before booking."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley and Avery do speech therapy; Riley also does feeding work and home visits."
+   ],
+   [
+    "like a color correction done in two steps",
+    "like the visits a plan of care sets"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most speech therapy clinics set it."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most speech therapy clinics start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules speech therapy clinics often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Evaluations, therapy sessions and hearing screenings."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Home speech therapy and hearing care, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A hearing care visit"
+   ],
+   [
+    "Groom's package",
+    "Feeding therapy package"
+   ],
+   [
+    "color and cut",
+    "voice evaluation"
+   ],
+   [
+    "Color and cut",
+    "Voice evaluation"
+   ],
+   [
+    "color correction",
+    "feeding evaluation"
+   ],
+   [
+    "Color correction",
+    "Feeding evaluation"
+   ],
+   [
+    "The chairs",
+    "The therapy rooms"
+   ],
+   [
+    "A chair, ready",
+    "A therapy room, ready"
+   ],
+   [
+    "like a chair renter,",
+    "like a therapist who rents a room,"
+   ],
+   [
+    "Jules rents a chair, with their own customers.",
+    "Jules rents a room, with their own clients."
+   ],
+   [
+    "A chair renter asked for by name",
+    "A room renter asked for by name"
+   ],
+   [
+    "Access, like a step-free chair:",
+    "Access, like a step-free therapy room:"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for tutoring, which isn't on the clinic's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't do tutoring."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Riley can do a shorter session in the time left"
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter session."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the waiting room during Lily's session?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring a favorite small toy on Saturday."
+   ],
+   [
+    "please come with dry hair.",
+    "please bring a favorite small toy."
+   ],
+   [
+    "the customer is already in the chair",
+    "the client is already in the therapy room"
+   ],
+   [
+    "Stopped A.M.'s cut.",
+    "Stopped A.M.'s session."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "Before paying, Riley goes over the session and the home practice."
+   ],
+   [
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE A.M.: practice the s sound 5 minutes a day"
+   ],
+   [
+    "A.M. says Saturday's cut is uneven on one side.",
+    "A.M. asks about the home practice after Saturday's session."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The home practice sheet is missing."
+   ],
+   [
+    "or can't be reached while care is due?",
+    "or can't be reached during care?"
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked a kids' session first, so the times fit it."
+   ],
+   [
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "The code line follows the plug-in's visit kind: at the desk, at a drop-off, or at a video call's start."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Any question about the session? Reply here. How was your visit with Jordan?"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Speech therapy SP031552 · audiology AU30417"
+   ],
+   [
+    "and electrical's and the barbershop's when Sam gets to them",
+    "and the others when Sam gets to them"
+   ],
+   [
+    "3 jobs",
+    "3 visits"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I had hip surgery last week and can't drive yet. Can a speech therapist come to my home Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Someone calls for a dentist: a wrong number.",
+    "Someone calls for an eye doctor: a wrong number."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My mother needs speech therapy at home."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi mamá necesita terapia física en casa."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿alguien se cayó o está herido?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: has anyone fallen, or is anyone hurt?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie se cayó."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody fell."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Bien. Si se cae y no puede levantarse, o se golpea la cabeza, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Good. If she falls and can't get up, or hits her head, call 911."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A speech therapy example: a fall with no new injury gets the plug-in's words, then the booking goes on."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to call 911 if her mother falls and can't get up, or hits her head."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a speech therapist come to Kim's home this Thursday? What does it cost?"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Speech Therapy can do an evaluation at the clinic for $140, or at your home for $179, before any health plan."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan cares for both parents at one home, with a check-in plan for each, every 4 weeks."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can we skip next week's check-ins?"
+   ],
+   [
+    "Rental 1",
+    "Visit 1"
+   ],
+   [
+    "Rental 2",
+    "Visit 2"
+   ],
+   [
+    "A haircut",
+    "An evaluation"
+   ],
+   [
+    "a haircut",
+    "an evaluation"
+   ],
+   [
+    "leehomeservices.com",
+    "leehomespeech.com"
+   ],
+   [
+    "MP045210",
+    "SP045210"
+   ],
+   [
+    "BS20981",
+    "PR20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states set their own rules for work done away from the business."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Occupational therapy for Lee Home Services: is it the same company?"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds occupational therapy to Lee Home Services."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW occupational therapy"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your custom brace job"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like a mealtime visit Jordan noted"
+   ],
+   [
+    "a proposal for new pipes, from Jordan's notes",
+    "a proposal for a mealtime visit, from Jordan's notes"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · A mealtime visit"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's speech therapy takes no jobs sent now, at the clinic or away."
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE report Mon Oct 26"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Home Speech LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Speech's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Speech Therapy"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Speech"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Home Speech and Lee Hearing Care"
+   ],
+   [
+    "plumbing and electrical",
+    "home speech therapy and hearing care"
+   ],
+   [
+    "1200 Main St",
+    "520 Main St"
+   ],
+   [
+    "88 Elm St",
+    "30 Cedar Ave"
+   ],
+   [
+    "42 Oak St",
+    "9 Aspen Ln"
+   ],
+   [
+    "Riley Chen",
+    "Iris Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Elise Diaz"
+   ],
+   [
+    "Jordan Price",
+    "Caleb Price"
+   ],
+   [
+    "Casey Moore",
+    "Tia Moore"
+   ],
+   [
+    "Riley",
+    "Iris"
+   ],
+   [
+    "Avery",
+    "Elise"
+   ],
+   [
+    "Jordan",
+    "Caleb"
+   ],
+   [
+    "Casey",
+    "Tia"
+   ],
+   [
+    "electrical",
+    "hearing care"
+   ],
+   [
+    "Electrical",
+    "Hearing care"
+   ],
+   [
+    "plumbing license",
+    "speech therapy license"
+   ],
+   [
+    "Plumbing license",
+    "Speech therapy license"
+   ],
+   [
+    "plumber",
+    "therapist"
+   ],
+   [
+    "Plumber",
+    "Therapist"
+   ],
+   [
+    "plumbing",
+    "home speech therapy"
+   ],
+   [
+    "Plumbing",
+    "Home speech therapy"
+   ],
+   [
+    "barbershop",
+    "clinic"
+   ],
+   [
+    "Barbershop",
+    "Clinic"
+   ],
+   [
+    "barbers",
+    "therapists"
+   ],
+   [
+    "barber",
+    "therapist"
+   ],
+   [
+    "Barber",
+    "Therapist"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Evaluation and hearing test"
+   ],
+   [
+    "beard trim",
+    "hearing test"
+   ],
+   [
+    "Beard trim",
+    "Hearing test"
+   ],
+   [
+    "haircut",
+    "evaluation"
+   ],
+   [
+    "Haircut",
+    "Evaluation"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "color",
+    "feeding therapy"
+   ],
+   [
+    "consult",
+    "exam"
+   ],
+   [
+    "shop",
+    "clinic"
+   ],
+   [
+    "Shop",
+    "Clinic"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "at the chair",
+    "at the front desk"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Home evaluation"
+   ],
+   [
+    "drain clearing",
+    "home evaluation"
+   ],
+   [
+    "Drain clearing",
+    "Home evaluation"
+   ],
+   [
+    "Water heater replacement",
+    "Custom brace"
+   ],
+   [
+    "water heater replacement",
+    "custom brace"
+   ],
+   [
+    "Water heater flush",
+    "Home session"
+   ],
+   [
+    "water heater flush",
+    "home session"
+   ],
+   [
+    "water heaters",
+    "braces"
+   ],
+   [
+    "water heater",
+    "brace"
+   ],
+   [
+    "leak repair",
+    "feeding evaluation"
+   ],
+   [
+    "Leak repair",
+    "Feeding evaluation"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "service call",
+    "no-show fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "Service call",
+    "No-show fee"
+   ],
+   [
+    "Sewer camera inspection",
+    "Fall-risk screen"
+   ],
+   [
+    "sewer camera inspection",
+    "mealtime visit"
+   ],
+   [
+    "credited to the repair",
+    "credited to the work"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This needs care now. Go to the nearest emergency room or call 911. Don't wait for a therapy visit."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swollen face with a fever, gets the safety steps first."
+   ],
+   [
+    "like a roof leak",
+    "like a chiropractic adjustment"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: who the visit is for, new or returning, and a plan's name or self-pay."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a swollen face or jaw with a fever, or trouble breathing or swallowing."
+   ],
+   [
+    "Just the kitchen sink.",
+    "For me."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a loose brace."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are there steps at your door?"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "warranty plan",
+    "health plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your photo ID and plan card ready."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that his hip hurts more now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "My hip hurts more now."
+   ],
+   [
+    "Kitchen drain",
+    "Home evaluation"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old mark on the wall by the bed"
+   ],
+   [
+    "Under the sink, before",
+    "The room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the bed, before"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace two grab bars"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "replace two grab bars, $160"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Replace two grab bars · $160"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace two grab bars"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 grab bar quote"
+   ],
+   [
+    "replacing both shutoff valves for $160",
+    "replacing two grab bars for $160"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD a loose stair rail, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the bed"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a loose stair rail"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the visit"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Have the outlet fixed first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting supplies from the van, back 9:30"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scuffed the hallway floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scuffed hallway floor"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 home evaluation"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE A.M.: added on the secure page."
+   ],
+   [
+    "the shutoff valves",
+    "the grab bars"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My knee has been sore since the visit."
+   ],
+   [
+    "with the store's receipt",
+    "with the lab's receipt"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what's free after a visit, like a check within 30 days."
+   ],
+   [
+    "Texts the camera report link",
+    "Says the written tips are ready"
+   ],
+   [
+    "Sewer camera report",
+    "written tips"
+   ],
+   [
+    "Drain clearings already booked",
+    "Home evaluations already booked"
+   ],
+   [
+    "to the repair",
+    "to the treatment"
+   ],
+   [
+    "labor",
+    "game coverage"
+   ],
+   [
+    "Labor",
+    "Game coverage"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My hip hurts more today. Can someone come tonight?"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I drink coffee right before the visit?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "I'll be back from a doctor's visit 30 minutes late, sorry!"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 custom brace job"
+   ],
+   [
+    "flush",
+    "therapy session"
+   ],
+   [
+    "faucet",
+    "brace"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 9:00am"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 1:00pm"
+   ],
+   [
+    "'starts at 8:00am'",
+    "'starts at 9:00am'"
+   ],
+   [
+    "Thu Oct 22 · 8–10am",
+    "Thu Oct 22 · 9:00am"
+   ],
+   [
+    "next for that window",
+    "next for that time"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "house call",
+  "therapist",
+  "clinic",
+  "evaluation",
+  "no-show fee"
+ ],
+ "story": {
+  "A": "Sam Lee, a speech therapist, signs up two companies by text. Then Alex books a speech and language evaluation for Lily, 4, with Iris at Lee Speech Therapy, for Sat Oct 24 at 11:00am. The desk checks the family's health plan by hand, the forms stay on the secure page, Alex stays for the visit, and pays the $35 copay at the front desk. Iris's plan of care sets weekly sessions after preschool, which Alex books by text. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a home evaluation for Max, 2, who says only a few words. Caleb, a speech therapist with Lee Home Speech, comes Thu Oct 22 at 9:00am, with Alex at home, and sets a plan of weekly home sessions. The office bills Max's health plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|card|card"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: Lily's evaluation with Iris. Nothing is taken. The desk checks the plan, and Alex pays the $35 copay at the front desk. Weekly sessions are paid the same way, one at a time. A self-pay family pays $140, then $110 a session.",
+    "list|card|counter": "The same evaluation where the clinic turns on its $20 late-cancel fee, free to cancel until 24 hours before. A card is saved for it, never for a fee-free family, and Sam confirms any charge.",
+    "list|card|card": "A Saturday-morning visit, when the front desk is closed: a card is saved, and the $110 session is charged to it when Iris texts DONE. Video sessions are paid this way too."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Speech and language evaluation"
+    },
+    "list|*|*": {
+     "price": "$140",
+     "name": "Speech and language evaluation"
+    },
+    "list|card|card": {
+     "price": "$110",
+     "fee": "$20",
+     "name": "Speech therapy session"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Hearing screening",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$35",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Feeding evaluation",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$160",
+      "paid": "$160",
+      "fee": "$20"
+     }
+    },
+    "a-pack": {
+     "flow": "A",
+     "name": "Speech therapy session (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|card|card"
+   ],
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "examples": {
+    "list|none|own": "The main story: Max's home evaluation with Caleb. Nothing is taken. The office bills the family's health plan its own way.",
+    "list|card|card": "The same visit, paid by the family itself: a card is saved, and the $179 is charged when Caleb texts DONE. Free to cancel until 7am on the day; after that, an $89 fee only if Sam confirms it."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Home evaluation"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "fee": "$89",
+     "name": "Home evaluation"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Hearing screening at home",
+     "price": "list",
+     "before": "card",
+     "after": "card",
+     "amounts": {
+      "price": "$60",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Feeding evaluation at home",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$199",
+      "paid": "$199",
+      "fee": "$89"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "Home session (plan visit)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A8-35",
+    "more": [
+     "Here: Iris finds a warning sign, like trouble swallowing, so there's no regular session today.",
+     "Iris tells Alex to see the child's doctor first.",
+     "Alex pays only for what was done, like the evaluation."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A9-20",
+    "more": [
+     "Lee Speech Therapy sends the claim itself. Alex pays the estimated share at the front desk.",
+     "A balance after the plan pays is billed by the clinic, never by Rosie's text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Therapy records stay with the clinic as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-64",
+    "more": [
+     "For a therapy visit, they sign the consent and the health history on the secure page.",
+     "The code goes to whoever brings the patient to the clinic."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A7-74",
+    "more": [
+     "At Lee Speech Therapy, the forms are the intake form, the health history and the consent.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Speech therapy always needs a license: each speech therapist and assistant, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Speech therapy books people (a speech therapist or a speech therapy assistant), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Speech therapy runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each speech therapist and assistant holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No speech therapy is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "A therapy visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "A therapy visit books a person's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A therapy visit books a person's time, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the clinic: the patient is always there."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's therapy visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A worried parent who wants a visit soon gets the soonest open time, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-50",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.14"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks the state's rule on a referral",
+      "q": "Is a referral needed before the evaluation?",
+      "does": "The plug-in holds a switch from the state's form: may a speech evaluation happen without a doctor's referral? Here it may, so the booking goes on with none yet.",
+      "more": [
+       "Some plans want a referral before weekly sessions, even where the state doesn't. The office asks for it later.",
+       "A referral's photo goes on the secure page, never through the AI.",
+       "Rosie never judges the reason. It only reads the switch from the state's form and the plan."
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.license"
+      ],
+      "branches": [
+       {
+        "label": "Not needed to evaluate",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Allowed, with limits",
+        "steps": [
+         {
+          "id": "A4-x02",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Marks the booking 'no referral'",
+          "does": "Say the state's form lets an evaluation happen without a referral, but with limits. The booking is marked 'no referral', and only therapists the state allows are offered.",
+          "more": [
+           "The state's form says the limit, like a number of visits or days.",
+           "The desk counts them, and Rosie reminds the desk before the limit.",
+           "The plan's rules can still ask for a referral before it pays."
+          ],
+          "needs": [
+           "pf.license",
+           "pf.rules"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "Needed first, and none yet",
+        "steps": [
+         {
+          "id": "A4-x03",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "chat",
+          "title": "Says a referral comes first",
+          "does": "Say the state's form, or the family's plan, needs a referral before any visit, and there's none. Nothing is booked. Alex gets one from the child's doctor, then books again.",
+          "more": [
+           "Nothing is saved, so nothing runs out."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Lee Speech Therapy needs a doctor's referral before a first visit, under the state's rules or the family's plan. Once Alex has one, booking takes a minute. Nothing is saved for now."
+           ]
+          ],
+          "tells": [
+           "agent"
+          ]
+         }
+        ],
+        "end": "end",
+        "endText": "Nothing booked. Alex books again once a doctor's referral is in hand."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-37",
+    "more": [
+     "The desk also notes the copay, any deductible left, any yearly visit limit, and if the plan must OK sessions.",
+     "The share is the plan's estimate, not a promise. The clinic bills the plan after the visit."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here: the intake form, the health history and the consent, due the day before.",
+     "A returning family's consent stays on file for a year."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "Speech therapy bills each visit on its own, never in stages."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Evaluation results and the plan of care go to the doctor office to office, and are shared with the patient in person, never through Rosie."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the clinic: the patient is always there."
+   },
+   {
+    "op": "after",
+    "at": "A8-45",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "8.12",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "portal",
+      "t": "Sat Oct 24, 12:20pm",
+      "title": "Iris sets the plan of care",
+      "does": "The evaluation is done. Iris writes the plan of care in the clinic's own record: goals and practice at home. It sets one 45-minute session a week for 12 weeks.",
+      "more": [
+       "Rosie keeps only the count and the dates.",
+       "The plan itself, the goals and the test results stay in the clinic's record, never in Rosie or a text.",
+       "The clinic sends the plan to Lily's doctor itself. Where a plan asks for it, the doctor signs it.",
+       "The sessions can be with Iris or Elise, both speech therapists.",
+       "Alex picks the day with Iris, or with the desk on a weekday: Tuesdays at 3:30pm, after preschool, at the clinic.",
+       "Video instead is the family's choice, only with a therapist licensed where the child will be.",
+       "A re-check comes after the 12 sessions, as the plan of care says."
+      ],
+      "needs": [
+       "pf.services",
+       "pf.staff"
+      ]
+     },
+     {
+      "id": "A8-x02",
+      "type": "split",
+      "line": [
+       "4.25",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "portal",
+      "t": "Sat Oct 24, 12:22pm",
+      "title": "The desk records the plan's answer",
+      "q": "Does the plan OK the sessions?",
+      "does": "The referral came in Friday. The desk asks the plan on its own website and records the answer. Here, the plan OKs 12 sessions, until Fri Jan 29.",
+      "more": [
+       "Some plans answer in minutes, some in days.",
+       "Rosie counts each session against the OK, and against the plan's limit of 20 therapy visits a year.",
+       "It warns the desk before the last one."
+      ],
+      "rule": "Rosie's rule: Rosie never contacts a plan. The desk records the plan's answer, and Rosie only counts the visits. Why: Rosie connects only to the calendar and Stripe.",
+      "needs": [
+       "pf.money"
+      ],
+      "branches": [
+       {
+        "label": "OK'd: 12 sessions",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Pending: one at a time",
+        "steps": [
+         {
+          "id": "A8-x03",
+          "line": [
+           "4.25"
+          ],
+          "who": "staff",
+          "via": "portal",
+          "title": "Books only the next session, marked pending",
+          "does": "The plan hasn't answered yet. Only the next session is booked, marked 'OK pending'. The weekly plan waits for the plan's answer.",
+          "more": [
+           "Alex hears that if the plan says no, it's $110 a session self-pay, or a free cancel.",
+           "The desk records the answer when it comes. Then the weekly plan's text goes out."
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "No: self-pay, or stop",
+        "steps": [
+         {
+          "id": "A8-x04",
+          "line": [
+           "4.25",
+           "4.11"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "visit",
+          "title": "Goes over the self-pay price with Alex",
+          "does": "The plan says no to more sessions. The desk shows Alex the self-pay price, $110 a session, and the right to a written price estimate. Iris can ask the plan to look again.",
+          "more": [
+           "If Alex goes on, the weekly plan's text shows the self-pay price.",
+           "If the clinic isn't in the family's plan, the family gets a receipt to send to its plan.",
+           "If Alex stops, nothing more is booked. Today's share is still paid."
+          ]
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     },
+     {
+      "id": "A8-x05",
+      "type": "split",
+      "line": [
+       "4.19",
+       "7.15"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Sat Oct 24, 12:25pm",
+      "title": "Texts the weekly plan for Alex's own yes",
+      "q": "Does Alex book the weekly plan?",
+      "does": "Alex picked the day at the visit, but the weekly plan still needs Alex's own yes by text. One reply can later cancel any session, or all that are left.",
+      "more": [
+       "The text names only the clinic and the days. The plan of care stays on the secure page.",
+       "Nothing repeats without this yes.",
+       "Each session is paid when it happens, like the first one."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your weekly sessions at Lee Speech Therapy are ready to book.",
+        {
+         "card": {
+          "title": "Lee Speech Therapy · 30 Cedar Ave",
+          "lines": [
+           "12 sessions · Tuesdays · 3:30pm",
+           "Tue Oct 27 to Tue Jan 12",
+           "Each session is paid like your first one",
+           "Free to cancel any session until 24 hours before"
+          ],
+          "button": "See the dates",
+          "link": "rosfield.com/v/a3"
+         },
+         "buttons": [
+          "Book all 12",
+          "Just the next one"
+         ]
+        }
+       ]
+      ],
+      "rule": "Rosie's rule: a series of visits needs the customer's own yes, and one reply can cancel any visit or all that are left. Why: nobody is booked again and again without saying so.",
+      "tells": [
+       "cust"
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "branches": [
+       {
+        "label": "1 Book all 12",
+        "steps": [
+         {
+          "id": "A8-x06",
+          "line": [
+           "4.19"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books the 12 weekly sessions",
+          "does": "Alex replies 1, so all 12 sessions are booked. It's one booking, and each session gets its own code in its own reminder.",
+          "more": [
+           "Rosie counts the sessions against the plan's OK.",
+           "If Alex has another open booking, like a sibling's, a reply first asks which one."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "1"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: 12 weekly sessions at Lee Speech Therapy.",
+            {
+             "card": {
+              "title": "Lee Speech Therapy · 30 Cedar Ave",
+              "lines": [
+               "Tuesdays · 3:30pm",
+               "Tue Oct 27 to Tue Jan 12",
+               "Each session's code comes with its reminder"
+              ]
+             },
+             "buttons": [
+              "Change the next one",
+              "Cancel the next one",
+              "Cancel all that are left"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "2 Just the next one",
+        "steps": [
+         {
+          "id": "A8-x07",
+          "line": [
+           "4.19",
+           "10.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books only the next session",
+          "does": "Alex replies 2, so only Tue Oct 27 is booked. The desk books each next session at checkout, one at a time.",
+          "say": [
+           [
+            "cust",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: your next session at Lee Speech Therapy.",
+            {
+             "card": {
+              "title": "Lee Speech Therapy · 30 Cedar Ave",
+              "lines": [
+               "Tue Oct 27 · 3:30pm",
+               "Free to cancel until Mon Oct 26, 3:30pm"
+              ]
+             },
+             "code": "7314",
+             "buttons": [
+              "Change the time",
+              "Cancel the visit"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "No reply in 2 hours",
+        "steps": [
+         {
+          "id": "A8-x08",
+          "line": [
+           "4.19"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Books only the session agreed at the desk",
+          "does": "No reply, so nothing repeats. Only Tue Oct 27, which Alex agreed to at the desk, is booked. The desk asks again at that session."
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A10-06",
+    "branch": {
+     "label": "A progress check comes due",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A10-x01",
+       "line": [
+        "10.10",
+        "8.12"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "portal",
+       "t": "Tue Dec 1, 3:30pm",
+       "title": "Iris checks Lily's progress",
+       "does": "Lily's 6th session includes the progress check the plan of care set. Iris measures progress against the goals and updates the plan in the clinic's record.",
+       "more": [
+        "The progress note goes to Lily's doctor office to office, never through Rosie or a text.",
+        "Rosie only counts the sessions: 6 of 12 done, 6 left on the plan's OK.",
+        "More sessions after the 12 need the plan's OK again, and Alex's own yes to a new weekly plan."
+       ],
+       "needs": [
+        "pf.services",
+        "pf.rules"
+       ]
+      },
+      {
+       "id": "A10-x02",
+       "line": [
+        "4.25",
+        "11.1"
+       ],
+       "who": "san",
+       "to": "staff",
+       "via": "msg",
+       "t": "Wed Dec 30, 8:00am",
+       "title": "Warns the desk before the OK runs out",
+       "does": "Two sessions are left on the plan's OK, which ends Fri Jan 29. The desk asks the plan for more, or tells Alex the self-pay price before the last one.",
+       "more": [
+        "The text names only the child's initials, the count and the date.",
+        "Rosie also counts the plan's yearly limit, and warns the desk the same way.",
+        "Rosie never asks the plan itself."
+       ],
+       "say": [
+        [
+         "san",
+         "staff",
+         "L.M.: 2 sessions left on the plan's OK, which ends Fri Jan 29.",
+         {
+          "card": {
+           "title": "Sessions left · L.M.",
+           "lines": [
+            "10 of 12 done",
+            "OK ends Fri Jan 29"
+           ],
+           "button": "Open the record",
+           "link": "rosfield.com/s/a4"
+          }
+         }
+        ]
+       ],
+       "tells": [
+        "staff"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A clinic sells its visit packs only at the clinic, never while booking (pf.money.packages)."
+   },
+   {
+    "op": "after",
+    "at": "A8-33",
+    "steps": [
+     {
+      "id": "A8-x09",
+      "type": "split",
+      "line": [
+       "8.12"
+      ],
+      "who": "staff",
+      "via": "visit",
+      "title": "Iris screens her hearing first",
+      "q": "Does she pass the hearing screening?",
+      "does": "Iris does a quick pass-or-fail hearing screening before the speech and language part. The result stays in the clinic's own record, never in a text.",
+      "more": [
+       "A speech therapist screens only. A full hearing test is an audiologist's work.",
+       "Either way, the evaluation goes on."
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "branches": [
+       {
+        "label": "Passes",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Doesn't pass",
+        "steps": [
+         {
+          "id": "A8-x10",
+          "line": [
+           "8.12",
+           "10.8"
+          ],
+          "who": "staff",
+          "to": "cust",
+          "via": "visit",
+          "title": "Refers her for a full hearing test",
+          "does": "Iris finishes the speech and language part, then tells Alex in person: a full hearing test with an audiologist comes next. Weekly sessions can still start meanwhile.",
+          "more": [
+           "It's the speech therapist's own referral. Rosie doesn't book it.",
+           "The written referral goes on the secure page, never in a text.",
+           "Iris updates the plan of care once the hearing result comes in."
+          ],
+          "needs": [
+           "pf.visit"
+          ]
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The clinic runs no classes; every visit is one client with one therapist."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off or mailed in for speech therapy."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A therapy visit always needs the patient there."
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Therapy records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Home speech therapy takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Nobody is on call for speech therapy (S2-27)."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A therapy visit always needs the patient there, so there's no visit with nobody home."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the therapist's care at home: an adult on the booking is there (B8-09)."
+   },
+   {
+    "op": "more",
+    "at": "S1-26",
+    "more": [
+     "Why: a fee for each patient booked can break health care rules, so Rosfield's lawyer checks it first."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Speech therapy always needs a license: each speech therapist and assistant, and the practice where the state's form asks."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: every profession pays the $2 per booking; the no-$2 branch stays off"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Speech therapy books people (a speech therapist or a speech therapy assistant), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Speech therapy runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "2 No person license",
+    "why": "Each speech therapist and assistant holds their own license."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No speech therapy is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A therapy visit is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Home speech therapy sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "No therapy visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "No therapy visit is sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "A home therapy visit needs no signed contract: the consent is a form on the secure page (B4-86)."
+   },
+   {
+    "op": "more",
+    "at": "S2-31",
+    "more": [
+     "A worried parent who wants a visit soon gets the soonest open time, once Sam OKs it."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "Speech therapy bills each visit on its own, never in stages."
+   },
+   {
+    "op": "after",
+    "at": "B4-05",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.14"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks the state's rule on a referral",
+      "q": "Is a referral needed before the evaluation?",
+      "does": "The plug-in holds a switch from the state's form: may a speech evaluation happen without a doctor's referral? Here it may, so the booking goes on with none yet.",
+      "more": [
+       "Some plans want a referral before weekly sessions, even where the state doesn't. The office asks for it later.",
+       "A referral's photo goes on the secure page, never through the AI.",
+       "Rosie never judges the reason. It only reads the switch from the state's form and the plan."
+      ],
+      "needs": [
+       "pf.first_steps",
+       "pf.license"
+      ],
+      "branches": [
+       {
+        "label": "Not needed to evaluate",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Allowed, with limits",
+        "steps": [
+         {
+          "id": "B4-x02",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Marks the booking 'no referral'",
+          "does": "Say the state's form lets an evaluation happen without a referral, but with limits. The booking is marked 'no referral', and only therapists the state allows are offered.",
+          "more": [
+           "The state's form says the limit, like a number of visits or days.",
+           "The office counts them, and Rosie reminds the office before the limit."
+          ],
+          "needs": [
+           "pf.license",
+           "pf.rules"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "Needed first, and none yet",
+        "steps": [
+         {
+          "id": "B4-x03",
+          "line": [
+           "4.7",
+           "4.14"
+          ],
+          "who": "san",
+          "to": "agent",
+          "via": "chat",
+          "title": "Says a referral comes first",
+          "does": "Say the state's form, or the family's plan, needs a referral before any visit, and there's none. Nothing is booked. Alex gets one from the child's doctor, then books again.",
+          "more": [
+           "Nothing is saved, so nothing runs out."
+          ],
+          "say": [
+           [
+            "san",
+            "agent",
+            "Lee Home Speech needs a doctor's referral before a first visit. That's the state's rule where the family lives, or the plan's. Once Alex has one, booking takes a minute. Nothing is saved for now."
+           ]
+          ],
+          "tells": [
+           "agent"
+          ]
+         }
+        ],
+        "end": "end",
+        "endText": "Nothing booked. Alex books again once a doctor's referral is in hand."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-74",
+    "more": [
+     "For a therapy visit, they sign the consent and the health history on the secure page.",
+     "Like Rosa, booking for her mother after a stroke, as her health care agent. The code goes to whoever meets the therapist."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-44",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "line": [
+       "8.12",
+       "4.19"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "portal",
+      "t": "Thu Oct 22, 10:20am",
+      "title": "Caleb sets the plan of home sessions",
+      "does": "Caleb writes the plan of care in the office's own record: one 45-minute home session a week for 12 weeks. Where the state's form allows it, Tia, the assistant, does most of them.",
+      "more": [
+       "The plan, the goals and the test results stay in the office's record, never in Rosie or a text.",
+       "The office sends the plan to Max's doctor itself. Where a plan asks for it, the doctor signs it.",
+       "Caleb comes back every fourth session, as the state's form sets for an assistant's work.",
+       "Where the form doesn't let an assistant do them, Caleb does every session.",
+       "The referral came in Wednesday. The office asks the plan to OK the 12 sessions on its own website. Rosie counts them."
+      ],
+      "needs": [
+       "pf.services",
+       "pf.staff"
+      ]
+     },
+     {
+      "id": "B8-x02",
+      "type": "split",
+      "line": [
+       "4.19",
+       "7.15"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "t": "Thu Oct 22, 10:25am",
+      "title": "Texts the home sessions for Alex's own yes",
+      "q": "Does Alex book the home sessions?",
+      "does": "Alex picked the day with Caleb, but the sessions still need Alex's own yes by text. One reply can later cancel any session, or all that are left.",
+      "more": [
+       "At home, the text names who comes, for the door check. The plan of care stays on the secure page.",
+       "Nothing repeats without this yes."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your weekly home sessions are ready to book.",
+        {
+         "card": {
+          "title": "Lee Home Speech · 9 Aspen Ln",
+          "lines": [
+           "12 sessions · Tuesdays · starts at 10:00am",
+           "Tue Oct 27 to Tue Jan 12",
+           "With Tia or Caleb, from Lee Home Speech",
+           "Each session is paid like your first one"
+          ],
+          "button": "See the dates",
+          "link": "rosfield.com/v/r6"
+         },
+         "buttons": [
+          "Book all 12",
+          "Just the next one"
+         ]
+        }
+       ]
+      ],
+      "rule": "Rosie's rule: a series of visits needs the customer's own yes, and one reply can cancel any visit or all that are left. Why: nobody is booked again and again without saying so.",
+      "tells": [
+       "cust"
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "branches": [
+       {
+        "label": "1 Book all 12",
+        "steps": [
+         {
+          "id": "B8-x03",
+          "line": [
+           "4.19"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books the 12 home sessions",
+          "does": "Alex replies 1, so all 12 sessions are booked. It's one booking, and each session gets its own code in its own on-my-way text.",
+          "more": [
+           "Tia comes for most of them. Whoever comes is named in each reminder, for the door check.",
+           "A parent or a named adult is home for each session.",
+           "If Alex has another open booking, a reply first asks which one."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "1"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: 12 home sessions with Lee Home Speech.",
+            {
+             "card": {
+              "title": "Lee Home Speech · 9 Aspen Ln",
+              "lines": [
+               "Tuesdays · starts at 10:00am",
+               "Tue Oct 27 to Tue Jan 12",
+               "Each session's code comes with its on-my-way text"
+              ]
+             },
+             "buttons": [
+              "Change the next one",
+              "Cancel the next one",
+              "Cancel all that are left"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "2 Just the next one",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "line": [
+           "4.19",
+           "10.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Books only the next home session",
+          "does": "Alex replies 2, so only Tue Oct 27 is booked. The office books each next session, one at a time.",
+          "say": [
+           [
+            "cust",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "cust",
+            "Booked: your next home session.",
+            {
+             "card": {
+              "title": "Lee Home Speech · 9 Aspen Ln",
+              "lines": [
+               "Tue Oct 27 · starts at 10:00am · Tia",
+               "Free to cancel until 7am on the day"
+              ]
+             },
+             "buttons": [
+              "Change the time",
+              "Cancel the visit"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ],
+        "end": "merge"
+       },
+       {
+        "label": "No reply in 2 hours",
+        "steps": [
+         {
+          "id": "B8-x05",
+          "line": [
+           "4.19"
+          ],
+          "who": "san",
+          "via": "auto",
+          "title": "Books only the session agreed with Caleb",
+          "does": "No reply, so nothing repeats. Only Tue Oct 27, which Alex agreed to with Caleb, is booked. Tia asks again at that session."
+         }
+        ],
+        "end": "merge"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "A check-in plan's home visits are each paid when they happen, like a single visit, so no plan charge is ever texted (pf.money.repeatPlans)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "Home speech therapy books a set start time, like a session at home, never a window."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Care already given at the visit has no cancel period (B8-24); only care not yet given can have one."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-43",
+   "A7-15",
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "Refit Tue Oct 27 2026 (R12) to the REDESIGN 2 master: facts planbill, forms, plans, video, children, firststeps, results; sensitive on; welfare on in flow B only; no $2 (S1-62 off); setstart both flows; cutoff 24 hours before (A) and 7am the day of (B). Money A list|none|counter (main; Speech and language evaluation $140, the $35 copay in the example), list|card|counter (fee $20), list|card|card (Speech therapy session $110, fee $20). Money B list|none|own (main; Home evaluation $179) and list|card|card (fee $89). Every old words op is gone; own steps kept (referral check, plan of care and weekly series, progress check, hearing screen), with their money variants folded into one line true on every path. The home company is now Lee Home Speech (word limits).\nFrom: physical-therapist (built from the dentist clinic pilot, reviewed). Why: a speech practice runs like it: an evaluation by a licensed therapist, then a plan of care with a weekly series booked by the client's own yes, plans checked by hand, video sessions only where the therapist is licensed for where the client is, home visits on the other side, and no $2 for a health practice. What it lacked came from the pediatrician overlay: a parent or guardian books for a child, who may bring the child is a switch, and children's details stay on the secure page.\nNames: Sam Lee, a speech therapist, owns Lee Home Speech (the master's main company: home speech therapy and hearing care, 520 Main St, a 25-mile area) and Lee Speech Therapy (the second company: the clinic, 30 Cedar Ave). Flow A's story is at the clinic: Alex's daughter Lily, 4. Flow B's is at the family's home, 9 Aspen Ln: Alex's son Max, 2.\nPeople: at the clinic, Iris (speech therapist; Spanish; feeding work; the clinic's home visits) and Elise (speech therapist, Saturday afternoons). On the home team, Caleb (speech therapist, also a licensed audiologist, feeding work) and Tia (speech therapy assistant, sessions only, under a therapist's plan). Sam, Pat and Alex M. stay. The pilot's people are all renamed; other clients keep master names (Dee W., Ben T., Nia K., Lin W., Morgan P., Kim L.) or new ones (Nora S., Ruth P., Ivy C.).\nKinds of work: plumbing became home speech therapy, electrical became hearing care (it waits for its audiologist's license), the barbershop became the clinic. Licenses are switches from the state's form: each speech therapist's own license (Sam's SP045210), an assistant's or a clinical fellow's credential where the state asks, an audiologist's license for hearing care, and the practice's registration (PR20981) only where asked.\nWho books: a parent or legal guardian for anyone under 18 (Rosie's rule for this work until a state's form says otherwise; the minor-consent age is a switch); an adult for themselves; a guardian or health care agent for an adult who can't consent, like after a stroke (Rosa for her mother). Anyone else is asked to have a parent book. Who may bring the child is a switch: a parent, or an adult the parent OKs on the secure page (A8-02, A8-51 to A8-60, B4-26, B4-27). At a preschool session, the parent signs an OK and stays reachable by phone (S1-59, B4-66).\nPrivacy: the AI hears only the kind of visit, the child's age, the languages at home, a school plan yes or no, a referral yes or not yet, and the plan's name. The child's name, birth date, the reason, test results and health history go only on the secure page. Customer texts carry the business, date, time and place, never the child's name or the visit type; an extra service in a text is 'one more thing' or 'the extra visit', with what it is on the secure page. Owner and staff texts use initials (L.M., M.M. for the child; A.M. for the parent) and a link. At home the therapist's name stays, for the door check.\nSafety: stroke signs at any age (sudden trouble speaking, a drooping face, weakness on one side), choking now or trouble breathing get 'Call 911 now' and no booking; self-harm words get 988 and 911. Coughing at meals with no choking now gets the 911 words first, then the booking goes on (A3-23, B3-18, B7-17). Rosie never judges how serious anything is.\nPrices are the example practices' own, not a standard: clinic evaluation $140 (75 min), session $110 (45 min), re-check $120, adult evaluation $140, voice check $40 (the one recording room), feeding evaluation $160 with Sam's OK, hearing screening $20 added to an evaluation, video session $110, a plan's $35 copay, a $20 late-cancel or missed-visit fee only where Sam turns it on. Home: evaluation $179 (75 min), session $150, mealtime visit $160, adult evaluation at home $199 ($249 with Sam), an $89 fee for self-pay visits only. Hearing care: $60 hearing test, $20 ear check, preschool screenings $120 an hour.\nMoney A: list|none|counter is the main path: nothing taken; the desk checks the plan by hand; the copay at the front desk at each visit; self-pay families pay the list price there, and a family whose plan the clinic doesn't take gets a receipt to send its plan (A9-03, A9-20, A8-x04). list|card|counter: the clinic's $20 late-cancel fee, free to cancel until 24 hours before, a card saved for it, Sam confirms each charge, never for a fee-free family. list|card|card: Saturday mornings with no front desk, and video sessions: the card is charged at DONE. Left out: holds, deposits and full price (therapy is never paid ahead), photos and visit pricing (every service is on the list), Rosie's texted bill (the clinic has a front desk).\nMoney B: list|none|own is the main path (the office bills the family's plan its own way). list|card|card is self-pay: a card saved, $179 charged at DONE, and an $89 fee after 7am on the day only if Sam confirms it. A self-pay family hears about the written price estimate before saying yes (B4-28). Left out: holds, deposits, full price, a texted bill, photos and visit pricing.\nSign-up words follow that (S1-12 to S1-18, S1-41 to S1-47): plan families book with nothing taken; self-pay home families save a card; the clinic saves a card only for its fee or a Saturday-morning visit. No tips, no bank transfer, no $2 (S1-26, S1-62, S1-65).\nReferral: a switch from the state's form (A4-x01 to A4-x03, B4-x01 to B4-x03): not needed to evaluate (the story); allowed with limits (marked 'no referral', only therapists the state allows, the desk counts the limit); needed first (nothing booked). Where the plan wants one before weekly sessions, the office asks the child's doctor itself with the parent's OK (A4-48, B4-42), and the sessions wait for it.\nPublic programs: said once, as information (Rosie's rule): a child 3 or older can get a free evaluation from the school district (A4-50); under 3, the state's early intervention program (B4-05). Speech services in a school plan are never booked: the school district gives them (A4-38).\nOwn steps: A8-x09 and A8-x10, a pass-or-fail hearing screening when Alex adds it (refer to an audiologist if not passed; sessions can still start). After the evaluation, Iris sets the plan of care (A8-x01), the desk records the plan's OK (A8-x02: 12 sessions until Fri Jan 29; pending; or self-pay), and the weekly plan goes out for Alex's own yes (A8-x05 to A8-x08: Tuesdays 3:30pm, after preschool). Flow B does the same for 12 weekly home sessions, mostly with Tia under Caleb's plan (B8-x01 to B8-x05). A10-x01 and A10-x02: a progress check at the 6th session, and a desk warning before the plan's OK or its yearly visit limit runs out.\nVideo: a session (never a first child evaluation, the example clinic's rule) only with a therapist licensed where the child is during the session, or with a compact privilege the state's form allows; a family across a state line from the clinic gets only therapists licensed in its state, or a clinic time (A4-36, A8-03).\nFlow B books a set start time (B4-83 keeps '2 A set start time'; arrival windows are off): a toddler's home session starts at 9:00am, not in a window. The master's window words are renamed to start times in B.\nStand-ins: nobody is moved to another therapist without the family's yes, so Sam turns the no-reply default off (A7-21, B7-20, B7-22, S11-46, S11-49), as the pediatrician overlay does. Families never hear why a therapist is out.\nA sick child never means a fee: Sam's own rule (A7-13, A8-14, pf.edges.sickChild). Fee-free families (Medicaid where that applies) are a switch in pf.money.\nOff, beyond the pilot's: in B, weather (indoor work) and arrival windows. splitsKept: A7-61 (Elise may stand in for an evaluation; nobody else for feeding work) and A8-02 (all here, or something missing).\nClocks: sign-up and the team Mon Oct 19 from 2:05pm. A: Wed Oct 21 7:15pm booking, Fri 10am reminder, Sat 8am day list, 11:00am check-in, a 75-minute evaluation, the plan of care 12:20pm, the weekly plan's text 12:25pm, the rating 4pm. B: Mon Oct 19 6:40pm booking, Wed 10am reminder, Thu 7am day list, OMW 8:45am, check-in 9:00am, DONE 10:15am (75 min), the plan 10:20am, the text 10:25am, the receipt 10:30am, the rating 11am.\nKept words: clinic, evaluation, therapist and no-show fee are this work's own words too (the pilot's checker lists them because the physical therapist used them).\nUnlisted money paths keep the pilot's or the master's own variants (the overlay stores only what its listed paths show).\nNot sure: the example prices; whether a $20 clinic fee and an $89 home fee suit most practices; whether a state lets an assistant run most home sessions (a switch, here every fourth session is Caleb's); the right to cancel extra care sold at home (B8-24) as a switch; Caleb holding both a speech and an audiology license is rare but real.\nReview, Oct 23: a child is never moved to another therapist without the family's yes: the plug-in turns Rosie's no-reply default off (A7-21, B7-22, pf.staff.standIn), not a setting Sam turns back on. B8-24 follows primary care and coach: care already given at a home visit (the mealtime visit) has no cancel period; only care sold at home and not given yet can have one, a switch (pf.rules.homeSales); B10-05's cancel branch is off and S11-72 is a written estimate that came due. An evaluation is never offered with Tia, the assistant (S11-05, S11-80, S11-87, S12). How many sessions an assistant may do is a switch (pf.staff.supervision, B8-x01). The loaner speech device is in pf.services.capacity. A8-03's class and drop-off branches and A8-32's several-days branch are off.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "like a color correction done in two steps",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Groom's package",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "A chair renter asked for by name",
+    "Access, like a step-free chair:",
+    "My employer pays for this cut.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Riley can do a shorter cut in the time left",
+    "No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "please come with dry hair.",
+    "the customer is already in the chair",
+    "Stopped A.M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror.",
+    "NOTE A.M.: #2 on the sides, scissors on top, low beard line",
+    "A.M. says Saturday's cut is uneven on one side.",
+    "The cut is uneven on one side.",
+    "or can't be reached while care is due?",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "The code line follows the plug-in's visit kind: at the chair, at a drop-off, or at the start of a video call.",
+    "Avery at the shop, Casey for plumbing.",
+    "3 jobs",
+    "A tip goes the shop's own way.",
+    "says the cape clip ripped a shirt collar today",
+    "The cape clip ripped my shirt collar.",
+    "Alex bought a package of cuts at the shop.",
+    "A beard trim",
+    "a beard trim",
+    "Lena",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "has a haircut plan with Riley, every 4 weeks.",
+    "Someone calls for a dentist: a wrong number.",
+    "Is this Elm Street Dental? I need to move my cleaning.",
+    "so I can't reach Elm Street Dental.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A haircut",
+    "a haircut",
+    "a kids cut",
+    "a house call",
+    "MP045210",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "price board",
+    "Price board",
+    "shop's board",
+    "15-minute style consult",
+    "like a burst pipe or a lockout",
+    "A cut is rated, so the shop takes the first branch.",
+    "May the shop show photos of your hair?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Haircut plan · every 4 weeks",
+    "Lee's Barbershop LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "hot towel",
+    "signature cut",
+    "Groom's package",
+    "groom's party",
+    "color and cut",
+    "Color and cut",
+    "color correction",
+    "Color correction",
+    "kids cuts",
+    "Kids cut",
+    "kids cut",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Beard trim",
+    "haircuts",
+    "Haircuts",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "Color",
+    "a patch test",
+    "patch test",
+    "a consult",
+    "consult",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Drain clearing",
+    "labor",
+    "I'd like a cut on Saturday.",
+    "Books a cut every 4 weeks",
+    "Alex asks for a cut every 4 weeks.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "staff cut",
+    "The rash on my scalp got worse. Can I still come in?",
+    "like a skin-test result",
+    "The cut is uneven on one side.",
+    "Quiero un corte el sábado.",
+    "Step-free door on Elm St",
+    "says the cape clip ripped",
+    "Books a free fix, if Sam says so"
+   ],
+   "B": [
+    "Water heater replacement",
+    "My gas water heater got wet in a flood.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check?",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "Say Alex also asks about a dripping faucet.",
+    "Can Jordan also look at a dripping faucet?",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for A.M.: replace both shutoff valves, $160.",
+    "Replace both shutoff valves · $160",
+    "The $160 valve quote is good for 7 days.",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds mold behind the sink wall.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "Safety note · your home",
+    "HAZARD mold behind the sink wall, stopped",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Jordan cracked the cabinet floor at A.M.'s.",
+    "The drain clogs again 2 weeks later.",
+    "A.M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty, so this visit is free.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Here are Jordan's next times for a bathroom drain.",
+    "sewer camera report",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "It's a leak under the sink, today,",
+    "The faucet is a leak repair, quoted at the visit.",
+    "M.P. would like to talk about the water heater quote before booking.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "The chairs",
+    "A chair, ready",
+    "like a chair renter,",
+    "Jules rents a chair, with their own customers.",
+    "or can't be reached while care is due?",
+    "1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Plumbing JP031552 · electrical JE30417",
+    "and electrical's and the barbershop's when Sam gets to them",
+    "3 jobs",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Someone calls for a dentist: a wrong number.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "Rental 1",
+    "Rental 2",
+    "A haircut",
+    "a haircut",
+    "leehomeservices.com",
+    "MP045210",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Price board",
+    "like a burst pipe or a lockout",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "a proposal for new pipes, from Jordan's notes",
+    "Proposal · Replace the old pipes",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "LATE camera report Mon Oct 26",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "Lee Plumbing and Lee Electric",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumbing license",
+    "Plumbing license",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "color",
+    "consult",
+    "shop",
+    "Shop",
+    "at the chair",
+    "Kitchen drain clearing",
+    "drain clearing",
+    "Drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "water heater flush",
+    "water heaters",
+    "water heater",
+    "leak repair",
+    "Leak repair",
+    "service call fee",
+    "service call",
+    "Service call fee",
+    "Service call",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "credited to the repair",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "like a roof leak",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Just the kitchen sink.",
+    "Say Alex also asks about a dripping faucet.",
+    "Is the sink still full of water?",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "warranty plan",
+    "A plan or warranty pays",
+    "Please clear the cabinet under the sink.",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Kitchen drain",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160",
+    "Replace both shutoff valves · $160",
+    "Replace both shutoff valves",
+    "The $160 valve quote",
+    "replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "the shutoff valves",
+    "The kitchen drain is clogged again.",
+    "with the store's receipt",
+    "The plug-in says how long the warranty lasts.",
+    "Texts the camera report link",
+    "Sewer camera report",
+    "Drain clearings already booked",
+    "to the repair",
+    "labor",
+    "Labor",
+    "It's overflowing. Can someone come tonight?",
+    "Can I run the dishwasher before you come?",
+    "I'll be home 30 minutes late, sorry!",
+    "$2,400 repipe",
+    "flush",
+    "faucet",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "'starts at 8:00am'",
+    "Thu Oct 22 · 8–10am",
+    "next for that window"
+   ]
+  },
+  "A": {
+   "A8-35": "a67e890a5b",
+   "A9-20": "0cfe0e1776",
+   "A10-21": "08514557c8",
+   "A4-64": "b98f95b738",
+   "A7-74": "b3ec278ce4",
+   "S1-26": "776159519e",
+   "S1-60": "7f268b2a07",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "S2-31": "320ac5e4cb",
+   "A4-50": "6f43775326",
+   "A4-37": "4ee9e74e71",
+   "A4-43": "c17d56f766",
+   "A9-15": "bd2a17c3c5",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A8-45": "6589a6b4d4",
+   "A5-01": "6c5c5c2f87",
+   "A8-33": "561bc291a5",
+   "A8-03": "7fe61cccf5",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "B8-03": "ac9d404766",
+   "B10-17": "b5f4aef51b",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-26": "776159519e",
+   "S1-60": "6b80e83cea",
+   "S1-62": "b5b0310865",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "578f6c41b7",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "93095f28e5",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B5-34": "917f89b62f",
+   "S2-31": "320ac5e4cb",
+   "B9-19": "b97bfbf0d2",
+   "B4-05": "fb3a9061c8",
+   "B4-74": "bae5529af9",
+   "B8-44": "3847104a93",
+   "B7-91": "7132851ec1",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255"
+  }
+ }
+}

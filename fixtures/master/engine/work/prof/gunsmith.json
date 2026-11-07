@@ -1,0 +1,4462 @@
+{
+ "id": "gunsmith",
+ "name": "Gunsmith",
+ "style": "Drop-off",
+ "pattern": "dropoff",
+ "from": "repair-shop",
+ "plugin": {
+  "pf.license": {
+   "need": "a federal firearms license that covers gunsmithing wherever the shop takes firearms in to work on them (a generic federal switch; work that federal rules count as manufacturing needs the matching license); any state or local dealer or gunsmith license where the state's rules require one; work on items regulated under the federal National Firearms Act (suppressors, short-barreled rifles and shotguns, machine guns) only where the shop's federal license and its special tax status allow it; a business registration",
+   "who": "the business: the federal license names its premises and its responsible persons",
+   "ask": [
+    "the federal firearms license number (shown only as 'checked' once it is)",
+    "any state or local license, where the state's rules require one",
+    "the business registration",
+    "the address on the federal license (work is done there)",
+    "whether the shop holds the federal status for regulated (NFA) items"
+   ],
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)",
+   "insurance": "liability insurance and coverage for customers' firearms while the shop has them, as the business says; shown only once proof is sent",
+   "security": "every firearm left overnight is locked in the shop's safe or vault, and as the state's rules require",
+   "otherwise": "identity checked",
+   "example": "the example walks the branch where a federal firearms license covers the shop (S1-60 '1'); person licenses are not asked (S2-28 '2'); example numbers are EX-style"
+  },
+  "pf.services": {
+   "shape": "drop-off: a firearm left at the counter unloaded and cased, checked in with a photo ID and logged, worked on, then READY and picked up only by the person who left it, with the same ID; small jobs while the owner waits; collection appraisals at the owner's home (the firearms never leave the home)",
+   "examples": "the example shop's own prices, not a standard",
+   "list": [
+    {
+     "name": "Bench diagnosis and written estimate",
+     "price": "$40 in the example, credited to the repair",
+     "kind": "priced at the visit",
+     "length": "about 1 hour",
+     "where": "at the shop",
+     "before": "nothing taken",
+     "after": "paid at the counter at pick-up"
+    },
+    {
+     "name": "Pistol cleaning",
+     "price": "$50 in the example (rifle or shotgun cleaning $65; a full strip $95)",
+     "kind": "one price",
+     "length": "3 to 5 business days",
+     "where": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter at pick-up, or the bill with READY"
+    },
+    {
+     "name": "Rifle or shotgun cleaning",
+     "price": "$65 in the example",
+     "kind": "one price",
+     "length": "3 to 5 business days",
+     "where": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter, or the bill"
+    },
+    {
+     "name": "Scope mount and bore sight",
+     "price": "$45 labor in the example; rings and bases extra",
+     "kind": "one price",
+     "length": "while you wait, about 45 minutes, when booked",
+     "where": "at the shop",
+     "before": "nothing taken",
+     "after": "at the counter"
+    },
+    {
+     "name": "Bore sight only",
+     "price": "$20 in the example",
+     "where": "at the shop"
+    },
+    {
+     "name": "Sling swivel install",
+     "price": "$25 in the example",
+     "where": "at the shop"
+    },
+    {
+     "name": "Trigger or action work",
+     "price": "from $85 labor plus parts, on the written estimate (the example estimate: $110 work and a $15 part, $125 with the diagnosis included)",
+     "kind": "priced at the visit",
+     "where": "at the shop",
+     "before": "nothing taken",
+     "after": "paid at the counter at pick-up"
+    },
+    {
+     "name": "Barrel threading or crowning",
+     "price": "$95 to $150, quoted at the bench (example)",
+     "where": "at the shop"
+    },
+    {
+     "name": "Refinish (bluing or a ceramic coating)",
+     "price": "$250 in the example",
+     "kind": "one price",
+     "length": "6 to 8 weeks",
+     "where": "at the shop",
+     "before": "a 50% deposit ($125) at booking, credited to the bill",
+     "after": "the rest ($125) at pick-up"
+    },
+    {
+     "name": "Function and safety check",
+     "price": "$35 in the example; free with any repair",
+     "where": "at the shop"
+    },
+    {
+     "name": "Transfer at pick-up",
+     "price": "a background-check transfer at pick-up, where federal or state rules require it, is the shop's own fee (the example: $25), named before the yes",
+     "where": "at the shop"
+    },
+    {
+     "name": "Collection appraisal at the owner's home (flow B)",
+     "price": "$95 the first hour and $60 each hour after, plus the $89 trip fee: $244 for 2 hours in the example",
+     "kind": "one price",
+     "length": "up to 2 hours; a larger collection is priced at the visit",
+     "where": "at the owner's home, with the owner there; the gunsmith never takes a firearm away",
+     "before": "a card saved for the trip fee",
+     "after": "the saved card is charged at DONE; the written report is on the secure page within 7 days"
+    },
+    {
+     "name": "Single-firearm appraisal at the owner's home (flow B)",
+     "price": "$150 in the example, the $89 trip fee in it",
+     "where": "at the owner's home"
+    },
+    {
+     "name": "Estate or large collection appraisal (flow B)",
+     "price": "priced at the visit after counting the firearms; only the trip fee is promised; the executor is there with the papers",
+     "where": "at the owner's or the estate's home"
+    },
+    {
+     "name": "Written appraisal letter for insurance (flow B)",
+     "price": "$199 in the example, added at the visit",
+     "where": "on the secure page"
+    },
+    {
+     "name": "Extra appraisal hour (flow B)",
+     "price": "$60 an hour, added only with the owner's yes",
+     "where": "at the owner's home"
+    },
+    {
+     "name": "Trip fee for the appraiser",
+     "price": "one fee, part of each home visit's price (the example: $89)",
+     "where": "at the owner's home"
+    }
+   ],
+   "never": "firearm sales, transfers for a sale and ammunition are never booked through Rosie (goods, and the shop's own business)",
+   "turnaround": "cleaning 3 to 5 business days; repairs 1 to 3 weeks after parts arrive; refinish 6 to 8 weeks",
+   "capacity": "bench hours per gunsmith; safe space for the firearms held; one appraiser per home visit",
+   "nobody_home": "no",
+   "online": "no",
+   "pattern": "drop-off: a firearm left at the counter unloaded and cased, checked in with a photo ID and logged, worked on, then READY and picked up only by the person who left it, with the same ID; small jobs while the owner waits; collection appraisals at the owner's home (the firearms never leave the home)"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "the kind of firearm (pistol, revolver, rifle, shotgun) and what it needs (cleaning, a repair, a scope, a refinish, an appraisal)",
+    "whether it's an item regulated under the National Firearms Act (a suppressor, a short barrel, fully automatic): it decides whether the shop can take it",
+    "for an appraisal: how many firearms, and the town"
+   ],
+   "afterTime": [
+    "what's wrong, in the customer's words (it jams, a part broke)",
+    "parts the customer is bringing"
+   ],
+   "securePage": [
+    "the make, model and serial number (for the shop's federal record)",
+    "the customer's name, address and date of birth as on a government photo ID (the ID itself is checked at the counter)",
+    "for a regulated (NFA) item: the owner's approved registration paper, shown at drop-off",
+    "the appraisal address, and photos of the firearm"
+   ],
+   "whoMayBook": "an adult who owns the firearm or may lawfully have it; 21 or older (the example shop's rule, and any age rule federal or state rules set for returning a firearm); only the person who leaves a firearm may pick it up; an estate's firearms are brought or appraised with the executor and the papers; a minor never books"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "someone threatening to hurt themselves or others, or someone hurt by a firearm right now",
+     "say": "Call 911 now. If you're thinking of hurting yourself, call or text 988.",
+     "booking": "no booking"
+    }
+   ],
+   "refuse": "making a firearm fully automatic, removing or changing a serial number, any change federal or state rules forbid, or work for someone who says they can't lawfully have a firearm: refused, no booking, and the owner is told",
+   "handling": "firearms come in unloaded, in a case or a locked bag, with no ammunition in the case; a loaded firearm at the counter: the gunsmith clears it, and the shop may refuse the job (the shop's rule)",
+   "crisisStorage": "a customer who asks the shop to hold firearms because someone at home may be at risk: the 988 line first, and the shop's own people call back about storage where the shop offers it and federal and state rules allow it; never a text conversation",
+   "canContinue": "no for refused requests; yes for handling notes",
+   "dont_drive_words": [
+    "a loaded firearm",
+    "a firearm within a child's reach",
+    "a firearm that fires when it should not"
+   ],
+   "dont_drive_action": "Rosie says: keep it cased and out of reach of children; do not handle it more. The gunsmith clears it at the visit. The booking goes on.",
+   "mobile_stops": "a child in the room, or a firearm that is loaded or within reach of a child: the appraisal waits until the firearms are cased and the children are away; the visit moves with no fee"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Firearm details form",
+     "when": "on the secure page, before drop-off",
+     "who": "the owner",
+     "result": "done: it books; not done: filled at the counter"
+    },
+    {
+     "name": "Photo ID",
+     "when": "at drop-off and at pick-up",
+     "who": "the owner, in person",
+     "result": "matches: checked in or handed back; doesn't match: nothing is taken in or handed over"
+    },
+    {
+     "name": "Registration paper for a regulated (NFA) item",
+     "when": "shown at drop-off",
+     "who": "the owner",
+     "result": "shown: taken in, if the shop has the status; missing: not taken in"
+    },
+    {
+     "name": "Signed written estimate",
+     "when": "before any work beyond the diagnosis; before a refinish's deposit",
+     "who": "the owner",
+     "result": "signed: work starts; not signed: returned as it came"
+    }
+   ],
+   "prepForReminder": [
+    "Unload it, case it, and leave the ammunition at home",
+    "Bring your government photo ID",
+    "Bring the magazines and any parts",
+    "For a regulated item, bring its approved registration paper"
+   ]
+  },
+  "pf.visit": {
+   "checkIn": "at the counter: the check-in code and a government photo ID; the gunsmith confirms it's unloaded, logs the make, model and serial (in the shop's federal record when it stays overnight, as federal rules require), photos its condition, and gives a claim ticket",
+   "estimate": "written, line by line, before any work beyond the diagnosis; the customer says yes to all, to some lines, or not today; good for 30 days",
+   "addedWork": "anything found at the bench is priced and texted; nothing extra without a yes; a safety defect is written on the secure page, and the firearm is never handed back as safe",
+   "ready": "READY texted as 'your item is ready', never naming the firearm",
+   "pickup": "only the person who left it, with the same photo ID and the claim code; anyone else only through a lawful transfer at the shop with the federal background check (where federal or state rules require it), or not at all (the shop's choice); where the state's rules require a background check or a wait for the return itself, it's done at pick-up",
+   "done": "DONE at pick-up, when the ID matches and the shop's record is closed",
+   "unclaimed": "not picked up: reminders at 30 and 60 days; never sold or disposed of except as federal and state rules allow, after written notice",
+   "safeStorage": "every firearm held is locked in the safe or vault after hours"
+  },
+  "pf.money": {
+   "before": "a drop-off takes nothing (the diagnosis fee is paid at pick-up); a refinish takes a 50% deposit ($125 in the example) at booking, credited to the bill; an appraisal saves a card for the trip fee",
+   "after": "repairs and cleaning are paid at the counter at pick-up, or on the bill Rosie texts with READY; an appraisal is charged to the saved card at DONE, or billed after",
+   "parts": "parts at the shop's price, listed on the written estimate",
+   "fees": "no fee for a missed drop-off slot; a refinish cancelled after the coating or parts are ordered: the deposit may be kept, only if the owner confirms (the shop's terms); storage after 30 days unclaimed, $5 a day, only after written notice and the owner's yes (example); the appraisal: the $89 trip fee on the saved card, only with the owner's yes, for a late cancel or a no-show; the owner confirms every fee",
+   "transfer": "a background-check transfer at pick-up, where it's needed, is the shop's own fee ($25, example), named before",
+   "tax": "sales tax on parts where the state's rules require it (the owner's setting)",
+   "tips": "no tips line",
+   "two_dollars": "$2 per confirmed booking",
+   "rosfield_2": "Rosfield's $2 per confirmed booking applies"
+  },
+  "pf.messages": {
+   "never": "a firearm's make, model and serial number, the customer's ID details, registration papers and anything about who may lawfully have a firearm never go in a text: only on the secure page; READY and pick-up texts say 'your item'; the owner may pick a plain display name",
+   "staffTexts": "staff texts: the customer's name, the claim number and the bench job; never a serial number",
+   "languages": "English and Spanish",
+   "minors": "minors don't book"
+  },
+  "pf.staff": {
+   "licenses": "no person license; the federal license is the business's, and its responsible persons are named on it; each person who handles customers' firearms has a background check (the shop's rule, and where the state's rules require it)",
+   "skills": "cleaning, general repair, action and trigger work, optics, barrel work, refinish, appraisal, regulated (NFA) work only with the status",
+   "supervision": "an apprentice works only under a gunsmith; only the license holder or a named person hands a firearm back and closes the record",
+   "oks": "the owner OKs any regulated (NFA) work, any refinish, any estimate over $300, and any unusual request (refused if it isn't lawful)",
+   "standIn": "bench work names nobody: any gunsmith with the skill may do it; an appraisal names the appraiser and moves only with the owner's yes"
+  },
+  "pf.rules": {
+   "federal": "federal firearms rules as generic switches: the federal license; the shop's record for firearms held overnight; returned only to the person who left it, anyone else only through a lawful transfer with the federal background check; regulated items only with the right status; no change that federal rules forbid",
+   "state": "state and local rules as switches: a background check or a wait at return, safe-storage rules, limits on features or magazines, a state dealer or gunsmith license",
+   "shipping": "a mail-in only as federal and carrier rules allow; sent back only to the person who sent it, or to a licensee where the state's rules require it",
+   "records": "the shop's federal record kept as long as federal rules require; Rosie's own records 7 years",
+   "goods": "firearm sales and ammunition are never booked through Rosie"
+  },
+  "pf.edges": {
+   "someoneElsePicksUp": "refused, or a lawful transfer with a background check (the shop's choice and the rules)",
+   "checkAtPickup": "a background check at the return is delayed or denied: the firearm stays; the customer hears only that pick-up can't happen today and the shop will call",
+   "loaded": "the gunsmith clears it",
+   "prohibited": "never returned to someone the shop knows can't lawfully have it: the shop's own legal process",
+   "unclaimed": "notices; handled only as federal and state rules allow",
+   "defect": "a written safety note; never returned as safe",
+   "partsLate": "LATE with a new date",
+   "nfaPaperMissing": "not taken in",
+   "estate": "the executor brings the papers; returned only through a lawful transfer",
+   "crisis": "988 first; the shop calls about storage",
+   "minor": "not booked; a minor at the counter isn't served",
+   "appraisal": "the owner is there; firearms never leave the home with the gunsmith"
+  },
+  "pf.facts": [
+   "dropoff",
+   "extrawork",
+   "documents"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": {
+     "window": 2
+    }
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Gene and Carla (gunsmiths)",
+   "other": "Others (a bank, a parent)"
+  },
+  "B": {
+   "staff": "Walt and Beth (appraisers)",
+   "other": "Others (a bank, an executor)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Gene"
+  },
+  "B": {
+   "staff": "Walt"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex leaves a pistol that jams at Lee's Gunsmithing on Sat Oct 24 at 11:00am. Gene checks the photo ID, clears and logs it, and diagnoses it for $40. The repair waits for Alex's yes on the written estimate. Only Alex picks it up, with the same ID, and pays at the counter. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Gun Appraisal for a collection appraisal at home, 9 Orchard Way, and Walt comes Thu Oct 22 between 8 and 10am. No firearm leaves the home. A card is saved for the trip fee and charged at DONE. The written report comes on the secure page."
+ },
+ "money": {
+  "A": {
+   "main": "visit|none|counter",
+   "combos": [
+    "visit|none|counter",
+    "list|none|counter",
+    "visit|none|bill",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "visit|none|counter": "The main story: a pistol that jams. Only the $40 diagnosis is promised. Gene's written estimate is OK'd before any work, the part is ordered, and Alex pays at the counter at pick-up, with the same photo ID.",
+    "list|none|counter": "A $50 pistol cleaning from the shop's board. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+    "visit|none|bill": "The same repair, with the bill texted when it is ready, so Alex can pay before pick-up. The firearm is still handed back only to Alex, with the ID.",
+    "list|deposit|counter": "A $250 refinish: a $125 deposit at booking, credited to the bill, and the $125 rest at the counter at pick-up."
+   },
+   "amounts": {
+    "*": {
+     "fee": "free",
+     "name": "Pistol cleaning"
+    },
+    "list|*|*": {
+     "price": "$50",
+     "name": "Pistol cleaning"
+    },
+    "list|deposit|*": {
+     "price": "$250",
+     "deposit": "$125",
+     "rest": "$125",
+     "fee": "$125",
+     "name": "Refinish"
+    },
+    "visit|*|*": {
+     "name": "Trigger and action work"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "visit|card|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a collection appraisal at Alex's home, up to 2 hours, $244 with the $89 trip fee in it. A card is saved for the trip fee, charged at DONE for the appraisal, and for the fee only on Sam's yes after a late cancel or a no-show. No firearm leaves the home.",
+    "visit|card|bill": "An estate collection, priced at the visit after counting the firearms. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE. The executor is there with the papers."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Collection appraisal"
+    },
+    "list|*|*": {
+     "price": "$244",
+     "name": "Collection appraisal"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Estate appraisal"
+    }
+   }
+  }
+ },
+ "keep": [
+  "leak",
+  "color",
+  "trip fee",
+  "Grace",
+  "diagnosis",
+  "valve",
+  "perm"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02",
+   "A8-53"
+  ],
+  "B": []
+ },
+ "rename": {
+  "A": [
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone threatening to hurt themselves or others, or someone hurt by a firearm."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A gunsmith's example: 'Repairs here need the item unloaded and cased first. Is it?'"
+   ],
+   [
+    "quote 110 color correction + 20 toner",
+    "quote 110 trigger and action work + 20 spring set"
+   ],
+   [
+    "Toner · $20",
+    "Spring set · $20"
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a time for your drop-off:"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $125 repair quote. Sam taps Call, and the call goes out from the shop's number."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 one more hour"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Keep it cased and out of reach until a gunsmith looks at it"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A gunsmith's example: a loaded firearm gets 'keep it cased and out of reach of children'."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "a federal firearms license names one shop address"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Report fixes: reply here within 7 days."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A gunsmith shop takes drop-offs: the firearm is left and picked up when it's ready."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds a firearm with a cracked frame. The plug-in says an appraiser stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD cracked frame, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Cracked frame"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a cracked frame on one firearm and stopped handling it."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a cracked frame"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the function check of that firearm"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found rust on one of the rifles this morning."
+   ],
+   [
+    "Overflowing kitchen drain",
+    "A loaded rifle in the safe"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither the appraisers nor the shop take jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a tow or a lockout. The plug-in says which services. Firearm work is never sent now, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Firearm work takes no jobs sent now: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Does any firearm job get sent now? No: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Thanks. The state licenses the shop and each barber. What's the shop's license number?",
+    "Thanks. A federal firearms license covers the shop. What's the shop's federal license number?"
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most gunsmith shops start. Is it right? Send only what's different."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules gunsmith shops often set. Your call: keep them, or change any. They become the shop's own rules."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most gunsmith shops set it."
+   ],
+   [
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "Its money card is set the way most home appraisal businesses start. Is it right? Send only what's different."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Jordan and Casey do home appraisals; Jordan does estate appraisals too. Riley and Avery work the shop's bench; Riley also does refinishing. Pat is my office manager, for prices over $500. Jules rents a bench, with their own customers."
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: collection and estate appraisals"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A clean-up' or 'a once-over' fits a pistol cleaning."
+   ],
+   [
+    "Every plumbing service",
+    "Every home visit"
+   ],
+   [
+    "A water heater job",
+    "A collection appraisal at home"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Collection and estate appraisals at your home in Springfield, within 25 miles."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: the case is wearing out; mention it at pick-up."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you install sling swivels? I have a new rifle."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "You told us the item is your son's, and that you're his parent."
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The photo ID is missing."
+   ],
+   [
+    "Who is the haircut for? And are you 18 or older?",
+    "Who is the item for? And are you 21 or older?"
+   ],
+   [
+    "Book this {{svc.intext:haircut|visit}}? You told us you're 18 or older.",
+    "Book this {{svc.intext:pistol cleaning|visit}}? You told us you're 21 or older."
+   ],
+   [
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A barbershop books a person's time.",
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A gunsmith shop books a drop-off slot."
+   ],
+   [
+    "The price is on the shop's board: {{price:$35}}. It shows before anyone says yes, and it never needs Sam's OK.",
+    "The price is on the shop's board: {{price:$50}}. It shows before anyone says yes, and it never needs Sam's OK."
+   ],
+   [
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "Alex wants it at home: a home visit, $244, with a card saved for the $89 trip fee. From here it's the other flow, where the business goes to the customer."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The refinish can take a $125 deposit when booked. The other $125 is paid at the counter."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The refinish can take a $125 deposit when booked. The other $125 is on the bill after the visit."
+   ],
+   [
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "The refinish can take a $125 deposit when booked. The other $125 is on the bill after the visit."
+   ],
+   [
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "On this path, the refinish takes a $125 deposit; the $125 rest is paid after the visit."
+   ],
+   [
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Free until 24 hours before. After that, or a no-show: no fee at the shop, except the $125 deposit on a refinish once parts are ordered, only if you say yes; the appraisal's $89 trip fee, only if you say yes"
+   ],
+   [
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $50 pistol cleaning can work this way."
+   ],
+   [
+    "Haircut · $35",
+    "Pistol cleaning · $50"
+   ],
+   [
+    "Skin fade · $40",
+    "Bench diagnosis and estimate · $40"
+   ],
+   [
+    "Beard trim · $20",
+    "Bore sight only · $20"
+   ],
+   [
+    "Haircut at home · $75",
+    "Pistol cleaning at home · $244"
+   ],
+   [
+    "Signature cut and hot towel shave · $55",
+    "Rifle or shotgun cleaning · $65"
+   ],
+   [
+    "Groom's package · $40 deposit",
+    "Refinish · $125 deposit"
+   ],
+   [
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "a bore sight is on the price board: $20. The customer hears the price and says yes before it's done."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a bore sight. Rosie finds one time long enough for both, with one gunsmith, and adds the prices: $50 and $20."
+   ],
+   [
+    "'Adding a beard trim, +$20? Say so.'",
+    "'Adding a bore sight, +$20? Say so.'"
+   ],
+   [
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "One request waits for Lee's Barbershop. It's a bore sight today at 2:00pm with Avery, for a new customer. It's $20. Accept it?"
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Reading it back: accept a bore sight today at 2:00pm with Avery. Say yes to go ahead."
+   ],
+   [
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Accepted: the bore sight today at 2:00pm with Avery."
+   ],
+   [
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Reading it back: the pistol cleaning goes to $60 for new bookings. Booked customers keep the price they were shown. Change it?"
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the pistol cleaning to $60 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "Pistol cleanings already booked keep $50, even after Nov 2."
+   ],
+   [
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "A plan goes to $60 from Wed Nov 25 only with that customer's yes."
+   ],
+   [
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $50."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: pistol cleaning $60 for visits from Mon Nov 2. Pistol cleanings already booked keep $50. Pistol cleaning plans go to $60 from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Pistol cleaning $50 ($60 from Nov 2) · Bench diagnosis and estimate $40 · Bore sight only $20"
+   ],
+   [
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "Sam switches the pistol cleaning from nothing taken to a $20 deposit. It's for new bookings only, and each change is read back first."
+   ],
+   [
+    "A card saved for the $20 fee · paid after the visit",
+    "Nothing taken when they book · paid after the visit"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a bench diagnosis at $30, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A bench diagnosis at Lee's Barbershop is $40, not $30. Here are the open times at $40."
+   ],
+   [
+    "Refund · $20",
+    "Refund · $125"
+   ],
+   [
+    "Dee W.'s $20 payment through Rosie was charged twice.",
+    "Dee W.'s $125 deposit was charged twice."
+   ],
+   [
+    "Haircut (pack)",
+    "Pistol cleaning (pack)"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Quotes for a repair come to you first. Board prices never need one"
+   ],
+   [
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Someone with their own customers, like a gunsmith, gets their own sign-up link instead."
+   ],
+   [
+    "Access, like a step-free chair: only times and places that fit show.",
+    "Access, like a step-free entrance: only times and places that fit show."
+   ],
+   [
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "A what-if: someone else pays, like Alex's employer for a club rifle. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this repair."
+   ],
+   [
+    "The plug-in's plain questions are optional, like 'How would you like it on top?'",
+    "The plug-in's plain questions are optional, like 'Is it unloaded and cased?'"
+   ],
+   [
+    "How would you like it on top? (optional)",
+    "Is it unloaded and cased? (optional)"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the shop show photos of the item? Yes / No"
+   ],
+   [
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it a fade' goes back to the times.",
+    "A yes with a 'but' isn't a yes yet. 'Yes, add a bore sight' goes back to the times."
+   ],
+   [
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "No problem. Riley can do a shorter job in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter job."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during the repair?"
+   ],
+   [
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "NOTE Alex: please bring a photo ID on Saturday."
+   ],
+   [
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please bring a photo ID."
+   ],
+   [
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "At the shop, the customer is already at the counter, so there's no door check."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s job."
+   ],
+   [
+    "stopped Alex M.'s cut.",
+    "stopped Alex M.'s job."
+   ],
+   [
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Before paying, Riley shows the work, like the finished item at the counter. A fix asked for now is done before paying, at no extra cost."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A job is rated, so the shop takes the first branch."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The pistol still jams after the repair."
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says the pistol still jams after the repair"
+   ],
+   [
+    "1 color quote",
+    "1 quote"
+   ],
+   [
+    "'A trim' or 'a fade' fits a haircut.",
+    "'A clean-up' or 'a once-over' fits a pistol cleaning."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $125 repair quote. Sam taps Call, and the call goes out from the shop's number."
+   ],
+   [
+    "{{name.staff:Nia K.}} would like to talk about the color quote before booking.",
+    "{{name.staff:Nia K.}} would like to talk about the quote before booking."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "My pistol jams. Can Lee's Gunsmithing look at it on Saturday?"
+   ],
+   [
+    "once Riley sees the hair.",
+    "once Gene sees the item."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks to make a rifle fully automatic, which the shop never does."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Gene use a different spring instead?"
+   ],
+   [
+    "asks for a toner instead of the gloss. What's the new price?",
+    "asks for a different spring instead. What's the new price?"
+   ],
+   [
+    "two skin fades on",
+    "two cleanings on"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood gunsmith on Anvil St. Cleaning, repairs, scopes and refinishing, by appointment."
+   ],
+   [
+    "Alex picked a kids cut for a son",
+    "Alex picked a cleaning for a rifle"
+   ],
+   [
+    "Today · 3:00pm · Avery",
+    "Today · 3:00pm drop-off"
+   ],
+   [
+    "a beard trim today at 2:00pm with Avery",
+    "a bore sight today at 2:00pm"
+   ],
+   [
+    "the beard trim today at 2:00pm with Avery",
+    "the bore sight today at 2:00pm"
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: a 10:00am drop-off"
+   ],
+   [
+    "A card saved for the $20 fee",
+    "Nothing taken when they book"
+   ],
+   [
+    "haircut with Riley",
+    "pistol cleaning"
+   ],
+   [
+    "Sat 11am Riley",
+    "Sat 11am drop-off"
+   ],
+   [
+    "at 11:20am on Riley's phone",
+    "at 12:25pm on Gene's phone"
+   ],
+   [
+    "Gloss to finish · $15",
+    "Spring set (part) · $15"
+   ],
+   [
+    "Riley quotes the rest at the chair, before any work.",
+    "Gene writes an estimate before any work."
+   ],
+   [
+    "Wants Saturday morning, with Riley",
+    "Wants a Saturday morning drop-off"
+   ],
+   [
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "Cancel your Sat 11:00am drop-off? It's free."
+   ],
+   [
+    "How was your visit with Riley?",
+    "How was your visit with Gene?"
+   ],
+   [
+    "Sun Oct 25 · 11:00am · Riley",
+    "Mon Oct 26 · 11:00am drop-off"
+   ],
+   [
+    "Walk-in for a haircut",
+    "Walk-in for a bore sight"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a sling swivel install is $25."
+   ],
+   [
+    "Your item is still waiting for pick-up.",
+    "Your item is still waiting for pick-up."
+   ],
+   [
+    "A drop-off item isn't picked up.",
+    "A drop-off item isn't picked up."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $40 diagnosis first"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds knife sharpening to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Knife sharpening for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW knife sharpening"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee's Barbershop doesn't make firearms fully automatic."
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Appraisal and Lee Estate."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero que revisen mi pistola el sábado."
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A gunsmith shop books a drop-off slot."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Drop-off times name no gunsmith. A day shows only if a gunsmith with the skill is in."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee's Barbershop · drop-off"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A repair is rated, so the shop takes the first branch."
+   ],
+   [
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Say a visit leads to more work, like the sights Riley noted, or a lawyer's engagement letter."
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee's Barbershop sent you a proposal: the sights Riley noted."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · New sights"
+   ],
+   [
+    "3 visits with Riley",
+    "One drop-off · about 1 week"
+   ],
+   [
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "The work is booked like any booking, with its own money choices and confirmation."
+   ],
+   [
+    "Drain clearing",
+    "Pistol cleaning"
+   ],
+   [
+    "home warranty plan",
+    "service plan"
+   ],
+   [
+    "a package of cuts",
+    "a package of cleanings"
+   ],
+   [
+    "patch test",
+    "function check"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A cleaning could mean a pistol or a long gun."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A gunsmith's plug-in adds firearm danger words, like a loaded firearm."
+   ],
+   [
+    "A barbershop's services need none.",
+    "A gunsmith needs none at booking: the firearm details are filled at the counter."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a club's rifles together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A club manager books cleanings for five rifles on one morning. Rosie finds bench time side by side across Riley and Avery."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "There's a new scratch on the stock."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says there's a new scratch on the stock today"
+   ],
+   [
+    "Riley looks, then prices it",
+    "Riley diagnoses, then writes the estimate"
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Only the consult; the price stays open",
+    "Only the diagnosis; the estimate stays open"
+   ],
+   [
+    "Follows up on an item left behind",
+    "Follows up on an item left behind"
+   ],
+   [
+    "a skin-test result",
+    "a function check note"
+   ],
+   [
+    "color and house calls",
+    "refinishing and home appraisals"
+   ],
+   [
+    "color, house calls",
+    "refinishing, home appraisals"
+   ],
+   [
+    "Consult only",
+    "Diagnosis only"
+   ],
+   [
+    "photos of your hair",
+    "photos of the item"
+   ],
+   [
+    "a cut on Saturday",
+    "a cleaning on Saturday"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a cleaning every 6 months"
+   ],
+   [
+    "a cut every 4 weeks",
+    "a cleaning every 6 months"
+   ],
+   [
+    "for a staff cut",
+    "for a club rifle"
+   ],
+   [
+    "in the chair",
+    "at the counter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Gunsmithing"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Gun Appraisal's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Gun Appraisal"
+   ],
+   [
+    "electrical license",
+    "appraiser license"
+   ],
+   [
+    "Electrical",
+    "Estate appraisal"
+   ],
+   [
+    "electrical",
+    "estate appraisal"
+   ],
+   [
+    "plumber",
+    "appraiser"
+   ],
+   [
+    "Plumber",
+    "Appraiser"
+   ],
+   [
+    "Plumbing",
+    "Collection appraisal"
+   ],
+   [
+    "plumbing",
+    "collection appraisal"
+   ],
+   [
+    "Barbershop",
+    "Gunsmith shop"
+   ],
+   [
+    "barbershops",
+    "gunsmith shops"
+   ],
+   [
+    "barbershop",
+    "gunsmith shop"
+   ],
+   [
+    "Barber license",
+    "Gunsmith license"
+   ],
+   [
+    "barbers",
+    "gunsmiths"
+   ],
+   [
+    "barber",
+    "gunsmith"
+   ],
+   [
+    "Barber",
+    "Gunsmith"
+   ],
+   [
+    "cut hair",
+    "fix firearms"
+   ],
+   [
+    "MP045210",
+    "EX-3310"
+   ],
+   [
+    "EC22871",
+    "EX-2087"
+   ],
+   [
+    "BS20981",
+    "EX-1042"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am drop-off"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm drop-off"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm drop-off"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am drop-off"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm drop-off"
+   ],
+   [
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Say Alex M. left an item at Lee's Gunsmithing. Staff text READY when the work is done. Alex hears that it is ready, the pick-up hours, and anything due."
+   ],
+   [
+    "Your item is ready for pick-up.",
+    "Your item is ready for pick-up at Lee's Gunsmithing. Bring your photo ID."
+   ],
+   [
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "Pick-up: Tue to Sat, 10am to 6pm"
+   ],
+   [
+    "4471",
+    "5160"
+   ],
+   [
+    "Sofia",
+    "Alex"
+   ],
+   [
+    "Riley",
+    "Gene"
+   ],
+   [
+    "Avery",
+    "Carla"
+   ],
+   [
+    "Jordan",
+    "Walt"
+   ],
+   [
+    "Casey",
+    "Beth"
+   ],
+   [
+    "88 Elm St",
+    "72 Anvil St"
+   ],
+   [
+    "Elm St",
+    "Anvil St"
+   ],
+   [
+    "Oak St",
+    "Orchard Way"
+   ],
+   [
+    "1200 Main St",
+    "15 Mill Ln"
+   ],
+   [
+    "Haircuts",
+    "Pistol cleanings"
+   ],
+   [
+    "haircuts",
+    "pistol cleanings"
+   ],
+   [
+    "A haircut",
+    "A pistol cleaning"
+   ],
+   [
+    "a haircut",
+    "a pistol cleaning"
+   ],
+   [
+    "Haircut",
+    "Pistol cleaning"
+   ],
+   [
+    "haircut",
+    "pistol cleaning"
+   ],
+   [
+    "kids cuts",
+    "sling swivel installs"
+   ],
+   [
+    "a kids cut",
+    "a sling swivel install"
+   ],
+   [
+    "Kids cut",
+    "Sling swivel install"
+   ],
+   [
+    "kids cut",
+    "sling swivel install"
+   ],
+   [
+    "Skin fade",
+    "Bench diagnosis"
+   ],
+   [
+    "skin fade",
+    "bench diagnosis"
+   ],
+   [
+    "fade",
+    "bench diagnosis"
+   ],
+   [
+    "Beard trim",
+    "Bore sight only"
+   ],
+   [
+    "beard trim",
+    "bore sight only"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Rifle or shotgun cleaning"
+   ],
+   [
+    "Signature cut and shave",
+    "Rifle or shotgun cleaning"
+   ],
+   [
+    "signature cut",
+    "rifle or shotgun cleaning"
+   ],
+   [
+    "Groom's package",
+    "Refinish"
+   ],
+   [
+    "Color and cut",
+    "Barrel work, from photos"
+   ],
+   [
+    "color and cut",
+    "barrel work, from photos"
+   ],
+   [
+    "Color correction",
+    "Trigger and action work"
+   ],
+   [
+    "color correction",
+    "trigger and action work"
+   ],
+   [
+    "color quote",
+    "repair quote"
+   ],
+   [
+    "$25 consult",
+    "$40 diagnosis"
+   ],
+   [
+    "Only the consult",
+    "Only the diagnosis"
+   ],
+   [
+    "the consult",
+    "the diagnosis"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the repair?"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once diagnosed"
+   ],
+   [
+    "priced at the chair",
+    "priced once diagnosed"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "Home appraisals"
+   ],
+   [
+    "house calls",
+    "home appraisals"
+   ],
+   [
+    "a house call",
+    "a home appraisal"
+   ],
+   [
+    "water heaters",
+    "collections"
+   ],
+   [
+    "water heater",
+    "collection"
+   ],
+   [
+    "Panel upgrade",
+    "Estate appraisal"
+   ],
+   [
+    "like a burst pipe",
+    "like a house fire"
+   ],
+   [
+    "$75",
+    "$244"
+   ],
+   [
+    "service-call fee",
+    "trip fee"
+   ],
+   [
+    "a appraiser",
+    "an appraiser"
+   ],
+   [
+    "A appraiser",
+    "An appraiser"
+   ],
+   [
+    "$55",
+    "$65"
+   ],
+   [
+    "$35",
+    "$50"
+   ],
+   [
+    "$140",
+    "$250"
+   ],
+   [
+    "$40 deposit",
+    "$125 deposit"
+   ],
+   [
+    "$100 rest",
+    "$125 rest"
+   ],
+   [
+    "$75",
+    "$244"
+   ],
+   [
+    "18 or older",
+    "21 or older"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Elm St",
+    "Anvil St"
+   ]
+  ],
+  "B": [
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone threatening to hurt themselves or others, or someone hurt by a firearm."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A gunsmith's example: 'Repairs here need the item unloaded and cased first. Is it?'"
+   ],
+   [
+    "quote 110 color correction + 20 toner",
+    "quote 110 trigger and action work + 20 spring set"
+   ],
+   [
+    "Toner · $20",
+    "Spring set · $20"
+   ],
+   [
+    "Pick a time for your first color plan visit:",
+    "Pick a time for your drop-off:"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about the $125 repair quote. Sam taps Call, and the call goes out from the shop's number."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 one more hour"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Keep it cased and out of reach until a gunsmith looks at it"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A gunsmith's example: a loaded firearm gets 'keep it cased and out of reach of children'."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "a federal firearms license names one shop address"
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Report fixes: reply here within 7 days."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A gunsmith shop takes drop-offs: the firearm is left and picked up when it's ready."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds a firearm with a cracked frame. The plug-in says an appraiser stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD cracked frame, stopped"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Cracked frame"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found a cracked frame on one firearm and stopped handling it."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a cracked frame"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the function check of that firearm"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found rust on one of the rifles this morning."
+   ],
+   [
+    "Overflowing kitchen drain",
+    "A loaded rifle in the safe"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither the appraisers nor the shop take jobs sent now."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Some work takes urgent jobs sent now, like a tow or a lockout. The plug-in says which services. Firearm work is never sent now, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Firearm work takes no jobs sent now: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Does any firearm job get sent now? No: every job is booked ahead, so nobody is on call."
+   ],
+   [
+    "The license can stop the work and cut what may be offered, so it comes before prices and money. The state licenses the barbershop itself, and each barber.",
+    "The license can stop the work and cut what may be offered, so it comes before prices and money. A federal firearms license covers the shop where firearms are taken in to work on."
+   ],
+   [
+    "The state licenses the shop itself, and each barber. What's the shop's license number?",
+    "A federal firearms license covers the shop. What's the shop's federal license number?"
+   ],
+   [
+    "Thanks. The state licenses plumbing for the company and each plumber. What's the license number Lee Home Services works under?",
+    "Thanks. Where the state's rules require it, the appraiser holds a license. What's the license number Lee Gun Appraisal works under?"
+   ],
+   [
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Its money card is set the way most gunsmith shops start. Is it right? Send only what's different."
+   ],
+   [
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "Here are the rules gunsmith shops often set. Your call: keep them, or change any. They become the shop's own rules."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most gunsmith shops set it."
+   ],
+   [
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "Its money card is set the way most home appraisal businesses start. Is it right? Send only what's different."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Jordan and Casey do home appraisals; Jordan does estate appraisals too. Riley and Avery work the shop's bench; Riley also does refinishing. Pat is my office manager, for prices over $500. Jules rents a bench, with their own customers."
+   ],
+   [
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Jordan: collection and estate appraisals"
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "At the shop, Lee's Gunsmithing checks one firearm for $35. At your home, Lee Gun Appraisal appraises it for $150. Where would you like it?"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $640 estate appraisal is quoted at the visit and OK'd there; no document is signed first."
+   ],
+   [
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Here, no document is signed first. The price is from the list, or quoted at the visit and OK'd there."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I want my father's firearms appraised for insurance."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee's Barbershop can do your pistol cleaning at the shop for $50, or at your home for $244. Where would you like it?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Written appraisal letter · $199"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas.",
+    "Safety stop: a customer's AI said someone is in danger."
+   ],
+   [
+    "A gas smell at the home",
+    "Someone in danger at the home"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911, or 988 for a crisis"
+   ],
+   [
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Someone with their own customers, like a gunsmith, gets their own sign-up link instead."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. The shop's counter is in the other flow."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's counter is in the other flow."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about appraising my father's collection. A text back is fine."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'What are my guns worth?' fits a collection appraisal."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like handling a firearm that isn't yours, unasked."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, in the safe"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $244 appraisal needs none."
+   ],
+   [
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "'s appraisal, done Thu Oct 22, needs a correction."
+   ],
+   [
+    "Drain clearings",
+    "Collection appraisals"
+   ],
+   [
+    "drain clearings",
+    "collection appraisals"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Two estate collections · $540"
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding an appraisal letter? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. About ten firearms, in a safe."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Walt scratches the safe door and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE scratched the safe door"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Scratched safe door"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "scratched the safe door at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no scratch."
+   ],
+   [
+    "heating and cooling",
+    "knife sharpening"
+   ],
+   [
+    "Heating and cooling",
+    "Knife sharpening"
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood gunsmith on Anvil St. Cleaning, repairs, scopes and refinishing, by appointment."
+   ],
+   [
+    "Sam adds Reese K. to Lee Home Services.",
+    "Sam adds Reese K., an appraiser, to Lee Home Services."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of the firearms and their cases, and an appraiser will price the job."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Home Services does collection and estate appraisals, not firearm sales."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a licensed dealer near you."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you update my appraisal every year, too?"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Yes. Lee Gun Appraisal has a yearly update plan, $150 a visit."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for an appraisal update every year."
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly appraisal update plan"
+   ],
+   [
+    "water heater contract",
+    "appraisal agreement"
+   ],
+   [
+    "replaces water heaters",
+    "does estate appraisals"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan counted the firearms. Here's the price to appraise them today."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan counts the firearms and texts the price with its lines."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: how many firearms, where they are kept, and whether any is loaded."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I take them out of the safe before you come?"
+   ],
+   [
+    "like Lee Plumbing and Lee Electric.",
+    "like Lee Appraisal and Lee Estate."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee's Barbershop can appraise one firearm at the shop for $40, or at your home for $150."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 estate collection, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Gun Appraisal's quote for your estate collection."
+   ],
+   [
+    "Repipe · $2,400",
+    "Estate collection · $2,400"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$800 to start, $800 when the count is done, $800 at the finish"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 estate collection appraisal"
+   ],
+   [
+    "of your repipe",
+    "of your appraisal"
+   ],
+   [
+    "repipe",
+    "estate collection appraisal"
+   ],
+   [
+    "Both rentals' visits go on one bill on the 1st.",
+    "Both homes' visits go on one bill on the 1st."
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like the insurance letter Jordan noted"
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Gun Appraisal sent you a proposal for an insurance letter, from Jordan's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Insurance letter"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan look at my other safe next week?"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left the safe door open."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I need my father's collection appraised."
+   ],
+   [
+    "Just the kitchen sink.",
+    "About ten firearms."
+   ],
+   [
+    "a leak under the sink",
+    "a collection to appraise"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the firearms unloaded and cased, and keep children away."
+   ],
+   [
+    "a drain cleaning at two rentals",
+    "an appraisal at two homes"
+   ],
+   [
+    "next week's drain cleaning",
+    "next week's appraisal"
+   ],
+   [
+    "clear a yard drain",
+    "appraise a small collection"
+   ],
+   [
+    "Yard drain",
+    "Small collection"
+   ],
+   [
+    "yard drain",
+    "small collection"
+   ],
+   [
+    "BOOK Tessa drain",
+    "BOOK Tessa appraisal"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Collection appraisal"
+   ],
+   [
+    "Kitchen drain",
+    "Collection appraisal"
+   ],
+   [
+    "Drain clearing",
+    "Collection appraisal"
+   ],
+   [
+    "drain clearing",
+    "collection appraisal"
+   ],
+   [
+    "clear the drain",
+    "appraise the collection"
+   ],
+   [
+    "your new pipes are in",
+    "your appraisal is done"
+   ],
+   [
+    "a roof leak",
+    "a firearm sale"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Jordan's notes"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds more firearms in the safe."
+   ],
+   [
+    "replace both shutoff valves, corroded",
+    "one more hour"
+   ],
+   [
+    "replace both shutoff valves",
+    "one more hour"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more hour"
+   ],
+   [
+    "replacing both shutoff valves",
+    "one more hour"
+   ],
+   [
+    "shutoff valves",
+    "extra hour"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say an executor books the same job for 4 homes of one estate."
+   ],
+   [
+    "Each unit's notes",
+    "Each home's notes"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Insurance, the home policy."
+   ],
+   [
+    "home warranty plan",
+    "insurance policy"
+   ],
+   [
+    "home warranty",
+    "home insurance"
+   ],
+   [
+    "supply house",
+    "gun safe maker"
+   ],
+   [
+    "Rental 1",
+    "Home 1"
+   ],
+   [
+    "Rental 2",
+    "Home 2"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that one of the rifles is still loaded."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "One of the rifles in the safe is still loaded."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep it cased and out of reach of children, and do not handle it more."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a person hurt or a threat, gets the safety steps first."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A correction to the report is asked 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "I think a serial number in the report is wrong."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your report is covered by the correction promise"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "It's urgent. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also write an insurance letter?"
+   ],
+   [
+    "$160 valve quote",
+    "$60 extra hour quote"
+   ],
+   [
+    "$160 valve work",
+    "$60 extra hour"
+   ],
+   [
+    "a bathroom drain",
+    "your other safe"
+   ],
+   [
+    "kitchen drain",
+    "collection"
+   ],
+   [
+    "The faucet is a leak repair, quoted at the visit.",
+    "The letter is a small job, quoted at the visit."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "An appraisal could mean a quick look or a written report."
+   ],
+   [
+    "Texts Alex the price",
+    "Texts Alex the written estimate"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero que valoren las armas de mi padre para el seguro."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep the firearms cased and away from children. She is told to call 911 if anyone is in danger."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido o en peligro?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt or in danger?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está en peligro."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is in danger."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantenga las armas descargadas y guardadas, lejos de los niños. Si alguien está en peligro, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep the firearms unloaded and cased, away from children. If anyone is in danger, call 911."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For firearms, someone threatening harm, or someone hurt by a firearm, stops the booking."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Call 911 now. If you are thinking of hurting yourself, call or text 988."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can my son pick up my rifle for me?"
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how many firearms, and are any loaded?"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Are the firearms unloaded and cased?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE 9 firearms in the safe, all cased. Safe door scuffed."
+   ],
+   [
+    "Under the sink, before",
+    "Safe, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Safe door, before"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 244 appraisal"
+   ],
+   [
+    "245 valve 165 supply line 80",
+    "245 first home 165 second home 80"
+   ],
+   [
+    "Shutoff valve",
+    "First home"
+   ],
+   [
+    "Supply line",
+    "Second home"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE one stock refinished. Mention it in the next report."
+   ],
+   [
+    "1-year labor warranty",
+    "7-day report correction promise"
+   ],
+   [
+    "a dripping faucet",
+    "an insurance letter"
+   ],
+   [
+    "color and house calls",
+    "board repair and on-site visits"
+   ],
+   [
+    "color, house calls",
+    "board repair, on-site visits"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee's Gunsmithing"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Gun Appraisal's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Gun Appraisal"
+   ],
+   [
+    "leehomeservices.com",
+    "leegunappraisal.com"
+   ],
+   [
+    "plumbing license",
+    "appraiser license"
+   ],
+   [
+    "Plumbing license",
+    "Appraiser license"
+   ],
+   [
+    "electrical license",
+    "estate appraiser license"
+   ],
+   [
+    "Electrical license",
+    "Estate appraiser license"
+   ],
+   [
+    "Electrical",
+    "Estate appraisal"
+   ],
+   [
+    "electrical",
+    "estate appraisal"
+   ],
+   [
+    "plumber",
+    "appraiser"
+   ],
+   [
+    "Plumber",
+    "Appraiser"
+   ],
+   [
+    "Plumbing",
+    "Collection appraisal"
+   ],
+   [
+    "plumbing",
+    "collection appraisal"
+   ],
+   [
+    "Barbershop",
+    "Gunsmith shop"
+   ],
+   [
+    "barbershops",
+    "gunsmith shops"
+   ],
+   [
+    "barbershop",
+    "gunsmith shop"
+   ],
+   [
+    "barbers",
+    "gunsmiths"
+   ],
+   [
+    "barber",
+    "gunsmith"
+   ],
+   [
+    "Barber",
+    "Gunsmith"
+   ],
+   [
+    "cut hair",
+    "fix firearms"
+   ],
+   [
+    "MP045210",
+    "EX-3310"
+   ],
+   [
+    "EC22871",
+    "EX-2087"
+   ],
+   [
+    "BS20981",
+    "EX-1042"
+   ],
+   [
+    "Riley",
+    "Gene"
+   ],
+   [
+    "Avery",
+    "Carla"
+   ],
+   [
+    "Jordan",
+    "Walt"
+   ],
+   [
+    "Casey",
+    "Beth"
+   ],
+   [
+    "88 Elm St",
+    "72 Anvil St"
+   ],
+   [
+    "Elm St",
+    "Anvil St"
+   ],
+   [
+    "42 Oak St",
+    "9 Orchard Way"
+   ],
+   [
+    "1200 Main St",
+    "15 Mill Ln"
+   ],
+   [
+    "a haircut",
+    "a pistol cleaning"
+   ],
+   [
+    "Haircut",
+    "Pistol cleaning"
+   ],
+   [
+    "fade",
+    "charging port cleaning"
+   ],
+   [
+    "beard trim",
+    "bore sight"
+   ],
+   [
+    "Priced at the chair",
+    "Priced once diagnosed"
+   ],
+   [
+    "at the chair",
+    "at the counter"
+   ],
+   [
+    "rents a chair",
+    "rents a bench"
+   ],
+   [
+    "chairs",
+    "benches"
+   ],
+   [
+    "House calls",
+    "Home appraisals"
+   ],
+   [
+    "house calls",
+    "home appraisals"
+   ],
+   [
+    "Water heater flush",
+    "Single-firearm appraisal"
+   ],
+   [
+    "water heater flush",
+    "single-firearm appraisal"
+   ],
+   [
+    "Water heater replacement",
+    "Estate appraisal from photos"
+   ],
+   [
+    "water heater replacement",
+    "estate appraisal from photos"
+   ],
+   [
+    "water heaters",
+    "collections"
+   ],
+   [
+    "Water heater",
+    "Collection"
+   ],
+   [
+    "water heater",
+    "collection"
+   ],
+   [
+    "Sewer camera inspection",
+    "Written appraisal letter"
+   ],
+   [
+    "sewer camera inspection",
+    "written appraisal letter"
+   ],
+   [
+    "Sewer camera report",
+    "Appraisal report"
+   ],
+   [
+    "sewer camera report",
+    "appraisal report"
+   ],
+   [
+    "camera inspection",
+    "appraisal letter"
+   ],
+   [
+    "camera report",
+    "appraisal report"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Panel upgrade",
+    "Estate appraisal"
+   ],
+   [
+    "under my sink",
+    "in my safe"
+   ],
+   [
+    "under the sink",
+    "in the safe"
+   ],
+   [
+    "like a burst pipe",
+    "like a house fire"
+   ],
+   [
+    "The $80 supply line stays good until Thu Oct 29.",
+    "The $80 second home stays good until Thu Oct 29."
+   ],
+   [
+    "shutoff valve",
+    "first home"
+   ],
+   [
+    "$75",
+    "$150"
+   ],
+   [
+    "Leak repair",
+    "Estate collection appraisal"
+   ],
+   [
+    "leak repair",
+    "estate collection appraisal"
+   ],
+   [
+    "A estate",
+    "An estate"
+   ],
+   [
+    "a estate",
+    "an estate"
+   ],
+   [
+    "a appraiser",
+    "an appraiser"
+   ],
+   [
+    "A appraiser",
+    "An appraiser"
+   ],
+   [
+    "fade",
+    "bench diagnosis"
+   ],
+   [
+    "supply line",
+    "second home"
+   ],
+   [
+    "$179",
+    "$244"
+   ],
+   [
+    "$120 an hour",
+    "$60 an hour"
+   ],
+   [
+    "Labor",
+    "Each extra hour"
+   ],
+   [
+    "Water pressure check",
+    "Phone question before booking"
+   ],
+   [
+    "Priced from photos",
+    "Priced at the visit"
+   ],
+   [
+    "$160",
+    "$60"
+   ],
+   [
+    "service-call fee",
+    "trip fee"
+   ],
+   [
+    "At the chair",
+    "At the counter"
+   ],
+   [
+    "Style consult",
+    "Phone question"
+   ],
+   [
+    "Elm St",
+    "Anvil St"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every repair, mail-in and on-site visit booked through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The device repair plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A repair shop books drop-off slots and technicians, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Device repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Device repair is never sent now: a swollen battery gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "A device is fixed in hand. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "The shop sells no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The shop bills no plan or insurance. A customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "Lee's Device Repair books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "Lee's Device Repair books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Lee's Device Repair books drop-off slots every 30 minutes (the 'A drop-off slot' branch, A4-67)."
+   },
+   {
+    "op": "off",
+    "at": "A4-15",
+    "label": "Asks for one person by name",
+    "why": "Drop-off slots name no technician. A wish for one goes in the notes (A4-15)."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "Device repair needs no first step: the data consent is signed at drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "A repair shop sells no packages, memberships or plans. A gift card or a discount still works."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "The pro runs late",
+    "why": "A device waits in its drop-off slot, so a technician running late moves only the ready time (A8-11), never Alex's drop-off."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "The shop sells no plans and bills no plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "A repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A child is never left at a repair shop: a parent drops off and picks up."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A repair is paid once: at pick-up, or by the bill."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The shop bills no insurance."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A repair is rated like any visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Next visit booked at checkout",
+    "why": "A repair shop books no next visit at pick-up: each repair is booked when it's needed."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "label": "Yes: everyone signs",
+    "why": "A repair at the shop needs no contract before booking: the data consent is signed at drop-off, and the written estimate comes before any work."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "The shop sells no plans: each repair is paid at its own pick-up, or by its own bill."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "label": "Yes: a contract signed today",
+    "why": "The shop sells no plans or contracts, so nothing signed at the shop has a cancel period."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "a gunsmith who takes firearms in holds a federal firearms license",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "the federal license is the business's; staff checks are asked at S2-29",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "firearm work is never sent now",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the home visits team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Walt Price and Beth Moore run the home appraisals. Walt does estate appraisal too. Gene Chen and Carla Diaz work the shop's bench. Gene also does refinishing and home appraisals"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Walt Price: home appraisals and estate appraisals",
+         "Beth Moore: the home visits",
+         "Gene Chen: the shop, refinishing and home appraisals",
+         "Carla Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Gunsmithing. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Gene"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Gun Appraisal. Sam Lee added you to the team for home visits and estate appraisal jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Walt"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Gene replies YES, then checks what Sam set. One reply covers everything Gene does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Gene Chen · my profile",
+        "lines": [
+         "Every shop service, refinishing and home appraisals",
+         "The shop's hours"
+        ]
+       },
+       "as": "Gene"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Gene"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the shop and home appraisals, so Gene is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Gene picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Carla, Walt and Beth set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None of their own: the federal license is the shop's"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Gun Appraisal",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Walt Price",
+       "Lee Gun Appraisal",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Beth Moore",
+       "Lee Gun Appraisal",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Gun Appraisal",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Gene Chen",
+       "Lee's Gunsmithing",
+       "At the shop, and home appraisals",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Carla Diaz",
+       "Lee's Gunsmithing",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Walt: home appraisals and estate appraisals",
+         "Beth: the home visits",
+         "Gene: the shop, refinishing and home appraisals",
+         "Carla: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, estate appraisal and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Carla at the shop, Beth for the home visits.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Gunsmithing can book you from now on, at the shop and for home appraisals. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Gene"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Gunsmithing can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Carla"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Gun Appraisal can book you for home appraisals and estate appraisals from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Walt"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Estate appraisal and Lee's Gunsmithing now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on home visits and estate appraisal jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Sam sends a photo of the shop's price board and checks what Rosie read. Nothing is typed from scratch.",
+    "more": [
+     "Parts are listed on the written estimate at the shop's price. The estimate is signed before any work beyond the diagnosis.",
+     "Firearm sales, ammunition and transfers for a sale are not services and are never booked.",
+     "A regulated (NFA) item is taken in only if the shop holds the matching federal status."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the shop's price board."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Bench diagnosis and written estimate",
+          "$40, credited to the repair"
+         ],
+         [
+          "Pistol cleaning",
+          "$50 · 3 to 5 days"
+         ],
+         [
+          "Rifle or shotgun cleaning",
+          "$65 · 3 to 5 days"
+         ],
+         [
+          "Scope mount and bore sight",
+          "$45 labor · 45 min"
+         ],
+         [
+          "Bore sight only",
+          "$20"
+         ],
+         [
+          "Sling swivel install",
+          "$25"
+         ],
+         [
+          "Trigger or action work",
+          "From $85 labor plus parts"
+         ],
+         [
+          "Refinish",
+          "$250 · $125 deposit"
+         ],
+         [
+          "Function and safety check",
+          "$35, free with a repair"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex at the counter, Sat 11:00am. Gene checks the photo ID, confirms the firearm is unloaded and cased, and notes what is there before any work.",
+    "more": [
+     "Gene logs the make, model and serial in the shop's federal record, as the rules require. They go on the secure page only.",
+     "Photos of the firearm's condition are the record. A damage claim or a later complaint is checked against them.",
+     "It's kept with the booking, and Alex can see the record on the secure page."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "IN Alex M. ID matched, cleared and cased, logged. Condition photos taken.",
+      {
+       "photos": [
+        "Item, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s drop-off as the before record. The make, model and serial stay on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-25",
+    "does": "Only the $40 diagnosis was promised. Gene finds the cause, then writes the estimate and texts its lines.",
+    "more": [
+     "The estimate shows labor and parts, line by line.",
+     "The price is checked against the plug-in's rules first.",
+     "Nothing more is done until Alex says yes."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 110 trigger work + 15 spring set Alex M."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M.'s estimate: $110 trigger work and a $15 spring set, $125 in all, the $40 diagnosis included. It goes to Sam first."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-26",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Gene's estimate for Alex M.'s item.",
+      {
+       "card": {
+        "title": "Trigger and action work · $125",
+        "lines": [
+         "Trigger work $110 · spring set $15",
+         "The $40 diagnosis included",
+         "The part is ordered in: 3 business days"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-29",
+    "t": "Sat Oct 24, 12:20pm",
+    "does": "Once Sam OKs it, Alex gets the written estimate. Alex says yes to all of it, to some lines, or not today. Nothing is worked on before a yes.",
+    "more": [
+     "Each line shows its parts and labor.",
+     "Anything over the estimate needs a new yes first.",
+     "The part isn't in stock, so it's ordered once Alex says yes.",
+     "Only Alex says yes. Silence is never a yes."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Gene found what's wrong. Here's Gene's written estimate. Nothing is done until you say yes.",
+      {
+       "card": {
+        "title": "Trigger and action work · $125",
+        "lines": [
+         "Trigger work · $110",
+         "Spring set (part) · $15",
+         "The $40 diagnosis included"
+        ]
+       },
+       "buttons": [
+        "Yes, do it",
+        "Not today",
+        "OK some lines"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks! Gene orders the part now. It comes Tue Oct 27, and your item should be ready that afternoon.",
+      {
+       "card": {
+        "title": "Estimate OK'd · $125",
+        "lines": [
+         "Part due Tue Oct 27",
+         "Ready Tue afternoon"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-30",
+    "does": "Alex says no for now. Nothing is repaired, and Alex owes only the $40 diagnosis.",
+    "more": [
+     "The estimate stays good for 30 days. Alex can still OK it on the page."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your item is ready to pick up as it came, not repaired. You owe only the $40 diagnosis.",
+      {
+       "card": {
+        "title": "Not repaired, as you chose",
+        "lines": [
+         "$40 diagnosis, at pick-up",
+         "Estimate good for 30 days"
+        ],
+        "button": "See the estimate",
+        "link": "rosfield.com/q/a8"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-48",
+    "does": "Alex ticks the lines to do on the secure page. Only those are done and billed. The rest of the estimate stays good for 30 days.",
+    "more": [
+     "Here Alex OKs the $110 trigger work and skips the $15 spring set.",
+     "The bill has only the lines Alex OK'd: $110, with the $40 diagnosis included.",
+     "The spring set can be added later at that price."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Pick the lines to do. Only those are done and billed.",
+      {
+       "card": {
+        "title": "Gene's estimate · $125",
+        "lines": [
+         "Trigger work · $110",
+         "Spring set · $15"
+        ],
+        "button": "Pick the lines",
+        "link": "rosfield.com/e/a8"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Done. Gene orders the part now: $110, with the diagnosis. The $15 spring set price is good for 30 days."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. OK'd the trigger work only, $110. No spring set."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "A what-if: Gene opens an action and finds a worn part that makes the firearm unsafe. Gene stops. Alex gets a written note on the secure page.",
+    "more": [
+     "The note says what was found, what wasn't done, and why. The firearm is never handed back as safe.",
+     "A repair is quoted before any more work.",
+     "Nothing is charged for the part not done."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD unsafe sear, stopped.",
+      {
+       "photos": [
+        "Sear, worn"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Gene found a safety problem and stopped, to keep everyone safe. A repair is quoted before any more work. The note is on your secure page.",
+      {
+       "card": {
+        "title": "A note from Lee's Gunsmithing",
+        "lines": [
+         "Found: a safety problem",
+         "Not done: the rest of the repair, for now",
+         "Next: a quote to fix it"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Gene stopped Alex M.'s repair for a safety problem. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-54",
+    "does": "The person who left the firearm gives the claim code and shows the same photo ID. It is handed back once anything due is paid.",
+    "more": [
+     "Who may collect is the plug-in's setting: only the person who left it, with the same ID.",
+     "A code alone is never enough. Nobody is added by a text.",
+     "Anyone else only through a lawful transfer, with the federal check where required, or not at all.",
+     "A check or wait the rules require at return comes first. Delayed: it stays and the customer is told when.",
+     "Denied: it stays, and the shop's own legal process follows. Nothing more goes by text.",
+     "Not picked up: reminders at 30 and 60 days. Never sold or disposed of except as the rules allow, after written notice.",
+     "Never: hand a firearm to someone not allowed, on a text yes."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "That's Alex M.'s code. Check that the photo ID matches, then hand back the item once anything due is paid."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-50",
+    "more": [
+     "READY says only that the item is ready. It never names the firearm, and never carries a serial number.",
+     "Anything due comes with a pay link, or is paid at pick-up, as the service is set.",
+     "After a no to the estimate, READY says the item is back as it came, not repaired.",
+     "Sent inside text hours. A late READY waits for 9am."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A4-65",
+    "steps": [
+     {
+      "id": "A4-x01",
+      "type": "split",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "cust",
+      "to": "san",
+      "via": "page",
+      "title": "Alex says if it is a regulated item",
+      "q": "Is it a regulated (NFA) item?",
+      "does": "The secure page asks if the item is a suppressor, a short-barreled rifle or shotgun, or fully automatic. Those are taken in only if the shop holds the matching federal status.",
+      "more": [
+       "Alex shows the approved registration paper at the counter. It is never put in a text.",
+       "A regular firearm takes nothing extra here."
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "branches": [
+       {
+        "label": "No: a regular firearm",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Yes: a regulated item",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "A4-x02",
+          "line": [
+           "4.7",
+           "4.15"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Says what a regulated item needs",
+          "does": "Say the item is a suppressor. Rosie says the shop takes it in only with the matching federal status. Alex must show the approved registration paper at the counter.",
+          "more": [
+           "Nothing is taken. If the shop lacks the status, nothing is booked.",
+           "Sam is told only that a regulated item was asked about."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "A regulated item is taken in only if the shop holds the matching federal status. Bring the approved registration paper to the counter. Nothing was taken."
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Every repair, mail-in and on-site visit booked through Rosfield pays the $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The device repair plug-in adds no agreement to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "A repair shop books drop-off slots and technicians, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Device repair runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Device repair is never sent now: a swollen battery gets the safety steps and the soonest time, not someone on call."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "A device is fixed in hand, where Alex is. Nothing is repaired by video or phone."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty is billed: a customer's own claim is theirs to file."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "On-site repair arrives in a 2-hour window, with a named technician (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "On-site repair arrives in a 2-hour window, with a named technician (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "On-site repair arrives in a 2-hour window, with a named technician (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "On-site repair needs no first step."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Device repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "Device repair has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Device repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A technician never minds a child: an adult on the booking must be there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone must be there to hand over, unlock and test the device."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for a device repair."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance is billed."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Device repair is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Device repair is never sent now (S2-30), so there's no such button."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "Someone must be there to hand over, unlock and test the device."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "Someone must be there to hand over, unlock and test the device."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A repair is rated, like any job."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "why": "a gunsmith who takes firearms in holds a federal firearms license, and an appraiser holds a license where the state's rules require one",
+    "label": "2 No license: registration only"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "why": "the federal license is the business's; staff checks are asked at S2-29",
+    "label": "1 Yes, each one"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "why": "firearm work is never sent now",
+    "label": "1 Yes: some work is sent now"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "An appraisal needs no signed contract: the price is from the list, or quoted at the visit and OK'd there.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "a child is never minded: the owner must be there and the firearms are cased",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam is on the home visits team too, since Sam goes out on jobs.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Walt Price and Beth Moore run the home appraisals. Walt does estate appraisal too. Gene Chen and Carla Diaz work the shop's bench. Gene also does refinishing and home appraisals"
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Walt Price: home appraisals and estate appraisals",
+         "Beth Moore: the home visits",
+         "Gene Chen: the shop, refinishing and home appraisals",
+         "Carla Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee's Gunsmithing. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Gene"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Gun Appraisal. Sam Lee added you to the team for home visits and estate appraisal jobs. Reply YES to join and get your jobs here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Walt"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Gene replies YES, then checks what Sam set. One reply covers everything Gene does for the shop.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "[calendar linked] Day list at 8am",
+      {
+       "card": {
+        "title": "Gene Chen · my profile",
+        "lines": [
+         "Every shop service, refinishing and home appraisals",
+         "The shop's hours"
+        ]
+       },
+       "as": "Gene"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Set. Your busy times now block bookings, and your day list comes at 8:00am.",
+      {
+       "as": "Gene"
+      }
+     ]
+    ],
+    "more": [
+     "One calendar covers the shop and home appraisals, so Gene is never booked twice.",
+     "Rosie never sees what an event is, only that the time is busy.",
+     "Gene picks 8:00am for the day list. Other texts that can wait come 8am to 8pm.",
+     "Carla, Walt and Beth set up their profiles the same way."
+    ],
+    "form": [
+     [
+      "Kinds of work",
+      "Set by Sam"
+     ],
+     [
+      "Licenses",
+      "None of their own: the federal license is the shop's"
+     ],
+     [
+      "Days and hours",
+      "Set by Sam"
+     ],
+     [
+      "My phone calendar (optional)",
+      "Google: Rosie reads when I'm busy, never what it is"
+     ],
+     [
+      "Day list by text",
+      "The time I pick"
+     ],
+     [
+      "Takes bookings",
+      "Set by Sam"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Gun Appraisal",
+       "At the customer's place",
+       "None needed",
+       "Yes"
+      ],
+      [
+       "Walt Price",
+       "Lee Gun Appraisal",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Beth Moore",
+       "Lee Gun Appraisal",
+       "At the customer's place",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Pat",
+       "Lee Gun Appraisal",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices"
+      ],
+      [
+       "Gene Chen",
+       "Lee's Gunsmithing",
+       "At the shop, and home appraisals",
+       "None needed",
+       "Once Sam says yes"
+      ],
+      [
+       "Carla Diaz",
+       "Lee's Gunsmithing",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they join and Sam says yes. Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Walt: home appraisals and estate appraisals",
+         "Beth: the home visits",
+         "Gene: the shop, refinishing and home appraisals",
+         "Carla: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, estate appraisal and the shop now show to AI assistants too. Each person hears they can be booked for their own work: Carla at the shop, Beth for the home visits.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Gunsmithing can book you from now on, at the shop and for home appraisals. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Gene"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee's Gunsmithing can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Carla"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Gun Appraisal can book you for home appraisals and estate appraisals from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Walt"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Estate appraisal and Lee's Gunsmithing now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your people. Who goes out on home visits and estate appraisal jobs, and who works the shop's bays? Send contact cards, or add them later.",
+      {
+       "buttons": [
+        "Send them now",
+        "Later, by text",
+        "Later, in the portal"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "does": "Sam sends a photo of the appraiser's price list and checks what Rosie read. Nothing is typed from scratch.",
+    "more": [
+     "Each home price has the $89 trip fee in it. An estate or a large collection is counted at the visit, then priced.",
+     "The appraiser never takes a firearm away, and sells nothing."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send a photo of the appraiser's price list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Appraisal price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Collection appraisal, up to 2 hours",
+          "$244 · trip fee in it"
+         ],
+         [
+          "Single-firearm appraisal",
+          "$150 · trip fee in it"
+         ],
+         [
+          "Each extra hour",
+          "$60"
+         ],
+         [
+          "Estate or large collection",
+          "Counted at the visit, then priced"
+         ],
+         [
+          "Written appraisal letter for insurance",
+          "$199"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B4-69",
+    "steps": [
+     {
+      "id": "B4-x01",
+      "line": [
+       "4.7",
+       "4.11"
+      ],
+      "who": "san",
+      "to": "cust",
+      "via": "msg",
+      "title": "Says the firearms stay at home",
+      "does": "Before anything is taken, Rosie tells Alex how the appraisal works. Walt appraises each firearm at the home and never takes one away. The firearms must be unloaded and cased, and children kept away.",
+      "more": [
+       "The owner or an adult must be there for the whole visit.",
+       "Nothing about the firearms goes in a text. The report comes on the secure page."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Walt appraises each firearm at your home and never takes one away. Please have them unloaded and cased, and keep children away during the visit. An adult must be there."
+       ]
+      ],
+      "needs": [
+       "pf.questions"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "more": [
+     "Walt counts the firearms and photographs each one. The make, model and serial stay on the secure page."
+    ]
+   }
+  ]
+ },
+ "notes": "Built on the REDESIGN 2 master (Tue Oct 27, batch D4). Parent: the refitted repair-shop overlay (a device repair shop run as a drop-off); not edited. Base plug-in: the held-back test-drive build (work/prof/gunsmith.json of Oct 24, kept in the scratch folder), read with work/testdrive/gunsmith.md and work/gaps/gunsmith.json: its plug-in (licenses, who may collect, refused requests, handling, crisis storage, NFA status, estate, no-sale rule) is kept and sharpened; the 6 verified findings were each re-checked on the rebuilt master and are now covered by it (A8-54 'who may collect' setting with a check or wait at return; A4-99 declines and tells the owner; A3-25 tells Sam of crisis words; the cancelright switch; B7-19 'Sam calls, nobody moves'; A3-13 call summary without legal-status detail), so the gaps file is now empty.\nTwo companies: Lee's Gunsmithing (flow A, 72 Anvil St) and Lee Gun Appraisal (flow B, collection and estate appraisals at the owner's home). Staff: Gene and Carla (shop), Walt and Beth (appraisers). Alex lives at 9 Orchard Way.\nLicenses matter most here: a federal firearms license covers the shop where firearms are taken in to work on (S1-60 '1', example EX-1042); person licenses are not asked (S2-28 '2'), staff are checked as the plug-in says; regulated (NFA) items only with the matching federal status (own step A4-x01 / A4-x02); any state or local license where the state's rules require one. Nothing names a state.\nWho must not be served: a minor (21 or older is the example shop's rule, and any federal or state age rule); anyone who says they cannot lawfully have a firearm; a request to make a firearm fully automatic, change a serial number, or anything the rules forbid (refused, no booking, owner told); anyone but the person who left a firearm picking it up (A8-54 words; a lawful transfer with the background check is the only other way).\nMoney A: visit|none|counter (main: a pistol that jams; $40 bench diagnosis credited to the repair, estimate $125 = $110 work + $15 part, paid at the counter at pick-up), list|none|counter ($50 pistol cleaning), visit|none|bill (the same, bill with READY), list|deposit|counter ($250 refinish, $125 deposit at booking, $125 rest at pick-up; the deposit may be kept after the coating is ordered, only if Sam confirms). Money B: list|card|card (main: a collection appraisal at home, 2 hours, $244 with the $89 trip fee in it; the card is charged at DONE; the fee only on Sam's yes after a late cancel or no-show) and visit|card|bill (an estate or large collection, counted and priced at the visit). No hold, no full price, no photos path. An extra appraisal hour is $60, added only with the owner's yes.\nThe master's numbers are kept in the sign-up rows where they fit ($40 diagnosis, $20 bore sight, $25 sling swivel, $245 visit quote in flow B, $89 trip fee).\nPrivacy: a firearm's make, model, serial number, ID details and registration papers never go in a text; READY says 'your item'; the report is on the secure page.\nSafety: stop words are someone threatening to hurt themselves or others, or someone hurt by a firearm (911 and 988, no booking); a loaded firearm or one within a child's reach gets the handling steps, then the booking goes on. Crisis words always get 988 first and Sam is told (A3-25); storage is Sam's call.\nNever sent now. Off as work this trade never has: video, seats, stays, classes, plans, packs, insurance, stage payments, a child left, results later.\nNot sure (for the verifier): $244 and the 2-hour appraisal length are the example's own; whether an appraiser needs a state license is left to the state form; the S1-13 and S1-14 per-path lines still show the master's example (paid in full, a $20 fee card) that no overlay can change without money words per path (MASTER line in the log).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "quote 110 color correction + 20 toner",
+    "Toner · $20",
+    "Pick a time for your first color plan visit:",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Each service starts the way most barbershops set it.",
+    "Its money card is set the way most plumbing businesses start. Is it right? Send only what's different.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Every plumbing service",
+    "A water heater job",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Do you do kids cuts? My son is 8.",
+    "You told us the kids cut is for your son, and that you're his parent.",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "Who is the haircut for? And are you 18 or older?",
+    "The plug-in says what each time is for: a person's time, a seat in a session, a space, or a stay. A barbershop books a person's time.",
+    "The price is on the shop's board: {{price:$35}}. It shows before anyone says yes, and it never needs Sam's OK.",
+    "Alex wants it at home: a house call, $75, paid in full when booking. From here it's the other flow, where the business goes to the customer.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is paid at the chair.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is on the bill after the visit.",
+    "The Groom's package can take a $40 deposit when booked. The other $100 is charged to the saved card at the end.",
+    "On this path, the Groom's package takes a $40 deposit; the $100 rest is paid after the visit.",
+    "Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes",
+    "Nothing is taken, and no card is asked for: the customer's YES books it. A $35 haircut can work this way.",
+    "Haircut · $35",
+    "Skin fade · $40",
+    "Beard trim · $20",
+    "Haircut at home · $75",
+    "Signature cut and hot towel shave · $55",
+    "Groom's package · $40 deposit",
+    "A beard trim is on the price board: $20. The customer hears the price and says yes before it's done.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "'Adding a beard trim, +$20? Say so.'",
+    "One request waits for Lee's Barbershop. It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery. Say yes to go ahead.",
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Reading it back: the haircut goes to $40 for new bookings. Booked customers keep the price they were shown. Change it?",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Haircuts already booked keep $35, even after Nov 2.",
+    "A plan goes to $40 from Wed Nov 25 only with that customer's yes.",
+    "No yes: nothing at the new price. The plan ends after its last visit at $35.",
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Sam switches the haircut from a card saved for the $20 fee to a $20 deposit. It's for new bookings only, and each change is read back first.",
+    "A card saved for the $20 fee · paid after the visit",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Refund · $20",
+    "Dee W.'s $20 payment through Rosie was charged twice.",
+    "Color quotes come to you first. Board prices never need one",
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "Access, like a step-free chair: only times and places that fit show.",
+    "A what-if: someone else pays, like Alex's employer for a staff cut. What's due at booking is paid on the page by the person booking. The person paying gets a pay link for the rest.",
+    "My employer pays for this cut.",
+    "The plug-in's plain questions are optional, like 'How would you like it on top?'",
+    "How would you like it on top? (optional)",
+    "May the shop show photos of your hair? Yes / No",
+    "A yes with a 'but' isn't a yes yet. 'Yes, make it a fade' goes back to the times.",
+    "No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut.",
+    "Can my son wait in the shop during my cut?",
+    "NOTE Alex: please come with dry hair on Saturday.",
+    "A note from Lee's Barbershop about your Sat 11:00am visit: please come with dry hair.",
+    "At the shop, the customer is already in the chair, so there's no door check.",
+    "Stopped Alex M.'s cut.",
+    "stopped Alex M.'s cut.",
+    "Before paying, Riley shows the work, like the cut in the mirror. A fix asked for now is done before paying, at no extra cost.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "The cut is uneven on one side.",
+    "says Saturday's cut is uneven on one side",
+    "1 color quote",
+    "'A trim' or 'a fade' fits a haircut.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "once Riley sees the hair.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Could Riley use a toner instead of the gloss?",
+    "asks for a toner instead of the gloss. What's the new price?",
+    "two skin fades on",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Alex picked a kids cut for a son",
+    "Today · 3:00pm · Avery",
+    "a beard trim today at 2:00pm with Avery",
+    "the beard trim today at 2:00pm with Avery",
+    "first tomorrow: 10:00am, Riley",
+    "A card saved for the $20 fee",
+    "haircut with Riley",
+    "Sat 11am Riley",
+    "at 11:20am on Riley's phone",
+    "Gloss to finish · $15",
+    "Riley quotes the rest at the chair, before any work.",
+    "Wants Saturday morning, with Riley",
+    "Cancel your Sat 11:00am visit with Riley? It's free.",
+    "How was your visit with Riley?",
+    "Sun Oct 25 · 11:00am · Riley",
+    "Walk-in for a haircut",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Your item is still waiting for pick-up.",
+    "A drop-off item isn't picked up.",
+    "Promises the $25 consult; priced at the chair",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "like Lee Plumbing and Lee Electric.",
+    "Quiero un corte el sábado.",
+    "A barbershop books a person's time.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Lee's Barbershop · with Riley",
+    "A cut is rated, so the shop takes the first branch.",
+    "Say a visit leads to more work, like Riley's color plan after a consult, or a lawyer's engagement letter.",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "3 visits with Riley",
+    "The plan's visits are booked like any booking, each with its own money choices and confirmation.",
+    "Drain clearing",
+    "home warranty plan",
+    "a package of cuts",
+    "patch test",
+    "A haircut could mean a salon or a barbershop.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop's services need none.",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today",
+    "Riley looks, then prices it",
+    "Texts Alex the price",
+    "Only the consult; the price stays open",
+    "Follows up on an item left behind",
+    "a skin-test result",
+    "color and house calls",
+    "color, house calls",
+    "Consult only",
+    "photos of your hair",
+    "a cut on Saturday",
+    "Books a cut every 4 weeks",
+    "a cut every 4 weeks",
+    "for a staff cut",
+    "in the chair",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "Barber license",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "11:00am · Riley",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "Say Sofia G. left an item at a business that takes drop-offs. Staff text READY when the work is done. Sofia hears what was done, the pick-up hours, and anything due.",
+    "Your item is ready for pick-up.",
+    "Pick-up: Tue to Sat, 9am to 6pm",
+    "4471",
+    "Sofia",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "1200 Main St",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "kids cuts",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "fade",
+    "Beard trim",
+    "beard trim",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "$25 consult",
+    "Only the consult",
+    "the consult",
+    "What happens at the chair?",
+    "Priced at the chair",
+    "priced at the chair",
+    "Paid at the chair",
+    "At the chair",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "a house call",
+    "water heaters",
+    "water heater",
+    "Panel upgrade",
+    "like a burst pipe",
+    "$75",
+    "service-call fee",
+    "$55",
+    "$35",
+    "$140",
+    "$40 deposit",
+    "$100 rest",
+    "$75",
+    "18 or older",
+    "At the chair",
+    "Elm St"
+   ],
+   "B": [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Call a mold cleanup company first",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Found: mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "I found water damage under the sink this morning.",
+    "Overflowing kitchen drain",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout. The plug-in says which services. Work that's never sent now sets nobody on call.",
+    "Plumbing takes jobs sent now, like a burst pipe. Sam names who takes them in open hours and who's on call while closed.",
+    "Plumbing takes jobs sent now, like a burst pipe. Who takes them in open hours, and who's on call when you're closed?",
+    "Its money card is set the way most barbershops start. Is it right? Send only what's different.",
+    "Here are the rules barbershops often set. Your call: keep them, or change any. They become the shop's own rules.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Jordan: plumbing and electrical, $140 an hour",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Here, jobs over the plug-in's amount need a written estimate. The $179 drain needs none.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Sewer camera inspection · $199",
+    "Safety stop: a customer's AI said they smell gas.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Someone with their own customers, like a chair renter, gets their own sign-up link instead.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "The shop's chair is in the other flow.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "'s drain, cleared Thu Oct 22, is clogged again.",
+    "Drain clearings",
+    "drain clearings",
+    "Shutoff valve and wall pipe · $540",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "heating and cooling",
+    "Heating and cooling",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sam adds Reese K. to Lee Home Services.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "You can look for a roofer near you.",
+    "Can you flush my water heater every year, too?",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Say Alex asks for a water heater flush every year.",
+    "Yearly water heater flush plan",
+    "water heater contract",
+    "replaces water heaters",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Can I run the dishwasher before you come?",
+    "like Lee Plumbing and Lee Electric.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "a $2,400 repipe",
+    "of your repipe",
+    "repipe",
+    "Both rentals' visits go on one bill on the 1st.",
+    "like replacing the old pipes Jordan noted",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "Can Jordan look at my bathroom sink next week?",
+    "Jordan left a mess under the sink.",
+    "My kitchen drain is clogged.",
+    "Just the kitchen sink.",
+    "a leak under the sink",
+    "Please clear the cabinet under the sink.",
+    "a drain cleaning at two rentals",
+    "next week's drain cleaning",
+    "clear a yard drain",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain",
+    "Kitchen drain clearing",
+    "Kitchen drain",
+    "Drain clearing",
+    "drain clearing",
+    "clear the drain",
+    "your new pipes are in",
+    "a roof leak",
+    "Video and Jordan's notes",
+    "Jordan finds corroded shutoff valves.",
+    "replace both shutoff valves, corroded",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "shutoff valves",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Each unit's notes",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "home warranty",
+    "supply house",
+    "Rental 1",
+    "Rental 2",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also run a camera down my sewer line?",
+    "$160 valve quote",
+    "$160 valve work",
+    "a bathroom drain",
+    "kitchen drain",
+    "The faucet is a leak repair, quoted at the visit.",
+    "A haircut could mean a salon or a barbershop.",
+    "Texts Alex the price",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "Is the sink still full of water?",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "DONE 179 drain",
+    "245 valve 165 supply line 80",
+    "Shutoff valve",
+    "Supply line",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "1-year labor warranty",
+    "a dripping faucet",
+    "color and house calls",
+    "color, house calls",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "plumbing license",
+    "Plumbing license",
+    "electrical license",
+    "Electrical license",
+    "Electrical",
+    "electrical",
+    "plumber",
+    "Plumber",
+    "Plumbing",
+    "plumbing",
+    "Barbershop",
+    "barbershops",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "cut hair",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "1200 Main St",
+    "a haircut",
+    "Haircut",
+    "fade",
+    "beard trim",
+    "at the chair",
+    "rents a chair",
+    "chairs",
+    "House calls",
+    "house calls",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Sewer camera report",
+    "sewer camera report",
+    "camera inspection",
+    "camera report",
+    "Service call fee",
+    "Service call",
+    "service call fee",
+    "service call",
+    "Panel upgrade",
+    "under my sink",
+    "under the sink",
+    "like a burst pipe",
+    "The $80 supply line stays good until Thu Oct 29.",
+    "shutoff valve",
+    "$75",
+    "Leak repair",
+    "leak repair",
+    "fade",
+    "supply line",
+    "$179",
+    "$120 an hour",
+    "Labor",
+    "Water pressure check",
+    "Priced from photos",
+    "$160",
+    "service-call fee",
+    "Elm St"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-15": "db5792db95",
+   "A4-43": "c17d56f766",
+   "A5-01": "6c5c5c2f87",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A5-19": "5d5db6f3c1",
+   "A10-05": "63c3536c7a",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "S2-02": "b2094081ee",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S1-70": "3961b1f903",
+   "S1-12": "41b86c1e72",
+   "A8-23": "e3a35f7f9e",
+   "A8-25": "a79292eae2",
+   "A8-26": "1e164bc165",
+   "A8-29": "6b776f2a37",
+   "A8-30": "c0f4d7c935",
+   "A8-48": "4797cd5902",
+   "A8-35": "a67e890a5b",
+   "A8-54": "bc2f9467fd",
+   "A8-50": "0f26abfc87",
+   "A4-65": "fa7ec0389d"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B7-55": "3ce84c57a3",
+   "B7-90": "a5b8b2fe42",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B9-06": "f091432f2d",
+   "B9-19": "b97bfbf0d2",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B8-03": "ac9d404766",
+   "B10-32": "7713bff255",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "B5-34": "917f89b62f",
+   "S2-02": "b2094081ee",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "S1-70": "34e952eac5",
+   "S1-12": "0bea92643b",
+   "B4-69": "350fbaf90a",
+   "B8-18": "530038d2b8"
+  }
+ }
+}

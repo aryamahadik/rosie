@@ -1,0 +1,3918 @@
+{
+ "id": "drywall",
+ "name": "Drywall and plaster",
+ "style": "Project",
+ "pattern": "project",
+ "from": "painter",
+ "plugin": {
+  "pf.license": {
+   "need": "if: a drywall or plaster contractor license or registration for the company, where the state's form requires one (often above a job size)",
+   "ask": [
+    "The company's license or registration number, and its class",
+    "Any job-size limit the license has",
+    "The firm's lead-safe certificate, for work on older homes where the rules require it",
+    "General liability insurance; workers' comp where the business has employees",
+    "A bond, where the state's form asks for one"
+   ],
+   "holder": "The business; plus a qualifying person where the state's form names one. A crew lead who disturbs old paint in an older home holds a lead-safe certificate, where the rules require it.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks": [
+    "No drywall work goes live until the company's license or registration checks out, where one is required",
+    "A job over the license's size limit is never offered or quoted, even a free estimate: the owner is told why",
+    "An older home is offered only if the firm's lead-safe certificate is on file, where the rules require it; if not, no time is offered and the customer is pointed to the kind of business that can help"
+   ],
+   "asbestos": "The business never removes asbestos and never disturbs a suspect material before a lab says there is none. Removal is done only by a licensed abatement company that the customer hires; the business comes back after the area is cleared.",
+   "plaster": "Plaster repair goes live on its own license where the state's form asks for one, and each plasterer's own where it asks",
+   "texture_shop": "A texture consult at the shop needs no license: the shop gives its business registration only",
+   "renewals": "License, certificate, insurance and bond dates kept; reminded 30 days out; a lapse pauses new bookings",
+   "background": "Background checks only where the state's form asks"
+  },
+  "pf.services": {
+   "pattern": "Estimate visit, then project: a drywall job above the small list jobs is booked only after a written quote and a signed contract",
+   "B": [
+    {
+     "name": "Estimate at the home",
+     "price": "$89, credited to the job if the customer signs (the example business's own price; a free estimate is the safe start)",
+     "length": "45 to 60 minutes, plus the drive",
+     "where": "at the customer's place; an adult must be home",
+     "before": "nothing taken (or a card saved for the $89)",
+     "after": "billed only if no contract follows"
+    },
+    {
+     "name": "Ceiling and wall repair (water damage, sagging or cracked board)",
+     "price": "quoted after the estimate visit, by the room and the square foot: a written quote within 2 business days, good for 30 days (example: a hallway ceiling and two wall patches, $4,800)",
+     "length": "about 5 to 7 work days, with drying time between coats",
+     "where": "at the customer's place; someone home, or a lockbox",
+     "before": "nothing at booking; a deposit only after the contract is signed",
+     "after": "one last bill, after the walk-through and touch-ups"
+    },
+    {
+     "name": "Hang, tape and finish (a basement, an addition, a garage)",
+     "price": "quoted after the estimate visit, by the square foot",
+     "length": "about 5 to 10 work days, with drying time between coats",
+     "where": "at the customer's place",
+     "before": "the same as the ceiling repair",
+     "after": "the same"
+    },
+    {
+     "name": "Plaster repair and skim coat",
+     "price": "quoted after the estimate visit, by the room",
+     "length": "about 2 to 6 work days",
+     "where": "at the customer's place",
+     "before": "the same",
+     "after": "the same"
+    },
+    {
+     "name": "Popcorn texture removal (a ceiling)",
+     "price": "quoted after the estimate visit; in an older home, only after a lab says there is no asbestos",
+     "length": "about 2 to 4 work days",
+     "where": "at the customer's place; rooms emptied and floors covered first",
+     "before": "the same",
+     "after": "the same"
+    },
+    {
+     "name": "Ceiling section repair (up to 8 by 8 feet)",
+     "price": "priced from the customer's photos (example: $640); over $500, Sam OKs it",
+     "length": "1 to 2 days, with drying time",
+     "where": "at the customer's place",
+     "before": "a signed contract where the state's form needs one, then a 25% deposit (example: $160)",
+     "after": "the rest on the bill (example: $480)"
+    },
+    {
+     "name": "Drywall patch",
+     "price": "$179, from the list: up to 3 small holes, or one up to 12 inches; patched, texture matched and primed",
+     "length": "2 to 3 hours, one visit, with quick-setting compound",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 late-cancel fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Nail pop and crack repair",
+     "price": "$150, from the list: one room's nail pops and hairline cracks, fixed and primed",
+     "length": "2 to 3 hours",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 late-cancel fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Moisture check",
+     "price": "$199: a meter reading of the walls and ceiling, with a written report",
+     "length": "about 1 hour",
+     "where": "at the customer's place",
+     "before": "a card saved for the $89 late-cancel fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Crack check",
+     "price": "free: a 10-minute look at a hairline crack, added to a visit already booked, never booked alone",
+     "where": "at the customer's place"
+    },
+    {
+     "name": "Garage wall patch",
+     "price": "$179, from the list",
+     "length": "2 to 3 hours",
+     "where": "at the customer's place; nobody needs to be home if a lockbox is set",
+     "before": "a card saved for the $89 late-cancel fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "name": "Finish samples",
+     "price": "up to 2 texture sample boards free with a signed job"
+    },
+    {
+     "name": "Labor",
+     "price": "$120 an hour for drywall, $140 an hour for plaster, 1-hour minimum",
+     "where": "added to a job, never booked alone"
+    },
+    {
+     "name": "Change order",
+     "price": "priced, written and signed by both before the changed work; added to the last bill"
+    },
+    {
+     "name": "Painting (the second kind of work)",
+     "price": "waits for its own license where the state's form asks; a drywall job is left primed, ready for paint"
+    }
+   ],
+   "A": [
+    {
+     "name": "Texture consult",
+     "price": "$35, 30 minutes",
+     "where": "at the shop; or at the customer's home for $75, paid in full when booked",
+     "before": "a card saved for the $20 missed-consult fee",
+     "after": "paid at the shop counter"
+    },
+    {
+     "name": "Ceiling texture consult",
+     "price": "$40, 30 minutes, with photos of the ceiling",
+     "where": "at the shop",
+     "before": "a card saved",
+     "after": "at the shop counter"
+    },
+    {
+     "name": "Sample board",
+     "price": "$20, an add-on to take home",
+     "where": "at the shop"
+    },
+    {
+     "name": "Room texture pick",
+     "price": "$25, 15 minutes",
+     "where": "at the shop"
+    },
+    {
+     "name": "Whole-house texture plan",
+     "price": "$55, 60 minutes; credited to the drywall job if the customer hires Lee Drywall",
+     "where": "at the shop",
+     "before": "paid in full when booked",
+     "after": "nothing more"
+    },
+    {
+     "name": "Texture package (plan, 6 sample boards, finish guide)",
+     "price": "$140, 2 1/2 hours",
+     "where": "at the shop",
+     "before": "the $40 fee on a saved card, or a $40 deposit",
+     "after": "at the shop counter"
+    },
+    {
+     "name": "Custom plaster sample",
+     "price": "priced from the customer's photos (example: $90); Sam OKs each one",
+     "where": "at the shop"
+    },
+    {
+     "name": "Quick photo check",
+     "price": "free, 15 minutes, by video or phone",
+     "where": "by video or phone (counts as at the shop)",
+     "before": "nothing taken",
+     "after": "nothing owed"
+    },
+    {
+     "name": "Plaster molding repair",
+     "price": "priced at the shop after a $25 look at the piece the customer brings",
+     "where": "at the shop"
+    }
+   ],
+   "capacity": "One estimator or texture consultant per booking; one crew of 3 per drywall job, 2 crews; the shop's one sample table is saved for custom plaster samples",
+   "skills": "Estimates and running a job: crew leads. Older homes: a certified renovator on the job, where the rules require it. Texture consults: texture consultants. Plaster: a plasterer.",
+   "nobody_home": "Garage wall patches with a lockbox: nobody needs to be home, with a start and an end photo. Inside work: someone home, or a lockbox the customer sets up.",
+   "online": "A texture consult can be a video call (counts as at the shop)",
+   "recent_range": "Before an estimate, the AI may show the business's range of recent jobs (example: hallway ceiling repairs ran $3,000 to $6,500), labeled as the business's own numbers, never as a quote"
+  },
+  "pf.questions": {
+   "before_times": [
+    "What needs work: a hole, a crack, a water-stained or sagging ceiling, or new walls?",
+    "Which rooms, and about how big is the area?",
+    "Is water still coming in, or has the leak been fixed? (the source is fixed before any board goes up)",
+    "The year the home was built (older homes may need lead and asbestos care, where the rules require it)"
+   ],
+   "after_time": [
+    "Is the ceiling or wall textured (popcorn, orange peel, knockdown) or smooth?",
+    "Do you own the home or rent? (the owner must OK the work)",
+    "Pets or children at home on work days, how to get in, and where the crew can park",
+    "Is there a homeowners' group with rules on work hours?"
+   ],
+   "secure_page_only": [
+    "Photos of the damage or the walls (optional)",
+    "Gate, door or lockbox codes",
+    "Budget range"
+   ],
+   "who_may_book": "An adult who owns the home, or someone with the owner's written OK. A renter's job needs the owner to sign.",
+   "shop": [
+    "Which rooms or ceilings",
+    "A photo of the wall or ceiling to match, or a chip of the old texture (optional)"
+   ]
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "a fire, smoke or a gas smell",
+     "says": "Leave the house now, and call 911.",
+     "booking": "no booking"
+    },
+    {
+     "words": "someone is hurt, fainted, can't breathe, or fell from a ladder; a ceiling has fallen on someone",
+     "says": "Call 911 now.",
+     "booking": "no booking"
+    },
+    {
+     "words": "sparks, a burning smell or a buzzing sound from wires or outlets in a wet wall or ceiling",
+     "says": "Leave the room, don't touch anything, and call 911. If you can do it safely from a dry spot, turn the power off at the panel.",
+     "booking": "no booking"
+    }
+   ],
+   "steps_then_go_on": [
+    {
+     "words": "water coming through a ceiling, or a ceiling that is sagging, bulging or dripping",
+     "says": "Stay out from under it. Shut off the water at the main valve, and keep away from wet lights and outlets. Call a plumber first if it is still leaking. We come after the source is fixed and the area is dry.",
+     "booking": "goes on; the estimate is booked, the drywall waits for a dry area"
+    },
+    {
+     "words": "an old popcorn ceiling, old plaster or old joint compound in an older home that someone wants to scrape, sand or drill",
+     "says": "Please don't scrape, sand, drill or sweep it up. Older materials can hold asbestos, and the dust is the danger. Keep children and pets away. We test it before any work.",
+     "booking": "goes on; a lab test comes first"
+    },
+    {
+     "words": "old paint flaking or chipping in an older home",
+     "says": "Keep children and pets away from the chips, and don't sweep, sand or scrape them. We'll treat the paint as lead until it's tested.",
+     "booking": "goes on; lead-safe work becomes the plan"
+    },
+    {
+     "words": "dark or musty patches on a wall or ceiling, or a musty smell after a leak",
+     "says": "Stay out of the room if you can, and don't scrub or cut into it. The crew stops at mold and leaves a written note.",
+     "booking": "goes on; mold is handled by a company that does it, then the board goes up"
+    },
+    {
+     "words": "dust that makes someone cough or short of breath",
+     "says": "Leave the dusty room and open a window. If anyone has trouble breathing, call 911.",
+     "booking": "goes on"
+    }
+   ],
+   "business_line": "Questions about whether an old texture or plaster is safe to remove yourself go to the business's own line"
+  },
+  "pf.first_steps": {
+   "before_quote": "The estimate visit at the home. An adult must be home.",
+   "after_contract": [
+    "The cancel window ends before any work starts or materials are bought, where the state's rules give one",
+    "In an older home, the lead pamphlet the rules require, given and signed for before work starts",
+    "In an older home, a lab test of the old ceiling texture and joint compound before anything is scraped, sanded or torn out; samples are taken by a person the rules allow",
+    "A texture sample board and the finish sheet: texture, finish level and primer, signed before materials are bought",
+    "The work plan, texted before the first work day"
+   ],
+   "prep": [
+    "Move furniture out of the work area, and cover what stays",
+    "Take pictures and small things off the walls; keep pets in another room",
+    "Clear a path from the front door to the work area and a place to park",
+    "Put any gate or lockbox code on the secure page"
+   ],
+   "shop_prep": [
+    "Bring photos of the walls or ceilings, taken in daylight",
+    "Bring a chip of the old texture or plaster you want to match, if you have one"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "Estimate visit: the check-in code at the door. Each work day: that day's code, or a start photo when a lockbox is used. Shop: the code at the desk.",
+   "at_the_visit": "The estimator measures, checks the board for water and soft spots, photographs the damage and notes the year the home was built; the written quote follows within 2 business days, good for 30 days",
+   "older_homes": "Old texture, joint compound, plaster and paint in an older home are treated as possible asbestos or lead until a lab or a test says otherwise, where the rules require it",
+   "changes": "A written change order, priced and signed by both, before any changed work. Hidden damage found when the old board comes down is priced this way; not signed by the set time, the crew lead calls and the crew finishes only what the contract covers.",
+   "outside_checks": "A lab test of old materials, before work, only where the rules require one; asbestos removal by a licensed abatement company the customer hires",
+   "drying": "Compound dries between coats, so a finished wall takes days, not hours; each work day says what is done and what is drying",
+   "done": "A walk-through with the finish sheet; each touch-up fixed and ticked off by the customer before the last bill; then DONE on the last work day. The wall is left primed, ready for paint.",
+   "paint_disputes": "A color or paint finish is not part of this work: painting is a separate job unless the contract lists it",
+   "shop_done": "DONE after the consult, with the texture picks saved on the finish sheet for the estimate",
+   "before_photos": "Water stains, sagging board, cracks, old repairs and anything already damaged"
+  },
+  "pf.money": {
+   "estimate": "The example's $89 estimate visit is credited to the job; billed only if no contract follows. A free estimate is the safe start.",
+   "no_money_before_contract": "On a quoted job, nothing is taken before the contract is signed by everyone",
+   "deposit": "Only after signing; the deposit cap comes from the state's form (example: $480 on a $4,800 job; $160 on a $640 job priced from photos)",
+   "kept_apart": "Money paid before the work is kept apart or bonded where the state's rules require it (a switch from the state's form)",
+   "no_payment_ahead": "Never paid ahead of the work done, where the state's rules say so: the last bill comes after the walk-through and touch-ups",
+   "change_orders": "Added to the last bill",
+   "samples": "2 texture sample boards free; more at the owner's price, OK'd by the customer first",
+   "weather": "Drywall is indoor work: a move for a wet or cold day costs the customer nothing",
+   "big_bills": "Bank transfer through the company's own Stripe for bills over the owner's amount (the example: $500); paid once it clears. A check also works: the crew lead texts 'paid check'.",
+   "tips": "No tip line",
+   "tax": "Tax on materials and labor follows the state's form",
+   "shop": "The whole-house texture plan's $55 is credited to the drywall job if the customer hires Lee Drywall; the $20 missed-consult fee only after Sam OKs it"
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate, door or lockbox codes",
+    "The budget",
+    "Lab results about asbestos or lead: only the secure page, and only a plain 'your result is ready' in a text",
+    "Contract and change order papers (secure page only, with a copy by email)"
+   ],
+   "languages": "English and Spanish",
+   "minors": "Never booked by a minor; a child at home is never the one who lets the crew in"
+  },
+  "pf.staff": {
+   "roles": "Crew leads (Marco, Luz): estimates, quotes and running each job with a crew of 3. Texture consultants (Ines, Paolo) at the shop.",
+   "licenses": "The company holds the license or registration; a crew lead who disturbs old paint in an older home holds a lead-safe certificate where the rules require it; plasterers hold their own where the state asks. Texture consultants need none.",
+   "lead_safe": "A certified renovator on each job in an older home, where the rules require it: on site for setup and cleanup, and directing the trained crew",
+   "sales": "An estimator who sells contracts at the home holds any salesperson registration the state's form asks for",
+   "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+   "stand_in": "Another crew lead may take an estimate visit; a job keeps its crew lead unless Sam moves it; an older home's stand-in must be a certified renovator"
+  },
+  "pf.rules": {
+   "contract": "A written contract for a quoted job where the state's rules require one, signed by everyone on title and by the business before any money",
+   "contract_parts": "The parts the state's form lists (license number, dates, price, deposit, cancel notice, any lien notice, insurance)",
+   "cancel_window": "A cancel window after signing, where the state's rules give one; work and material purchases wait for it",
+   "older_home": "In an older home, lead-safe methods where the rules require them: plastic on the floor and over doors, nearby vents shut, wet sanding or a sander with a HEPA vacuum, no open-flame burning, and the cleanup checked before leaving. A suspect old material is tested before it is disturbed.",
+   "pamphlet": "The lead pamphlet the rules require, given before work, with the customer's signed receipt kept",
+   "change_orders": "Written and signed by both before the changed work",
+   "papers": "With the last payment: any lien release the state's rules provide, the signed finish sheet and the leftover-material list",
+   "show": "The license number on the listing, the quote, the contract and the receipt, where the state's rules require it",
+   "warranty": "1 year against cracks at taped seams and nail pops (the example's own term)",
+   "records": "7 years; lead-safe records as long as the rules require"
+  },
+  "pf.edges": {
+   "wet_area": "Water still coming in, or a wet area: no board goes up until the source is fixed and a moisture check shows it dry; the estimate is still booked",
+   "asbestos_found": "A lab finding of asbestos: no work on it, the customer hires a licensed abatement company, the start moves with no fee, or the customer cancels with everything paid back",
+   "hidden_damage": "A change order before the fix; not signed by the set time: the crew lead calls, and the crew finishes only what the contract covers",
+   "finish_not_signed": "Not signed by the set day: the crew lead calls; materials are bought only after sign-off, so the dates may move",
+   "texture_match": "An old texture can only be matched, not copied exactly; a sample board is shown first",
+   "mold": "Mold behind or on old board: the crew stops there, and the customer gets a written note",
+   "dust": "Dust walls and floor covers go up before any sanding; the crew cleans each day",
+   "cancel_after_window": "Sam and the customer settle it; Rosie moves no money on its own",
+   "nobody_home": "A lockbox with start and end photos",
+   "over_license_limit": "Not offered, and the owner is told why",
+   "other": "All other edge cases are handled the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "multiday",
+   "extrawork",
+   "photos",
+   "banktransfer",
+   "video"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Marco and Luz do drywall; Marco does plaster too, at $140 an hour. Ines and Paolo run texture consults; Ines also does custom plaster samples and home visits. Pat is my office manager, for prices over $500. Jules works independently, with their own customers."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this consult."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a texture consult on Saturday."
+   ],
+   [
+    "a staff cut",
+    "a staff consult"
+   ],
+   [
+    "a shorter cut",
+    "a shorter consult"
+   ],
+   [
+    "the shorter cut",
+    "the shorter consult"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s consult"
+   ],
+   [
+    "the cut in the mirror",
+    "the sample on the wall"
+   ],
+   [
+    "A cut is rated",
+    "A consult is rated"
+   ],
+   [
+    "Style consult",
+    "Quick photo check"
+   ],
+   [
+    "a step-free chair",
+    "a step-free entrance"
+   ],
+   [
+    "see your hair",
+    "see your wall"
+   ],
+   [
+    "come with dry hair on Saturday",
+    "bring your wall photos on Saturday"
+   ],
+   [
+    "come with dry hair",
+    "bring your wall photos"
+   ],
+   [
+    "like a chair renter",
+    "like an independent plasterer"
+   ],
+   [
+    "A chair renter",
+    "An independent finisher"
+   ],
+   [
+    "The chairs",
+    "The sample wall"
+   ],
+   [
+    "A chair, ready",
+    "A finished corner"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most plaster and texture shops set it."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Texture consults, sample boards and custom plaster samples."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Drywall patches and ceiling repairs, within 25 miles."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for tile setting, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Texture Shop doesn't set tile."
+   ],
+   [
+    "like a roofer",
+    "like a tile setter"
+   ],
+   [
+    "skin fades",
+    "texture consults"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds tile setting to Lee Texture Shop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Tile setting for Lee Texture Shop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW tile setting"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout or a tow"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Drywall's"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A drywall example: water through a ceiling gets 'shut off the water at the main'."
+   ],
+   [
+    "A skin fade",
+    "A ceiling texture consult"
+   ],
+   [
+    "a skin fade",
+    "a ceiling texture consult"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither drywall nor the shop takes jobs sent now."
+   ],
+   [
+    "style consult",
+    "quick photo check"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex manages rentals and asks for a texture consult every 4 weeks."
+   ],
+   [
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Say Owen H., who manages rentals, has a texture consult plan with Ines, every 4 weeks."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una consulta de textura el sábado."
+   ],
+   [
+    "Avery can't be booked until it matches.",
+    "Luz can't be booked until it matches."
+   ],
+   [
+    "Avery · license not found",
+    "Luz · license not found"
+   ],
+   [
+    "Avery · license expired",
+    "Luz · license expired"
+   ],
+   [
+    "Avery stays on the team, and can be booked again once it shows renewed.",
+    "Luz stays on the team, and can be booked again once it shows renewed."
+   ],
+   [
+    "so Lee's Barbershop can't book you until it shows renewed",
+    "so Lee Drywall can't book you until it shows renewed"
+   ],
+   [
+    "Avery's license is checked again when the lookup answers.",
+    "Luz's license is checked again when the lookup answers."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says a plaster sample stained a jacket today."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A plaster sample stained my jacket."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Ines sees the photo"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Alder St"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do room texture picks? It's for the guest room."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A texture consult could mean a design firm or a drywall crew."
+   ],
+   [
+    "2 No person license",
+    "2 No person license: the shop"
+   ],
+   [
+    "Plumbing JP031552",
+    "Drywall EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-2210"
+   ],
+   [
+    "EC22871",
+    "EX-3871"
+   ],
+   [
+    "JE30417",
+    "EX-4417"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works independently"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's rooms together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books texture consults for three rooms on one morning. Rosie finds times side by side with Ines and Paolo."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A texture consult and a room texture pick work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of the wall"
+   ],
+   [
+    "patch test",
+    "test board"
+   ],
+   [
+    "skin-test result",
+    "test board result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the shop during my consult?"
+   ],
+   [
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "Say a new water stain shows on the customer's ceiling before the visit, and they ask if they can still come in."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "A new water stain showed up on my ceiling. Can I still come in?"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: orange peel texture, level 4 finish. Hall ceiling stain: primer first"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the hallway."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the hallway"
+   ],
+   [
+    "takes no cut of",
+    "takes no fee on"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Drywall"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Texture Shop LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Texture Shop"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Drywall"
+   ],
+   [
+    "Lee Electric",
+    "Lee Plaster"
+   ],
+   [
+    "1200 Main St",
+    "212 Mill Rd"
+   ],
+   [
+    "88 Elm St",
+    "9 Alder St"
+   ],
+   [
+    "Riley",
+    "Ines"
+   ],
+   [
+    "Avery",
+    "Paolo"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Luz"
+   ],
+   [
+    "plumbing and electrical",
+    "drywall and plaster"
+   ],
+   [
+    "electrical",
+    "plaster"
+   ],
+   [
+    "Electrical",
+    "Plaster"
+   ],
+   [
+    "Panel upgrade",
+    "Ceiling replacement"
+   ],
+   [
+    "plumber",
+    "drywall finisher"
+   ],
+   [
+    "plumbing",
+    "drywall"
+   ],
+   [
+    "Plumbing",
+    "Drywall"
+   ],
+   [
+    "barbershop",
+    "texture shop"
+   ],
+   [
+    "Barbershop",
+    "Texture shop"
+   ],
+   [
+    "Barbering",
+    "Texture work"
+   ],
+   [
+    "barbers",
+    "texture consultants"
+   ],
+   [
+    "barber",
+    "texture consultant"
+   ],
+   [
+    "Barber",
+    "Texture consultant"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Whole-house texture plan"
+   ],
+   [
+    "Signature cut and shave",
+    "Whole-house texture plan"
+   ],
+   [
+    "signature cut",
+    "whole-house texture plan"
+   ],
+   [
+    "Groom's package",
+    "Texture package"
+   ],
+   [
+    "Color and cut",
+    "Custom plaster sample"
+   ],
+   [
+    "color and cut",
+    "custom plaster sample"
+   ],
+   [
+    "Color correction",
+    "Plaster molding repair"
+   ],
+   [
+    "color correction",
+    "plaster molding repair"
+   ],
+   [
+    "color quote",
+    "finish quote"
+   ],
+   [
+    "color",
+    "texture"
+   ],
+   [
+    "Color",
+    "Texture"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Room texture pick"
+   ],
+   [
+    "Kids cut",
+    "Room texture pick"
+   ],
+   [
+    "kids cut",
+    "room texture pick"
+   ],
+   [
+    "Skin fade",
+    "Ceiling texture consult"
+   ],
+   [
+    "Beard trim",
+    "Sample board"
+   ],
+   [
+    "beard trim",
+    "sample board"
+   ],
+   [
+    "Haircuts",
+    "Texture consults"
+   ],
+   [
+    "haircuts",
+    "texture consults"
+   ],
+   [
+    "Haircut",
+    "Texture consult"
+   ],
+   [
+    "haircut",
+    "texture consult"
+   ],
+   [
+    "the chair",
+    "the shop"
+   ],
+   [
+    "estimate visit",
+    "estimate"
+   ],
+   [
+    "Gloss to finish",
+    "New finish"
+   ],
+   [
+    "gloss",
+    "finish"
+   ],
+   [
+    "water heater",
+    "ceiling section"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ]
+  ],
+  "B": [
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Marco and Luz do drywall; Marco does plaster too, at $140 an hour. Ines and Paolo run texture consults; Ines also does custom plaster samples and home visits. Pat is my office manager, for prices over $500. Jules works independently, with their own customers."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every job is booked ahead"
+   ],
+   [
+    "a card saved for the $89 service-call fee you OK",
+    "a card saved for the $89 estimate fee you OK"
+   ],
+   [
+    "Water pressure check",
+    "Crack check"
+   ],
+   [
+    "1-year labor warranty",
+    "1-year crack warranty"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A texture consult could mean a design firm or a drywall crew."
+   ],
+   [
+    "It's my kitchen.",
+    "It's my house."
+   ],
+   [
+    "like a chair renter",
+    "like an independent plasterer"
+   ],
+   [
+    "The shop front",
+    "The truck, loaded"
+   ],
+   [
+    "The chairs",
+    "The crew at work"
+   ],
+   [
+    "A chair, ready",
+    "A finished ceiling"
+   ],
+   [
+    "new pipes put in one day and finished another",
+    "new board hung one day and finished another"
+   ],
+   [
+    "your new pipes are in",
+    "the board is hung"
+   ],
+   [
+    "Harper gets the notice",
+    "Alex gets the notice"
+   ],
+   [
+    "Harper's first cancel message",
+    "Alex's first cancel message"
+   ],
+   [
+    "only in Harper's own words",
+    "only in Alex's own words"
+   ],
+   [
+    "11:59pm Tue Oct 27",
+    "11:59pm Mon Nov 2"
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Drywall · Drywall job"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · Drywall job"
+   ],
+   [
+    "Book this drain clearing?",
+    "Book this drywall job?"
+   ],
+   [
+    "can clear the drain",
+    "can do this drywall job"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And what needs work: a hole, a crack, a water-stained ceiling or new walls?"
+   ],
+   [
+    "a camera inspection",
+    "a moisture check"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most drywall businesses start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules drywall businesses often set."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Texture consults, sample boards and custom plaster samples."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a hole in my hallway ceiling."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I have a hole in my wall' fits a drywall patch."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please move furniture out of the hallway, and cover what stays."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a new crack in the hallway ceiling this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an estimate for a ceiling repair, tomorrow,"
+   ],
+   [
+    "like a $620 repair",
+    "like the $4,800 ceiling repair"
+   ],
+   [
+    "leak repair is $620",
+    "ceiling and wall repair is $4,800"
+   ],
+   [
+    "Leak repair · $620",
+    "Ceiling and wall repair · $4,800"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "New ceiling board, taped and finished · $3,900"
+   ],
+   [
+    "Supply line · $80",
+    "Wall patches, texture match and primer · $900"
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like patching a neighbor's wall without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding the closet wall? Say so.'"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · ceiling and wall repair"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds painting to Lee Drywall."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Painting for Lee Drywall: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW painting"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 ceiling job"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like replacing the hallway ceiling Marco noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to replace the hallway ceiling, from Marco's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Replace the hallway ceiling"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like a lockout or a tow"
+   ],
+   [
+    "LATE camera report",
+    "LATE moisture report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A drywall patch happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Drywall doesn't do, like a roof leak."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Drywall does drywall and plaster work, not roofing. Nothing was saved. You can look for a roofer near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Drywall's"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what needs work and where, if water is still coming in, and the year the home was built."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a fire, a gas smell, sparks from wires, or someone hurt."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE water stain and sag on the hallway ceiling"
+   ],
+   [
+    "Under the sink, before",
+    "Hallway ceiling, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Wall by the closet, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A ceiling and wall repair is quoted after the estimate: only the $89 estimate was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Jordan finds mold on the back of the old ceiling board. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold on the old ceiling board"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold on the old ceiling board"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Jordan found mold on the back of the old ceiling board and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the wet part of the ceiling"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"Jordan left dust in the hallway.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Jordan left dust in the hallway."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Jordan look at my bathroom ceiling next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Jordan's next times for an inside estimate."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the inside estimate for today"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Entra agua por el techo y el techo se está hundiendo."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Water is coming through the ceiling, and the ceiling is sagging."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A drywall example: a sagging wet ceiling gets 'shut off the water at the main, stay out from under it'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to shut off the water at the main and stay out from under the ceiling. If there's a gas smell, Rosa leaves and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Cierre la llave principal del agua y salga de debajo del techo. No toque luces ni enchufes mojados. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Shut off the water at the main, and stay out from under the ceiling. Don't touch wet lights or outlets. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Is it safe to scrape the old popcorn ceiling myself?"
+   ],
+   [
+    "a dripping faucet",
+    "a nail pop in the bedroom wall"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The nail pop is a small patch, priced at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "a leak repair",
+    "a ceiling and wall repair"
+   ],
+   [
+    "A drain clearing",
+    "A drywall patch"
+   ],
+   [
+    "a drain clearing",
+    "a drywall patch"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 wall patch 165 texture match 80"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Wall patch · $165"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan looks at the damage and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Jordan looked at the damage. Here's the price to fix it today."
+   ],
+   [
+    "covers part of the repair",
+    "covers part of the job"
+   ],
+   [
+    "today's repair",
+    "today's work"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "Book the repair",
+    "Book the work"
+   ],
+   [
+    "the repair price",
+    "the price"
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Shut off the water at the main, stay out from under the ceiling, and keep away from wet outlets."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither drywall nor the shop takes jobs sent now."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This job needs a lab test first. It takes about 5 days, so the first open times are next week."
+   ],
+   [
+    "It will be ready Mon Oct 26.",
+    "The result will be ready Mon Oct 26."
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Jordan's notes"
+   ],
+   [
+    "sewer camera report",
+    "moisture report"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I sand the patch myself before you come?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Jordan says no. Please don't sand or scrape it before the job."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The patch is cracking again. Can someone come tonight?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Jordan needs more joint compound from the supply store."
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE getting more compound, back 9:30"
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Jordan went to get more compound and will be back about 9:30am."
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan hurts a hand on a ladder and texts HURT."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT fell off the ladder, hurt my hand, need to stop"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Jordan's ladder cracked a floor tile at Alex M.'s. The before photo shows no crack."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE ladder cracked a floor tile"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Cracked floor tile"
+   ],
+   [
+    "cracks the cabinet floor",
+    "cracks a floor tile with a ladder"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a drywall crew patch a garage wall this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Garage wall patch"
+   ],
+   [
+    "yard drain",
+    "garage wall patch"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa garage patch Thu 12-2 Casey"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a wall touch-up at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's wall touch-up?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I have a crack and a water stain on my hallway ceiling. Can a drywall crew come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Just the kitchen sink.",
+    "The hallway ceiling, and a hole by the closet."
+   ],
+   [
+    "Yes, it won't drain",
+    "No, it stopped last week."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is water still coming in?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that water is coming through the ceiling again."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Water is coming through the ceiling again now."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 patch"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE orange peel texture, level 4 finish. Spare board in the garage, labeled."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The patch cracks again 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The drywall patch is cracking again."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s drywall patch, finished Thu Oct 22, is cracking again."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your patch is under warranty"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you check my ceilings for cracks every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Drywall has a yearly crack check plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a ceiling crack check every year."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Jordan finds a second cracked seam down the hall."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 tape and refinish the cracked seam"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves",
+    "Extra for Alex M.: tape and refinish the cracked seam"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Tape and refinish the cracked seam"
+   ],
+   [
+    "replacing both shutoff valves",
+    "taping and refinishing the cracked seam"
+   ],
+   [
+    "the shutoff valves",
+    "the cracked seam"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 seam quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 seam work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Jordan also check my walls for moisture?"
+   ],
+   [
+    "Sewer camera report",
+    "Moisture report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the moisture report link"
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your ceiling job"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Drywall patch"
+   ],
+   [
+    "Drain clearings",
+    "Drywall patches"
+   ],
+   [
+    "Drain clearing",
+    "Drywall patch"
+   ],
+   [
+    "drain clearing",
+    "drywall patch"
+   ],
+   [
+    "the kitchen drain",
+    "the patched wall"
+   ],
+   [
+    "Kitchen drain",
+    "Patched wall"
+   ],
+   [
+    "kitchen drain",
+    "patched wall"
+   ],
+   [
+    "Water heater flush",
+    "Nail pop and crack repair"
+   ],
+   [
+    "water heater flush",
+    "nail pop and crack repair"
+   ],
+   [
+    "drain",
+    "patch"
+   ],
+   [
+    "leehomeservices.com",
+    "leedrywall.com"
+   ],
+   [
+    "2 No person license",
+    "2 No person license: the shop"
+   ],
+   [
+    "Plumbing JP031552",
+    "Drywall EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-2210"
+   ],
+   [
+    "EC22871",
+    "EX-3871"
+   ],
+   [
+    "JE30417",
+    "EX-4417"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "works independently"
+   ],
+   [
+    "takes no cut of",
+    "takes no fee on"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The shop's consults are in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Texture Shop can do your texture consult at the shop for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Drywall LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Drywall"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Texture Shop"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Drywall"
+   ],
+   [
+    "Lee Electric",
+    "Lee Plaster"
+   ],
+   [
+    "1200 Main St",
+    "410 Foundry Rd"
+   ],
+   [
+    "88 Elm St",
+    "9 Alder St"
+   ],
+   [
+    "42 Oak St",
+    "73 Willow Ct"
+   ],
+   [
+    "Riley",
+    "Ines"
+   ],
+   [
+    "Avery",
+    "Paolo"
+   ],
+   [
+    "Jordan",
+    "Marco"
+   ],
+   [
+    "Casey",
+    "Luz"
+   ],
+   [
+    "plumbing and electrical",
+    "drywall and plaster"
+   ],
+   [
+    "electrical",
+    "plaster"
+   ],
+   [
+    "Electrical",
+    "Plaster"
+   ],
+   [
+    "Panel upgrade",
+    "Ceiling replacement"
+   ],
+   [
+    "plumber",
+    "drywall finisher"
+   ],
+   [
+    "plumbing",
+    "drywall"
+   ],
+   [
+    "Plumbing",
+    "Drywall"
+   ],
+   [
+    "barbershop",
+    "texture shop"
+   ],
+   [
+    "barbers",
+    "texture consultants"
+   ],
+   [
+    "barber",
+    "texture consultant"
+   ],
+   [
+    "Barber",
+    "Texture consultant"
+   ],
+   [
+    "color",
+    "texture"
+   ],
+   [
+    "haircut",
+    "texture consult"
+   ],
+   [
+    "the chair",
+    "the shop"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "service call",
+    "estimate"
+   ],
+   [
+    "Service call",
+    "Estimate"
+   ],
+   [
+    "estimate visit",
+    "estimate"
+   ],
+   [
+    "$640 water heater",
+    "$640 ceiling section"
+   ],
+   [
+    "Water heater replacement",
+    "Ceiling section repair"
+   ],
+   [
+    "water heater replacement",
+    "ceiling section repair"
+   ],
+   [
+    "replaces water heaters",
+    "repairs ceiling sections"
+   ],
+   [
+    "Leak repair",
+    "Ceiling and wall repair"
+   ],
+   [
+    "leak repair",
+    "ceiling and wall repair"
+   ],
+   [
+    "Sewer camera inspection",
+    "Moisture check"
+   ],
+   [
+    "sewer camera inspection",
+    "moisture check"
+   ],
+   [
+    "water heaters",
+    "ceiling sections"
+   ],
+   [
+    "Water heater",
+    "Ceiling section"
+   ],
+   [
+    "water heater",
+    "ceiling section"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "house call",
+    "home visit"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "roofer",
+  "estimate visit",
+  "drywall",
+  "painting",
+  "painter",
+  "estimate",
+  "Hugo",
+  "house call"
+ ],
+ "splitsKept": {
+  "A": [
+   "S2-28"
+  ],
+  "B": [
+   "S2-28"
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex visits Lee Texture Shop, Sam's plaster and texture shop, for a texture consult with Ines on Sat Oct 24 at 11:00am. The consult depends on the money choice you pick. Pick one at the top to follow its path from start to end.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Drywall to replace the water-damaged hallway ceiling and patch two walls at Alex's 1968 house at 73 Willow Ct. Marco comes for the estimate Thu Oct 22 between 8 and 10am, sends a written quote, and runs the job once the contract and the finish sheet are signed. The money choice you pick changes the path."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter",
+    "list|none|none"
+   ],
+   "examples": {
+    "list|card|counter": "Texture consult, $35 at the shop; a card saved for the $20 missed-consult fee; paid at the shop counter.",
+    "list|none|counter": "Texture consult, $35; nothing taken; a YES books it; paid at the shop counter.",
+    "list|full|none": "Whole-house texture plan, $55, paid in full when booking; credited to the drywall job if Alex hires Lee Drywall.",
+    "list|deposit|counter": "Texture package, $140 (2½ hours); a $40 deposit now; the $100 rest at the shop counter.",
+    "photos|card|counter": "Custom plaster sample, priced from Alex's photos at $90 (Sam OKs it); a card saved for the $20 fee; paid at the counter.",
+    "list|none|none": "Quick photo check, a free 15-minute look by video or phone. Nothing is taken and nothing is owed."
+   },
+   "labels": {
+    "price": {
+     "photos": "Priced from photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Texture consult"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Texture consult"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Whole-house texture plan"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Texture package"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Custom plaster sample"
+    },
+    "list|none|none": {
+     "price": "free",
+     "name": "Quick photo check"
+    }
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "photos|deposit|bill",
+    "list|card|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "Hallway ceiling and wall repair: the $89 estimate, nothing taken; Marco's written quote of $4,800; the contract and a $480 deposit; the last $4,530 (with a $210 change order) on the bill Rosie texts.",
+    "visit|none|own": "The same repair, but Sam bills the deposit and the last payment the business's own way; Rosie sends nothing about money.",
+    "visit|card|bill": "The same repair, with a card saved when Alex books, for the $89 estimate if Alex cancels late or isn't there.",
+    "photos|deposit|bill": "A ceiling section repair priced from photos at $640 (over $500, so Sam OKs it); the contract signed on the page; a 25% deposit of $160; the rest on the bill.",
+    "list|card|bill": "Drywall patch, $179 from the list: a card saved for the $89 late-cancel fee; Rosie texts the bill after the job."
+   },
+   "labels": {
+    "price": {
+     "visit": "Quoted after the estimate",
+     "photos": "Quoted from photos first"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Drywall patch"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Drywall patch"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Ceiling section repair"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Ceiling section repair"
+    },
+    "visit|*|*": {
+     "fee": "$89",
+     "name": "Ceiling and wall repair"
+    }
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A5-16",
+    "more": [
+     "Sam's setting: a whole-house texture plan is credited to the drywall job if Alex hires Lee Drywall."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "A8-44",
+    "steps": [
+     {
+      "id": "A8-x01",
+      "line": [
+       "10.10",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "title": "Offers the estimate at home",
+      "does": "Ines saves Alex's texture picks on a finish sheet. If Alex wants a wall or ceiling repaired, Ines books Marco's estimate at Alex's home.",
+      "more": [
+       "That visit belongs to Lee Drywall, Sam's other company. It runs in the other flow.",
+       "The finish sheet goes with it, so Marco's quote uses that texture and finish.",
+       "Alex can also book it later, by text or through an AI assistant."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "NEXT Alex M.: estimate at home for a ceiling repair. Finish sheet saved"
+       ],
+       [
+        "san",
+        "cust",
+        "Ines saved your texture picks. Want Lee Drywall to come measure for a quote?",
+        {
+         "buttons": [
+          "Book the estimate",
+          "Not now"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.services"
+      ],
+      "tells": [
+       "cust"
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A texture consult is for the home's owner or someone they send. A child is never the one served."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The shop books a texture consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The shop books a texture consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The shop books a texture consultant's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "A texture consult has no form to sign first; a drywall job's contract comes after its quote, in the other flow."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Alex stays for the consult; nothing is left at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "Nothing is required for a texture consult: photos and a chip are optional."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A consult is rated."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Drywall and plaster are licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Drywall, plaster and the shop all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The drywall plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and texture consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, drywall jobs and texture consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Drywall is never sent now: estimates and jobs are booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "The shop and a drywall job bill no plan or insurance; the customer pays."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "The shop and a drywall job bill no plan or insurance; the customer pays."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A texture consult never keeps a child without a parent."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "The home is from 1968, so it's marked an older-home job, where the rules require it. Only a lead-safe certified crew lead is sent.",
+     "The old texture is tested before anything is scraped, sanded or torn out.",
+     "That mark reaches the crew too, on every work day."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-03",
+    "more": [
+     "Inside, Marco walks the hallway with Alex, checks the board for water and soft spots, and measures. An adult must be home for the estimate.",
+     "On work days, someone is home or a lockbox is used. If Alex isn't there, Marco texts DONE with a photo of the work area."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-20",
+    "does": "Marco measures and checks for water. The house is from 1968, so the old texture is treated as asbestos until a lab says otherwise. On Fri Oct 23, the written quote reaches Alex's secure page, once Sam OKs it.",
+    "more": [
+     "It's over Sam's $500, so Sam OKs it first. No answer in 30 minutes: Alex is told it's with the owner.",
+     "The quote is good for 30 days. Since the $89 estimate is credited to the job, it's billed only if Alex doesn't sign.",
+     "It's priced by the room and the square foot from Sam's list, board and finishing coats included.",
+     "It says that if the lab finds asbestos, a licensed abatement company that Alex hires removes it first, and the start moves.",
+     "Any fact the state's rules require, like a license number, is on the quote.",
+     "The job is checked against the job limit the owner gave, where the plug-in sets one."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "QUOTE 4800 ceiling and wall repair, older home. Scope on the page",
+      {
+       "photos": [
+        "Hallway ceiling, measured",
+        "Water stain and sag"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Marco's quote for Alex M. is $4,800. It's over your $500 limit.",
+      {
+       "card": {
+        "title": "Ceiling and wall repair · $4,800",
+        "lines": [
+         "Hall ceiling and 2 wall patches",
+         "Test first, about 7 work days"
+        ]
+       },
+       "buttons": [
+        "Send it",
+        "Change it"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "cust",
+      "Here's your written quote from Lee Drywall. It's good until Sun Nov 22.",
+      {
+       "card": {
+        "title": "Ceiling and wall repair · $4,800",
+        "lines": [
+         "Remove the wet ceiling; hang, tape and finish",
+         "Two wall patches, texture matched and primed",
+         "Old texture tested first, the older-home way",
+         "$480 deposit once the contract is signed",
+         "$4,320 after the walk-through and touch-ups",
+         "Paid on the bill we text you"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/d8"
+       },
+       "buttons": [
+        "Sign the contract",
+        "Not now"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "QUOTE 4800 ceiling and wall repair, older home. Scope on the page",
+        {
+         "photos": [
+          "Hallway ceiling, measured",
+          "Water stain and sag"
+         ]
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Marco's quote for Alex M. is $4,800. It's over your $500 limit.",
+        {
+         "card": {
+          "title": "Ceiling and wall repair · $4,800",
+          "lines": [
+           "Hall ceiling and 2 wall patches",
+           "Test first, about 7 work days"
+          ]
+         },
+         "buttons": [
+          "Send it",
+          "Change it"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Here's your written quote from Lee Drywall. It's good until Sun Nov 22.",
+        {
+         "card": {
+          "title": "Ceiling and wall repair · $4,800",
+          "lines": [
+           "Remove the wet ceiling; hang, tape and finish",
+           "Two wall patches, texture matched and primed",
+           "Old texture tested first, the older-home way",
+           "$480 deposit once the contract is signed",
+           "$4,320 after the walk-through and touch-ups",
+           "Billed by Lee Drywall, its own way"
+          ],
+          "button": "Read the quote",
+          "link": "rosfield.com/q/d8"
+         },
+         "buttons": [
+          "Sign the contract",
+          "Not now"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-21",
+    "does": "Alex doesn't sign now. Only the $89 estimate is owed, and the quote stays good until Sun Nov 22.",
+    "more": [
+     "Marco texts DONE 89 estimate. The bill, or the business's own bill, is $89.",
+     "Alex can sign later from the same page, until the quote's date.",
+     "Alex can ask for a call first. Marco or Sam calls, and the quote stays open."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. Your quote stays good until Sun Nov 22. For now, only the $89 estimate is billed.",
+      {
+       "card": {
+        "title": "Ceiling and wall repair · $4,800",
+        "lines": [
+         "Good until Sun Nov 22"
+        ],
+        "button": "Sign it later",
+        "link": "rosfield.com/q/d8"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-49",
+    "does": "Alex hasn't answered the quote in 5 days. Rosie sends one reminder. Still no answer 2 days later: Sam picks to call Alex, or let the quote run to its date.",
+    "more": [
+     "Nothing starts without the signed contract.",
+     "Let it run: only the $89 estimate is owed, the same as Not now.",
+     "Alex can still sign from the page until Sun Nov 22.",
+     "Rosie sends no more texts about it.",
+     "No answer from Sam in 2 days: the quote runs to its date, as with Let it run."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "A reminder: your drywall quote from Lee Drywall is good until Sun Nov 22.",
+      {
+       "card": {
+        "title": "Ceiling and wall repair · $4,800",
+        "lines": [
+         "Good until Sun Nov 22"
+        ],
+        "button": "Read the quote",
+        "link": "rosfield.com/q/d8"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. hasn't answered Marco's $4,800 drywall quote in 7 days. It's good until Sun Nov 22.",
+      {
+       "buttons": [
+        "I'll call Alex",
+        "Let it run"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Wed Oct 28, 10:00am"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-62",
+    "does": "Alex taps Sign the contract on the quote's page. Rosie builds it from the quote and the parts the state's rules require. Everyone on the home's title signs, then Sam does.",
+    "more": [
+     "A co-owner signs on a link Alex forwards. Rosie never texts them itself.",
+     "The home is from 1968. Alex ticks a box for the lead pamphlet and any older-home notice the rules require, and that receipt is kept.",
+     "Sam signs within 24 hours. Each one gets a copy by text and email.",
+     "Nothing is taken before everyone has signed.",
+     "Not signed by Sun Nov 22: one reminder 3 days before, then the quote lapses. Only the $89 estimate is owed.",
+     "The contract shows the license number and the state's notices, where the rules require them."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. signed the drywall contract. Please sign it too. Nothing is charged until you do.",
+      {
+       "card": {
+        "title": "Contract · Ceiling and wall repair · $4,800",
+        "lines": [
+         "Signed by Alex M. · Mon 7:40pm",
+         "Older-home notices received"
+        ],
+        "button": "Read and sign",
+        "link": "rosfield.com/k/d8"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Drywall signed your contract. Your copy is on the page and in your email.",
+      {
+       "card": {
+        "title": "Contract signed by both",
+        "lines": [
+         "Ceiling and wall repair · $4,800",
+         "Alex M. · Mon Oct 26",
+         "Sam Lee · Tue Oct 27"
+        ],
+        "button": "See your copy",
+        "link": "rosfield.com/k/d8"
+       }
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Mon Oct 26, 7:40pm"
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-63",
+    "does": "With both signatures in, Alex pays the $480 deposit on the secure page, into Lee Drywall's own Stripe. The contract set it, within the state's cap. Then Alex picks the start.",
+    "more": [
+     "Where the state's rules say money paid before the work is kept apart, it goes to the account Sam named at sign-up.",
+     "Not paid in 2 days: one reminder. A day later, Sam is asked to call Alex or cancel under the contract.",
+     "No work starts and no materials are bought until the cancel window ends.",
+     "No start picked in 48 hours: one reminder, then Sam calls. The deposit stays."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your contract is signed. The next step is the deposit.",
+      {
+       "pay": {
+        "amount": "$480",
+        "what": "your drywall deposit",
+        "link": "rosfield.com/p/d8d"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Paid: your $480 deposit to Lee Drywall. The receipt is on the page. Pick your start day:",
+      {
+       "times": [
+        "Mon Nov 9 · start · Marco",
+        "Mon Nov 16 · start · Marco"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "price:visit": {
+      "t": "Tue Oct 27, 8:20am"
+     },
+     "price:visit+after:own": {
+      "t": "Tue Oct 27, 8:20am",
+      "does": "With both signatures in, Sam bills the $480 deposit outside Rosie, as the contract set. Rosie sends nothing about money. Alex picks the start.",
+      "more": [
+       "Rosfield's $2 for this booking goes on the monthly bill.",
+       "Sam bills the last payment outside Rosie too.",
+       "No work starts and no materials are bought until the cancel window ends."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your contract is signed. Lee Drywall bills the deposit its own way. Pick your start day:",
+        {
+         "times": [
+          "Mon Nov 9 · start · Marco",
+          "Mon Nov 16 · start · Marco"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B5-03",
+    "form": [
+     [
+      "Your visit",
+      "Drywall job · Thu Oct 22 · arriving 8–10am · Marco"
+     ],
+     [
+      "Price",
+      "Priced at the visit · the bill comes after"
+     ],
+     [
+      "Card",
+      "None needed"
+     ],
+     [
+      "I agree",
+      "No fee can be charged. Please cancel before 8am Wed"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-78",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Oct 27, 8:40am"
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B8-78",
+    "steps": [
+     {
+      "id": "B8-x03",
+      "type": "split",
+      "line": [
+       "4.14",
+       "7.16"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "visit",
+      "t": "Tue Nov 3, 9:00am",
+      "title": "Marco brings a sample; Alex signs the finish",
+      "q": "Is the finish sheet signed by Thu Nov 5?",
+      "does": "The window ends with no cancel. Marco brings a sample board that matches the hallway's old texture. Alex picks the texture, the finish level and primer on the finish sheet, on the secure page.",
+      "more": [
+       "Marco also takes 3 small samples of the old texture for a lab, where the rules let the business take them.",
+       "Materials are bought only after the finish sheet is signed, the same way as the contract.",
+       "Painting is not part of this job. The wall is left primed, ready for the painter Alex picks.",
+       "Up to 2 sample boards are free. Due Thu Nov 5 at 6pm, so the board and compound arrive before the start."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "SAMPLE board matched to the hall texture",
+        {
+         "photos": [
+          "The sample board"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Marco brought a sample board that matches your hallway. Pick your finish on the finish sheet by Thu Nov 5.",
+        {
+         "card": {
+          "title": "Finish sheet · Ceiling and wall repair",
+          "lines": [
+           "The texture to match",
+           "The finish level",
+           "Primed, ready for paint",
+           "Materials are bought once you sign"
+          ],
+          "button": "Pick and sign",
+          "link": "rosfield.com/c/d8"
+         },
+         "buttons": [
+          "Sign the finish sheet",
+          "Another sample"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs the finish sheet",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Wants another sample",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x04",
+          "line": [
+           "4.14",
+           "8.8"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Tue Nov 3, 6:10pm",
+          "title": "Marco makes a second sample board",
+          "does": "Alex wants a smoother finish to compare. The second board is free (up to 2 are). Marco brings it Wed morning.",
+          "more": [
+           "A third board is priced from Sam's list, and Alex OKs it first.",
+           "Alex signs the finish sheet Wed evening, and the start stays."
+          ],
+          "say": [
+           [
+            "cust",
+            "san",
+            "2"
+           ],
+           [
+            "san",
+            "cust",
+            "Marco will bring a second board, a smoother finish, tomorrow morning. It's free.",
+            {
+             "card": {
+              "title": "Second sample board",
+              "lines": [
+               "Wed Nov 4, morning",
+               "No charge"
+              ]
+             }
+            }
+           ]
+          ],
+          "needs": [
+           "pf.services"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Not signed by Thu",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x05",
+          "line": [
+           "7.16",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "staff",
+          "via": "msg",
+          "t": "Thu Nov 5, 6:00pm",
+          "title": "Asks Marco to call about the finish",
+          "does": "The finish sheet isn't signed by Thu 6pm. Marco gets a to-do to call Alex. Materials are bought only after the sign-off, so the start may move.",
+          "more": [
+           "A move caused by the finish sheet costs Alex nothing, but the dates may slip.",
+           "Once Alex signs, the materials are ordered, and Alex gets the work plan."
+          ],
+          "say": [
+           [
+            "san",
+            "staff",
+            "Alex M. hasn't signed the finish sheet. The materials order waits for it. Please call Alex today.",
+            {
+             "buttons": [
+              "I called",
+              "Remind me at 10am"
+             ]
+            }
+           ],
+           [
+            "san",
+            "cust",
+            "Marco will call you about your finish. Materials are bought only after you sign, so the work days may move."
+           ]
+          ],
+          "tells": [
+           "staff",
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "B8-x09",
+      "type": "split",
+      "line": [
+       "4.14",
+       "8.12"
+      ],
+      "who": "staff",
+      "to": "cust",
+      "via": "msg",
+      "t": "Fri Nov 6, 8:30am",
+      "title": "The lab result for the old texture is back",
+      "q": "What did the lab find in the old texture and joint compound?",
+      "does": "On Tue Nov 3, Marco took three small samples of the old texture, where the rules let the business take them. The lab found no asbestos. The report is on Alex's secure page, and the work plan goes out.",
+      "more": [
+       "Nothing is scraped, sanded or torn out before a result.",
+       "The result is on the secure page only. The text says it is ready, never what it says.",
+       "Clear: Marco sends the work plan next.",
+       "The old paint is still handled the lead-safe way, because the home is from 1968."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your lab result is ready. Please open it on your secure page.",
+        {
+         "card": {
+          "title": "Lab result · old ceiling texture",
+          "lines": [
+           "Ready on your secure page"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/l/d8"
+         }
+        }
+       ]
+      ],
+      "needs": [
+       "pf.first_steps"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 None found: the work goes on",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Asbestos found: no work yet",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x10",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Fri Nov 6, 8:40am",
+          "title": "Marco stops before anything is disturbed",
+          "does": "The lab found asbestos in the old ceiling texture. Nothing has been touched. Only a licensed abatement company that Alex hires may remove it. Lee Drywall comes back after the area is cleared.",
+          "more": [
+           "Lee Drywall never removes asbestos itself.",
+           "The page gives Alex two choices: wait for the clearance, or cancel with everything paid back.",
+           "The start moves with no fee. Nothing is bought until the area is cleared.",
+           "No reply in 3 days: Sam calls Alex. Nothing moves or cancels on silence.",
+           "The text never says what the lab found."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your start date needs to change. Please open your lab result on your secure page and choose how to go on.",
+            {
+             "card": {
+              "title": "Your start date",
+              "lines": [
+               "Details on your secure page",
+               "Your choice is there too"
+              ],
+              "button": "Open it",
+              "link": "rosfield.com/l/d8"
+             }
+            }
+           ]
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-37",
+    "vary": {
+     "price:visit": {
+      "t": "Fri Nov 6, 10:00am",
+      "does": "The finish sheet is signed, the lab result is clear and the materials are ordered. Alex gets the work plan: about 7 work days from Mon Nov 9, with Marco's crew. Compound needs time to dry, so the days are paced.",
+      "more": [
+       "Someone is home each work day, or a lockbox is used. Each day starts with a photo and ends with one.",
+       "Marco texts a short update each afternoon, with what is done and what is drying. Alex sees each day's photos on the secure page.",
+       "The plug-in's prep: furniture out of the work area, the rest covered, and a clear path from the door.",
+       "Marco is the certified renovator. Setup and cleanup are done the older-home way, where the rules require it.",
+       "That means plastic over floors and doors, a dust wall, and wet sanding or a HEPA vacuum.",
+       "If a day moves, only that day moves, and Alex is told.",
+       "Alex can move the start before day 1, to the next opening, at no cost. The cancel window's date stays as it was.",
+       "A cancel after the window goes to Sam to settle with Alex. Rosie moves no money on its own."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Your drywall work starts Mon Nov 9. Here's the plan.",
+        {
+         "card": {
+          "title": "Work plan · 73 Willow Ct",
+          "lines": [
+           "Mon · cover floors, dust wall, take down the wet ceiling, hang board",
+           "Tue · tape and first coat",
+           "Wed–Thu · second and third coats, drying between",
+           "Fri–Mon · sand, prime, match the texture",
+           "Tue Nov 17 · walk-through and touch-ups"
+          ],
+          "button": "See the plan",
+          "link": "rosfield.com/s/d8"
+         }
+        }
+       ],
+       [
+        "staff",
+        "san",
+        "IN day 1: floors covered, dust wall up",
+        {
+         "photos": [
+          "Hallway, start of day 1"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Marco's crew started day 1. Please keep pets in another room today. You'll get an update this afternoon."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "after",
+    "at": "B8-37",
+    "steps": [
+     {
+      "id": "B8-x06",
+      "type": "split",
+      "line": [
+       "8.8",
+       "8.9"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "msg",
+      "t": "Mon Nov 9, 1:30pm",
+      "title": "Marco finds more wet board: a change order first",
+      "q": "Does Alex sign the change order?",
+      "does": "Taking the wet ceiling down shows the soaked board runs 3 feet past the line Marco drew. The contract can't change by text alone, so Alex and Sam sign a change order before more board is hung.",
+      "more": [
+       "It's $210, under Sam's $500, so it goes to Alex at once.",
+       "It gives the price and any days added. It goes on the last bill. Nothing is taken today.",
+       "Hidden damage is part of this job only where the plug-in says so. Wiring or framing needs that trade.",
+       "Other work goes on while Alex decides."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "CHANGE 210 wet board runs 3 ft past the line. Same days",
+        {
+         "photos": [
+          "Soaked board, hall ceiling"
+         ]
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Marco's crew found the wet board runs 3 feet past the line. It has to come down too before the new board goes up.",
+        {
+         "card": {
+          "title": "Change order 1 · $210",
+          "lines": [
+           "Extra board and one more coat",
+           "Your dates stay the same",
+           "Added to your last bill"
+          ],
+          "button": "Read and sign",
+          "link": "rosfield.com/k/d8c1"
+         },
+         "buttons": [
+          "Sign it",
+          "Call me first"
+         ]
+        }
+       ]
+      ],
+      "needs": [
+       "pf.rules",
+       "price_oks"
+      ],
+      "tells": [
+       "cust"
+      ],
+      "branches": [
+       {
+        "label": "1 Signs it",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "2 Call first, or no reply",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x07",
+          "line": [
+           "8.8",
+           "11.22"
+          ],
+          "who": "san",
+          "to": "staff",
+          "via": "msg",
+          "title": "Asks Marco to call Alex",
+          "does": "Alex wants a call first, or doesn't sign by 5pm. Marco gets a to-do to call. No more board is hung past the line until the change order is signed.",
+          "more": [
+           "Other work goes on while it waits.",
+           "No signature: the crew finishes only what the contract covers, and the rest stays as it is.",
+           "If Alex says no, Rosie moves no money on its own."
+          ],
+          "say": [
+           [
+            "san",
+            "staff",
+            "Alex M. wants a call about change order 1: $210 for the extra wet board. Please call today.",
+            {
+             "buttons": [
+              "I called",
+              "Finish what's covered"
+             ]
+            }
+           ]
+          ],
+          "tells": [
+           "staff"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "vary": {
+     "price:visit": {
+      "does": "On the last work day, Marco and Alex walk every room with the finish sheet. Each touch-up is fixed and ticked off on the page before Marco texts DONE.",
+      "more": [
+       "The plug-in names what's checked: flat seams, no cracks or nail pops, the texture matched, the wall primed.",
+       "After photos are taken from the same angles as the before photos.",
+       "Painting is a separate job. If Alex disputes the work, Sam is told, and the last bill waits.",
+       "If Alex didn't sign, there's nothing to check. Marco texts DONE for the estimate."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "PUNCH 3 touch-ups: a seam by the closet, a nail pop, one corner. All fixed"
+       ],
+       [
+        "san",
+        "cust",
+        "Marco fixed the 3 touch-ups. Please tick them off on the page.",
+        {
+         "card": {
+          "title": "Touch-ups · 3 fixed",
+          "lines": [
+           "A seam by the closet",
+           "A nail pop in the hall",
+           "A corner by the door"
+          ],
+          "button": "Tick them off",
+          "link": "rosfield.com/t/d8"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "vary": {
+     "price:photos": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 640 ceiling section"
+       ]
+      ]
+     },
+     "price:visit+after:bill": {
+      "t": "Tue Nov 17, 3:30pm",
+      "does": "The touch-ups are done and ticked off. Marco texts DONE with the last payment, so Rosie can text the bill.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE 4530 last payment"
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Tue Nov 17, 3:30pm",
+      "does": "The touch-ups are done and ticked off. Marco texts DONE. Sam bills the last payment outside Rosie.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "DONE"
+       ],
+       [
+        "san",
+        "staff",
+        "Done: Alex M., ceiling and wall repair."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "staff",
+        "san",
+        "NOTE hall ceiling replaced, orange peel matched, level 4. Spare board and compound in the garage, labeled"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved to Alex M.'s private record."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-22",
+    "vary": {
+     "price:visit": {
+      "does": "Back to the work. Each branch is one thing that can happen while Marco works, at the estimate or on a work day. Most rejoin before DONE."
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-12",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "other",
+        "This is Rosie, the automated booking assistant for Lee Drywall. Here's the last bill for the ceiling and wall repair you OK'd at 73 Willow Ct.",
+        {
+         "pay": {
+          "amount": "$4,530",
+          "what": "the last payment on the repair at 73 Willow Ct",
+          "link": "rosfield.com/p/d8l"
+         },
+         "stop": true
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Copy: the $4,530 bill went to the person you named, as agreed when you booked."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-05",
+    "vary": {
+     "price:visit": {
+      "does": "Rosie reads Marco's DONE back. The $4,530 is the contract's $4,800 plus the $210 change order, less the $480 deposit. It matches what Alex signed, so it needs no OK.",
+      "more": [
+       "A bill that matches the contract or an OK'd quote never needs an OK.",
+       "If Alex didn't sign, the bill is the $89 estimate.",
+       "A different total over Sam's $500 goes to Sam first."
+      ],
+      "say": [
+       [
+        "san",
+        "staff",
+        "Alex M.: $4,530, the last payment for the repair. It matches the contract and change order 1. Sending Alex the bill.",
+        {
+         "buttons": [
+          "Change it"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-06",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Drywall: the last payment for your ceiling and wall repair. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$4,530",
+          "what": "the last payment on your repair",
+          "link": "rosfield.com/p/d8"
+         },
+         "buttons": [
+          "Pay with my saved card"
+         ]
+        }
+       ]
+      ],
+      "t": "Tue Nov 17, 3:35pm"
+     },
+     "price:visit+before:none": {
+      "t": "Tue Nov 17, 3:35pm",
+      "does": "Alex gets the last bill with a pay link. No card was saved, so the link is the way to pay. It's over Sam's $500, so it offers bank transfer too.",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Drywall: the last payment for your ceiling and wall repair. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$4,530",
+          "what": "the last payment on your repair",
+          "link": "rosfield.com/p/d8"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-07",
+    "vary": {
+     "price:visit": {
+      "does": "The $4,530 lands in Lee Drywall's own Stripe, less Stripe's card fee.",
+      "more": [
+       "Paid by bank transfer, it counts once it clears, in a few business days.",
+       "The receipt goes out once the money is in."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-26",
+    "vary": {
+     "price:visit": {
+      "does": "Sam turned on bank transfer for bills over $500. The repair's last $4,530 is over it, so the pay link offers it. It counts as paid only once it clears.",
+      "more": [
+       "Clearing takes a few business days. Alex is told it's on the way, and again when it clears.",
+       "The receipt and the lien release wait until it clears.",
+       "If it bounces, Alex gets one pay link, and Sam is told."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Drywall: the last payment for your ceiling and wall repair. Pay by card, or by bank transfer.",
+        {
+         "pay": {
+          "amount": "$4,530",
+          "what": "the last payment on your repair",
+          "link": "rosfield.com/p/d8"
+         }
+        }
+       ],
+       [
+        "san",
+        "cust",
+        "Your $4,530 bank transfer is on its way. It counts as paid once it clears, in a few business days. We'll text you then."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-09",
+    "vary": {
+     "price:visit": {
+      "does": "Alex pays the last $4,530 by check to Marco.",
+      "say": [
+       [
+        "staff",
+        "san",
+        "paid check 4530"
+       ],
+       [
+        "san",
+        "staff",
+        "Recorded: $4,530 check from Alex M."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-10",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Drywall: your card didn't go through for the last $4,530.",
+        {
+         "pay": {
+          "amount": "$4,530",
+          "what": "the last payment on your repair",
+          "link": "rosfield.com/p/d8"
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s card declined for the last $4,530 on the repair. Alex has one pay link."
+       ]
+      ]
+     },
+     "price:visit+before:none": {
+      "does": "The card on the pay page didn't go through. Alex can try another on the same link, and Sam is told.",
+      "more": [
+       "Rosie never tries a card again on its own.",
+       "The last payment is still owed. The receipt and the lien release wait for it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Drywall: your card didn't go through for the last $4,530. Try another card on the same link.",
+        {
+         "pay": {
+          "amount": "$4,530",
+          "what": "the last payment on your repair",
+          "link": "rosfield.com/p/d8"
+         }
+        }
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s card declined for the last $4,530 on the repair. Alex can try another on the same link."
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B9-11",
+    "vary": {
+     "price:visit": {
+      "t": "Sat Nov 21, 11:00am",
+      "say": [
+       [
+        "san",
+        "owner",
+        "Alex M. hasn't paid the last $4,530 for the repair after 4 days. Rosie sends no reminders of its own.",
+        {
+         "buttons": [
+          "Send one more link",
+          "I'll call Alex"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-01",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Nov 17, 4:00pm",
+      "does": "The receipt goes out once the last payment is in, by text and email. It carries the lien release, the finish sheet and the plug-in's warranty.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "A lien release comes with it, where the state's rules provide one.",
+       "The signed finish sheet and the leftover-material list are with it, for repairs later.",
+       "Any fact the state's rules require, like a license number, is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your ceiling and wall repair. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $5,010",
+          "lines": [
+           "Contract $4,800 · change order $210",
+           "$480 deposit + $4,530 last payment",
+           "Lien release, finish sheet, leftover-material list",
+           "1-year warranty against cracks at seams, to Nov 17, 2027"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/d8"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+after:own": {
+      "t": "Tue Nov 17, 4:00pm",
+      "does": "Lee Drywall sends its own receipt and lien release. Rosie sends the warranty note and the finish sheet.",
+      "more": [
+       "Rosie sends no receipt here. The business's own receipt carries any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Drywall. Your 1-year warranty against cracks at the seams runs to Nov 17, 2027. Your finish sheet is on the page. If anything looks wrong, reply here.",
+        {
+         "card": {
+          "title": "Finish sheet · 73 Willow Ct",
+          "lines": [
+           "Texture: orange peel",
+           "Finish: level 4",
+           "Primed, ready for paint"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/d8c"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "t": "Tue Nov 17, 4:00pm",
+      "does": "The receipt goes out once the last payment is in, by text and email. It carries the lien release, the finish sheet and the plug-in's warranty.",
+      "more": [
+       "Cash or check: the receipt says how it was paid.",
+       "A lien release comes with it, where the state's rules provide one.",
+       "The signed finish sheet and the leftover-material list are with it, for repairs later.",
+       "Any fact the state's rules require, like a license number, is on it."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Paid in full: your ceiling and wall repair. Your papers are on the page.",
+        {
+         "card": {
+          "title": "Receipt · $5,010",
+          "lines": [
+           "Contract $4,800 · change order $210",
+           "$480 deposit + $4,530 last payment",
+           "Lien release, finish sheet, leftover-material list",
+           "1-year warranty against cracks at seams, to Nov 17, 2027"
+          ],
+          "button": "See your papers",
+          "link": "rosfield.com/r/d8"
+         }
+        }
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "t": "Tue Nov 17, 4:00pm",
+      "does": "Lee Drywall sends its own receipt and lien release. Rosie sends the warranty note and the finish sheet.",
+      "more": [
+       "Rosie sends no receipt here. The business's own receipt carries any fact the state's rules require."
+      ],
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Drywall. Your 1-year warranty against cracks at the seams runs to Nov 17, 2027. Your finish sheet is on the page. If anything looks wrong, reply here.",
+        {
+         "card": {
+          "title": "Finish sheet · 73 Willow Ct",
+          "lines": [
+           "Texture: orange peel",
+           "Finish: level 4",
+           "Primed, ready for paint"
+          ],
+          "button": "See it",
+          "link": "rosfield.com/r/d8c"
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "vary": {
+     "price:visit": {
+      "t": "Tue Nov 17, 6:00pm",
+      "say": [
+       [
+        "san",
+        "cust",
+        "Thanks for choosing Lee Drywall! How was working with Marco and the crew?",
+        {
+         "card": {
+          "title": "Rate your repair",
+          "lines": [
+           "73 Willow Ct · Marco"
+          ],
+          "button": "Rate it",
+          "link": "rosfield.com/r/d8"
+         },
+         "stars": true
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-08",
+    "vary": {
+     "price:visit": {
+      "does": "A seam cracks in the hallway 3 weeks later. It's inside the 1-year warranty, so Sam OKs a free return visit.",
+      "say": [
+       [
+        "cust",
+        "san",
+        "A seam is cracking in the hallway."
+       ],
+       [
+        "san",
+        "owner",
+        "Alex M.'s ceiling and wall repair, done Tue Nov 17, has a cracking seam. It's under the 1-year warranty.",
+        {
+         "buttons": [
+          "Book a free fix",
+          "Call Alex"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ],
+       [
+        "san",
+        "cust",
+        "Sorry about that. Your repair is under warranty, so this visit is free.",
+        {
+         "times": [
+          "Mon Dec 14 · arriving 8–10am · Marco",
+          "Tue Dec 15 · arriving 8–10am · Marco"
+         ]
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "B10-10",
+    "vary": {
+     "price:visit": {
+      "say": [
+       [
+        "san",
+        "cust",
+        "Lee Drywall refunded your last payment.",
+        {
+         "card": {
+          "title": "Refund · $4,530",
+          "lines": [
+           "Ceiling and wall repair · paid Tue Nov 17",
+           "Back on your card in 5 to 10 days"
+          ]
+         }
+        }
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Drywall is never sent now, so the button never shows."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Drywall is never sent now (S2-30)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Drywall is never sent now; every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Drywall is never sent now; every visit has a set time."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Estimate visits are booked in 2-hour arrival windows; work days are set in the work plan."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Drywall books visits and work days, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Drywall books a crew lead's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "A form signed on the secure page",
+    "why": "An estimate visit has no form to sign first; the job's contract is signed with the quote (B8-62)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never in the crew's care; an adult on the booking lets the crew in."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "1 Yes, do it",
+    "why": "A drywall job never starts at the estimate visit: Alex signs a written contract first, in the branch below."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "3 OK some lines",
+    "why": "A drywall job's quote is signed whole, as one contract. A smaller job is a new written quote from Marco, after a call."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "2 No license: registration only",
+    "why": "Drywall and plaster are licensed or registered where the state's form requires it, so Sam's work takes the license step."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Drywall, plaster and the shop all pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The drywall plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Crew leads and texture consultants are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: estimate visits, drywall jobs and texture consults."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Drywall is never sent now: estimates and jobs are booked ahead."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "The shop and a drywall job bill no plan or insurance; the customer pays."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "The shop and a drywall job bill no plan or insurance; the customer pays."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A rating is asked after estimates and drywall jobs."
+   }
+  ]
+ },
+ "notes": "New profession (P3 pass, Tue Oct 27 2026, batch P6), started from the refitted painter (from: painter), rebuilt for drywall and plaster. The painter's own words, steps and dates were not carried: every plug-in key, rename pair and own step was rewritten.\nStyle Project: an estimate at the home, a written quote, a signed contract, a deposit, the cancel window, then several work days (with drying time between coats) and one last bill. Small list jobs (drywall patch, nail pop and crack repair, garage wall patch, moisture check) and a ceiling section priced from photos run the same master steps.\nFlow B main path visit|none|bill: Alex's 1968 house at 73 Willow Ct, a water-damaged hallway ceiling and two wall patches. The $89 estimate (credited to the job; billed only if no contract follows; a free estimate is the safe start) Thu Oct 22 with Marco; the quote Fri Oct 23 after Sam's OK: $4,800 (new ceiling board, taped and finished $3,900 + wall patches, texture match and primer $900), good until Sun Nov 22; contract Mon Oct 26 (Alex) and Tue Oct 27 (Sam); $480 deposit (10%, within the state's cap); cancel window to 11:59pm Mon Nov 2 (B8-78, switch cancelright in flow B only).\nOwn steps (all dated forward): B8-x03 Tue Nov 3 sample board + finish sheet (texture, finish level, primer; due Thu Nov 5; branches: signed, another sample, not signed by Thu -> B8-x04 / B8-x05); B8-x09 Fri Nov 6 the lab result for the old texture (branches: none found; asbestos found -> B8-x10: nothing is touched, a licensed abatement company the customer hires removes it, the start moves with no fee or the customer cancels with everything back; the text never says what the lab found); work plan B8-37 Fri Nov 6; B8-x06 Mon Nov 9 change order $210 (wet board runs 3 ft past the line; B8-x07 if Alex wants a call first); walk-through B8-39 and DONE Tue Nov 17; last bill $4,530 = $4,800 + $210 - $480; receipt $5,010 with the lien release, the finish sheet and a 1-year crack warranty (to Nov 17, 2027). Flow A: A8-x01 offers the home estimate.\nFlow A is Sam's second company Lee Texture Shop (a plaster and texture shop, 212 Mill Rd; consultants Ines and Paolo). Paths: list|card|counter (main: texture consult $35, card saved for the $20 missed-consult fee), list|none|counter, list|full|none (whole-house texture plan $55, credited to the drywall job), list|deposit|counter (texture package $140, $40 deposit, $100 rest), photos|card|counter (custom plaster sample $90), list|none|none (quick photo check, free). Video or phone consults on (fact video).\nFlow B money: visit|none|bill (main), visit|none|own (Sam bills the deposit and last payment the business's own way; Rosie says nothing about money), visit|card|bill (card saved for the $89 estimate fee), photos|deposit|bill (ceiling section repair $640 from photos, Sam OKs, contract on the page, 25% deposit $160, $480 on the bill), list|card|bill (drywall patch $179, card saved for the $89 late-cancel fee). A fee is never more than what was paid now; nothing is paid ahead of the work except a signed-contract deposit; a change order is added to the last bill.\nOlder homes (the year built is asked before times): the old texture, joint compound and paint are treated as possible asbestos and lead until a lab says otherwise; lead pamphlet and notices where the rules require them; a certified renovator on site. Lee Drywall never removes asbestos and never disturbs a suspect material before a result. These are generic switches (\"where the rules require it\"); no state, law or year is written.\nSafety (pf.safety): stop = fire, smoke, gas smell; someone hurt or fell from a ladder; a ceiling fell on someone; sparks or a burning smell from wires. Steps then go on = water through or a sagging ceiling (stay out from under it, shut off the water at the main; the estimate is booked, the drywall waits for a dry area), a popcorn ceiling or old plaster someone wants to scrape, flaking paint in an older home, mold, dust that makes someone cough. B3-11 and B3-18 are one conversation (water through a sagging ceiling, in Spanish).\nWho must not be booked: a minor; a renter without the owner's OK; a job over the license's size limit (not even a free estimate). Never booked for asbestos removal, wiring or framing: those need that trade.\nSent now is off: S2-30 '1 Yes' and every sent-now branch are off; pairs reword S2-30 and the S1-21 'Jobs sent now' row ('None: every job is booked ahead'). Self-check: the joined text was searched for 'sent now', 'on-call' and 'emergency' claims; what remains is the master's conditional rules.\nSplits: B4-83 windows kept (set times and the 2-hour windows for estimates), B8-67 an adult must be there, B10-32 a rating is asked, S1-60 a license, S1-62 the $2, S1-80/S1-82 off, S2-28 both (finishers licensed where the state asks; the shop's people need none), S2-30 never sent now, A4-66 a person's time, A8-02 nothing required (off 'Something required is missing'), A8-53 no drop-off, A8-67 no child left, A10-34 a rating. Plans and insurance branches (A4-28, A9-15, B4-43, B9-19) are off.\nScreens: B5-03's screen (the yes on a nothing-taken visit) is a base screen with the visit price ('Priced at the visit'), because the master's own screen shows the list job's $179 on every path (MASTER, see the log).\nSecond kind of work in sign-up: painting (S11-58 'Sam adds painting'); drywall is left primed and ready for paint, painting is a separate job unless listed. Plaster is the second licensed kind (Lee Plaster).\nWord choices: the studio is 'Lee Texture Shop' (a longer name made the emergency-contact text pass 260 characters). Example license numbers use the obviously fake format EX-1042. keep: leak, roofer, estimate, drywall, painting, painter (the trade's own words and the sibling's), house call, Hugo (the master's new owner).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "My employer pays for this cut.",
+    "I'd like a cut on Saturday.",
+    "a staff cut",
+    "a shorter cut",
+    "the shorter cut",
+    "Alex M.'s cut",
+    "the cut in the mirror",
+    "A cut is rated",
+    "Style consult",
+    "a step-free chair",
+    "see your hair",
+    "come with dry hair on Saturday",
+    "come with dry hair",
+    "like a chair renter",
+    "A chair renter",
+    "The chairs",
+    "A chair, ready",
+    "Each service starts the way most barbershops set it.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "like a roofer",
+    "skin fades",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "takes jobs sent now, like a burst pipe",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A skin fade",
+    "a skin fade",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "style consult",
+    "Alex asks for a cut every 4 weeks.",
+    "Say Owen H. has a haircut plan with Riley, every 4 weeks.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Avery can't be booked until it matches.",
+    "Avery · license not found",
+    "Avery · license expired",
+    "Avery stays on the team, and can be booked again once it shows renewed.",
+    "so Lee's Barbershop can't book you until it shows renewed",
+    "Avery's license is checked again when the lookup answers.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The cape clip ripped my shirt collar.",
+    "once Riley sees the hair",
+    "Step-free door on Elm St",
+    "Do you do kids cuts? My son is 8.",
+    "A haircut could mean a salon or a barbershop.",
+    "2 No person license",
+    "Plumbing JP031552",
+    "MP045210",
+    "EC22871",
+    "JE30417",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "Say the customer's scalp rash gets worse before the visit, and they ask if they can still come in.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "takes no cut of",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "Barbering",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color",
+    "Color",
+    "Kids cut (12 and under)",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "the chair",
+    "estimate visit",
+    "Gloss to finish",
+    "gloss",
+    "water heater",
+    "house calls",
+    "house call"
+   ],
+   "B": [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "The on-call plumber · a STOP before they set out: they call first",
+    "a card saved for the $89 service-call fee you OK",
+    "Water pressure check",
+    "1-year labor warranty",
+    "A haircut could mean a salon or a barbershop.",
+    "It's my kitchen.",
+    "like a chair renter",
+    "The shop front",
+    "The chairs",
+    "A chair, ready",
+    "new pipes put in one day and finished another",
+    "your new pipes are in",
+    "Harper gets the notice",
+    "Harper's first cancel message",
+    "only in Harper's own words",
+    "11:59pm Tue Oct 27",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Book this drain clearing?",
+    "can clear the drain",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "a camera inspection",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Hi, it's about a leaking pipe under my sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "like a $620 repair",
+    "leak repair is $620",
+    "Leak repair · $620",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Right to cancel · repipe",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "a leak repair",
+    "A drain clearing",
+    "a drain clearing",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve · $165",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "covers part of the repair",
+    "today's repair",
+    "The repair price is good for 7 days.",
+    "Book the repair",
+    "the repair price",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "It will be ready Mon Oct 26.",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "It's overflowing. Can someone come tonight?",
+    "Jordan needs a part from the supply house.",
+    "UPDATE getting a part, back 9:30",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Jordan cuts a hand and texts HURT.",
+    "HURT cut my hand, need to stop",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracks the cabinet floor",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Yes, it won't drain",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Your drain is under warranty",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves",
+    "Replace both shutoff valves",
+    "replacing both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "stage 2 of your repipe",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "the kitchen drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "drain",
+    "leehomeservices.com",
+    "2 No person license",
+    "Plumbing JP031552",
+    "MP045210",
+    "EC22871",
+    "JE30417",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "takes no cut of",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "color",
+    "haircut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "estimate visit",
+    "$640 water heater",
+    "Water heater replacement",
+    "water heater replacement",
+    "replaces water heaters",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "house calls",
+    "house call"
+   ]
+  },
+  "A": {
+   "A5-16": "8045a6b80c",
+   "A8-44": "4410a4860c",
+   "A4-24": "0a292df05b",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-53": "33f4da69f5",
+   "A8-02": "15f418fec4",
+   "A10-34": "78c2d9a6a3",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "B6-14": "dfd03ee673",
+   "B8-03": "ac9d404766",
+   "B8-20": "53903a8275",
+   "B8-21": "43557106b2",
+   "B8-49": "4fcfdeb80b",
+   "B8-62": "4203f3ab94",
+   "B8-63": "c0d957be82",
+   "B5-03": "7c7d43f508",
+   "B8-78": "628ca6843e",
+   "B8-37": "3ce85cf051",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B8-22": "50d78f1af0",
+   "B9-12": "0beb9062e8",
+   "B9-05": "6cbce323ed",
+   "B9-06": "f091432f2d",
+   "B9-07": "310f930c3b",
+   "B9-26": "d356566ab1",
+   "B9-09": "832947585f",
+   "B9-10": "4ec0979e1a",
+   "B9-11": "9525d5f9c9",
+   "B10-01": "814aa1fde7",
+   "B10-02": "eaf53a5e74",
+   "B10-08": "01bac94fd8",
+   "B10-10": "30b382ad47",
+   "B4-16": "37cd99137d",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-83": "a7473a80ea",
+   "B4-38": "9539521dc7",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255"
+  }
+ }
+}

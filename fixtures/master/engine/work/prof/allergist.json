@@ -1,0 +1,5070 @@
+{
+ "id": "allergist",
+ "name": "Allergist",
+ "style": "Clinic",
+ "pattern": "clinic",
+ "from": "primary-care",
+ "plugin": {
+  "pf.license": {
+   "need": "the business's own word only: Rosie never requires a license or insurance and never checks one (D96); a clinician's license is for the business to add if it wants it shown; a license the owner says the work needs, and that a person doesn't hold, stops that person's bookings for it",
+   "who": "each clinician, and the practice, if the owner adds one",
+   "ask": "any license number the owner wants shown, in the invite reply or sent by the owner (optional)",
+   "check": "none: Rosie never looks up, verifies or tracks a license, insurance or registration (D96)",
+   "blocks": "only the owner's own word: a person the owner says lacks a needed license isn't offered that work; nothing else waits on a license",
+   "video": "a video visit only where the owner says the clinician may treat a patient in the state the patient will be in during the visit; where the owner says no, no video times, and an office visit is offered instead",
+   "away": "house calls only where the owner says the state's rules allow them, with any registration the owner adds",
+   "bloodWork": "home blood draws for allergy tests: the person who does them is one the owner has cleared for it (the owner's own word)",
+   "agreement": "a health privacy agreement (a HIPAA business associate agreement) signed on the secure page before the first booking; every company in Rosie's chain signs one with Rosie",
+   "renewals": "none tracked by Rosie: the owner keeps their own papers and sends any new number",
+   "insurance": "optional: malpractice insurance the owner adds is shown as given; Rosie never checks it",
+   "claims": "a specialty or 'board-certified' is shown only as the owner typed it; Rosie never says it's checked"
+  },
+  "pf.services": {
+   "shape": "visits of a set length, booked with an allergist or a nurse practitioner by name; a new patient's first visit is longer and the owner OKs it; skin tests are a visit on the allergist's order; allergy shots are given only at the office, in a visit that holds 30 minutes after the shot, never at home or by video, and are never paid up front; follow-ups are booked by the office at checkout; a house call has a 2-hour arrival window; no same-day sick times: a worry goes to the nurse line first",
+   "examples": "the example office's own prices (Lee Allergy Care and Lee Home Visits), not a standard; a plan pays its own in-network fee, and the patient's share (a copay) is an estimate; no visit is promised as free",
+   "list": [
+    {
+     "name": "New patient allergy visit",
+     "price": "billed to the patient's plan, the copay at the front desk; self-pay $230",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "the copay at the front desk; any balance after the plan pays is billed by the office",
+     "note": "the owner OKs every new patient; records from the last allergist come office to office"
+    },
+    {
+     "name": "Allergy testing visit (skin tests, on the allergist's order)",
+     "price": "billed to the plan; self-pay $185",
+     "kind": "one price",
+     "length": "60 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "any share at the front desk",
+     "note": "a nurse runs the skin tests on the allergist's order"
+    },
+    {
+     "name": "Allergy shot visit (current patients, on the allergist's order)",
+     "price": "billed to the plan; self-pay $35",
+     "kind": "one price",
+     "length": "40 min, the shot and a 30-minute wait",
+     "where": "at the office only",
+     "before": "nothing taken, never paid up front",
+     "after": "any share at the front desk",
+     "note": "shots are given only at the office, never at home or by video; a nurse gives them on the allergist's order"
+    },
+    {
+     "name": "Follow-up allergy visit (current patients)",
+     "price": "billed to the plan; self-pay $125",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "any share at the front desk",
+     "note": "booked by the office at checkout only"
+    },
+    {
+     "name": "Video follow-up (current patients)",
+     "price": "billed to the plan; self-pay $95",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "by video, counted as at the office",
+     "before": "nothing taken",
+     "after": "any share taken by the front desk, the office's own way",
+     "note": "only where the owner says the allergist may treat the patient in the state the patient will be in"
+    },
+    {
+     "name": "Child's allergy visit (5 to 17, a parent or guardian books)",
+     "price": "billed to the child's plan; self-pay $150",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the office",
+     "before": "nothing taken",
+     "after": "any share at the front desk",
+     "note": "booked by a parent or guardian; a child under 5 is not booked"
+    },
+    {
+     "name": "House call (for a patient who can't easily leave home)",
+     "price": "$179 ($199 when Sam goes himself); billed to the patient's plan, or self-pay",
+     "kind": "one price",
+     "length": "60 min, in a 2-hour arrival window",
+     "where": "at the patient's home, or at a care home with its OK",
+     "before": "nothing taken",
+     "after": "the office bills the plan its own way; self-pay: Rosfield's bill after DONE",
+     "note": "no allergy shots at home"
+    },
+    {
+     "name": "Follow-up house call",
+     "price": "$89; billed to the plan, or self-pay",
+     "kind": "one price",
+     "length": "30 min",
+     "where": "at the patient's home",
+     "before": "nothing taken",
+     "after": "as for the house call"
+    },
+    {
+     "name": "Home blood draw for allergy tests",
+     "price": "$95; billed to the plan where it pays, or self-pay",
+     "kind": "one price",
+     "length": "20 min",
+     "where": "at the patient's home",
+     "before": "nothing taken",
+     "after": "as for the house call",
+     "note": "on the allergist's order; the lab bills its own tests"
+    }
+   ],
+   "capacity": "one patient per visit; a second person is added as a second person on the same booking, each with their own time",
+   "nobodyHome": "never: the patient is always there",
+   "online": "video follow-ups for current patients, counted as at the office, with the check-in code read out at the start",
+   "notOffered": "the example office lists what it doesn't do (like a surgery or an imaging scan the office doesn't run) and points the person elsewhere; Rosie never books a service the office didn't list"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "a new or a current patient",
+    "which visit: the office's own visit types only, never a symptom typed into the AI",
+    "a plan (its name only) or self-pay",
+    "for a video visit: which state the patient will be in",
+    "who the visit is for: the person booking, a child, or another adult"
+   ],
+   "afterTime": [
+    "anything the office should know to help, like needing an interpreter or a step-free door",
+    "the name and mobile of the person booking"
+   ],
+   "securePage": [
+    "the patient's legal name and birth date, and home address",
+    "the plan's member ID, the plan holder and a photo of the plan card",
+    "the health history and the medicines taken",
+    "a release so the office can get records from the last allergist",
+    "the consent and the privacy notice",
+    "whether an interpreter or other help is needed",
+    "'I'm 18 or older, booking for myself', or how the person booking is related to the patient",
+    "the OK to texts and email, and the cancel terms"
+   ],
+   "whoMayBook": "an adult books for themselves; a parent or legal guardian books for a child from 5 to 17 (a switch for children); another adult (a grown child, a caregiver) only with the patient's own OK on the secure page, or as the patient's guardian or health care agent; a child under 5 is never booked; a teen books alone only where the state's rules let a minor consent and the office marks the visit private (the example allergy office marks none)",
+   "whoMayBring": "a switch: a parent or legal guardian brings a child; another adult only with the parent's signed OK on the secure page; an adult patient may bring anyone they like",
+   "neverAsked": "symptoms, reasons, medicines or results are never asked or typed in the AI chat"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "trouble breathing, a tight or closing throat, swelling of the lips, tongue or face, hives with dizziness or fainting, vomiting after a bite, sting, food or a shot, or any bad reaction right after an allergy shot",
+     "say": "Call 911 or go to the emergency room now. Don't wait for a booking.",
+     "booking": "no booking; the same words in a later text get 911 again, and any visit stays booked"
+    },
+    {
+     "words": "an overdose, or swallowed medicine or a chemical",
+     "say": "Call Poison Help now at 1-800-222-1222. If the person isn't breathing or won't wake up, call 911.",
+     "booking": "no booking"
+    }
+   ],
+   "nurseLine": [
+    {
+     "words": "the office's own list of signs for its nurse line (the example office lists hives that spread for a day, or a new wheeze that doesn't clear)",
+     "say": "Please call the office's nurse line now: (555) 010-0207, option 2. If it's an emergency, call 911.",
+     "booking": "no shot visit or booking by the AI until the nurse has talked with the patient"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "someone feeling sick with nothing on the lists above",
+     "what": "matched to the office's own allergy visit; Rosie never judges how sick someone is or what care they need"
+    }
+   ],
+   "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about suicide or self-harm get 988"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Health history, medicines, the consent and the privacy notice",
+     "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before check-in); one reminder before it's due",
+     "who": "every new patient; current patients update them before each follow-up",
+     "result": "not done by its due date: the owner keeps the visit (signed on the secure page at the front desk first), moves it, or cancels with no fee"
+    },
+    {
+     "name": "The plan check",
+     "when": "while booking, by the front desk, by hand; checked again a few days before the visit",
+     "who": "every patient who names a plan",
+     "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the patient may cancel free)"
+    },
+    {
+     "name": "A written price estimate for self-pay patients",
+     "when": "told while booking; sent within 1 business day (the example office's rule), or sooner where the rules require it",
+     "who": "every patient paying for themselves",
+     "result": "a to-do for the front desk, with its due date"
+    },
+    {
+     "name": "Records from the last allergist",
+     "when": "the patient signs a release on the secure page; the office gets them, office to office",
+     "who": "every new patient",
+     "result": "a to-do for the front desk; the first visit goes ahead without them"
+    },
+    {
+     "name": "The owner's OK for a new patient",
+     "when": "before the first visit is booked",
+     "who": "every new patient",
+     "result": "OK: booked; no: told kindly, nothing kept"
+    }
+   ],
+   "prep": "arrive 15 minutes early; bring a photo ID, the plan card, your medicines or a list of them, and any past skin-test or shot notes; for a skin test or a shot, the secure page says which medicine (if any) to pause, named by the office; plan to stay 30 minutes after a shot; at home: have the plan card and your medicines ready"
+  },
+  "pf.visit": {
+   "checkIn": "at the office: the check-in code at the front desk, then the desk checks the photo ID and the plan card against the secure page; a video visit: the code read out at the start; at home: the code from the patient at the door",
+   "beforeWork": "a medical assistant or nurse checks the vital signs and the medicines list before the exam; a skin test or a shot is given by a nurse on the allergist's order",
+   "changes": "a skin test or a shot is added only with the patient's yes, with any self-pay price first; more care is booked as its own visit only if the patient asks; follow-ups and shots are booked at checkout",
+   "done": "the check-in code or DONE; the visit notes, results and medicines stay in the office's own records, never in Rosie or a text",
+   "away": "at home: the clinician brings a medical bag and any kit the visit needs; the patient is there for the whole visit",
+   "childLeft": "never: the adult who brings a child stays for the whole visit"
+  },
+  "pf.money": {
+   "before": "nothing taken at booking (the office bills the patient's plan); a card saved only where the office turns on its no-show fee, never for a fee-free patient; at home: nothing taken",
+   "plans": "the plans the office takes (its own list); the front desk checks each plan by hand and records it; the share is an estimate, not a promise",
+   "selfPay": "a self-pay patient sees the price before saying yes, is told while booking that they can get a written price estimate, and gets it on time; a bill far above it can be disputed (the federal rules set how)",
+   "fees": "the no-show and late-cancel fee: $20 at the example office, only where the owner turns it on and only when the owner confirms it; the same fee for every patient who may be charged one",
+   "feeFree": "a switch: no fee ever for patients whose plan or the state's rules bar one (like Medicaid, where that applies), or whom the owner marks fee-free; their texts say 'No fee to cancel or miss'",
+   "after": "at the office: the copay at the front desk, the office's own way; a balance after the plan pays is billed by the office, not by Rosie's text; a self-pay visit is paid at the front desk; at home: the office bills the plan its own way, or Rosie texts a self-pay patient the bill after DONE",
+   "membership": "no monthly membership in the example office; a practice that sells one sets it at sign-up (not in these flows)",
+   "private": "not used: no teen-private visit here; any visit's bill goes to the patient or the plan only",
+   "rosfield": "the $2 per booking applies here too (D97): a flat fee for each booking Rosie's AI makes, counted when the visit's check-in code is entered (no visit, no $2); bookings the office handles outside Rosie carry none. Card payments also cost Stripe's own card fee, paid to Stripe",
+   "caps": "deposit cap: from the state form (no deposits are taken); fee limits for plan patients: from the plan's and the state's rules",
+   "tips": "none",
+   "tax": "no tax line (the default)"
+  },
+  "pf.messages": {
+   "never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the reason, symptoms, medicines, test results or the clinician's name (at a house call the clinician's name stays, for the door check)",
+   "staff": "texts to the owner and staff carry no health detail either: the patient's initials, the time and a link; the visit type and any notes are on the secure page",
+   "languages": "English and Spanish; the secure page asks if the patient needs an interpreter, and the office is told",
+   "minors": "texts about a child go to the parent or guardian only; a child's visit is never texted to the child; a child under 5 never books, and nothing about a child under 5 is kept",
+   "medical": "a medical question is never answered, saved or passed on: 911 if it's an emergency, then the nurse line or the patient portal; results come only in person or in the office's patient portal"
+  },
+  "pf.staff": {
+   "licenses": "any license the owner wants shown, as given, per person; Rosie never checks it (D96)",
+   "skills": "allergists and nurse practitioners: new patients, follow-up visits, skin tests, video follow-ups and house calls; nurses: allergy shots on the allergist's order, in the office; home blood draws: someone the owner has cleared for them; only people cleared for house calls go to homes",
+   "supervision": "a nurse practitioner works within the state's rules for supervision or a collaboration agreement (a switch from the owner's own rules); where a supervising clinician must be reachable, they're offered only on those days",
+   "oks": "the owner OKs every new patient's first visit, same-day times for a new patient, and anything a nurse flags",
+   "standIn": "the allergist out: the nurse practitioner may take the visit, with the patient's yes; nobody is moved without it",
+   "away": "the house-call team is the people the owner clears for house calls, with a medical bag"
+  },
+  "pf.rules": {
+   "records": "the office keeps its medical records as long as the state's rules require; a delete request removes only Rosie's own booking details, never the office's records",
+   "copies": "a patient's copy of their records within the time the rules set; Rosie sends only booking and payment records",
+   "showLicense": "any license the owner adds is shown where the state asks, as given; Rosie never says it's checked",
+   "minors": "who may consent for a child: the parent or guardian (a switch from the owner's state form); a teen books alone only where the state's rules let a minor consent and the office marks the visit private (none here)",
+   "proxies": "an adult booking for another adult needs that patient's OK, or papers that show they're the guardian or health care agent, where the state's rules ask for them",
+   "language": "free language help where the rules require it, like for practices that take Medicaid",
+   "estimate": "a written price estimate for self-pay patients, by the deadline the federal rules set (a switch keeps the office's own faster rule)",
+   "host": "a care home's visit day only under the home's written OK and its sign-in rules; the example sets none",
+   "ads": "no free-visit or price claims the state's rules don't allow",
+   "privacy": "health privacy rules for every message and form",
+   "cancelRight": "no cancel period for care given at a visit, at the office or at home; where a state's rules give one for something sold at the home, it goes in writing (a switch)"
+  },
+  "pf.edges": {
+   "lateArrival": "up to 15 minutes late: still seen; later, the desk may offer a new time (the office decides; Rosie never changes the booking itself)",
+   "officeLate": "when the office runs late, a new time costs nothing",
+   "standIn": "the allergist out: the nurse practitioner, with the patient's yes, or new times with no fee",
+   "forms": "a form not done by its due date: one reminder, then the owner keeps the visit (signed on the secure page at the front desk first), moves it, or cancels with no fee",
+   "planChange": "the plan check comes back not covered: self-pay with the price and the estimate notice, or a free cancel",
+   "twoBookings": "a patient with two visits open: Rosie asks which one before any change",
+   "worse": "someone feels worse before the visit: the 911 words if they match, the nurse line if it's on the office's list; Rosie never judges it, and the visit stays booked",
+   "healthQuestion": "a question about medicine or care before the visit: never answered by Rosie; 911 if it's an emergency, then the nurse line or the portal",
+   "newPatientFull": "a allergist taking no new patients: only clinicians who take them are offered; nobody: the AI hears so plainly",
+   "homebound": "a house call that can't happen as booked: the soonest open window comes first, with no fee, and the nurse line is named in the text",
+   "other": "all other edge cases the generic way",
+   "urgent": "no service is sent now and nobody is on call: someone sick gets the soonest same-day time the owner allows; the danger words get 911"
+  },
+  "pf.facts": [
+   "forms",
+   "firststeps",
+   "planbill",
+   "children",
+   "video",
+   "extrawork"
+  ],
+  "pf.switches": {
+   "sensitive": true,
+   "welfare": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "business": "Lee Allergy Care",
+   "staff": "Anika (allergist) and Lucas (nurse practitioner)",
+   "cust": "Alex M. (a new patient) · other patients",
+   "other": "Others (a bank, a parent or guardian, a grown child who helps, a plan)"
+  },
+  "B": {
+   "business": "Lee Home Visits",
+   "staff": "Felipe and Gina (nurse practitioners), who visit with a medical bag",
+   "cust": "Alex M. (a patient who can't easily leave home) · other patients",
+   "other": "Others (a bank, a grown child or caregiver, a care home's nurse, a plan)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Anika"
+  },
+  "B": {
+   "staff": "Felipe"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Lee Plumbing",
+    "Lee Home Visits"
+   ],
+   [
+    "like Alex's employer for a staff cut.",
+    "like Alex's employer for a follow-up visit."
+   ],
+   [
+    "My employer pays for this cut.",
+    "My employer pays for this visit."
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Felipe and Gina do house calls; Felipe does home blood draws too. Anika and Lucas see patients at the office; Anika also does house calls. Pat is my office manager, for prices over $500. Jules rents an exam room, with their own patients."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Anika: allergist, house calls"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Anika: allergist and house calls"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "New patients come to you first. Current patients never need one"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A new patient stays with the doctor they picked."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about a self-pay price before booking."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Checkups, sick visits, flu shots and physicals."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "House calls for patients in Springfield who can't easily leave home, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A blood draw at home"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Follow-up visit"
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Office visits work like this:"
+   ],
+   [
+    "A $35 haircut can work this way.",
+    "Every office visit can work this way."
+   ],
+   [
+    "Haircut · $35",
+    "New patient allergy visit · $230"
+   ],
+   [
+    "A tip at the chair is the shop's own way. Rosie never asks for one.",
+    "Rosie never asks for a tip."
+   ],
+   [
+    "a $20 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for cosmetic injections, which aren't on the office's list."
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't do cosmetic injections."
+   ],
+   [
+    "Can I add a beard trim on Saturday?",
+    "Can I get a skin test at my Saturday visit?"
+   ],
+   [
+    "Add a beard trim to your Sat 11:00am visit?",
+    "Add it to your Sat 11:00am visit?"
+   ],
+   [
+    "Add a beard trim today?",
+    "Add one more service today? Its name is on your secure page."
+   ],
+   [
+    "Beard trim · $20",
+    "Added service · $20"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The exam table's edge tore my jacket."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says the exam table's edge tore a jacket today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "prefers morning visits and a Spanish interpreter"
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Self-pay new patient allergy visit $230 ($220 from Nov 2) · Follow-up visit $40 · Flu shot $20"
+   ],
+   [
+    "Haircuts",
+    "New patient allergy visits"
+   ],
+   [
+    "haircuts",
+    "new patient allergy visits"
+   ],
+   [
+    "massage",
+    "nutrition counseling"
+   ],
+   [
+    "Massage",
+    "Nutrition counseling"
+   ],
+   [
+    "Hugo",
+    "Nadia"
+   ],
+   [
+    "1200 Main St",
+    "480 Market Ave"
+   ],
+   [
+    "Beard trim",
+    "Flu shot"
+   ],
+   [
+    "Kids cut",
+    "Child's visit"
+   ],
+   [
+    "kids cut",
+    "child's visit"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A flu shot could mean a doctor's office or a pharmacy."
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a new allergy visit and a skin test"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "shop's board",
+    "shop's price list"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "Lena",
+    "Grace"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A new patient allergy visit is rated, so the shop takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's health care takes no jobs sent now, at the office or away."
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Allergy Care LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Allergy Care"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Visits"
+   ],
+   [
+    "plumbing and electrical",
+    "house calls and home blood draws"
+   ],
+   [
+    "88 Elm St",
+    "612 Cedar Rd"
+   ],
+   [
+    "Riley",
+    "Anika"
+   ],
+   [
+    "Avery",
+    "Lucas"
+   ],
+   [
+    "Jordan",
+    "Felipe"
+   ],
+   [
+    "Casey",
+    "Gina"
+   ],
+   [
+    "electrical",
+    "home blood draws"
+   ],
+   [
+    "Electrical",
+    "Home blood draws"
+   ],
+   [
+    "plumber",
+    "clinician"
+   ],
+   [
+    "Plumber",
+    "Clinician"
+   ],
+   [
+    "plumbing",
+    "house calls"
+   ],
+   [
+    "Plumbing",
+    "House calls"
+   ],
+   [
+    "barbershop",
+    "allergy practice"
+   ],
+   [
+    "Barbershop",
+    "Allergy practice"
+   ],
+   [
+    "barbers",
+    "clinicians"
+   ],
+   [
+    "barber",
+    "clinician"
+   ],
+   [
+    "groom's party",
+    "family"
+   ],
+   [
+    "skin fade",
+    "follow-up visit"
+   ],
+   [
+    "Skin fade",
+    "Follow-up visit"
+   ],
+   [
+    "beard trim",
+    "flu shot"
+   ],
+   [
+    "Groom's package",
+    "Follow-up visit"
+   ],
+   [
+    "Signature cut and shave",
+    "Follow-up visit"
+   ],
+   [
+    "haircut",
+    "new patient allergy visit"
+   ],
+   [
+    "Haircut",
+    "New patient allergy visit"
+   ],
+   [
+    "shops",
+    "offices"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "priced at the chair",
+    "priced in the exam room"
+   ],
+   [
+    "Priced at the chair",
+    "Priced in the exam room"
+   ],
+   [
+    "is at the chair",
+    "is in the exam room"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Anika · Sat Oct 24",
+    "Your Sat Oct 24 visit"
+   ],
+   [
+    "Anika marked you as not here",
+    "The office marked you as not here"
+   ],
+   [
+    "How was your visit with Anika?",
+    "How was your visit?"
+   ],
+   [
+    "Why: many clinicians, salons and groomers are licensed to their office.",
+    "Why: in many states, health care away from an office has its own rules."
+   ],
+   [
+    "It's 11:00am, and Alex is in the exam room. Alex reads the code from the confirmation or the reminder, and Anika texts it in.",
+    "It's Sat 10:45am, and Alex is at the front desk, 15 minutes early. Alex reads the code from the confirmation or the reminder, and the desk enters it."
+   ],
+   [
+    "What happens at the front desk?",
+    "What happens in the exam room?"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "like a new patient visit at the office or at home",
+    "like a visit at the office or a house call"
+   ],
+   [
+    "Barber",
+    "Allergist"
+   ],
+   [
+    "barber",
+    "allergist"
+   ]
+  ],
+  "B": [
+   [
+    "Lee Plumbing",
+    "Lee Home Visits"
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can someone visit Kim at home this Thursday?"
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee Allergy Care for a checkup instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Allergy Care can see you at the office for $185, or at your home for $199. Where would you like it?"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "Office visits are in the other flow."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This visit needs a plan check first. It takes about 2 days, so the first open times are next week."
+   ],
+   [
+    "like a chair renter",
+    "like a clinician who rents a room"
+   ],
+   [
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "[6 contact cards] Felipe and Gina do house calls; Felipe does home blood draws too. Anika and Lucas see patients at the office; Anika also does house calls. Pat is my office manager, for prices over $500. Jules rents an exam room, with their own patients."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Anika: allergist, house calls"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Anika: allergist and house calls"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "New patients come to you first. Current patients never need one"
+   ],
+   [
+    "Color always stays with Riley.",
+    "A new patient stays with the doctor they picked."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about a self-pay price before booking."
+   ],
+   [
+    "would like to talk about the color quote before booking.",
+    "would like to talk about the price before booking."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a prescription for someone never seen."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "House calls for patients in Springfield who can't easily leave home, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A blood draw at home"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Checkups, sick visits, flu shots and physicals."
+   ],
+   [
+    "barbershops",
+    "allergy practices"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, I'd like a house call this week. A text back is fine."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa house call Thu 12-2 Gina"
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for care Lee Home Visits doesn't give, like a cosmetic procedure."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I can't get out to see a doctor' fits a house call."
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Home Visits can come to you:"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Will someone else be home?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, my daughter"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $179 house call needs none."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the photos path, only Felipe's times show: Felipe does the blood draws."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have your medicines and plan card ready."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Felipe also do my blood draw at that visit?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Blood draw at home · $95"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can my dog stay in the room during the visit?"
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $160 quote is good for 7 days."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Added care · $160 · details on your secure page"
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160.",
+    "you said yes to the added care for $160."
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Felipe suggests one more test at the visit."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 added care, details on the secure page"
+   ],
+   [
+    "replace both shutoff valves, $160.",
+    "added care, $160."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Felipe breaks a lamp and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE knocked over a lamp, broken"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Broken lamp"
+   ],
+   [
+    "cracked the cabinet floor at",
+    "broke a lamp at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows it whole."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE ring the side door; the front steps are steep."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Felipe left the gate open."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a scratch on my floor this morning."
+   ],
+   [
+    "asked overnight for a drain clearing today.",
+    "asked overnight for a house call today."
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "would like to talk about the water heater quote before booking.",
+    "would like to talk about the house call before booking."
+   ],
+   [
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "House call $179 ($199 when Sam goes himself) · Follow-up house call $89"
+   ],
+   [
+    "heating and cooling",
+    "nutrition counseling"
+   ],
+   [
+    "Heating and cooling",
+    "Nutrition counseling"
+   ],
+   [
+    "Water heater flush",
+    "Follow-up house call"
+   ],
+   [
+    "Water heater replacement",
+    "Blood draw at home"
+   ],
+   [
+    "Water heater fix",
+    "Blood draw at home"
+   ],
+   [
+    "Leak repair",
+    "Home visit"
+   ],
+   [
+    "leak repair",
+    "home visit"
+   ],
+   [
+    "Kitchen drain clearing",
+    "House call"
+   ],
+   [
+    "Drain clearing",
+    "House call"
+   ],
+   [
+    "drain clearing",
+    "house call"
+   ],
+   [
+    "water heater",
+    "blood draw"
+   ],
+   [
+    "Water heater",
+    "Blood draw"
+   ],
+   [
+    "Hugo",
+    "Nadia"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a lockout or a tow"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no signed consent"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sam's health care takes no jobs sent now, at the office or away."
+   ],
+   [
+    "The work never started, so there's no $2.",
+    "The work never started."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Home Visits'"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Allergy Care"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Home Visits"
+   ],
+   [
+    "plumbing and electrical",
+    "house calls and home blood draws"
+   ],
+   [
+    "1200 Main St",
+    "480 Market Ave"
+   ],
+   [
+    "88 Elm St",
+    "612 Cedar Rd"
+   ],
+   [
+    "42 Oak St",
+    "27 Birch Ln"
+   ],
+   [
+    "Riley",
+    "Anika"
+   ],
+   [
+    "Avery",
+    "Lucas"
+   ],
+   [
+    "Jordan",
+    "Felipe"
+   ],
+   [
+    "Casey",
+    "Gina"
+   ],
+   [
+    "electrical",
+    "home blood draws"
+   ],
+   [
+    "Electrical",
+    "Home blood draws"
+   ],
+   [
+    "plumber",
+    "clinician"
+   ],
+   [
+    "Plumber",
+    "Clinician"
+   ],
+   [
+    "plumbing",
+    "house calls"
+   ],
+   [
+    "Plumbing",
+    "House calls"
+   ],
+   [
+    "barbershop",
+    "allergy practice"
+   ],
+   [
+    "Barbershop",
+    "Allergy practice"
+   ],
+   [
+    "barbers",
+    "clinicians"
+   ],
+   [
+    "barber",
+    "clinician"
+   ],
+   [
+    "beard trim",
+    "flu shot"
+   ],
+   [
+    "haircut",
+    "new patient allergy visit"
+   ],
+   [
+    "Haircut",
+    "New patient allergy visit"
+   ],
+   [
+    "shop",
+    "office"
+   ],
+   [
+    "Shop",
+    "Office"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which health plan should pay?"
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Health, the basic plan."
+   ],
+   [
+    "home warranty plan",
+    "health plan"
+   ],
+   [
+    "A plan or warranty pays",
+    "A health plan pays"
+   ],
+   [
+    "Felipe needs a part from the supply house.",
+    "Felipe needs supplies from the van."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 house call"
+   ],
+   [
+    "Why: many clinicians, salons and groomers are licensed to their office.",
+    "Why: in many states, health care away from an office has its own rules."
+   ],
+   [
+    "like a new patient visit at the office or at home",
+    "like a visit at the office or a house call"
+   ],
+   [
+    "service call",
+    "visit"
+   ],
+   [
+    "Sewer camera inspection",
+    "Blood draw at home"
+   ],
+   [
+    "A office",
+    "An office"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "At the chair",
+    "At the desk"
+   ],
+   [
+    "Barber",
+    "Allergist"
+   ],
+   [
+    "barber",
+    "allergist"
+   ]
+  ]
+ },
+ "keep": [
+  "house call",
+  "house calls",
+  "House calls",
+  "clinician",
+  "Clinician",
+  "leak",
+  "blood draw",
+  "Blood draw"
+ ],
+ "story": {
+  "A": "Sam Lee, an allergist, signs up two companies by text. Then Alex, new in town, books a first allergy visit as a new patient with Anika at Lee Allergy Care, for Sat Oct 24 at 11:00am. Sam OKs every new patient. The desk checks Alex's plan by hand, the health forms and the old doctor's records stay on the secure page, and Alex pays the copay at the front desk. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, who can't easily leave home, books a house call with Lee Home Visits. Felipe, a nurse practitioner, comes Thu Oct 22, arriving 8 to 10am, with a medical bag. The office bills Alex's plan its own way. Pick a money choice at the top to follow its path."
+ },
+ "money": {
+  "A": {
+   "main": "list|none|counter",
+   "combos": [
+    "list|none|counter",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|none|counter": "The main story: Alex's new patient allergy visit with Anika, billed to Alex's plan. Nothing is taken. The desk checks the plan, and Alex pays the $30 copay at the front desk. Self-pay visits ($230 for a new patient) are paid the same way; a balance after the plan pays is the office's own bill.",
+    "list|card|counter": "The same visit where the office turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient, and Sam confirms any charge."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "New patient allergy visit"
+    },
+    "list|*|*": {
+     "price": "$230",
+     "name": "New patient allergy visit"
+    }
+   }
+  },
+  "B": {
+   "main": "list|none|own",
+   "combos": [
+    "list|none|own",
+    "list|none|bill"
+   ],
+   "examples": {
+    "list|none|own": "The main story: a $179 house call for Alex with Felipe. Nothing is taken. The office bills Alex's plan its own way.",
+    "list|none|bill": "The same house call, paid by Alex himself: nothing is taken, and Rosie texts the $179 bill when Felipe texts DONE."
+   },
+   "amounts": {
+    "*": {
+     "name": "House call"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "House call"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 per booking applies to every profession; the no-$2 switch stays off"
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's health companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A10-21",
+    "more": [
+     "Health records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Health care books people (an allergist or a nurse practitioner), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Health care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No health care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit books a person's time.",
+    "label": "A seat in a session"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit books a person's time.",
+    "label": "A space or a table"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "why": "A visit books a person's time, never a stay.",
+    "label": "A stay, start to end"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "why": "Nothing is left at the office: the patient is in the exam room.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent or guardian stays for a child's child's visit (pf.questions.whoMayBook)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "why": "No repeat plan: yearly checkups and follow-ups are booked by the office at checkout (A10-07).",
+    "label": "A repeat plan"
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "The example office sells no plans or memberships: yearly checkups are billed to the child's plan."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plan here (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plan here (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plan here (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A package or membership",
+    "why": "The example office sells no packages or memberships: visits are billed to the child's plan."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The example office sells no packages or memberships."
+   },
+   {
+    "op": "off",
+    "at": "A10-05",
+    "why": "Nothing sold at an office visit comes with a cancel period.",
+    "label": "Yes: a contract signed today"
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "A allergy practice sends no proposals: more care is booked as its own visit (A8-34)."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Health care has no free-fix visit: a worry after a visit goes to the nurse line (A10-25)."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Results come only through the office's own patient portal, never in Rosie's texts (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at an allergy practice."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The office runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "why": "Nothing is left at a doctor's office.",
+    "label": "A drop-off"
+   },
+   {
+    "op": "words",
+    "at": "A10-22",
+    "more": [
+     "Health X-rays and results never go through Rosie.",
+     "The text says only that the office will go over them in person, or call."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Sat 3pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Sat Oct 24 at 3:00pm with Anika?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-14",
+    "say": [
+     [
+      "staff",
+      "san",
+      "LATE 20"
+     ],
+     [
+      "san",
+      "cust",
+      "The office is running about 20 minutes late, so your 11:00am starts about 11:20am.",
+      {
+       "buttons": [
+        "That's fine",
+        "Move my visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-19",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Pick a new time with the same doctor, with no fee:",
+      {
+       "times": [
+        "Tue Oct 27 · 11:00am",
+        "Wed Oct 28 · 3:00pm"
+       ]
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "A"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: A.M., Sat 11:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "You're checked in at Lee Allergy Care. Thanks, Alex!"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-05",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5106"
+     ],
+     [
+      "san",
+      "staff",
+      "That isn't A.M.'s code. Check it with A.M. and send it again."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-08",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE A.M."
+     ],
+     [
+      "san",
+      "staff",
+      "Done: A.M., Sat 11:00am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Lee Allergy Care you're here."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says they're here for the 11:00am. Check A.M. in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-04",
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M. rated the visit 2 stars.",
+      {
+       "card": {
+        "title": "Rating · 2 of 5",
+        "lines": [
+         "Your Sat Oct 24 visit",
+         "Only you see this"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Reminder: A.M. asked for money back.",
+      {
+       "buttons": [
+        "Refund it",
+        "Keep it"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Lee Allergy Care hasn't answered, so the payment stays as it is for now. You can call them at (555) 010-0177."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-27",
+    "say": [
+     [
+      "san",
+      "owner",
+      "OK. Nothing is sent, and the bank keeps the payment with A.M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "does": "Sam raises the self-pay follow-up visit to $135 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "more": [
+     "Visits already booked keep $125, even after Nov 2.",
+     "A time being saved right now keeps the price on the patient's screen.",
+     "A plan pays its own fee, so a self-pay price change never touches it.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: follow-up visit $135 for visits from Mon Nov 2. Visits already booked keep $125."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam turns on the office's $20 no-show fee, for new bookings only. A card is then saved for it when a patient books, never for a fee-free patient.",
+    "more": [
+     "Visits already booked keep their terms: nothing saved.",
+     "Shots are never paid up front, whatever the setting.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "Each change is read back first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "more": [
+     "The example follows the money choice at the top. Here, it's Alex's first visit as a new patient, billed to Alex's plan.",
+     "Only Alex's words pass through the AI: no birth date, plan number or health detail."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I just moved here and need an allergist. Can you book me a first visit at Lee Allergy Care on Saturday?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. For someone who feels sick, that's the 911 words and the office's nurse line. Then the booking goes on, with the soonest same-day time the owner allows.",
+    "more": [
+     "Rosie never judges how sick someone is. A sick patient with nothing on the plug-in's lists goes on to a follow-up visit the owner OKs.",
+     "A sign on the office's nurse-line list, like vomiting that won't stop, stops the booking instead.",
+     "That goes as 'Needs the office's own people': nothing is booked until the nurse has talked with the patient.",
+     "Alex's words had none of these, so nothing is sent here."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "If you have chest pain, trouble breathing or signs of a stroke, call 911 or go to the emergency room now. For questions before the visit, call the office's nurse line: (555) 010-0177, option 2. Here are the soonest sick-visit times."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "more": [
+     "The plug-in's 911 words come first.",
+     "An overdose or a swallowed poison gets Poison Help, 1-800-222-1222, or 911 if the person won't wake up."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. Call 911 or go to the emergency room now. Don't wait for a booking."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-01",
+    "does": "No danger, so the booking goes on. Each service is set at sign-up: at the office, at the patient's home, or both. A new patient allergy visit is at the office only.",
+    "more": [
+     "At the office, no address or travel check is needed. The office's address goes in the confirmation.",
+     "A house call for someone who can't easily leave home is Lee Home Visits' work, in the other flow.",
+     "A current patient can also have a video visit, where the plug-in allows it. That's a third place to pick."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "A new patient allergy visit is at the office: Lee Allergy Care, 612 Cedar Rd, Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "does": "Alex asks for a skin test at the same visit. Rosie finds one time long enough for both, with one clinician. Both are billed to the plan, or $230 and $185 self-pay.",
+    "more": [
+     "It's one booking, with one code.",
+     "If no one person has time for both, the times show two clinicians back to back.",
+     "Shots are never paid up front."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-24",
+    "does": "Alex books for themselves, an adult. The plug-in says who may book for someone else: a parent for a child, or an adult with the patient's own OK.",
+    "more": [
+     "A patient 18 or older books for themselves.",
+     "A child at an allergy practice is booked by a parent or guardian. A child under 5 is not booked.",
+     "Another adult, like a grown child, books only with the patient's OK on the secure page, or as their guardian."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-25",
+    "does": "A what-if: Alex books a checkup for their son Max, 9, at an allergy practice. A parent or guardian books, pays any share and gets the texts. The secure page asks how Alex is related to Max.",
+    "more": [
+     "Either parent may book, unless the office holds a court order that limits it.",
+     "Texts go only to the parent's phone, never the child's.",
+     "Who else may bring a child is a switch: an adult the parent names, with a signed OK on the secure page."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "The checkup is for your son Max, who's 9. Are you Max's parent or legal guardian?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Yes, I'm Max's parent."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-37",
+    "more": [
+     "The plan's name came before the times. Nothing else about the plan passes through the AI.",
+     "No answer in 30 minutes counts as 'Can't check now'.",
+     "Lee Allergy Care bills health plans, so the desk checks every plan a patient names.",
+     "The desk checks it again a few days before the visit.",
+     "The share is the plan's estimate, not a promise. The office bills the plan after the visit."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "does": "On the secure page, Alex answers one short question: are texts to this phone safe? The office never shows photos of patients, so nothing is asked about photos.",
+    "more": [
+     "Texts aren't safe, like a shared phone: Alex picks this page, email or a call. Rosie then reaches Alex only that way.",
+     "Here, Alex says texts are safe."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "One quick question.",
+      {
+       "form": [
+        "Are texts to this phone safe? Yes / No, reach me another way"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-64",
+    "more": [
+     "The page asks them to confirm they may act for the adult.",
+     "Where the state's rules require it, the page asks for the paper that shows it.",
+     "The plug-in says if a guardian may book this work.",
+     "They sign the consent and the health history on the secure page.",
+     "The code goes to whoever brings the patient to the office."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-02",
+    "does": "A what-if: a self-pay patient has the office's own discount. It comes off first, and the new total shows before Alex says yes."
+   },
+   {
+    "op": "words",
+    "at": "A7-18",
+    "more": [
+     "Where the plug-in keeps service names private, the text says only the business, date, time and place. The rest is on the secure page.",
+     "Lucas is a nurse practitioner, so Lucas can take Alex's new patient allergy visit.",
+     "Sam oversees Lucas where the state's rules ask for a doctor, so Lucas can stand in while Anika is out."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Done. Your Sat 11:00am visit is now with someone else on the team. Give this code at the front desk.",
+      {
+       "code": "5160"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Confirmed: come in early Sat Oct 24 for A.M. at 11:00am, moved from Anika.",
+      {
+       "as": "Lucas"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-02",
+    "does": "Back to Alex: it's Saturday, and Alex comes to the office 15 minutes early. The desk checks what the plug-in asks for first: a photo ID and the plan card, against the secure page.",
+    "more": [
+     "Who may bring a child is a switch: a parent, a guardian, or an adult the parent OKs on the secure page.",
+     "The reminder already said what to bring.",
+     "The code is taken only once nothing required is missing.",
+     "A forgotten plan card doesn't stop the visit: the desk checks the plan later."
+    ],
+    "t": "Sat Oct 24, 10:45am"
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "does": "Back to Alex in the exam room, Sat 11:00am. Before the exam, a medical assistant checks Alex's vital signs and medicines list, in the office's own chart.",
+    "more": [
+     "Health notes and results stay in the office's own chart, never in Rosie or a text.",
+     "A complaint later is checked against the office's chart.",
+     "The plug-in names the checks, and which visits need them."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE noted in the chart: A.M."
+     ],
+     [
+      "san",
+      "staff",
+      "Noted. The details stay in the office's chart."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Anika finds something that means part of the visit should wait. That part isn't done, and nothing is billed for it.",
+    "more": [
+     "The note says what was found, what wasn't done, and why.",
+     "It names the kind of pro to see, like a specialist, never a named one.",
+     "Health details stay on the secure page, never in a text.",
+     "Here: Anika decides a test should wait for another day. It's booked later, if Alex asks.",
+     "Only what was done is billed."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Stopped part of A.M.'s visit. I put a note on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "The office left you a note about today's visit.",
+      {
+       "card": {
+        "title": "A note from Lee Allergy Care",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "link": "rosfield.com/n/a6",
+        "button": "Read the note"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Anika stopped part of A.M.'s visit. The note is on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "Someone is hurt, sick or lost during the visit. Anika helps first, and calls 911 in an emergency. Sam is told at once, with no health detail in the text.",
+    "more": [
+     "A record is kept on the secure page, never in a text.",
+     "Lost means a child in the office's care, at an allergy practice.",
+     "The plug-in says what staff must do for this work."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Someone felt unwell in the exam room. Details on the page."
+     ],
+     [
+      "san",
+      "owner",
+      "Anika reports someone felt unwell during A.M.'s visit. Anika is with them. Details: rosfield.com/i/a8"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A9-03",
+    "does": "Alex pays the $30 copay at the front desk, the office's own way. Rosie doesn't text a bill.",
+    "more": [
+     "The copay comes from the desk's plan check. A self-pay patient pays $230 here the same way.",
+     "A balance after the plan pays is the office's own bill, never Rosie's text.",
+     "A video visit's share is taken by the desk too."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A9-20",
+    "does": "Lee Allergy Care bills Alex's plan first. Alex pays only their share: the $30 copay at the desk.",
+    "more": [
+     "Health details stay on the secure page.",
+     "The office sends the claim itself. The share is the desk's estimate.",
+     "A balance after the plan pays is billed by the office, never by Rosie's text.",
+     "A follow-up visit is never promised as free: a problem treated at the same visit can add a copay."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-24",
+    "does": "Sam links a calendar, so visits already booked block those times. Rosie sees only when Sam is busy, never what the visit is.",
+    "more": [
+     "Each person can link their own calendar from their invite.",
+     "One person has one calendar across every kind of work, so nobody is booked twice.",
+     "Visits that came in another way carry no $2 on Rosie: the $2 is only for a booking Rosie's AI makes.",
+     "Rosie doesn't text the patients on those visits."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Any visits already booked? Link your calendar so they block those times. Or send a photo of your schedule.",
+      {
+       "card": {
+        "title": "Link your calendar",
+        "lines": [
+         "I see only when you're busy, never what"
+        ],
+        "button": "Link calendar",
+        "link": "rosfield.com/cal/s01"
+       }
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Linked"
+     ],
+     [
+      "san",
+      "owner",
+      "Linked. The visits already on it now block those times."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The owner's own rules say where a visit away from the office is allowed, and who may go. Rosie offers none outside them."
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The office's registration PR20981 is saved.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way home blood draws was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "House calls",
+          "Now"
+         ],
+         [
+          "Home blood draws",
+          "Once Felipe is confirmed and you say yes"
+         ],
+         [
+          "Lee Allergy Care",
+          "Its registration is on file as given, not checked. It shows once you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Allergy Care. Sam Lee added you to the office's team. Reply YES to join and get your bookings here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Anika"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Home Visits. Sam Lee added you to the team for house calls and home blood draws. Reply YES to join and get your visits here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Felipe"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Anika replies YES, then checks what Sam set. Any license Anika wants shown can be added later, as given.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Lucas joins the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Anika"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Allergy Care! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Anika Ortiz · Lee Allergy Care",
+        "lines": [
+         "Every office visit, and video visits",
+         "Hours: the office's hours"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Anika"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Anika"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-31",
+    "more": [
+     "Jobs sent now are never offered.",
+     "The owner can set who's on call later on the Team page, if the plug-in allows it.",
+     "Someone who's sick gets the soonest same-day time at the office instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Allergy Care can book you from now on, at the office and by video. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Anika"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Allergy Care can book you from now on, at the office and by video. Your day list comes at the time you picked.",
+      {
+       "as": "Lucas"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Home Visits can book you for house calls and home blood draws from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Felipe"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Home blood draws and Lee Allergy Care now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S13-17",
+    "more": [
+     "Optional extras and tax may be shown apart.",
+     "When only part of the price is promised, like a visit fee, it's shown first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero una primera cita como paciente nueva el sábado.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like a first visit as a new patient on Saturday."
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Allergy Care. Esta llamada se graba. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Allergy Care. This call is recorded. How can I help?"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-12",
+    "does": "Someone calls for a vet: a wrong number. Rosie says whose line this is, once. A sales caller or a robocall is ended politely.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Is this Elm Street Vet? I need to move my dog's shots.",
+      {
+       "as": "a wrong number"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "This is Lee Allergy Care's booking line, so I can't reach Elm Street Vet. Please check their number. Goodbye.",
+      {
+       "as": "a wrong number"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-14",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Hi, you've reached Lee Allergy Care. This is Rosie, an automated assistant, and this message is recorded. Leave your name and what you need, and say if a text back is OK."
+     ],
+     [
+      "cust",
+      "san",
+      "Hi, it's Alex. I'm new in town and I'd like a first visit, Saturday morning if you can. A text is fine."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-22",
+    "more": [
+     "The general check looks for danger to life, fire, gas, a medical emergency or self-harm.",
+     "Every answer later in the booking is checked the same way.",
+     "On a call, the voice AI says any safety words out loud.",
+     "The allergy care plug-in adds its own danger words."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "more": [
+     "Sam set this line at sign-up: the office's nurse line, for what only a nurse or doctor should answer.",
+     "911 or 988 come first when they're needed.",
+     "The plug-in lists which words go to this line. Sam can add more.",
+     "A clinic or a vet often names a nurse line or an emergency clinic here.",
+     "Where the plug-in says those words stop a booking, nothing is booked. Otherwise Alex can go on.",
+     "Here: a sign on the office's nurse-line list, like vomiting that won't stop.",
+     "Then the AI says 'Please call the office's nurse line now'. Nothing is booked until the nurse has talked with the patient."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "I can't answer medical questions. The office's nurse line can: (555) 010-0177, option 2. If it's an emergency, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-27",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Allergy Care has open times on Saturday morning for new patients. The desk checks each plan a patient names, and a new patient allergy visit is $230 self-pay. I can't book on this call. I'll text Alex a secure link to pick a time. Which mobile should I text?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-02",
+    "does": "Someone who can't easily leave home can have a house call, with Lee Home Visits. From here, that follows the other flow, where the business goes to the patient."
+   },
+   {
+    "op": "words",
+    "at": "A4-36",
+    "does": "A what-if: the plug-in lets this work be done by video, like a 20-minute video visit for a current patient. It counts as at the business, so the code is read out at the start.",
+    "more": [
+     "The plug-in says which services can be done by video or phone. The customer picks it here, like a place.",
+     "Rosie first asks which state the patient will be in during the visit.",
+     "It offers only clinicians the state's rules allow there, and uses that state's rules.",
+     "Nobody allowed there: the patient books an office visit, or a video time on a day they're back.",
+     "The confirmation and the reminder carry the clinician's video link from the Team page.",
+     "Nobody joins within 10 minutes: it's handled like a no-show."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-32",
+    "does": "A parent books allergy visits for two children on one morning, at this allergy practice. Rosie finds times side by side with Anika and Lucas."
+   },
+   {
+    "op": "words",
+    "at": "A4-53",
+    "more": [
+     "A plan the business doesn't take turns into self-pay. Its price and notice show before any yes.",
+     "The desk checks the benefit later, while the time is saved.",
+     "Lee Allergy Care bills health plans, so the desk checks every plan a patient names.",
+     "Here: Alex names Willow Health. Only the name, never the member number."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-06",
+    "does": "A new patient allergy visit is on the office's list: billed to the patient's plan, or $230 self-pay. The price shows before anyone says yes, and it never needs Sam's OK."
+   },
+   {
+    "op": "words",
+    "at": "A4-16",
+    "more": [
+     "A patient's own doctor is often the one they ask for.",
+     "If Anika can't take it, the AI says so. It offers Anika's next open day, or another clinician who takes new patients."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-23",
+    "does": "The AI sends Rosie only Alex's name and mobile. The mobile isn't on file, so Alex is a new patient, as Alex said.",
+    "more": [
+     "A new patient is added to the office's list once Sam OKs the first visit.",
+     "If new or current changes the service, the times are offered again."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-41",
+    "more": [
+     "Alex named a health plan, so no notice is due here.",
+     "A self-pay patient hears they can get a written price estimate before saying yes.",
+     "The office sends it within 1 business day, or sooner where the rules say so.",
+     "The booking records that the notice was said.",
+     "Any paper owed after booking becomes a to-do for the office, with its due date. Sam is reminded once before it's late."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A5-07",
+    "does": "Only for the office's $20 no-show fee, for a no-show or a cancel within 24 hours. A fee-free patient saves no card. Alex ticks it, and Sam confirms any charge."
+   },
+   {
+    "op": "words",
+    "at": "A6-01",
+    "more": [
+     "Rosie checked this before the secure page too.",
+     "Here it asks Sam first: Alex is a new patient, and Sam OKs every new patient.",
+     "A current patient's visit books right away. Same-day sick times book at once for current patients too.",
+     "A request also waits for Sam if it has an answer only Sam, or an expert, should read.",
+     "Pat, the office manager, gets the same requests. Sam's answer wins."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-51",
+    "more": [
+     "The patient's side: say Alex's son Max, 9, comes with Max's grandmother, who has no parent's OK on file. Alex can't be reached to sign it.",
+     "The office's side: a conflict found, the customer isn't eligible, or a permit the office needed.",
+     "No code was taken, so the visit isn't confirmed.",
+     "The plug-in says what's required, and what counts as a conflict."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "CAN'T START M.M. The adult with the child has no parent's OK on file."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-67",
+    "does": "The plug-in says if a child may be left without a parent, like at a class or a camp. At the office, the parent or the adult they named stays for the whole visit, so nothing more happens."
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "more": [
+     "Next: Anika goes over the visit, then Alex pays any share at the front desk.",
+     "At a drop-off, READY and the pick-up come first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-05",
+    "does": "A new patient allergy visit at the office has no cancel period. Only a contract the state's rules cover gets one, and an office visit sells none."
+   },
+   {
+    "op": "words",
+    "at": "A10-20",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I get a skin test too?"
+     ],
+     [
+      "san",
+      "cust",
+      "Yes: billed to your plan, or $185 self-pay. Want a time?",
+      {
+       "times": [
+        "Sat Nov 14 · 10:00am",
+        "Sat Nov 14 · 12:30pm"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-21",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Please send me a copy of my records."
+     ],
+     [
+      "san",
+      "cust",
+      "Here's a copy of your records with Lee Allergy Care.",
+      {
+       "card": {
+        "title": "Your records",
+        "lines": [
+         "Bookings and payments · medical records come from the office"
+        ],
+        "button": "Open the copy",
+        "link": "rosfield.com/r/a13"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Allergy Care",
+          "6 bookings · Anika 3, Lucas 3"
+         ],
+         [
+          "Lee Home Visits",
+          "3 visits"
+         ],
+         [
+          "Waiting on you",
+          "D.W.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-19",
+    "does": "Say nobody answers all day. Each request is declined politely at 4 hours, and no fee is charged. Sam gets one text at the start of Sam's next text hours.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Yesterday, nobody answered for Lee Allergy Care.",
+      {
+       "list": {
+        "plain": true,
+        "rows": [
+         [
+          "2 requests",
+          "Declined at 4 hours"
+         ],
+         [
+          "1 fee question",
+          "Still waiting on you"
+         ]
+        ]
+       },
+       "buttons": [
+        "See them",
+        "Set up AWAY"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-23",
+    "does": "Say Ben T. missed the Fri 1:00 visit with Anika, and didn't answer in 30 minutes. A fee can come only from what Ben agreed to when booking."
+   },
+   {
+    "op": "words",
+    "at": "S11-35",
+    "say": [
+     [
+      "san",
+      "owner",
+      "B.T. missed the Fri 1:00 with Anika. Ben is fee-free, so no fee is asked."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Hi Sam, it's Rosie, recording as always. One request waits for Lee Allergy Care. It's a same-day visit today at 2:00pm with Lucas, for a current patient. It's $35. Accept it?"
+     ],
+     [
+      "owner",
+      "san",
+      "Yeah, take it."
+     ],
+     [
+      "san",
+      "owner",
+      "Reading it back: accept a same-day visit today at 2:00pm with Lucas. Say yes to go ahead."
+     ],
+     [
+      "owner",
+      "san",
+      "Yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-41",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Today, Fri Oct 23, for each business:",
+      {
+       "list": {
+        "head": [
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Allergy Care",
+          "1 missed visit · 1 fee question for you · first tomorrow: 10:00am, Anika"
+         ],
+         [
+          "Lee Home Visits",
+          "Nothing waits on you · next visit: Mon 8 to 10am"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Allergy Care: your card was charged twice for the same payment. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $20",
+        "lines": [
+         "Lee Allergy Care · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Omar P."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "O.P.'s $20 no-show fee was charged twice. The second charge is refunded, and O.P. is told."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-26",
+    "does": "A what-if: Alex books a visit for their father, Walt, 80. Walt says yes on the secure page, so the office has Walt's own OK. Then Alex gets the texts too.",
+    "more": [
+     "Without the patient's own OK, another adult can't book for them.",
+     "A guardian or health care agent books with the paper that shows it, as in 'A guardian for an adult'.",
+     "The health forms are Walt's own, on the secure page.",
+     "Whoever pays gets the receipt."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "It's for my dad, Walt. Dad is 80 and needs a new doctor too. Can I book it for Dad?"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-74",
+    "more": [
+     "The plug-in names the form and when it's due, like a waiver, a consent or an intake form.",
+     "Signed forms stay on file for the plug-in's time.",
+     "At Lee Allergy Care, the forms are the health history, the medicines list and the consent.",
+     "They're filled in and signed only on the secure page, never by text."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-03",
+    "t": "Sat Oct 24, 10:45am"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When patients book, do you take anything? Each service starts the way most allergy practices set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your office: the plan is billed first, any share paid at the front desk, your own way",
+         "When they book: nothing taken",
+         "Shots are never paid up front"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "New patient allergy visit",
+          "$230 self-pay"
+         ],
+         [
+          "Allergy testing visit",
+          "$185 self-pay"
+         ],
+         [
+          "Allergy shot visit",
+          "$35 self-pay"
+         ],
+         [
+          "Follow-up allergy visit",
+          "$125 self-pay"
+         ],
+         [
+          "Video follow-up",
+          "$95 self-pay"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:none+after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Right for all of them"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Nothing is taken when patients book. Any share is paid at the front desk, your own way.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, nothing is taken when patients book: their YES books it."
+      ]
+     },
+     "after:counter": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Save a card for the $20 no-show fee, except fee-free patients"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. A card is saved for the $20 fee, charged only after you OK it, and never for a patient you mark fee-free. The rest stays as on the card.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, a card is saved for the office's $20 fee."
+      ]
+     }
+    }
+   },
+   {
+    "op": "words",
+    "at": "S1-78",
+    "say": [
+     [
+      "san",
+      "other",
+      "This is Rosie, an automated assistant for Lee Allergy Care. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, after a missed check.",
+      {
+       "buttons": [
+        "Yes",
+        "No"
+       ],
+       "stop": "first",
+       "as": "Morgan Lee"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "Every patient may book; Sam OKs each new patient first (the plug-in)."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 per booking applies to every profession; the no-$2 switch stays off"
+   },
+   {
+    "op": "more",
+    "at": "S1-29",
+    "more": [
+     "Sam's health companies each sign it once, before their first booking.",
+     "Each company in Rosie's chain signs one with Rosie too."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "why": "A house call always needs the patient there.",
+    "label": "Nobody needs to be home"
+   },
+   {
+    "op": "more",
+    "at": "B9-17",
+    "more": [
+     "Here, the office bills Alex's health plan, then Alex for any share. Rosie sends nothing about money."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B10-17",
+    "more": [
+     "Health records stay with the office as long as the state's rules say. A delete removes only Rosie's own booking details."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "House calls takes no jobs sent now (S2-27), so this is never offered."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "why": "A house call always needs the patient there, so there's no visit with nobody home.",
+    "label": "The way in fails"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "why": "A child is never left alone with the clinician at home: an adult on the booking is there (B8-09).",
+    "label": "2 The child is in the pro's care"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Health care books people (an allergist or a nurse practitioner), never spaces."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Health care runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "No health care is sent now, and nobody is on call (pf.edges.urgent)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "House calls books a 2-hour arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "why": "A house call is never a stay.",
+    "label": "3 A stay: a start and an end"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "House calls sells no seats in a session: each patient has their own visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "why": "No house call is sent now.",
+    "label": "Sent now: the pro's on the way"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "why": "No house call is sent now.",
+    "label": "Sent now: OMW right away"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "why": "No repeat plan: each follow-up house call is booked on its own, at the visit.",
+    "label": "Repeat visits: a plan"
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "why": "No house call needs a written contract.",
+    "label": "Yes: a signed contract first"
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plan here (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "No house calls are billed in stages."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No repeat plan here (B4-43), so there's no monthly bill for visits."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "why": "A plan visit is billed the office's own way. Rosfield's bill is only for a self-pay patient.",
+    "label": "Insurance pays part"
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam set cards only (S1-57), and no bill here is that big."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "Nobody else pays at booking here (B4-78)."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Health care has no free-fix visit: a worry after a visit goes to the nurse line (B10-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "why": "No proposals: more care is booked as its own visit (B10-18).",
+    "label": "The business sends a proposal"
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Results come only through the office's own patient portal, never in Rosie's texts (pf.messages)."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "why": "No house call is sent now, and nobody is on call.",
+    "label": "Sent now: the on-call pro"
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Care already given can't be cancelled; the plug-in's rules give no cancel period for it."
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Home Visits. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Home Visits · Your visit",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Fri 8am"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer A.M. Fri Oct 23, arriving 8 to 10am, with Felipe?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3906"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: A.M., 8–10."
+     ],
+     [
+      "san",
+      "cust",
+      "Felipe from Lee Home Visits is checked in for your 8–10am visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-05",
+    "say": [
+     [
+      "staff",
+      "san",
+      "3960"
+     ],
+     [
+      "san",
+      "staff",
+      "That isn't A.M.'s code. Check it with A.M. and send it again."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "3"
+     ],
+     [
+      "san",
+      "cust",
+      "Thanks. We've told Felipe you're home."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. says they're home. Try the door again, and check in with the code."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-09",
+    "say": [
+     [
+      "staff",
+      "san",
+      "paid cash 179"
+     ],
+     [
+      "san",
+      "staff",
+      "Recorded: $179 cash from A.M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Sorry to hear that. What went wrong?"
+     ],
+     [
+      "cust",
+      "san",
+      "Felipe was late and rushed."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. rated the visit 2 stars: \"Felipe was late and rushed.\"",
+      {
+       "card": {
+        "title": "Rating · 2 of 5",
+        "lines": [
+         "Thu Oct 22 visit with Felipe",
+         "Only you see this"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-09",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I get some money back? Felipe came late and rushed."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. asked for money back for the Thu Oct 22 visit.",
+      {
+       "buttons": [
+        "Refund it",
+        "Keep it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Reminder: A.M. asked for money back for the Thu Oct 22 visit.",
+      {
+       "buttons": [
+        "Refund it",
+        "Keep it"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Your request is still with Lee Home Visits. We've asked Sam to get back to you."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-23",
+    "say": [
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "OK. Nothing is sent, and the bank keeps the payment with A.M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-54",
+    "does": "Sam raises the self-pay follow-up house call to $95 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "more": [
+     "Follow-up house calls already booked keep $89, even after Nov 2.",
+     "A time being saved right now keeps the price on the patient's screen.",
+     "A plan pays its own fee, so a self-pay price change never touches it.",
+     "A new service starts from the plug-in's services template."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Saved: follow-up house call $95 for visits from Mon Nov 2. Visits already booked keep $89."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-56",
+    "does": "Sam turns on the office's $20 no-show fee, for new bookings only. A card is then saved for it when a patient books, never for a fee-free patient.",
+    "more": [
+     "Visits already booked keep their terms: nothing saved.",
+     "Shots are never paid up front, whatever the setting.",
+     "The price-OK limit changes the same way: from now on, and read back first.",
+     "Each change is read back first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Felipe replies YES, then checks what Sam set. One reply covers every kind of work Felipe does.",
+    "more": [
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Gina, Anika and Lucas join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Felipe"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Home Visits! Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Felipe Price · Lee Home Visits",
+        "lines": [
+         "Every house call",
+         "Hours: Mon–Sat 7:30am–5pm"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "does": "Alex uses any AI assistant, like ChatGPT, Claude or Gemini. The AI passes on the visit, the area and the day. No name, phone or street address yet.",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "I can't easily get out of the house these days. Can someone from Lee Home Visits see me at home Thursday morning? I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety words come first. Then the booking goes on, with the soonest visit. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "Rosa finds it hard to leave home. Rosie never judges how sick someone is.",
+     "It gives the 911 words and the nurse line, then offers the soonest visit."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Tengo tos y me cuesta salir de casa.",
+      {
+       "lang": "es",
+       "en": "I have a cough, and it's hard for me to leave home.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Si le cuesta respirar o se le cierra la garganta, llame al 911 ahora. Para preguntas, llame a la línea de enfermería: (555) 010-0207, opción 2.",
+      {
+       "lang": "es",
+       "en": "If you have trouble breathing or a closing throat, call 911 now. For questions, call the nurse line: (555) 010-0207, option 2.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "Gracias. Quiero la primera visita.",
+      {
+       "lang": "es",
+       "en": "Thanks. I want the first visit.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. Chest pain, trouble breathing, stroke signs like a sudden severe headache, fainting or heavy bleeding stop the booking. An overdose gets Poison Help.",
+    "more": [
+     "The message is the plug-in's for that danger, or the general one: get to safety and call 911.",
+     "On a call, the caller hears it, and Sam gets a summary with no health details."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If you have chest pain, trouble breathing, a drooping face or slurred speech, call 911 now. Don't wait for a booking."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a caller got the 911 message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "The 911 message was sent",
+         "No health details here"
+        ],
+        "link": "rosfield.com/t/s1",
+        "button": "Open it"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: new or current patient, a plan's name or self-pay, and who the visit is for.",
+     "Its danger words: chest pain, trouble breathing, signs of a stroke, fainting, heavy bleeding or an overdose.",
+     "Its first steps: the health forms on the secure page, due the day before.",
+     "Who can stand in for whom, and how the visit is checked in: the code at the door.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "more": [
+     "Each answer is checked for danger too.",
+     "New or returning is asked first only if Sam set a different service, length or price for new patients.",
+     "Lee Home Visits treats every patient the same, so the AI doesn't ask. A later move offers only times of the same length.",
+     "Which visit sets the length: a house call, a follow-up house call or a blood draw."
+    ],
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Home Visits asks: is this a first house call, a follow-up, or a blood draw at home?"
+     ],
+     [
+      "cust",
+      "agent",
+      "A first house call."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-46",
+    "does": "Say a care home's nurse books house calls for 3 residents on one morning, with the home's OK. Each resident gets their own visit and code, one after the other.",
+    "more": [
+     "The plug-in sets the group's size limits and its price.",
+     "Each resident, or their guardian, says yes on the secure page and signs their own consent.",
+     "Each resident's notes stay on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-48",
+    "does": "Say Alex also asks for a blood draw at the same visit. Both go in one booking, with one arrival window and one code.",
+    "more": [
+     "Each service keeps its own price kind and money.",
+     "If both don't fit one person's day, the AI offers another time."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Can Felipe also draw blood for an allergy test while Felipe's here?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Yes. Felipe does both, and they fit in the same arrival window. A blood draw at home is $95, or billed to your plan where it pays."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-27",
+    "does": "Say Alex's daughter will let the clinician in. The daughter's name and mobile go on the secure page. The daughter gets the visit texts and the code. Alex gets a copy without the code.",
+    "more": [
+     "Rosie texts the daughter only on Alex's word that they agreed to texts.",
+     "Alex is still the patient: Alex's health details stay on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "more": [
+     "Examples: a written estimate for work over a set amount, or the right to cancel a sale made at home.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date. Sam is reminded before it's late.",
+     "A self-pay patient hears they can get a written price estimate, before saying yes. A patient whose plan pays needs none.",
+     "The $179 house call and the $95 blood draw need no other notice."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-69",
+    "does": "Where the plug-in says the business may show customers' photos, the page asks once. A health practice never shows patients' photos, so this isn't asked.",
+    "more": [
+     "A no never changes the booking."
+    ],
+    "say": [],
+    "form": [
+     [
+      "May Lee Home Visits show photos?",
+      "Not asked: a health practice never shows them"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-74",
+    "more": [
+     "They OK prices and pay, as the customer would.",
+     "They sign the consent and the health history on the secure page.",
+     "The code goes to whoever meets the clinician."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts a worry before the visit. Rosie runs the danger check again, gives the nurse line, then offers an earlier time if one is free.",
+    "more": [
+     "Real danger, like chest pain or trouble breathing, gets the 911 words first.",
+     "Rosie never judges how sick someone is, and never repeats the worry in a text.",
+     "An earlier time shows its price first. No reply: the visit stays as booked.",
+     "If Alex picks the earlier time, Felipe and Gina are told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "My leg looks more swollen today."
+     ],
+     [
+      "san",
+      "cust",
+      "If you have chest pain or trouble breathing, call 911 now. For anything else today, call the nurse line: (555) 010-0177, option 2. Gina can come sooner, at the same price:",
+      {
+       "times": [
+        "Wed Oct 21 · arriving 2–4pm · Gina"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep Thursday"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-20",
+    "more": [
+     "The offer comes first when the plug-in or Sam says a new person needs an OK.",
+     "It also comes first when Alex asked for Felipe by name.",
+     "No reply by 8pm Wed: Sam is asked to call, since nobody new comes without the patient's yes.",
+     "Gina is a nurse practitioner, so Gina can do Alex's house call."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before the exam, Felipe checks Alex's vital signs and medicines, and notes them in the office's own chart. Nothing about them goes in Rosie or a text.",
+    "more": [
+     "The plug-in names the checks: vital signs, medicines and changes since the last visit.",
+     "Notes and results stay in the office's own chart.",
+     "A complaint later is checked against the chart."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE noted in the chart: A.M."
+     ],
+     [
+      "san",
+      "staff",
+      "Noted. The details stay in the office's chart."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Felipe smells gas in the home. The plug-in says a clinician stops there: everyone goes outside, and Alex gets a written note.",
+    "more": [
+     "The note says what was found, what wasn't done and why, and which kind of business to call.",
+     "It never names a company.",
+     "Only what was done is charged.",
+     "Sam is told, and the note stays with the booking.",
+     "Alex can text when it's fixed, and the visit is booked again then."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD gas smell, we stepped outside"
+     ],
+     [
+      "san",
+      "cust",
+      "Felipe smelled gas, so Felipe stopped the visit. Please stay outside and call the gas company, or 911.",
+      {
+       "card": {
+        "title": "Safety note · 27 Birch Ln",
+        "lines": [
+         "Found: a gas smell",
+         "Not done: today's visit",
+         "Call the gas company before the next visit"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-18",
+    "does": "At DONE, Alex asks Felipe for a follow-up in 2 weeks. Felipe texts NEXT, and Alex gets times to pick, booked like any visit.",
+    "more": [
+     "Rosie never offers a next visit on its own: only when the patient asks.",
+     "It's booked with the same money rules as any visit.",
+     "A visit past the 14 days Sam books ahead is saved as a reminder instead."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "NEXT A.M. asks for a follow-up in 2 weeks"
+     ],
+     [
+      "san",
+      "cust",
+      "Here are times for the visit you asked Felipe about:",
+      {
+       "times": [
+        "Thu Nov 5 · arriving 8–10am · Felipe",
+        "Thu Nov 5 · arriving 10am–12pm · Gina"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-22",
+    "does": "Sam turned Rosie's default off for this work: nobody new comes into the home without the patient's yes. At 8pm, Sam is asked to call Alex.",
+    "more": [
+     "Gina's time is held until they talk.",
+     "Not reached by 7am Thu: nobody goes.",
+     "Alex gets a text with Felipe's soonest windows and the nurse line. There's no fee."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "A.M. hasn't answered about tomorrow's visit. Nobody new goes without the patient's yes, so please call A.M. Gina's time is held."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-24",
+    "does": "Sam links a calendar, so visits already booked block those times. Rosie sees only when Sam is busy, never what the visit is.",
+    "more": [
+     "Each person can link their own calendar from their invite.",
+     "One person has one calendar across every kind of work, so nobody is booked twice.",
+     "Visits that came in another way carry no $2 on Rosie: the $2 is only for a booking Rosie's AI makes.",
+     "Rosie doesn't text the patients on those visits."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Any visits already booked? Link your calendar so they block those times. Or send a photo of your schedule.",
+      {
+       "card": {
+        "title": "Link your calendar",
+        "lines": [
+         "I see only when you're busy, never what"
+        ],
+        "button": "Link calendar",
+        "link": "rosfield.com/cal/s01"
+       }
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Linked"
+     ],
+     [
+      "san",
+      "owner",
+      "Linked. The visits already on it now block those times."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-43",
+    "does": "The owner's own rules say where a visit away from the office is allowed, and who may go. Rosie offers none outside them."
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "more": [
+     "The office's registration PR20981 is saved.",
+     "MORE finishes a setup that was saved halfway.",
+     "NEW adds another kind of work, the same way home blood draws was added.",
+     "MENU shows every word Sam can text."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "House calls",
+          "Now"
+         ],
+         [
+          "Home blood draws",
+          "Once Felipe is confirmed and you say yes"
+         ],
+         [
+          "Lee Allergy Care",
+          "Its registration is on file as given, not checked. It shows once you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Home Visits. Sam Lee added you to the team for house calls and home blood draws. Reply YES to join and get your visits here by text. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Felipe"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-31",
+    "more": [
+     "Jobs sent now are never offered.",
+     "The owner can set who's on call later on the Team page, if the plug-in allows it.",
+     "Someone who's sick gets the soonest same-day time at the office instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Home Visits can book you for house calls and home blood draws from now on. Your day list comes at 7:00am, the time you picked.",
+      {
+       "as": "Felipe"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Allergy Care can book you from now on, at the office and by video. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Anika"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Allergy Care can book you from now on, at the office and by video. Your day list comes at the time you picked.",
+      {
+       "as": "Lucas"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Home blood draws and Lee Allergy Care now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S13-17",
+    "more": [
+     "Optional extras and tax may be shown apart.",
+     "When only part of the price is promised, like a visit fee, it's shown first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-07",
+    "more": [
+     "Gina can't be booked until Gina replies YES.",
+     "Sam can take Gina's visit texts instead, on the Team page."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Home Visits. Reminder: Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": true,
+       "as": "Gina"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Gina hasn't answered the invite, so I won't text Gina again.",
+      {
+       "card": {
+        "title": "Gina · not joined",
+        "lines": [
+         "Not offered to customers until Gina replies YES",
+         "Or get Gina's visit texts yourself"
+        ],
+        "button": "Open the Team page",
+        "link": "rosfield.com/s/team"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-08",
+    "more": [
+     "If Gina had already joined, Gina's booked visits would stay, and the visit texts would go to Sam."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "STOP",
+      {
+       "as": "Gina"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You won't get more texts from Rosie for Lee Home Visits.",
+      {
+       "as": "Gina"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Gina replied STOP to the invite, so I won't text Gina.",
+      {
+       "card": {
+        "title": "Gina · texts stopped",
+        "lines": [
+         "Not offered to customers until Gina texts START",
+         "Or get Gina's visit texts yourself"
+        ],
+        "button": "Open the Team page",
+        "link": "rosfield.com/s/team"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-01",
+    "does": "Every way in reaches the same booking desk, with the same rules. The main story: Alex asks an AI for a house call on Mon Oct 19, 6:40pm."
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero una visita a casa.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like a house call.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automático de Lee Home Visits. La llamada se graba.",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Home Visits. The call is recorded.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-13",
+    "does": "Someone calls for a vet: a wrong number. Rosie says whose line this is, once. Only the call log keeps it.",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Is this Oak Street Vet? I need to move my cat's shots.",
+      {
+       "as": "a wrong number"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "This is Lee Home Visits' booking line, so I can't reach Oak Street Vet. Please check their number. Goodbye.",
+      {
+       "as": "a wrong number"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Home Visits. We got your voicemail. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Home Visits · Your visit",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about a house call. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants a visit this week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Booked, with no texts to T. Please tell T. the details yourself.",
+      {
+       "card": {
+        "title": "T. · details on the page",
+        "lines": [
+         "Thu Oct 22 · arriving 12–2pm · Gina",
+         "Add the address on the Today page"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/b8"
+       },
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Should I keep taking my antihistamine before the visit?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't answer medical questions. The nurse line can: (555) 010-0207, option 2. If it's an emergency, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "does": "The request turns out to be for work Lee Home Visits doesn't do, like an X-ray. Rosie says so plainly, and the AI can look for another business.",
+    "more": [
+     "Rosie never hands a customer to a business on its own. The AI looks again, ranked fairly.",
+     "The plug-in can name the kind of care to suggest, like an imaging center."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Home Visits does house calls and home blood draws, not X-rays. Nothing was saved. A clinician can send you for one after a visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-77",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Home Visits comes to you in Springfield. Is the visit at a home, or somewhere else?"
+     ],
+     [
+      "cust",
+      "agent",
+      "At my home."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-31",
+    "does": "Say another customer's AI asks for a visit in Riverton, 40 miles away. Rosie says so before any times. Nothing is saved, and the AI can look elsewhere."
+   },
+   {
+    "op": "words",
+    "at": "B4-62",
+    "does": "Alex wants their health plan to pay. Before the times, the AI asks only the plan's name, since a plan can limit who may come."
+   },
+   {
+    "op": "words",
+    "at": "B4-21",
+    "does": "No clinician is free in the days Sam books ahead, or none can reach the address. Rosie says so plainly. It never guesses a time.",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Home Visits has no open times for this visit in the next 14 days. Nothing was saved."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-23",
+    "more": [
+     "Rosie checks again before it writes the booking.",
+     "A visit Sam adds by hand, or an event on Felipe's phone calendar, could still take it.",
+     "A job that needs a signed contract keeps its time saved while both sign, up to 24 hours here.",
+     "A guardian's OK on the secure page keeps it saved up to 30 minutes."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-25",
+    "more": [
+     "A returning patient's record shows past visits and notes for the clinician.",
+     "New or returning is checked again here, where it matters."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "more": [
+     "Building rules, like a homeowners' group's work hours or proof of insurance, go to Sam to check.",
+     "The plug-in adds its own questions, like who meets the clinician."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-63",
+    "does": "If Alex named a health plan before the times, Sam checks it here. The time is saved and the secure page is open, so Alex can get texts. Most patients name one."
+   },
+   {
+    "op": "words",
+    "at": "B6-03",
+    "more": [
+     "Here it books right away: it isn't for today, and the price is from the list or already OK'd.",
+     "A job sent now would go first to the clinician on call, with no window. Only a booking marked sent now, at the pick, comes here.",
+     "A job sent now skips Sam's same-day OK. The on-call clinician's yes books it, as Sam set with the on-call list. Sam sees it on Today."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-15",
+    "more": [
+     "The word CANCEL also means 'stop texting me', never 'cancel my visit'.",
+     "To cancel the visit, Alex taps Cancel the visit, or calls.",
+     "With no code, Felipe texts DONE when the job is finished.",
+     "A self-pay bill goes by email, or on the pay page on Felipe's phone."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "STOP"
+     ],
+     [
+      "san",
+      "cust",
+      "You won't get more texts from Rosie for Lee Home Visits. Your visit stays booked."
+     ],
+     [
+      "san",
+      "staff",
+      "A.M. opted out of texts. The visit stays. Call A.M. instead of texting when you head over."
+     ],
+     [
+      "san",
+      "owner",
+      "A.M. opted out of texts. The Thu 8–10am visit stands. For any change, call A.M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-27",
+    "say": [
+     [
+      "cust",
+      "san",
+      "My ride home is running late. I'll be home 30 minutes late, sorry!"
+     ],
+     [
+      "san",
+      "cust",
+      "Felipe can come 30 minutes later if the next visit allows, or you can pick another time.",
+      {
+       "buttons": [
+        "Come later",
+        "Another time"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-19",
+    "does": "Most jobs have a price before the visit. Every house call has its price before the visit."
+   },
+   {
+    "op": "words",
+    "at": "B8-24",
+    "does": "Felipe draws the blood. A right to cancel goes in writing only where the state's rules give one for care sold at the home. Care already given isn't undone.",
+    "more": [
+     "Here, the plug-in's rules give none, so no notice goes.",
+     "The lab bills its own test, outside this visit's bill.",
+     "Felipe also tells Alex what was added, in person."
+    ],
+    "say": []
+   },
+   {
+    "op": "words",
+    "at": "B8-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "No problem. The $95 price is good for 7 days.",
+      {
+       "card": {
+        "title": "Added care · $95",
+        "lines": [
+         "Good until Thu Oct 29"
+        ],
+        "button": "Book it",
+        "link": "rosfield.com/q/r4v"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-26",
+    "say": [
+     [
+      "san",
+      "staff",
+      "A.M.'s page is open on your phone. Hand it to Alex to choose.",
+      {
+       "card": {
+        "title": "Added care · $95",
+        "lines": [
+         "For Alex to tap: yes, no, or cancel"
+        ],
+        "button": "Open Alex's page",
+        "link": "rosfield.com/q/r4v"
+       }
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Copy: at 8:52am on Felipe's phone, you said yes to the added care for $95."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE getting supplies from the van, back 9:30"
+     ],
+     [
+      "san",
+      "cust",
+      "Felipe went to the van for supplies and will be back about 9:30am. The visit should be done by 10am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "does": "The visit is done. Felipe texts DONE with the total and its lines, so Rosie can text the bill.",
+    "more": [
+     "DONE is the word a worker texts when the job is finished."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 179 house call"
+     ],
+     [
+      "san",
+      "staff",
+      "Done: A.M., Thu 8–10am. Sending the bill."
+     ]
+    ],
+    "t": "Thu Oct 22, 9:20am"
+   },
+   {
+    "op": "words",
+    "at": "B9-19",
+    "does": "Before the bill goes out: each branch is one more thing a bill can carry. Most show only for the money choices that use them."
+   },
+   {
+    "op": "words",
+    "at": "B9-05",
+    "more": [
+     "A bill that matches the list or an OK'd quote never needs an OK.",
+     "Extra care Alex said yes to is added as its own line, like the $95 blood draw.",
+     "A different total over Sam's $500 goes to Sam first. Felipe can leave while it waits.",
+     "No answer from Sam in 30 minutes: Alex is told it's with the owner."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "A.M.: $179 for the visit. Sending A.M. the bill.",
+      {
+       "buttons": [
+        "Change it"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-10",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Home Visits refunded your $179.",
+      {
+       "card": {
+        "title": "Refund · $179",
+        "lines": [
+         "Visit · Thu Oct 22",
+         "Back on your card in 5 to 10 days"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can Felipe come back for a follow-up next week?"
+     ],
+     [
+      "san",
+      "cust",
+      "Sure. Here are Felipe's next times:",
+      {
+       "times": [
+        "Tue Nov 24 · arriving 8–10am · Felipe",
+        "Wed Nov 25 · arriving 10am–12pm · Felipe"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-17",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Please send me a copy of my records."
+     ],
+     [
+      "san",
+      "cust",
+      "Here's your Lee Home Visits record, on a secure page.",
+      {
+       "card": {
+        "title": "Your records",
+        "lines": [
+         "Bookings and payments · medical records come from the office"
+        ],
+        "button": "Open",
+        "link": "rosfield.com/v/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Allergy Care",
+          "6 bookings"
+         ],
+         [
+          "Lee Home Visits",
+          "3 visits · Felipe 2, Gina 1"
+         ],
+         [
+          "Waiting on you",
+          "N.S.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-19",
+    "does": "Say nobody answers all day. Each request is declined politely at 4 hours, and nothing is charged. Sam gets one text at the start of Sam's next text hours.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Yesterday, nobody answered for Lee Home Visits.",
+      {
+       "list": {
+        "plain": true,
+        "rows": [
+         [
+          "2 requests",
+          "Declined at 4 hours"
+         ],
+         [
+          "1 day-off ask",
+          "Still waiting on you"
+         ]
+        ]
+       },
+       "buttons": [
+        "See them",
+        "Set up AWAY"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Hi Sam, it's Rosie, recording as always. One request waits for Lee Home Visits. It's a house call today, arriving 3 to 5pm, with Felipe, at $179. Accept it?"
+     ],
+     [
+      "owner",
+      "san",
+      "Yeah, take it."
+     ],
+     [
+      "san",
+      "owner",
+      "Reading it back: accept the house call for today, arriving 3 to 5pm, with Felipe. Say yes to go ahead."
+     ],
+     [
+      "owner",
+      "san",
+      "Yes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-41",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Today, Fri Oct 23, for each business:",
+      {
+       "list": {
+        "head": [
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Allergy Care",
+          "1 missed visit · 1 fee question for you · first tomorrow: 10:00am"
+         ],
+         [
+          "Lee Home Visits",
+          "1 missed visit · nothing waits on you · next visit: Mon 8 to 10am, Felipe"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-43",
+    "does": "Rosie checks the day, finds the visits it touches, and pauses new ones for Gina that day.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OFF Fri Oct 30",
+      {
+       "as": "Gina"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Off all day Fri Oct 30: that touches 3 visits. I've asked Sam.",
+      {
+       "as": "Gina"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-44",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Gina asks for Fri Oct 30 off, all day. 3 visits that day.",
+      {
+       "buttons": [
+        "OK",
+        "Say no"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-79",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Still waiting on you: Gina asks for Fri Oct 30 off, all day. 3 visits that day.",
+      {
+       "buttons": [
+        "OK",
+        "Say no"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-47",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Gina's Fri Oct 30 is sorted.",
+      {
+       "card": {
+        "title": "Fri Oct 30 · Gina off",
+        "lines": [
+         "3 visits that day",
+         "2 moved to Felipe, 1 cancelled with no fee",
+         "Nothing waiting on you"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-46",
+    "does": "Gina's day is blocked, and each patient picks. A cancel is free, and anything paid is refunded. Nobody new comes into the home without the patient's yes: with no reply in 24 hours, Sam is asked to call.",
+    "more": [
+     "Only someone the plug-in allows for that visit stands in, at the same price or lower.",
+     "A higher price needs the customer's yes, so Sam would call instead.",
+     "A STOP keeps the booking as it is, and Sam calls.",
+     "Where the plug-in keeps service names private, the text gives only the business, the date, the time and the place."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-76",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Home Visits is off Rosie. Its records stay 7 years, then they're deleted. Its Stripe account stays yours."
+     ],
+     [
+      "san",
+      "staff",
+      "Lee Home Visits has left Rosie, so this is our last text. Ask Sam about your visits.",
+      {
+       "as": "Felipe"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Home Visits. Your booking wasn't finished, so nothing was booked or charged. To finish it, use this link.",
+      {
+       "card": {
+        "title": "Lee Home Visits · house calls",
+        "lines": [
+         "Open times are on the page"
+        ],
+        "button": "Finish booking",
+        "link": "rosfield.com/c/ns"
+       },
+       "stop": true,
+       "as": "Nora S."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 visits at Lee Home Visits this week under different names, and nobody was home for any of them. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-28",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Home Visits can't take this booking online today. Please call (555) 010-0142."
+     ],
+     [
+      "san",
+      "owner",
+      "Flag: one address tried to book more visits today than the plug-in allows. Nothing was booked. Rosie's team will check it within 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-26",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Lee Home Visits: your card was charged twice for the same payment. The second charge is refunded.",
+      {
+       "card": {
+        "title": "Refund · $179",
+        "lines": [
+         "Lee Home Visits · charged twice",
+         "Your bank may take 5 to 10 business days to show it"
+        ]
+       },
+       "as": "Nora S."
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "N.S.'s $179 bill was charged twice. The second charge is refunded, and N.S. is told."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B9-08",
+    "say": [
+     [
+      "san",
+      "staff",
+      "A.M.'s pay page is open on your phone. Hand it to Alex to pay.",
+      {
+       "card": {
+        "title": "A.M.'s pay page",
+        "lines": [
+         "Lee Home Visits · Thu Oct 22"
+        ],
+        "button": "Open",
+        "link": "rosfield.com/p/r4"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "Where the state's rules give a cancel period for something sold at the home, Alex could cancel it. Care given at the visit has none, so nothing waits here.",
+    "more": [
+     "Where a state's rules do give one, the plug-in's switch turns it on, and the refund follows those rules.",
+     "Here, the visit goes on with nothing to wait for."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now money. When patients book, do you take anything? Each service starts the way most house call practices set it. Send only what's different, by letter.",
+      {
+       "card": {
+        "title": "Every house call service, to start",
+        "lines": [
+         "Where: at the patient's home",
+         "When they book: nothing taken",
+         "After the visit: Rosie texts a self-pay patient the bill"
+        ]
+       },
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "House call",
+          "$179 self-pay"
+         ],
+         [
+          "Follow-up house call",
+          "$89 self-pay"
+         ],
+         [
+          "Home blood draw",
+          "$95 self-pay"
+         ]
+        ]
+       },
+       "buttons": [
+        "Right for all of them",
+        "No money through us"
+       ]
+      }
+     ]
+    ],
+    "vary": {
+     "before:none+after:own": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "After a visit, I bill the plan my own way"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Nothing is taken when patients book. After the visit, you bill them your own way.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, every visit is billed Sam's own way."
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [
+       [
+        "owner",
+        "san",
+        "Right for all of them"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Nothing is taken when patients book. After the visit, Rosie texts a self-pay patient the bill.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ],
+      "addMore": [
+       "On this path, a self-pay patient gets Rosfield's bill after DONE."
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "Yes, a rating is asked",
+    "why": "Health care is sensitive work: no rating request (S13-22)."
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "A4-80",
+   "A7-15",
+   "A8-02",
+   "S1-60",
+   "S2-28"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "notes": "From: primary-care (refitted R01 on the REDESIGN 2 master): an allergy office runs the same way as a family practice (visits of a set length by name, the owner OKs each new patient, health forms only on the secure page, the front desk checks each plan by hand, nothing taken at booking, the copay at the desk, the nurse line for urgent signs, no same-day sick times, video only where the owner says the allergist may treat, a stand-in only with the patient's yes, the $2 per booking as every profession (D97)). Changed: children 5 to 17 may be booked by a parent (children fact on; under 5 not booked; a teen never alone); allergy shots only at the office, with a 30-minute wait after each (the shot visit is 40 minutes) and never paid up front; skin tests are the work's own visit; no shot at home. Danger words cover breathing, throat, lips and face, and a bad reaction after a shot: 911, no booking. Licenses optional, never checked (D96). Prices are the example office's own (new patient $230, skin tests $185, shot visit $35, follow-up $125, video follow-up $95, child's visit $150; house call $179, $199 when Sam goes; follow-up house call $89; home blood draw $95); the copay ($30) is an example. Money paths as cardiology.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Lee Plumbing",
+    "like Alex's employer for a staff cut.",
+    "My employer pays for this cut.",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Color quotes come to you first. Board prices never need one",
+    "Color always stays with Riley.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Signature cut and hot towel shave",
+    "Haircuts at the shop work like this:",
+    "A $35 haircut can work this way.",
+    "Haircut · $35",
+    "A tip at the chair is the shop's own way. Rosie never asks for one.",
+    "a $20 fee ($40 for the Groom's package)",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "doesn't do perms.",
+    "Can I add a beard trim on Saturday?",
+    "Add a beard trim to your Sat 11:00am visit?",
+    "Add a beard trim today?",
+    "Beard trim · $20",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Haircuts",
+    "haircuts",
+    "massage",
+    "Massage",
+    "Hugo",
+    "1200 Main St",
+    "Beard trim",
+    "Kids cut",
+    "kids cut",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a haircut and a beard trim",
+    "price board",
+    "shop's board",
+    "like a burst pipe or a lockout",
+    "Lena",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "plumbing and electrical",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "groom's party",
+    "skin fade",
+    "Skin fade",
+    "beard trim",
+    "Groom's package",
+    "Signature cut and shave",
+    "haircut",
+    "Haircut",
+    "shops",
+    "shop",
+    "Shop",
+    "priced at the chair",
+    "Priced at the chair",
+    "is at the chair",
+    "at the chair",
+    "At the chair",
+    "Barber",
+    "barber"
+   ],
+   "B": [
+    "Lee Plumbing",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "The shop's chair is in the other flow.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "like a chair renter",
+    "[6 contact cards] Jordan and Casey do plumbing; Jordan does electrical too, at $140 an hour. Riley and Avery cut hair; Riley also does color and house calls. Pat is my office manager, for prices over $500. Jules rents a chair, with their own customers.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Like tapping a neighbor's water line without asking.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Classic cuts, fades and hot towel shaves.",
+    "barbershops",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Lee Home Services can clear the drain:",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Please clear the cabinet under the sink.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "Can I run the dishwasher before you come?",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Replace both shutoff valves · $160",
+    "you said yes to replacing both shutoff valves for $160.",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "replace both shutoff valves, $160.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Jordan left a mess under the sink.",
+    "I found water damage under the sink this morning.",
+    "asked overnight for a drain clearing today.",
+    "service call fee",
+    "Service call fee",
+    "would like to talk about the water heater quote before booking.",
+    "Kitchen drain clearing $179 ($199 from Nov 2) · Water heater flush $150",
+    "heating and cooling",
+    "Heating and cooling",
+    "Water heater flush",
+    "Water heater replacement",
+    "Water heater fix",
+    "Leak repair",
+    "leak repair",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "water heater",
+    "Water heater",
+    "like a burst pipe or a lockout",
+    "CANT START no proof Alex may have this work done",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "The work never started, so there's no $2.",
+    "Lee Home Services'",
+    "Lee's Barbershop",
+    "Lee Home Services",
+    "plumbing and electrical",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "electrical",
+    "Electrical",
+    "plumber",
+    "Plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "beard trim",
+    "haircut",
+    "Haircut",
+    "shop",
+    "Shop",
+    "Which home warranty plan should pay?",
+    "Willow Home Warranty, the basic plan.",
+    "home warranty plan",
+    "A plan or warranty pays",
+    "DONE 179 drain",
+    "service call",
+    "Sewer camera inspection",
+    "at the chair",
+    "Barber",
+    "barber"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "A10-21": "08514557c8",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A4-28": "c8e677520c",
+   "A5-01": "6c5c5c2f87",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A10-05": "63c3536c7a",
+   "A10-45": "855be6050a",
+   "A10-44": "50aad85ac2",
+   "A10-06": "a9f01f141d",
+   "A8-03": "7accda6f86",
+   "A10-22": "c891ad7af1",
+   "A6-04": "fe10e3d360",
+   "A7-14": "6a57738a17",
+   "A7-19": "850f8173d8",
+   "A8-04": "8caf7636f3",
+   "A8-05": "bcf176bdb3",
+   "A8-08": "3662e9ea04",
+   "A8-16": "90a6202deb",
+   "A10-04": "a716e16e38",
+   "A10-13": "b06dc7e545",
+   "A10-27": "a4118d32ac",
+   "S11-54": "ce20fc799b",
+   "S11-56": "bd841a4732",
+   "A3-02": "223044a79d",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A4-01": "7e7a61082c",
+   "A4-34": "9f322d96aa",
+   "A4-24": "0a292df05b",
+   "A4-25": "e9a8fd4868",
+   "A4-37": "4ee9e74e71",
+   "A4-65": "fa7ec0389d",
+   "A4-64": "b98f95b738",
+   "A5-02": "46a4789cda",
+   "A7-18": "b98d7c1744",
+   "A8-02": "15f418fec4",
+   "A8-23": "e3a35f7f9e",
+   "A8-35": "a67e890a5b",
+   "A8-38": "5e48b74f3a",
+   "A9-03": "219c966588",
+   "A9-20": "0cfe0e1776",
+   "S1-24": "176a7adc28",
+   "S1-43": "e16d5048f3",
+   "S1-50": "3167049ceb",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-31": "320ac5e4cb",
+   "S2-24": "0acce38d9e",
+   "S13-17": "4857a9f772",
+   "A3-07": "6b005cf195",
+   "A3-12": "d473270a08",
+   "A3-14": "e9a30c1b15",
+   "A3-22": "0057d8fc9f",
+   "A3-26": "9e3630dc0b",
+   "A3-27": "42786e5f80",
+   "A4-02": "433e3cd172",
+   "A4-36": "f261af1660",
+   "A4-32": "d5a284a416",
+   "A4-53": "55eb876b45",
+   "A4-06": "e9e9bb848b",
+   "A4-16": "753b207e16",
+   "A4-23": "9f76d7b6f5",
+   "A4-41": "15813954ee",
+   "A5-07": "f0028a1760",
+   "A6-01": "df3c5778ea",
+   "A8-51": "71142aa1fa",
+   "A8-43": "7b0f73c701",
+   "A10-20": "f082cec9f8",
+   "S11-02": "d0b2cf9f6c",
+   "S11-19": "65910a6777",
+   "S11-23": "03ef5e8d86",
+   "S11-35": "3c96cb8869",
+   "S11-38": "1fd6962e5d",
+   "S11-41": "24e7a5a9a4",
+   "S12-26": "7b7e6af034",
+   "A4-26": "add3e44476",
+   "A7-74": "b3ec278ce4",
+   "S1-13": "eca22651fd",
+   "S1-78": "240d450c92",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "B8-03": "ac9d404766",
+   "B9-17": "24b5acdf89",
+   "B10-17": "b5f4aef51b",
+   "B4-16": "37cd99137d",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-43": "fc9855955a",
+   "B5-34": "917f89b62f",
+   "B5-01": "841c417586",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B6-03": "dcc1eb310c",
+   "B10-05": "a326ea3c0b",
+   "B3-25": "4413e58bcb",
+   "B6-06": "1d676278da",
+   "B8-04": "6c9782920d",
+   "B8-05": "90f94e0f1e",
+   "B8-12": "7e627afb46",
+   "B9-09": "832947585f",
+   "B10-04": "b25044fa47",
+   "B10-09": "b0bde2b7fe",
+   "B10-12": "ded576c8bc",
+   "B10-23": "eea2f1cde7",
+   "S11-54": "f2d479cd60",
+   "S11-56": "8b6c6c101f",
+   "S2-06": "b78d25d6e2",
+   "B3-02": "74ad1f98f2",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B4-04": "df3ea4b2f5",
+   "B4-05": "fb3a9061c8",
+   "B4-46": "cac59291a3",
+   "B4-48": "8a955b9849",
+   "B4-27": "4b45128d2c",
+   "B4-28": "506d267aaf",
+   "B4-69": "350fbaf90a",
+   "B4-74": "bae5529af9",
+   "B7-17": "ac1fd212f3",
+   "B7-20": "364245afef",
+   "B8-18": "530038d2b8",
+   "B8-30": "a1ef4983e4",
+   "B10-18": "3d7ba16539",
+   "B7-22": "c8a4abe80b",
+   "S1-24": "176a7adc28",
+   "S1-43": "dd3ae2a1a9",
+   "S1-50": "daa9091585",
+   "S2-05": "5051cc07a8",
+   "S2-31": "320ac5e4cb",
+   "S2-24": "593cd0d5cf",
+   "S13-17": "a26ea543f1",
+   "S2-07": "50e4eaaf3a",
+   "S2-08": "602012fc1b",
+   "B3-01": "06b59bb8f3",
+   "B3-11": "e459daf83c",
+   "B3-13": "7427fd216d",
+   "B3-04": "31447caa31",
+   "B3-24": "a31b436ff1",
+   "B3-21": "ad48326ac5",
+   "B4-03": "1126d68737",
+   "B4-77": "67ff953065",
+   "B4-31": "9100d39354",
+   "B4-62": "9769228e39",
+   "B4-21": "7884d5cacd",
+   "B4-23": "3bbc0f30df",
+   "B4-25": "004f66a272",
+   "B4-34": "74ff52d83d",
+   "B4-63": "49ce39c037",
+   "B7-15": "a00f0c64fb",
+   "B7-27": "0f5f9883ff",
+   "B8-19": "11e79a26d8",
+   "B8-24": "bd5fb0ef0b",
+   "B8-25": "3f7d0c2f58",
+   "B8-26": "056ea7b435",
+   "B8-32": "1cfd4f7afa",
+   "B8-41": "6e8e9825b2",
+   "B9-05": "6cbce323ed",
+   "B10-10": "30b382ad47",
+   "B10-16": "c7a47a391c",
+   "S11-02": "b5be5f9aa7",
+   "S11-19": "1efef7e356",
+   "S11-38": "58d27fc71e",
+   "S11-41": "b9894f01ce",
+   "S11-43": "5590dd350b",
+   "S11-44": "6836975dd7",
+   "S11-79": "dda2a4de6b",
+   "S11-47": "205e7f8256",
+   "S11-46": "ed17f66a63",
+   "S11-76": "47a5d0c63e",
+   "S12-04": "6892dde8c1",
+   "S12-24": "7514a15e65",
+   "S12-28": "6e7a9bf25f",
+   "S12-26": "8368479b9d",
+   "B9-08": "40919b5ca4",
+   "S1-13": "6964bfbe60",
+   "B10-32": "7713bff255"
+  }
+ }
+}

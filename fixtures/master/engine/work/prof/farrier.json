@@ -1,0 +1,6011 @@
+{
+ "id": "farrier",
+ "name": "Farrier",
+ "style": "Set service",
+ "pattern": "service",
+ "from": "groomer",
+ "plugin": {
+  "pf.license": {
+   "need": "Usually none: most places license neither farriers nor horse shoeing. A farrier may hold a voluntary certification, which shows only as the business's own word. A city or county may ask for a business license. The state's or city's form says which.",
+   "ask": "The business registration or local business license number, where the form asks for one.",
+   "who_holds": "The business. A certification, where a farrier has one, is that farrier's own word.",
+   "check": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks_live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "insurance_bond": "Liability insurance that covers horses in the farrier's care is shown as given by the business, not checked by Rosie.",
+   "background_checks": "Only where the state's rules require them, or as the business's own word.",
+   "not_this_work": "Sedation, vet care, hoof surgery, horse training, boarding and teeth floating are other kinds of work, with their own plug-ins."
+  },
+  "pf.services": {
+   "pattern": "Set service: a farrier comes to the customer's barn on a set day, usually every 6 to 8 weeks, and the owner or a handler holds the horse. A horse can also be trailered to the farrier's shop, where the owner stays with it.",
+   "list": [
+    {
+     "name": "Hoof check, new horse",
+     "price_kind": "free",
+     "length": "15 minutes",
+     "where": "at the barn, with the owner or a handler there",
+     "money": "nothing taken",
+     "note": "The farrier looks at how the horse stands and at the hooves before any work. A shop visit with a hoof evaluation is $25 when it leads to corrective work."
+    },
+    {
+     "name": "Trim, 4 feet",
+     "price_kind": "one price",
+     "example": "$65 at the barn, $35 at the shop (the example business's own prices)",
+     "length": "about 30 minutes",
+     "where": "at the customer's barn, or at the shop",
+     "money": "barn: a card saved, charged at DONE; shop: a card saved, paid at the counter"
+    },
+    {
+     "name": "Full set of shoes, 4 feet",
+     "price_kind": "one price",
+     "example": "$179 at the barn, $140 at the shop",
+     "length": "about 60 to 90 minutes",
+     "where": "at the customer's barn, or at the shop",
+     "money": "barn: a card saved for the trip fee, charged at DONE; shop: a card saved, paid at the counter"
+    },
+    {
+     "name": "Front shoes, 2 feet",
+     "price_kind": "one price",
+     "example": "$55 at the shop",
+     "where": "at the shop"
+    },
+    {
+     "name": "Pull shoes, 4 feet",
+     "price_kind": "one price",
+     "example": "$20 at the shop"
+    },
+    {
+     "name": "Foal or yearling trim",
+     "price_kind": "one price",
+     "example": "$25 at the shop"
+    },
+    {
+     "name": "Trim with wall repair",
+     "price_kind": "one price",
+     "example": "$40 at the shop"
+    },
+    {
+     "name": "Hoof pads",
+     "price_kind": "per hoof, added to a visit",
+     "example": "$20 a hoof, only after the customer's yes"
+    },
+    {
+     "name": "Reset a thrown shoe, one foot",
+     "price_kind": "one price",
+     "example": "$45 at the barn. A shoe that comes off within 7 days of a visit is reset free."
+    },
+    {
+     "name": "Corrective or therapeutic shoeing",
+     "price_kind": "priced after the farrier looks",
+     "example": "therapeutic shoes (egg bar, wedge) from $199; only the trip fee ($50 at the barn) or the $25 hoof evaluation (at the shop) is promised until the owner says yes",
+     "where": "at the barn, or at the shop",
+     "money": "a card saved; charged at DONE (barn) or paid at the counter (shop)",
+     "note": "Often follows a vet's written plan. Only the lead farrier does it."
+    },
+    {
+     "name": "Late cancel or no-show",
+     "price_kind": "a fee, never more than the visit's own price",
+     "example": "up to $50 at the barn and $20 at the shop, only if the owner confirms it",
+     "where": "not booked alone"
+    }
+   ],
+   "capacity": "One farrier does about 6 horses a day. Up to 4 horses of one owner go on one booking; a bigger barn is booked as more visits. The shop works on 3 horses a day in two bays.",
+   "nobody_home": "No. The owner or an adult handler stays with the horse for the whole visit. A child alone never holds a horse.",
+   "online": "No.",
+   "not_offered": "Sedation or any vet care, horse training, boarding and teeth floating (other work). A horse that can't be caught or held safely isn't worked on until a handler is there or a vet has sedated it."
+  },
+  "pf.questions": {
+   "before_times": [
+    "How many horses, their ages, and about how much each weighs",
+    "Has any horse ever kicked, bitten or struck at a person? (a yes sends the request to the owner first)",
+    "Shod or barefoot now, and what's needed: a trim, new shoes, a reset, or something corrective",
+    "How long since the last visit, and any lameness or a crack the owner knows about",
+    "The barn: a private barn, a boarding stable or a field, and a covered, level, dry place to work"
+   ],
+   "after_a_time": [
+    "Who holds the horse, and does the horse stand well?",
+    "Will the horse be caught and clean, in the cross-ties or a stall?",
+    "Water and shade nearby, and where the truck can park",
+    "A vet's order for shoes or pads, if there is one",
+    "Other horses or dogs near the work area"
+   ],
+   "secure_page_only": [
+    "The gate or barn code, and where a key is kept",
+    "The vet's name and phone, an emergency contact, and the vet-care OK with a spending limit",
+    "The vet's written plan for corrective or therapeutic shoeing",
+    "The horse's health conditions and medicines"
+   ],
+   "who_may_book": "An adult (18 or older) who owns the horse or leases it with the owner's OK. A barn manager books for a boarder only with the owner's OK. Nobody under 18 books, and a teen holds a horse only with an adult at the barn."
+  },
+  "pf.safety": {
+   "words": [
+    "a horse that is hurt, bleeding badly, down, in colic pain or can't put weight on a leg, right now",
+    "a person kicked, stepped on or bitten and hurt",
+    "a horse loose on a road or lost right now",
+    "a horse with hot, painful hooves that won't walk",
+    "a horse that can't be held safely"
+   ],
+   "what_happens": [
+    "A horse hurt, down, in colic pain or unable to bear weight now: Rosie can't judge how sick a horse is. It says to call the vet, or an emergency equine vet, now. No booking until the horse is safe.",
+    "A person hurt: call 911 first.",
+    "A horse loose now: Rosie gives the business's number to call, and tells the owner at once.",
+    "Hot, painful hooves that won't walk: no trimming or shoeing until a vet has seen the horse. The vet's written plan then goes on the secure page.",
+    "A horse that can't be held safely: no work until a handler is there or a vet has sedated it. The farrier can stop at any time."
+   ],
+   "booking_goes_on": "No, for an emergency now or for hot, painful hooves. Yes, after the owner's OK, for a horse that has kicked or bitten. Yes with a handler or a vet's sedation, for a horse that can't be held."
+  },
+  "pf.first_steps": {
+   "hoof_check": "No separate meeting. A new horse's first visit starts with a free 15-minute hoof check at the barn: the farrier looks at how the horse stands and at the hooves before any work.",
+   "forms": "On the secure page, before the first visit: a handling release (the owner answers for how the horse is handled; horses can be unpredictable), an emergency contact, and a vet-care OK with a spending limit the customer sets (the example: up to $500).",
+   "plan": "A 6-week plan gets its own yes after the first visit, and its terms are texted back. If the first check shows the horse needs a vet first, the plan waits and nothing is charged.",
+   "prep_for_reminder": [
+    "Catch and clean the horse, and bring it to the work area",
+    "Have a handler there to hold the horse",
+    "Keep other horses and dogs away from the work area",
+    "Put the gate code on the secure page, never in a text"
+   ]
+  },
+  "pf.visit": {
+   "check_in": "At the barn: the owner or handler gives the check-in code to the farrier at the work area. At the shop: the code is given at the shoeing bay. DONE with a photo of the finished hooves confirms the visit.",
+   "entry_codes": "Gate or barn codes are shown only to the farrier on the job, on the visit day. Each use is logged. Deleted 72 hours after the plan ends.",
+   "handler": "The owner or an adult handler stays with the horse for the whole visit. A child alone doesn't hold a horse. If nobody is there, the farrier waits 15 minutes, then leaves, and the owner decides any fee.",
+   "visit_report": "The work done, the shoe sizes, hoof notes for next time, and a photo.",
+   "changes_at_visit": "Pads, a wall repair or an extra horse only when the customer says yes first, priced from the list. It is paid with the visit.",
+   "proof_done": "DONE with the work done and a photo of the finished hooves.",
+   "weather": "Lightning, heavy rain, ice or heat over the owner's limit: the work moves to a covered area or to another day, no fee."
+  },
+  "pf.money": {
+   "start": "Barn calls: a card saved for the trip fee at booking, and the visit charged to it at DONE. Sam can send a bill after the visit instead, for barns that pay by link, or take nothing for a known barn. Corrective shoeing is priced after the farrier looks: only the trip fee is promised, the farrier quotes at the barn, the owner says yes, and the card is charged at DONE. At the shop: a card saved for the late-cancel fee, paid at the counter after. The hoof check for a new horse is free.",
+   "deposits": "None. Nothing is held for a visit.",
+   "fees": "A late cancel (the example: inside 24 hours) or a no-show: up to $50 at the barn and $20 at the shop, only if the owner confirms. No answer, no fee. With no handler, the farrier waits 15 minutes, then leaves; the owner decides any fee. A change the business makes never costs the customer.",
+   "plans": "Each plan visit is charged at its own DONE, or billed after by text. Rosfield's $2 counts once a month for a plan.",
+   "tips": "Optional, all to the farrier. A tip line only if the owner turns it on.",
+   "tax": "A sales tax line only where the state taxes farrier services, from the state form.",
+   "rosfield_fee": "The usual $2 per confirmed booking, once a month for a plan."
+  },
+  "pf.messages": {
+   "never_in_texts": [
+    "Gate, barn and tack-room codes",
+    "Where a key is kept",
+    "A horse's health conditions, medicines and vet records",
+    "The vet-care spending limit"
+   ],
+   "photos": "Visit photos go only to the customer and the business. They show the hooves and the horse, never people or the barn's address. They are shown to others only with the customer's yes.",
+   "urgent": "A person kicked, a horse loose or a horse hurt at a visit: the owner and the customer are told at once, at any hour. Rosie then steps back, and never admits fault or offers money.",
+   "languages": "English and Spanish.",
+   "minors": "Nobody under 18 books. A teen at the barn isn't the booking's adult."
+  },
+  "pf.staff": {
+   "skills": [
+    "Trims and steel shoes",
+    "Corrective and therapeutic shoeing (lead farrier only)",
+    "Hot shoeing and custom shoes at the forge",
+    "Young and nervous horses",
+    "Barn calls in the truck"
+   ],
+   "licenses": "None per person unless the state's form says so. A certification is the farrier's own word.",
+   "new_person_ok": "A farrier the customer hasn't met works only after the customer's OK by reply, or after the owner calls them. No answer: the owner calls first, or the visit is skipped with no charge.",
+   "ratio": "One farrier at each horse. An apprentice works only while the lead farrier is on the job.",
+   "who_oks": "The owner OKs a horse with a kicking history, every fee, every refund and every corrective shoeing price. The office manager may OK prices over the limit; the owner's answer wins."
+  },
+  "pf.rules": {
+   "plans": [
+    "The plan's terms show before any card is asked: the day and window, the price a visit, when it's charged, skip and weather terms, that it runs until ended, and how to end it.",
+    "The plan gets its own yes, apart from the booking, and the terms are texted back.",
+    "One reply ends it.",
+    "A price change is told 30 days ahead, or more where the state's rules ask.",
+    "Once a year, the terms and how to end the plan are texted again (the business's own rule), plus any reminder the state's rules require."
+   ],
+   "agreement": "A signed handling release and vet-care OK before the first visit (the business's own rule).",
+   "free_reset": "A shoe that comes off within 7 days of a visit is reset free, with the owner's OK (the business's own rule).",
+   "local_rules": "Trailer, barn and animal transport rules, as the state's form sets them.",
+   "records": "3 years, with the shoeing notes and anything that happened at a visit (the business's own rule)."
+  },
+  "pf.edges": {
+   "matter_most": [
+    "A horse kicks or hurts a person: help and 911 first; the owner and Sam are told at once. Rosie never admits fault or offers money.",
+    "A horse that can't be held: no work until a handler is there or a vet has sedated it; the owner decides any fee.",
+    "Hot, painful hooves found at a visit: the farrier stops, a vet comes first, and the owner gets a written note.",
+    "A shoe thrown within 7 days of a visit: a free re-set visit that Sam OKs.",
+    "A horse loose at the barn: the owner and Sam are told at once.",
+    "A farrier is out: someone the customer hasn't met works only after the customer's OK. No reply: the owner calls first, or a free skip.",
+    "Weather day: lightning, heavy rain, ice or heat moves the work to a covered area or another day, or a free skip.",
+    "Pads, a wall repair or an extra horse found at the visit: price and a yes first, paid with the visit.",
+    "Skip, pause or end a plan. A skip after the cutoff may be charged, only if the owner confirms.",
+    "An apprentice works only while the lead farrier is on the job."
+   ],
+   "rest": "All other edge cases are handled the generic way."
+  },
+  "pf.facts": [
+   "animals",
+   "plans",
+   "forms",
+   "extrawork"
+  ],
+  "pf.switches": {},
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   }
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Rowan and Cass (shop farriers)",
+   "cust": "Alex M. (customer, with Dusty) · other customers"
+  },
+  "B": {
+   "staff": "Tate and Wren (farriers)",
+   "cust": "Alex M. (customer, with Juniper) · other customers"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Rowan"
+  },
+  "B": {
+   "staff": "Tate"
+  }
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex trailers Dusty, a gelding, to Lee Forge Shop at 40 Anvil Rd for a trim with Rowan, Sat Oct 24 at 11:00am. Alex stays with Dusty in the bay and pays at the counter. The money depends on the choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Mobile Farrier for Juniper, a quarter horse mare, at 6 Pasture Ln: a full set of shoes with Tate on Thu Oct 22, arriving 8 to 10am, with Alex there to hold her. The money depends on the choice you pick."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 trim for Dusty at the shop. A card is saved for the shop's $20 late-cancel and no-show fee. Alex pays at the counter after the trim.",
+    "list|none|counter": "The same $35 trim for a horse the shop knows. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "visit|card|counter": "Corrective shoeing, priced at the shop once Rowan sees the hooves. Only the $25 hoof evaluation is promised. A card is saved for the $20 fee."
+   },
+   "booking": {
+    "times": [
+     "setstart"
+    ]
+   },
+   "labels": {
+    "price": {
+     "visit": "Priced at the shop"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Trim, 4 feet"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Trim, 4 feet"
+    },
+    "visit|*|*": {
+     "name": "Corrective shoeing"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|card|bill",
+    "list|none|bill",
+    "visit|card|card"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a $179 full set of shoes for Juniper at Alex's barn. A card is saved for the $50 trip fee, and charged $179 when Tate texts DONE.",
+    "list|card|bill": "The same $179 set of shoes. A card is saved for the $50 fee. Rosie texts the bill after the visit.",
+    "list|none|bill": "A $65 trim for a barn Sam knows. Nothing is taken. Rosie texts the bill after the visit.",
+    "visit|card|card": "Corrective shoeing, priced at the barn once Tate sees the hooves. Only the $50 trip fee is promised. The card is charged at DONE."
+   },
+   "booking": {
+    "timing": [
+     "settime"
+    ],
+    "times": [
+     "window"
+    ]
+   },
+   "labels": {
+    "price": {
+     "visit": "Priced at the barn"
+    }
+   },
+   "amounts": {
+    "*": {
+     "fee": "$50",
+     "name": "Full set of shoes, 4 feet"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Full set of shoes, 4 feet"
+    },
+    "list|none|*": {
+     "price": "$65",
+     "name": "Trim, 4 feet"
+    },
+    "visit|*|*": {
+     "name": "Corrective shoeing"
+    }
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Farrier work needs no state license; a city may ask for a business license."
+   ],
+   [
+    "please come with dry hair",
+    "please bring Dusty clean and dry"
+   ],
+   [
+    "Step-free door on Elm St · parking in the back",
+    "Level yard on Anvil Rd · trailer parking in the back"
+   ],
+   [
+    "a $20 fee ($40 for the Groom's package)",
+    "a $20 fee"
+   ],
+   [
+    "Style consult",
+    "Hoof and gait check"
+   ],
+   [
+    "a step-free chair",
+    "a step-free ramp"
+   ],
+   [
+    "The chairs",
+    "The shoeing bay"
+   ],
+   [
+    "A chair, ready",
+    "A shoe, ready"
+   ],
+   [
+    "My employer pays for this cut.",
+    "My barn pays for this trim."
+   ],
+   [
+    "a shorter cut",
+    "a shorter trim"
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee's Barbershop. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Forge Shop. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd only call or text for that. Reply YES to agree, or STOP."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood forge shop on Anvil Rd. Trims, steel shoes and corrective shoeing for horses trailered in."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mobile farrier work at barns in Springfield. Trims and shoes at your barn, within 40 miles."
+   ],
+   [
+    "A water heater job",
+    "A set of shoes"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for horse boarding, which isn't on the shop's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Forge Shop doesn't board horses."
+   ],
+   [
+    "Here they OK the $110 color correction and skip the $15 gloss.",
+    "Here they OK the $110 corrective shoeing and skip the $15 pads."
+   ],
+   [
+    "Gloss to finish · $15",
+    "Hoof pads · $15"
+   ],
+   [
+    "The $15 gloss price is good until Sat Oct 31.",
+    "The $15 pads price is good until Sat Oct 31."
+   ],
+   [
+    "No gloss today.",
+    "No pads today."
+   ],
+   [
+    "Could Riley use a toner instead of the gloss?",
+    "Could Rowan use plain shoes instead of the pads?"
+   ],
+   [
+    "Alex M. asks for a toner instead of the gloss.",
+    "Alex M. asks for plain shoes instead of the pads."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7",
+    "Ben T. books a trim for Sat Nov 7"
+   ],
+   [
+    "you now have two skin fades on Sat Nov 7",
+    "you now have two trims on Sat Nov 7"
+   ],
+   [
+    "Color quotes come to you first. Board prices never need one",
+    "Corrective shoeing quotes come to you first. Board prices never need one"
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Rowan: farrier, corrective shoeing, barn calls"
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A new horse's example: 'A first visit needs the vaccine record first. Is it on file at Lee's?'"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Alex books Dusty and a neighbor's two horses for one morning. Rosie finds bays side by side across Rowan and Cass."
+   ],
+   [
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "It's 11:00am, and Alex leads Dusty into the shoeing bay. Alex reads the code from the confirmation or the reminder, and Rowan texts it in."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds pulling the shoes. Rosie finds one time long enough for both, with one farrier, and adds the prices: $35 and $20."
+   ],
+   [
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "Alex M.'s price: $110 corrective shoeing and $15 pads, $125 in all, the $25 hoof evaluation included. It goes to Sam first."
+   ],
+   [
+    "A nothing before, and at their home too, 75, paid when they book. E paid when they book",
+    "A nothing before, and at their barn too, 75, card charged when it's done"
+   ],
+   [
+    "The color correction alone is the $110 starting price, so no choice comes in under it.",
+    "The corrective shoeing alone is the $110 starting price, so no choice comes in under it."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Lee Forge Shop prices corrective shoeing at the shop, once Rowan sees the hooves."
+   ],
+   [
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Alex picked Rowan, so Rowan's next times show. Corrective shoeing always stays with Rowan."
+   ],
+   [
+    "Set. For a haircut, the customer picks the place and sees both prices first.",
+    "Set. For a trim, the customer picks the place and sees both prices first."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A forge shop takes no drop-offs: the horse stays with its handler. A boarding barn or a repair shop does."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A farrier's example: a horse that won't stand gets 'a vet sedates first'."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a car that won't start."
+   ],
+   [
+    "Booking for a pet works the same way, where the plug-in books pets.",
+    "A horse is always booked under its owner, who books, pays and gets the texts."
+   ],
+   [
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "A at their barn too, 75, card charged when it's done"
+   ],
+   [
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "CAN'T START Alex M. The signed handling release this service needs is missing."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "Two horses, like Dusty and a new foal, work the same way."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Dusty: size 1 front shoes, a little long in the toe. Stands well, nervous with clippers."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Trim, 4 feet $35 ($40 from Nov 2) · Trim with wall repair $40 · Pull shoes $20"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "The shop's money terms apply per person, as Sam set them.",
+    "The shop's money terms apply per horse, as Sam set them."
+   ],
+   [
+    "A color correction can't be priced before Riley sees it.",
+    "Corrective shoeing can't be priced before Rowan sees the hooves."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like my horse's hooves trimmed on Saturday."
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The plug-in adds its own danger words, like a horse that's hurt or can't put weight on a leg."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Horse boarding for Lee Forge Shop: is it the same company?"
+   ],
+   [
+    "Riley quotes the rest at the chair, before any work.",
+    "Rowan quotes the rest at the shop, before any work."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "Dusty's hoof crack got longer. Can I still come in?"
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A shoeing is rated, so the shop takes the first branch."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a visit gets the soonest open day."
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book me a trim for my horse at Lee Forge Shop on Saturday."
+   ],
+   [
+    "A service priced at the chair gets its price now.",
+    "A service priced at the shop gets its price now."
+   ],
+   [
+    "the item, its condition and the customer's mobile",
+    "the horse, its condition and the customer's mobile"
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "A forge shop has none, so nothing is sent here."
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May Lee Forge Shop show photos of your horse's hooves? Yes / No"
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 hoof-crack quote."
+   ],
+   [
+    "Alex says yes or no to the quote at the chair.",
+    "Alex says yes or no to the quote at the shop."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today",
+    "says the shoeing bay gate was left unlatched today"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A trim could mean a farrier or a horse trainer."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 check; priced at the shop"
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter, your own way"
+   ],
+   [
+    "quote 110 color correction + 15 gloss Alex M.",
+    "quote 110 corrective shoeing + 15 pads Alex M."
+   ],
+   [
+    "Give this code at the chair when you arrive.",
+    "Give this code at the shoeing bay when you arrive."
+   ],
+   [
+    "Riley's price for Alex M., at the chair now.",
+    "Rowan's price for Alex M., at the shop now."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my daughter hold Dusty during the trim?"
+   ],
+   [
+    "says Saturday's cut is uneven on one side",
+    "says Saturday's trim left one hoof uneven"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every shop service, corrective shoeing and barn calls"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a foal trim (under 1 year) is $25."
+   ],
+   [
+    "Lee's Barbershop will fix it for free.",
+    "Lee Forge Shop will touch it up for free."
+   ],
+   [
+    "Give your check-in code at the chair.",
+    "Give your check-in code at the shoeing bay."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Rowan also does corrective shoeing and barn calls"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The shoeing bay gate was left unlatched."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds horse boarding to Lee Forge Shop."
+   ],
+   [
+    "Haircuts at the shop work like this:",
+    "Trims at the shop work like this:"
+   ],
+   [
+    "A barbershop books a person's time.",
+    "A forge shop books a farrier's time."
+   ],
+   [
+    "Picks it up with the code or an ID",
+    "Hands the horse over with the code or an ID"
+   ],
+   [
+    "A barbershop's services need none.",
+    "A forge shop's services need none."
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a trim every 6 weeks."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do foal trims? Mine is 4 months old."
+   ],
+   [
+    "Books the next visit at the chair",
+    "Books the next visit at the shop"
+   ],
+   [
+    "Color correction $110 · gloss $15",
+    "Corrective shoeing $110 · pads $15"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Front shoes, 2 feet"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's horses together"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "One hoof is uneven after the trim."
+   ],
+   [
+    "Lee's Barbershop · with Riley",
+    "Lee Forge Shop · with Rowan"
+   ],
+   [
+    "barber, color and house calls",
+    "farrier, corrective shoeing and barn calls"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Barn Calls and Lee Forge"
+   ],
+   [
+    "Haircut plan · every 4 weeks",
+    "Trim plan · every 6 weeks"
+   ],
+   [
+    "Give this code at the chair.",
+    "Give this code at the shoeing bay."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Rowan stopped Alex M.'s trim."
+   ],
+   [
+    "Anything added at the chair",
+    "Anything added at the shop"
+   ],
+   [
+    "extra 20 beard trim Alex M.",
+    "extra 20 pull shoes Alex M."
+   ],
+   [
+    "Saturdays · 11:00am · Riley",
+    "Saturdays · 11:00am · Rowan"
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like trims?"
+   ],
+   [
+    "Lee's Barbershop · Haircut",
+    "Lee Forge Shop · Trim"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens in the bay?"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero que le recorten los cascos el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a trim every 6 weeks"
+   ],
+   [
+    "Color correction · $110",
+    "Corrective shoeing · $110"
+   ],
+   [
+    "Color correction · $125",
+    "Corrective shoeing · $125"
+   ],
+   [
+    "Add a beard trim today?",
+    "Pull the shoes today?"
+   ],
+   [
+    "Riley finishes the work",
+    "Rowan finishes the work"
+   ],
+   [
+    "Haircuts work like this",
+    "Trims work like this"
+   ],
+   [
+    "plumbing and electrical",
+    "barn calls and forge work"
+   ],
+   [
+    "Plumbing and electrical",
+    "Barn calls and forge work"
+   ],
+   [
+    "Signature cut and shave",
+    "Front shoes"
+   ],
+   [
+    "A barbershop has none.",
+    "A forge shop has none."
+   ],
+   [
+    "Alex pays at the chair",
+    "Alex pays at the counter"
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s trim."
+   ],
+   [
+    "Walk-in for a haircut",
+    "Walk-in for a trim"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Forge Shop LLC"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the shop"
+   ],
+   [
+    "priced at the chair",
+    "priced at the shop"
+   ],
+   [
+    "photos of your hair",
+    "photos of your horse's hooves"
+   ],
+   [
+    "Color and cut · $90",
+    "Hoof crack repair · $90"
+   ],
+   [
+    "A tip at the chair",
+    "A tip at the counter"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Farrier's"
+   ],
+   [
+    "electrical license",
+    "forge license"
+   ],
+   [
+    "Alex M. · Haircut",
+    "Alex M. · Trim"
+   ],
+   [
+    "paid at the chair",
+    "paid at the counter"
+   ],
+   [
+    "Paid at the chair",
+    "Paid at the counter"
+   ],
+   [
+    "pays at the chair",
+    "pays at the counter"
+   ],
+   [
+    "a package of cuts",
+    "a package of trims"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Farrier"
+   ],
+   [
+    "Beard trim · $20",
+    "Pull shoes · $20"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Forge Shop"
+   ],
+   [
+    "Color correction",
+    "Corrective shoeing"
+   ],
+   [
+    "color correction",
+    "corrective shoeing"
+   ],
+   [
+    "Only the consult",
+    "Only the hoof evaluation"
+   ],
+   [
+    "11:00am · Riley",
+    "11:00am · Rowan"
+   ],
+   [
+    "10:00am · Riley",
+    "10:00am · Rowan"
+   ],
+   [
+    "12:30pm · Avery",
+    "12:30pm · Cass"
+   ],
+   [
+    "11:00am · Avery",
+    "11:00am · Cass"
+   ],
+   [
+    "for a staff cut",
+    "for a stable's staff trim"
+   ],
+   [
+    "Groom's package",
+    "Full set of shoes, 4 feet"
+   ],
+   [
+    "2:00pm · Riley",
+    "2:00pm · Rowan"
+   ],
+   [
+    "3:00pm · Riley",
+    "3:00pm · Rowan"
+   ],
+   [
+    "Haircut · $35",
+    "Trim · $35"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "1 color quote",
+    "1 hoof-crack quote"
+   ],
+   [
+    "signature cut",
+    "front shoes"
+   ],
+   [
+    "Color and cut",
+    "Hoof crack repair"
+   ],
+   [
+    "color and cut",
+    "hoof crack repair"
+   ],
+   [
+    "in the chair",
+    "in the bay"
+   ],
+   [
+    "at the chair",
+    "in the bay"
+   ],
+   [
+    "At the chair",
+    "In the bay"
+   ],
+   [
+    "Consult only",
+    "Hoof evaluation only"
+   ],
+   [
+    "1200 Main St",
+    "3 Forge Ln"
+   ],
+   [
+    "NEW massage",
+    "NEW horse boarding"
+   ],
+   [
+    "barbershops",
+    "forge shops"
+   ],
+   [
+    "$25 consult",
+    "$25 hoof evaluation"
+   ],
+   [
+    "the consult",
+    "the hoof evaluation"
+   ],
+   [
+    "Electrical",
+    "Forge work"
+   ],
+   [
+    "electrical",
+    "forge work"
+   ],
+   [
+    "Barbershop",
+    "Forge shop"
+   ],
+   [
+    "barbershop",
+    "forge shop"
+   ],
+   [
+    "a kids cut",
+    "a foal trim"
+   ],
+   [
+    "Beard trim",
+    "Pull shoes"
+   ],
+   [
+    "beard trim",
+    "pull shoes"
+   ],
+   [
+    "88 Elm St",
+    "40 Anvil Rd"
+   ],
+   [
+    "Skin fade",
+    "Trim with wall repair"
+   ],
+   [
+    "skin fade",
+    "trim with wall repair"
+   ],
+   [
+    "A haircut",
+    "A trim"
+   ],
+   [
+    "a haircut",
+    "a trim"
+   ],
+   [
+    "cut hair",
+    "trim hooves"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "Plumbing",
+    "Barn calls"
+   ],
+   [
+    "plumbing",
+    "barn calls"
+   ],
+   [
+    "Kids cut",
+    "Foal trim"
+   ],
+   [
+    "kids cut",
+    "foal trim"
+   ],
+   [
+    "Haircuts",
+    "Trims"
+   ],
+   [
+    "haircuts",
+    "trims"
+   ],
+   [
+    "BS20981",
+    "EX-2087"
+   ],
+   [
+    "plumber",
+    "farrier"
+   ],
+   [
+    "Plumber",
+    "Farrier"
+   ],
+   [
+    "barbers",
+    "farriers"
+   ],
+   [
+    "Haircut",
+    "Trim"
+   ],
+   [
+    "haircut",
+    "trim"
+   ],
+   [
+    "Elm St",
+    "Anvil Rd"
+   ],
+   [
+    "Oak St",
+    "Pasture Ln"
+   ],
+   [
+    "barber",
+    "farrier"
+   ],
+   [
+    "Barber",
+    "Farrier"
+   ],
+   [
+    "Jordan",
+    "Tate"
+   ],
+   [
+    "Riley",
+    "Rowan"
+   ],
+   [
+    "Avery",
+    "Cass"
+   ],
+   [
+    "Casey",
+    "Wren"
+   ],
+   [
+    "25 miles",
+    "40 miles"
+   ],
+   [
+    "$75",
+    "$65"
+   ],
+   [
+    "your hair",
+    "your horse's hooves"
+   ],
+   [
+    "the hair",
+    "the hooves"
+   ],
+   [
+    "$150",
+    "$65"
+   ],
+   [
+    "$89",
+    "$50"
+   ],
+   [
+    "House calls",
+    "Barn calls"
+   ],
+   [
+    "house calls",
+    "barn calls"
+   ],
+   [
+    "house call",
+    "barn call"
+   ]
+  ],
+  "B": [
+   [
+    "Plumbing needs a company license, and one for each plumber.",
+    "Farrier work needs no state license; a city may ask for a business license."
+   ],
+   [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "None: every visit is booked ahead"
+   ],
+   [
+    "Free until 7am on the visit day",
+    "Free until 24 hours before"
+   ],
+   [
+    "After that, or nobody home: up to the",
+    "After that, or no handler at the barn: up to the"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Mon–Fri 7am–4pm"
+   ],
+   [
+    "A tip line · bank transfer over $500",
+    "Cards only · a tip line if you turn it on"
+   ],
+   [
+    "Priced at the visit",
+    "Priced at the barn"
+   ],
+   [
+    "Set at the visit",
+    "Priced at the barn"
+   ],
+   [
+    "E 25% deposit after the quote",
+    "E priced from photos, card saved"
+   ],
+   [
+    "25% deposit",
+    "Card saved for the $50 fee"
+   ],
+   [
+    "The rest after",
+    "Card at DONE"
+   ],
+   [
+    "is the job at a home, an office or somewhere else?",
+    "is the barn at a home, a boarding stable or somewhere else?"
+   ],
+   [
+    "$89, credited to the repair",
+    "up to $50, only if you OK it"
+   ],
+   [
+    "Labor",
+    "Hoof pads"
+   ],
+   [
+    "$120 an hour",
+    "$20 per hoof"
+   ],
+   [
+    "Water pressure check",
+    "Hoof check, new horse"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "The trim is $65. Accept it?"
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a trim, today,"
+   ],
+   [
+    "accept the leak repair for today,",
+    "accept the trim for today,"
+   ],
+   [
+    "Accepted: the leak repair today,",
+    "Accepted: the trim today,"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Mobile Farrier has a 6-week trim plan, $65 a visit. Each visit is booked and paid like a single one. Want it every 6 weeks?"
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's my barn."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A first visit needs the horse's vaccine record first. Add it on the secure page before the visit."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found the pasture gate unlatched this morning."
+   ],
+   [
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "This is Rosie, an automated assistant for Lee Mobile Farrier. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd only call or text for that. Reply YES to agree, or STOP."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "Reply here, and it goes to Sam. A shoe that comes off within a week gets a free re-set."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A neighborhood forge shop on Anvil Rd. Trims, steel shoes and corrective shoeing for horses trailered in."
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Mobile farrier work at barns in Springfield. Trims and shoes at your barn, within 40 miles."
+   ],
+   [
+    "A water heater job",
+    "A set of shoes"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A big job over the plug-in's amount gets an estimate to sign."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about shoes for my horse. A text back is fine."
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a trim every 6 weeks."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can Tate trim Juniper every 6 weeks, too?"
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a hoof crack that needs two resets."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My horse threw a shoe' fits a reset or a new shoe."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like trimming a neighbor's horse without asking."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a second horse? Say so.'"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Mobile Farrier can shoe your horse:"
+   ],
+   [
+    "The $179 drain needs none.",
+    "A $179 set of shoes needs none."
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Corrective shoes and pads · $540"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Tate finds the front hooves worn thin."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 40 add pads to both front feet"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: pads on both front feet, $40. Sent to Alex."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "Pads on both front feet · $40"
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Tate dents the tack-room door with the tailgate and texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE dented the tack-room door"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Dented tack-room door"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "Tate dented the tack-room door at Alex M.'s. The before photo shows no dent."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Juniper throws a shoe 3 days later. It's inside the 7-day free re-set window, so Sam OKs a free return visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "Juniper threw a shoe."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. It's inside the free re-set window, so this visit is free."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Tate: farrier, corrective shoeing, barn calls"
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Mobile Farrier has a 6-week trim plan, $65 a visit. Each visit is booked and paid like a single one. Want it every 6 weeks?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Tate finds heat and a bounding pulse in Juniper's front hooves. The plug-in says a farrier stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Mobile Farrier trims and shoes horses, but doesn't sedate or treat them. Nothing was saved. You can ask your vet about sedation."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks to pull the shoes on a pony. Both go in one booking, with one arrival window and one code."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Forge Shop can trim your horse at the shop for $35, or at your barn for $65. Where would you like it?"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency for your horse. Call your vet or an emergency equine vet now. If a person is hurt, call 911."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said their horse is down and rolling. They got the vet message, and nothing was booked."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Tate does the corrective shoes today, $165. The $80 pads price stays good until Thu Oct 29."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the horse's age and weight, how it stands, any lameness, and any kicking or biting."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M. says Juniper threw a shoe after Thu Oct 22's visit. It's inside the 7-day free re-set window."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to keep the horse still and call her vet now, and to call 911 if a person is hurt."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. Pulling shoes is $20 from the list. Both fit in the same arrival window."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Mantenga quieto al caballo y llame a su veterinario ahora. Si una persona está herida, llame al 911."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Tate's phone, you said yes to pads on both front feet for $40."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Keep the horse quiet and off its feet, and keep other horses away."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "Tate is shaping a custom shoe and will be back about 9:30am. Juniper should be done by about 10:30am."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "For corrective shoeing, only Tate's times show: Tate does the corrective work."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My horse Juniper needs new shoes. Can a farrier come Thursday morning? I'm in Springfield."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Mobile Farrier doesn't do, like floating a horse's teeth."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Tate found heat in Juniper's front hooves and stopped that part of the work."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Keep Juniper quiet and call your vet now. If a person is hurt, call 911."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a horse that is down or bleeding badly, gets the safety steps first."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For a farrier, a horse that is hurt, down or can't put weight on a leg, right now, stops the booking."
+   ],
+   [
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "We couldn't find business registration EX-1042 for Sam Lee on the official lookup."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A barn call goes on in this flow. The shoeing bay is in the other flow."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A barn call happens only at the customer's barn, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: trims for two horses every 6 weeks."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about the two-horse price before booking."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A farrier's example: a horse that won't stand gets 'a vet sedates first'."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address.",
+    "Say a barn manager books the same visit for 4 horses at one barn."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? My horse lost a shoe."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a car that won't start."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Juniper has a crack in a hoof. Is it safe to ride her?"
+   ],
+   [
+    "Booking for a pet works the same way, where the plug-in books pets.",
+    "A horse is always booked under its owner, who books, pays and gets the texts."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Horse boarding for Lee Mobile Farrier: is it the same company?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a horse that's hurt, down or can't put weight on a leg, or hot, painful hooves."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a farrier trim my horse this Thursday? What does it cost?"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the pads only, $40. Leave the hoof wall repair."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE Juniper stands well, a little short in the left hind toe. Bring the larger shoe size next time."
+   ],
+   [
+    "which drain is clogged, and is water backing up anywhere else?",
+    "how many horses, and are they shod now? Any lameness?"
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some kinds of work are licensed only at a shop"
+   ],
+   [
+    "If the person at your door isn't Jordan, don't let them in.",
+    "If the person at your barn isn't Tate, don't let them near the horses."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Tate looks at the hooves and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Tate looked at the hooves. Here's the price to do it today."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Tate's next times for a set of shoes."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The $40 pads price is good for 7 days."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Tate says no. Please wait until the shoeing is done."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds horse boarding to Lee Mobile Farrier."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now: a visit gets the soonest open day."
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no proof Alex owns this horse"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Tate also add pads to the front feet?"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call the vet now, and 911 if a person is hurt"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Mi caballo perdió una herradura."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Tate do the shoeing next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says how long the free re-set lasts."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A trim could mean a farrier or a horse trainer."
+   ],
+   [
+    "At your shop, paid at the chair, your own way",
+    "At your shop, paid at the counter, your own way"
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "Tate only, until others are registered there"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the horse show moved up a day."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "She lost a shoe. Can someone come today?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The horse show moved up a day. Can you come sooner?"
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE shod 7 weeks ago, shoes worn thin, a small crack in the right front"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido? ¿Está caído el caballo?"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "Tate needs to shape a custom shoe at the forge."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Tate also pull the shoes on my pony?"
+   ],
+   [
+    "If someone else comes, don't let them in.",
+    "If someone else comes, don't hand over the horse."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I turn Juniper out before you come?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD heat in both front hooves, stopped"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the horse caught and clean, in the cross-ties."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt? Is the horse down?"
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's trim? I'm away."
+   ],
+   [
+    "like a permit it needed that isn't in",
+    "like a vaccine record it needed that isn't in"
+   ],
+   [
+    "Riley also does color and house calls",
+    "Tate also does corrective shoeing"
+   ],
+   [
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Thu Nov 5 · arriving 8–10am · Tate"
+   ],
+   [
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Tate"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 corrective shoes 165 pads 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the shoeing"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Tate is kicked in the leg and texts HURT."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Tate left the pasture gate open."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call your vet first"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE shaping a custom shoe, back 9:30"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Does the horse kick or pull away?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: heat in both front hooves"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa trim Thu 12-2 Wren"
+   ],
+   [
+    "Water heater replacement · $640",
+    "Corrective shoe set · $640"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Therapeutic shoes · $199"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT kicked in the leg, need to stop"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. The horse is standing."
+   ],
+   [
+    "barber, color and house calls",
+    "farrier, corrective shoeing and barn calls"
+   ],
+   [
+    "Lee Plumbing and Lee Electric",
+    "Lee Barn Calls and Lee Forge"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Pads on both front feet"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Heat in both front hooves"
+   ],
+   [
+    "Water heater replacement",
+    "Custom forged shoes"
+   ],
+   [
+    "water heater replacement",
+    "custom forged shoes"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW horse boarding"
+   ],
+   [
+    "A gas smell at the home",
+    "A horse that is down in the barn"
+   ],
+   [
+    "plumbing and electrical",
+    "barn calls and forge work"
+   ],
+   [
+    "Plumbing and electrical",
+    "Barn calls and forge work"
+   ],
+   [
+    "Sewer camera inspection",
+    "Therapeutic shoeing"
+   ],
+   [
+    "sewer camera inspection",
+    "therapeutic shoeing"
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the one horse."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Full set of shoes, 4 feet"
+   ],
+   [
+    "Under the sink, before",
+    "Front feet, before"
+   ],
+   [
+    "Tessa · Drain clearing",
+    "Tessa · Trim"
+   ],
+   [
+    "Cabinet floor, before",
+    "Hind feet, before"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Farrier LLC"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Corrective shoes · $165"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. El caballo está de pie."
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the barn"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilefarrier.com"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Farrier's"
+   ],
+   [
+    "electrical license",
+    "forge license"
+   ],
+   [
+    "Electrical license",
+    "Forge license"
+   ],
+   [
+    "Water heater flush",
+    "Trim, 4 feet"
+   ],
+   [
+    "water heater flush",
+    "trim, 4 feet"
+   ],
+   [
+    "for today's work.",
+    "for today's visit."
+   ],
+   [
+    "Supply line · $80",
+    "Hoof pads, 4 feet · $80"
+   ],
+   [
+    "the kitchen drain",
+    "the shoeing"
+   ],
+   [
+    "paid at the chair",
+    "paid at the counter"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Farrier"
+   ],
+   [
+    "the repair price",
+    "the price"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Forge Shop"
+   ],
+   [
+    "plumbing license",
+    "business registration"
+   ],
+   [
+    "Plumbing license",
+    "Business registration"
+   ],
+   [
+    "Service call fee",
+    "Trip fee"
+   ],
+   [
+    "service call fee",
+    "trip fee"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 6 weeks"
+   ],
+   [
+    "Book the repair",
+    "Book the shoeing"
+   ],
+   [
+    "Drain clearings",
+    "Visits"
+   ],
+   [
+    "drain clearings",
+    "visits"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 shoes"
+   ],
+   [
+    "Drain clearing",
+    "Shoeing"
+   ],
+   [
+    "drain clearing",
+    "shoeing"
+   ],
+   [
+    "Kitchen drain",
+    "Full set"
+   ],
+   [
+    "rents a chair",
+    "rents a bay"
+   ],
+   [
+    "1200 Main St",
+    "3 Forge Ln"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "barbershops",
+    "forge shops"
+   ],
+   [
+    "Leak repair",
+    "Corrective shoeing"
+   ],
+   [
+    "leak repair",
+    "corrective shoeing"
+   ],
+   [
+    "Yard drain",
+    "Trim, 4 feet"
+   ],
+   [
+    "yard drain",
+    "trim, 4 feet"
+   ],
+   [
+    "Electrical",
+    "Forge work"
+   ],
+   [
+    "electrical",
+    "forge work"
+   ],
+   [
+    "Barbershop",
+    "Forge shop"
+   ],
+   [
+    "barbershop",
+    "forge shop"
+   ],
+   [
+    "beard trim",
+    "pull shoes"
+   ],
+   [
+    "88 Elm St",
+    "40 Anvil Rd"
+   ],
+   [
+    "42 Oak St",
+    "6 Pasture Ln"
+   ],
+   [
+    "a haircut",
+    "a trim"
+   ],
+   [
+    "Rental 1",
+    "Horse 1"
+   ],
+   [
+    "Rental 2",
+    "Horse 2"
+   ],
+   [
+    "the shop",
+    "the company"
+   ],
+   [
+    "The shop",
+    "The company"
+   ],
+   [
+    "cut hair",
+    "trim hooves"
+   ],
+   [
+    "MP045210",
+    "EX-1042"
+   ],
+   [
+    "Plumbing",
+    "Barn calls"
+   ],
+   [
+    "plumbing",
+    "barn calls"
+   ],
+   [
+    "BS20981",
+    "EX-2087"
+   ],
+   [
+    "plumber",
+    "farrier"
+   ],
+   [
+    "Plumber",
+    "Farrier"
+   ],
+   [
+    "barbers",
+    "farriers"
+   ],
+   [
+    "Haircut",
+    "Trim"
+   ],
+   [
+    "barber",
+    "farrier"
+   ],
+   [
+    "Barber",
+    "Farrier"
+   ],
+   [
+    "Jordan",
+    "Tate"
+   ],
+   [
+    "Riley",
+    "Rowan"
+   ],
+   [
+    "Avery",
+    "Cass"
+   ],
+   [
+    "Casey",
+    "Wren"
+   ],
+   [
+    "25 miles",
+    "40 miles"
+   ],
+   [
+    "$160",
+    "$40"
+   ],
+   [
+    "$150",
+    "$65"
+   ],
+   [
+    "$89",
+    "$50"
+   ],
+   [
+    "valve quote",
+    "pads price"
+   ],
+   [
+    "replacing both shutoff valves",
+    "pads on both front feet"
+   ]
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Farrier work needs no state license where Sam works (the plug-in), so each company gives its registration (S1-61). Where a city asks for a business license, its form asks there."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The farrier plug-in adds no agreement for the business to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Farriers are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: shoeing and trimming."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Farriers need no license of their own unless the state's form says so (the plug-in)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A visit is never sent now: a horse that needs a vet right now goes to one, and every visit has a set time (the plug-in)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your services and prices for Lee Forge Shop. Send a photo of your price board, or fill in the form.",
+      {
+       "card": {
+        "title": "Shop prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Trim, 4 feet",
+          "$35"
+         ],
+         [
+          "Trim with wall repair",
+          "$40"
+         ],
+         [
+          "Pull shoes, 4 feet",
+          "$20"
+         ],
+         [
+          "Foal or yearling trim",
+          "$25"
+         ],
+         [
+          "Front shoes, 2 feet",
+          "$55"
+         ],
+         [
+          "Full set of shoes, 4 feet",
+          "$140"
+         ],
+         [
+          "Corrective shoeing",
+          "Priced after the farrier looks"
+         ],
+         [
+          "Hoof and gait check, new horse",
+          "Free · 15 min"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Barn calls next: its own company, Lee Mobile Farrier. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The truck"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove Lee Mobile Farrier is yours, I'm calling its listed number with a code: (555) 010-0142. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "318406"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Farrier work needs no state license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Farrier price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most mobile farriers start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Mobile Farrier, to start",
+        "lines": [
+         "Every barn call",
+         "At the customer's barn, the owner or a handler holds the horse",
+         "When they book: a card saved for a $50 fee you OK",
+         "After the visit: the saved card is charged at DONE"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules mobile farriers often set. Your call: keep them, or change any. They become the company's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for Lee Mobile Farrier, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price, pack, membership and intro-offer services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Mobile Farrier will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "Mobile farrier work at barns in Springfield. Trims and shoes at your barn, within 40 miles."
+        ]
+       },
+       "photos": [
+        "The truck",
+        "A set of shoes"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Mobile Farrier the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Mobile Farrier · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Lee Forge Shop",
+          "Once a shop farrier joins and you say yes. Stripe still to connect"
+         ],
+         [
+          "Barn calls",
+          "Once your farrier joins and you say yes"
+         ],
+         [
+          "Forge work",
+          "Once your farrier joins and you say yes"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Book me a trim for my horse at Lee Forge Shop on Saturday."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-07",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Quiero que le recorten los cascos a mi caballo el sábado.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? I'd like my horse's hooves trimmed on Saturday.",
+       "as": "Lucía"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Forge Shop. Esta llamada se graba y se transcribe. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Forge Shop. This call is recorded and transcribed. How can I help?",
+       "as": "Lucía"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-23",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, marked urgent.",
+    "more": [
+     "A farrier example: a horse with hot, painful hooves gets 'no trimming until a vet has seen it'.",
+     "Then only dates after the vet's OK are offered."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-24",
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency. If your horse is hurt or down, call your vet or an emergency equine vet now. If a person is hurt, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-26",
+    "say": [
+     [
+      "san",
+      "agent",
+      "That's a question for the farriers themselves. Rowan can go over it at your visit. For anything sooner, call Lee Forge Shop at (555) 010-0177. If your horse seems hurt, call your vet."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A3-20",
+    "does": "A walk-in horse is booked into the next free bay time, if a farrier has one. The horse needs a handler there for the whole visit.",
+    "more": [
+     "The price, and the owner's OK, come before the work.",
+     "A horse that can't be held is not worked on."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-03",
+    "more": [
+     "Its questions: how many horses, any kicking or biting, and what's needed.",
+     "Its danger words: a horse that's hurt, down or can't put weight on a leg, or hot, painful hooves.",
+     "Its forms: a handling release, an emergency contact and a vet-care OK.",
+     "Who can stand in for whom, and how a visit is checked in: the code at the bay.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-50",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Forge Shop asks: how old is the horse, and is it shod now? Has it ever kicked or bitten? And who will hold it?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Dusty, a 9-year-old gelding, barefoot. Dusty has never kicked or bitten. I'll hold the lead."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-43",
+    "does": "The plug-in's form goes on the secure page: the handling release, an emergency contact and a vet-care OK. It's due before the first visit."
+   },
+   {
+    "op": "words",
+    "at": "A4-34",
+    "does": "Alex adds pulling the shoes. Rosie finds one time long enough for both, with one farrier, and adds the prices: $35 and $20."
+   },
+   {
+    "op": "words",
+    "at": "A4-65",
+    "say": [
+     [
+      "san",
+      "cust",
+      "A few questions before you book.",
+      {
+       "form": [
+        "Anything the farrier should know about Dusty's hooves? (optional)",
+        "Anything the farrier should know about Dusty?",
+        "May Lee Forge Shop show photos of your horse's hooves? Yes / No"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-04",
+    "does": "Sam says yes, with a change, like another time. Rosie reads it back, then asks Alex. Here, Sam offers the Saturday 3:00pm bay time instead.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "What time can you offer?"
+     ],
+     [
+      "owner",
+      "san",
+      "Sat 3pm"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer {{alex.staff}} Sat Oct 24 at 3:00pm with Rowan?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-12",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can my daughter hold Dusty during the trim?"
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff:Alex M.}} asks: Can my daughter hold Dusty during the trim?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ]
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Rowan says no. An adult holds the horse for the whole visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A7-13",
+    "does": "Say Dusty gets a new crack in a hoof before the visit. The plug-in's danger words are checked first. A new crack alone doesn't stop the visit, so Rowan looks at it in the bay.",
+    "more": [
+     "A sign of danger gets the safety message first, like 'call your vet now'.",
+     "Health details stay on the secure page, never in a text to staff.",
+     "A hot or painful hoof means no trimming until a vet has seen the horse."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "Dusty has a new crack in a hoof. Can Dusty still come Saturday?"
+     ],
+     [
+      "san",
+      "cust",
+      "A new crack alone is fine: Rowan will look at it in the bay. If the hoof is hot or Dusty is lame, call your vet first. Keep Saturday, or move it with no fee:",
+      {
+       "times": [
+        "Sat Oct 24 · 11:00am",
+        "Sat Oct 31 · 11:00am"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-04",
+    "say": [
+     [
+      "staff",
+      "san",
+      "5160"
+     ],
+     [
+      "san",
+      "staff",
+      "Checked in: Alex M.'s Dusty, Sat 11:00am."
+     ],
+     [
+      "san",
+      "cust",
+      "Dusty is checked in with Rowan. Thanks, Alex! Stay with Dusty in the bay for the whole visit."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-23",
+    "t": "Sat Oct 24, 11:05am",
+    "does": "Back to Alex in the bay, Sat 11:05am. Rowan looks at how Dusty stands and notes the hooves: cracks, worn spots, old nail holes. It's the before record.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE barefoot, hoof walls chipped at the quarters, stands well.",
+      {
+       "photos": [
+        "Dusty's front feet, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with Alex M.'s visit as the before record."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-38",
+    "does": "A horse steps on Rowan's foot and Rowan texts HURT. Rowan stops, and Sam is told at once and calls Rowan.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT horse stepped on my foot, need to stop"
+     ],
+     [
+      "san",
+      "owner",
+      "Urgent: call Rowan now about the visit at 11:00am. Details on the secure page.",
+      {
+       "buttons": [
+        "Offer Cass",
+        "New time for Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam is told. If you need care, call 911."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-35",
+    "does": "Rowan finds heat and a bounding pulse in Dusty's front hooves. The plug-in says to stop: nothing more is done, and nothing is charged for the part not done.",
+    "more": [
+     "The note says what was found, what wasn't done, and why.",
+     "It names the kind of pro to see, like a vet, never a named one.",
+     "Health details stay on the secure page, never in a text."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "Stopped Alex M.'s trim: heat in both front hooves. I put a note and a photo on the page."
+     ],
+     [
+      "san",
+      "cust",
+      "Rowan left you a note about today's visit.",
+      {
+       "card": {
+        "title": "A note from Lee Forge Shop",
+        "lines": [
+         "What was found, and what wasn't done"
+        ],
+        "button": "Read the note",
+        "link": "rosfield.com/n/a6"
+       }
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Rowan stopped {{alex.staff:Alex M.}}'s trim. The note and photo are on the secure page."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-43",
+    "does": "Rowan does the work: what was booked, and anything Alex said yes to, like pads.",
+    "more": [
+     "Alex stays with Dusty in the bay.",
+     "Anything new needs Alex's yes and its price first."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A8-44",
+    "does": "Before paying, Rowan and Alex look at the work together: the fit, the clinches, the level hooves. A fix asked for now is done before paying, at no extra cost."
+   },
+   {
+    "op": "words",
+    "at": "A8-45",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Dusty: barefoot trim, rasp the quarters lightly. Stands well, nervous with clippers."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to Alex M.'s private notes."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-02",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Thanks for visiting Lee Forge Shop! How was Dusty's trim?",
+      {
+       "card": {
+        "title": "Rate the visit",
+        "lines": [
+         "Sat Oct 24",
+         "1 to 5 stars, one tap on the page"
+        ],
+        "button": "Rate it",
+        "link": "rosfield.com/r/a2"
+       },
+       "stars": true
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A10-08",
+    "does": "A shoe that comes off within 7 days is reset free, with Sam's OK. Rosie never argues and never offers money on its own."
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Forge Shop",
+          "5 horses · Rowan 3, Cass 2"
+         ],
+         [
+          "Lee Mobile Farrier",
+          "6 horses at 3 barns · Tate and Wren"
+         ],
+         [
+          "Waiting on you",
+          "Dee W.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-11",
+    "say": [
+     [
+      "san",
+      "cust",
+      "Your corrective shoeing quote is with Lee Forge Shop's owner. We'll text you as soon as it's ready.",
+      {
+       "as": "Nia K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam shoes horses too, so Sam is on the barn call team.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Tate Price and Wren Moore do the barn calls. Tate also does the corrective shoeing. Wren is an apprentice who works only while Tate is there. Rowan Chen and Cass Diaz run the shop."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Tate Price: barn calls, corrective shoeing",
+         "Wren Moore: barn calls, with Tate",
+         "Rowan Chen: the shop and corrective shoeing",
+         "Cass Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Wren gets the same invite. Rowan and Cass get theirs from Lee Forge Shop.",
+     "Pat gets one too, to OK prices for Lee Mobile Farrier.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Sam Lee added you to the team for barn calls. Reply YES to join and get your visits here by text.",
+      {
+       "stop": "first",
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Sam Lee added you to the team for barn calls. Reply YES to join and get your visits here by text.",
+      {
+       "stop": "first",
+       "as": "Wren"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Forge Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text.",
+      {
+       "stop": "first",
+       "as": "Rowan"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Forge Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text.",
+      {
+       "stop": "first",
+       "as": "Cass"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Sam Lee added you to OK its prices. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Tate replies YES, then checks what Sam set. One reply covers every kind of work Tate does.",
+    "more": [
+     "No license number is asked: farrier work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Wren, Rowan and Cass join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Mobile Farrier! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time",
+         "An emergency contact, since you work alone"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t01"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time",
+        "Emergency contact"
+       ],
+       "as": "Tate"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 6:30am",
+      {
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Tate Price · Lee Mobile Farrier",
+        "lines": [
+         "Every barn call, and corrective shoeing",
+         "Hours: Mon–Fri 7am–4pm",
+         "Day list: 6:30am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Tate"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Tate"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "more": [
+     "Corrective and therapeutic shoeing: only Tate and Rowan are cleared, so only their times show for it.",
+     "Wren is an apprentice: Wren is offered only while Tate is working.",
+     "Fees, refunds and what a business keeps are Sam's, never an apprentice's."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Farrier",
+       "At the customer's barn",
+       "None needed",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Tate Price",
+       "Lee Mobile Farrier",
+       "At the customer's barn",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Wren Moore",
+       "Lee Mobile Farrier",
+       "At the customer's barn, with Tate",
+       "None needed",
+       "Once Sam says yes, only with Tate",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Farrier",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Rowan Chen",
+       "Lee Forge Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Cass Diaz",
+       "Lee Forge Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license in Sam's state, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Tate: barn calls and corrective shoeing",
+         "Wren: barn calls, with Tate",
+         "Rowan: the shop and corrective shoeing",
+         "Cass: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, forge work and Lee Forge Shop now show to AI assistants too. Each person hears they can be booked for their own work: Wren with Tate, Cass at the shop.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Farrier can book you for barn calls from now on. Your day list comes at 6:30am, the time you picked.",
+      {
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Forge Shop can book you from now on, at the shop and for corrective shoeing. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Rowan"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Forge Shop can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Cass"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Forge work and Lee Forge Shop now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone else work in Lee Mobile Farrier? Working alone? Add one emergency contact on this page. Without one, no safety timer runs while you work alone.",
+      {
+       "card": {
+        "title": "Your emergency contact",
+        "lines": [
+         "Called only for your safety",
+         "Told only where you're working, if you miss a safety check",
+         "Not now: no safety timer"
+        ],
+        "button": "Add a contact",
+        "link": "rosfield.com/v/e01"
+       },
+       "form": [
+        "Name",
+        "Mobile",
+        "They agreed to a call or text from Rosie"
+       ],
+       "buttons": [
+        "Just me, for now",
+        "People to add"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Wren Moore"
+     ],
+     [
+      "Company",
+      "Lee Mobile Farrier"
+     ],
+     [
+      "Kinds of work",
+      "Barn calls"
+     ],
+     [
+      "Jobs",
+      "Trims, shoes, resets"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7am–4pm"
+     ],
+     [
+      "Wren agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Mobile Farrier. Reese gets one invite, and replies YES. Reese works only while a lead farrier is on the job, until Sam says otherwise.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": "first",
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Insurance is the one date that comes due for this work: no license is needed. Rosie reminds Sam 30 days and 7 days before the certificate ends.",
+    "more": [
+     "A new certificate in the business's name keeps 'insured' on the listing.",
+     "Not sent by then: 'insured' comes off the listing.",
+     "Each certificate has a record: who checked, when, and the end date."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Mobile Farrier's liability insurance certificate ends in 30 days. Send the new one to keep 'insured' on the listing.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "A new certificate in the business's name",
+         "Not sent by then: 'insured' comes off the listing"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Where a city's form asks for a business license, Rosie checks it on the city's own records. While they're down, nobody new is offered for that work until it's checked.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The city's records are down, so the business license isn't re-checked yet. Visits already booked stay booked. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "does": "One number booked several visits under different names, and each time nobody was there to hold the horse. New requests from it now wait for Sam's OK.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 visits at Lee Mobile Farrier this week under different names. Each time, nobody was there to hold the horse. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-24",
+    "label": "A child",
+    "why": "A horse is booked by its adult owner, never for a child."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The shop books a farrier's time in a bay, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The shop books a farrier's time, never a space."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "A horse is never kept overnight at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "The owner stays with the horse in the bay: nothing is left at the shop."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "No child is left at the shop, and a child alone doesn't hold a horse."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A shoeing is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A shoeing has no result that comes later."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "The business sends a proposal",
+    "why": "Corrective work is priced at the shop before it is done; nothing is proposed after a visit."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "A visit is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a shoeing."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every horse gets the handling release, emergency contact and vet-care OK first."
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Farrier work needs no state license where Sam works (the plug-in), so each company gives its registration (S1-61). Where a city asks for a business license, its form asks there."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The farrier plug-in adds no agreement for the business to sign before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Farriers are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes: shoeing and trimming."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "Farriers need no license of their own unless the state's form says so (the plug-in)."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "A visit is never sent now: a horse that needs a vet right now goes to one, and every visit has a set time (the plug-in)."
+   },
+   {
+    "op": "words",
+    "at": "S1-12",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Now your farrier services and prices. Send a photo of your price list, or fill in the form.",
+      {
+       "card": {
+        "title": "Farrier prices",
+        "lines": [
+         "One row per service"
+        ],
+        "button": "Fill in the form",
+        "link": "rosfield.com/f/s01"
+       },
+       "form": [
+        "Service",
+        "Price kind",
+        "Price",
+        "Time it takes"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Farrier price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Here's what I read.",
+      {
+       "list": {
+        "head": [
+         "Service",
+         "Price"
+        ],
+        "rows": [
+         [
+          "Hoof check, new horse",
+          "Free · 15 min"
+         ],
+         [
+          "Trim, 4 feet",
+          "$65"
+         ],
+         [
+          "Full set of shoes, 4 feet",
+          "$179"
+         ],
+         [
+          "Hoof pads",
+          "$20 a hoof"
+         ],
+         [
+          "Reset a thrown shoe, one foot",
+          "$45"
+         ],
+         [
+          "Therapeutic shoes",
+          "From $199"
+         ],
+         [
+          "Corrective shoeing",
+          "Priced after the farrier looks"
+         ],
+         [
+          "Late cancel or no-show",
+          "Up to $50, if you OK it"
+         ]
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Change something"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-38",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Forge work next: same company, so only what's new. It needs no state license where you work. Send your forge work prices."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Forge work price list"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "I've set each one like barn calls. Send only what's different.",
+      {
+       "card": {
+        "title": "Forge work, set like barn calls",
+        "lines": [
+         "At the customer's barn, or at the shop",
+         "A card saved when they book, charged at DONE",
+         "Custom shoes, therapeutic shoes from $199"
+        ]
+       },
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Lee Forge Shop is its own company. Send a photo of its card or listing."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "The shop front"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "To prove the shop is yours, I'm calling its listed number with a code: (555) 010-0177. Type the code here."
+     ],
+     [
+      "owner",
+      "san",
+      "552901"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. Farrier work needs no state license where you work. Now send its prices: a photo or a list."
+     ],
+     [
+      "owner",
+      "san",
+      "",
+      {
+       "photos": [
+        "Price board"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Its money card is set the way most forge shops start. Is it right? Send only what's different.",
+      {
+       "card": {
+        "title": "Lee Forge Shop, to start",
+        "lines": [
+         "Every shop service",
+         "At your shop, paid at the counter, your own way",
+         "When they book: a card saved, for a $20 fee you OK"
+        ]
+       },
+       "buttons": [
+        "Right for all of them"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here are the rules forge shops often set. Your call: keep them, or change any. They become the shop's own rules.",
+      {
+       "buttons": [
+        "Keep them",
+        "Change one"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Stripe for the shop, in its own name: now or later? Until then, a card-saved booking asks you first. Deposit, full-price, pack, membership and intro-offer services can't be booked yet. Its preview and Go live come next.",
+      {
+       "buttons": [
+        "Now",
+        "Later"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's how Lee Forge Shop will look to customers and AI assistants. I drafted it from your Google listing. Send what to change, if anything.",
+      {
+       "card": {
+        "title": "About us",
+        "lines": [
+         "A neighborhood forge shop on Anvil Rd. Trims, steel shoes and corrective shoeing for horses trailered in."
+        ]
+       },
+       "photos": [
+        "The shop front",
+        "The shoeing bay",
+        "A shoe, ready"
+       ],
+       "buttons": [
+        "Looks right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ],
+     [
+      "san",
+      "owner",
+      "Here's Lee Forge Shop the way AI assistants will see it. Tap Go live when it looks right.",
+      {
+       "card": {
+        "title": "Lee Forge Shop · Preview",
+        "lines": [
+         "With the terms and data agreement",
+         "Card for Rosfield's monthly bill: add now or before Mon Nov 2"
+        ],
+        "button": "Open preview",
+        "link": "rosfield.com/look/s02"
+       },
+       "buttons": [
+        "Go live"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Go live"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-50",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Done! Here's where each one stands. I'll tell you as each one goes live. Text MENU anytime, or NEW to add another kind of work.",
+      {
+       "list": {
+        "head": [
+         "Kind of work",
+         "Live for customers"
+        ],
+        "rows": [
+         [
+          "Barn calls",
+          "Now"
+         ],
+         [
+          "Forge work",
+          "Once your farrier joins and you say yes"
+         ],
+         [
+          "Lee Forge Shop",
+          "Once a shop farrier joins and you say yes. Stripe still to connect"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-02",
+    "does": "Sam sends four contact cards and says who does what. Sam shoes horses too, so Sam is on the barn call team.",
+    "say": [
+     [
+      "owner",
+      "san",
+      "[4 contact cards] Tate Price and Wren Moore do the barn calls. Tate also does the corrective shoeing. Wren is an apprentice who works only while Tate is there. Rowan Chen and Cass Diaz run the shop."
+     ],
+     [
+      "san",
+      "owner",
+      "Did they all agree to get a text from Rosie? With no yes, nobody gets an invite.",
+      {
+       "card": {
+        "title": "Your people",
+        "lines": [
+         "Tate Price: barn calls, corrective shoeing",
+         "Wren Moore: barn calls, with Tate",
+         "Rowan Chen: the shop and corrective shoeing",
+         "Cass Diaz: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four agreed",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-05",
+    "more": [
+     "Wren gets the same invite. Rowan and Cass get theirs from Lee Forge Shop.",
+     "Pat gets one too, to OK prices for Lee Mobile Farrier.",
+     "One reminder after 48 hours. Invites go out between 9am and 8pm."
+    ],
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Sam Lee added you to the team for barn calls. Reply YES to join and get your visits here by text.",
+      {
+       "stop": "first",
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Sam Lee added you to the team for barn calls. Reply YES to join and get your visits here by text.",
+      {
+       "stop": "first",
+       "as": "Wren"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Forge Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text.",
+      {
+       "stop": "first",
+       "as": "Rowan"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Forge Shop. Sam Lee added you to the shop's team. Reply YES to join and get your bookings here by text.",
+      {
+       "stop": "first",
+       "as": "Cass"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Sam Lee added you to OK its prices. Reply YES to join.",
+      {
+       "stop": "first",
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-06",
+    "does": "Tate replies YES, then checks what Sam set. One reply covers every kind of work Tate does.",
+    "more": [
+     "No license number is asked: farrier work needs none where Sam works.",
+     "A change to the details waits for Sam's OK.",
+     "With no answer to the welcome text, what Sam set stays.",
+     "Wren, Rowan and Cass join the same way."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Welcome to Lee Mobile Farrier! Please fill in your secure page.",
+      {
+       "card": {
+        "title": "Your page",
+        "lines": [
+         "Languages you speak",
+         "Your phone calendar (optional)",
+         "Your day list time",
+         "An emergency contact, since you work alone"
+        ],
+        "button": "Open your page",
+        "link": "rosfield.com/v/t01"
+       },
+       "form": [
+        "Languages you speak",
+        "Phone calendar (optional)",
+        "Day list time",
+        "Emergency contact"
+       ],
+       "as": "Tate"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "[page done] Day list at 6:30am",
+      {
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Here's what Sam set up for you. Is it right?",
+      {
+       "card": {
+        "title": "Tate Price · Lee Mobile Farrier",
+        "lines": [
+         "Every barn call, and corrective shoeing",
+         "Hours: Mon–Fri 7am–4pm",
+         "Day list: 6:30am"
+        ]
+       },
+       "buttons": [
+        "That's right",
+        "Fix something"
+       ],
+       "as": "Tate"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "1",
+      {
+       "as": "Tate"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-15",
+    "more": [
+     "Corrective and therapeutic shoeing: only Tate and Rowan are cleared, so only their times show for it.",
+     "Wren is an apprentice: Wren is offered only while Tate is working.",
+     "Fees, refunds and what a business keeps are Sam's, never an apprentice's."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-21",
+    "table": {
+     "head": [
+      "Person",
+      "Company",
+      "Where",
+      "Licenses",
+      "Takes bookings",
+      "Safety contact"
+     ],
+     "rows": [
+      [
+       "Sam Lee",
+       "Lee Mobile Farrier",
+       "At the customer's barn",
+       "None needed",
+       "Yes",
+       "Yes"
+      ],
+      [
+       "Tate Price",
+       "Lee Mobile Farrier",
+       "At the customer's barn",
+       "None needed",
+       "Once Sam says yes",
+       "Yes"
+      ],
+      [
+       "Wren Moore",
+       "Lee Mobile Farrier",
+       "At the customer's barn, with Tate",
+       "None needed",
+       "Once Sam says yes, only with Tate",
+       "Yes"
+      ],
+      [
+       "Pat",
+       "Lee Mobile Farrier",
+       "Office",
+       "None needed",
+       "Never offered; OKs prices",
+       "Not needed"
+      ],
+      [
+       "Rowan Chen",
+       "Lee Forge Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ],
+      [
+       "Cass Diaz",
+       "Lee Forge Shop",
+       "At the shop",
+       "None needed",
+       "Once Sam says yes",
+       "Not needed"
+      ]
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "S2-22",
+    "does": "Nobody is offered to customers until they've joined and Sam says yes. This work needs no license in Sam's state, so Rosie asks about all four at once.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Everyone has joined. Let them take bookings now?",
+      {
+       "card": {
+        "title": "Ready to take bookings",
+        "lines": [
+         "Tate: barn calls and corrective shoeing",
+         "Wren: barn calls, with Tate",
+         "Rowan: the shop and corrective shoeing",
+         "Cass: the shop"
+        ]
+       },
+       "buttons": [
+        "Yes, all four",
+        "Not yet"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-24",
+    "does": "With Sam's yes, forge work and Lee Forge Shop now show to AI assistants too. Each person hears they can be booked for their own work: Wren with Tate, Cass at the shop.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Mobile Farrier can book you for barn calls from now on. Your day list comes at 6:30am, the time you picked.",
+      {
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Forge Shop can book you from now on, at the shop and for corrective shoeing. Your day list comes at 8:00am, the time you picked.",
+      {
+       "as": "Rowan"
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "You're all set: Lee Forge Shop can book you from now on, at the shop. Your day list comes at the time you picked.",
+      {
+       "as": "Cass"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Forge work and Lee Forge Shop now show to AI assistants too."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-70",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Does anyone else work in Lee Mobile Farrier? Working alone? Add one emergency contact on this page. Without one, no safety timer runs while you work alone.",
+      {
+       "card": {
+        "title": "Your emergency contact",
+        "lines": [
+         "Called only for your safety",
+         "Told only where you're working, if you miss a safety check",
+         "Not now: no safety timer"
+        ],
+        "button": "Add a contact",
+        "link": "rosfield.com/v/e01"
+       },
+       "form": [
+        "Name",
+        "Mobile",
+        "They agreed to a call or text from Rosie"
+       ],
+       "buttons": [
+        "Just me, for now",
+        "People to add"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "2"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-48",
+    "form": [
+     [
+      "Name",
+      "Wren Moore"
+     ],
+     [
+      "Company",
+      "Lee Mobile Farrier"
+     ],
+     [
+      "Kinds of work",
+      "Barn calls"
+     ],
+     [
+      "Jobs",
+      "Trims, shoes, resets"
+     ],
+     [
+      "Hours",
+      "Mon–Fri 7am–4pm"
+     ],
+     [
+      "Wren agreed to get Rosie's invite text",
+      "Yes"
+     ]
+    ],
+    "does": "Sam adds Reese K. to Lee Mobile Farrier. Reese gets one invite, and replies YES. Reese works only while a lead farrier is on the job, until Sam says otherwise.",
+    "say": [
+     [
+      "san",
+      "staff",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Sam Lee added you to the team. Reply YES to join. Msg & data rates may apply.",
+      {
+       "stop": "first",
+       "as": "Reese K."
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "YES",
+      {
+       "as": "Reese K."
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S11-50",
+    "does": "Insurance is the one date that comes due for this work: no license is needed. Rosie reminds Sam 30 days and 7 days before the certificate ends.",
+    "more": [
+     "A new certificate in the business's name keeps 'insured' on the listing.",
+     "Not sent by then: 'insured' comes off the listing.",
+     "Each certificate has a record: who checked, when, and the end date."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Lee Mobile Farrier's liability insurance certificate ends in 30 days. Send the new one to keep 'insured' on the listing.",
+      {
+       "card": {
+        "title": "Insurance renewal",
+        "lines": [
+         "A new certificate in the business's name",
+         "Not sent by then: 'insured' comes off the listing"
+        ],
+        "button": "Upload it",
+        "link": "rosfield.com/s/lic"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-19",
+    "does": "Where a city's form asks for a business license, Rosie checks it on the city's own records. While they're down, nobody new is offered for that work until it's checked.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "The city's records are down, so the business license isn't re-checked yet. Visits already booked stay booked. I'll tell you if it takes more than 1 business day."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S12-24",
+    "does": "One number booked several visits under different names, and each time nobody was there to hold the horse. New requests from it now wait for Sam's OK.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "One number booked 3 visits at Lee Mobile Farrier this week under different names. Each time, nobody was there to hold the horse. New requests from it will wait for your OK.",
+      {
+       "buttons": [
+        "Keep asking me",
+        "Block it",
+        "Let it book"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "The visit notes come at DONE, with the photo (B8-41)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "The business sends a proposal",
+    "why": "Visits are booked from the list; corrective work is priced at the barn before it is done."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Barn calls are booked in 2-hour windows (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "A barn call is a visit, never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "A barn call books a farrier's time, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "Both places: the customer picks",
+    "why": "Barn calls start at the customer's barn. The shoeing bay is the other flow."
+   },
+   {
+    "op": "off",
+    "at": "B4-26",
+    "label": "3 Nobody will be home",
+    "why": "The owner or a handler holds the horse: nobody-home work is never booked."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "The owner or a handler holds the horse for the whole visit."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "A visit has no smallest group."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A farrier never looks after a child."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "label": "An estimate becomes its own job",
+    "why": "Corrective work is priced at the barn (the visit path); no estimate becomes a job."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a visit."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "A visit is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "The handling release is the plug-in's form on the secure page (B4-38), signed with the booking."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "A visit is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "A visit is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "A visit is never sent now (B4-81)."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A visit is paid in one go."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Bank transfer, if it's on",
+    "why": "Sam keeps cards only: visits are small bills (S1-57)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Keeps it",
+    "why": "No extra work is sold at a barn call that can be cancelled this way (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "No extra work is sold at a barn call that can be cancelled this way (B8-22)."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Next visit booked at checkout",
+    "why": "A plan books the next visits."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Each visit is rated."
+   },
+   {
+    "op": "words",
+    "at": "B3-02",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "My horse Juniper needs new shoes. Can a farrier come to my barn Thursday morning? I'm in Springfield."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-11",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Hola, ¿habla español? Mi caballo perdió una herradura.",
+      {
+       "lang": "es",
+       "en": "Hello, do you speak Spanish? My horse lost a shoe.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Sí, claro. Soy Rosie, un asistente automatizado de Lee Mobile Farrier. Esta llamada se graba y se transcribe. ¿En qué le ayudo?",
+      {
+       "lang": "es",
+       "en": "Yes, of course. I'm Rosie, an automated assistant for Lee Mobile Farrier. This call is recorded and transcribed. How can I help?",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-18",
+    "does": "When it's safe to go on, the plug-in's safety steps come first. Then the booking goes on, and a kicking history sends it to Sam first. Here it's Rosa's call, in Spanish, with the English under each line.",
+    "more": [
+     "A farrier example: a horse that kicked someone gets 'is anyone hurt?' first.",
+     "Rosa's mare kicked at the last farrier, and nobody was hurt. The call goes on. Sam reads her answers first."
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "Primero: ¿hay alguien herido? ¿Está caído el caballo?",
+      {
+       "lang": "es",
+       "en": "First: is anyone hurt? Is the horse down?",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "cust",
+      "san",
+      "No. Mi yegua le tiró una patada al herrador anterior, pero nadie se lastimó.",
+      {
+       "lang": "es",
+       "en": "No. My mare kicked at the last farrier, but nobody got hurt.",
+       "as": "Rosa"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Gracias. Si una persona está herida, llame al 911. Sam revisa su pedido antes de reservar.",
+      {
+       "lang": "es",
+       "en": "Thanks. If a person is hurt, call 911. Sam checks your request before it's booked.",
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-19",
+    "does": "Nobody is booked into danger. A horse that's hurt, down or can't put weight on a leg right now stops the booking.",
+    "more": [
+     "The message is the plug-in's: Rosie can't judge how sick a horse is, so it says to call the vet now.",
+     "A person who is hurt gets 911 first.",
+     "On a call, the caller hears it, and Sam gets the call summary."
+    ],
+    "say": [
+     [
+      "san",
+      "agent",
+      "This sounds like an emergency for your horse. Rosie can't judge how sick a horse is. Call your vet, or an emergency equine vet, now. If a person is hurt, call 911."
+     ],
+     [
+      "san",
+      "owner",
+      "Safety stop: a customer's AI said their horse is down and rolling. They got the safety message, and nothing was booked.",
+      {
+       "card": {
+        "title": "Safety stop · Mon Oct 19",
+        "lines": [
+         "A horse that is down and rolling",
+         "Told to call the vet or an emergency vet now"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/s1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-21",
+    "say": [
+     [
+      "cust",
+      "agent",
+      "Juniper has a crack in a hoof. Is it safe to ride her?"
+     ],
+     [
+      "san",
+      "agent",
+      "Rosie can't judge a horse's health. Ask your vet whether it's safe to ride. To ask about the shoeing, call Lee Mobile Farrier at (555) 010-0142."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-22",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Call summary: Rosa called at 7:12am, in Spanish. She wants shoes for her mare. The mare kicked at the last farrier; nobody was hurt. Safety steps given, and a booking link sent.",
+      {
+       "card": {
+        "title": "Call · Tue Oct 20 · 7:12am",
+        "lines": [
+         "Rosa · speaks Spanish",
+         "A kick at the last farrier · nobody hurt · safety steps given",
+         "Booking link sent · comes to you first"
+        ],
+        "button": "Hear the call",
+        "link": "rosfield.com/k/a1"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-25",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. Our call dropped. Your answers so far are kept. Tap to go on from where we stopped.",
+      {
+       "card": {
+        "title": "Lee Mobile Farrier · Barn calls",
+        "lines": [
+         "Your answers so far are kept"
+        ],
+        "button": "Go on booking",
+        "link": "rosfield.com/c/m20"
+       },
+       "stop": true,
+       "as": "Rosa"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-04",
+    "say": [
+     [
+      "san",
+      "cust",
+      "This is Rosie, the automated booking assistant for Lee Mobile Farrier. We got your voicemail about shoes for your horses. Tap to pick a time, or to ask for a call back.",
+      {
+       "card": {
+        "title": "Lee Mobile Farrier · Full set of shoes",
+        "lines": [
+         "Pick a time, or ask Sam to call you"
+        ],
+        "button": "See times",
+        "link": "rosfield.com/v/k11"
+       },
+       "stop": true,
+       "as": "a caller"
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Voicemail from a new caller about shoes for two horses. They got a link to book.",
+      {
+       "card": {
+        "title": "Voicemail · Tue Oct 20 · 12:30pm",
+        "lines": [
+         "Wants shoes for two horses next week"
+        ],
+        "button": "Hear it",
+        "link": "rosfield.com/l/k11"
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B3-24",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Booked, with no texts to Tessa. Please tell Tessa the details yourself.",
+      {
+       "card": {
+        "title": "Tessa · Trim, 4 feet",
+        "lines": [
+         "Thu Oct 22 · 12–2pm · Wren, with Tate",
+         "Add the address on the Today page"
+        ],
+        "button": "Open it",
+        "link": "rosfield.com/t/b8"
+       },
+       "as": "Pat"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-03",
+    "say": [
+     [
+      "san",
+      "agent",
+      "Lee Mobile Farrier trims and shoes horses, but doesn't sedate or treat them. Nothing was saved. You can ask your vet about sedation."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-04",
+    "more": [
+     "Its questions: how many horses, any kicking or biting, what's needed, and a safe place to work.",
+     "Its danger words: a horse that's hurt, down or can't put weight on a leg, or hot, painful hooves.",
+     "Its forms: a handling release, an emergency contact and a vet-care OK.",
+     "Who can stand in for whom: an apprentice works only with the lead farrier.",
+     "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-05",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Lee Mobile Farrier asks: how many horses, and are they shod now? Has any horse ever kicked or bitten? And is there a covered, level place to work?"
+     ],
+     [
+      "cust",
+      "agent",
+      "Just Juniper, a quarter horse mare, shod 7 weeks ago. She has never kicked anyone. Yes, the aisle is level and covered."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-34",
+    "does": "Alex adds where the truck parks and who holds Juniper. A gate or barn code shows to Tate only on the visit day.",
+    "say": [
+     [
+      "agent",
+      "cust",
+      "Who will hold Juniper, and does she stand well? And where's the work area?"
+     ],
+     [
+      "cust",
+      "agent",
+      "I'll hold her. She stands well. The aisle by the tack room is covered and level."
+     ]
+    ],
+    "form": [
+     [
+      "Parking",
+      "By the barn door"
+     ],
+     [
+      "The horse",
+      "Juniper, quarter horse mare · caught and clean"
+     ],
+     [
+      "Gate or barn code",
+      "Typed here only"
+     ],
+     [
+      "Work area",
+      "The aisle by the tack room"
+     ],
+     [
+      "Building rules",
+      "None"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-26",
+    "does": "Who meets the farrier comes from the plug-in: the owner or an adult handler holds the horse for the whole visit.",
+    "form": [
+     [
+      "An adult (18+) will hold the horse {{day:Thu Oct 22}}, {{window:8–10am|when the farrier arrives}}",
+      "I will"
+     ],
+     [
+      "Or",
+      "Someone else will"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-32",
+    "does": "Who may book comes from the plug-in. The person booking confirms they're 18 or older and own the horse or may decide for it.",
+    "form": [
+     [
+      "I'm 18 or older",
+      "Yes"
+     ],
+     [
+      "Juniper is my horse, or I may decide for her",
+      "Yes"
+     ],
+     [
+      "An adult (18+) will hold her",
+      "Yes"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-38",
+    "does": "The plug-in needs a form before the first visit: the handling release, an emergency contact and a vet-care OK.",
+    "form": [
+     [
+      "Form",
+      "Handling release: the owner answers for how the horse is handled"
+     ],
+     [
+      "Due",
+      "Before the first visit"
+     ],
+     [
+      "Signed by",
+      "Alex M."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B4-28",
+    "more": [
+     "Examples: a written estimate for work over a set amount, or the right to cancel a sale made at home.",
+     "Any paper owed after booking becomes a to-do for Sam, with its due date. Sam is reminded before it's late.",
+     "Barn calls need no notice at booking here. The handling terms are on the secure page."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B5-21",
+    "form": [
+     [
+      "How often",
+      "Every 6 weeks"
+     ],
+     [
+      "Price a visit",
+      "$179"
+     ],
+     [
+      "When it's charged",
+      "Each visit, like a single booking"
+     ],
+     [
+      "Skip, pause or end",
+      "Any time, by text"
+     ],
+     [
+      "I agree to the plan's terms",
+      "Yes"
+     ]
+    ],
+    "say": [
+     [
+      "san",
+      "cust",
+      "The plan's terms, before any card:",
+      {
+       "card": {
+        "title": "Shoeing plan",
+        "lines": [
+         "Every 6 weeks · 8–10am",
+         "Each visit: $179",
+         "Each visit is booked and paid like this one",
+         "Skip, pause or end any time, by text"
+        ]
+       },
+       "buttons": [
+        "I agree",
+        "Just this visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-06",
+    "say": [
+     [
+      "owner",
+      "san",
+      "Fri 8am"
+     ],
+     [
+      "san",
+      "owner",
+      "Offer Alex M. Fri Oct 23, 8–10am, with Tate?",
+      {
+       "buttons": [
+        "Send it",
+        "Type another time"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-15",
+    "say": [
+     [
+      "cust",
+      "san",
+      "STOP"
+     ],
+     [
+      "san",
+      "cust",
+      "You won't get more texts from Rosie for Lee Mobile Farrier. Your visits stay booked."
+     ],
+     [
+      "san",
+      "staff",
+      "Alex M. opted out of texts. The visits stay. Check them in with the code at the barn."
+     ],
+     [
+      "san",
+      "owner",
+      "Alex M. opted out of texts. The visits stand, every 6 weeks. For any change, call Alex."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-16",
+    "say": [
+     [
+      "cust",
+      "san",
+      "Can I turn Juniper out before you come?"
+     ],
+     [
+      "san",
+      "staff",
+      "{{alex.staff}} asks: Can I turn Juniper out before you come?",
+      {
+       "buttons": [
+        "Yes",
+        "No",
+        "Call Alex"
+       ],
+       "as": "Tate"
+      }
+     ],
+     [
+      "staff",
+      "san",
+      "2"
+     ],
+     [
+      "san",
+      "cust",
+      "Tate says no. Please keep Juniper in, caught and clean, until Tate arrives."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B7-17",
+    "does": "Alex texts that the horse show moved up a day. The danger check runs again: nothing in it, so Rosie asks the farrier. Tate can come sooner, so that's offered.",
+    "more": [
+     "Real danger, like a horse that is hurt or lame, gets the safety steps first: call the vet now.",
+     "An earlier time shows its price first. No reply: the visit stays as booked.",
+     "If Alex picks the earlier time, Tate and Wren are told."
+    ],
+    "say": [
+     [
+      "cust",
+      "san",
+      "The horse show moved up a day. Can you come sooner?"
+     ],
+     [
+      "san",
+      "cust",
+      "Tate can come sooner, at the same price. If your horse is hurt or lame, call your vet now.",
+      {
+       "times": [
+        "Wed Oct 21 · 12–2pm · Tate"
+       ],
+       "buttons": [
+        [
+         "B",
+         "Keep Thursday"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-02",
+    "does": "Back to Alex: it's Thursday, and Tate heads to Alex's barn for Juniper's shoes. The text carries the check-in code.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "OMW"
+     ],
+     [
+      "san",
+      "cust",
+      "Tate from Lee Mobile Farrier is on the way to your barn, about 15 minutes. When Tate arrives, give your check-in code at the work area. We'll text you as soon as it's entered. If someone else comes, don't let them near the horses.",
+      {
+       "photos": [
+        "Tate, from Lee Mobile Farrier"
+       ],
+       "photoLink": "rosfield.com/m/r4",
+       "code": "3906",
+       "buttons": [
+        [
+         "2",
+         "It isn't Tate"
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-18",
+    "does": "Before the work, Tate looks at how Juniper stands and notes the hooves: cracks, worn spots, nail holes. The notes stay with the visit.",
+    "more": [
+     "The plug-in names the checks: the stance, the hoof walls, the old shoes and the work area.",
+     "Alex can see them on the secure page.",
+     "A claim later is checked against them."
+    ],
+    "say": [
+     [
+      "staff",
+      "san",
+      "BEFORE shod 7 weeks ago, shoes worn thin, a small crack in the right front. She stands well.",
+      {
+       "photos": [
+        "Juniper's front feet, before",
+        "Juniper's hind feet, before"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Saved with {{alex.staff}}'s visit.",
+      {
+       "as": "Tate"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-19",
+    "does": "Visits have their price before the visit, from Sam's list. Corrective work is priced after the farrier looks, and only the trip fee is promised until then."
+   },
+   {
+    "op": "words",
+    "at": "B8-22",
+    "does": "Back to Juniper's visit on Thursday. Each branch is one thing that can happen at a visit. Most rejoin before DONE."
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A horse can't be held",
+     "end": "end",
+     "endText": "Tate doesn't work on the horse. Alex picks a new day with a handler, and Sam decides any fee.",
+     "steps": [
+      {
+       "id": "B8-x01",
+       "line": [
+        "8.20"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:35am",
+       "title": "A horse can't be held: the farrier stops",
+       "does": "Juniper pulls back and won't stand for the front feet, and nobody can hold her safely. Tate stops and texts CAN'T HOLD. Alex hears at once and picks a new day. Sam decides any fee.",
+       "more": [
+        "The farrier can stop at any time. A horse that can't be held is worked on only with a handler or a vet's sedation.",
+        "A fee, never more than the visit's price, only if Sam says yes.",
+        "No reply from Alex: Sam calls before the next visit."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "CAN'T HOLD Juniper keeps pulling back, no safe way to work"
+        ],
+        [
+         "san",
+         "owner",
+         "Tate stopped at Alex M.'s: Juniper can't be held safely. Alex is asked for a new day with a handler.",
+         {
+          "buttons": [
+           "No fee",
+           "Charge the fee",
+           "Call Alex"
+          ]
+         }
+        ],
+        [
+         "san",
+         "cust",
+         "Tate stopped today since Juniper couldn't be held safely. Please have a handler there, or ask your vet about sedation. Pick a new day:",
+         {
+          "times": [
+           "Thu Oct 29 · 8–10am",
+           "Fri Oct 30 · 8–10am"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "branch",
+    "at": "B8-22",
+    "branch": {
+     "label": "A horse gets loose",
+     "end": "end",
+     "endText": "Sam and Tate help look, with Alex on the phone. Rosie logged the time and the place.",
+     "steps": [
+      {
+       "id": "B8-x02",
+       "line": [
+        "8.20"
+       ],
+       "who": "staff",
+       "to": "san",
+       "via": "msg",
+       "t": "Thu Oct 22, 8:50am",
+       "title": "A horse is loose: Sam and Alex told at once",
+       "does": "Juniper pulls free and gets out the pasture gate. Tate texts HORSE LOOSE with the place. Rosie tells Sam and Alex at once, at any hour, then steps back.",
+       "more": [
+        "Sam and Tate help look, with Alex on the phone.",
+        "Rosie never admits fault or offers money. Sam decides the rest.",
+        "The time and the place stay on the visit record."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "HORSE LOOSE Juniper pulled free, out the pasture gate toward Pasture Ln"
+        ],
+        [
+         "san",
+         "owner",
+         "URGENT: Juniper (Alex M.) got loose at 8:50am. Tate is looking. Call Alex now."
+        ],
+        [
+         "san",
+         "cust",
+         "Urgent from Lee Mobile Farrier: Juniper got loose at 8:50am. Tate is looking now, and Sam is calling you."
+        ]
+       ],
+       "needs": [
+        "pf.edges"
+       ],
+       "tells": [
+        "owner",
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "words",
+    "at": "B8-23",
+    "t": "Thu Oct 22, 9:00am",
+    "does": "Tate sees both front feet are worn thin. Hoof pads are on the list, $20 a hoof. Alex hears the price and says yes before they are added.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "EXTRA 40 pads on both front feet, worn thin"
+     ],
+     [
+      "san",
+      "staff",
+      "Extra for {{alex.staff}}: pads on both front feet, $40. Sent to Alex.",
+      {
+       "as": "Tate"
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Tate found more work. Add it today?",
+      {
+       "card": {
+        "title": "Pads on both front feet · $40",
+        "lines": [
+         "Done today, if you say yes",
+         "Paid with the rest of your visit"
+        ]
+       },
+       "buttons": [
+        "Yes, add them",
+        "No, just the shoes"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-30",
+    "does": "Tate finds heat and a bounding pulse in Juniper's front hooves. The plug-in says a farrier stops there, so Alex gets a written note and the photo.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HAZARD heat in both front hooves, stopped. Vet first",
+      {
+       "photos": [
+        "Juniper's front hooves"
+       ]
+      }
+     ],
+     [
+      "san",
+      "cust",
+      "Tate found heat in Juniper's front hooves and stopped that part of the work.",
+      {
+       "card": {
+        "title": "Safety note · your horse",
+        "lines": [
+         "Found: heat in both front hooves",
+         "Not done: the shoeing",
+         "Call your vet first"
+        ]
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-32",
+    "does": "Tate needs extra time to shape a custom shoe at the forge. Alex is told in the business's name, inside text hours, with the new finish time.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "UPDATE shaping a custom shoe, back 9:30"
+     ],
+     [
+      "san",
+      "cust",
+      "Tate is shaping a custom shoe and will be back about 9:30am. Juniper should be done by about 10:30am."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-35",
+    "does": "Say Tate dents the tack-room door with the tailgate and texts a photo. It's checked against the before photos, and Sam decides how to make it right.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DAMAGE dented the tack-room door",
+      {
+       "photos": [
+        "Dented tack-room door"
+       ]
+      }
+     ],
+     [
+      "san",
+      "owner",
+      "Tate dented the tack-room door at Alex M.'s. The before photo shows no dent.",
+      {
+       "photos": [
+        "Before",
+        "After"
+       ],
+       "buttons": [
+        "Fix it, no charge",
+        "Take money off",
+        "I'll call Alex"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-39",
+    "does": "Before DONE, Tate and Alex look at the work together: the fit of each shoe, the nails clinched, the hooves level. Anything wrong is fixed first, and after photos are taken.",
+    "more": [
+     "The plug-in names what's checked: shoe fit, clinches and level hooves.",
+     "The after photos are taken from the same angles as the before photos."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-41",
+    "t": "Thu Oct 22, 9:40am",
+    "does": "The shoeing is done. Tate texts DONE with the total and its lines. Alex gets the notes and a photo.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "DONE 179 full set of shoes. Front and hind, nails clinched",
+      {
+       "photos": [
+        "Juniper's feet, after"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Done: Alex M., Thu 8–10am. The visit notes are sent to Alex."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-44",
+    "say": [
+     [
+      "staff",
+      "san",
+      "NOTE Juniper: size 1 front shoes, a little short in the left hind toe. Stands well. Bring size 2 next time."
+     ],
+     [
+      "san",
+      "staff",
+      "Saved to {{alex.staff}}'s private record.",
+      {
+       "as": "Tate"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B8-34",
+    "does": "A horse kicks Tate in the leg. Tate texts HURT and steps away. Rosie tells Sam at once, by phone and by text.",
+    "say": [
+     [
+      "staff",
+      "san",
+      "HURT kicked in the leg, need to stop"
+     ],
+     [
+      "san",
+      "owner",
+      "Urgent: call Tate now about the visit at 6 Pasture Ln. Details on the secure page.",
+      {
+       "buttons": [
+        "Offer Wren",
+        "New time for Alex"
+       ]
+      }
+     ],
+     [
+      "san",
+      "staff",
+      "Sam is told. If you need care, call 911.",
+      {
+       "as": "Tate"
+      }
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B10-02",
+    "t": "Thu Oct 22, 1:00pm"
+   },
+   {
+    "op": "words",
+    "at": "B10-05",
+    "does": "A barn call sells no extra work that can be cancelled this way, so there's nothing here to cancel. The booked visits can't be cancelled this way."
+   },
+   {
+    "op": "words",
+    "at": "S11-02",
+    "say": [
+     [
+      "owner",
+      "san",
+      "AGENDA"
+     ],
+     [
+      "san",
+      "owner",
+      "Fri Oct 23. 1 thing waits on you. Full day: rosfield.com/a/f23",
+      {
+       "list": {
+        "head": [
+         "",
+         "Today"
+        ],
+        "rows": [
+         [
+          "Lee Forge Shop",
+          "5 horses · Rowan 3, Cass 2"
+         ],
+         [
+          "Lee Mobile Farrier",
+          "6 horses at 3 barns · Tate and Wren"
+         ],
+         [
+          "Waiting on you",
+          "Nora S.'s request"
+         ]
+        ],
+        "plain": true
+       }
+      }
+     ]
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B6-13",
+    "steps": [
+     {
+      "id": "B6-x01",
+      "type": "split",
+      "line": [
+       "4.18",
+       "6.3"
+      ],
+      "who": "san",
+      "via": "auto",
+      "title": "Checks for a plan",
+      "q": "Did Alex say yes to a plan?",
+      "does": "A plan's terms are texted back right after its own yes. Alex has them in writing, and can end the plan with one reply.",
+      "needs": [
+       "pf.rules"
+      ],
+      "branches": [
+       {
+        "label": "Yes: every 6 weeks",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B6-x02",
+          "line": [
+           "4.18"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "t": "Mon Oct 19, 6:49pm",
+          "title": "Texts the plan's terms back",
+          "does": "Alex said yes to the 6-week plan on the secure page. Rosie texts the terms back, so Alex can find them and end the plan with one reply.",
+          "more": [
+           "The terms: the day, the arrival window, the price a visit and when it's charged. Skip and weather terms. It runs until Alex ends it.",
+           "Ending it takes one reply. Visits already done stay paid.",
+           "Once a year, the terms and how to end the plan come again, by the business's own rule."
+          ],
+          "say": [
+           [
+            "san",
+            "cust",
+            "Your shoeing plan with Lee Mobile Farrier is set.",
+            {
+             "card": {
+              "title": "Shoes every 6 weeks · $179 a visit",
+              "lines": [
+               "From Thu Oct 22 · 8–10am · Tate",
+               "Your saved card is charged after each visit",
+               "Skip free until 24 hours before",
+               "Runs until you end it"
+              ]
+             },
+             "buttons": [
+              [
+               "3",
+               "End the plan"
+              ]
+             ]
+            }
+           ]
+          ],
+          "vary": {
+           "after:bill": {
+            "say": [
+             [
+              "san",
+              "cust",
+              "Your shoeing plan with Lee Mobile Farrier is set.",
+              {
+               "card": {
+                "title": "Shoes every 6 weeks · $179 a visit",
+                "lines": [
+                 "From Thu Oct 22 · 8–10am · Tate",
+                 "We text you the bill after each visit",
+                 "Skip free until 24 hours before",
+                 "Runs until you end it"
+                ]
+               },
+               "buttons": [
+                [
+                 "3",
+                 "End the plan"
+                ]
+               ]
+              }
+             ]
+            ]
+           }
+          },
+          "needs": [
+           "booked"
+          ],
+          "tells": [
+           "cust"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "No plan",
+        "end": "merge",
+        "steps": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "keep": [
+  "leak",
+  "visit fee",
+  "Visit fee",
+  "color"
+ ],
+ "splitsKept": {
+  "A": [
+   "A8-02"
+  ],
+  "B": []
+ },
+ "notes": "Built Tue Oct 27 2026 from the refitted groomer (from: groomer); the plug-in, rename pairs, money and every own step were rewritten for farrier work. A farrier is a barn-call trade (a horse is not left at the shop), so the groomer's drop-off steps are not used: the owner or a handler stays with the horse. No sample or test-drive plug-in existed, so it is built from the trade's norm and says so here.\nWork: a farrier trims and shoes horses every 6 to 8 weeks. Flow B (the usual side) is Lee Mobile Farrier at Alex's barn, 6 Pasture Ln: a full set of shoes for Juniper, a quarter horse mare, Thu Oct 22, arriving 8 to 10am, with Tate and Alex holding her. Flow A (the less usual side) is Lee Forge Shop, Sam's second company: Alex trailers Dusty, a gelding, to the shop, 40 Anvil Rd, for a trim with Rowan, Sat Oct 24 at 11:00am, stays with Dusty in the bay and pays at the counter.\nPrices (the example business's own): at the barn trim $65, full set of shoes $179, hoof pads $20 a hoof, therapeutic shoes from $199, reset a thrown shoe $45, trip fee (late cancel or no-show) up to $50; corrective shoeing is priced after the farrier looks. At the shop trim $35, trim with wall repair $40, pull shoes $20, foal trim $25, front shoes $55, full set $140, late-cancel fee $20, hoof evaluation $25 before corrective work. The hoof check for a new horse is free. A shoe thrown within 7 days of a visit is reset free, with Sam's OK.\nMoney paths. B: list|card|card (main: $179, card saved for the $50 trip fee, charged at DONE), list|card|bill (the same, Rosie texts the bill), list|none|bill (a $65 trim for a known barn, nothing taken), visit|card|card (corrective shoeing priced at the barn; only the $50 trip fee is promised; $245 in the quote example = $165 shoes + $80 pads, four hooves at $20). A: list|card|counter (main: $35 trim, card saved for the $20 fee, paid at the counter), list|none|counter (a horse the shop knows), visit|card|counter (corrective shoeing priced at the shop; only the $25 hoof evaluation is promised). No hold, no deposit, no full price: farriers are paid at the visit. Pads or an extra horse found at the visit need a yes and are paid with the visit.\nLicenses: none in most places (S1-60 '1 A license' and S2-28 off; the sign-up gives the registration only; a certification is the farrier's own word). Insurance is the date that comes due (S11-50). An apprentice (Wren) works only while the lead farrier is on the job; corrective and therapeutic shoeing are the lead farrier's.\nSafety: a horse hurt, down, in colic pain or unable to bear weight now (call the vet, no booking); a person kicked or stepped on and hurt (911); a horse loose now; hot, painful hooves that won't walk (a vet first, no trimming); a horse that can't be held (no work until a handler is there or a vet has sedated it). Sedation is vet work. A horse that has kicked or bitten goes to the owner first. A child alone never holds a horse.\nOwn steps: B6-x01 and B6-x02 (the plan's terms texted back); branches of B8-22: B8-x01 (a horse can't be held: the farrier stops, the owner picks a new day with a handler) and B8-x02 (a horse gets loose). Hoof findings that stop the work use B8-30; pads use B8-23.\nSettings: arrive A a set start, B a 2-hour window; cutoff 24 hours before in both. Booking choices limited: nothing is sent now (S2-30's yes branch and every sent-now branch are off; S1-21's 'Jobs sent now' row says every visit is booked ahead).\nNames: Tate Price and Wren Moore (barn calls), Rowan Chen and Cass Diaz (shop); the horses are Juniper (B) and Dusty (A). Second kind of work: forge work (custom shoes). Kept words: 'leak' (S12-29), 'visit fee', 'color' (S13-40).\nOff, as farriers never use them: drop-offs, children left, crews, estimates, contracts, deliveries, rentals, stays, classes, seats, proposals, results later, insurance or plan pays, bank transfer, stage billing, nobody-home entry, groups.\nNot sure (verifier): the S1-13 / S1-14 sign-up money cards are the master's example rows with this trade's names and amounts put in by pairs; a few owner-reply lines for paths the work never uses (the paid-in-full and deposit read-backs) still show the master's wording (MASTER 2 of batch D1); B6-13 and A6-14 name the main service on every path (MASTER); the A both-places read-back shows a barn trim at $65 'paid in full' from the master's example; the 7-day free re-set is an owner's rule written as a plug-in rule.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "please come with dry hair",
+    "Step-free door on Elm St · parking in the back",
+    "a $20 fee ($40 for the Groom's package)",
+    "Style consult",
+    "a step-free chair",
+    "The chairs",
+    "A chair, ready",
+    "My employer pays for this cut.",
+    "a shorter cut",
+    "This is Rosie, an automated assistant for Lee's Barbershop. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "Here they OK the $110 color correction and skip the $15 gloss.",
+    "Gloss to finish · $15",
+    "The $15 gloss price is good until Sat Oct 31.",
+    "No gloss today.",
+    "Could Riley use a toner instead of the gloss?",
+    "Alex M. asks for a toner instead of the gloss.",
+    "Ben T. books a skin fade for Sat Nov 7",
+    "you now have two skin fades on Sat Nov 7",
+    "Color quotes come to you first. Board prices never need one",
+    "Riley: barber, color, house calls",
+    "A color's example: 'Color here needs a quick patch test first. Had one at Lee's in the last 3 months?'",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "It's 11:00am, and Alex is at the chair. Alex reads the code from the confirmation or the reminder, and Riley texts it in.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex M.'s price: $110 color correction and $15 gloss, $125 in all, the $25 consult included. It goes to Sam first.",
+    "A nothing before, and at their home too, 75, paid when they book. E paid when they book",
+    "The color correction alone is the $110 starting price, so no choice comes in under it.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Alex picked Riley, so Riley's next times show. Color always stays with Riley.",
+    "Set. For a haircut, the customer picks the place and sees both prices first.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Booking for a pet works the same way, where the plug-in books pets.",
+    "E paid when they book. A at their home too, 75, paid when they book",
+    "CAN'T START Alex M. The signed form this service needs is missing.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "many barbers, salons and groomers are licensed to their shop",
+    "The shop's money terms apply per person, as Sam set them.",
+    "A color correction can't be priced before Riley sees it.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Riley quotes the rest at the chair, before any work.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "A cut is rated, so the shop takes the first branch.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "A service priced at the chair gets its price now.",
+    "the item, its condition and the customer's mobile",
+    "A barbershop has none, so nothing is sent here.",
+    "May the shop show photos of your hair? Yes / No",
+    "Nia K. asked to talk about the $90 color quote.",
+    "Alex says yes or no to the quote at the chair.",
+    "says the cape clip ripped a shirt collar today",
+    "A haircut could mean a salon or a barbershop.",
+    "Promises the $25 consult; priced at the chair",
+    "At your shop, paid at the chair, your own way",
+    "quote 110 color correction + 15 gloss Alex M.",
+    "Give this code at the chair when you arrive.",
+    "Riley's price for Alex M., at the chair now.",
+    "Can my son wait in the shop during my cut?",
+    "says Saturday's cut is uneven on one side",
+    "Every shop service, color and house calls",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Lee's Barbershop will fix it for free.",
+    "Give your check-in code at the chair.",
+    "Riley also does color and house calls",
+    "The cape clip ripped my shirt collar.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Haircuts at the shop work like this:",
+    "A barbershop books a person's time.",
+    "Picks it up with the code or an ID",
+    "A barbershop's services need none.",
+    "Alex asks for a cut every 4 weeks.",
+    "Do you do kids cuts? My son is 8.",
+    "Books the next visit at the chair",
+    "Color correction $110 · gloss $15",
+    "Signature cut and hot towel shave",
+    "Books the groom's party together",
+    "The cut is uneven on one side.",
+    "Lee's Barbershop · with Riley",
+    "barber, color and house calls",
+    "Lee Plumbing and Lee Electric",
+    "Haircut plan · every 4 weeks",
+    "Give this code at the chair.",
+    "Riley stopped Alex M.'s cut.",
+    "Anything added at the chair",
+    "extra 20 beard trim Alex M.",
+    "Saturdays · 11:00am · Riley",
+    "Does it work like haircuts?",
+    "Lee's Barbershop · Haircut",
+    "What happens at the chair?",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "Color correction · $110",
+    "Color correction · $125",
+    "Add a beard trim today?",
+    "Riley finishes the work",
+    "Haircuts work like this",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Signature cut and shave",
+    "A barbershop has none.",
+    "Alex pays at the chair",
+    "Stopped Alex M.'s cut.",
+    "Walk-in for a haircut",
+    "Lee's Barbershop LLC",
+    "Priced at the chair",
+    "priced at the chair",
+    "photos of your hair",
+    "Color and cut · $90",
+    "A tip at the chair",
+    "Lee Home Services'",
+    "electrical license",
+    "Alex M. · Haircut",
+    "paid at the chair",
+    "Paid at the chair",
+    "pays at the chair",
+    "a package of cuts",
+    "Lee Home Services",
+    "Beard trim · $20",
+    "Lee's Barbershop",
+    "Color correction",
+    "color correction",
+    "Only the consult",
+    "11:00am · Riley",
+    "10:00am · Riley",
+    "12:30pm · Avery",
+    "11:00am · Avery",
+    "for a staff cut",
+    "Groom's package",
+    "2:00pm · Riley",
+    "3:00pm · Riley",
+    "Haircut · $35",
+    "rents a chair",
+    "1 color quote",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "in the chair",
+    "at the chair",
+    "At the chair",
+    "Consult only",
+    "1200 Main St",
+    "NEW massage",
+    "barbershops",
+    "$25 consult",
+    "the consult",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "a kids cut",
+    "Beard trim",
+    "beard trim",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "A haircut",
+    "a haircut",
+    "cut hair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "haircut",
+    "Elm St",
+    "Oak St",
+    "barber",
+    "Barber",
+    "Jordan",
+    "Riley",
+    "Avery",
+    "Casey",
+    "25 miles",
+    "$75",
+    "your hair",
+    "the hair",
+    "$89",
+    "House calls",
+    "house calls",
+    "house call"
+   ],
+   "B": [
+    "The on-call plumber · a STOP before they set out: they call first",
+    "Free until 7am on the visit day",
+    "After that, or nobody home: up to the",
+    "Mon–Fri 7:30am–5:30pm",
+    "A tip line · bank transfer over $500",
+    "Priced at the visit",
+    "Set at the visit",
+    "E 25% deposit after the quote",
+    "25% deposit",
+    "The rest after",
+    "is the job at a home, an office or somewhere else?",
+    "$89, credited to the repair",
+    "Labor",
+    "$120 an hour",
+    "Water pressure check",
+    "The service call is $89. Accept it?",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today,",
+    "Accepted: the leak repair today,",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "I found water damage under the sink this morning.",
+    "This is Rosie, an automated assistant for Lee Home Services. Sam named you their emergency contact. May we call or text you if they miss a safety check, or can't be reached while care is due? We'd share only where they're working, only after a missed check.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Say Alex asks for a water heater flush every year.",
+    "Can you flush my water heater every year, too?",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "'Adding a faucet check? Say so.'",
+    "Lee Home Services can clear the drain:",
+    "The $179 drain needs none.",
+    "Shutoff valve and wall pipe · $540",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Replace both shutoff valves · $160",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Riley: barber, color, house calls",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Jordan went to get a part and will be back about 9:30am. The job should be done by 10am.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "We couldn't find plumbing license MP045210 for Sam Lee on the state's lookup.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Say a building manager books the same job for 4 units at one address.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Booking for a pet works the same way, where the plug-in books pets.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "which drain is clogged, and is water backing up anywhere else?",
+    "many barbers, salons and groomers are licensed to their shop",
+    "If the person at your door isn't Jordan, don't let them in.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Jordan says no. Please wait until the job is done.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "CANT START no proof Alex may have this work done",
+    "Can Jordan also run a camera down my sewer line?",
+    "Told to leave, then call 911 and the gas company",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "A haircut could mean a salon or a barbershop.",
+    "At your shop, paid at the chair, your own way",
+    "Jordan only, until others are licensed there",
+    "Alex texts that the sink is now overflowing.",
+    "It's overflowing. Can someone come tonight?",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Jordan needs a part from the supply house.",
+    "Can Jordan also look at a dripping faucet?",
+    "If someone else comes, don't let them in.",
+    "Can I run the dishwasher before you come?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Please clear the cabinet under the sink.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Can I skip next week's drain cleaning?",
+    "like a permit it needed that isn't in",
+    "Riley also does color and house calls",
+    "Thu Nov 5 · arriving 8–10am · Jordan",
+    "Fri Nov 6 · arriving 8–10am · Jordan",
+    "The repair price is good for 7 days.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan left a mess under the sink.",
+    "Call a mold cleanup company first",
+    "UPDATE getting a part, back 9:30",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Water heater replacement · $640",
+    "Sewer camera inspection · $199",
+    "HURT cut my hand, need to stop",
+    "No. It doesn't smell like gas.",
+    "barber, color and house calls",
+    "Lee Plumbing and Lee Electric",
+    "Replace both shutoff valves",
+    "Mold behind the sink wall",
+    "Water heater replacement",
+    "water heater replacement",
+    "NEW heating and cooling",
+    "A gas smell at the home",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "Just the kitchen sink.",
+    "Kitchen drain clearing",
+    "Under the sink, before",
+    "Tessa · Drain clearing",
+    "Cabinet floor, before",
+    "Lee Home Services LLC",
+    "Shutoff valve · $165",
+    "No. No huele a gas.",
+    "leehomeservices.com",
+    "Lee Home Services'",
+    "electrical license",
+    "Electrical license",
+    "Water heater flush",
+    "water heater flush",
+    "for today's work.",
+    "Supply line · $80",
+    "the kitchen drain",
+    "paid at the chair",
+    "Lee Home Services",
+    "the repair price",
+    "Lee's Barbershop",
+    "plumbing license",
+    "Plumbing license",
+    "Service call fee",
+    "service call fee",
+    "Yes, every year",
+    "Book the repair",
+    "Drain clearings",
+    "drain clearings",
+    "DONE 179 drain",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "rents a chair",
+    "1200 Main St",
+    "Service call",
+    "service call",
+    "barbershops",
+    "Leak repair",
+    "leak repair",
+    "Yard drain",
+    "yard drain",
+    "Electrical",
+    "electrical",
+    "Barbershop",
+    "barbershop",
+    "beard trim",
+    "88 Elm St",
+    "42 Oak St",
+    "a haircut",
+    "Rental 1",
+    "Rental 2",
+    "the shop",
+    "The shop",
+    "cut hair",
+    "MP045210",
+    "Plumbing",
+    "plumbing",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "barbers",
+    "Haircut",
+    "barber",
+    "Barber",
+    "Jordan",
+    "Riley",
+    "Avery",
+    "Casey",
+    "25 miles",
+    "$160",
+    "$150",
+    "$89",
+    "valve quote",
+    "replacing both shutoff valves"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "41b86c1e72",
+   "S1-38": "b50b0bd4e8",
+   "S1-50": "3167049ceb",
+   "A3-02": "223044a79d",
+   "A3-07": "6b005cf195",
+   "A3-23": "4a8b7c72a2",
+   "A3-24": "78e61fd50f",
+   "A3-26": "9e3630dc0b",
+   "A3-20": "b8251d2535",
+   "A4-03": "c24298dc38",
+   "A4-50": "6f43775326",
+   "A4-43": "c17d56f766",
+   "A4-34": "9f322d96aa",
+   "A4-65": "fa7ec0389d",
+   "A6-04": "fe10e3d360",
+   "A7-12": "05f64179a4",
+   "A7-13": "e41528a397",
+   "A8-04": "8caf7636f3",
+   "A8-23": "e3a35f7f9e",
+   "A8-38": "5e48b74f3a",
+   "A8-35": "a67e890a5b",
+   "A8-43": "7b0f73c701",
+   "A8-44": "4410a4860c",
+   "A8-45": "6589a6b4d4",
+   "A10-02": "c9223be948",
+   "A10-08": "b60e30f285",
+   "S11-02": "d0b2cf9f6c",
+   "A4-11": "2983f72b69",
+   "S2-02": "b2094081ee",
+   "S2-05": "463c757953",
+   "S2-06": "6b01a08c94",
+   "S2-15": "4a64408afc",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "0acce38d9e",
+   "S1-70": "3961b1f903",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S12-19": "07db0515b2",
+   "S12-24": "329bff1093",
+   "A4-24": "0a292df05b",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A9-15": "bd2a17c3c5"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-28": "549fd7ae22",
+   "S2-30": "3a9ee593f3",
+   "S1-12": "0bea92643b",
+   "S1-38": "6301c86637",
+   "S1-50": "daa9091585",
+   "S2-02": "b2094081ee",
+   "S2-05": "5051cc07a8",
+   "S2-06": "b78d25d6e2",
+   "S2-15": "4a64408afc",
+   "S2-21": "bf6617b6d3",
+   "S2-22": "6fe11c094c",
+   "S2-24": "593cd0d5cf",
+   "S1-70": "34e952eac5",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S12-19": "176d3d2beb",
+   "S12-24": "7514a15e65",
+   "B10-38": "867fe1ab7c",
+   "B4-83": "a7473a80ea",
+   "B4-01": "15f683e6cb",
+   "B4-26": "912686f788",
+   "B8-03": "ac9d404766",
+   "B7-90": "a5b8b2fe42",
+   "B8-67": "b66ffbd04d",
+   "B8-93": "c1406fd6bc",
+   "B4-43": "fc9855955a",
+   "B4-16": "37cd99137d",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255",
+   "B3-02": "74ad1f98f2",
+   "B3-11": "e459daf83c",
+   "B3-18": "a4b81ea9b3",
+   "B3-19": "2f53161fb2",
+   "B3-21": "ad48326ac5",
+   "B3-22": "19f64ba1ba",
+   "B3-25": "4413e58bcb",
+   "B3-04": "31447caa31",
+   "B3-24": "a31b436ff1",
+   "B4-03": "1126d68737",
+   "B4-04": "df3ea4b2f5",
+   "B4-05": "fb3a9061c8",
+   "B4-34": "74ff52d83d",
+   "B4-32": "fcfe092e37",
+   "B4-38": "9539521dc7",
+   "B4-28": "506d267aaf",
+   "B5-21": "925b7342ed",
+   "B6-06": "1d676278da",
+   "B7-15": "a00f0c64fb",
+   "B7-16": "3177c3701b",
+   "B7-17": "ac1fd212f3",
+   "B8-02": "024afae342",
+   "B8-18": "530038d2b8",
+   "B8-19": "11e79a26d8",
+   "B8-22": "50d78f1af0",
+   "B8-23": "dd780a2ec8",
+   "B8-30": "a1ef4983e4",
+   "B8-32": "1cfd4f7afa",
+   "B8-35": "93207824c7",
+   "B8-39": "aa75251207",
+   "B8-41": "6e8e9825b2",
+   "B8-44": "3847104a93",
+   "B8-34": "643812e26f",
+   "B10-02": "eaf53a5e74",
+   "S11-02": "b5be5f9aa7",
+   "B6-13": "ed1f412f7d"
+  }
+ }
+}

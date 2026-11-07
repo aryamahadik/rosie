@@ -1,0 +1,5303 @@
+{
+ "id": "wellness-studio",
+ "name": "Float, sauna, cryotherapy and wellness studio",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "spa",
+ "plugin": {
+  "pf.license": {
+   "need": "no state license for float, sauna or cryotherapy in most places; a local health permit where the local rules treat float tanks, plunge pools or saunas as pools or spas (the business's own permit, shown as its word; none is checked by Rosie, D96)",
+   "who": "the business, for its registration and any local health permit it chooses to show",
+   "ask": "optional: the business registration and any local permit it wants shown; nothing is asked of each attendant",
+   "check": "none: Rosie never checks a permit, license or insurance for this work (D96)",
+   "certificates": "the cryotherapy maker's operator training and CPR certificates are the business's own word, shown that way, never as a license",
+   "blocks": "nothing: no permit or certificate blocks a booking here",
+   "claims": "no health or medical claims for any service; what the studio says about a service is its own word, never Rosie's",
+   "insurance": "general liability insurance is optional: the business's own word; host places and events may ask to see it, and the business shows it there",
+   "renewals": "none checked; a renewal date a permit or certificate carries is only a reminder the business sets itself"
+  },
+  "pf.services": {
+   "shape": "private rooms booked by time like a space (float rooms, sauna suites, the cryotherapy chamber, the contrast suite, the red light bed, the compression chairs), with a trained staff member on duty; no person is named; flow B: a mobile sauna and cold plunge delivered to a home or event and run by a staff member, and wellness days at a host's place where guests book seats",
+   "examples": "the example studio's own prices, not a standard",
+   "list": [
+    {
+     "name": "Float, 60 minutes",
+     "price": "$79",
+     "kind": "one price",
+     "length": "60 minutes in the room, plus 30 minutes to clean and filter the room after",
+     "where": "a private float room (3 rooms)",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "a shower before and after; ages 16 and up, 16 and 17 with a parent's signed OK"
+    },
+    {
+     "name": "Float, 90 minutes",
+     "price": "$99",
+     "kind": "one price",
+     "length": "90 minutes, plus 30 minutes to reset",
+     "where": "a private float room",
+     "before": "paid in full when booking",
+     "after": "nothing more"
+    },
+    {
+     "name": "Infrared sauna suite",
+     "price": "$45 for one, $60 for two",
+     "kind": "one price",
+     "length": "40 minutes, plus 10 minutes to reset",
+     "where": "a private sauna suite (2 suites)",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "note": "ages 12 and up with a parent in the suite"
+    },
+    {
+     "name": "Whole-body cryotherapy",
+     "price": "$45; 10 for $350",
+     "kind": "one price",
+     "length": "3 minutes in the chamber, about 15 minutes with check-in",
+     "where": "the cryotherapy chamber",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "needs": "a trained operator in the room the whole time",
+     "note": "ages 18 and up (16 and 17 with a parent's signed OK, where the studio allows it); blood pressure checked before every session"
+    },
+    {
+     "name": "Contrast suite (sauna and cold plunge)",
+     "price": "$65 for one or two",
+     "kind": "one price",
+     "length": "60 minutes, plus 15 minutes to reset",
+     "where": "the contrast suite",
+     "before": "a card saved for the $25 late-cancel fee",
+     "after": "paid at the front desk"
+    },
+    {
+     "name": "Compression session",
+     "price": "$35",
+     "kind": "one price",
+     "length": "30 minutes",
+     "where": "one of 4 chairs in the lounge",
+     "before": "a card saved",
+     "after": "paid at the front desk"
+    },
+    {
+     "name": "Red light bed",
+     "price": "$35",
+     "kind": "one price",
+     "length": "20 minutes",
+     "where": "the red light room",
+     "before": "a card saved",
+     "after": "paid at the front desk"
+    },
+    {
+     "name": "Membership",
+     "price": "$129 a month: 4 sessions of any kind",
+     "kind": "membership",
+     "length": "monthly",
+     "where": "at the studio",
+     "before": "first month paid when joining",
+     "after": "charged monthly, with its own yes to the terms",
+     "note": "one month's unused sessions roll over once; 30 days' notice to cancel"
+    },
+    {
+     "name": "Gift card",
+     "price": "any amount",
+     "kind": "a gift card",
+     "length": "",
+     "where": "both",
+     "before": "typed on the secure page",
+     "after": "comes off what's paid"
+    }
+   ],
+   "capacity": "3 float rooms, 2 sauna suites, 1 cryotherapy chamber, 1 contrast suite, 4 compression chairs, 1 red light bed; each room's reset time is kept free after a booking",
+   "online": "never"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "which service, and the length",
+    "new to the studio, or been before (sets the first-float price and the briefing)",
+    "one person or two (suites for two)",
+    "the age of anyone under 18",
+    "for flow B: a home, an event or an office, the town, and how many guests"
+   ],
+   "afterTime": [
+    "anything staff should know (first time, nervous in small spaces)"
+   ],
+   "securePage": [
+    "the waiver, signed by each person (a parent signs for anyone under 18)",
+    "the health questions for each service, the studio's own list: pregnancy; a heart condition, high blood pressure or a pacemaker; seizures; open wounds or a skin infection; a tattoo or hair dye in the last 2 weeks (float); cold allergy, poor circulation in the hands or feet (cryotherapy); alcohol or drugs today",
+    "a doctor's written OK where an answer needs one under the studio's rule",
+    "an emergency contact"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or legal guardian books for anyone under 18 and signs; each guest at a mobile sauna or a wellness day fills their own forms"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "chest pain, trouble breathing, fainting, a seizure, someone not answering in a float room or sauna",
+     "say": "Call 911 now.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "pregnant, a heart condition, high blood pressure, a pacemaker, seizures",
+     "what": "the health questions decide which services may be booked, by the studio's own list; some need a doctor's written OK; Rosie gives no medical advice"
+    },
+    {
+     "words": "a burn, a cold burn or a rash after a session",
+     "what": "the studio's own line; staff give first aid; 911 if it's serious"
+    }
+   ],
+   "sobriety": "nobody who has had alcohol or drugs that day uses the float, sauna, plunge or cryotherapy",
+   "cryo": "a trained operator stays in the room for the whole session; never over 3 minutes; never with wet skin or clothes; blood pressure checked first",
+   "float": "staff check on a floater by the room's intercom if they don't come out on time",
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Waiver and health questions",
+     "when": "on the secure page while booking, before the first visit, again each year and whenever health changes",
+     "who": "every person who uses a service; a parent signs for anyone under 18; each guest at a mobile sauna or wellness day signs their own",
+     "goodFor": "1 year",
+     "result": "all clear: it books; an answer the studio's list rules out: another service or no booking, before any money; an answer that needs a doctor's OK: it books only once the OK is on file"
+    },
+    {
+     "name": "Doctor's written OK",
+     "when": "before the session, where the studio's rule asks for one (pregnancy for a float, a heart condition for the sauna)",
+     "who": "the customer brings or uploads it",
+     "result": "on file: it goes ahead; not in: another service, or a move with no fee"
+    },
+    {
+     "name": "Blood pressure check",
+     "when": "at the front desk right before each cryotherapy session",
+     "who": "every cryotherapy customer",
+     "result": "under the studio's limit: the session goes ahead; over: no cryotherapy today, another service or a refund"
+    },
+    {
+     "name": "First-visit briefing",
+     "when": "at the start of a first float or cryotherapy session, 5 minutes",
+     "who": "first-time customers",
+     "result": "staff show how the room or chamber works"
+    }
+   ],
+   "prep": "no alcohol that day; eat lightly 1 hour before; for a float, no shaving that day and no new tattoo or hair dye in the last 2 weeks; for cryotherapy, dry skin and no lotion"
+  },
+  "pf.visit": {
+   "checkIn": "at the front desk: the check-in code; for cryotherapy, the blood pressure check first; at a mobile sauna or a wellness day (flow B): each guest's own code on the host's list",
+   "beforeWork": "staff check the health questions are done for each person, show first-timers the room, and for cryotherapy check dry skin, gloves, socks and slippers",
+   "changes": "a session ended early for safety is done another way or refunded for the part not given; an added session is priced first and needs a free room",
+   "done": "the check-in code; for flow B, DONE from the staff member after pack-up",
+   "after": "staff check each room is reset before the next booking"
+  },
+  "pf.money": {
+   "before": "most sessions are paid in full when booking; the contrast suite, compression and red light save a card for the fee and are paid at the front desk; packs and memberships are paid ahead; a mobile sauna takes a $200 deposit with the rest 3 days before; a wellness day takes a 25% deposit from the host",
+   "after": "the front desk for card-saved services; the host's bill for a wellness day",
+   "caps": "deposit cap: from the state form",
+   "cancel": "free to cancel until 12 hours before (the owner's setting); 7 days for a mobile sauna; a cancel for a health reason found by the questions is always free",
+   "fees": "$25 for a late cancel or no-show (example), or the session is used from a pack or membership, only with the owner's OK A customer turned away for having had alcohol or drugs that day is treated like a late cancel: the fee, or the used session, is the owner's call. A health answer or a blood pressure reading that stops a session is never charged.",
+   "membership": "charged monthly to the saved card after the membership's own yes; unused sessions roll over 1 month; cancel with 30 days' notice (the example's terms) or as the state's rules require",
+   "refunds": "a session the studio cancels (a room out of order) is refunded or moved; no refund after the session starts, except a stop for safety",
+   "giftCards": "gift cards are the studio's own, set on the portal",
+   "tax": "where the state's rules tax these services",
+   "tips": "none",
+   "fee2": "Rosfield's $2 applies: one $2 per confirmed booking; a membership counts once a month"
+  },
+  "pf.messages": {
+   "never": "health answers, blood pressure readings, a doctor's OK and a child's details never go in a text: only the secure page",
+   "staffTexts": "texts to staff name the customer, the room and the time only; they never say which answer needs a check",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian"
+  },
+  "pf.staff": {
+   "licenses": "no person license",
+   "skills": "front desk, float rooms, cryotherapy operator (trained by the maker), sauna and plunge, mobile sauna driver and setup",
+   "supervision": "a trained cryotherapy operator in the room for every session; at least one CPR-trained staff member on duty whenever rooms are booked",
+   "oks": "the owner OKs fees, refunds and mobile bookings, and decides which health answers need a doctor's OK",
+   "standIn": "no person is named; any trained staff member on duty runs a session",
+   "away": "only staff cleared to tow and set up the trailer run mobile bookings"
+  },
+  "pf.rules": {
+   "health": "local health rules for float tanks, plunge pools and saunas (water testing, cleaning between users) where the local rules treat them as pools or spas (switches)",
+   "claims": "no medical claims in listings or texts",
+   "minors": "minimum ages by service, the studio's own rule and the state's where it has one",
+   "records": "waivers and health questions kept 7 years, longer for minors where the state asks"
+  },
+  "pf.edges": {
+   "healthNo": "an answer that rules out the service: another service or no booking, told on the page, never in a text",
+   "bloodPressure": "blood pressure over the limit at the desk: no cryotherapy today; another service or a refund",
+   "roomOut": "a float room or the chamber out of order: another room, another service or a move with no fee",
+   "late": "a late customer: the session is shorter, so the room's reset and the next booking stay on time",
+   "faint": "someone faints or feels unwell: first aid, 911 if serious; the owner told at once",
+   "weather": "a mobile sauna in lightning or high wind: use stops; the rest moves or is refunded",
+   "couple": "two people in a suite: each signs their own waiver and health questions",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "plans",
+   "packs",
+   "groups",
+   "forms",
+   "children",
+   "aftercare",
+   "spaces"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   }
+  },
+  "pf.switches": {}
+ },
+ "cast": {
+  "A": {
+   "staff": "Tara and Eli (attendants)",
+   "cust": "Alex M. (customer) · other guests"
+  },
+  "B": {
+   "staff": "Kai and Noor (attendants who visit)",
+   "cust": "Alex M. (customer) · other guests",
+   "other": "Others (a host, an office manager)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Tara"
+  },
+  "B": {
+   "staff": "Kai"
+  }
+ },
+ "keep": [
+  "sauna",
+  "float",
+  "visit fee",
+  "Visit fee",
+  "no-show fee",
+  "No-show fee",
+  "late-cancel",
+  "leak"
+ ],
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-15",
+   "S1-80"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "S1-80"
+  ]
+ },
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a 60-min float at Lee Float Studio with Tara, for Sat Oct 24 at 11:00am. Alex fills in the wellness form on the secure page, and the float is paid in full when booking. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books a mobile sauna and cold plunge at 58 Hazel Ct, with Kai from Lee Mobile Sauna, Thu Oct 22 at 8:00am. The wellness form is on the secure page. The money choice at the top picks the path: a $650 sauna with a $200 deposit, or a wellness day at an office."
+ },
+ "money": {
+  "A": {
+   "main": "list|full|none",
+   "combos": [
+    "list|full|none",
+    "list|card|counter"
+   ],
+   "examples": {
+    "list|full|none": "The main story: a 60-minute float, $79, paid in full when booking. Sauna suites and cryotherapy are paid this way too.",
+    "list|card|counter": "A $65 contrast suite for one or two. A card is saved for the $25 late-cancel fee, and it's paid at the front desk."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$25",
+     "name": "60-min float"
+    },
+    "list|*|*": {
+     "price": "$79",
+     "name": "60-min float"
+    },
+    "list|full|*": {
+     "price": "$79",
+     "paid": "$79",
+     "fee": "$40",
+     "name": "60-min float"
+    },
+    "list|card|counter": {
+     "price": "$65",
+     "fee": "$25",
+     "name": "contrast suite (sauna and cold plunge)"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Cold plunge add-on",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$25"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "infrared sauna suite",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$45",
+      "paid": "$45",
+      "fee": "$25"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|deposit|card",
+   "combos": [
+    "list|deposit|card",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|deposit|card": "The main story: a $650 mobile sauna and cold plunge at a home: a $200 deposit now, and the $450 rest charged to the saved card at DONE, after the visit.",
+    "list|deposit|bill": "A $600 wellness day at an office: a $150 deposit from the host, the rest billed by Rosie after the visit."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$200",
+     "name": "mobile sauna and cold plunge at home"
+    },
+    "list|*|*": {
+     "price": "$650",
+     "name": "mobile sauna and cold plunge at home"
+    },
+    "list|deposit|card": {
+     "price": "$650",
+     "deposit": "$200",
+     "rest": "$450",
+     "fee": "$200",
+     "name": "mobile sauna and cold plunge at home"
+    },
+    "list|deposit|bill": {
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "fee": "$150",
+     "name": "wellness day at an office (for 6)"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Cold plunge add-on",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$20",
+      "fee": "$200"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "recovery visit at home, paid in full",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$75"
+     }
+    },
+    "b-pack": {
+     "flow": "B",
+     "name": "mobile sauna at home (membership)",
+     "price": "list",
+     "before": "none",
+     "after": "none",
+     "paidby": "credit"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No state license for this work: the business gives only its own registration (S1-61); nothing is looked up (D96)."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The plug-in names no license to check for this work, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license, certificate or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license is checked for this work (D96): a certificate is the person's own word, optional."
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the person's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the person's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "Each service's card comes from its own price, fee and way of payment.",
+     "A pack or membership is paid when bought. Each visit uses one credit.",
+     "A home or office visit is paid as its card says: a deposit now, the rest later.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your studio, paid when they book, your own way",
+         "A card saved when they book, for a fee you OK"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Keep it"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Each service shows its price and its place before the client picks.",
+      {
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:counter": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Spa work pays Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Spa work adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The spa runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Float and sauna sessions are never sent now: every visit has a set start."
+   },
+   {
+    "op": "off",
+    "at": "A4-01",
+    "label": "By video or phone",
+    "why": "Spa work is done in person."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for a float studio visit."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Spa visits are never stays."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "No",
+    "why": "Every guest has the spa's health form on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "Nothing is brought to the spa. A form that isn't done is filled in on the desk's tablet."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "The spa runs no classes."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Nothing is dropped off at the spa."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays at the spa for a teen's visit."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Nothing is left at the spa: the guest is there."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No plan or insurance pays for a float studio visit."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A spa visit is rated."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "A spa visit has no result to send later."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing is left at the spa."
+   },
+   {
+    "op": "off",
+    "at": "A5-19",
+    "why": "A float studio's services need no written contract: the health form and the terms on the secure page are enough (pf.rules).",
+    "label": "Yes: everyone signs"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "No state license for this work: the business gives only its own registration (S1-61); nothing is looked up (D96)."
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The plug-in names no license to check for this work, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license, certificate or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "No person license is checked for this work (D96): a certificate is the person's own word, optional."
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the person's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the person's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "no license is checked for this work (D96)"
+   },
+   {
+    "op": "words",
+    "at": "S1-13",
+    "more": [
+     "Each service's card comes from its own price, fee and way of payment.",
+     "A pack or membership is paid when bought. Each visit uses one credit.",
+     "A home or office visit is paid as its card says: a deposit now, the rest later.",
+     "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+    ],
+    "say": [
+     [
+      "san",
+      "owner",
+      "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+      {
+       "card": {
+        "title": "Every service, to start",
+        "lines": [
+         "At your studio, paid when they book, your own way",
+         "A card saved when they book, for a fee you OK"
+        ]
+       },
+       "buttons": [
+        "Keep it as is"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "Keep it"
+     ],
+     [
+      "san",
+      "owner",
+      "Set. Each service shows its price and its place before the client picks.",
+      {
+       "buttons": [
+        "That's right"
+       ]
+      }
+     ],
+     [
+      "owner",
+      "san",
+      "1"
+     ]
+    ],
+    "vary": {
+     "after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:none+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:deposit+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:none+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:card+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:photos+before:full+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:none+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:card": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:visit+before:deposit+after:own": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "price:list+before:none+after:none": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "after:bill": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     },
+     "before:full": {
+      "addSay": [],
+      "addMore": [],
+      "more": [
+       "Each service's card comes from its own price, fee and way of payment.",
+       "A pack or membership is paid when bought. Each visit uses one credit.",
+       "A home or office visit is paid as its card says: a deposit now, the rest later.",
+       "The money choices at the top of this page set Sam's answer here, for the service Alex books."
+      ],
+      "say": [
+       [
+        "san",
+        "owner",
+        "Here's how I've started each service. Want any paid when they book, or done at a home or office?",
+        {
+         "card": {
+          "title": "Every service, to start",
+          "lines": [
+           "At your studio, paid when they book, your own way",
+           "A card saved when they book, for a fee you OK"
+          ]
+         },
+         "buttons": [
+          "Keep it as is"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "Keep it"
+       ],
+       [
+        "san",
+        "owner",
+        "Set. Each service shows its price and its place before the client picks.",
+        {
+         "buttons": [
+          "That's right"
+         ]
+        }
+       ],
+       [
+        "owner",
+        "san",
+        "1"
+       ]
+      ]
+     }
+    }
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Spa work pays Rosfield's $2."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "Spa work adds no agreement, so there's nothing to leave unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "The spa books people. Its rooms come with each service, and are checked like equipment (A4-35)."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "The spa runs no classes on a timetable."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Float and sauna sessions are never sent now: every visit has a set start."
+   },
+   {
+    "op": "off",
+    "at": "B4-01",
+    "label": "A video or phone session",
+    "why": "Spa work is done in person."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "No plan or warranty pays for a float."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "A float at home starts at a set time, not in a window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Spa work is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Float at home is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B4-38",
+    "label": "No",
+    "why": "Every guest has the spa's health form on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B5-34",
+    "label": "Yes: a signed contract first",
+    "why": "Spa work needs no written contract: the terms are agreed on the secure page."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Float at home is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Float at home is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Float at home is never sent now."
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "A float needs the guest there."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "The way in fails",
+    "why": "A float needs the guest there."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "A child is never left in the attendant's care: an adult on the booking is there."
+   },
+   {
+    "op": "off",
+    "at": "B8-22",
+    "label": "An update for Alex",
+    "why": "The guest is there for the whole visit."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "A float is one visit, paid once."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for a float."
+   },
+   {
+    "op": "off",
+    "at": "B9-06",
+    "label": "Someone else pays",
+    "why": "No landlord pays for a float. A gift is paid by the booker, or with a gift card."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "A float has no report to send later."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "A float at home isn't redone under a warranty; a complaint goes to Sam (B10-36)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Lee Mobile Sauna asks for a rating after a visit."
+   }
+  ]
+ },
+ "notes": "Built from spa (Chair; the sibling's refitted overlay) and the verified sample plug-in (work/prof/wellness-studio.json, test-drive Oct 24; its notes in work/testdrive/wellness-studio.md). Oct 27 2026.\nChanged from the sample: the permit line says nothing is looked up (D96); the flow B deposit rest is charged at DONE or billed after (never on a set day, D65); the $2 applies (D97, no2 never on).\nMoney: A float paid in full (main), contrast suite with a card saved (card at the desk). B mobile sauna with a $200 deposit and the $450 rest at DONE (main), wellness day at an office with a $150 deposit and the bill after.\nFacts: plans (membership), packs, groups, forms, children (16-17 float with a parent's OK), aftercare, spaces (rooms booked by time). No switches: sensitive off (wellness, not health care; health answers stay on the secure page).",
+ "rename": {
+  "A": [
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Sessions, sauna sessions and spa packages."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Float and spa parties at home, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A spa party at home"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The spa's example: a rash after a sauna session product gets 'rinse it off with cool water' first."
+   ],
+   [
+    "Service call fee",
+    "No-show fee"
+   ],
+   [
+    "service call fee",
+    "no-show fee"
+   ],
+   [
+    "A time shows only if the person and the things are all free.",
+    "A time shows only if the person and the room are both free."
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a body wrap, which isn't on the spa's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Float Studio doesn't do body wraps."
+   ],
+   [
+    "the color and cut takes",
+    "a custom spa day takes"
+   ],
+   [
+    "the color and cut is paid",
+    "a custom spa day is paid"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: medium pressure, likes a warm table, no scented oil"
+   ],
+   [
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Accepted: the red light float today at 2:00pm with Noor."
+   ],
+   [
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "Saved: 60-min float $135 for visits from Mon Nov 2. Sessions already booked keep $79. 60-min float plans go to $135 from Wed Nov 25, only for customers who say yes."
+   ],
+   [
+    "first tomorrow: 10:00am, Riley",
+    "first tomorrow: 9:30am, Tara"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Alex asks for a float every 4 weeks. The spa offers a plan, so Rosie books the first visit and saves the next ones on the same day and time."
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Ben's AI asks for a red light float at $79, an old price. Rosie answers with the real price, $145. That's the price Ben sees before saying yes."
+   ],
+   [
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "Some services take several visits, like a sauna session series of 4. Where the plug-in says so, all the times are picked now."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A bride books a spa morning for herself and four friends. Rosie fits each one's float and sauna session in turns, across the rooms and the team."
+   ],
+   [
+    "Riley finds something the plug-in says stops the work. Nothing more is done, and nothing is charged for the part not done.",
+    "Tara finds a rash the plug-in says stops work on that area. Nothing more is done there, and nothing is charged for the part not done."
+   ],
+   [
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Alex adds a sauna session after the float. Rosie finds one time with Tara, then an attendant, back to back, and adds the prices: $79 and $65."
+   ],
+   [
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Where the plug-in says the work is named only, no rating is asked. A spa visit is rated, so the spa takes the first branch."
+   ],
+   [
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the 60-min float to $135 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "Nia K. asked to talk about a group spa day before booking. Sam taps Call, and the call goes out from the spa's number."
+   ],
+   [
+    "From the price list or photos, the price is set. A service priced at the chair gets its price now.",
+    "From the price list or photos, the price is set. A service priced at the visit gets its price now."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "A float for Alex and a teen sauna session for a daughter work the same way. Both are asked before the times."
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "It's a red light float today at 2:00pm with Noor, for a new customer. It's $145. Accept it?"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "A red light float at Lee Float Studio is $145, not $79. Here are the open times at $145."
+   ],
+   [
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "Tara stopped part of Alex M.'s float. The note is on the secure page."
+   ],
+   [
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "At the spa, a parent stays for a teen's visit, so nothing more happens."
+   ],
+   [
+    "Reading it back: accept the beard trim today at 2:00pm with Avery.",
+    "Reading it back: accept the red light float today at 2:00pm with Noor."
+   ],
+   [
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "Stopped part of Alex M.'s float. I put a note on the page."
+   ],
+   [
+    "The shop's money terms apply per person, as Sam set them.",
+    "A group day takes a 50% deposit, and Sam OKs each group first."
+   ],
+   [
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Hello, do you speak Spanish? I'd like a float on Saturday."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says float oil stained a silk scarf today."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Nail care for Lee Float Studio: is it the same company?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My sunburn got worse. Can I still come in?"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "Yes: a teen sauna session, for 13 to 17, is $70. Want a time?"
+   ],
+   [
+    "A booked window stays right when the clocks change",
+    "A booked time stays right when the clocks change"
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says Saturday's float felt rushed at the end."
+   ],
+   [
+    "A barbershop sells its packages only at the shop.",
+    "The spa sells packs and memberships on the page too, with their terms first."
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero un masaje el sábado."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A float could mean a float studio or a attendant who comes to you."
+   ],
+   [
+    "Riley can do a shorter cut in the time left",
+    "Tara can give a shorter float in the time left"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the lounge during my float?"
+   ],
+   [
+    "Lee's Barbershop will fix it for free.",
+    "Lee Float Studio will make it up with a free 30-minute float."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds nail care to Lee Float Studio."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Float oil stained my silk scarf."
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do teen sauna sessions? My daughter is 14."
+   ],
+   [
+    "Books the groom's party together",
+    "Books a group spa day together"
+   ],
+   [
+    "Books a haircut and a beard trim",
+    "Books a float and a sauna session"
+   ],
+   [
+    "Color always stays with Riley.",
+    "Compression float always stays with Tara."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The float felt rushed at the end."
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the visit?"
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a float every 4 weeks"
+   ],
+   [
+    "Riley enters the code",
+    "The desk enters the code"
+   ],
+   [
+    "Beard trim · $20",
+    "Cold plunge · $30"
+   ],
+   [
+    "Color correction",
+    "Red light float"
+   ],
+   [
+    "Skin fade · $40",
+    "Red light float · $145"
+   ],
+   [
+    "1 color quote",
+    "1 late-cancel fee"
+   ],
+   [
+    "Haircut plan",
+    "Float plan"
+   ],
+   [
+    "NEW massage",
+    "NEW nail care"
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a float at the spa or at home."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states license float and esthetics only inside a licensed place."
+   ],
+   [
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Sam Lee added you to the team for float and sauna and cold plunge visits."
+   ],
+   [
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "60-min float $79 ($135 from Nov 2) · Red light float $145 · Cold plunge $30"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes visits sent now: every float has a set start."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Float takes no jobs sent now."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every float, compression and house calls"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Float MT031552 · esthetics ES30417"
+   ],
+   [
+    "$140 an hour",
+    "$79 an hour"
+   ],
+   [
+    "$20 fee",
+    "$65 fee"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Infrared sauna"
+   ],
+   [
+    "Signature cut and shave",
+    "Infrared sauna"
+   ],
+   [
+    "Signature cut",
+    "Infrared sauna"
+   ],
+   [
+    "signature cut",
+    "signature sauna session"
+   ],
+   [
+    "Groom's package",
+    "Sauna for two"
+   ],
+   [
+    "a beard trim",
+    "cold plunge"
+   ],
+   [
+    "A beard trim",
+    "Cold plunge"
+   ],
+   [
+    "Beard trim",
+    "Cold plunge"
+   ],
+   [
+    "beard trim",
+    "cold plunge"
+   ],
+   [
+    "Skin fade",
+    "Red light float"
+   ],
+   [
+    "skin fade",
+    "red light float"
+   ],
+   [
+    "a kids cut",
+    "a teen sauna session"
+   ],
+   [
+    "Kids cut",
+    "Teen sauna session"
+   ],
+   [
+    "kids cut",
+    "teen sauna session"
+   ],
+   [
+    "Haircuts",
+    "Sessions"
+   ],
+   [
+    "haircuts",
+    "sessions"
+   ],
+   [
+    "Haircut",
+    "60-min float"
+   ],
+   [
+    "haircut",
+    "60-min float"
+   ],
+   [
+    "the shop's board",
+    "the spa's menu"
+   ],
+   [
+    "price board",
+    "menu"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the visit"
+   ],
+   [
+    "priced at the chair",
+    "priced at the visit"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "$140",
+    "$79"
+   ],
+   [
+    "$100",
+    "$79"
+   ],
+   [
+    "$40",
+    "$79"
+   ],
+   [
+    "$35",
+    "$79"
+   ],
+   [
+    "$20",
+    "$65"
+   ],
+   [
+    "$25",
+    "$70"
+   ],
+   [
+    "$55",
+    "$65"
+   ],
+   [
+    "$75",
+    "$180"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Float Studio LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Float Studio"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Sauna's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Sauna"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Float"
+   ],
+   [
+    "Lee Electric",
+    "Lee Mobile Sauna"
+   ],
+   [
+    "MP045210",
+    "MT045210"
+   ],
+   [
+    "JP031552",
+    "MT031552"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "EC22871",
+    "EE22871"
+   ],
+   [
+    "BS20981",
+    "SP20981"
+   ],
+   [
+    "Riley Chen",
+    "Tara Brooks"
+   ],
+   [
+    "Riley",
+    "Tara"
+   ],
+   [
+    "Avery Diaz",
+    "Eli Grant"
+   ],
+   [
+    "Avery",
+    "Eli"
+   ],
+   [
+    "Jordan Price",
+    "Kai Hart"
+   ],
+   [
+    "Jordan",
+    "Kai"
+   ],
+   [
+    "Casey Moore",
+    "Noor Ramos"
+   ],
+   [
+    "Casey",
+    "Noor"
+   ],
+   [
+    "88 Elm St",
+    "215 Oak Ave"
+   ],
+   [
+    "1200 Main St",
+    "21 Harbor Rd"
+   ],
+   [
+    "Elm St",
+    "Oak Ave"
+   ],
+   [
+    "Oak St",
+    "Ash Ct"
+   ],
+   [
+    "Electrical",
+    "Sauna and cold plunge"
+   ],
+   [
+    "electrical",
+    "sauna and cold plunge"
+   ],
+   [
+    "Plumbing",
+    "Float"
+   ],
+   [
+    "plumbing",
+    "float"
+   ],
+   [
+    "plumber",
+    "attendant"
+   ],
+   [
+    "Plumber",
+    "Attendant"
+   ],
+   [
+    "barbershops",
+    "float studios"
+   ],
+   [
+    "Barbershop",
+    "Float studio"
+   ],
+   [
+    "barbershop",
+    "float studio"
+   ],
+   [
+    "Barbers",
+    "Attendants"
+   ],
+   [
+    "barbers",
+    "attendants"
+   ],
+   [
+    "Barber",
+    "Attendant"
+   ],
+   [
+    "barber",
+    "attendant"
+   ],
+   [
+    "shops",
+    "spas"
+   ],
+   [
+    "Shop",
+    "Spa"
+   ],
+   [
+    "shop",
+    "spa"
+   ],
+   [
+    "skin fades",
+    "60-min floats"
+   ],
+   [
+    "$130",
+    "$79"
+   ],
+   [
+    "$65",
+    "$65"
+   ],
+   [
+    "$55",
+    "$79"
+   ],
+   [
+    "$35",
+    "$45"
+   ],
+   [
+    "$40",
+    "$45"
+   ],
+   [
+    "$20",
+    "$25"
+   ],
+   [
+    "$510",
+    "$79"
+   ],
+   [
+    "$255",
+    "$79"
+   ],
+   [
+    "$89",
+    "$25"
+   ],
+   [
+    "$180",
+    "$99"
+   ],
+   [
+    "$65",
+    "$45"
+   ],
+   [
+    "$30",
+    "$20"
+   ],
+   [
+    "$145",
+    "$99"
+   ],
+   [
+    "$135",
+    "$85"
+   ],
+   [
+    "$189",
+    "$99"
+   ],
+   [
+    "$130",
+    "$79"
+   ],
+   [
+    "Hot stones add-on",
+    "Cold plunge add-on"
+   ],
+   [
+    "Yes: a teen sauna session, for 13 to 17, is $70. Want a time?",
+    "Yes: a teen sauna session, for 16 and 17, is $45. Want a time?"
+   ],
+   [
+    "Booked for 8 people · $70 each",
+    "Booked for 8 people · $79 each"
+   ],
+   [
+    "The visit is for a child, and a parent or guardian books. Alex picked a teen sauna session for a son before the times, so the times fit it.",
+    "The visit is for a teen, and a parent or guardian books. Alex picked a sauna session for a son before the times, so the times fit it."
+   ]
+  ],
+  "B": [
+   [
+    "Barber license: on file, checked Oct 19",
+    "Attendant's own word: a certificate, if they have one"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Sessions, sauna sessions and spa packages."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Float and spa parties at home, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A spa party at home"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The spa's example: a rash after a sauna session product gets 'rinse it off with cool water' first."
+   ],
+   [
+    "Service call fee",
+    "No-show fee"
+   ],
+   [
+    "service call fee",
+    "no-show fee"
+   ],
+   [
+    "A time shows only if the person and the things are all free.",
+    "A time shows only if the person and the room are both free."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Quiero un masaje, pero una crema me dio un sarpullido."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I'd like a float, but a cream gave me a rash."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿se le hincha la cara o la garganta? ¿Le cuesta respirar?"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is your face or throat swelling? Is it hard to breathe?"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo tengo la piel roja."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. My skin is just red."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Lave la zona con agua fría y no use la crema. Si se le hincha la cara o le cuesta respirar, llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rinse the area with cool water and stop using the cream. If your face swells or it's hard to breathe, call 911."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to rinse the rash with cool water, and to call 911 if their face or throat swells."
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about a float at home. A text back is fine."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the float length, the pressure, and a quiet room with space for the table."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a reaction happening now to an oil or a lotion, like a swelling face or trouble breathing."
+   ],
+   [
+    "Here, the plumbing plug-in's parts load",
+    "Here, the spa plug-in's parts load"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A float could mean a float studio or a physical attendant."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding 30 more minutes? Say so.'"
+   ],
+   [
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Mobile Sauna asks: is it at a home, a hotel or an office? And is it 60 or 90 minutes?"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. 90 minutes."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My back is sore' fits a 90-minute float."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like a float in a neighbor's home."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some bookings take more than one visit, like a float every 4 weeks."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you come every 4 weeks, too?"
+   ],
+   [
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Sam can set this for one service, like the spa party at home."
+   ],
+   [
+    "Lee Home Services can start the sewer camera inspection at a set time.",
+    "Lee Mobile Sauna can start the spa party at a set time."
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "A $600 office wellness day is over the plug-in's amount, so it gets a written estimate to sign."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is there room for the table?'"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a quiet room with space for the table?"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, the living room"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $650 float needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have a quiet room with space for the table."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I put on lotion before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that a new lotion left a rash."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "A new lotion left a rash on my arm now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "Rinse it with cool water and don't use the lotion. If your face or throat swells, call 911. Kai will check before starting."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old scuff on the floor by the couch"
+   ],
+   [
+    "Under the sink, before",
+    "Living room, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor by the couch, before"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks Kai for 30 more minutes."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Kai's float oil stains Alex's rug, and Kai texts a photo."
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE oil stain on the rug"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Oil stain on the rug"
+   ],
+   [
+    "Jordan cracked the cabinet floor at",
+    "Kai's float oil stained the rug at"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no stain."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found an oil stain on the rug this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's a 90-minute float at home, today,"
+   ],
+   [
+    "accept the leak repair for today",
+    "accept the 90-minute float for today"
+   ],
+   [
+    "Accepted: the leak repair today",
+    "Accepted: the 90-minute float today"
+   ],
+   [
+    "The service call is $89.",
+    "The late-cancel and no-show fee is $200."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I'd like a 90-minute float at home on Thursday morning. I'm in Springfield."
+   ],
+   [
+    "Me, and yes. It's my kitchen.",
+    "Me, and yes. It's at my home."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "A float needs nothing first, unless the health form asks for a doctor's OK. So the first open times are this week."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "Aftercare tips are on your secure page."
+   ],
+   [
+    "first tomorrow: 10:00am",
+    "first tomorrow: 9:30am"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Say Alex asks for a 90-minute float every 4 weeks. Lee Float Studio offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one."
+   ],
+   [
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Ivy's AI asks for a 90-minute float at $150, an old price. Rosie answers with the real price, $650. That's the price Ivy sees before saying yes."
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say a bride books sessions for herself and 3 friends at one hotel suite. It's one booking with one code, given by whoever lets the attendants in."
+   ],
+   [
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Yes. Lee Float Studio has a plan every 4 weeks, $650 a visit. Each visit is booked and paid like a single one. Want it every 4 weeks?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Mobile Sauna has a plan every 4 weeks, $650 a visit."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The outlet for the table warmer sparks. The plug-in says to stop using it, so Alex gets a written note."
+   ],
+   [
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Sam raises the 90-minute float to $189 for visits from Mon Nov 2. AI assistants show the new price for those dates at once."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Float Studio does float and sauna and cold plunge, not nails. Nothing was saved. You can look for a nail studio near you."
+   ],
+   [
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Say Alex had asked Lee Float Studio for a 60-min float instead. It's offered in both places, so Alex sees both prices first."
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Every float has its price before the visit, so nothing is priced here."
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for a sauna session after the float. Both go in one booking, back to back, with one code."
+   ],
+   [
+    "Morgan P. asked to talk about the $640 quote. Sam taps Call, and the call goes out from the business's number.",
+    "Morgan P. asked to talk about a spa party before booking. Sam taps Call, and the call goes out from the business's number."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "Lee Float Studio can give you a 60-min float at the spa for $130, or at your home for $180. Where would you like it?"
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. Call 911 now. Rinse the lotion off with cool water."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said their face is swelling after a lotion. They got the safety message, and nothing was booked."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M. says Thursday's float felt rushed at the end."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. Kai does sauna sessions too: $189 for a signature sauna session at home. Both fit back to back."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "A 90-minute float with Lee Float Studio is $650, not $150. Here are the open times at $650."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 5:52pm on Kai's phone, you said yes to 30 more minutes for $60."
+   ],
+   [
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "We'll text you times for the float you asked Kai about in late Mar 2027."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Only people who do this service are offered again."
+   ],
+   [
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "Lee Float Studio: $800 for your office chair-float day. Pay by card, or by bank transfer."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Float Studio doesn't do, like a manicure."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Kai found the outlet by the table sparks, so Kai turned off the table warmer."
+   ],
+   [
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Kai left oil on the rug.\""
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a swelling face, gets the safety steps first."
+   ],
+   [
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "A visit at home goes on in this flow. A visit at the spa is in the other flow."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Lee Float Studio sent you a proposal for a float plan, from Kai's notes."
+   ],
+   [
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Morgan P. would like to talk about a spa party before booking."
+   ],
+   [
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "Sorry about that. Here's a free 30-minute float to make it up."
+   ],
+   [
+    "The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "The main story: Alex asks an AI for a float at home on Mon Oct 19, 6:40pm."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "I'm 30 weeks pregnant. Is a float safe for me?"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Extra for Alex M.: 30 more minutes, $60. Sent to Alex."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can a attendant give a hot stone float at home this Thursday? What does it cost?"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Lash and brow work for Lee Float Studio: is it the same company?"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE medium pressure, tight shoulders. Bring the bolster next time."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Sessions already booked keep $650, even after Nov 2."
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Kai's next times for a 90-minute float."
+   ],
+   [
+    "No problem. The $160 valve quote is good for 7 days.",
+    "No problem. The float ends at the booked time."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each guest's own form goes only to the attendant serving that guest."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds lash and brow work to Lee Float Studio."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Kai says no. Please skip lotion, so the float oil works well."
+   ],
+   [
+    "A booked window stays right when the clocks change",
+    "A booked time stays right when the clocks change"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now and rinse it off"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Kai do a hot stone float instead?"
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: 90min float, in the spring"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 60 30 more minutes"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Kai come back next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what the spa promises, if anything."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My back is sore. Can someone come tonight?"
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Kai also do a sauna session after the float?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD outlet sparks, table warmer off"
+   ],
+   [
+    "Nora can ask to be next for that window.",
+    "Nora can ask to be next for that time."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's float?"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The float felt rushed at the end."
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "30 more minutes · $60"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the warm table"
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Kai left oil on the rug."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Call an electric repair company first"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the outlet by the table sparks"
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Float every 4 weeks"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa 90min Thu 7pm Casey"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Float plan · every 4 weeks"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT strained my wrist, need to stop"
+   ],
+   [
+    "Rental 1 · Tue Oct 20 · $179",
+    "Float · Tue Oct 6 · $650"
+   ],
+   [
+    "Rental 2 · Wed Oct 21 · $179",
+    "Float · Tue Oct 20 · $650"
+   ],
+   [
+    "raise drain clearing to 199",
+    "raise 90min float to 189"
+   ],
+   [
+    "Cancel your plumbing visit",
+    "Cancel your spa visit"
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the table"
+   ],
+   [
+    "A gas smell at the home",
+    "A swelling face after a lotion"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW lash and brow"
+   ],
+   [
+    "stage 2 of your repipe",
+    "your office chair-float day"
+   ],
+   [
+    "Yes, every year",
+    "Yes, every 4 weeks"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 90min float"
+   ],
+   [
+    "Rental 1",
+    "Float"
+   ],
+   [
+    "Rental 2",
+    "Float"
+   ],
+   [
+    "1 quote",
+    "1 late-cancel fee"
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a float at the spa or at home."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent jobs sent now, like a lockout or a tow."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states license float and esthetics only inside a licensed place."
+   ],
+   [
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Sam Lee added you to the team for float and sauna and cold plunge visits."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes visits sent now: every float has a set start."
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Float takes no jobs sent now."
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every float, and sauna sessions at home"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Float MT031552 · esthetics ES30417"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Every day, 9am–8pm"
+   ],
+   [
+    "Electrical license",
+    "Esthetics license"
+   ],
+   [
+    "Plumbing license",
+    "Float license"
+   ],
+   [
+    "$140 an hour",
+    "$150 an hour"
+   ],
+   [
+    "$20 fee",
+    "$65 fee"
+   ],
+   [
+    "arriving 8–10am",
+    "starts 5:00pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts 7:00pm"
+   ],
+   [
+    "8–10am",
+    "5:00pm"
+   ],
+   [
+    "8–10",
+    "5:00pm"
+   ],
+   [
+    "12–2pm",
+    "7:00pm"
+   ],
+   [
+    "7am Thu",
+    "5pm Wed"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 4:45pm"
+   ],
+   [
+    "8:20am",
+    "4:45pm"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 4:25pm"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 6:45pm"
+   ],
+   [
+    "Kitchen drain clearing",
+    "90-minute float"
+   ],
+   [
+    "Yard drain",
+    "Hot stone float"
+   ],
+   [
+    "yard drain",
+    "hot stone float"
+   ],
+   [
+    "Kitchen drain",
+    "90-minute float"
+   ],
+   [
+    "kitchen drain",
+    "90-minute float"
+   ],
+   [
+    "Drain clearings",
+    "90-minute sessions"
+   ],
+   [
+    "drain clearings",
+    "90-minute sessions"
+   ],
+   [
+    "Drain clearing",
+    "90-minute float"
+   ],
+   [
+    "drain clearing",
+    "90-minute float"
+   ],
+   [
+    "drain cleaning",
+    "float"
+   ],
+   [
+    "Water heater flush",
+    "60-minute float"
+   ],
+   [
+    "water heater flush",
+    "60-minute float"
+   ],
+   [
+    "Water heater replacement",
+    "Spa party at home"
+   ],
+   [
+    "water heater replacement",
+    "spa party at home"
+   ],
+   [
+    "Leak repair",
+    "Compression float at home"
+   ],
+   [
+    "leak repair",
+    "compression float at home"
+   ],
+   [
+    "$89 service call",
+    "$200 fee"
+   ],
+   [
+    "service call",
+    "starting price"
+   ],
+   [
+    "plumbing visit",
+    "spa visit"
+   ],
+   [
+    "the drain",
+    "the float"
+   ],
+   [
+    "$40",
+    "$200"
+   ],
+   [
+    "$110",
+    "$450"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Float Studio"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Mobile Sauna LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Mobile Sauna's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Mobile Sauna"
+   ],
+   [
+    "leehomeservices.com",
+    "leemobilespa.com"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Mobile Float"
+   ],
+   [
+    "Lee Electric",
+    "Lee Mobile Sauna"
+   ],
+   [
+    "MP045210",
+    "MT045210"
+   ],
+   [
+    "JP031552",
+    "MT031552"
+   ],
+   [
+    "JE30417",
+    "ES30417"
+   ],
+   [
+    "EC22871",
+    "EE22871"
+   ],
+   [
+    "BS20981",
+    "SP20981"
+   ],
+   [
+    "Sewer camera inspection",
+    "Hot stone float"
+   ],
+   [
+    "Labor",
+    "Extra time"
+   ],
+   [
+    "Riley Chen",
+    "Tara Brooks"
+   ],
+   [
+    "Riley",
+    "Tara"
+   ],
+   [
+    "Avery Diaz",
+    "Eli Grant"
+   ],
+   [
+    "Avery",
+    "Eli"
+   ],
+   [
+    "Jordan Price",
+    "Kai Hart"
+   ],
+   [
+    "Jordan",
+    "Kai"
+   ],
+   [
+    "Casey Moore",
+    "Noor Ramos"
+   ],
+   [
+    "Casey",
+    "Noor"
+   ],
+   [
+    "88 Elm St",
+    "215 Oak Ave"
+   ],
+   [
+    "1200 Main St",
+    "21 Harbor Rd"
+   ],
+   [
+    "42 Oak St",
+    "58 Ash Ct"
+   ],
+   [
+    "Elm St",
+    "Oak Ave"
+   ],
+   [
+    "Oak St",
+    "Ash Ct"
+   ],
+   [
+    "Electrical",
+    "Sauna and cold plunge"
+   ],
+   [
+    "electrical",
+    "sauna and cold plunge"
+   ],
+   [
+    "Plumbing",
+    "Float"
+   ],
+   [
+    "plumbing",
+    "float"
+   ],
+   [
+    "plumber",
+    "attendant"
+   ],
+   [
+    "Plumber",
+    "Attendant"
+   ],
+   [
+    "barbershops",
+    "float studios"
+   ],
+   [
+    "Barbershop",
+    "Float studio"
+   ],
+   [
+    "barbershop",
+    "float studio"
+   ],
+   [
+    "Barbers",
+    "Attendants"
+   ],
+   [
+    "barbers",
+    "attendants"
+   ],
+   [
+    "Barber",
+    "Attendant"
+   ],
+   [
+    "barber",
+    "attendant"
+   ],
+   [
+    "shops",
+    "spas"
+   ],
+   [
+    "Shop",
+    "Spa"
+   ],
+   [
+    "shop",
+    "spa"
+   ],
+   [
+    "replace both shutoff valves, $160",
+    "30 more minutes, $60"
+   ],
+   [
+    "Service call",
+    "No-show fee"
+   ],
+   [
+    "$179",
+    "$650"
+   ],
+   [
+    "$89",
+    "$200"
+   ],
+   [
+    "$160",
+    "$200"
+   ],
+   [
+    "$640",
+    "$600"
+   ],
+   [
+    "$125",
+    "$150"
+   ],
+   [
+    "$480",
+    "$450"
+   ],
+   [
+    "$199",
+    "$150"
+   ],
+   [
+    "$189",
+    "$150"
+   ],
+   [
+    "$180",
+    "$150"
+   ],
+   [
+    "$130",
+    "$79"
+   ],
+   [
+    "$358",
+    "$300"
+   ],
+   [
+    "$145",
+    "$150"
+   ],
+   [
+    "Marco finds mold behind the sink wall.",
+    "Kai finds a cracked tile in the cold plunge."
+   ],
+   [
+    "Mold behind the sink wall",
+    "Cracked tile"
+   ],
+   [
+    "cracks the cabinet floor",
+    "chips the tile floor"
+   ],
+   [
+    "cracked the cabinet floor",
+    "chipped the tile floor"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Chipped tile floor"
+   ],
+   [
+    "In their own chat, the customer says not to message this number and gives another phone or an email.",
+    "In their own chat, the customer gives another phone or an email and says to stop texts here."
+   ],
+   [
+    "No reply by 11:00am means the shorter cut.",
+    "No reply by 11:00am means the shorter session."
+   ],
+   [
+    "behind the sink wall",
+    "on the back"
+   ],
+   [
+    "Iris",
+    "Noor"
+   ],
+   [
+    "The visit is for a child, and a parent or guardian books. Alex picked a teen sauna session for a son before the times, so the times fit it.",
+    "The visit is for a teen, and a parent or guardian books. Alex picked a sauna session for a son before the times, so the times fit it."
+   ]
+  ]
+ },
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A time shows only if the person and the things are all free.",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "the color and cut takes",
+    "the color and cut is paid",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Accepted: the beard trim today at 2:00pm with Avery.",
+    "Saved: haircut $40 for visits from Mon Nov 2. Haircuts already booked keep $35. Haircut plans go to $40 from Wed Nov 25, only for customers who say yes.",
+    "first tomorrow: 10:00am, Riley",
+    "Alex asks for a cut every 4 weeks. The shop offers a plan, so Rosie books the first visit and saves the next ones on the same day and time.",
+    "Ben's AI asks for a skin fade at $35, an old price. Rosie answers with the real price, $40. That's the price Ben sees before saying yes.",
+    "Some jobs take several visits, like a color correction done in two steps. Where the plug-in says so, all the times are picked now.",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "Riley finds something the plug-in says stops the work. Nothing more is done, and nothing is charged for the part not done.",
+    "Alex adds a beard trim. Rosie finds one time long enough for both, with one barber, and adds the prices: $35 and $20.",
+    "Where the plug-in says the work is named only, no rating is asked. A cut is rated, so the shop takes the first branch.",
+    "Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Nia K. asked to talk about the $90 color quote. Sam taps Call, and the call goes out from the shop's number.",
+    "From the price list or photos, the price is set. A service priced at the chair gets its price now.",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20. Accept it?",
+    "A skin fade at Lee's Barbershop is $40, not $35. Here are the open times at $40.",
+    "Riley stopped Alex M.'s cut. The note and photo are on the secure page.",
+    "At the shop, a parent stays for a kids cut, so nothing more happens.",
+    "Reading it back: accept the beard trim today at 2:00pm with Avery.",
+    "Stopped Alex M.'s cut. I put a note and a photo on the page.",
+    "The shop's money terms apply per person, as Sam set them.",
+    "Hello, do you speak Spanish? I'd like a cut on Saturday.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Yes: a Kids cut (12 and under) is $25. Want a time?",
+    "A booked window stays right when the clocks change",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "A barbershop sells its packages only at the shop.",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "A haircut could mean a salon or a barbershop.",
+    "Riley can do a shorter cut in the time left",
+    "Can my son wait in the shop during my cut?",
+    "Lee's Barbershop will fix it for free.",
+    "Sam adds massage to Lee's Barbershop.",
+    "The cape clip ripped my shirt collar.",
+    "Do you do kids cuts? My son is 8.",
+    "Books the groom's party together",
+    "Books a haircut and a beard trim",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "What happens at the chair?",
+    "Books a cut every 4 weeks",
+    "Riley enters the code",
+    "Beard trim · $20",
+    "Color correction",
+    "Skin fade · $40",
+    "1 color quote",
+    "Haircut plan",
+    "NEW massage",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Haircut $35 ($40 from Nov 2) · Skin fade $40 · Beard trim $20",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Every shop service, color and house calls",
+    "Plumbing JP031552 · electrical JE30417",
+    "$140 an hour",
+    "$20 fee",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "Groom's package",
+    "a beard trim",
+    "A beard trim",
+    "Beard trim",
+    "beard trim",
+    "Skin fade",
+    "skin fade",
+    "a kids cut",
+    "Kids cut",
+    "kids cut",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "the shop's board",
+    "price board",
+    "Priced at the chair",
+    "priced at the chair",
+    "paid at the chair",
+    "at the chair",
+    "$140",
+    "$100",
+    "$40",
+    "$35",
+    "$20",
+    "$25",
+    "$55",
+    "$75",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "EC22871",
+    "BS20981",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "Elm St",
+    "Oak St",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "barbershops",
+    "Barbershop",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "skin fades",
+    "$130",
+    "$55",
+    "$35",
+    "$40",
+    "$20",
+    "$89",
+    "$130"
+   ],
+   "B": [
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Service call fee",
+    "service call fee",
+    "A time shows only if the person and the things are all free.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "First: is anyone hurt? Do you smell gas?",
+    "No. No huele a gas.",
+    "No. It doesn't smell like gas.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Here, the plumbing plug-in's parts load",
+    "A haircut could mean a salon or a barbershop.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "Lee Home Services asks: is the job at a home, an office or somewhere else? And which drain is clogged, and is water backing up anywhere else?",
+    "At my home. Just the kitchen sink.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Can you flush my water heater every year, too?",
+    "Sam can set this for one service, like the sewer camera inspection.",
+    "Lee Home Services can start the sewer camera inspection at a set time.",
+    "The $640 water heater is over the plug-in's amount, so it gets an estimate to sign.",
+    "like 'Is the sink still full of water?'",
+    "Is the sink still full of water?",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches. Casey can come sooner, at the same price.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Jordan finds corroded shutoff valves.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "DAMAGE cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "Jordan cracked the cabinet floor at",
+    "The before photo shows no crack.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "accept the leak repair for today",
+    "Accepted: the leak repair today",
+    "The service call is $89.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Me, and yes. It's my kitchen.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "first tomorrow: 10:00am",
+    "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms. Each visit is booked and paid like a single one.",
+    "Ivy's AI asks for a drain clearing at $150, an old price. Rosie answers with the real price, $179. That's the price Ivy sees before saying yes.",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Sam raises the drain clearing to $199 for visits from Mon Nov 2. AI assistants show the new price for those dates at once.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Say Alex had asked Lee's Barbershop for a haircut instead. It's offered in both places, so Alex sees both prices first.",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Morgan P. asked to talk about the $640 quote. Sam taps Call, and the call goes out from the business's number.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75. Where would you like it?",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Lee Home Services: $800 for stage 2 of your repipe. Pay by card, or by bank transfer.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Alex M. isn't happy with the Thu Oct 22 visit: \"Jordan left a mess under the sink.\"",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A visit at home goes on in this flow. The shop's chair is in the other flow.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Morgan P. would like to talk about the water heater quote before booking.",
+    "Sorry about that. Your drain is under warranty, so this visit is free.",
+    "The main story: Alex asks an AI for a plumber on Mon Oct 19, 6:40pm.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "No problem. The $160 valve quote is good for 7 days.",
+    "Each unit's notes go to the plumber, one line each.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Jordan says no. Please wait until the job is done.",
+    "A booked window stays right when the clocks change",
+    "Told to leave, then call 911 and the gas company",
+    "Can Jordan also run a camera down my sewer line?",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "It's overflowing. Can someone come tonight?",
+    "Can Jordan also look at a dripping faucet?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Nora can ask to be next for that window.",
+    "Can I skip next week's drain cleaning?",
+    "The kitchen drain is clogged again.",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Call a mold cleanup company first",
+    "Found: mold behind the sink wall",
+    "Proposal · Replace the old pipes",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Yearly water heater flush plan",
+    "HURT cut my hand, need to stop",
+    "Rental 1 · Tue Oct 20 · $179",
+    "Rental 2 · Wed Oct 21 · $179",
+    "raise drain clearing to 199",
+    "Cancel your plumbing visit",
+    "Mold behind the sink wall",
+    "A gas smell at the home",
+    "NEW heating and cooling",
+    "stage 2 of your repipe",
+    "Yes, every year",
+    "DONE 179 drain",
+    "Rental 1",
+    "Rental 2",
+    "1 quote",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Every plumbing job, and electrical jobs",
+    "Plumbing JP031552 · electrical JE30417",
+    "Mon–Fri 7:30am–5:30pm",
+    "Electrical license",
+    "Plumbing license",
+    "$140 an hour",
+    "$20 fee",
+    "arriving 8–10am",
+    "arriving 12–2pm",
+    "8–10am",
+    "8–10",
+    "12–2pm",
+    "Thu Oct 22, 8:20am",
+    "8:20am",
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 9:10am",
+    "Kitchen drain clearing",
+    "Yard drain",
+    "yard drain",
+    "Kitchen drain",
+    "kitchen drain",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "drain cleaning",
+    "Water heater flush",
+    "water heater flush",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "$89 service call",
+    "service call",
+    "plumbing visit",
+    "the drain",
+    "$40",
+    "$110",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Lee Plumbing",
+    "Lee Electric",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "EC22871",
+    "BS20981",
+    "Sewer camera inspection",
+    "Labor",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "88 Elm St",
+    "1200 Main St",
+    "42 Oak St",
+    "Elm St",
+    "Oak St",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "barbershops",
+    "Barbershop",
+    "barbershop",
+    "Barbers",
+    "barbers",
+    "Barber",
+    "barber",
+    "shops",
+    "Shop",
+    "shop",
+    "replace both shutoff valves, $160",
+    "Service call",
+    "$179",
+    "$89",
+    "$160",
+    "$640",
+    "$480",
+    "$199",
+    "$358",
+    "Mold behind the sink wall",
+    "cracks the cabinet floor",
+    "cracked the cabinet floor",
+    "Cracked cabinet floor",
+    "In their own chat, the customer says not to message this number and gives another phone or an email.",
+    "behind the sink wall",
+    "Iris"
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-61": "7421d186d5",
+   "S2-28": "549fd7ae22",
+   "S2-29": "974ca3a481",
+   "S1-32": "60f59eda70",
+   "S1-33": "eeaadba298",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-99": "efed1e4f4d",
+   "S11-57": "a3996ae84e",
+   "S12-19": "07db0515b2",
+   "S13-41": "18b280aaa2",
+   "S13-43": "a1049201f6",
+   "S13-11": "4345036419",
+   "S1-13": "eca22651fd",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-01": "7e7a61082c",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A8-02": "15f418fec4",
+   "A8-03": "7accda6f86",
+   "A8-67": "e9fd748fc5",
+   "A8-53": "33f4da69f5",
+   "A9-15": "bd2a17c3c5",
+   "A10-34": "78c2d9a6a3",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A5-19": "5d5db6f3c1"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-61": "e30e71f65d",
+   "S2-28": "549fd7ae22",
+   "S2-29": "974ca3a481",
+   "S1-32": "60f59eda70",
+   "S1-33": "2b5d1fa4ab",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S11-99": "a97de4ca58",
+   "S11-57": "2f34f23d8a",
+   "S12-19": "176d3d2beb",
+   "S13-41": "fb75fbb382",
+   "S13-43": "55206e4cb1",
+   "S13-11": "6561316ed7",
+   "S1-13": "6964bfbe60",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-01": "15f683e6cb",
+   "B4-43": "fc9855955a",
+   "B4-83": "a7473a80ea",
+   "B4-16": "37cd99137d",
+   "B4-38": "9539521dc7",
+   "B5-34": "917f89b62f",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B8-03": "ac9d404766",
+   "B8-69": "5d0e4c0045",
+   "B8-67": "b66ffbd04d",
+   "B8-22": "50d78f1af0",
+   "B9-19": "b97bfbf0d2",
+   "B9-06": "f091432f2d",
+   "B10-38": "867fe1ab7c",
+   "B10-37": "be87433467",
+   "B10-32": "7713bff255"
+  }
+ }
+}

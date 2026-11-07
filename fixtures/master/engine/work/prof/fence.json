@@ -1,0 +1,2070 @@
+{
+ "id": "fence",
+ "name": "Fence installer",
+ "style": "Project",
+ "pattern": "project",
+ "from": "contractor",
+ "cast": {
+  "A": {
+   "staff": "Dana and the showroom",
+   "cust": "Alex M. (a homeowner) · neighbors and family"
+  },
+  "B": {
+   "staff": "Owen and the crew (estimators who go out)",
+   "cust": "Alex M. (a homeowner) · a family member",
+   "other": "Others (a neighbor, a landlord, an HOA)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Dana"
+  },
+  "B": {
+   "staff": "Owen"
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "if a contractor or home improvement license where the state or local rules require one (some only above a job size), else a business registration on file; nothing is looked up",
+   "ask": "the license or registration number and the state it's from",
+   "holds": "the business (a qualifying person on its behalf, where the state's form says so)",
+   "checked": "the state's lookup; a person on Rosie's team within 1 business day when it's down",
+   "blocks": "no install over the license's job-size limit, where the state's form sets one; a lapsed license stops new bookings for that work",
+   "insurance": "general liability, and workers' comp for a crew, where the state's form requires it; the certificate on file",
+   "renewals": "the expiry date from the lookup; reminded before it lapses"
+  },
+  "pf.services": [
+   {
+    "name": "Free on-site estimate",
+    "place": "the customer's place",
+    "price": "free (nothing before, nothing after)",
+    "length": "45 to 60 minutes",
+    "note": "measures the line, looks at slope, gates and old fence; the install is priced at it as a written estimate"
+   },
+   {
+    "name": "New fence install (wood, vinyl, chain link, aluminum)",
+    "place": "the customer's place",
+    "price": "per foot, quoted at the estimate visit (written estimate), or from photos and the customer's measurements",
+    "length": "1 to 3 days with a crew of 2 or 3",
+    "money": "a deposit when the written estimate is signed (materials are ordered with it); the rest on the bill when it's done"
+   },
+   {
+    "name": "Gate install or gate repair",
+    "place": "the customer's place",
+    "price": "the example shop's own list: gate repair $175, a new walk gate from $450",
+    "length": "1 to 3 hours",
+    "money": "nothing before; the bill after"
+   },
+   {
+    "name": "Fence repair (posts, panels, boards)",
+    "place": "the customer's place",
+    "price": "quoted from photos first, or at the visit",
+    "length": "2 to 4 hours",
+    "money": "nothing before; the bill after"
+   },
+   {
+    "name": "Old fence removal and haul-away",
+    "place": "the customer's place",
+    "price": "per foot, added to an install",
+    "length": "part of the install"
+   },
+   {
+    "name": "Stain and seal a wood fence",
+    "place": "the customer's place",
+    "price": "per foot, quoted from photos or at the visit",
+    "length": "1 day; needs dry weather"
+   },
+   {
+    "name": "Design consult (flow A)",
+    "place": "the showroom, or by video",
+    "price": "free",
+    "length": "30 minutes",
+    "note": "picks a style, material and height from samples; nothing is measured; the estimate visit follows at the customer's place"
+   }
+  ],
+  "pf.questions": {
+   "before_times": [
+    "the property's address",
+    "what's needed: a new fence, a repair, a gate, or stain",
+    "about how many feet, and the height and material wanted",
+    "is there an old fence to take out",
+    "is it around a pool (a pool fence has its own barrier rules)",
+    "does the customer own the property, or have the owner's OK"
+   ],
+   "after_time": [
+    "the way into the yard and any gate code (on the secure page)",
+    "dogs that will be in the yard on work days",
+    "known private lines the public locate doesn't mark: sprinklers, a pet fence, outdoor lighting, a gas line to a grill or pool heater, septic",
+    "an HOA that must approve the fence, and its approval if they have it",
+    "where the property line is: a survey or plat if they have one"
+   ],
+   "secure_page_only": [
+    "a gate or lockbox code",
+    "a survey or plat document"
+   ],
+   "who_may_book": "an adult who owns the property, or someone the owner authorizes on a forwarded link (a renter or a property manager); never a minor"
+  },
+  "pf.safety": {
+   "stop_words": [
+    "a gas smell",
+    "a hit gas line",
+    "a downed power line",
+    "sparks or a live wire",
+    "someone hurt by a tool or a falling post"
+   ],
+   "tell_customer": "Gas smell or a hit gas line: leave the area now, and call 911 and the gas company from away. A downed power line: stay far away and call 911 and the power company. No booking until it's safe.",
+   "continue": "a fence knocked down by a storm or a car is booked once the area is safe (no lines down)",
+   "on_the_job": "no digging until the public utility locate marks are in; the crew stops at once if a line is hit or a mark is near the hole; pets and children kept inside while the crew works; the yard can be open while the old fence is out"
+  },
+  "pf.first_steps": [
+   {
+    "step": "the estimate visit (measure and written estimate)",
+    "before": "every new install",
+    "timing": "booked first, as its own visit"
+   },
+   {
+    "step": "the written estimate signed and the deposit paid",
+    "before": "materials are ordered",
+    "timing": "materials take 1 to 3 weeks; the install day is set after they arrive"
+   },
+   {
+    "step": "the public utility locate (call before you dig)",
+    "who": "the business asks for it",
+    "timing": "a few business days before digging; no digging until the lines are marked"
+   },
+   {
+    "step": "a fence permit, where the local rules require one",
+    "who": "the business pulls it unless the owner wants to",
+    "timing": "the times start after its lead time; no work before it's approved"
+   },
+   {
+    "step": "HOA approval, where there is an HOA",
+    "who": "the customer gets it",
+    "timing": "before the install day"
+   },
+   {
+    "step": "the property line confirmed",
+    "who": "the customer (a survey or plat where unsure)",
+    "timing": "before the install day; the crew never sets a fence on a line the customer can't confirm"
+   }
+  ],
+  "pf.visit": {
+   "check_in": "estimate visits: the customer's code at the door; install days: the code if someone's home, else nobody needs to be home when the yard is open (DONE with photos)",
+   "work_changes": "rock or roots found while digging (priced per hole, the customer's yes first); more old fence to remove; a gate added; any change is priced and the customer says yes first",
+   "proof": "DONE with photos of the finished fence and gates; a walk-through with the customer when they're home",
+   "multiday": "posts set in concrete on day 1, panels or chain link on day 2 once it cures"
+  },
+  "pf.money": {
+   "defaults": "estimate visit free; installs: a deposit when the written estimate is signed, the rest on the bill when it's done; repairs and gates: nothing before, the bill after",
+   "deposit_cap": "where the state caps a home improvement deposit, the cap from the state's form, shown as a suggested rule",
+   "bank_transfer": "big install bills may be paid by bank transfer",
+   "materials": "custom materials ordered for the job: a cancel after the order keeps only what the signed estimate's schedule says, from money already taken",
+   "tips": "no tip line",
+   "tax": "the business's own tax setting",
+   "rosfield_fee": "$2 per confirmed booking (not a health practice or a law firm)"
+  },
+  "pf.messages": {
+   "never_in_text": "gate or lockbox codes, money details",
+   "languages": "English and Spanish",
+   "minors": "not served; a minor can't book"
+  },
+  "pf.staff": {
+   "roles": "an estimator (measures and writes the estimate) and install crews (a crew lead and 1 or 2 helpers)",
+   "license": "the crew lead or the business holds any license the state's form asks; helpers work under the crew lead",
+   "stand_in": "any crew lead with the skill may take an install; the estimator who wrote the estimate needn't be there",
+   "who_oks": "the owner OKs quotes over their limit"
+  },
+  "pf.rules": {
+   "written_contract": "a written estimate signed before an install, where the state's form requires one above an amount",
+   "cancel_period": "work sold at the customer's place: the written cancel period where the state's form gives one (switch cancelright)",
+   "license_number": "on estimates and bills, where the state's form requires it",
+   "permits": "a fence permit where the local rules require one; height and pool barrier rules from the local rules",
+   "records": "estimates, contracts and photos kept 7 years",
+   "warranty": "the business's own workmanship warranty (for example 1 year)"
+  },
+  "pf.edges": {
+   "weather": "rain, frozen ground or a storm: concrete can't set; the business moves the day (the business can't give it)",
+   "rock": "rock or roots in a post hole: extra per hole, priced first, the customer's yes",
+   "line_hit": "a utility line hit: stop, safety first, the owner told",
+   "property_line": "a neighbor disputes the line: the work stops on that side until the customer settles it",
+   "materials_late": "materials not in by the install day: the business moves the day",
+   "nobody_home": "fine when the yard is open and the way in is on the secure page",
+   "dog": "a dog loose in the yard: the crew doesn't go in; the customer is asked to bring it in",
+   "hoa": "HOA approval not in by the install day: the customer's side; the day moves"
+  },
+  "pf.switches": {
+   "cancelright": true
+  },
+  "pf.facts": [
+   "firststeps",
+   "documents",
+   "multiday",
+   "extrawork",
+   "photos",
+   "banktransfer",
+   "video"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "B": "24 hours before"
+   }
+  }
+ },
+ "money": {
+  "A": {
+   "main": "list|none|none",
+   "combos": [
+    "list|none|none"
+   ],
+   "examples": {
+    "list|none|none": "A free design consult at the showroom or by video: nothing taken, nothing after."
+   },
+   "amounts": {
+    "*": {
+     "name": "Design consult"
+    },
+    "list|none|*": {
+     "price": "free",
+     "name": "Design consult"
+    }
+   }
+  },
+  "B": {
+   "main": "visit|none|bill",
+   "combos": [
+    "visit|none|bill",
+    "photos|deposit|bill",
+    "list|none|bill"
+   ],
+   "examples": {
+    "visit|none|bill": "A free estimate visit; the install is priced after the estimate and billed after the job.",
+    "photos|deposit|bill": "A cedar fence quoted from photos: $5,400, with a $1,800 deposit when the signed estimate is in, and the $3,600 rest on the bill after.",
+    "list|none|bill": "A $175 gate repair, billed after the work: nothing taken to book."
+   },
+   "amounts": {
+    "*": {
+     "name": "Fence estimate and install"
+    },
+    "visit|none|*": {
+     "price": "free",
+     "fee": "free",
+     "name": "Free estimate"
+    },
+    "photos|deposit|*": {
+     "price": "$5,400",
+     "deposit": "$1,800",
+     "rest": "$3,600",
+     "fee": "$1,800",
+     "name": "Cedar privacy fence, 120 feet"
+    },
+    "list|none|*": {
+     "price": "$175",
+     "fee": "free",
+     "name": "Gate repair"
+    }
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "a house call, $75, paid in full when booking",
+    "a home visit, free, with nothing to pay"
+   ],
+   [
+    "Haircut · $35",
+    "Design consult · free"
+   ],
+   [
+    "two skin fades on",
+    "two free estimates on"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a gate repair, which isn't on the company's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Fence Co doesn't do gate repairs."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "A post sample fell and chipped my phone."
+   ],
+   [
+    "says the cape clip ripped a shirt collar today.",
+    "says a post sample fell and chipped their phone today."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "likes warm wood, matte black fixtures, no open shelves"
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books a free estimate for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most fence companies set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A yard fence company on Elm St. Layouts, finishes and 3D design."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most fence companies start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules fence companies often set."
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds lighting design to Lee Fence Co."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Lighting design for Lee Fence Co: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW lighting design"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like fence boards blown over in a storm"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a stain pick is $25"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una consulta de diseño el sábado."
+   ],
+   [
+    "Gloss to finish",
+    "Gate pick"
+   ],
+   [
+    "gloss",
+    "gate pick"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like fence boards blown over in a storm"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "A repair workshop, a tailor or a groomer does."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Fence Co's"
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A fence builder's example: water through a ceiling gets 'shut off the main valve, and stay away from wet outlets'."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small jobs have a set price. Remodels are quoted after an estimate visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Drain clearing",
+    "Staining"
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Gate and hardware picks at Lee Fence Co are $40, not $35."
+   ],
+   [
+    "asks for a skin fade at $35",
+    "asks for gate and hardware picks at $35"
+   ],
+   [
+    "once Riley sees the hair",
+    "once Dana sees the room photos"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you do stain picks? We're redoing the kids' rooms."
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Free estimates, picks and sample boards at the company. A consult at home too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A free estimate could mean an interior estimator or a fence builder's company."
+   ],
+   [
+    "MP045210",
+    "GC045210"
+   ],
+   [
+    "EC22871",
+    "RF22871"
+   ],
+   [
+    "BS20981",
+    "DS20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's rooms together"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A family books consults for three rooms on one morning. Rosie finds times side by side with Dana and Sol."
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "A free estimate and a stain pick work the same way."
+   ],
+   [
+    "photos of your hair",
+    "photos of your room"
+   ],
+   [
+    "patch test",
+    "measure check"
+   ],
+   [
+    "skin-test result",
+    "measure check result"
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my son wait in the company during my consult?"
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "The leak over my bathroom got worse. Can I still come in?"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The plan left out the back gate."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's plan left out the back gate"
+   ],
+   [
+    "Step-free door on Elm St",
+    "Step-free door on Mill Rd"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Fence Co"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Fence Co LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Fence Co"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Fence Co"
+   ],
+   [
+    "Lee Electric",
+    "Lee Fence Co"
+   ],
+   [
+    "1200 Main St",
+    "310 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "24 Quarry Rd"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Sol"
+   ],
+   [
+    "Jordan",
+    "Owen"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "plumbing and electrical",
+    "fencing and gates"
+   ],
+   [
+    "Plumbing and electrical",
+    "Fencing and gates"
+   ],
+   [
+    "electrical",
+    "fencing"
+   ],
+   [
+    "Electrical",
+    "Fencing"
+   ],
+   [
+    "Panel upgrade",
+    "Fence replacement"
+   ],
+   [
+    "Plumber",
+    "Fence builder"
+   ],
+   [
+    "plumber",
+    "fence builder"
+   ],
+   [
+    "plumbing",
+    "fencing"
+   ],
+   [
+    "Plumbing",
+    "Fencing"
+   ],
+   [
+    "barbershop",
+    "fence company"
+   ],
+   [
+    "Barbershop",
+    "Fence company"
+   ],
+   [
+    "barbers",
+    "designers"
+   ],
+   [
+    "barber",
+    "estimator"
+   ],
+   [
+    "Barber",
+    "Estimator"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "fence design visit"
+   ],
+   [
+    "Signature cut and shave",
+    "fence design visit"
+   ],
+   [
+    "signature cut",
+    "fence design visit"
+   ],
+   [
+    "Groom's package",
+    "Cedar fence package"
+   ],
+   [
+    "Color and cut",
+    "Fence layout"
+   ],
+   [
+    "color and cut",
+    "fence layout"
+   ],
+   [
+    "Color correction",
+    "Gate redesign"
+   ],
+   [
+    "color correction",
+    "gate redesign"
+   ],
+   [
+    "color quote",
+    "design quote"
+   ],
+   [
+    "color",
+    "fence design"
+   ],
+   [
+    "Color",
+    "Fence design"
+   ],
+   [
+    "Kids cut",
+    "Stain pick"
+   ],
+   [
+    "kids cut",
+    "stain pick"
+   ],
+   [
+    "Skin fade",
+    "Gate and hardware picks"
+   ],
+   [
+    "skin fade",
+    "gate and hardware picks"
+   ],
+   [
+    "Beard trim",
+    "Stain sample"
+   ],
+   [
+    "beard trim",
+    "stain sample"
+   ],
+   [
+    "Haircuts",
+    "Free estimates"
+   ],
+   [
+    "haircuts",
+    "free estimates"
+   ],
+   [
+    "Haircut",
+    "Free estimate"
+   ],
+   [
+    "haircut",
+    "free estimate"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the company"
+   ],
+   [
+    "water heaters",
+    "gates"
+   ],
+   [
+    "water heater",
+    "gate"
+   ],
+   [
+    "shops",
+    "companies"
+   ],
+   [
+    "shop",
+    "company"
+   ],
+   [
+    "Shop",
+    "Company"
+   ],
+   [
+    "float studio",
+    "fence crew"
+   ],
+   [
+    "Springfield",
+    "Riverton"
+   ],
+   [
+    "designers",
+    "estimators"
+   ],
+   [
+    "Designers",
+    "Estimators"
+   ],
+   [
+    "designer",
+    "estimator"
+   ],
+   [
+    "Designer",
+    "Estimator"
+   ]
+  ],
+  "B": [
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And which room is it, and about how big?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Fence Co can come for an estimate visit:"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about redoing my hall bathroom. A text back is fine."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like skipping a permit the work needs."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'My bathroom needs redoing' fits a bathroom fence."
+   ],
+   [
+    "'Adding a faucet check? Say so.'",
+    "'Adding a gate? Say so.'"
+   ],
+   [
+    "At my home. Just the kitchen sink.",
+    "At my home. Just the hall bathroom."
+   ],
+   [
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Some jobs take more than one visit, like a fence's work days."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the bathroom and the path to it."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack in the new post this morning."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's an estimate visit, today,"
+   ],
+   [
+    "The service call is $89.",
+    "The estimate visit is $89."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Owen measures the bathroom and texts the quote with its lines."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 7000 demolition and post 4500 fixtures 2500"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Post and fixtures · $540"
+   ],
+   [
+    "Supply line · $80",
+    "Haul-away · $80"
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Owen measured the bathroom. Here's the written quote."
+   ],
+   [
+    "Shutoff valve · $165",
+    "Demolition and post · $4,500"
+   ],
+   [
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK'd the demolition and post only, $4,500. Leave the fixtures."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Owen does the demolition and post, $4,500. The fixtures line stays good until Thu Oct 29."
+   ],
+   [
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "Say Owen's estimate visit at Harper J.'s is for a $24,000 bathroom fence."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 24000 bathroom fence, 3 stages"
+   ],
+   [
+    "Here's Lee Home Services' quote for your repipe.",
+    "Here's Lee Fence Co's quote for your bathroom fence."
+   ],
+   [
+    "Repipe · $2,400",
+    "Bathroom fence · $24,000"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$1,000 to start, $16,000 when the rough-in passes, $7,000 at the finish"
+   ],
+   [
+    "Right to cancel · repipe",
+    "Right to cancel · bathroom fence"
+   ],
+   [
+    "The $800 start payment",
+    "The $1,000 start payment"
+   ],
+   [
+    "Your $800 start payment",
+    "Your $1,000 start payment"
+   ],
+   [
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "Say Harper J.'s $24,000 bathroom fence is billed in three stages"
+   ],
+   [
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of 3 is done: the rough-in passed its inspection."
+   ],
+   [
+    "stage 2 of your repipe",
+    "stage 2 of your bathroom fence"
+   ],
+   [
+    "$800",
+    "$16,000"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most fence companies set it."
+   ],
+   [
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "A yard fence company on Elm St. Layouts, finishes and 3D design."
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most fence companies start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules fence companies often set."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds siding to Lee Fence Co."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Siding for Lee Fence Co: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW siding"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I paint the bathroom before you come?"
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like fence boards blown over in a storm"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Owen's notes"
+   ],
+   [
+    "sewer camera report",
+    "pre-fence inspection report"
+   ],
+   [
+    "An estimate becomes its own job",
+    "1 Signs the contract"
+   ],
+   [
+    "The estimate becomes its own job",
+    "Alex signs the contract; Sam signs too"
+   ],
+   [
+    "$2,400 repipe",
+    "$2,400 deck rebuild"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like regrouting the shower Owen noted"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a proposal to regrout the shower, from Owen's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Regrout the shower"
+   ],
+   [
+    "takes jobs sent now, like a burst pipe",
+    "takes jobs sent now, like fence boards blown over in a storm"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Water's pouring over the fence boards. Can someone come tonight?"
+   ],
+   [
+    "LATE camera report",
+    "LATE inspection report"
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "A fence happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Fence Co doesn't do, like a pool install."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Fence Co does fencing and gates, not pools. Nothing was saved. You can look for a pool builder near you."
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Fence Co's"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: which room, about how big, when it should be done, and the year the home was built."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a gas smell, sparking wires, or a ceiling or wall giving way."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE soft floor by the tub, cracked wall post"
+   ],
+   [
+    "Under the sink, before",
+    "Bathroom, before"
+   ],
+   [
+    "Cabinet floor, before",
+    "Floor by the tub, before"
+   ],
+   [
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Most jobs have a price before the visit. A fence is quoted after the estimate visit: only the $89 visit was promised."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Owen finds mold behind the shower wall. The plug-in says the crew stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "mold behind the sink wall",
+    "mold behind the shower wall"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Mold behind the shower wall"
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Owen found mold behind your shower wall and stopped that part of the work."
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the shower wall"
+   ],
+   [
+    "\"Jordan left a mess under the sink.\"",
+    "\"The crew left dust in the hallway.\""
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "The crew left dust in the hallway."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Owen look at my yard next week too?"
+   ],
+   [
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Sure. Here are Owen's next times for a yard estimate."
+   ],
+   [
+    "Reading it back: accept the leak repair for today",
+    "Reading it back: accept the yard estimate for today"
+   ],
+   [
+    "$245",
+    "$7,000"
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Entra agua por el techo del baño."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? Water is coming through the bathroom ceiling."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A fence builder's example: water through a ceiling gets 'shut off the main valve, and stay away from wet outlets'."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told to shut the main valve and stay away from wet outlets. If there's a gas smell, she leaves and calls 911."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Cierre la llave principal del agua y no toque enchufes mojados. Si huele a gas, salga y llame al 911."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Shut the main water valve, and don't touch wet outlets. If you smell gas, get out and call 911."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Can you take out the wall between my yard and dining room?"
+   ],
+   [
+    "a dripping faucet",
+    "a sticking gate door"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. The gate door is a small repair, quoted at the visit. Both fit in the same arrival window."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone come for a fence estimate this Thursday? What does it cost?"
+   ],
+   [
+    "Yard drain",
+    "Estimate visit"
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa estimate Thu 12-2 Priya"
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a staining at two rentals every 3 months."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's staining?"
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "I want to redo my hall bathroom. Can someone come for an estimate Thursday morning? I'm in Riverton."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the front ones, over the door."
+   ],
+   [
+    "Is the sink still full of water?",
+    "Does water pool at the front door?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that water is now pouring in by the front door."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Water is coming in by the front door now."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Move rugs and boxes away, and keep away from any outlet the water reaches."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you seal my deck every year, too?"
+   ],
+   [
+    "Lee Home Services has a yearly flush plan",
+    "Lee Fence Co has a yearly deck sealing plan"
+   ],
+   [
+    "Say Alex asks for a water heater flush every year.",
+    "Say Alex asks for a deck sealing every year."
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 7000 bathroom fence"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE heavy leaves at the front corner. Guards would help: quote next time."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "A post cracks 2 weeks later."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "A post in the new shower cracked."
+   ],
+   [
+    "Your drain is under warranty",
+    "Your fence is under warranty"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Owen finds two rotted window sills."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace both window sills, rotted"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both window sills"
+   ],
+   [
+    "both shutoff valves",
+    "both window sills"
+   ],
+   [
+    "the shutoff valves",
+    "the window sills"
+   ],
+   [
+    "The $160 valve quote",
+    "The $160 window sill quote"
+   ],
+   [
+    "the $160 valve work",
+    "the $160 window sill work"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Owen also check the house before the fence?"
+   ],
+   [
+    "Sewer camera report",
+    "Inspection report"
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the inspection report link"
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Small jobs have a set price. Remodels are quoted after an estimate visit. A gas smell stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A registration or license behind the company, where the state asks."
+   ],
+   [
+    "Kitchen drain clearing",
+    "Estimate visit"
+   ],
+   [
+    "Drain clearings",
+    "Estimate visits"
+   ],
+   [
+    "drain clearings",
+    "estimate visits"
+   ],
+   [
+    "Drain clearing",
+    "Estimate visit"
+   ],
+   [
+    "drain clearing",
+    "estimate visit"
+   ],
+   [
+    "Kitchen drain",
+    "Hall bathroom"
+   ],
+   [
+    "kitchen drain",
+    "hall bathroom"
+   ],
+   [
+    "Water heater flush",
+    "Deck sealing"
+   ],
+   [
+    "water heater flush",
+    "deck sealing"
+   ],
+   [
+    "drain",
+    "gutter"
+   ],
+   [
+    "leehomeservices.com",
+    "leefenceco.example"
+   ],
+   [
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "Free estimates, picks and sample boards at the company. A consult at home too. Any license only where the state asks for one."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A free estimate could mean an interior estimator or a fence builder's company."
+   ],
+   [
+    "MP045210",
+    "GC045210"
+   ],
+   [
+    "EC22871",
+    "RF22871"
+   ],
+   [
+    "BS20981",
+    "DS20981"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work, like salons and groomers, are licensed to their own place."
+   ],
+   [
+    "rents a chair",
+    "rents a desk"
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "The company is in the other flow."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Fence Co can do your free estimate at the company for $35, or at your home for $75."
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Fence Co LLC"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Fence Co"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Fence Co"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Fence Co"
+   ],
+   [
+    "Lee Electric",
+    "Lee Fence Co"
+   ],
+   [
+    "1200 Main St",
+    "310 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "24 Quarry Rd"
+   ],
+   [
+    "42 Oak St",
+    "6 Ridge Ct"
+   ],
+   [
+    "Riley",
+    "Dana"
+   ],
+   [
+    "Avery",
+    "Sol"
+   ],
+   [
+    "Jordan",
+    "Owen"
+   ],
+   [
+    "Casey",
+    "Priya"
+   ],
+   [
+    "plumbing and electrical",
+    "fencing and gates"
+   ],
+   [
+    "Plumbing and electrical",
+    "Fencing and gates"
+   ],
+   [
+    "electrical",
+    "fencing"
+   ],
+   [
+    "Electrical",
+    "Fencing"
+   ],
+   [
+    "Panel upgrade",
+    "Fence replacement"
+   ],
+   [
+    "Plumber",
+    "Fence builder"
+   ],
+   [
+    "plumber",
+    "fence builder"
+   ],
+   [
+    "plumbing",
+    "fencing"
+   ],
+   [
+    "Plumbing",
+    "Fencing"
+   ],
+   [
+    "barbershop",
+    "fence company"
+   ],
+   [
+    "Barbershop",
+    "Fence company"
+   ],
+   [
+    "barbers",
+    "designers"
+   ],
+   [
+    "barber",
+    "estimator"
+   ],
+   [
+    "Barber",
+    "Estimator"
+   ],
+   [
+    "color",
+    "fence design"
+   ],
+   [
+    "haircut",
+    "free estimate"
+   ],
+   [
+    "cuts",
+    "consults"
+   ],
+   [
+    "cut",
+    "consult"
+   ],
+   [
+    "the chair",
+    "the company"
+   ],
+   [
+    "credited to the repair",
+    "credited to the job"
+   ],
+   [
+    "service call",
+    "estimate visit"
+   ],
+   [
+    "Service call",
+    "Estimate visit"
+   ],
+   [
+    "Water heater replacement",
+    "Gate replacement"
+   ],
+   [
+    "water heater replacement",
+    "gate replacement"
+   ],
+   [
+    "Leak repair",
+    "Bathroom fence"
+   ],
+   [
+    "leak repair",
+    "bathroom fence"
+   ],
+   [
+    "Sewer camera inspection",
+    "Pre-fence inspection"
+   ],
+   [
+    "sewer camera inspection",
+    "pre-fence inspection"
+   ],
+   [
+    "water heaters",
+    "gates"
+   ],
+   [
+    "Water heater",
+    "Gate"
+   ],
+   [
+    "water heater",
+    "gate"
+   ],
+   [
+    "shop",
+    "company"
+   ],
+   [
+    "Shop",
+    "Company"
+   ],
+   [
+    "float studio",
+    "fence crew"
+   ],
+   [
+    "Springfield",
+    "Riverton"
+   ],
+   [
+    "$24,000",
+    "$5,400"
+   ],
+   [
+    "$16,000",
+    "$5,400"
+   ],
+   [
+    "$7,000",
+    "$5,400"
+   ],
+   [
+    "$4,500",
+    "$5,400"
+   ],
+   [
+    "$640",
+    "$5,400"
+   ],
+   [
+    "$600",
+    "$5,400"
+   ],
+   [
+    "$620",
+    "$175"
+   ],
+   [
+    "$540",
+    "$175"
+   ],
+   [
+    "$160",
+    "$175"
+   ],
+   [
+    "$179",
+    "$175"
+   ],
+   [
+    "$199",
+    "$175"
+   ],
+   [
+    "$150",
+    "$175"
+   ],
+   [
+    "$80",
+    "$175"
+   ],
+   [
+    "$89",
+    "$1,800"
+   ],
+   [
+    "shutoff valve",
+    "gate latch"
+   ],
+   [
+    "wall pipe",
+    "fence post"
+   ],
+   [
+    "supply line",
+    "gate hardware"
+   ],
+   [
+    "pipe",
+    "post"
+   ],
+   [
+    "designers",
+    "estimators"
+   ],
+   [
+    "Designers",
+    "Estimators"
+   ],
+   [
+    "designer",
+    "estimator"
+   ],
+   [
+    "Designer",
+    "Estimator"
+   ],
+   [
+    "cabinet",
+    "gate"
+   ],
+   [
+    "Cabinet",
+    "Gate"
+   ],
+   [
+    "gutter",
+    "fence board"
+   ]
+  ]
+ },
+ "keep": [
+  "leak",
+  "estimate visit",
+  "Estimate visit",
+  "overflowing",
+  "valve",
+  "hardware pick"
+ ],
+ "story": {
+  "A": "Alex visits the showroom (or a video call) for a free design consult to pick a style; the estimate visit at Alex's home follows.",
+  "B": "Alex books a free estimate visit; the estimator measures and sends a written estimate; Alex signs, pays a deposit, and a crew installs the fence over two days; the rest is billed when it's done."
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "fence work runs no classes"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "fence work pays the $2"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "fence work is never sent now"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "no classes"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "books a person's time"
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "nothing is left at the showroom"
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "children are never left at the showroom"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "a rating is asked"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "books people, not spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "no form: the written estimate is a document (A5-19)"
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "anyone may book"
+   },
+   {
+    "op": "off",
+    "at": "A8-02",
+    "label": "Something required is missing",
+    "why": "nothing is required at a design consult"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "fence work runs no classes"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "fence work pays the $2"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "fence work is never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "estimate visits and crews come in arrival windows"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "no classes"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "a fence crew never takes care of a child"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "a rating is asked"
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "books people, not spaces or things"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "fence work is never sent now"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "fence work is never sent now"
+   },
+   {
+    "op": "words",
+    "at": "B4-07",
+    "does": "The price comes straight from Sam's list. List prices never need Sam's OK."
+   },
+   {
+    "op": "words",
+    "at": "B4-14",
+    "does": "The work is priced at the visit, like a bathroom fence. Only the estimate visit is promised now. Owen quotes it there, and Alex says yes before any work.",
+    "more": [
+     "At booking: {{pay.asks}}.",
+     "The price: {{pay.price}}.",
+     "The estimate visit is free: nothing is owed for it, even after a no to the price."
+    ]
+   }
+  ]
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28"
+  ],
+  "B": [
+   "S1-60",
+   "S2-28"
+  ]
+ },
+ "notes": "Test-drive on the REDESIGN 2 master (Tue Oct 27 2026, 1:44am): plug-in facts, services, prices, rules and the decided fixes kept as verified (estimate first; signed estimate before a job; deposit when signed; cancel window; permit and utility locate as first steps; job-size limit; nobody home allowed only where the plug-in marks it). Built on the contractor parent (refitted) for rename pairs (trade words replaced); the parent's own ops are not copied.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "a house call, $75, paid in full when booking",
+    "Haircut · $35",
+    "two skin fades on",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "says the cape clip ripped a shirt collar today.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Each service starts the way most barbershops set it.",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "a Kids cut (12 and under) is $25",
+    "Quiero un corte el sábado.",
+    "Gloss to finish",
+    "gloss",
+    "takes jobs sent now, like a burst pipe",
+    "A repair shop, a tailor or a groomer does.",
+    "Lee Home Services'",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Drain clearing",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "asks for a skin fade at $35",
+    "once Riley sees the hair",
+    "Do you do kids cuts? My son is 8.",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "Books the groom's party together",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across Riley and Avery.",
+    "A haircut for Alex and a kids cut for a child work the same way.",
+    "photos of your hair",
+    "patch test",
+    "skin-test result",
+    "Can my son wait in the shop during my cut?",
+    "The rash on my scalp got worse. Can I still come in?",
+    "The cut is uneven on one side.",
+    "Saturday's cut is uneven on one side",
+    "Step-free door on Elm St",
+    "Lee Home Services",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "Groom's package",
+    "Color and cut",
+    "color and cut",
+    "Color correction",
+    "color correction",
+    "color quote",
+    "color",
+    "Color",
+    "Kids cut",
+    "kids cut",
+    "Skin fade",
+    "skin fade",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "water heaters",
+    "water heater",
+    "shops",
+    "shop",
+    "Shop",
+    "float studio",
+    "Springfield"
+   ],
+   "B": [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Like tapping a neighbor's water line without asking.",
+    "'My sink won't drain' fits a drain clearing.",
+    "'Adding a faucet check? Say so.'",
+    "At my home. Just the kitchen sink.",
+    "Some jobs take more than one visit, like new pipes put in one day and finished another.",
+    "Please clear the cabinet under the sink.",
+    "I found water damage under the sink this morning.",
+    "It's a leak under the sink, today,",
+    "The service call is $89.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Shutoff valve · $165",
+    "OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "Say Jordan's estimate visit at Harper J.'s is for a $2,400 repipe.",
+    "QUOTE 2400 repipe, 3 stages",
+    "Here's Lee Home Services' quote for your repipe.",
+    "Repipe · $2,400",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Right to cancel · repipe",
+    "The $800 start payment",
+    "Your $800 start payment",
+    "Say Harper J.'s $2,400 repipe is billed in three stages",
+    "stage 2 of 3 is done: your new pipes are in.",
+    "stage 2 of your repipe",
+    "$800",
+    "A neighborhood barbershop on Elm St. Classic cuts, fades and hot towel shaves.",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "no cut of",
+    "like a burst pipe or a lockout",
+    "Video and Jordan's notes",
+    "sewer camera report",
+    "An estimate becomes its own job",
+    "The estimate becomes its own job",
+    "$2,400 repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "takes jobs sent now, like a burst pipe",
+    "It's overflowing. Can someone come tonight?",
+    "LATE camera report",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Lee Home Services does plumbing and electrical work, not roofing. Nothing was saved. You can look for a roofer near you.",
+    "Lee Home Services'",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "BEFORE old water stain on the cabinet floor",
+    "Under the sink, before",
+    "Cabinet floor, before",
+    "Most jobs have a price before the visit. A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Not done: the pipe behind the wall",
+    "\"Jordan left a mess under the sink.\"",
+    "Jordan left a mess under the sink.",
+    "Can Jordan look at my bathroom sink next week?",
+    "Sure. Here are Jordan's next times for a bathroom drain.",
+    "Reading it back: accept the leak repair for today",
+    "$245",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "a dripping faucet",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Yard drain",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Can I skip next week's drain cleaning?",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Just the kitchen sink.",
+    "Is the sink still full of water?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Can you flush my water heater every year, too?",
+    "Lee Home Services has a yearly flush plan",
+    "Say Alex asks for a water heater flush every year.",
+    "DONE 179 drain",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "The drain clogs again 2 weeks later.",
+    "The kitchen drain is clogged again.",
+    "Your drain is under warranty",
+    "Jordan finds corroded shutoff valves.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Replace both shutoff valves",
+    "both shutoff valves",
+    "the shutoff valves",
+    "The $160 valve quote",
+    "the $160 valve work",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera report",
+    "Texts the camera report link",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Kitchen drain clearing",
+    "Drain clearings",
+    "drain clearings",
+    "Drain clearing",
+    "drain clearing",
+    "Kitchen drain",
+    "kitchen drain",
+    "Water heater flush",
+    "water heater flush",
+    "drain",
+    "leehomeservices.com",
+    "A license for the shop and for each barber. Haircut, fade and beard trim at the shop. House calls only where the state's rules allow them.",
+    "A haircut could mean a salon or a barbershop.",
+    "MP045210",
+    "EC22871",
+    "BS20981",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "rents a chair",
+    "The shop's chair is in the other flow.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Home Services LLC",
+    "Lee Home Services",
+    "Lee's Barbershop",
+    "Lee Plumbing",
+    "Lee Electric",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "Riley",
+    "Avery",
+    "Jordan",
+    "Casey",
+    "plumbing and electrical",
+    "Plumbing and electrical",
+    "electrical",
+    "Electrical",
+    "Panel upgrade",
+    "Plumber",
+    "plumber",
+    "plumbing",
+    "Plumbing",
+    "barbershop",
+    "Barbershop",
+    "barbers",
+    "barber",
+    "Barber",
+    "color",
+    "haircut",
+    "cuts",
+    "cut",
+    "the chair",
+    "credited to the repair",
+    "service call",
+    "Service call",
+    "Water heater replacement",
+    "water heater replacement",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "water heaters",
+    "Water heater",
+    "water heater",
+    "shop",
+    "Shop",
+    "float studio",
+    "Springfield",
+    "$640",
+    "$600",
+    "$620",
+    "$540",
+    "$160",
+    "$179",
+    "$199",
+    "$150",
+    "$80",
+    "$89",
+    "shutoff valve",
+    "wall pipe",
+    "supply line",
+    "pipe",
+    "cabinet",
+    "Cabinet"
+   ]
+  },
+  "A": {
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-30": "3a9ee593f3",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A10-34": "78c2d9a6a3",
+   "S1-80": "1d7be919fe",
+   "A4-43": "c17d56f766",
+   "A8-02": "15f418fec4"
+  },
+  "B": {
+   "S1-82": "5fac7742c5",
+   "S1-62": "c4f497de12",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B10-32": "7713bff255",
+   "S1-80": "1d7be919fe",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B4-07": "9d0dbc90ad",
+   "B4-14": "bea6443957"
+  }
+ }
+}

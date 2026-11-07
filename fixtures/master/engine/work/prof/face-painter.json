@@ -1,0 +1,3810 @@
+{
+ "id": "face-painter",
+ "name": "Face painter",
+ "style": "Event",
+ "pattern": "event",
+ "from": "makeup",
+ "cast": {
+  "A": {
+   "staff": "Kit and Bo (face painters at the studio)"
+  },
+  "B": {
+   "staff": "Nia and Bo (face painters at the party)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Kit"
+  },
+  "B": {
+   "staff": "Nia"
+  }
+ },
+ "plugin": {
+  "pf.license": {
+   "need": "None for face painting in most places. A local business license where the city or county asks for one, and a permit for a public or outdoor event where the state's form or the venue asks for one.",
+   "who holds it": "The business holds any business license or permit. Each painter needs no license of their own in most places; the state form says.",
+   "what to ask": [
+    "The business's license or permit number, where the city or county asks for one",
+    "The liability insurance policy and its end date (schools, parks and venues often ask)"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or permit (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each painter go live once set up and the owner says yes; a job the owner says needs a permit they don't have isn't booked",
+   "away from the studio": "Parties at homes, parks, halls, schools and venues are normal work. A permit for a public or outdoor event is the business's own, asked only where the state's form or the venue names one.",
+   "renewals": "optional reminders the owner sets; a permit the owner says has lapsed pauses that work until the owner says it's renewed (the owner's word, never a check)",
+   "insurance or bond": "Liability insurance on file, with its end date, where a venue or the state's form asks. Many schools, parks and venues ask for a certificate naming them.",
+   "background checks": "Only where the venue or the state's form asks, like a school or library event. The business's own word, never checked by Rosie.",
+   "glitter tattoos": "Its own kind of work, optional and shown as given the same way."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Lee Face Painting's own list)": [
+    {
+     "service": "Kids' party face painting (2 hours, one painter, up to 20 faces)",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "2 hours",
+     "place": "at a home, a park or a hall",
+     "before": "the full price, paid when booking",
+     "after": "nothing more",
+     "note": "A parent or another adult stays in the room the whole time. A late cancel or no-show keeps at most $40, only as the owner confirms; the rest is refunded."
+    },
+    {
+     "service": "Party face painting, quoted from the plan (two or three painters: the date, hours, guests and their ages)",
+     "price kind": "quoted from the plan first",
+     "price": "the quote (the example: $640 for about 30 kids, two painters, two hours)",
+     "length": "the party's hours, plus 30 minutes to set up",
+     "place": "at a home, a park, a school or a venue",
+     "before": "a signed agreement, then a 25% deposit that holds the date",
+     "after": "the rest ($480 in the example) charged to the saved card when the painter texts DONE, or on the bill after the party",
+     "note": "Over $500, the owner OKs the quote first."
+    },
+    {
+     "service": "School or company event (quoted, billed after)",
+     "price kind": "quoted from the plan first",
+     "price": "the quote, with the same deposit rule",
+     "length": "by the hour",
+     "place": "at the venue",
+     "before": "a signed agreement and a 25% deposit",
+     "after": "the bill after the event, texted by Rosie"
+    },
+    {
+     "service": "One-painter visit (1 hour, a small party)",
+     "price kind": "one price",
+     "price": "$120, travel within 10 miles included",
+     "length": "1 hour",
+     "place": "at a home or a park",
+     "before": "a $40 deposit",
+     "after": "the $80 rest charged to the saved card when the painter texts DONE"
+    },
+    {
+     "service": "Second painter (added to a booking)",
+     "price kind": "one price, per painter",
+     "price": "$120",
+     "length": "the same hours as the booking",
+     "place": "at the same place",
+     "before": "a card saved for the $40 fee",
+     "after": "on the bill after the party"
+    },
+    {
+     "service": "Glitter tattoos (the second kind of work: Lee Party Glitter)",
+     "price kind": "one price, for a set number of guests",
+     "price": "$60 for up to 10 guests (the example)",
+     "length": "by the hour",
+     "place": "where the party is",
+     "before": "with the main booking",
+     "after": "with the main booking",
+     "note": "Only water-based glitter and a patch test for any guest with a known allergy, 24 hours before."
+    },
+    {
+     "service": "Extra painting time on the day (one painter, by the half hour)",
+     "price kind": "per hour, for one painter",
+     "price": "$60 an hour for one painter, $100 an hour for two (the example)",
+     "length": "by the half hour",
+     "place": "at the party",
+     "before": "with the main booking",
+     "after": "paid at the visit or on the bill (D91)",
+     "note": "Added on the day only with the payer's written yes, and only if a painter is free before the end time."
+    },
+    {
+     "service": "Travel",
+     "price kind": "travel fee, per painter",
+     "price": "free within 10 miles; $40 a painter from 10 to 25 miles; farther, quoted first",
+     "place": "at the customer's place",
+     "before": "in the quote or the list price",
+     "after": "with the rest"
+    }
+   ],
+   "at the business (the example: Lee Face Studio's own list)": [
+    {
+     "service": "Face-painting lesson (one to one, with a design card to keep)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2 hours",
+     "place": "at the studio",
+     "before": "a $40 deposit",
+     "after": "the $100 rest at the studio"
+    },
+    {
+     "service": "Quick face design (one design, 20 minutes)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "20 min",
+     "place": "at the studio",
+     "before": "a card saved for the studio's $20 no-show fee, or nothing for a returning customer",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Full face design with glitter (60 minutes)",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the studio",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Half-face design (about 30 minutes)",
+     "price kind": "one price",
+     "price": "$40",
+     "length": "30 min",
+     "place": "at the studio",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Glitter add-on (with the main booking)",
+     "price kind": "one price",
+     "price": "$20",
+     "length": "10 min",
+     "place": "at the studio",
+     "before": "with the main booking",
+     "after": "paid at the studio"
+    },
+    {
+     "service": "Kids' design at the studio (under 12: a parent books and stays)",
+     "price kind": "one price",
+     "price": "$25",
+     "length": "20 min",
+     "place": "at the studio",
+     "before": "a card saved",
+     "after": "paid at the studio",
+     "note": "A parent books and stays. No photo of a child without a parent's yes."
+    },
+    {
+     "service": "Custom design from a photo",
+     "price kind": "quoted from the photo first",
+     "price": "the quote (the example: $90)",
+     "length": "about 60 min",
+     "place": "at the studio",
+     "before": "the full price, paid when booking",
+     "after": "nothing more"
+    }
+   ]
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What it's for: a birthday, a school or shop event, a fair or festival, or a lesson",
+    "The date and the start and end time (the painting time is the party's hours)",
+    "Where: a home, a park, a school, a hall or another venue, and the town only (for the travel fee)",
+    "How many guests, and roughly their ages (it sets how many painters and how long)",
+    "Indoors, outdoors, or both (an outdoor party has a weather rule)",
+    "Add-ons: a second painter, glitter tattoos, extra time"
+   ],
+   "after a time is picked": [
+    "The host's name and mobile, and a day-of contact if the host won't be there",
+    "Where to set up: a table near a plug or the light, and a chair for each painter",
+    "Any theme the party wants (a superhero, a princess, animals); a photo, if there is one, on the secure page",
+    "The do-not-paint list for the guests: anyone who can't be painted, answered on the secure page"
+   ],
+   "only on the secure page": [
+    "Known allergies (to a paint, glitter or a fragrance) and skin conditions, each child's answer from a parent, on a link the booker forwards",
+    "A past reaction to face paint or glitter",
+    "The party's street address and any gate or door code",
+    "A child's name and age, and the child's own do-not-paint notes",
+    "May the business show photos of the painting? Each guest's own yes; a parent for anyone under 18",
+    "The card"
+   ],
+   "flags": "A known allergy or a past reaction is flagged: the painter calls (never a text) and offers a patch test 24 hours before, uses only that child's own paint, or leaves that spot unpainted.",
+   "who may book": "An adult. A parent books a kids' party and stays. For a school or company event, someone the school or company names. The booker answers only for themselves; each child's notes come from a parent on the secure page."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "A reaction now: swelling of the face, lips or throat, hives all over, or trouble breathing",
+     "says": "Call 911 now.",
+     "booking": "No booking, and the painter and the owner are told. No paint goes on a reacting face; that child is not painted again."
+    },
+    {
+     "words": "Paint or glitter in the eye with pain or a change in sight",
+     "says": "Rinse the eye with clean running water for 15 minutes. If you can't see or it's badly hurt, call 911 now. Otherwise see a doctor today.",
+     "booking": "No booking for that child until a doctor says it's fine."
+    }
+   ],
+   "safety steps, then the booking goes on": [
+    {
+     "words": "A rash, redness, itching or puffiness after the paint, with no danger signs",
+     "says": "Wash the paint off gently with water and a mild soap. Don't add more. Your painter will call you.",
+     "booking": "The painter calls within the hour (the owner if the painter is silent 15 minutes) and decides: a different paint, a patch test next time, or a doctor."
+    },
+    {
+     "words": "A cold sore, pink eye, a sty or open skin where the paint goes, on the day",
+     "says": "No paint on that spot, so it can't spread or get worse.",
+     "booking": "The painter works around it or leaves that spot bare. The rest of the party goes on as booked; no fee is kept for a child who can't be painted for a skin reason."
+    }
+   ],
+   "clean tools": "Water-based, cosmetic-grade paints only, with each product's label kept on file. Sponges and brushes are cleaned between children; paint is taken out with a clean spatula, never dipped back. Loose glitter is never used near the eyes or mouth.",
+   "on the night": [
+    "Nothing is painted on a face with a rash, a cut, a burn, a cold sore, pink eye or a sty",
+    "No paint near the eyes, lips or nostrils: the painter stops at the eyelid's edge",
+    "A child is never alone with a painter; a parent or another adult stays in sight the whole time",
+    "The painters stop if a crowd gets unsafe, and tell the host. They never step into a fight."
+   ],
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first. Rosie never judges a reaction: the painter or a doctor decides."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "The signed agreement",
+     "for": "Every quoted party and school or company event",
+     "timing": "Before any money is taken, on the secure page"
+    },
+    {
+     "step": "The venue's rules: the load-in time and door, parking, power, table space, and the end time",
+     "for": "Every party at a venue, school or park",
+     "timing": "At booking. A venue not on file waits for the owner's OK first."
+    },
+    {
+     "step": "An insurance certificate naming the venue",
+     "for": "Venues and schools that ask",
+     "timing": "A to-do for the owner, before the date the venue sets"
+    },
+    {
+     "step": "The party form: the theme, the guests' ages, the paints each child has had before, and the do-not-paint list",
+     "for": "Parties",
+     "timing": "Sent 2 weeks before, due 7 days before. Booked within 7 days: sent at booking, due the day before."
+    },
+    {
+     "step": "A patch test, 24 hours before, for each child with a known allergy or sensitive skin",
+     "for": "Any child with a known allergy",
+     "timing": "On a small spot of skin, with a parent's yes; a reaction means that paint is left out"
+    },
+    {
+     "step": "A planning call (15 minutes for a kids' party, 45 minutes for a school or company event), by phone or video",
+     "for": "Parties",
+     "timing": "The week before. Booked within a week: the day before."
+    }
+   ],
+   "prep for the reminder": [
+    "The final party form and the do-not-paint list, 2 days before",
+    "The host's mobile, and where the painters park and come in",
+    "A table and an outlet near the front, if the venue doesn't set them",
+    "Kids: come with clean faces, no lotion, and tell the painter about any skin spots"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code, given to the lead painter at the door by the host, or by a day-of contact named on the booking.",
+   "check-in at the studio": "The code at the desk, or the painter types it.",
+   "setup": "Painters arrive 30 minutes before the start, set up the paint table and the chairs, and check the venue's rules before the first child.",
+   "before each child": "The painter reads that child's secure notes, asks if anything changed, and uses only paint that child has used safely, with a clean brush or sponge.",
+   "the schedule": "Each painter takes the children in the order the host sets. A late painter shortens the first breaks, never the end time.",
+   "work changes at the visit": "An extra painter or extra time added on the day only if a painter is free, with the payer's written yes; paid at the visit or on the bill, as D91 says.",
+   "proof it's done": "The lead painter texts DONE when the last face is done and the table is packed up.",
+   "props": "Paints, brushes and glitter belong to the business and are cleaned after each party. Nothing is handed over or sold at the party."
+  },
+  "pf.money": {
+   "starting answers": [
+    "Kids' parties: the full price when booking (the example: $150 for two hours). A one-painter visit: a $40 deposit at booking and the $80 rest charged to the saved card when the painter texts DONE",
+    "Quoted parties and school or company events: a signed agreement, a 25% deposit that holds the date, and the rest charged to the saved card when the painter texts DONE, or billed after (Rosie never charges the rest on a set day by itself)",
+    "Studio: lessons with a deposit and the rest at the studio; quick designs with a card saved for a $20 no-show fee, or nothing for a returning customer; full designs paid in full"
+   ],
+   "limits": [
+    "Deposit cap: from the state form",
+    "A late cancel keeps only what the agreement says, and the owner confirms it. No answer: nothing kept",
+    "The business cancels, or the painter can't come: a full refund",
+    "A child who can't be painted for a skin reason: no fee for that child; the party goes on"
+   ],
+   "travel": "Free within 10 miles; $40 a painter from 10 to 25 miles; farther, quoted first (the example's own fees).",
+   "early start": "Not offered: painters arrive 30 minutes before the start, at no charge.",
+   "tips": "On: optional, on the receipt page or the bill, split between the painters as the owner sets.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the service or products sold.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Allergies, skin conditions, past reactions, patch-test results and medical notes, and any child's name, age or notes, stay on the secure page and the painter's job link, never in a text to the host, the owner or the staff. A text says only 'a note is on the page'.",
+   "photos": "Photos of a child's face go only by the secure page, never in a text. In a portfolio only with each guest's own yes; a parent for anyone under 18. No answer means no.",
+   "languages": "English and Spanish.",
+   "minors": "A parent books a kids' party and stays. Rosie never texts a child first, and a child's name is never said in a text. A parent gives the yes for each child's face on the secure page."
+  },
+  "pf.staff": {
+   "roles": [
+    "Lead face painter",
+    "Face painter",
+    "Glitter artist",
+    "Studio face painter"
+   ],
+   "licenses": "None needed for face painting in most places; the state form says. Glitter artists need no license of their own in most places.",
+   "skills": [
+    "Kids' parties",
+    "School and event face painting",
+    "Lessons",
+    "Glitter tattoos",
+    "Theme designs"
+   ],
+   "away from the studio": "Parties at homes, parks, halls and venues are the usual place for this work; the venue's own rules and the state's form apply.",
+   "supervision": "Students and new painters work only under a lead painter the owner names.",
+   "who OKs what": "The owner OKs every quoted party, any stand-in lead and any extra painter added on the day.",
+   "stand-ins": "At the studio: another studio painter with the skill, at the same time and price; with no reply 2 hours before, that stand-in comes, and the owner can turn this off. On location: a lead painter the owner trusts, offered by name; the agreement names the stand-in, so with no reply by 8pm the evening before, the stand-in comes and the owner calls. A full refund is always the other choice. The stand-in gets the party form and each child's secure notes."
+  },
+  "pf.rules": {
+   "license shown": "A license or permit number on the confirmation, the reminder or the receipt where the city or county asks for one (a switch from the state form).",
+   "away from the studio": "Parties at homes, parks, halls, schools and venues are normal work; a permit for a public or outdoor event is asked where the state's form or the venue names one.",
+   "written contract": "The business's own agreement for every quoted party and school or company event, signed by the customer and the business before money is taken; any parts the state adds come from the state form.",
+   "date hold": "A party's date stays saved while the agreement is signed: up to 24 hours (the owner's setting).",
+   "cancel and date change": "Free to cancel until 24 hours before; after that, what the agreement says, with the owner's OK. One free date change to an open date (the owner's setting).",
+   "final count": "The guest count is set on the party form, due 7 days before; a bigger count later is quoted first.",
+   "minors": "A parent's yes for each child's face, and the parent stays. Nothing is painted on a child without that yes.",
+   "photo use": "Portfolio or ad photos only with each guest's own yes; a parent's for anyone under 18. No answer means no.",
+   "hygiene": "Water-based, cosmetic-grade paints and cleaned tools, as the state's sanitation rules require (a switch from the state form).",
+   "weather": "An outdoor party has a rain plan. The owner sets a weather limit (the example: heavy rain or storms in the forecast); over it, the owner is asked the afternoon before to keep it under the rain plan or move it.",
+   "records": "Agreements, party forms, patch-test notes and payments kept 7 years, or longer where the state asks."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for face painting:",
+   "face painting": [
+    "The end time can't move: late painters shorten the first breaks, and the last child is done on time",
+    "A reaction or a rash during or after painting: paint off, the painter calls, a doctor if needed",
+    "A known allergy: a patch test 24 hours before, or that paint is left out",
+    "A child added late: only if a painter is free, with the owner's OK",
+    "A child with no adult in sight: the painting stops until an adult is back",
+    "The lead painter can't come: a trusted stand-in the agreement names, or a full refund",
+    "The party moves to another place on the day: the travel fee is checked again before anyone agrees",
+    "Rain on an outdoor party: the rain plan, called the afternoon before",
+    "A crowd gets unsafe: the painters stop and tell the host",
+    "Guest requests: the do-not-paint list always wins"
+   ]
+  },
+  "pf.facts": [
+   "children",
+   "firststeps",
+   "forms",
+   "groups",
+   "documents",
+   "tips",
+   "extrawork",
+   "photos"
+  ],
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   }
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "{{due:$125}}",
+    "{{due:$100}}"
+   ],
+   [
+    "{{price:$125}}",
+    "{{price:$140}}"
+   ],
+   [
+    "A at their home too, 75, paid when they book",
+    "A kids' party at their home too, 150, paid when they book"
+   ],
+   [
+    "a house call, $75, paid in full when booking",
+    "a kids' party face painting at home, $150, paid in full when booking"
+   ],
+   [
+    "Haircut at home · $75",
+    "Kids' party face painting at home · $150"
+   ],
+   [
+    "So is a house call, $75.",
+    "So is a kids' party face painting at home, $150."
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Lessons, quick face design and event looks."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Birthday party and party face painting on location, within 25 miles."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Kit and Eli do studio face paint; Kit also does theme looks and face paint at home."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Kit: studio painter, theme looks, face paint at home"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Kit: studio painter, theme looks and face paint at home"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, theme looks and face paint at home"
+   ],
+   [
+    "Each service starts the way most barbershops set it.",
+    "Each service starts the way most face paint studios set it."
+   ],
+   [
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "J: a glitter extra painting in the first 2 weeks, checked from photos, free."
+   ],
+   [
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "On this path, a glitter extra painting checked from photos is free: nothing before, nothing after."
+   ],
+   [
+    "Color touch-up",
+    "Lash extra painting"
+   ],
+   [
+    "Color quotes come to you first.",
+    "Theme design quotes come to you first."
+   ],
+   [
+    "A water heater job",
+    "A birthday party"
+   ],
+   [
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Alex asks for a spray tan, which isn't on the studio's list."
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Face Studio doesn't do spray tattoos."
+   ],
+   [
+    "A color's example: 'Color here needs a quick patch test first.",
+    "A studio's example: 'Lash glue here needs a quick patch test first."
+   ],
+   [
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Ben T. books an quick face design for Sat Nov 7 at 2:00pm."
+   ],
+   [
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Lee Face Studio: you now have two quick face paints on Sat Nov 7."
+   ],
+   [
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "Alex picked show face paint for a child before the times."
+   ],
+   [
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "You told us the show face paint is for your child, and that you're their parent. Their details go on the secure page."
+   ],
+   [
+    "A haircut at Lee's Barbershop:",
+    "{{name}} at Lee Face Studio:"
+   ],
+   [
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Book me a face paint session at Lee Face Studio on Saturday."
+   ],
+   [
+    "Alex M. · Haircut",
+    "Alex M. · Face paint visit"
+   ],
+   [
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "Lee Face Studio · Quick face design: your 3:00pm"
+   ],
+   [
+    "Lee's Barbershop · Haircut",
+    "Lee Face Studio · {{name}}"
+   ],
+   [
+    "Books the groom's party together",
+    "Books the group together"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds spray tattoos to Lee's Barbershop."
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Spray tattoos for Lee's Barbershop: is it the same company?"
+   ],
+   [
+    "NEW massage",
+    "NEW spray tattoos"
+   ],
+   [
+    "Lee's Barbershop doesn't do perms.",
+    "Lee Face Studio doesn't do glitter."
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "Foundation got on my silk blouse."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says paint got on a silk blouse today."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a tow or a lockout"
+   ],
+   [
+    "Gloss to finish",
+    "Setting spray"
+   ],
+   [
+    "gloss",
+    "setting spray"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A session is rated, so the studio takes the first branch."
+   ],
+   [
+    "like Riley's color plan after a consult",
+    "like Kit's cover-up plan after a consult"
+   ],
+   [
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Lee Face Studio sent you a school fair: Kit's cover-up plan."
+   ],
+   [
+    "Proposal · Color plan",
+    "Proposal · Cover-up plan"
+   ],
+   [
+    "your first color plan visit",
+    "your first cover-up plan visit"
+   ],
+   [
+    "May the shop show photos of your hair? Yes / No",
+    "May the studio show your photos in its portfolio? Yes / No"
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Kit can do a shorter session in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Face Studio can book you from now on, at the studio and for quick face paints at home."
+   ],
+   [
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "Lee Face Studio prices an glitter tattoo at the studio, once Kit sees the photos."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company, and one for each painter where the state asks."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A face paint example: a rash after face paint elsewhere, with no swelling, gets 'take it off gently' first."
+   ],
+   [
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "The plug-in sets the status words, like in, scanning, ready."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Add photos of your old print, and a face painter will price the restoration."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only for their own place."
+   ],
+   [
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "The plug-in names what's worth keeping, like the shades Alex liked."
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning.",
+    "A school dance group of five books face paint for one afternoon."
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: warm shades, soft wing, brown liner works best"
+   ],
+   [
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Rosie finds back-to-back times across Kit and Eli."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your baby party session is part of a plan with Kit, every 4 weeks."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Quick face paints at home wherever the studio travels."
+   ],
+   [
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Alex M. says one of Saturday's photos has a shadow on the face."
+   ],
+   [
+    "Nia K. asked to talk about the $90 color quote.",
+    "Nia K. asked to talk about the $90 theme design quote."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "Face paint could mean a face painter or a cosmetics store."
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A business license for the studio, where the city asks."
+   ],
+   [
+    "Alex bought a package of cuts at the shop.",
+    "Alex bought a package of sessions at the studio."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can my friend wait in the studio during my lesson?"
+   ],
+   [
+    "A repair shop, a tailor or a groomer does.",
+    "Alex leaves the old print, and picks it up when it's ready."
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Headshots, pet portraits and glitter at the studio."
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, theme looks and quick face paints at home"
+   ],
+   [
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Yes: a kids' design (12 and under) is $25."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Kit also does theme looks and quick face paints at home"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Kit: studio, theme looks and quick face paints at home"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks.",
+    "Alex asks for a baby party session every 4 weeks."
+   ],
+   [
+    "A barbershop takes no drop-offs.",
+    "The studio takes theme looks as drop-offs."
+   ],
+   [
+    "The rash on my scalp got worse.",
+    "The rash on my face got worse."
+   ],
+   [
+    "Color always stays with Riley.",
+    "Theme looks always stay with Kit."
+   ],
+   [
+    "The cut is uneven on one side.",
+    "One photo has a shadow on my face."
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "A birthday party is quoted from the plan."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone hurt at the venue stops the booking."
+   ],
+   [
+    "Riley stopped Alex M.'s cut.",
+    "Kit stopped Alex M.'s face paint."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a face paint lesson on Saturday."
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero una clase de maquillaje el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a baby party every 4 weeks"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A face paint lesson needs Alex's own face paint bag, to learn with."
+   ],
+   [
+    "Drains have a set price.",
+    "One-painter visit has a set price."
+   ],
+   [
+    "Stopped Alex M.'s cut.",
+    "Stopped Alex M.'s face paint."
+   ],
+   [
+    "License renewal",
+    "Renewal due"
+   ],
+   [
+    "1 color quote",
+    "1 theme design quote"
+   ],
+   [
+    "Panel upgrade",
+    "Glitter extensions, styled"
+   ],
+   [
+    "Avery: barber",
+    "Eli: studio"
+   ],
+   [
+    "$140 an hour",
+    "$160 an hour"
+   ],
+   [
+    "At the chair",
+    "At the studio"
+   ],
+   [
+    "EC22871",
+    "EL22871"
+   ],
+   [
+    "BS20981",
+    "EL20981"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Face Painting's"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Face Painting"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Face Paint"
+   ],
+   [
+    "Lee Electric",
+    "Lee Party Glitter"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Face Studio LLC"
+   ],
+   [
+    "Lee's Barbershop's",
+    "Lee Face Studio's"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Face Studio"
+   ],
+   [
+    "Jordan Price",
+    "Nia Park"
+   ],
+   [
+    "Casey Moore",
+    "Bo Ellis"
+   ],
+   [
+    "Riley Chen",
+    "Kit Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Eli Diaz"
+   ],
+   [
+    "Jordan",
+    "Nia"
+   ],
+   [
+    "Casey",
+    "Bo"
+   ],
+   [
+    "Riley",
+    "Kit"
+   ],
+   [
+    "Avery",
+    "Eli"
+   ],
+   [
+    "1200 Main St",
+    "44 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "9 Harbor Rd"
+   ],
+   [
+    "Elm St",
+    "Rose St"
+   ],
+   [
+    "plumbing and electrical",
+    "face paint and glitter tattoos"
+   ],
+   [
+    "Electrical",
+    "Glitter tattoos"
+   ],
+   [
+    "electrical",
+    "glitter tattoos"
+   ],
+   [
+    "Plumbing",
+    "Face paint"
+   ],
+   [
+    "plumbing",
+    "face paint"
+   ],
+   [
+    "plumber",
+    "painter"
+   ],
+   [
+    "Plumber",
+    "Painter"
+   ],
+   [
+    "Barbershop",
+    "Face paint studio"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A face paint studio's plug-in adds its own: a reaction with swelling, or face paint in an eye with pain."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Alex's words had none of them, so nothing is sent here."
+   ],
+   [
+    "A barbershop's plug-in has none.",
+    "Face paint's is each person's face form."
+   ],
+   [
+    "barbershop",
+    "face paint studio"
+   ],
+   [
+    "barbers",
+    "studio painters"
+   ],
+   [
+    "a barber",
+    "a studio painter"
+   ],
+   [
+    "barber",
+    "studio painter"
+   ],
+   [
+    "Barber",
+    "Studio painter"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Full face design with glitter"
+   ],
+   [
+    "Signature cut and shave",
+    "Full face design with glitter"
+   ],
+   [
+    "Signature cut",
+    "Full face design with glitter"
+   ],
+   [
+    "signature cut",
+    "full face design with glitter"
+   ],
+   [
+    "the Groom's package",
+    "the face paint lesson"
+   ],
+   [
+    "The Groom's package",
+    "The face paint lesson"
+   ],
+   [
+    "Groom's package",
+    "Face paint lesson"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Kids' design (12 and under)"
+   ],
+   [
+    "kids cuts",
+    "kids' show face paints"
+   ],
+   [
+    "kids cut",
+    "kids' design"
+   ],
+   [
+    "a skin fade",
+    "a natural face paint"
+   ],
+   [
+    "A skin fade",
+    "A natural face paint"
+   ],
+   [
+    "Skin fade",
+    "Natural face paint"
+   ],
+   [
+    "skin fade",
+    "natural face paint"
+   ],
+   [
+    "A beard trim is",
+    "Glitter are"
+   ],
+   [
+    "a beard trim",
+    "glitter"
+   ],
+   [
+    "Beard trim",
+    "Glitter"
+   ],
+   [
+    "beard trim",
+    "glitter"
+   ],
+   [
+    "Haircuts",
+    "Quick face paints"
+   ],
+   [
+    "haircuts",
+    "quick face paints"
+   ],
+   [
+    "Haircut",
+    "Quick face design"
+   ],
+   [
+    "a haircut",
+    "an quick face design"
+   ],
+   [
+    "A haircut",
+    "An quick face design"
+   ],
+   [
+    "haircut",
+    "quick face design"
+   ],
+   [
+    "Color and cut",
+    "Theme design"
+   ],
+   [
+    "color and cut",
+    "theme design"
+   ],
+   [
+    "a color correction",
+    "a cover-up session"
+   ],
+   [
+    "A color correction",
+    "A cover-up session"
+   ],
+   [
+    "Color correction",
+    "Glitter tattoo"
+   ],
+   [
+    "color correction",
+    "glitter tattoo"
+   ],
+   [
+    "house calls",
+    "quick face paints at home"
+   ],
+   [
+    "House calls",
+    "Quick face paints at home"
+   ],
+   [
+    "a house call",
+    "an quick face design at home"
+   ],
+   [
+    "house call",
+    "quick face design at home"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "the shop's board",
+    "the studio's price list"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "shops",
+    "studios"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "Water heater flush",
+    "Kids' party face painting"
+   ],
+   [
+    "photos of your hair",
+    "photos of your old print"
+   ],
+   [
+    "sees the hair",
+    "sees the photos"
+   ],
+   [
+    "MP045210",
+    "ES045210"
+   ],
+   [
+    "JP031552",
+    "ES031552"
+   ],
+   [
+    "JE30417",
+    "CO30417"
+   ],
+   [
+    "Your day list comes at 7:00am, the time you picked.",
+    "Your day list comes at 6:00am, the time you picked."
+   ],
+   [
+    "$89",
+    "$40"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the party's details"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 30-minute video face paint lesson"
+   ],
+   [
+    "Kids cut",
+    "Kids' design"
+   ]
+  ],
+  "B": [
+   [
+    "A at their home too, 75, paid when they book",
+    "A kids' party at their home too, 150, paid when they book"
+   ],
+   [
+    "$179, paid after the job",
+    "$120, $40 now, $80 after the visit"
+   ],
+   [
+    "Shutoff valve and wall pipe · $540",
+    "Second painter · $120"
+   ],
+   [
+    "Supply line · $80",
+    "Glitter tattoos · $60"
+   ],
+   [
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "$160 to start, $480 at DONE"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Glitter tattoos · $60"
+   ],
+   [
+    "Repipe · $2,400 / $800 to start, $800 when the pipes are in, $800 at the finish",
+    "Party face painting · $640 / $160 to start, $480 at DONE"
+   ],
+   [
+    "is for a $2,400 repipe",
+    "is for a $640 party face painting"
+   ],
+   [
+    "like the $89 service call",
+    "like the $40 travel fee"
+   ],
+   [
+    "The $800 start payment is taken as the deposit",
+    "The $160 deposit is taken"
+   ],
+   [
+    "Your $800 start payment is taken.",
+    "Your $160 deposit is taken."
+   ],
+   [
+    "Each stage is billed when Jordan texts it done.",
+    "The rest is charged when Nia texts DONE."
+   ],
+   [
+    "Leak repair · $620 / Shutoff valve and wall pipe · $540 / Supply line · $80",
+    "Party face painting · $640 / Second painter · $120 / Glitter tattoos · $60"
+   ],
+   [
+    "leak repair is $620",
+    "party face painting is $640"
+   ],
+   [
+    "like a $620 repair",
+    "like a $640 party"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Lessons, quick face design and event looks."
+   ],
+   [
+    "Drain clearing and water heaters, within 25 miles.",
+    "Birthday party and party face painting on location, within 25 miles."
+   ],
+   [
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Kit and Eli do studio face paint; Kit also does theme looks and face paint at home."
+   ],
+   [
+    "Riley: barber, color, house calls",
+    "Kit: studio painter, theme looks, face paint at home"
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Kit: studio painter, theme looks and face paint at home"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every studio service, theme looks and face paint at home"
+   ],
+   [
+    "Its money card is set the way most barbershops start.",
+    "Its money card is set the way most face paint studios start."
+   ],
+   [
+    "Here are the rules barbershops often set.",
+    "Here are the rules face paint studios often set."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'Face paint for my birthday party' fits party face painting."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like face paint on someone who hasn't agreed to it."
+   ],
+   [
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "A commonly paired add-on is one line on the card: 'Adding glitter tattoos? Say so.'"
+   ],
+   [
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "And how many faces, and what time must everyone be ready?"
+   ],
+   [
+    "Lee Home Services can clear the drain:",
+    "Lee Face Painting can do the face paint:"
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, by the big window"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $150 kids' party face painting needs none."
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 extra-hour quote is good for 7 days."
+   ],
+   [
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "Say Nia's kit stand scratches the hall desk, and Nia texts a photo."
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a face paint stain on the hall chair this morning."
+   ],
+   [
+    "Drain clearings already booked keep $179.",
+    "Event face paints already booked keep $150."
+   ],
+   [
+    "Drain clearings already booked keep only their saved card.",
+    "Event face paints already booked keep only their saved card."
+   ],
+   [
+    "Lee Home Services: you have two drain clearings on Mon Nov 9.",
+    "Lee Face Painting: you have two event face paints on Mon Nov 9."
+   ],
+   [
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Reply here, and it goes to Sam. How was the face paint with Jordan?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "Hi, it's about face paint for my birthday party. A text back is fine."
+   ],
+   [
+    "It's a leak under the sink, today,",
+    "It's kids' party face painting, today,"
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Yes. Glitter tattoos are $60 for up to 10 guests, with Nia. Both fit in the same morning if Nia starts at 7:45am."
+   ],
+   [
+    "Lee Home Services · Kitchen drain clearing",
+    "Lee Face Painting · {{name}}"
+   ],
+   [
+    "Alex M. · Kitchen drain clearing",
+    "Alex M. · {{name}}"
+   ],
+   [
+    "Prices it: the list, photos or the visit",
+    "Prices it: the list, a quote or the visit"
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds live streaming to Lee Home Services."
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Live streaming for Lee Home Services: is it the same company?"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW live streaming"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can you start the face paint at 7am instead?"
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Nia says no. The faces start at 8am, as planned."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a tow or a lockout"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company takes jobs sent now."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "Our party is tonight. Can a face painter come?"
+   ],
+   [
+    "Plumbing books a 2-hour window.",
+    "Face paint books a time slot, like 8 to 10am."
+   ],
+   [
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "Your face paint runs two days: today, and Fri Oct 23, 8–10am, for day 2."
+   ],
+   [
+    "$2,400 repipe",
+    "$640 birthday party weekend"
+   ],
+   [
+    "stage 2 of your repipe",
+    "theme 2 of your birthday party weekend"
+   ],
+   [
+    "like replacing the old pipes Jordan noted",
+    "like face paint for the couple's birthday photo shoot"
+   ],
+   [
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "sent you a school fair for face paint at your birthday shoot, from Nia's notes."
+   ],
+   [
+    "Proposal · Replace the old pipes",
+    "Proposal · Anniversary shoot face paint"
+   ],
+   [
+    "One of the shop's barbers does house calls.",
+    "Kit, a studio face painter, does quick face paints at home."
+   ],
+   [
+    "Alex's home in Springfield is inside it.",
+    "Harbor Inn in Springfield is inside it."
+   ],
+   [
+    "At my home.",
+    "At a hall: Harbor Inn."
+   ],
+   [
+    "Is the report ready on time?",
+    "Is the photo ready on time?"
+   ],
+   [
+    "LATE camera report Mon Oct 26",
+    "LATE photo Mon Oct 26"
+   ],
+   [
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "Alex M. OK'd the interior photos only, $60. Skip the evening photos."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "OK: Nia takes the interior photos today, $60. The $80 evening photos stay good until Thu Oct 29."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurt or in danger, call 911 now."
+   ],
+   [
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "The plug-in says a birthday party is planned and quoted first, so Rosie's first text asks for the party's details."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told how to take the face paint off gently, and to call 911 if her daughter's lips or throat swell."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: the date, the done-by time, where everyone gets ready, and how many faces."
+   ],
+   [
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Before setting up, Nia lays a drop cloth and photographs the carpet and the table, noting any stains."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Quítele el maquillaje con agua y un limpiador suave. Si se le hinchan los labios o la garganta, llame al 911."
+   ],
+   [
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "You're all set: Lee Face Studio can book you from now on, at the studio and for quick face paints at home."
+   ],
+   [
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "Copy: at 8:52am on Nia's phone, you said yes to one more hour for $160."
+   ],
+   [
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "On the quote path, only Nia's times show: he leads birthday parties here."
+   ],
+   [
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Nia can start 30 minutes later if the next booking allows, or you can pick another time."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Take the face paint off with water and a mild cleanser. If her lips or throat swell, call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Lee Face Painting doesn't do, like glitter."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Bo stopped using the outlet by the table: it sparked. Please tell the front desk."
+   ],
+   [
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "The plug-in says to stop using it, so Alex gets a written note and the photo."
+   ],
+   [
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "For face paint, a reaction with swelling or trouble breathing, or face paint in an eye with pain, stops the booking."
+   ],
+   [
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Lee Face Studio can do an quick face design at the studio for $35, or at your home for $75."
+   ],
+   [
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "Nia finds Alex and checks in with the code, so it's a normal visit."
+   ],
+   [
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "Every face paint job is priced before the visit: from the list, or quoted and OK'd first."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company, and one for each painter where the state asks."
+   ],
+   [
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "An event happens only at the customer's place, so nothing is asked."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: listing photos for two rentals every 3 months."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A face paint example: a rash after face paint elsewhere, with no swelling, gets 'take it off gently' first."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? I need face paint for my daughter's quinceañera on Saturday."
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: a reaction with swelling, or face paint in an eye with pain."
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add each person's name and role, and any look photos. Our lead painter will plan your morning and price it."
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some kinds of work are licensed only for their own place."
+   ],
+   [
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "A gate or door code for the venue shows to Nia only on the day."
+   ],
+   [
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Lee Face Painting does face paint and glitter tattoos on location, not glitter."
+   ],
+   [
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Nia is at the venue for your 8–10am booking and can't reach you."
+   ],
+   [
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "One-painter visit already booked keeps $120, even after Nov 2."
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Nia counts the rooms and texts the price with its lines."
+   ],
+   [
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Lee Face Painting has a yearly kids' party face painting plan, $150 a visit."
+   ],
+   [
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Your face paint is ahead of schedule: everyone should be done by 9:45am."
+   ],
+   [
+    "Sam bills the warranty company the business's own way.",
+    "Sam bills the company the business's own way."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M. says the face paint from Thu Oct 22 creased before the photos."
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: one more hour, $160."
+   ],
+   [
+    "Jordan priced a water heater replacement for Alex M.",
+    "Nia planned a birthday party for Alex M.: four faces, two painters, done by 10am Thu."
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Extra painting are part of your booking, so this visit is free."
+   ],
+   [
+    "House calls only where the state's rules allow them.",
+    "Quick face paints at home wherever the studio travels."
+   ],
+   [
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "A party's time block is worked back from its done-by time."
+   ],
+   [
+    "Your water heater price is with Lee Home Services.",
+    "Your birthday party quote is with Lee Face Painting."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Nia's next times for party face painting."
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can you add my aunt? She'd like face paint too."
+   ],
+   [
+    "Lee Home Services: your share of today's repair.",
+    "Lee Face Painting: your share of today's photos."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Necesito maquillaje para la quinceañera de mi hija el sábado."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday?",
+    "Can a face painter do extra painting at an outdoor photo shoot this Thursday?"
+   ],
+   [
+    "Try the door again, and check in with the code.",
+    "Look for Alex again, and check in with the code."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 one more hour of extra painting"
+   ],
+   [
+    "Alex's home warranty covers part of the repair.",
+    "Alex's company account covers part of the bill."
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you do kids' party face painting for us every year, too?"
+   ],
+   [
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Foundation spilled on the carpet at Alex M.'s suite."
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Nia do my face paint for an birthday dinner next week?"
+   ],
+   [
+    "The plug-in says how long the warranty lasts.",
+    "The plug-in says what a free fix covers."
+   ],
+   [
+    "Jordan only, until others are licensed there",
+    "The whole team, since no license is needed"
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿tiene hinchados los labios o la garganta? ¿Le cuesta respirar?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "Say Alex also asks for glitter tattoos. Both go in one booking, with one time and one code."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE scuff on the hall floor, before setup"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "A business license for the studio, where the city asks."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Nia also do my glitter?"
+   ],
+   [
+    "Contract · Water heater replacement · $640",
+    "Agreement · Party face painting · $640"
+   ],
+   [
+    "Jordan needs a part from the supply house.",
+    "The faces are ahead of schedule."
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD outlet by the table sparks, unplugged"
+   ],
+   [
+    "Haircut, fade and beard trim at the shop.",
+    "Headshots, pet portraits and glitter at the studio."
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: are her lips or throat swelling? Is she having trouble breathing?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Your timeline is on your page."
+   ],
+   [
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "Cancel your face paint (Thu 8–10am)?"
+   ],
+   [
+    "My gas water heater got wet in a flood.",
+    "Can I wear face paint if I'm allergic to latex?"
+   ],
+   [
+    "Jordan finds mold behind the sink wall.",
+    "The outlet by the table sparks when Bo plugs in a light."
+   ],
+   [
+    "The shop's chair is in the other flow.",
+    "A session at the studio is in the other flow."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's listing photos?"
+   ],
+   [
+    "Old pipes: bring the camera next time.",
+    "Bring the long lens next time."
+   ],
+   [
+    "Willow Home Warranty, the basic plan.",
+    "Willow Events, our office account."
+   ],
+   [
+    "Nobody home needed: DONE with a photo",
+    "Nobody needs to be home: DONE with a photo"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Alex asks Nia to stay one more hour, for extra painting before the photos."
+   ],
+   [
+    "It's under the 1-year labor warranty.",
+    "It was on the shot list."
+   ],
+   [
+    "Riley also does color and house calls",
+    "Kit also does theme looks and quick face paints at home"
+   ],
+   [
+    "Which home warranty plan should pay?",
+    "Which company account should pay?"
+   ],
+   [
+    "I'll be home 30 minutes late, sorry!",
+    "We'll be 30 minutes late, sorry!"
+   ],
+   [
+    "The repair price is good for 7 days.",
+    "The price is good for 7 days."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The face paint creases before the photos."
+   ],
+   [
+    "Give this code to Casey at the door.",
+    "Give this code to Bo on arrival."
+   ],
+   [
+    "Give your check-in code at the door.",
+    "Give your check-in code when the face painter arrives."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Kit: studio, theme looks and quick face paints at home"
+   ],
+   [
+    "Say Alex books for a parent's home.",
+    "Say Alex books face paint for a parent's birthday party."
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a glitter studio near you."
+   ],
+   [
+    "Your home warranty covers the rest.",
+    "Your company account covers the rest."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My face paint creased before the photos."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 rooms 165 evening 80"
+   ],
+   [
+    "Replace both shutoff valves · $160",
+    "One more hour of extra painting · $160"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: nothing, the lights moved"
+   ],
+   [
+    "Jordan cuts a hand and texts HURT.",
+    "Nia slips on a wet floor and texts HURT."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Nia was 20 minutes late."
+   ],
+   [
+    "Here's the price to fix it today.",
+    "Here's the price for today's photos."
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Nothing comes off your price"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is there a table by a window?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a sparking outlet by the table"
+   ],
+   [
+    "UPDATE getting a part, back 9:30",
+    "UPDATE ahead of schedule, all done by 9:45"
+   ],
+   [
+    "DAMAGE cracked the cabinet floor",
+    "DAMAGE paint spilled on the carpet"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no stain."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa event Thu 12-2 Bo"
+   ],
+   [
+    "Alex gives the code at the door",
+    "Alex gives the code at the venue"
+   ],
+   [
+    "The job should be done by 10am.",
+    "Nia and Bo stay for extra painting until 10am."
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. It's just red."
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT slipped and hurt my wrist, need to stop"
+   ],
+   [
+    "Leaks are priced at the visit.",
+    "A birthday party is quoted from the plan."
+   ],
+   [
+    "A gas smell stops the booking.",
+    "Someone hurt at the venue stops the booking."
+   ],
+   [
+    "There's no counter at a home.",
+    "There's no counter at a venue."
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "I need face paint for my birthday party of four."
+   ],
+   [
+    "Texts the camera report link",
+    "Texts the photo link"
+   ],
+   [
+    "Is it safe to turn back on?",
+    "Is that safe?"
+   ],
+   [
+    "The quote stays open 7 days",
+    "Nothing extra is done today"
+   ],
+   [
+    "Replace both shutoff valves",
+    "One more hour of extra painting"
+   ],
+   [
+    "$89, credited to the repair",
+    "$40 an painter, past 10 miles"
+   ],
+   [
+    "NOTE grease clog 12 ft in.",
+    "NOTE the CEO prefers her left side."
+   ],
+   [
+    "Mold behind the sink wall",
+    "The outlet by the table"
+   ],
+   [
+    "Video and Jordan's notes",
+    "25 edited photos"
+   ],
+   [
+    "Drains have a set price.",
+    "One-painter visit has a set price."
+   ],
+   [
+    "A plan or warranty pays",
+    "A plan or account pays"
+   ],
+   [
+    "Priced from your photos",
+    "Planned from your answers"
+   ],
+   [
+    "Jordan found more work.",
+    "You asked Nia for one more hour."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Four faces, all done by 10am."
+   ],
+   [
+    "Under the sink, before",
+    "Hall floor, before"
+   ],
+   [
+    "Jordan found the leak.",
+    "Nia counted the rooms."
+   ],
+   [
+    "Kitchen drain clearing",
+    "One-painter visit"
+   ],
+   [
+    "Cabinet floor, before",
+    "Carpet by the table, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Foundation on the carpet"
+   ],
+   [
+    "Shutoff valve · $165",
+    "Interior photos · $60"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Solo está roja."
+   ],
+   [
+    "Insurance pays part",
+    "An account pays part"
+   ],
+   [
+    "Sewer camera report",
+    "Sneak peek"
+   ],
+   [
+    "the shutoff valves",
+    "the extra hour"
+   ],
+   [
+    "Supply line · $80",
+    "Twilight photos · $80"
+   ],
+   [
+    "the kitchen drain",
+    "the birthday party"
+   ],
+   [
+    "Book the repair",
+    "Book the face paint"
+   ],
+   [
+    "Book a free fix",
+    "Book a free reshoot"
+   ],
+   [
+    "Arrival windows",
+    "Time slots"
+   ],
+   [
+    "License renewal",
+    "Renewal due"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 event"
+   ],
+   [
+    "Kitchen drain",
+    "Birthday party"
+   ],
+   [
+    "Panel upgrade",
+    "Glitter extensions, styled"
+   ],
+   [
+    "Avery: barber",
+    "Eli: studio"
+   ],
+   [
+    "$140 an hour",
+    "$160 an hour"
+   ],
+   [
+    "Add photos",
+    "Add the details"
+   ],
+   [
+    "Yard drain",
+    "Outdoor shoot extra painting"
+   ],
+   [
+    "EC22871",
+    "EL22871"
+   ],
+   [
+    "BS20981",
+    "EL20981"
+   ],
+   [
+    "leehomeservices.com",
+    "leebridalbeauty.com"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Face Painting LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Face Painting's"
+   ],
+   [
+    "Lee Home Services has no open times for this job in the next 60 days. Nothing was saved.",
+    "Lee Face Painting has no painter free that morning, so nothing was saved."
+   ],
+   [
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "Lee Face Painting books up to 18 months ahead. We'll text you times for your sister's birthday party in Apr 2027."
+   ],
+   [
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "One-painter visit with Lee Face Painting is $120, not $150. Here are the open times at $120."
+   ],
+   [
+    "Lee Home Services",
+    "Lee Face Painting"
+   ],
+   [
+    "Lee Plumbing",
+    "Lee Face Paint"
+   ],
+   [
+    "Lee Electric",
+    "Lee Party Glitter"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Face Studio"
+   ],
+   [
+    "Jordan Price",
+    "Nia Park"
+   ],
+   [
+    "Casey Moore",
+    "Bo Ellis"
+   ],
+   [
+    "Riley Chen",
+    "Kit Chen"
+   ],
+   [
+    "Avery Diaz",
+    "Eli Diaz"
+   ],
+   [
+    "Yes, Jordan has time for it.",
+    "Yes, Bo can fit her in if both painters arrive at 7am."
+   ],
+   [
+    "Jordan",
+    "Nia"
+   ],
+   [
+    "Casey",
+    "Bo"
+   ],
+   [
+    "Riley",
+    "Kit"
+   ],
+   [
+    "Avery",
+    "Eli"
+   ],
+   [
+    "1200 Main St",
+    "44 Cedar Ave"
+   ],
+   [
+    "88 Elm St",
+    "9 Harbor Rd"
+   ],
+   [
+    "42 Oak St",
+    "Harbor Inn, 9 Lake Rd"
+   ],
+   [
+    "plumbing and electrical",
+    "face paint and glitter tattoos"
+   ],
+   [
+    "electrical prices",
+    "glitter prices"
+   ],
+   [
+    "electrical jobs",
+    "glitter jobs"
+   ],
+   [
+    "Electrical",
+    "Glitter tattoos"
+   ],
+   [
+    "electrical",
+    "glitter tattoos"
+   ],
+   [
+    "plumbing license",
+    "esthetics license"
+   ],
+   [
+    "Plumbing license",
+    "Esthetics license"
+   ],
+   [
+    "Plumbing",
+    "Face paint"
+   ],
+   [
+    "plumbing",
+    "face paint"
+   ],
+   [
+    "a plumber",
+    "an painter"
+   ],
+   [
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Say a maid of honor books face paint for the whole party at one hall suite. It's one booking with one code, given by whoever meets the painters."
+   ],
+   [
+    "Each unit's notes go to the plumber, one line each.",
+    "Each person's start time and look go to the painters, one line each. Skin notes stay on each person's own page."
+   ],
+   [
+    "plumber",
+    "painter"
+   ],
+   [
+    "Plumber",
+    "Painter"
+   ],
+   [
+    "Barbershop",
+    "Face paint studio"
+   ],
+   [
+    "barbershop",
+    "face paint studio"
+   ],
+   [
+    "a barber",
+    "a studio painter"
+   ],
+   [
+    "barber",
+    "studio painter"
+   ],
+   [
+    "Barber",
+    "Studio painter"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Full face design with glitter"
+   ],
+   [
+    "Beard trim",
+    "Glitter"
+   ],
+   [
+    "beard trim",
+    "glitter"
+   ],
+   [
+    "Haircut",
+    "Quick face design"
+   ],
+   [
+    "a haircut",
+    "an quick face design"
+   ],
+   [
+    "A haircut",
+    "An quick face design"
+   ],
+   [
+    "haircut",
+    "quick face design"
+   ],
+   [
+    "house calls",
+    "quick face paints at home"
+   ],
+   [
+    "House calls",
+    "Quick face paints at home"
+   ],
+   [
+    "house call",
+    "quick face design at home"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "at the chair",
+    "at the studio"
+   ],
+   [
+    "shop",
+    "studio"
+   ],
+   [
+    "Shop",
+    "Studio"
+   ],
+   [
+    "a drain clearing",
+    "one-painter visit"
+   ],
+   [
+    "A drain clearing",
+    "One-painter visit"
+   ],
+   [
+    "Drain clearing",
+    "One-painter visit"
+   ],
+   [
+    "drain clearing",
+    "one-painter visit"
+   ],
+   [
+    "Water heater replacement",
+    "Party face painting"
+   ],
+   [
+    "water heater replacement",
+    "party face painting"
+   ],
+   [
+    "Water heater flush",
+    "Kids' party face painting"
+   ],
+   [
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "NEXT Alex M. asks: sister's birthday party, Oct 2028"
+   ],
+   [
+    "water heater flush",
+    "kids' party face painting"
+   ],
+   [
+    "Leak repair",
+    "On-set extra painting"
+   ],
+   [
+    "leak repair",
+    "on-set extra painting"
+   ],
+   [
+    "Sewer camera inspection",
+    "Airbrush face paint"
+   ],
+   [
+    "sewer camera inspection",
+    "airbrush face paint"
+   ],
+   [
+    "service call fee",
+    "travel fee"
+   ],
+   [
+    "Service call fee",
+    "Travel fee"
+   ],
+   [
+    "service call",
+    "travel fee"
+   ],
+   [
+    "Service call",
+    "Travel fee"
+   ],
+   [
+    "Labor",
+    "Extra painting on site"
+   ],
+   [
+    "arriving 8–10am",
+    "8–10am"
+   ],
+   [
+    "arriving 10am–12pm",
+    "10am–12pm"
+   ],
+   [
+    "arriving 12–2pm",
+    "12–2pm"
+   ],
+   [
+    "arriving 2–4pm",
+    "2–4pm"
+   ],
+   [
+    "new arrival time",
+    "new start time"
+   ],
+   [
+    "water heater",
+    "birthday party"
+   ],
+   [
+    "I'm home",
+    "I'm here"
+   ],
+   [
+    "Alex is home",
+    "Alex is here"
+   ],
+   [
+    "they're home",
+    "they're here"
+   ],
+   [
+    "you're home",
+    "you're here"
+   ],
+   [
+    "late-cancel or nobody-home fee",
+    "late-cancel or no-show fee"
+   ],
+   [
+    "Nobody home",
+    "Nobody there"
+   ],
+   [
+    "nobody home",
+    "nobody there"
+   ],
+   [
+    "wasn't home",
+    "wasn't there"
+   ],
+   [
+    "was home",
+    "was there"
+   ],
+   [
+    "landlord",
+    "parent"
+   ],
+   [
+    "replaces water heaters",
+    "leads birthday parties"
+   ],
+   [
+    "Electric.",
+    "At a hall suite. Two of us, for a school fair."
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 birthday party weekend, 3 stages"
+   ],
+   [
+    "quote for your repipe",
+    "quote for your birthday party weekend"
+   ],
+   [
+    "Repipe · $2,400",
+    "Birthday party weekend · $640"
+   ],
+   [
+    "$800 when the pipes are in",
+    "$480 at DONE"
+   ],
+   [
+    "The $80 supply line stays",
+    "The $80 evening photos stay"
+   ],
+   [
+    "shutoff valve",
+    "interior photos"
+   ],
+   [
+    "The report is ready on the date Alex was told.",
+    "The photo is ready on the date Alex was told."
+   ],
+   [
+    "The report is ready on the new date.",
+    "The photo is ready on the new date."
+   ],
+   [
+    "Texts the report link on the new date",
+    "Texts the photos link on the new date"
+   ],
+   [
+    "The repair price",
+    "The quote"
+   ],
+   [
+    "MP045210",
+    "ES045210"
+   ],
+   [
+    "JP031552",
+    "ES031552"
+   ],
+   [
+    "JE30417",
+    "CO30417"
+   ],
+   [
+    "From the photos and answers",
+    "From the party's answers: 4 faces, done by 10am"
+   ],
+   [
+    "The plug-in sets the group's size limits and its price.",
+    "The plug-in sets the price per face and how many painters the time needs. Anyone under 18 needs a parent's yes, and the parent stays."
+   ],
+   [
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "This booking needs a first step at least a day before, so the first open times start Thursday."
+   ],
+   [
+    "Entry statement: I live here, or may let the pro in",
+    "Face form: allergies, skin conditions and past reactions, each person's own"
+   ],
+   [
+    "In the driveway",
+    "The hall garage"
+   ],
+   [
+    "A dog, kept inside",
+    "None"
+   ],
+   [
+    "Written estimate and terms",
+    "Agreement and terms"
+   ],
+   [
+    "7am on the visit day",
+    "6pm the day before"
+   ],
+   [
+    "Day list at 7am",
+    "Day list at 6am"
+   ],
+   [
+    "Your day list comes at 7:00am, the time you picked.",
+    "Your day list comes at 6:00am, the time you picked."
+   ],
+   [
+    "Thu Oct 22, 7:00am",
+    "Wed Oct 21, 6:00pm"
+   ],
+   [
+    "7am Thu",
+    "6pm Wed"
+   ],
+   [
+    "an $89",
+    "a $40"
+   ],
+   [
+    "$89",
+    "$40"
+   ],
+   [
+    "Fri 8am",
+    "Thu 7am"
+   ],
+   [
+    "Only a teen is home at Alex M.'s",
+    "Only a teen is at Alex M.'s suite"
+   ],
+   [
+    "Photos and answers added",
+    "Answers and look photos added"
+   ],
+   [
+    "Price it before anyone says yes",
+    "Plan and price it before anyone says yes"
+   ],
+   [
+    "CANT START no proof Alex may have this work done",
+    "CANT START no vendor pass from the venue"
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI raised an emergency. They got the safety message, and nothing was booked."
+   ],
+   [
+    "A gas smell at the home",
+    "An emergency: the details are on the portal"
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911 now"
+   ],
+   [
+    "Arrival times:",
+    "Open times:"
+   ],
+   [
+    "Asks Alex for photos",
+    "Asks Alex for the party's details"
+   ],
+   [
+    "Mon–Fri 7:30am–5:30pm",
+    "Every day, 6am–7pm"
+   ],
+   [
+    "On the photos path",
+    "On the quote path"
+   ],
+   [
+    "Quoted from photos first",
+    "Planned and quoted first"
+   ]
+  ]
+ },
+ "keep": [
+  "travel fee",
+  "leak",
+  "party",
+  "Party",
+  "kids' party",
+  "Kids' party",
+  "design"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex books a face-painting lesson at Lee Face Studio, Sam's own studio, with Kit on Sat Oct 24 at 11:00am. The visit depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Lee Face Painting for a birthday party of about 30 kids at Harbor Inn, Thu Oct 22 from 1pm to 3pm. Nia plans the afternoon with a second painter, Sam OKs the $640 quote, both sign the agreement, a deposit holds the date, and the rest is charged to the saved card when the faces are done."
+ },
+ "money": {
+  "A": {
+   "main": "list|deposit|counter",
+   "combos": [
+    "list|deposit|counter",
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "photos|full|none"
+   ],
+   "examples": {
+    "list|deposit|counter": "The main story: a $140 face-painting lesson (2 hours, one to one). A $40 deposit now, and the $100 rest at the studio.",
+    "list|card|counter": "A $35 quick face design. A card is saved for the studio's $20 no-show fee. Alex pays at the studio.",
+    "list|none|counter": "A $35 quick face design for a returning customer. Nothing is taken: a YES books it, and Alex pays at the studio.",
+    "list|full|none": "A $55 full face design with glitter, paid in full when booking.",
+    "photos|full|none": "A custom design from a photo, quoted on the secure page at $90 and paid in full when booking. A late cancel keeps the $20 fee."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Quick face design"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Quick face design"
+    },
+    "list|deposit|*": {
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "fee": "$40",
+     "name": "Face-painting lesson (2 hours)"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "fee": "$20",
+     "name": "Full face design with glitter"
+    },
+    "photos|full|*": {
+     "price": "$90",
+     "paid": "$90",
+     "fee": "$20",
+     "name": "Custom design from a photo"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Glitter add-on",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$20",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Full face design with glitter",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "photos|deposit|card",
+   "combos": [
+    "photos|deposit|card",
+    "photos|deposit|bill",
+    "list|deposit|card",
+    "list|full|none"
+   ],
+   "booking": {
+    "times": [
+     "window"
+    ]
+   },
+   "labels": {
+    "price": {
+     "photos": "Quoted from the plan first"
+    }
+   },
+   "examples": {
+    "photos|deposit|card": "The main story: a birthday party for about 30 kids, two painters, quoted at $640 (over $500, so Sam OKs it). Both sign the agreement. A $160 deposit holds the date, and the $480 rest is charged to the saved card when the faces are done.",
+    "photos|deposit|bill": "The same party, with the $160 deposit now and the $480 rest on the bill after the faces, with a tip line.",
+    "list|deposit|card": "A one-painter visit at home, $120 from the list (one hour). A $40 deposit now, and the $80 rest charged to the saved card when the faces are done.",
+    "list|full|none": "A kids' party face painting for two hours, $150, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$40",
+     "name": "Kids' party face painting (2 hours)"
+    },
+    "photos|*|*": {
+     "price": "$640",
+     "name": "Party face painting (quoted, two painters)"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$160",
+     "name": "Party face painting (quoted, two painters)"
+    },
+    "list|*|*": {
+     "price": "$150",
+     "name": "Kids' party face painting (2 hours)"
+    },
+    "list|deposit|*": {
+     "price": "$120",
+     "deposit": "$40",
+     "rest": "$80",
+     "fee": "$40",
+     "name": "One-painter visit (1 hour)"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "fee": "$40",
+     "name": "Kids' party face painting (2 hours)"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Second painter",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$120",
+      "fee": "$40"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Kids' party face painting (2 hours)",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$40"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "A7-15",
+   "A7-63",
+   "A8-02",
+   "A4-43"
+  ],
+  "B": [
+   "S1-38",
+   "B5-34"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The makeup plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Artists are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable: lessons are one to one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Makeup is booked ahead for a set time and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A repeat plan",
+    "why": "Studio makeup is booked visit by visit; no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "No plan or insurance pays for makeup."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "The studio books an artist's time."
+   },
+   {
+    "op": "off",
+    "at": "A7-96",
+    "label": "The problem gets worse",
+    "why": "Makeup has no problem that gets worse before the visit."
+   },
+   {
+    "op": "off",
+    "at": "A7-93",
+    "label": "Too few booked to run",
+    "why": "No group class with a smallest size (A7-67)."
+   },
+   {
+    "op": "off",
+    "at": "A7-92",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan charge is due",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A7-94",
+    "label": "A plan's price changes",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A class: names on a roster",
+    "why": "No classes at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "Makeup is done in the chair: nothing is dropped off."
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "Makeup is done in the chair: nothing is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "A parent stays for kids' recital makeup."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "One bill for many visits",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "No insurance pays for makeup."
+   },
+   {
+    "op": "off",
+    "at": "A10-44",
+    "label": "Alex asks for a fix",
+    "why": "Makeup is done in the chair: a problem is fixed before Alex leaves, or goes as a refund request."
+   },
+   {
+    "op": "off",
+    "at": "A10-45",
+    "label": "Results ready later",
+    "why": "Nothing comes later: the makeup is the work."
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "Nothing of the customer's is left at the studio."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "A studio visit is rated."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans (A4-28)."
+   },
+   {
+    "op": "off",
+    "at": "A5-01",
+    "label": "Buys a pack or membership",
+    "why": "The studio sells its packages only at the studio, never on the booking page."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "Not on the business's own list",
+    "why": "The studio takes new customers."
+   },
+   {
+    "op": "off",
+    "at": "A8-25",
+    "why": "Visit-priced work only: this studio has no price-at-the-chair path; its prices are on the list (A4-06)."
+   },
+   {
+    "op": "off",
+    "at": "A8-26",
+    "why": "Visit-priced work only (see A8-25)."
+   },
+   {
+    "op": "off",
+    "at": "A8-29",
+    "why": "Visit-priced work only (see A8-25)."
+   },
+   {
+    "op": "off",
+    "at": "A8-30",
+    "why": "Visit-priced work only (see A8-25)."
+   },
+   {
+    "op": "off",
+    "at": "A8-31",
+    "why": "Visit-priced work only (see A8-25)."
+   },
+   {
+    "op": "off",
+    "at": "A8-48",
+    "why": "Visit-priced work only (see A8-25): line picks for a quote do not apply to list prices."
+   },
+   {
+    "op": "off",
+    "at": "A8-88",
+    "why": "Visit-priced work only (see A8-25)."
+   },
+   {
+    "op": "off",
+    "at": "A5-02",
+    "why": "No discount codes on this business (the fact is not listed)."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Face painting needs no state license in most places; the business's registration is the one line (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "A painter needs no license of their own in most places (S2-29)."
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here: the child's face form (a parent answers for a child). A patch test comes first for a known allergy."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Both companies pay Rosfield's $2 a booking."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "The makeup plug-in adds no agreement before going live."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Artists are booked, never a space."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "No classes on a timetable: lessons are one to one."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "Makeup is booked ahead for a set time and never sent now, so nobody is on call (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "Makeup is booked for a set time and never sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "A booking is a time block for the faces, shown like 8 to 10am (the first branch)."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Makeup is never a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "An artist's time is booked, never a seat."
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "Repeat visits: a plan",
+    "why": "Makeup for an event is booked one event at a time; no repeat plans."
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "Makeup is booked for a set time and never sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "Makeup is booked for a set time and never sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B7-93",
+    "label": "The problem gets worse",
+    "why": "Makeup has no problem that gets worse before the day. A changed party goes through 'Alex changes what's booked'."
+   },
+   {
+    "op": "off",
+    "at": "B7-90",
+    "label": "Too few booked to run",
+    "why": "No group class with a smallest size."
+   },
+   {
+    "op": "off",
+    "at": "B7-89",
+    "label": "A plan is skipped, paused or ended",
+    "why": "No repeat plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan's price changes",
+    "why": "No repeat plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B7-91",
+    "label": "A plan charge is due",
+    "why": "No repeat plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "Makeup is booked for a set time and never sent now (S2-31)."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "An artist never looks after a child: a parent stays for anyone under 18."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "Someone always sits in the chair, so someone is always there."
+   },
+   {
+    "op": "off",
+    "at": "B5-01",
+    "label": "A repeat plan",
+    "why": "No repeat plans (B4-43)."
+   },
+   {
+    "op": "off",
+    "at": "B10-37",
+    "label": "Alex asks for a fix",
+    "why": "Makeup is done on the day; nothing can be redone later. A complaint or a refund request goes its own way."
+   },
+   {
+    "op": "off",
+    "at": "B10-38",
+    "label": "Results ready later",
+    "why": "Nothing comes later: the makeup is the work."
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "One bill for many visits",
+    "why": "No repeat plans, so nothing is billed for many visits at once."
+   },
+   {
+    "op": "off",
+    "at": "B10-05",
+    "label": "Cancels inside the period",
+    "why": "Touch-ups done at the visit have no cancel period (B8-24)."
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "A makeup artist asks for a rating after the faces."
+   },
+   {
+    "op": "off",
+    "at": "B4-02",
+    "why": "Both places priced: each service has one place on the price list."
+   },
+   {
+    "op": "off",
+    "at": "B5-32",
+    "why": "No packs or memberships sold on the booking page (the fact is not listed)."
+   },
+   {
+    "op": "off",
+    "at": "B5-33",
+    "why": "No discount codes on this business (the fact is not listed)."
+   },
+   {
+    "op": "off",
+    "at": "B8-93",
+    "why": "On-set photo quotes are not used (extra painting time is added at the visit, D91)."
+   },
+   {
+    "op": "off",
+    "at": "B8-77",
+    "why": "Part-level quote changes are not used; a party quote is one price."
+   },
+   {
+    "op": "off",
+    "at": "B9-21",
+    "why": "Stage bills are not used: the rest is one bill at DONE (D66 #7)."
+   },
+   {
+    "op": "off",
+    "at": "B9-25",
+    "why": "Split payments between a share and a company account are not used here."
+   },
+   {
+    "op": "off",
+    "at": "B8-21",
+    "why": "On-set quotes are not used: extra painting time is added and paid at the visit (D91)."
+   },
+   {
+    "op": "off",
+    "at": "B8-48",
+    "why": "Line picks for an on-set quote are not used (see B8-21)."
+   },
+   {
+    "op": "off",
+    "at": "B8-49",
+    "why": "Reminder for an on-set quote, not used (see B8-21)."
+   },
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "Face painting needs no state license in most places; the business's registration is the one line (S1-61)."
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "A painter needs no license of their own in most places (S2-29)."
+   },
+   {
+    "op": "more",
+    "at": "B4-38",
+    "more": [
+     "Here: the party form, and each child's face form on the secure page. A parent answers for each child.",
+     "A known allergy is flagged: the painter calls (never a text) and offers a patch test 24 hours before."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-15",
+    "more": [
+     "The party's start and end come from the host's party hours, with 30 minutes of setup before the first child."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-23",
+    "more": [
+     "A party booked months ahead keeps its date saved up to 24 hours while the agreement is signed (the owner's setting)."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B5-35",
+    "more": [
+     "The agreement shows each party's start and end, the count of children and what can't be done away from the venue."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B4-69",
+    "more": [
+     "Here: the business's photos of past parties. No answer means no; a parent answers for a child."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-03",
+    "more": [
+     "The owner's rule: every quoted party waits for the owner's OK. This party's quote was OK'd already, so it books now."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-14",
+    "more": [
+     "Bo gets the same job text, with Bo's own list of children and start times."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-07",
+    "more": [
+     "The owner's rule for parties: one free date move, if the painters are free that day."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-10",
+    "more": [
+     "For a quoted party, what may be kept follows the signed agreement. The owner confirms first."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-01",
+    "more": [
+     "The day list carries each child's start time and do-not-paint list; notes open only on the job link."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-23",
+    "more": [
+     "Extra painting time needs the payer's written yes, at the rate shown before booking.",
+     "No yes in 10 minutes: the painters finish on time, as booked."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-24",
+    "more": [
+     "At a venue, a right to cancel comes only where the state's rules say so."
+    ]
+   }
+  ]
+ },
+ "notes": "Built Tue Oct 27 2026 (batch E2, new) from the refitted makeup overlay (Event), copied and changed: the plug-in is written for face painting (kids' parties, schools and fairs, a studio for lessons, glitter tattoos), not weddings. Facts: children (a child's face, a parent stays), firststeps (patch tests, the planning call), forms (the party form), groups (a party of guests), documents (the agreement), tips, extrawork (extra painting time), weather (an outdoor party), photos (the quoted party). No switches (children is a fact, not the sensitive switch). License: none asked by Rosie; the business's own word only, nothing looked up (D96); the license steps stay as the sibling set them (S1-60 and S2-28 off). Money: A list|deposit|counter (lesson $140, $40 deposit, $100 at the studio), list|card|counter (quick design $35, card for the $20 no-show fee), list|none|counter (returning customer, nothing taken), list|full|none (full design $55). B photos|deposit|card (party quoted $640, $160 deposit, $480 at DONE), photos|deposit|bill (the same quote, billed after), list|deposit|card (one-painter visit $120, $40 deposit, $80 at DONE), list|full|none (kids' party $150 paid in full). Each sibling wedding `more` line is dropped; face-painting `more` lines are added where the words need them. Extra painting time is paid at the visit or on the bill (D91), with the payer's written yes. The sibling's wedding-only ops (bridal trial, cover-up, early start) are gone with the services they described.",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "{{due:$125}}",
+    "{{price:$125}}",
+    "A at their home too, 75, paid when they book",
+    "a house call, $75, paid in full when booking",
+    "Haircut at home · $75",
+    "So is a house call, $75.",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Every shop service, color and house calls",
+    "Each service starts the way most barbershops set it.",
+    "J: a color touch-up in the first 2 weeks, checked from photos, free.",
+    "On this path, a color touch-up checked from photos is free: nothing before, nothing after.",
+    "Color touch-up",
+    "Color quotes come to you first.",
+    "A water heater job",
+    "Alex asks for a perm, which isn't on the shop's list.",
+    "Lee's Barbershop doesn't do perms.",
+    "A color's example: 'Color here needs a quick patch test first.",
+    "Ben T. books a skin fade for Sat Nov 7 at 2:00pm.",
+    "Lee's Barbershop: you now have two skin fades on Sat Nov 7.",
+    "Alex picked a kids cut for a son before the times, so the times fit it.",
+    "You told us the kids cut is for your son, and that you're his parent. His details go on the secure page.",
+    "A haircut at Lee's Barbershop:",
+    "Book me a haircut at Lee's Barbershop on Saturday.",
+    "Alex M. · Haircut",
+    "Lee's Barbershop · Haircut: your 3:00pm",
+    "Lee's Barbershop · Haircut",
+    "Books the groom's party together",
+    "Sam adds massage to Lee's Barbershop.",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "NEW massage",
+    "Lee's Barbershop doesn't do perms.",
+    "The cape clip ripped my shirt collar.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "like a burst pipe or a lockout",
+    "Gloss to finish",
+    "gloss",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "A cut is rated, so the shop takes the first branch.",
+    "like Riley's color plan after a consult",
+    "Lee's Barbershop sent you a proposal: Riley's color plan.",
+    "Proposal · Color plan",
+    "your first color plan visit",
+    "May the shop show photos of your hair? Yes / No",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Lee's Barbershop prices a color correction at the chair, once Riley sees the hair.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The plug-in sets the status words, like in, waiting on a part, ready.",
+    "Add photos of your hair, and a barber will price your color and cut.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "The plug-in names what's worth keeping, like a skin-test result.",
+    "A groom books cuts for himself and four friends on one morning.",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "Rosie finds chairs side by side across Riley and Avery.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "House calls only where the state's rules allow them.",
+    "Alex M. says Saturday's cut is uneven on one side.",
+    "Nia K. asked to talk about the $90 color quote.",
+    "A haircut could mean a salon or a barbershop.",
+    "A license for the shop and for each barber.",
+    "Alex bought a package of cuts at the shop.",
+    "Can my son wait in the shop during my cut?",
+    "A repair shop, a tailor or a groomer does.",
+    "Haircut, fade and beard trim at the shop.",
+    "Every shop service, color and house calls",
+    "Yes: a Kids cut (12 and under) is $25.",
+    "Riley also does color and house calls",
+    "Riley: barber, color and house calls",
+    "Alex asks for a cut every 4 weeks.",
+    "A barbershop takes no drop-offs.",
+    "The rash on my scalp got worse.",
+    "Color always stays with Riley.",
+    "The cut is uneven on one side.",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "Riley stopped Alex M.'s cut.",
+    "I'd like a cut on Saturday.",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "Drains have a set price.",
+    "Stopped Alex M.'s cut.",
+    "License renewal",
+    "1 color quote",
+    "Panel upgrade",
+    "Avery: barber",
+    "$140 an hour",
+    "At the chair",
+    "EC22871",
+    "BS20981",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop's",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "A barbershop has none, so nothing is sent here.",
+    "A barbershop's plug-in has none.",
+    "barbershop",
+    "barbers",
+    "a barber",
+    "barber",
+    "Barber",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "Signature cut",
+    "signature cut",
+    "the Groom's package",
+    "The Groom's package",
+    "Groom's package",
+    "Kids cut (12 and under)",
+    "kids cuts",
+    "kids cut",
+    "a skin fade",
+    "A skin fade",
+    "Skin fade",
+    "skin fade",
+    "A beard trim is",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "Haircuts",
+    "haircuts",
+    "Haircut",
+    "a haircut",
+    "A haircut",
+    "haircut",
+    "Color and cut",
+    "color and cut",
+    "a color correction",
+    "A color correction",
+    "Color correction",
+    "color correction",
+    "house calls",
+    "House calls",
+    "a house call",
+    "house call",
+    "price board",
+    "Price board",
+    "the shop's board",
+    "at the chair",
+    "shops",
+    "shop",
+    "Shop",
+    "photos of your hair",
+    "sees the hair",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "Your day list comes at 7:00am, the time you picked.",
+    "$89",
+    "Asks Alex for photos",
+    "like a 15-minute style consult",
+    "Kids cut"
+   ],
+   "B": [
+    "$179, paid after the job",
+    "Shutoff valve and wall pipe · $540",
+    "Supply line · $80",
+    "$800 to start, $800 when the pipes are in, $800 at the finish",
+    "Sewer camera inspection · $199",
+    "is for a $2,400 repipe",
+    "like the $89 service call",
+    "The $800 start payment is taken as the deposit",
+    "Your $800 start payment is taken.",
+    "Each stage is billed when Jordan texts it done.",
+    "leak repair is $620",
+    "like a $620 repair",
+    "Classic cuts, fades and hot towel shaves.",
+    "Drain clearing and water heaters, within 25 miles.",
+    "Riley and Avery cut hair; Riley also does color and house calls.",
+    "Riley: barber, color, house calls",
+    "Riley: barber, color and house calls",
+    "Its money card is set the way most barbershops start.",
+    "Here are the rules barbershops often set.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "A commonly paired add-on is one line on the card: 'Adding a faucet check? Say so.'",
+    "And which drain is clogged, and is water backing up anywhere else?",
+    "Lee Home Services can clear the drain:",
+    "Yes, it won't drain",
+    "The $179 drain needs none.",
+    "The $160 valve quote is good for 7 days.",
+    "Say Jordan cracks the cabinet floor and texts a photo.",
+    "I found water damage under the sink this morning.",
+    "Drain clearings already booked keep $179.",
+    "Drain clearings already booked keep only their saved card.",
+    "Lee Home Services: you have two drain clearings on Mon Nov 9.",
+    "Reply here, and it goes to Sam. 1-year labor warranty: if there's a problem with the work, reply here. How was your visit with Jordan?",
+    "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+    "It's a leak under the sink, today,",
+    "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+    "Lee Home Services · Kitchen drain clearing",
+    "Alex M. · Kitchen drain clearing",
+    "Prices it: the list, photos or the visit",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "NEW heating and cooling",
+    "Can I run the dishwasher before you come?",
+    "Jordan says no. Please wait until the job is done.",
+    "like a burst pipe or a lockout",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "It's overflowing. Can someone come tonight?",
+    "Plumbing books a 2-hour window.",
+    "Your job takes two days: today, and Fri Oct 23, arriving 8–10am, to finish.",
+    "$2,400 repipe",
+    "stage 2 of your repipe",
+    "like replacing the old pipes Jordan noted",
+    "sent you a proposal for new pipes, from Jordan's notes.",
+    "Proposal · Replace the old pipes",
+    "One of the shop's barbers does house calls.",
+    "Alex's home in Springfield is inside it.",
+    "At my home.",
+    "Is the report ready on time?",
+    "LATE camera report Mon Oct 26",
+    "Alex M. OK'd the shutoff valve only, $165. Leave the supply line.",
+    "OK: Jordan fixes the shutoff valve today, $165. The $80 supply line stays good until Thu Oct 29.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "The plug-in says a water heater is priced from photos, so Rosie's first text asks for them.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "You're all set: Lee's Barbershop can book you from now on, at the shop and for house calls.",
+    "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+    "On the photos path, only Jordan's times show: he's the one who replaces water heaters.",
+    "Jordan can come 30 minutes later if the next job allows, or you can pick another time.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+    "Lee's Barbershop can cut your hair at the shop for $35, or at your home for $75.",
+    "Jordan tries the door again and checks in with the code, so it's a normal visit.",
+    "A leak repair is priced at the visit: only the $89 service call was promised.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A drain clearing happens only at the customer's place, so nothing is asked.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A gate or door code shows to Jordan only on the day of the visit.",
+    "Lee Home Services does plumbing and electrical work, not roofing.",
+    "Jordan is at your door for your 8–10am visit and can't reach you.",
+    "Drain clearings already booked keep $179, even after Nov 2.",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Lee Home Services has a yearly flush plan, $150 a visit.",
+    "Jordan went to get a part and will be back about 9:30am.",
+    "Sam bills the warranty company the business's own way.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Jordan priced a water heater replacement for Alex M.",
+    "Your drain is under warranty, so this visit is free.",
+    "House calls only where the state's rules allow them.",
+    "Arrival windows are 2 hours, as Sam set at sign-up.",
+    "Your water heater price is with Lee Home Services.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Can Jordan also run a camera down my sewer line?",
+    "Lee Home Services: your share of today's repair.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Can a plumber clear a yard drain this Thursday?",
+    "Try the door again, and check in with the code.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Alex's home warranty covers part of the repair.",
+    "Can you flush my water heater every year, too?",
+    "Jordan cracked the cabinet floor at Alex M.'s.",
+    "Can Jordan look at my bathroom sink next week?",
+    "The plug-in says how long the warranty lasts.",
+    "Jordan only, until others are licensed there",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+    "BEFORE old water stain on the cabinet floor",
+    "A license for the shop and for each barber.",
+    "Can Jordan also look at a dripping faucet?",
+    "Contract · Water heater replacement · $640",
+    "Jordan needs a part from the supply house.",
+    "HAZARD mold behind the sink wall, stopped",
+    "Haircut, fade and beard trim at the shop.",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "Cancel your plumbing visit (Thu 8–10am)?",
+    "My gas water heater got wet in a flood.",
+    "Jordan finds mold behind the sink wall.",
+    "The shop's chair is in the other flow.",
+    "Can I skip next week's drain cleaning?",
+    "Old pipes: bring the camera next time.",
+    "Willow Home Warranty, the basic plan.",
+    "Nobody home needed: DONE with a photo",
+    "Jordan finds corroded shutoff valves.",
+    "It's under the 1-year labor warranty.",
+    "Riley also does color and house calls",
+    "Which home warranty plan should pay?",
+    "I'll be home 30 minutes late, sorry!",
+    "The repair price is good for 7 days.",
+    "The drain clogs again 2 weeks later.",
+    "Give this code to Casey at the door.",
+    "Give your check-in code at the door.",
+    "Riley: barber, color and house calls",
+    "Say Alex books for a parent's home.",
+    "You can look for a roofer near you.",
+    "Your home warranty covers the rest.",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Replace both shutoff valves · $160",
+    "Not done: the pipe behind the wall",
+    "Jordan cuts a hand and texts HURT.",
+    "Jordan left a mess under the sink.",
+    "Here's the price to fix it today.",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "UPDATE getting a part, back 9:30",
+    "DAMAGE cracked the cabinet floor",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Alex gives the code at the door",
+    "The job should be done by 10am.",
+    "No. It doesn't smell like gas.",
+    "HURT cut my hand, need to stop",
+    "Leaks are priced at the visit.",
+    "A gas smell stops the booking.",
+    "There's no counter at a home.",
+    "My kitchen drain is clogged.",
+    "Texts the camera report link",
+    "Is it safe to turn back on?",
+    "The quote stays open 7 days",
+    "Replace both shutoff valves",
+    "$89, credited to the repair",
+    "NOTE grease clog 12 ft in.",
+    "Mold behind the sink wall",
+    "Video and Jordan's notes",
+    "Drains have a set price.",
+    "A plan or warranty pays",
+    "Priced from your photos",
+    "Jordan found more work.",
+    "Just the kitchen sink.",
+    "Under the sink, before",
+    "Jordan found the leak.",
+    "Kitchen drain clearing",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "Shutoff valve · $165",
+    "No. No huele a gas.",
+    "Insurance pays part",
+    "Sewer camera report",
+    "the shutoff valves",
+    "Supply line · $80",
+    "the kitchen drain",
+    "Book the repair",
+    "Book a free fix",
+    "Arrival windows",
+    "License renewal",
+    "DONE 179 drain",
+    "Kitchen drain",
+    "Panel upgrade",
+    "Avery: barber",
+    "$140 an hour",
+    "Add photos",
+    "Yard drain",
+    "EC22871",
+    "BS20981",
+    "leehomeservices.com",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services has no open times for this job in the next 60 days. Nothing was saved.",
+    "Lee Home Services books up to 60 days ahead. We'll text you times for the water heater flush you asked Jordan about in late Aug 2027.",
+    "A drain clearing with Lee Home Services is $179, not $150. Here are the open times at $179.",
+    "Lee Home Services",
+    "Lee Plumbing",
+    "Lee Electric",
+    "Lee's Barbershop",
+    "Jordan Price",
+    "Casey Moore",
+    "Riley Chen",
+    "Avery Diaz",
+    "Yes, Jordan has time for it.",
+    "Jordan",
+    "Casey",
+    "Riley",
+    "Avery",
+    "1200 Main St",
+    "88 Elm St",
+    "42 Oak St",
+    "plumbing and electrical",
+    "electrical prices",
+    "electrical jobs",
+    "Electrical",
+    "electrical",
+    "plumbing license",
+    "Plumbing license",
+    "Plumbing",
+    "plumbing",
+    "a plumber",
+    "Say a building manager books the same job for 4 units at one address. It's one booking with one code, given by whoever lets the plumber in.",
+    "Each unit's notes go to the plumber, one line each.",
+    "plumber",
+    "Plumber",
+    "Barbershop",
+    "barbershop",
+    "a barber",
+    "barber",
+    "Barber",
+    "beard trim",
+    "Haircut",
+    "a haircut",
+    "A haircut",
+    "haircut",
+    "house calls",
+    "House calls",
+    "house call",
+    "Price board",
+    "at the chair",
+    "shop",
+    "Shop",
+    "a drain clearing",
+    "A drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater replacement",
+    "water heater replacement",
+    "Water heater flush",
+    "NEXT Alex M. asks: water heater flush, 12 months",
+    "water heater flush",
+    "Leak repair",
+    "leak repair",
+    "Sewer camera inspection",
+    "sewer camera inspection",
+    "service call fee",
+    "Service call fee",
+    "service call",
+    "Service call",
+    "Labor",
+    "arriving 8–10am",
+    "arriving 10am–12pm",
+    "arriving 12–2pm",
+    "arriving 2–4pm",
+    "new arrival time",
+    "water heater",
+    "I'm home",
+    "Alex is home",
+    "they're home",
+    "you're home",
+    "late-cancel or nobody-home fee",
+    "Nobody home",
+    "nobody home",
+    "wasn't home",
+    "was home",
+    "replaces water heaters",
+    "Electric.",
+    "QUOTE 2400 repipe, 3 stages",
+    "quote for your repipe",
+    "Repipe · $2,400",
+    "$800 when the pipes are in",
+    "The $80 supply line stays",
+    "shutoff valve",
+    "The report is ready on the date Alex was told.",
+    "The report is ready on the new date.",
+    "Texts the report link on the new date",
+    "The repair price",
+    "MP045210",
+    "JP031552",
+    "JE30417",
+    "From the photos and answers",
+    "The plug-in sets the group's size limits and its price.",
+    "This job needs a permit first. It takes about 5 days, so the first open times are next week.",
+    "Entry statement: I live here, or may let the pro in",
+    "In the driveway",
+    "A dog, kept inside",
+    "Written estimate and terms",
+    "7am on the visit day",
+    "Day list at 7am",
+    "Your day list comes at 7:00am, the time you picked.",
+    "Thu Oct 22, 7:00am",
+    "an $89",
+    "$89",
+    "Fri 8am",
+    "Only a teen is home at Alex M.'s",
+    "Photos and answers added",
+    "Price it before anyone says yes",
+    "CANT START no proof Alex may have this work done",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "A gas smell at the home",
+    "Told to leave, then call 911 and the gas company",
+    "Arrival times:",
+    "Asks Alex for photos",
+    "Mon–Fri 7:30am–5:30pm",
+    "On the photos path",
+    "Quoted from photos first"
+   ]
+  },
+  "A": {
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A4-28": "c8e677520c",
+   "A4-66": "f622d7fe12",
+   "A7-96": "d540b91653",
+   "A7-93": "46cca94e45",
+   "A7-92": "446296af3c",
+   "A7-94": "6490d5d8e6",
+   "A8-03": "7accda6f86",
+   "A8-53": "33f4da69f5",
+   "A8-67": "e9fd748fc5",
+   "A9-15": "bd2a17c3c5",
+   "A10-44": "50aad85ac2",
+   "A10-45": "855be6050a",
+   "A10-06": "a9f01f141d",
+   "A10-34": "78c2d9a6a3",
+   "A5-01": "6c5c5c2f87",
+   "A4-43": "c17d56f766",
+   "A8-25": "a79292eae2",
+   "A8-26": "1e164bc165",
+   "A8-29": "6b776f2a37",
+   "A8-30": "c0f4d7c935",
+   "A8-31": "32e5ce8f2f",
+   "A8-48": "4797cd5902",
+   "A8-88": "a47580bb00",
+   "A5-02": "46a4789cda",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-16": "37cd99137d",
+   "B4-83": "a7473a80ea",
+   "B4-43": "fc9855955a",
+   "B6-03": "dcc1eb310c",
+   "B7-55": "3ce84c57a3",
+   "B7-93": "4d6f89e473",
+   "B7-90": "a5b8b2fe42",
+   "B7-89": "889628e2d6",
+   "B7-91": "7132851ec1",
+   "B8-58": "6a101417a1",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B5-01": "841c417586",
+   "B10-37": "be87433467",
+   "B10-38": "867fe1ab7c",
+   "B9-19": "b97bfbf0d2",
+   "B10-05": "a326ea3c0b",
+   "B10-32": "7713bff255",
+   "B4-02": "d857c517c8",
+   "B5-32": "4109673a42",
+   "B5-33": "56cda1e5fa",
+   "B8-93": "c1406fd6bc",
+   "B8-77": "d0d2f2bb37",
+   "B9-21": "33408663dc",
+   "B9-25": "ba71e46cce",
+   "B8-21": "43557106b2",
+   "B8-48": "3b55a46f7c",
+   "B8-49": "4fcfdeb80b",
+   "S1-60": "235c90a3c3",
+   "S2-28": "549fd7ae22",
+   "B4-38": "9539521dc7",
+   "B4-15": "f13240b9c6",
+   "B4-23": "3bbc0f30df",
+   "B5-35": "1de0d2312d",
+   "B4-69": "350fbaf90a",
+   "B6-14": "dfd03ee673",
+   "B7-07": "954270db4b",
+   "B7-10": "b5b9295e82",
+   "B8-01": "df9177b059",
+   "B8-23": "dd780a2ec8",
+   "B8-24": "bd5fb0ef0b"
+  }
+ }
+}

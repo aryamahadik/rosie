@@ -1,0 +1,2909 @@
+{
+ "id": "flight-school",
+ "name": "Flight school",
+ "style": "Chair",
+ "pattern": "chair",
+ "from": "driving-school",
+ "plugin": {
+  "pf.license": {
+   "need": "none checked by Rosie: a flight school needs no state license in most places; where the state licenses flight schools as private or vocational schools, the business says so (a switch from the state form). Each instructor's federal flight instructor certificate is the business's own word",
+   "who": "the school for its own registration or any school license it holds; each instructor for their own certificate",
+   "ask": "optional: the business registration number and each instructor's certificate number, if the business wants them shown; nothing is asked to be checked",
+   "check": "none: Rosie never checks a license, certificate, insurance or aircraft paper (D96); the school keeps its own records",
+   "aircraft": "each aircraft's inspections and insurance are the school's own record; an aircraft the school says is down is not offered (the business's word)",
+   "insurance": "aircraft liability and hull insurance is the school's own matter; optional for the booking",
+   "background": "any background or security check is the school's own step, outside Rosie; Rosie never checks it",
+   "renewals": "a reminder the business sets for its own dates, if it wants one; a lapsed certificate is the owner's call to pause an instructor",
+   "blocks": "nothing: no license, certificate or insurance blocks a booking here; the owner decides who may fly for the school"
+  },
+  "pf.services": {
+   "shape": "a person's time (an instructor) plus an aircraft or the simulator for lessons; an aircraft or the simulator alone for a student's supervised solo, with an instructor on duty; seats on a timetable for the ground school course; flow B: an instructor at the customer's own aircraft and airport, and a ground school class at a host's place",
+   "examples": "the example school's own prices (Lee Flight School and Lee Flight Lessons), not a standard",
+   "list": [
+    {
+     "name": "Discovery flight",
+     "price": "$149 (example)",
+     "kind": "one price",
+     "length": "1 hour at the school: 15-minute briefing, about 40 minutes in the air",
+     "where": "at the school's airport",
+     "before": "paid in full when booking (gift certificates too)",
+     "after": "nothing more",
+     "needs": "an instructor and a 2- or 4-seat trainer",
+     "note": "one guest may ride along in the 4-seat trainer, inside the weight limits; a flyer under 18 comes with a parent who signs and stays at the airport"
+    },
+    {
+     "name": "2-hour dual lesson (4-seat trainer)",
+     "price": "$470 (example: 2 hours of aircraft at $165 an hour plus the instructor at $70 an hour)",
+     "kind": "one block price",
+     "length": "2 hours: briefing, flight, debrief",
+     "where": "at the school's airport",
+     "before": "a card saved for the $75 fee",
+     "after": "the saved card is charged at DONE for the block; a flight that runs past the block needs the student's yes first",
+     "needs": "the student's instructor and a 4-seat trainer",
+     "note": "the 2-seat trainer is the same block at $410 (example); the block is the price, never a meter"
+    },
+    {
+     "name": "1-hour ground lesson",
+     "price": "$90 (example)",
+     "kind": "one price",
+     "length": "1 hour",
+     "where": "at the school, or by video",
+     "before": "a card saved for the $75 fee",
+     "after": "paid at the front desk after; a video lesson's saved card is charged at DONE"
+    },
+    {
+     "name": "1-hour simulator session",
+     "price": "$110 (example: the simulator $40 plus the instructor $70)",
+     "kind": "one price",
+     "length": "1 hour",
+     "where": "at the school",
+     "before": "a card saved for the $75 fee",
+     "after": "paid at the front desk after",
+     "needs": "the simulator; an instructor unless the pilot is current and checked out on it"
+    },
+    {
+     "name": "Supervised solo flight (1-hour block)",
+     "price": "$165 (example: the aircraft for the block)",
+     "kind": "one price",
+     "length": "a 1-hour block the student books",
+     "where": "from the school's airport",
+     "before": "a card saved for the $75 fee",
+     "after": "the saved card is charged at DONE",
+     "needs": "an aircraft, and an instructor on duty at the school for the whole flight",
+     "note": "only with a student pilot certificate, a current medical (or the federal rule's alternative), the instructor's solo endorsement in date, and the weather inside the student's own limits; never sold to a student under 16"
+    },
+    {
+     "name": "Flight review at the school (2-hour block)",
+     "price": "$470 (example, the same block as a dual lesson)",
+     "kind": "one block price",
+     "length": "about 2 hours: ground, flight and debrief",
+     "where": "at the school's airport",
+     "before": "a card saved for the $75 fee",
+     "after": "the saved card is charged at DONE"
+    },
+    {
+     "name": "Checkride warm-up (2-hour block)",
+     "price": "$470 (example)",
+     "kind": "one block price",
+     "length": "the day of the practical test: a warm-up flight with the instructor, then the examiner",
+     "where": "at the school's airport",
+     "before": "a card saved for the $75 fee",
+     "after": "the saved card is charged at DONE",
+     "note": "the examiner sets the date and is paid directly by the student, outside Rosie; the date can't move"
+    },
+    {
+     "name": "Private pilot ground school course",
+     "price": "$399 (example)",
+     "kind": "one price, seats in a session",
+     "length": "10 evenings, 3 hours each",
+     "where": "in the school's classroom",
+     "before": "a $100 deposit now",
+     "after": "the $299 rest paid at the front desk at the first evening",
+     "capacity": "12 seats; runs with at least 4 by 7 days before the first evening"
+    },
+    {
+     "name": "Flight review in the customer's own aircraft (flow B)",
+     "price": "$255 (example: 3 hours of instructor time at $85 an hour)",
+     "kind": "one block price",
+     "length": "about 3 hours: 1 hour ground, 2 hours flight",
+     "where": "at the customer's own airport and aircraft",
+     "before": "a card saved for the $75 fee",
+     "after": "the saved card is charged at DONE",
+     "note": "the aircraft is the owner's: airworthy, inspected and insured so the instructor may fly it"
+    },
+    {
+     "name": "Transition training in the customer's own aircraft (flow B)",
+     "price": "$1,200 estimate (example): a $300 deposit (25%) now and the $900 rest on the bill after the last visit",
+     "kind": "a series of visits",
+     "length": "several visits over 1 to 2 weeks",
+     "where": "at the customer's own airport and aircraft",
+     "before": "a $300 deposit on the estimate",
+     "after": "the $900 rest on the bill after the last visit",
+     "note": "the insurer's required hours set the number of visits"
+    },
+    {
+     "name": "Ground school class seat at a host's place (flow B)",
+     "price": "$45 a seat (example)",
+     "kind": "one price, a seat",
+     "length": "3 hours",
+     "where": "at a host's place, like a flying club or a school",
+     "before": "paid in full when booking",
+     "after": "nothing more",
+     "capacity": "20 seats; runs with at least 6"
+    }
+   ],
+   "capacity": "one instructor per lesson; each aircraft and the simulator is booked like a room, so a lesson shows a time only if the instructor and the aircraft are both free; an instructor must be on duty for any supervised solo",
+   "online": "ground lessons may be by video; flight and simulator time never",
+   "outOfScope": "renting an aircraft to a licensed pilot with no instruction is renting a thing for a time, which Rosie doesn't book (Jay, Oct 24); a pilot's checkout flight, currency flight and flight review are booked as lessons"
+  },
+  "pf.questions": {
+   "beforeTimes": [
+    "new to flying, a student pilot, or a licensed pilot (sets the service: a discovery flight, the next lesson, a solo, a flight review or checkout)",
+    "what the lesson is for, and the next stage of training if the student knows it",
+    "which aircraft type, if the pilot is checked out in one",
+    "for a discovery flight: how many people fly, and whether a guest under 18 is coming",
+    "for a flight in the customer's own aircraft (flow B): the airport and the aircraft type"
+   ],
+   "afterTime": [
+    "anything the instructor should know (last lesson's topic, nerves)",
+    "for a solo: the practice area or route the instructor agreed"
+   ],
+   "securePage": [
+    "each person's weight for the flight, for the aircraft's weight limits (never in a text, never through the AI)",
+    "the student's date of birth (age limits for solo and for certificates)",
+    "proof of citizenship, or the date of the school's federal security approval for a student who isn't a citizen, where the federal rules require it before training",
+    "the student pilot certificate and medical certificate: kind and end date (for a solo)",
+    "for the customer's own aircraft: the owner's name, the yearly inspection date, and the insurance showing the instructor may fly it",
+    "the waiver and the school's training agreement"
+   ],
+   "whoMayBook": "an adult for themselves; a parent or legal guardian books for anyone under 18 and signs their OK; a teen who starts a booking forwards the link to a parent"
+  },
+  "pf.safety": {
+   "stop": [
+    {
+     "words": "an aircraft crash or fire happening now, someone hurt at the airport, an aircraft overdue or missing",
+     "say": "Call 911 now. Stay clear of any aircraft that is burning or leaking fuel.",
+     "booking": "no booking"
+    }
+   ],
+   "goOn": [
+    {
+     "words": "feeling sick, very tired, on a new medicine, or drinking in the last 8 hours before a flight",
+     "what": "no flying that day for the person at the controls (the federal alcohol rule and the school's own fitness rule); the booking moves with no fee before the cutoff, or turns into a ground lesson; Rosie gives no medical advice"
+    },
+    {
+     "words": "a health condition that may affect flying, a medical certificate that was denied or ran out",
+     "what": "it goes on the secure page only; the school decides what may be booked (dual lessons need no medical; a solo does)"
+    },
+    {
+     "words": "fear of flying",
+     "what": "the booking goes on; the instructor is told privately to go gently"
+    }
+   ],
+   "fitness": "the instructor checks that the student is fit to fly before every flight (the school's own checklist); a student who isn't fit doesn't fly that day",
+   "weather": "the instructor decides go or no-go from the weather at the airport before each flight, against the school's limits and the student's own limits; a flight that can't go becomes a ground or simulator lesson, or moves with no fee",
+   "aircraft": "an aircraft with a defect found on the preflight check doesn't fly until it's fixed",
+   "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking"
+  },
+  "pf.first_steps": {
+   "steps": [
+    {
+     "name": "Waiver and training agreement",
+     "when": "signed on the secure page while booking, before the first flight",
+     "who": "every person who flies; a parent or guardian signs for anyone under 18; a discovery flight's guest signs their own",
+     "goodFor": "1 year",
+     "result": "signed: it books; not signed in the saved time: the time is let go"
+    },
+    {
+     "name": "Proof of citizenship, or the federal security approval",
+     "when": "on the secure page before the first lesson, checked by the school before the first flight",
+     "who": "every new student pilot, where the federal rules require it",
+     "result": "checked: training goes on; not checked by the lesson: a ground lesson only, or the lesson moves with no fee"
+    },
+    {
+     "name": "Weight for the flight",
+     "when": "on the secure page while booking",
+     "who": "everyone who flies, for the aircraft's weight limits",
+     "result": "inside the limits: it books; over: another aircraft type, fewer people, or no flight, before any money is taken"
+    },
+    {
+     "name": "Medical and student pilot certificate",
+     "when": "before a supervised solo, on the secure page, and shown at the front desk",
+     "who": "student pilots booking a solo",
+     "goodFor": "until each one's end date",
+     "result": "in date: the solo books; missing or ended: a dual lesson instead, or no solo"
+    },
+    {
+     "name": "Instructor's solo endorsement",
+     "when": "before each supervised solo",
+     "who": "the student's own instructor gives it",
+     "goodFor": "the time the federal rules set (90 days), or as the instructor limits it",
+     "result": "in date: the solo books; ended: a dual flight first"
+    },
+    {
+     "name": "The owner's aircraft papers (flow B)",
+     "when": "on the secure page before a flight in the customer's own aircraft",
+     "who": "the aircraft's owner",
+     "result": "the yearly inspection in date and insurance that lets the instructor fly it: it goes ahead; missing: the instructor gives ground only, or it moves"
+    }
+   ],
+   "prep": "bring the logbook, a photo ID, the headset if you have one, and the student pilot and medical certificates for a solo; eat first; check in 15 minutes early"
+  },
+  "pf.visit": {
+   "checkIn": "at the front desk: the check-in code and the photo ID; for a solo, the student pilot and medical certificates are shown; the class roster for ground school; at the customer's own airport (flow B): the code at the hangar",
+   "beforeWork": "the instructor checks the student is fit to fly, checks the weather against the limits, and does the preflight check of the aircraft with the student; no flight if any check fails",
+   "changes": "weather or an aircraft defect turns the flight into a ground or simulator lesson, or moves it with no fee; a flight that goes longer than the block is billed at the same rates from the meter, and more than 30 minutes over needs the student's yes first",
+   "done": "the aircraft's meter reading in and out, the instructor's hours, and DONE; the instructor signs the student's logbook and fills the training record",
+   "record": "the training record and logbook entry (date, aircraft, hours, what was taught, any endorsement), kept as the federal rules require",
+   "children": "a parent stays at the airport for a discovery flight or lesson under 16; a student pilot of 16 or 17 may come alone with the parent's signed OK on file and is handed back only to an adult on the pick-up list if one is named"
+  },
+  "pf.money": {
+   "before": "a discovery flight and the ground school course are paid in full or with a deposit when booking; lessons and solos save a card for the fee; the course's rest is paid at the first evening, never charged later on its own",
+   "after": "a lesson block is charged at DONE on the saved card, or a ground lesson paid at the front desk; the course's rest at the first evening; a flight-training series' rest on the bill after the last visit",
+   "caps": "deposit cap: from the state form; prepaid training money kept apart or bonded where the state's rules require it",
+   "cancel": "free to cancel until 24 hours before (the owner's setting); a weather or aircraft cancel by the school is always free",
+   "fees": "a late cancel or no-show: $75 (example), only with the owner's OK, and never more than what was paid now; never for weather, an aircraft defect, or a student who says before the flight that they aren't fit to fly. A student who arrives impaired (drinking in the last 8 hours, or drugs) doesn't fly, and it's treated like a late cancel: any fee is the owner's call.",
+   "refunds": "a lesson the school cancels is never charged; unused ground school evenings are refunded under the course terms; an unused block of hours is refunded under its terms",
+   "tax": "where the state's rules tax aircraft time or instruction",
+   "tips": "none",
+   "fee2": "Rosfield's $2 applies: one $2 per confirmed booking; a series of transition visits counts once",
+   "goods": "headsets, logbooks, charts and pilot supplies are the school's own sale at the front desk, outside Rosie"
+  },
+  "pf.messages": {
+   "never": "weight, date of birth, medical certificate details, health answers, citizenship papers and certificate numbers never go in a text: only the secure page",
+   "staffTexts": "texts to instructors name the student and the lesson only; the weight and certificate details open on the secure page",
+   "languages": "English and Spanish",
+   "minors": "a minor's texts go to the parent or guardian"
+  },
+  "pf.staff": {
+   "licenses": "each instructor's federal flight instructor certificate and ratings are the school's own word, shown to the owner; not checked by Rosie (D96)",
+   "skills": "discovery flights, primary training, instrument, multi-engine, tailwheel, checkout flights, flight reviews, simulator, ground school, stage checks (the chief instructor or a second instructor)",
+   "supervision": "a supervised solo needs an instructor on duty at the school for the whole flight; the student's own instructor gives the endorsement",
+   "oks": "the student's instructor OKs each solo and its weather limits; the chief instructor OKs stage checks and checkride sign-offs; the owner OKs fees, refunds and new renters",
+   "standIn": "another instructor with the same ratings may take a lesson, offered to the student first, never assumed; a stage check must be with a different instructor",
+   "dutyLimits": "an instructor gives no more than 8 hours of flight training in 24 hours (the federal rule as a switch)",
+   "away": "only instructors cleared by the owner fly customers' own aircraft (flow B)",
+   "certificates": "each instructor's certificate end date, if the school enters one: a reminder for the owner only"
+  },
+  "pf.rules": {
+   "aircraft": "aircraft used for hire or instruction have the inspections the federal rules require; an aircraft past one isn't offered",
+   "training": "training records and logbook endorsements as the federal rules require; the school's own syllabus decides the next lesson",
+   "solo": "a solo needs the student pilot certificate, a medical (or the federal rule's alternative), the instructor's endorsement in date, and an instructor on duty; the business's own word on each one",
+   "security": "a student who isn't a citizen: the school's own federal approval step, before flight training starts; the school keeps the proof itself; Rosie never checks a document (D96)",
+   "alcohol": "no flying within 8 hours of drinking or while impaired (the federal rule, and the school's own rule)",
+   "school": "where the state's rules license flight schools as private or vocational schools: the enrollment contract, its cancel window and any bond for prepaid training (a switch)",
+   "records": "training records, waivers and agreements kept as long as the federal rules ask, and at least 7 years"
+  },
+  "pf.edges": {
+   "weather": "weather below the limits: the instructor decides before the flight; a ground or simulator lesson at the same time, or a move with no fee",
+   "aircraft": "an aircraft down for a defect or an inspection: another aircraft of the same type, a simulator or ground lesson, or a move with no fee",
+   "notFit": "a student who isn't fit to fly: no flight; a ground lesson, or a move",
+   "checkride": "the checkride date is set by the examiner and can't move: the school keeps the aircraft and offers another of the same type if one goes down",
+   "late": "a late student: the lesson is shorter inside the block, or becomes ground only",
+   "overrun": "the flight runs past the block: billed from the meter; more than 30 minutes over needs the student's yes",
+   "minor": "a student under 18: a parent books and signs; a solo at 16 and up only",
+   "noShow": "a no-show: the fee only with the owner's OK",
+   "standIn": "the student's instructor out: another instructor with the ratings, offered first, or a move",
+   "emergency": "an incident in flight is handled by the instructor and the federal reporting rules; Rosie tells the owner at once and says nothing to anyone else",
+   "other": "all other edge cases the generic way"
+  },
+  "pf.facts": [
+   "firststeps",
+   "forms",
+   "children",
+   "classes",
+   "video",
+   "spaces",
+   "multiday"
+  ],
+  "pf.settings": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before"
+  }
+ },
+ "cast": {
+  "A": {
+   "staff": "Owen and Mia (instructors at the school's airport)",
+   "cust": "Alex M. (student) · other students",
+   "other": "Others (a parent, a bank)"
+  },
+  "B": {
+   "staff": "Ravi and Ines (instructors who fly to the customer's airport)",
+   "cust": "Alex M. (pilot, owner of the aircraft) · other customers",
+   "other": "Others (a flying club, a host, a bank)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Owen"
+  },
+  "B": {
+   "staff": "Ravi"
+  }
+ },
+ "keep": [
+  "instructor",
+  "Instructor",
+  "instructors",
+  "grace",
+  "leak",
+  "valve",
+  "color"
+ ],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex, a student pilot, books a 2-hour dual flight lesson at Lee Flight School with Owen, Sat Oct 24 at 11:00am. The card is saved and charged for the block at DONE. Alex's certificate and weight go on the secure page, and the desk checks the photo ID at check-in. Pick a money choice at the top to follow its path.",
+  "B": "Sam Lee signs up two companies by text. Then Alex, a licensed pilot, books a 3-hour flight review in Alex's own aircraft at Alex's home airport, with Ravi, Thu Oct 22 at 8:00am. The aircraft papers and Alex's certificate go on the secure page, and the saved card is charged at DONE. Pick a money choice at the top to follow its path."
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S1-80",
+   "A4-43",
+   "A4-80",
+   "A7-59",
+   "A7-15",
+   "A7-63",
+   "A7-68",
+   "A8-02",
+   "S11-87",
+   "S11-90",
+   "A8-67"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S1-80",
+   "B4-78",
+   "B5-34",
+   "B7-62",
+   "S11-87",
+   "S11-90"
+  ]
+ },
+ "rename": {
+  "A": [
+   [
+    "{{svc.intext:haircut|visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:color and cut|visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Color and cut|Your visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Your visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:beard trim|service}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Haircut|Visits}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:haircut plan|plan}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Skin fade|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Beard trim|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Signature cut and shave|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:color correction|visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Color correction|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:a color correction|the price}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:cut|visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:color plan visit|visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Skin fade}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:skin fades|visits}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Discovery flights, dual lessons and ground school for new and nervous pilots."
+   ],
+   [
+    "books a skin fade for",
+    "books a discovery flight for"
+   ],
+   [
+    "gives the job's address alone to their contact",
+    "gives the address alone to their contact"
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a lesson at the airport or at the customer's own airport."
+   ],
+   [
+    "no cut of",
+    "no part of"
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent visits sent now, like a tow or a lockout."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company sends anyone now."
+   ],
+   [
+    "Sets nobody on call: no jobs sent now",
+    "Sets nobody on call: nothing sent now"
+   ],
+   [
+    "Jobs sent now are never offered.",
+    "Nothing is ever sent now."
+   ],
+   [
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Your work is never sent now, so nobody needs to be on call."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Owen: flight instructor, dual lessons and checkrides"
+   ],
+   [
+    "Avery: barber",
+    "Mia: flight instructor"
+   ],
+   [
+    "Every shop service, color and house calls",
+    "Every service: flights, ground school and simulator time"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the airport and at a customer's own airport"
+   ],
+   [
+    "the visit fee",
+    "the trip fee"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the airport, and at a customer's own airport"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states tie a flight school's license to its place, and an instructor to their own certificate."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A flight school's example: a fuel smell gets 'get clear of the aircraft, and call 911'."
+   ],
+   [
+    "raises the haircut to $40",
+    "raises the 1-hour ground lesson to $95"
+   ],
+   [
+    "Next: Sat Nov 28 · 10:00am",
+    "Next: Sat Nov 7 · 10:00am"
+   ],
+   [
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "Ben's AI asks for a discovery flight at $139, an old price."
+   ],
+   [
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "A discovery flight at Lee Flight School is $149, not $139."
+   ],
+   [
+    "Priced from your photos",
+    "Priced from your answers"
+   ],
+   [
+    "raise haircut to 40",
+    "raise the ground lesson to 95"
+   ],
+   [
+    "Priced at the chair",
+    "Priced at the lesson"
+   ],
+   [
+    "What happens at the chair?",
+    "What happens during the lesson?"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lesson could mean a discovery flight or a ground school class."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a lesson every Saturday"
+   ],
+   [
+    "Books the groom's party together",
+    "Books a family's discovery flights together"
+   ],
+   [
+    "May the shop show photos of your hair?",
+    "May the school share photos of your flight?"
+   ],
+   [
+    "Color always stays with Riley.",
+    "The dual lesson always stays with Owen."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Owen can do a shorter lesson in the time left, at the same price, or you can move to a later time."
+   ],
+   [
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "Your lesson is part of a plan with Owen, every Saturday."
+   ],
+   [
+    "A cut is rated, so the shop takes the first branch.",
+    "A lesson is rated, so the school takes the first branch."
+   ],
+   [
+    "kids cuts",
+    "junior lessons"
+   ],
+   [
+    "kids cut",
+    "junior lesson"
+   ],
+   [
+    "Kids cut",
+    "Junior lesson"
+   ],
+   [
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "It's a ground lesson today at 2:00pm with Mia, for a new student. It's $90."
+   ],
+   [
+    "accept the beard trim today at 2:00pm with Avery",
+    "accept the ground lesson today at 2:00pm with Mia"
+   ],
+   [
+    "priced from photos",
+    "priced from her answers"
+   ],
+   [
+    "Color and cut",
+    "Lesson plan"
+   ],
+   [
+    "color and cut",
+    "lesson plan"
+   ],
+   [
+    "color quote",
+    "custom plan quote"
+   ],
+   [
+    "Sam adds massage to Lee's Barbershop.",
+    "Sam adds a simulator to Lee Flight Lessons."
+   ],
+   [
+    "NEW massage",
+    "NEW simulator time"
+   ],
+   [
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Simulator time for Lee Flight Lessons: is it the same company?"
+   ],
+   [
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "Hola, ¿habla español? Quiero una clase de vuelo el sábado."
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a flight lesson on Saturday."
+   ],
+   [
+    "JP031552",
+    "EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "EC22871",
+    "EX-1045"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "Lee's Barbershop LLC",
+    "Lee Flight School LLC"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Flight School"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Flight Lessons'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Flight Lessons"
+   ],
+   [
+    "Riley Chen",
+    "Owen Hale"
+   ],
+   [
+    "Riley",
+    "Owen"
+   ],
+   [
+    "Avery Diaz",
+    "Mia Cruz"
+   ],
+   [
+    "Avery",
+    "Mia"
+   ],
+   [
+    "Jordan Price",
+    "Ravi Patel"
+   ],
+   [
+    "Jordan",
+    "Ravi"
+   ],
+   [
+    "Casey Moore",
+    "Ines Lopez"
+   ],
+   [
+    "Casey",
+    "Ines"
+   ],
+   [
+    "1200 Main St",
+    "2 Hangar Rd"
+   ],
+   [
+    "88 Elm St",
+    "40 Airport Way"
+   ],
+   [
+    "Elm St",
+    "Airport Way"
+   ],
+   [
+    "Oak St",
+    "Pine Ct"
+   ],
+   [
+    "a barber",
+    "a flight instructor"
+   ],
+   [
+    "A barber",
+    "A flight instructor"
+   ],
+   [
+    "plumbing and electrical",
+    "flight training and ground school"
+   ],
+   [
+    "Electrical",
+    "Ground school"
+   ],
+   [
+    "electrical",
+    "ground school"
+   ],
+   [
+    "Plumbing",
+    "Flight training"
+   ],
+   [
+    "plumbing",
+    "flight training"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "Barbering",
+    "Flying"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "barbershop",
+    "flight school"
+   ],
+   [
+    "Barbershop",
+    "Flight school"
+   ],
+   [
+    "shops",
+    "schools"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "1 At the shop",
+    "1 At the airport"
+   ],
+   [
+    "Only at the shop",
+    "Only at the airport"
+   ],
+   [
+    "Books a free fix, if Sam says so",
+    "Books a free make-up lesson, if Sam says so"
+   ],
+   [
+    "Alex asks for a fix",
+    "Alex asks for a make-up lesson"
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Dual flight lesson"
+   ],
+   [
+    "Signature cut and shave",
+    "Dual flight lesson"
+   ],
+   [
+    "signature cut",
+    "dual flight lesson"
+   ],
+   [
+    "The Groom's package",
+    "The ground school course"
+   ],
+   [
+    "the Groom's package",
+    "the ground school course"
+   ],
+   [
+    "Groom's package",
+    "ground school course"
+   ],
+   [
+    "Haircuts",
+    "Lessons"
+   ],
+   [
+    "haircuts",
+    "lessons"
+   ],
+   [
+    "A haircut",
+    "A 2-hour dual lesson"
+   ],
+   [
+    "a haircut",
+    "a dual lesson"
+   ],
+   [
+    "Haircut",
+    "2-hour dual lesson"
+   ],
+   [
+    "haircut",
+    "dual lesson"
+   ],
+   [
+    "a beard trim",
+    "a discovery flight"
+   ],
+   [
+    "Beard trim",
+    "Discovery flight"
+   ],
+   [
+    "beard trim",
+    "discovery flight"
+   ],
+   [
+    "$55",
+    "$149"
+   ],
+   [
+    "$35",
+    "$90"
+   ],
+   [
+    "paid at the chair",
+    "paid at the desk"
+   ],
+   [
+    "at the chair",
+    "at the desk"
+   ],
+   [
+    "in the chair",
+    "in the cockpit"
+   ],
+   [
+    "the chair",
+    "the cockpit"
+   ],
+   [
+    "Jobs",
+    "Lessons"
+   ],
+   [
+    "jobs",
+    "lessons"
+   ],
+   [
+    "Job",
+    "Lesson"
+   ],
+   [
+    "job",
+    "lesson"
+   ],
+   [
+    "cuts",
+    "lessons"
+   ],
+   [
+    "cut",
+    "lesson"
+   ],
+   [
+    "every 4 weeks",
+    "every Saturday"
+   ],
+   [
+    "skin fades",
+    "discovery flights"
+   ],
+   [
+    "skin fade",
+    "discovery flight"
+   ],
+   [
+    "Skin fade",
+    "Discovery flight"
+   ],
+   [
+    "Skin fade",
+    "Discovery flight"
+   ],
+   [
+    "skin fade",
+    "discovery flight"
+   ],
+   [
+    "color correction",
+    "training program"
+   ],
+   [
+    "a perm",
+    "a helicopter rating"
+   ],
+   [
+    "perms",
+    "helicopter ratings"
+   ],
+   [
+    "perm",
+    "helicopter rating"
+   ],
+   [
+    "The cape clip",
+    "The seat belt clip"
+   ],
+   [
+    "the cape clip",
+    "the seat belt clip"
+   ],
+   [
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "NOTE Alex M.: crosswind landings next time; radio calls first."
+   ],
+   [
+    "barbershops",
+    "flight schools"
+   ],
+   [
+    "once Owen sees the hair",
+    "once Owen sees the student's needs"
+   ],
+   [
+    "Color correction",
+    "Training program"
+   ],
+   [
+    "At the cockpit",
+    "At the desk"
+   ],
+   [
+    "Flight training for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Discovery flights and dual lessons at the airport, and ground school."
+   ],
+   [
+    "water heater",
+    "transition estimate"
+   ],
+   [
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "a phone talk about the program is free: nothing before, nothing after."
+   ],
+   [
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "a visit with nobody at the desk is paid by the bill Rosie sends."
+   ],
+   [
+    "Saturday mornings are paid by the saved card at DONE.",
+    "a visit with nobody at the desk is charged to the saved card at DONE."
+   ]
+  ],
+  "B": [
+   [
+    "{{svc.intext:Drain clearing}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Water heater replacement}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain clearing}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:drain clearing|visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain clearing|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:plumbing visit|visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:camera inspection|service}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:home-repair class|session}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:plan|plan}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Yard drain|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Water heater flush|Visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Leak repair|Quote}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Leak repair|Your quote}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:leak repair|work}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:kitchen drain|visit}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:Sewer camera inspection}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "{{svc.intext:drain clearings|visits}}",
+    "{{svc.intext:Flight booking}}"
+   ],
+   [
+    "the shutoff valves",
+    "the extra time"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Ravi also add a simulator session?"
+   ],
+   [
+    "Sewer camera inspection · $199",
+    "Simulator session · $90"
+   ],
+   [
+    "added a camera inspection to",
+    "added a simulator session to"
+   ],
+   [
+    "Pay $160 for the shutoff valves",
+    "Pay $160 for the extra time"
+   ],
+   [
+    "$160 for today's extra work",
+    "$160 for today's extra time"
+   ],
+   [
+    "can start the sewer camera inspection at a set time",
+    "can start the lesson at a set time"
+   ],
+   [
+    "like the sewer camera inspection",
+    "like a ground lesson"
+   ],
+   [
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "Flight lessons at the customer's airport in Springfield, within 25 miles."
+   ],
+   [
+    "A water heater job",
+    "A flight review"
+   ],
+   [
+    "up to the $89 service call",
+    "up to the $75 late-cancel fee"
+   ],
+   [
+    "It's a leak under the sink, today",
+    "It's a flight review, today"
+   ],
+   [
+    "The service call is $89. Accept it?",
+    "The lesson is $255. Accept it?"
+   ],
+   [
+    "Hi, it's about a leaking pipe under my sink.",
+    "Hi, it's about a flight review for my plane."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A lesson could mean a flight review or a ground school class."
+   ],
+   [
+    "'My sink won't drain' fits a drain clearing.",
+    "'I need my flight review' fits a flight review."
+   ],
+   [
+    "Like tapping a neighbor's water line without asking.",
+    "Like flying someone else's plane without their OK."
+   ],
+   [
+    "two drain clearings",
+    "two ground lessons"
+   ],
+   [
+    "I found water damage under the sink this morning.",
+    "I found a crack on my wing this morning."
+   ],
+   [
+    "the kitchen drain",
+    "the ground lesson"
+   ],
+   [
+    "gives the job's address alone to their contact",
+    "gives the address alone to their contact"
+   ],
+   [
+    "Sam named you their emergency contact.",
+    "Sam named you as their contact."
+   ],
+   [
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Why: one service can have two places with different money, like a lesson at the airport or at the customer's airport."
+   ],
+   [
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Some work takes urgent visits sent now, like a tow or a lockout."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Neither company sends anyone now."
+   ],
+   [
+    "Sets nobody on call: no jobs sent now",
+    "Sets nobody on call: nothing sent now"
+   ],
+   [
+    "Jobs sent now are never offered.",
+    "Nothing is ever sent now."
+   ],
+   [
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Your work is never sent now, so nobody needs to be on call."
+   ],
+   [
+    "Riley: barber, color and house calls",
+    "Ravi: flight reviews, transition training and ground lessons"
+   ],
+   [
+    "Avery: barber",
+    "Ines: ground school and flight reviews"
+   ],
+   [
+    "at the shop and for house calls",
+    "at the airport and at the customer's airport"
+   ],
+   [
+    "the visit fee",
+    "the trip fee"
+   ],
+   [
+    "At the shop, and house calls",
+    "At the airport, and at the customer's airport"
+   ],
+   [
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "Why: some states tie a flight school's license to its place, and an instructor to their own certificate."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A flight school's example: a fuel smell gets 'get clear of the aircraft, and call 911'."
+   ],
+   [
+    "The door stayed shut.",
+    "The hangar door stayed shut."
+   ],
+   [
+    "for that window",
+    "for that time"
+   ],
+   [
+    "the safety check comes before the door opens",
+    "the preflight check comes before the student climbs in"
+   ],
+   [
+    "before letting anyone in",
+    "before the student climbs in"
+   ],
+   [
+    "Jordan and Alex check the work",
+    "Ravi and Alex do the preflight check"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The offer is good for the next lesson."
+   ],
+   [
+    "Sam adds heating and cooling to Lee Home Services.",
+    "Sam adds ground school to Lee Flight Lessons."
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW ground school"
+   ],
+   [
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "Ground school for Lee Flight Lessons: is it the same company?"
+   ],
+   [
+    "You go to customers",
+    "You go to the customer's airport"
+   ],
+   [
+    "Service call fee",
+    "Late-cancel fee"
+   ],
+   [
+    "service call fee",
+    "late-cancel fee"
+   ],
+   [
+    "Drain clearings already booked keep $179",
+    "Flight reviews already booked keep $255"
+   ],
+   [
+    "Drain clearing plans",
+    "Flight review plans"
+   ],
+   [
+    "at the door",
+    "at the hangar"
+   ],
+   [
+    "JP031552",
+    "EX-1042"
+   ],
+   [
+    "MP045210",
+    "EX-1043"
+   ],
+   [
+    "BS20981",
+    "EX-1044"
+   ],
+   [
+    "EC22871",
+    "EX-1045"
+   ],
+   [
+    "JE30417",
+    "EX-1046"
+   ],
+   [
+    "Lee's Barbershop",
+    "Lee Ground School"
+   ],
+   [
+    "Lee Home Services LLC",
+    "Lee Flight Lessons LLC"
+   ],
+   [
+    "Lee Home Services'",
+    "Lee Flight Lessons'"
+   ],
+   [
+    "Lee Home Services",
+    "Lee Flight Lessons"
+   ],
+   [
+    "leehomeservices.com",
+    "leeflightlessons.com"
+   ],
+   [
+    "Riley Chen",
+    "Owen Hale"
+   ],
+   [
+    "Riley",
+    "Owen"
+   ],
+   [
+    "Avery Diaz",
+    "Mia Cruz"
+   ],
+   [
+    "Avery",
+    "Mia"
+   ],
+   [
+    "Jordan Price",
+    "Ravi Patel"
+   ],
+   [
+    "Jordan",
+    "Ravi"
+   ],
+   [
+    "Casey Moore",
+    "Ines Lopez"
+   ],
+   [
+    "Casey",
+    "Ines"
+   ],
+   [
+    "1200 Main St",
+    "2 Hangar Rd"
+   ],
+   [
+    "88 Elm St",
+    "40 Airport Way"
+   ],
+   [
+    "Elm St",
+    "Airport Way"
+   ],
+   [
+    "42 Oak St",
+    "17 Cedar Ln"
+   ],
+   [
+    "a plumber",
+    "an instructor"
+   ],
+   [
+    "a barber",
+    "an instructor"
+   ],
+   [
+    "plumbing and electrical",
+    "flight training and ground school"
+   ],
+   [
+    "Electrical",
+    "Ground school"
+   ],
+   [
+    "electrical",
+    "ground school"
+   ],
+   [
+    "Plumbing",
+    "Flight training"
+   ],
+   [
+    "plumbing",
+    "flight training"
+   ],
+   [
+    "plumber",
+    "instructor"
+   ],
+   [
+    "barbers",
+    "instructors"
+   ],
+   [
+    "Barber",
+    "Instructor"
+   ],
+   [
+    "barber",
+    "instructor"
+   ],
+   [
+    "barbershop",
+    "flight school"
+   ],
+   [
+    "Shop",
+    "School"
+   ],
+   [
+    "2 At the shop",
+    "2 At the airport"
+   ],
+   [
+    "Booked at the shop: the other flow goes on from here.",
+    "Booked at the airport: the other flow goes on from here."
+   ],
+   [
+    "shop",
+    "school"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Flight review"
+   ],
+   [
+    "Drain clearing",
+    "Flight review"
+   ],
+   [
+    "drain clearing",
+    "flight review"
+   ],
+   [
+    "Water heater flush",
+    "Ground school course"
+   ],
+   [
+    "water heater flush",
+    "ground school course"
+   ],
+   [
+    "arriving 8–10am",
+    "starts at 8:00am"
+   ],
+   [
+    "8–10am",
+    "8:00am"
+   ],
+   [
+    "7am Thu",
+    "7:30am Thu"
+   ],
+   [
+    "arriving 12–2pm",
+    "starts at 12:00pm"
+   ],
+   [
+    "12–2pm",
+    "12:00pm"
+   ],
+   [
+    "Thursday morning",
+    "Thursday morning"
+   ],
+   [
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:00am"
+   ],
+   [
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 8:10am"
+   ],
+   [
+    "Thu Oct 22, 9:10am",
+    "Thu Oct 22, 10:00am"
+   ],
+   [
+    "$150",
+    "$255"
+   ],
+   [
+    "$110",
+    "$90"
+   ],
+   [
+    "$40",
+    "$75"
+   ],
+   [
+    "Jobs",
+    "Lessons"
+   ],
+   [
+    "jobs",
+    "lessons"
+   ],
+   [
+    "Job",
+    "Lesson"
+   ],
+   [
+    "job",
+    "lesson"
+   ],
+   [
+    "barbershops",
+    "flight schools"
+   ],
+   [
+    "for a haircut instead",
+    "for a discovery flight instead"
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "Alex M.'s Thu Oct 22 lesson ended 20 minutes early."
+   ],
+   [
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "Alex missed part of a lesson when Ravi left early. Sam OKs a free make-up visit at $0, with its own code."
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "The lesson ended early again."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Ines",
+    "BOOK Tessa lesson Thu 12-2 Ines"
+   ],
+   [
+    "Adding a faucet check? Say so.",
+    "Adding a ground lesson? Say so."
+   ],
+   [
+    "Just the kitchen sink.",
+    "Just the hangar."
+   ],
+   [
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Send Alex M. $1,100 for the transition estimate, not $1,200?"
+   ],
+   [
+    "Price needed: Alex M., water heater replacement.",
+    "Price needed: Alex M., transition estimate."
+   ],
+   [
+    "Ravi priced a water heater replacement for Alex M.",
+    "Ravi priced a transition estimate for Alex M."
+   ],
+   [
+    "Your water heater price is with Lee Flight Lessons.",
+    "Your estimate is with Lee Flight Lessons."
+   ],
+   [
+    "your water heater replacement at {{price:$90}}",
+    "your transition estimate at {{price:$1,200}}"
+   ],
+   [
+    "couldn't price your water heater this time",
+    "couldn't price your estimate this time"
+   ],
+   [
+    "The $640 water heater is over the plug-in's amount",
+    "The $1,200 transition estimate is over the plug-in's amount"
+   ],
+   [
+    "Can Ravi also look at a dripping faucet?",
+    "Can Ravi also look at a stuck throttle?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a stuck throttle."
+   ],
+   [
+    "with one arrival window and one code",
+    "with one start time and one code"
+   ],
+   [
+    "like new pipes put in one day and finished another.",
+    "like a transition series finished over two weeks."
+   ],
+   [
+    "like 'Is the sink still full of water?'",
+    "like 'Is the hangar still locked?'"
+   ],
+   [
+    "like an overflowing drain at night",
+    "like a tow at night"
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "The plane won't start. Can someone come tonight?"
+   ],
+   [
+    "The $179 drain needs none.",
+    "The $255 flight review needs none."
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please have the hangar door open."
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I warm up the engine before you come?"
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the fuel is leaking now."
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "The fuel is leaking onto the hangar floor now."
+   ],
+   [
+    "Can I skip next week's drain cleaning?",
+    "Can I skip next week's flight review?"
+   ],
+   [
+    "a drain cleaning at two rentals every 3 months",
+    "a flight review in two aircraft every 3 months"
+   ],
+   [
+    "yard drain needs nobody home",
+    "hangar needs nobody home"
+   ],
+   [
+    "old water stain on the cabinet floor",
+    "old oil stain on the hangar floor"
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 ground lesson 165 fuel line 80"
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 extra flight time, 30 minutes"
+   ],
+   [
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "Extra for Alex M.: 30 more minutes, $160."
+   ],
+   [
+    "Ravi finds corroded shutoff valves.",
+    "Ravi finds a worn spark plug."
+   ],
+   [
+    "you said yes to replacing both shutoff valves for $160",
+    "you said yes to 30 more minutes for $160"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD crack in the wing strut, stopped"
+   ],
+   [
+    "Ravi finds mold behind the sink wall.",
+    "Ravi finds a crack in the wing strut."
+   ],
+   [
+    "Ravi found mold behind the wall under your sink",
+    "Ravi found a crack in the wing strut"
+   ],
+   [
+    "cabinet floor",
+    "hangar floor"
+   ],
+   [
+    "shutoff valve only",
+    "fuel valve only"
+   ],
+   [
+    "Leave the supply line.",
+    "Leave the fuel line."
+   ],
+   [
+    "fixes the shutoff valve today",
+    "fixes the fuel valve today"
+   ],
+   [
+    "The $80 supply line",
+    "The $80 fuel line"
+   ],
+   [
+    "for your repipe",
+    "for your transition series"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 transition series, 3 stages"
+   ],
+   [
+    "Sewer camera inspection",
+    "Simulator session"
+   ],
+   [
+    "Service call",
+    "Trip fee"
+   ],
+   [
+    "service call",
+    "trip fee"
+   ],
+   [
+    "Leak repair",
+    "Transition estimate"
+   ],
+   [
+    "Water heater replacement",
+    "Transition estimate"
+   ],
+   [
+    "sewer camera report",
+    "training record"
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE takeoff roll longer than usual. Next time: add crosswind practice."
+   ],
+   [
+    "repipe",
+    "transition series"
+   ],
+   [
+    "A neighborhood flight school on Airport Way.",
+    "A flight school at Airport Way."
+   ],
+   [
+    "the valve is off",
+    "the fuel is off"
+   ],
+   [
+    "under the sink",
+    "under the wing"
+   ],
+   [
+    "bathroom sink",
+    "bathroom"
+   ],
+   [
+    "The $160 valve quote is good for 7 days.",
+    "The $160 extra time is good for 7 days."
+   ],
+   [
+    "Yes, it won't drain",
+    "Yes, it won't start"
+   ],
+   [
+    "{{svc.intext:Kitchen drain|Visit}}",
+    "{{svc.intext:Flight review|Visit}}"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 255 flight review"
+   ],
+   [
+    "leak repair is $620",
+    "transition estimate is $620"
+   ],
+   [
+    "Ravi found the leak.",
+    "Ravi found the fault."
+   ],
+   [
+    "Ravi finds the leak",
+    "Ravi finds the fault"
+   ],
+   [
+    "leak repair",
+    "transition estimate"
+   ],
+   [
+    "roof leak",
+    "roof repair"
+   ],
+   [
+    "A fix-a-leak class.",
+    "A throttle check class."
+   ],
+   [
+    "to shut the cold-water valve",
+    "to get clear of the aircraft"
+   ],
+   [
+    "a gas smell",
+    "a fuel smell"
+   ],
+   [
+    "My kitchen drain is clogged.",
+    "My plane needs its yearly review."
+   ],
+   [
+    "which drain is clogged",
+    "which part needs a check"
+   ],
+   [
+    "the leak",
+    "the fault"
+   ],
+   [
+    "replaces water heaters",
+    "replaces engines"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the hangar still locked?"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both fuel valves"
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My hangar got wet in a flood. Is my plane safe to fly?"
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the fuel is off.",
+    "Its questions: where the fault is, if anything is still wrong, and if the fuel is off."
+   ],
+   [
+    "The faucet is a transition estimate",
+    "The throttle is a transition estimate"
+   ],
+   [
+    "Your drain is under warranty, so this visit is free.",
+    "Your lesson ran short, so this make-up visit is free."
+   ],
+   [
+    "for a bathroom drain.",
+    "for a make-up lesson."
+   ],
+   [
+    "the water heater quote",
+    "the transition estimate"
+   ],
+   [
+    "Drain clearings already booked",
+    "Flight reviews already booked"
+   ],
+   [
+    "a yard drain this Thursday",
+    "a flight review this Thursday"
+   ],
+   [
+    "Replace both fuel valves · $160",
+    "30 more minutes · $160"
+   ],
+   [
+    "Water is coming out of the water heater.",
+    "Fuel is leaking out of the wing."
+   ],
+   [
+    "Shut the cold-water valve, above the heater.",
+    "Get clear of the aircraft, away from the fuel."
+   ],
+   [
+    "Cabinet floor, before",
+    "Hangar floor, before"
+   ],
+   [
+    "Under the sink, before",
+    "Under the wing, before"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Crack in the wing strut"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the fuel line behind the wing"
+   ],
+   [
+    "Kitchen drain",
+    "Flight review"
+   ],
+   [
+    "Yard drain",
+    "Hangar check"
+   ],
+   [
+    "Water heater fix",
+    "Engine fix"
+   ],
+   [
+    "Classic cuts, fades and hot towel shaves.",
+    "Discovery flights, dual lessons and ground school."
+   ],
+   [
+    "A neighborhood flight school on Airport Way.",
+    "A flight school at Airport Way."
+   ],
+   [
+    "Turn off the water valve under the wing, and keep away from any outlet the water reaches.",
+    "Shut off the fuel valve, and keep away from any fuel the aircraft spills."
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: a crack in the wing strut"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Crack in the wing strut"
+   ],
+   [
+    "Sale agua del calentador.",
+    "Sale combustible del ala."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Aléjese de la aeronave. Si huele a combustible, salga y llame al 911."
+   ],
+   [
+    "¿Huele a gas?",
+    "¿Huele a combustible?"
+   ],
+   [
+    "No huele a gas.",
+    "No huele a combustible."
+   ]
+  ]
+ },
+ "money": {
+  "A": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|card|counter",
+    "list|full|none",
+    "list|deposit|counter"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a 2-hour dual lesson in the 4-seat trainer, $470 for the block. A card is saved for the $75 fee; the block is charged at DONE.",
+    "list|card|counter": "A 1-hour ground lesson, $90. A card is saved for the $75 fee, and Alex pays at the front desk after.",
+    "list|full|none": "A $149 discovery flight, paid in full when booking.",
+    "list|deposit|counter": "The $399 private pilot ground school course: a $100 deposit now, and the $299 rest paid at the front desk at the first evening."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$75",
+     "name": "flight lesson"
+    },
+    "list|*|*": {
+     "price": "$90",
+     "name": "1-hour ground lesson"
+    },
+    "list|card|card": {
+     "price": "$470",
+     "name": "2-hour dual lesson"
+    },
+    "list|card|counter": {
+     "price": "$90",
+     "name": "1-hour ground lesson"
+    },
+    "list|full|none": {
+     "price": "$149",
+     "paid": "$149",
+     "name": "discovery flight"
+    },
+    "list|deposit|counter": {
+     "price": "$399",
+     "deposit": "$100",
+     "rest": "$299",
+     "fee": "$75",
+     "name": "ground school course (10 evenings)"
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|card",
+   "combos": [
+    "list|card|card",
+    "list|full|none",
+    "list|deposit|bill"
+   ],
+   "examples": {
+    "list|card|card": "The main story: a 3-hour flight review in Alex's own aircraft at Alex's home airport, $255. The saved card is charged at DONE.",
+    "list|full|none": "A $45 seat at a ground school class at a host's place, paid in full.",
+    "list|deposit|bill": "Transition training in a newly bought aircraft: a $300 deposit on the $1,200 estimate, and the $900 rest on the bill after the last visit."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$75",
+     "name": "flight review"
+    },
+    "list|card|card": {
+     "price": "$255",
+     "name": "flight review in your own aircraft",
+     "fee": "$75"
+    },
+    "list|full|none": {
+     "price": "$45",
+     "paid": "$45",
+     "fee": "$40",
+     "name": "ground school seat"
+    },
+    "list|deposit|bill": {
+     "price": "$1200",
+     "deposit": "$300",
+     "rest": "$900",
+     "fee": "$75",
+     "name": "transition training (estimate)"
+    },
+    "list|*|*": {
+     "price": "$255"
+    }
+   }
+  }
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked the company gives only its registration (S1-61)"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "this work adds no agreement with Rosie beyond the standard terms"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "this work runs classes (a timetable, seats)"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "nothing is ever sent now, and nobody is on call"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S1-71",
+    "label": "2 Yes: sign it now",
+    "why": "not health care: no health privacy agreement is signed for this work"
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The license can stop the work and cut what may be offered, so it comes before prices and money. The flight school needs no state license checked here, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Decides which check runs on what each person added on their secure page. For this work none runs: no person license is checked.",
+    "more": [
+     "The plug-in says which, and which official lookup checks it: none for this work (D96).",
+     "the instructor certificate is the school's own word, not checked",
+     "Safe default: no person license is checked here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the the flight school's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the the flight school's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A6-14",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're booked! Give this code at the desk when you arrive.",
+      {
+       "card": {
+        "title": "Lee Flight School · {{svc.intext:Flight booking}}",
+        "lines": [
+         "Sat Oct 24 · 11:00am · Owen",
+         "{{pay.price}}",
+         "{{pay.took}}",
+         "{{pay.cancel}}",
+         "Step-free door on Airport Way · parking in the back"
+        ]
+       },
+       "code": "5160",
+       "buttons": [
+        "Change the time",
+        "Call off the visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "A8-53",
+    "label": "A drop-off",
+    "why": "nothing is left with the school"
+   },
+   {
+    "op": "off",
+    "at": "A8-03",
+    "label": "A drop-off",
+    "why": "nothing is dropped off or mailed in at the school"
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "every lesson is rated"
+   },
+   {
+    "op": "off",
+    "at": "A4-28",
+    "label": "A plan or insurance",
+    "why": "this work never bills a plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Insurance pays part",
+    "why": "no insurance plan is billed for flight lessons"
+   },
+   {
+    "op": "off",
+    "at": "A9-15",
+    "label": "Paid in stages",
+    "why": "a lesson or course is never paid in stages"
+   },
+   {
+    "op": "off",
+    "at": "A10-06",
+    "label": "An item isn't picked up",
+    "why": "nothing is left at the school"
+   },
+   {
+    "op": "more",
+    "at": "A4-43",
+    "more": [
+     "Here it's the waiver and the school's training agreement, read and signed on the secure page before the first flight.",
+     "A discovery flight's guest signs their own waiver. A parent signs for anyone under 18.",
+     "Medical certificate, citizenship and weight answers stay on the secure page, never in a text or through the AI."
+    ]
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-60",
+    "label": "1 A license",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked the company gives only its registration (S1-61)"
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "D97: the $2 applies to every profession"
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "this work adds no agreement with Rosie beyond the standard terms"
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "1 No classes",
+    "why": "this work runs classes (a timetable, seats)"
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "1 Yes: some work is sent now",
+    "why": "nothing is ever sent now, and nobody is on call"
+   },
+   {
+    "op": "off",
+    "at": "S2-28",
+    "label": "1 Yes, each one",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S1-71",
+    "label": "2 Yes: sign it now",
+    "why": "not health care: no health privacy agreement is signed for this work"
+   },
+   {
+    "op": "off",
+    "at": "S1-32",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S1-33",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S2-22",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S11-48",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S11-50",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S11-99",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S11-57",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S12-19",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S13-41",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S13-43",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "off",
+    "at": "S13-11",
+    "why": "D96: no license is checked by Rosie for this work; the instructor certificate is the school's own word, not checked"
+   },
+   {
+    "op": "words",
+    "at": "S1-60",
+    "does": "The license can stop the work and cut what may be offered, so it comes before prices and money. The flight school needs no state license checked here, so nothing is looked up.",
+    "more": [
+     "The plug-in names no license to check (D96): none is asked or looked up.",
+     "A license or insurance the business holds is its own word, optional, shown as that.",
+     "Nothing goes live on a guess."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S1-61",
+    "does": "The plug-in names no license to check here. Rosie asks for the business registration only if the business has one. It's shown as the business's own word: nothing is looked up.",
+    "say": [
+     [
+      "san",
+      "owner",
+      "Send the business's registration number, if it has one. It's shown as your word; nothing is looked up."
+     ],
+     [
+      "owner",
+      "san",
+      "Registration EX-1187"
+     ],
+     [
+      "san",
+      "owner",
+      "Thanks. It's saved as your word, not checked. Customers see no license claim."
+     ]
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-28",
+    "does": "Decides which check runs on what each person added on their secure page. For this work none runs: no person license is checked.",
+    "more": [
+     "The plug-in says which, and which official lookup checks it: none for this work (D96).",
+     "the instructor certificate is the school's own word, not checked",
+     "Safe default: no person license is checked here."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "S2-29",
+    "does": "The plug-in names no license for each person, so nobody is asked for a number. A certificate the plug-in names is the the flight school's own word: shown as that, and nothing is looked up.",
+    "more": [
+     "Nothing is asked on the secure page for a license; a certificate is optional, the the flight school's word.",
+     "It limits no services. Customers see no license claim for that person."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "B6-13",
+    "say": [
+     [
+      "san",
+      "cust",
+      "You're booked! Give this code at the hangar when you arrive.",
+      {
+       "card": {
+        "title": "Lee Flight Lessons · {{svc.intext:Flight booking}}",
+        "lines": [
+         "Thu Oct 22 · starts at 8:00am · Ravi",
+         "{{pay.price}}",
+         "{{pay.took}}",
+         "{{pay.cancel}}",
+         "The address and way in, from your booking"
+        ]
+       },
+       "code": "5160",
+       "buttons": [
+        "Change the time",
+        "Call off the visit"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "1 Arrival windows",
+    "why": "a flight lesson starts at a set time"
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "no stays"
+   },
+   {
+    "op": "off",
+    "at": "B7-55",
+    "label": "Sent now: the pro's on the way",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B8-58",
+    "label": "Sent now: OMW right away",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B6-03",
+    "label": "Sent now: the on-call pro",
+    "why": "nobody is on call for flight lessons (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B4-16",
+    "label": "Takes 'Send someone now'",
+    "why": "never sent now (S2-30)"
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "an adult is always there for a flight review"
+   },
+   {
+    "op": "off",
+    "at": "B8-03",
+    "label": "Nobody needs to be home",
+    "why": "the customer must be there"
+   },
+   {
+    "op": "off",
+    "at": "B4-43",
+    "label": "A plan or warranty pays",
+    "why": "this work never bills a plan or insurance"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Insurance pays part",
+    "why": "no insurance plan is billed for flight training"
+   },
+   {
+    "op": "off",
+    "at": "B9-19",
+    "label": "Paid in stages",
+    "why": "a series is paid by a deposit and the bill, not in stages"
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "every flight visit is rated"
+   }
+  ]
+ },
+ "notes": "Built Oct 27 by Haiku builder C4 from driving-school (refitted, 0/0) and the Oct 24 flight sample plug-in (test-drive kept: its verified gaps are in work/gaps/flight-school.json).\nMoney is by block, not by meter: the 2-hour dual lesson is $470 (2 hours of aircraft at $165 plus the instructor at $70); a flight past the block needs the student's yes first (the master's rule). This closes test-drive gap 1 without a new rule.\nPaths A: card|card dual lesson ($470, fee $75, charged at DONE); card|counter 1-hour ground lesson ($90, fee $75, desk); full|none discovery flight ($149); deposit|counter ground school course ($399: $100 deposit now, $299 rest at the front desk at the first evening; no set-day charge, D65).\nPaths B: card|card flight review in the customer's own aircraft ($255, fee $75, DONE); full|none ground school seat at a host's place ($45, fee $40); deposit|bill transition series ($1,200 estimate: $300 deposit, $900 rest on the bill after the last visit).\nD96: no license, certificate or insurance is checked by Rosie. S1-60 'A license' off, S2-28 'Yes, each one' off, D96 steps S1-32 to S13-11 off (as the golf pilot did), words on S1-60, S1-61, S2-28, S2-29 say nothing is looked up.\nD97: the $2 applies; S1-62 'No $2' off. S2-30 sent now off; no sent-now or on-call branch is on.\nHealth privacy agreement (S1-71 'Yes: sign it now') off: this is not health care. Medical certificate, citizenship and weight answers stay on the secure page.\nSensitive switch OFF (decision for the verifier): the flight school's medical answers are asked on the secure page; the master keeps health details out of texts. Main-session rule: sensitive is for health and grief work.\nConfirmations (A6-14, B6-13): a words op sets the card title to the generic 'Flight booking' because the master's service-name slot shows the example name on every path (MASTER line in the log).\nChildren: a discovery flight or lesson under 16 has a parent at the airport; a student pilot of 16 or 17 may come alone with the parent's signed OK (A8-67 kept both). Solos are for certificate holders only.\nSplits kept: S1-60, S1-80 (aircraft and simulator as spaces), A4-43, A4-66 (person, seat, space), A7-59, A7-15, A7-63 (checkride date set by the examiner), A7-68, A8-02, A8-67, S11-87, S11-90; B: S1-60, S1-38, S1-80, B4-78 (aircraft owned by someone else), B5-34, B7-62, S11-87, S11-90.\nNot sure (verifier): block pricing for a school that also flies shorter; whether the 2-seat trainer block ($410) should be a path; the impaired student and fee (owner's call; a gap in A8-51); the 8-hour duty rule is the owner's own rule (a switch in the master is not live).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "Classic cuts, fades and hot towel shaves.",
+    "books a skin fade for",
+    "gives the job's address alone to their contact",
+    "Sam named you their emergency contact.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "no cut of",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sets nobody on call: no jobs sent now",
+    "Jobs sent now are never offered.",
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "Every shop service, color and house calls",
+    "at the shop and for house calls",
+    "the visit fee",
+    "At the shop, and house calls",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "raises the haircut to $40",
+    "Next: Sat Nov 28 · 10:00am",
+    "Ben's AI asks for a skin fade at $35, an old price.",
+    "A skin fade at Lee's Barbershop is $40, not $35.",
+    "Priced from your photos",
+    "raise haircut to 40",
+    "Priced at the chair",
+    "What happens at the chair?",
+    "A haircut could mean a salon or a barbershop.",
+    "Books a cut every 4 weeks",
+    "Books the groom's party together",
+    "May the shop show photos of your hair?",
+    "Color always stays with Riley.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Your haircut is part of a plan with Riley, every 4 weeks.",
+    "A cut is rated, so the shop takes the first branch.",
+    "kids cuts",
+    "kids cut",
+    "Kids cut",
+    "It's a beard trim today at 2:00pm with Avery, for a new customer. It's $20.",
+    "accept the beard trim today at 2:00pm with Avery",
+    "priced from photos",
+    "Color and cut",
+    "color and cut",
+    "color quote",
+    "Sam adds massage to Lee's Barbershop.",
+    "NEW massage",
+    "Massage for Lee's Barbershop: is it the same company?",
+    "Hola, ¿habla español? Quiero un corte el sábado.",
+    "I'd like a cut on Saturday.",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Lee's Barbershop LLC",
+    "Lee's Barbershop",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "Oak St",
+    "a barber",
+    "A barber",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "Barbering",
+    "barbers",
+    "Barber",
+    "barber",
+    "barbershop",
+    "Barbershop",
+    "shops",
+    "Shop",
+    "1 At the shop",
+    "Only at the shop",
+    "Books a free fix, if Sam says so",
+    "Alex asks for a fix",
+    "shop",
+    "Signature cut and hot towel shave",
+    "Signature cut and shave",
+    "signature cut",
+    "The Groom's package",
+    "the Groom's package",
+    "Groom's package",
+    "Haircuts",
+    "haircuts",
+    "A haircut",
+    "a haircut",
+    "Haircut",
+    "haircut",
+    "a beard trim",
+    "Beard trim",
+    "beard trim",
+    "$55",
+    "$35",
+    "paid at the chair",
+    "at the chair",
+    "in the chair",
+    "the chair",
+    "Jobs",
+    "jobs",
+    "Job",
+    "job",
+    "cuts",
+    "cut",
+    "every 4 weeks",
+    "skin fades",
+    "skin fade",
+    "Skin fade",
+    "Skin fade",
+    "skin fade",
+    "color correction",
+    "a perm",
+    "perms",
+    "perm",
+    "The cape clip",
+    "the cape clip",
+    "NOTE Alex M.: #2 on the sides, scissors on top, low beard line",
+    "barbershops",
+    "Color correction",
+    "water heater",
+    "a color touch-up checked from photos is free: nothing before, nothing after.",
+    "Saturday mornings are paid by the bill Rosie sends.",
+    "Saturday mornings are paid by the saved card at DONE."
+   ],
+   "B": [
+    "the shutoff valves",
+    "Can Jordan also run a camera down my sewer line?",
+    "Sewer camera inspection · $199",
+    "added a camera inspection to",
+    "$160 for today's extra work",
+    "can start the sewer camera inspection at a set time",
+    "like the sewer camera inspection",
+    "Plumbing for homes in Springfield. Drain clearing and water heaters, within 25 miles.",
+    "A water heater job",
+    "up to the $89 service call",
+    "It's a leak under the sink, today",
+    "The service call is $89. Accept it?",
+    "Hi, it's about a leaking pipe under my sink.",
+    "A haircut could mean a salon or a barbershop.",
+    "'My sink won't drain' fits a drain clearing.",
+    "Like tapping a neighbor's water line without asking.",
+    "two drain clearings",
+    "I found water damage under the sink this morning.",
+    "the kitchen drain",
+    "gives the job's address alone to their contact",
+    "Sam named you their emergency contact.",
+    "Why: one service can have two places with different money, like a haircut at the shop or at home.",
+    "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Sets nobody on call: no jobs sent now",
+    "Jobs sent now are never offered.",
+    "Your work takes no jobs sent now, so nobody needs to be on call.",
+    "Riley: barber, color and house calls",
+    "Avery: barber",
+    "at the shop and for house calls",
+    "the visit fee",
+    "At the shop, and house calls",
+    "Why: many barbers, salons and groomers are licensed to their shop.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "The door stayed shut.",
+    "for that window",
+    "the safety check comes before the door opens",
+    "before letting anyone in",
+    "Jordan and Alex check the work",
+    "The $160 valve quote is good for 7 days.",
+    "Sam adds heating and cooling to Lee Home Services.",
+    "NEW heating and cooling",
+    "Heating and cooling for Lee Home Services: is it the same company?",
+    "You go to customers",
+    "Service call fee",
+    "service call fee",
+    "Drain clearings already booked keep $179",
+    "Drain clearing plans",
+    "at the door",
+    "JP031552",
+    "MP045210",
+    "BS20981",
+    "EC22871",
+    "JE30417",
+    "Lee's Barbershop",
+    "Lee Home Services LLC",
+    "Lee Home Services'",
+    "Lee Home Services",
+    "leehomeservices.com",
+    "Riley Chen",
+    "Riley",
+    "Avery Diaz",
+    "Avery",
+    "Jordan Price",
+    "Jordan",
+    "Casey Moore",
+    "Casey",
+    "1200 Main St",
+    "88 Elm St",
+    "Elm St",
+    "42 Oak St",
+    "a plumber",
+    "a barber",
+    "plumbing and electrical",
+    "Electrical",
+    "electrical",
+    "Plumbing",
+    "plumbing",
+    "plumber",
+    "barbers",
+    "Barber",
+    "barber",
+    "barbershop",
+    "Shop",
+    "2 At the shop",
+    "Booked at the shop: the other flow goes on from here.",
+    "shop",
+    "Kitchen drain clearing",
+    "Drain clearing",
+    "drain clearing",
+    "Water heater flush",
+    "water heater flush",
+    "arriving 8–10am",
+    "8–10am",
+    "arriving 12–2pm",
+    "12–2pm",
+    "Thursday morning",
+    "Thu Oct 22, 8:20am",
+    "Thu Oct 22, 8:05am",
+    "Thu Oct 22, 9:10am",
+    "$150",
+    "$110",
+    "$40",
+    "Jobs",
+    "jobs",
+    "Job",
+    "job",
+    "barbershops",
+    "for a haircut instead",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again. It's under the 1-year labor warranty.",
+    "The drain clogs again 2 weeks later. It's inside the 1-year labor warranty, so Sam OKs a free return visit at $0, with its own code.",
+    "The kitchen drain is clogged again.",
+    "Adding a faucet check? Say so.",
+    "Just the kitchen sink.",
+    "Send Alex M. $600 for the water heater replacement, not $640?",
+    "Price needed: Alex M., water heater replacement.",
+    "your water heater replacement at {{price:$90}}",
+    "couldn't price your water heater this time",
+    "The $640 water heater is over the plug-in's amount",
+    "Say Alex also asks about a dripping faucet.",
+    "with one arrival window and one code",
+    "like new pipes put in one day and finished another.",
+    "like 'Is the sink still full of water?'",
+    "like an overflowing drain at night",
+    "It's overflowing. Can someone come tonight?",
+    "The $179 drain needs none.",
+    "Please clear the cabinet under the sink.",
+    "Can I run the dishwasher before you come?",
+    "Alex texts that the sink is now overflowing.",
+    "The sink is overflowing onto the floor now.",
+    "Can I skip next week's drain cleaning?",
+    "a drain cleaning at two rentals every 3 months",
+    "yard drain needs nobody home",
+    "old water stain on the cabinet floor",
+    "QUOTE 245 valve 165 supply line 80",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Extra for Alex M.: replace both shutoff valves, $160.",
+    "you said yes to replacing both shutoff valves for $160",
+    "HAZARD mold behind the sink wall, stopped",
+    "cabinet floor",
+    "shutoff valve only",
+    "Leave the supply line.",
+    "fixes the shutoff valve today",
+    "The $80 supply line",
+    "for your repipe",
+    "QUOTE 2400 repipe, 3 stages",
+    "Sewer camera inspection",
+    "Service call",
+    "service call",
+    "Leak repair",
+    "Water heater replacement",
+    "sewer camera report",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "repipe",
+    "the valve is off",
+    "under the sink",
+    "bathroom sink",
+    "The $160 valve quote is good for 7 days.",
+    "Yes, it won't drain",
+    "DONE 179 drain",
+    "leak repair is $620",
+    "leak repair",
+    "roof leak",
+    "A fix-a-leak class.",
+    "to shut the cold-water valve",
+    "a gas smell",
+    "My kitchen drain is clogged.",
+    "which drain is clogged",
+    "the leak",
+    "replaces water heaters",
+    "Is the sink still full of water?",
+    "Replace both shutoff valves",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Your drain is under warranty, so this visit is free.",
+    "for a bathroom drain.",
+    "the water heater quote",
+    "Drain clearings already booked",
+    "a yard drain this Thursday",
+    "Water is coming out of the water heater.",
+    "Shut the cold-water valve, above the heater.",
+    "Cabinet floor, before",
+    "Under the sink, before",
+    "Mold behind the sink wall",
+    "Not done: the pipe behind the wall",
+    "Kitchen drain",
+    "Yard drain",
+    "Water heater fix",
+    "Classic cuts, fades and hot towel shaves.",
+    "Found: mold behind the sink wall",
+    "Mold behind the sink wall",
+    "Sale agua del calentador.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "¿Huele a gas?",
+    "No huele a gas."
+   ]
+  },
+  "A": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S2-28": "549fd7ae22",
+   "S1-71": "d5b18e87e4",
+   "S1-32": "60f59eda70",
+   "S1-33": "eeaadba298",
+   "S2-22": "6fe11c094c",
+   "S11-48": "03f824b27b",
+   "S11-50": "c4536a448c",
+   "S11-99": "efed1e4f4d",
+   "S11-57": "a3996ae84e",
+   "S12-19": "07db0515b2",
+   "S13-41": "18b280aaa2",
+   "S13-43": "a1049201f6",
+   "S13-11": "4345036419",
+   "S1-61": "7421d186d5",
+   "S2-29": "974ca3a481",
+   "A6-14": "b17b52115e",
+   "A4-66": "f622d7fe12",
+   "A8-53": "33f4da69f5",
+   "A8-03": "7accda6f86",
+   "A10-34": "78c2d9a6a3",
+   "A4-28": "c8e677520c",
+   "A9-15": "bd2a17c3c5",
+   "A10-06": "a9f01f141d",
+   "A4-43": "c17d56f766"
+  },
+  "B": {
+   "S1-60": "235c90a3c3",
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "S2-28": "549fd7ae22",
+   "S1-71": "d5b18e87e4",
+   "S1-32": "60f59eda70",
+   "S1-33": "2b5d1fa4ab",
+   "S2-22": "6fe11c094c",
+   "S11-48": "6fd1c7b7b9",
+   "S11-50": "b9d718f51a",
+   "S11-99": "a97de4ca58",
+   "S11-57": "2f34f23d8a",
+   "S12-19": "176d3d2beb",
+   "S13-41": "fb75fbb382",
+   "S13-43": "55206e4cb1",
+   "S13-11": "6561316ed7",
+   "S1-61": "e30e71f65d",
+   "S2-29": "974ca3a481",
+   "B6-13": "ed1f412f7d",
+   "B4-83": "a7473a80ea",
+   "B7-55": "3ce84c57a3",
+   "B8-58": "6a101417a1",
+   "B6-03": "dcc1eb310c",
+   "B4-16": "37cd99137d",
+   "B8-67": "b66ffbd04d",
+   "B8-03": "ac9d404766",
+   "B4-43": "fc9855955a",
+   "B9-19": "b97bfbf0d2",
+   "B10-32": "7713bff255"
+  }
+ }
+}

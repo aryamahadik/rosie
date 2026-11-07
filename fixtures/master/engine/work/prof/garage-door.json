@@ -1,0 +1,3175 @@
+{
+ "id": "garage-door",
+ "name": "Garage door technician",
+ "style": "Home visit",
+ "pattern": "fix",
+ "from": "plumber",
+ "plugin": {
+  "pf.license": {
+   "need": "Garage door work needs a license where the state, county or city licenses door or home repair contractors. Some places license it only above a job amount.",
+   "who holds it": "The company, where a license is required. Each door tech only where the state's form licenses door techs.",
+   "what to ask": [
+    "The company's license number and class, where the state's form asks",
+    "Each door tech's own number, in their invite reply, only where the state asks",
+    "Insurance, and a bond where the state's form asks for one"
+   ],
+   "how it's checked": "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+   "blocks going live": "nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked",
+   "renewals": "Reminders before each expiry, on the dates the owner picks. A lapsed license pauses new bookings for that person.",
+   "insurance or bond": "Liability insurance, and a bond where the state's form asks: from the state form.",
+   "background checks": "Only where the state's form asks.",
+   "electrical work": "A new outlet or a hardwired opener circuit is electrical work. It's booked only where the company holds the electrical license the place requires; otherwise an electrician comes first.",
+   "at the counter": "Setting up remotes and keypads and repairing opener parts at the counter: the state's form says if it needs a license. Safe default: the business registration on file.",
+   "local rules": "Some cities and counties license door work or need a permit of their own, like for a new door: the form for that place applies, by the customer's address."
+  },
+  "pf.services": {
+   "at the customer's place (the example: Bayside Garage Doors' own list)": [
+    {
+     "service": "Visit fee (find any problem)",
+     "price kind": "one price",
+     "price": "$89, taken off the repair",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 fee",
+     "after": "Rosie texts the bill",
+     "note": "Goes on the jobs below; not booked alone"
+    },
+    {
+     "service": "Spring replacement (both springs)",
+     "price kind": "one price",
+     "price": "$179, the $89 visit included",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 visit fee",
+     "after": "Rosie texts the bill",
+     "note": "Springs are always replaced as a pair, sized to the door (the business's rule): one new spring beside an old one leaves the door out of balance"
+    },
+    {
+     "service": "Door repair (off track, cables, rollers, hinges)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 visit fee is promised",
+     "length": "60 to 90 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 visit fee",
+     "after": "Rosie texts the bill",
+     "note": "Every part is listed on the quote, before any work"
+    },
+    {
+     "service": "Opener repair (gears, sensors, limits)",
+     "price kind": "quoted at the visit",
+     "price": "only the $89 visit fee is promised",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 visit fee",
+     "after": "Rosie texts the bill"
+    },
+    {
+     "service": "Tune-up and safety check",
+     "price kind": "one price",
+     "price": "$150",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Also a yearly plan"
+    },
+    {
+     "service": "New opener, put in (with safety sensors)",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $640)",
+     "length": "half a day",
+     "place": "at the customer's place",
+     "before": "a 25% deposit once the quote is OK'd",
+     "after": "the rest on the bill",
+     "note": "Plugs into an outlet already on the ceiling. A new outlet or circuit is electrical work (see the license)."
+    },
+    {
+     "service": "New garage door",
+     "price kind": "free estimate visit first, then a quote",
+     "price": "the quote (the example: $2,400, paid in stages)",
+     "length": "a day",
+     "place": "at the customer's place",
+     "before": "a deposit once the estimate is signed",
+     "after": "each stage billed when it's done",
+     "note": "Never booked at once. The business pulls the permit, where the local rules require one."
+    },
+    {
+     "service": "Door safety inspection, with a written report",
+     "price kind": "by person",
+     "price": "the example: $199, or $249 when the owner goes himself",
+     "length": "60 min",
+     "place": "at the customer's place",
+     "before": "a card saved for the $89 visit fee",
+     "after": "Rosie texts the bill",
+     "note": "The report link comes later"
+    },
+    {
+     "service": "Urgent visit (a door stuck shut, a car inside)",
+     "price kind": "one price",
+     "price": "$129, taken off the repair",
+     "length": "sent now: an arrival estimate, not a window",
+     "place": "at the customer's place",
+     "before": "a card saved for the $129 fee",
+     "after": "Rosie texts the bill",
+     "note": "Sent now to the tech on call, then the backup. Free to cancel until he texts OMW."
+    }
+   ],
+   "at the business (the example: Bayside Door Parts' counter)": [
+    {
+     "service": "Remote set up (bring the old remote, or the opener's model)",
+     "price kind": "one price",
+     "price": "$35",
+     "length": "30 min",
+     "place": "both: at the counter, or at the customer's home as a $75 home visit paid in full",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Opener board test (bring the opener's circuit board)",
+     "price kind": "one price",
+     "price": "$40",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "New remote battery and case",
+     "price kind": "one price",
+     "price": "$20",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "Often added at the visit"
+    },
+    {
+     "service": "Keypad set up",
+     "price kind": "one price",
+     "price": "$25",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Opener gear kit, fitted (bring the opener's motor unit)",
+     "price kind": "one price",
+     "price": "$55",
+     "length": "60 min",
+     "place": "at the counter",
+     "before": "the full price",
+     "after": "nothing more"
+    },
+    {
+     "service": "Opener rebuild (gears, board and sensors)",
+     "price kind": "one price",
+     "price": "$140",
+     "length": "2½ hours, or a drop-off",
+     "place": "at the counter",
+     "before": "a card saved for the $40 fee (over 2 hours)",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Older opener board repair",
+     "price kind": "quoted from photos",
+     "price": "the quote (the example: $90)",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter",
+     "note": "The owner OKs each quote. Only Gina does board repairs."
+    },
+    {
+     "service": "Opener part repair",
+     "price kind": "quoted at the visit",
+     "price": "only the $25 bench check is promised",
+     "place": "at the counter",
+     "before": "a card saved for the $20 fee",
+     "after": "paid at the counter"
+    },
+    {
+     "service": "Video check of an opener or a remote",
+     "price kind": "the owner's own price",
+     "place": "at the business (a video session)",
+     "before": "the full price",
+     "after": "nothing more",
+     "note": "Only where the owner offers it. No spring or cable work is ever talked through by video."
+    }
+   ],
+   "capacity": "One tech per booking. A new door or a heavy double door can need a crew of two. The counter's board repairs need its one test bench.",
+   "skills each needs": "Springs and cables, openers, new doors and gates are separate skills. Board repairs at the counter need the board skill.",
+   "nobody home": "Never: an adult (18 or older) must be home for the whole visit, ticked on the booking page.",
+   "online": "A video check of an opener or a remote only, where the owner offers it. No repair is done by video.",
+   "extras": "Travel inside the service area only (the example: 25 miles). Every part is listed on the quote. No tax line unless the owner sets a rate."
+  },
+  "pf.questions": {
+   "before times (they set the price, length or who can go)": [
+    "What's wrong: it won't open or close, a loud bang, it's off its track, the opener, a remote, or a noise",
+    "Is a car stuck inside, and by when must it leave (this sets urgent)",
+    "How many doors, and single or double width",
+    "What the opener does: hums, clicks, or nothing",
+    "Is there a gap in a spring above the door: one, both, or can't tell",
+    "At the counter: which remote or opener, and its brand and model if known"
+   ],
+   "after a time is picked": [
+    "Who will be there: an adult must be home for the whole visit (their name and mobile go on the secure page)",
+    "Are the cables at the bottom corners of the door still attached",
+    "About how old the opener is",
+    "The way into the garage, parking, and pets",
+    "Own or rent, and who pays: the customer, or the landlord or manager"
+   ],
+   "only on the secure page": [
+    "The street address",
+    "A photo of the spring area and the opener's label",
+    "Keypad or gate codes",
+    "The landlord's or manager's name and mobile",
+    "The card"
+   ],
+   "who may book": "An adult. A renter books, and the landlord or manager OKs it where they pay. A person the home's owner names may book for them."
+  },
+  "pf.safety": {
+   "stops the booking": [
+    {
+     "words": "Someone hurt, or pinned under the door",
+     "says": "Call 911 now. Don't try to lift the door yourself.",
+     "booking": "No booking until it's safe; the customer can come back."
+    }
+   ],
+   "safety steps, then the booking goes on, marked urgent": [
+    {
+     "words": "A loud bang, a broken spring, a snapped cable, or a door hanging crooked",
+     "says": "Don't lift the door, pull the red release cord, or touch the springs. The door is very heavy now and can drop. Keep people, pets and the car clear."
+    },
+    {
+     "words": "An opener that won't stop, or won't go back up",
+     "says": "Unplug the opener, and keep everyone clear of the door."
+    },
+    {
+     "words": "A car stuck inside",
+     "says": "Don't force the door. A tech comes first; a ride is safer if you must leave sooner."
+    }
+   ],
+   "Rosie's rule": "Rosie never explains how to release, adjust or wind a spring. Safety answers come word for word from the business's own safety notes.",
+   "at the counter": "Springs and lift cables are never sold at the counter for a customer to put on. A spring job is a home visit by a tech.",
+   "a repair declined": "A part the tech marks as a danger (frayed cables, a door that can drop, an opener that fails its test) is left safe: the door shut, or the opener unplugged. The customer gets the written safety note.",
+   "general screen": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first."
+  },
+  "pf.first_steps": {
+   "before the main visit": [
+    {
+     "step": "An estimate visit (free)",
+     "for": "A new garage door",
+     "timing": "Before the quote; never booked at once"
+    },
+    {
+     "step": "Photos first",
+     "for": "A new opener",
+     "timing": "Before the quote, on the secure page: the door, the ceiling and the outlet"
+    },
+    {
+     "step": "A permit",
+     "for": "A new door, where the local rules require one",
+     "timing": "Pulled by the business before the work (a to-do for the owner)"
+    },
+    {
+     "step": "An electrician first",
+     "for": "A new opener that needs a new outlet or a hardwired circuit",
+     "timing": "Before the install, unless the company holds the electrical license the place requires"
+    },
+    {
+     "step": "The owner's OK",
+     "for": "Same-day urgent jobs",
+     "timing": "Before the booking is confirmed"
+    },
+    {
+     "step": "A model check (the old remote or board brought in)",
+     "for": "A special-order remote or board at the counter",
+     "timing": "At least 2 days before; stays good 3 months"
+    }
+   ],
+   "prep for the reminder": [
+    "Don't use the door or the opener if a spring or cable is broken",
+    "Clear the area under the door and around the opener",
+    "Put pets in another room",
+    "At the counter: bring the old remote, or the opener's model and a photo of its label; bring a board in an anti-static bag if you have one"
+   ]
+  },
+  "pf.visit": {
+   "check-in at the customer's place": "The check-in code at the door. The on-my-way text names the tech, with a photo. An adult stays home for the whole visit.",
+   "check-in at the counter": "The code at the counter (the tech or the desk types it). A drop-off gets its code when the opener is left, and READY when it's tested.",
+   "quotes at the visit": "The tech texts the quote with every part listed, before any work. It can be lines to say yes to one by one: springs, cables, rollers. The customer may OK part of it. The quote stays good 7 days.",
+   "springs": "Springs are replaced as a pair, sized to the door's weight.",
+   "extra work": "Quoted by text up to the owner's limit (the example: $500). Above it, the owner OKs it first. A new opener or a new door gets its own quote.",
+   "work sold at the home": "A written right to cancel for extras and new jobs sold at the home, where the rules require it. The repair the customer asked for isn't an extra.",
+   "safety test": "After every repair, before DONE: the auto-reverse test. The door must go back up when it touches a board laid flat under it, and when the light beam is blocked. A fail: the tech resets the opener's force and travel limits and tests again. Still a fail: the opener is unplugged, the door is left working by hand, and a new opener gets its own quote.",
+   "before work": "Photos of the door, springs and opener before work.",
+   "proof it's done": "The tech texts DONE with the bill's lines once the test passes, and photos after.",
+   "permits": "Where a permit was pulled for a new door, the inspector's visit is set up after the work, and the result is kept with the job."
+  },
+  "pf.money": {
+   "starting answers": [
+    "At the customer's place: a card saved for the $89 visit fee, and Rosie texts the bill after the job",
+    "An owner may save a card only, with no hold (the old example's own choice)",
+    "An urgent visit sent now: the $129 urgent visit, a card saved for it, taken off the repair",
+    "At the counter: nothing taken; a card saved for the $20 fee; paid at the counter. Over 2 hours: a card saved for the $40 fee"
+   ],
+   "limits": [
+    "Work quoted at the visit: nothing more than the visit fee is taken before",
+    "Deposits only on quoted installs (the example: 25% on a new opener; a new door in stages). Deposit cap: from the state form",
+    "Free to cancel until the tech heads out. After that, or nobody home: the visit fee, which the owner confirms each time; no answer, no fee",
+    "Emergency prices: where the state's rules limit prices in a declared emergency, those limits apply"
+   ],
+   "insurance and plans": "A home warranty plan pays only once the owner checks it. Insurance (a car backed into the door): the customer pays, and gets the receipt and photos for the claim.",
+   "tips": "Off by default.",
+   "tax": "No tax line unless the owner sets a rate where the state taxes the work.",
+   "parts": "Every part is listed on the quote; parts billed after go on the bill.",
+   "Rosfield's $2": "Applies, as for every kind of work."
+  },
+  "pf.messages": {
+   "never in a text": "Keypad and gate codes, card details, and photos from inside the garage: these stay on the secure page.",
+   "languages": "English and Spanish.",
+   "danger words": "Someone hurt or pinned under the door always gets 'call 911' first, before anything else."
+  },
+  "pf.staff": {
+   "levels": "Door techs and a lead tech. A person's license only where the state licenses door techs.",
+   "skills": [
+    "Springs and cables",
+    "Doors off track, rollers and hinges",
+    "Openers",
+    "New doors",
+    "Gates and gate openers",
+    "Counter: remotes, keypads and boards"
+   ],
+   "supervision": "A helper works only with a tech on the job, and never on springs alone.",
+   "special work": "Electrical work for a new opener only by people with that license, where the place requires one.",
+   "who OKs what": "The owner OKs fees, quotes over the limit and same-day urgent jobs. A job sent now goes to the tech on call, then the backup set at sign-up. An office manager may OK prices if the owner sets it.",
+   "stand-ins": "Another tech with the same skill, at the same window and price."
+  },
+  "pf.rules": {
+   "written estimate": "A written estimate or contract before work above an amount: from the state form.",
+   "right to cancel": "A written right to cancel for extras and new jobs sold at the home: where the rules require it. A new job sold at the home (a new opener or door) is put in after the cancel days end, where the rules require it.",
+   "license on papers": "The license number on the listing, quotes and bills: from the state form.",
+   "permits": "Pulled by the business for a new door where the local rules require one; the inspection follows.",
+   "declared emergency": "Price limits in a declared emergency: where the state's rules require it.",
+   "warranty": "The owner's own (the example: springs 3 years on parts, labor 1 year), shown on the receipt.",
+   "opener safety": "Every repair ends with the auto-reverse test. A new opener has its own reversing sensors.",
+   "state notices": "A state's own notices for home repairs: from the state form, sent before the work or with the quote.",
+   "records": "7 years, as for every kind of work, with each safety test result."
+  },
+  "pf.edges": {
+   "all": "Every edge case is handled the general way. These matter most for garage doors:",
+   "garage doors": [
+    "A car stuck inside: marked urgent, and sent now where someone is on call",
+    "Someone hurt or pinned under the door: call 911 first, no booking",
+    "The door gets worse before the visit: the safety steps again, then urgent",
+    "Asked how to fix a spring: never explained; the safety words, word for word",
+    "Nobody home at the door: the no-show steps, with the owner's OK before any fee",
+    "A part found worn at the visit (frayed cables): its own line on the quote; declined, it's noted with a safety note",
+    "The auto-reverse test fails: the force reset and tested again, or the opener unplugged and quoted on its own",
+    "A new opener needs a new outlet: an electrician first, unless the company holds that license",
+    "A renter whose landlord pays: the landlord's OK first, or the renter pays instead",
+    "A storm brings many calls: PAUSE, and a declared emergency's price limits",
+    "At the counter: a board that can't be repaired, a customer asking for springs, or a drop-off nobody picks up"
+   ]
+  },
+  "pf.facts": [
+   "photos",
+   "documents",
+   "extrawork",
+   "firststeps"
+  ],
+  "pf.switches": {
+   "cancelright": {
+    "A": false,
+    "B": true
+   }
+  },
+  "pf.settings": {
+   "arrive": {
+    "A": "setstart",
+    "B": "window"
+   },
+   "cutoff": "24 hours before"
+  }
+ },
+ "rename": {
+  "A": [
+   [
+    "a leak under the sink, today",
+    "a door off its track in the garage, today"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a broken spring, gets the safety steps first."
+   ],
+   [
+    "under the sink, today",
+    "in the garage, today"
+   ],
+   [
+    "Real danger, like a broken spring or someone pinned under a door, gets the safety steps first.",
+    "Real danger, like a broken spring, gets the safety steps first."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "1-year labor warranty: reply here if there's a problem."
+   ],
+   [
+    "fades and hot towel shaves",
+    "opener tune-ups and remotes"
+   ],
+   [
+    "barbershops",
+    "door companies"
+   ],
+   [
+    "asks for a perm",
+    "asks for a driveway gate"
+   ],
+   [
+    "skin fades",
+    "tune-ups"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "a spring that snapped"
+   ],
+   [
+    "water damage under the sink this morning",
+    "a cracked panel this morning"
+   ],
+   [
+    "a door off its track under the sink",
+    "a door off its track in the garage"
+   ],
+   [
+    "My sink won't drain",
+    "My door won't close"
+   ],
+   [
+    "wall pipe",
+    "wall track"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "opening a neighbor's garage without asking"
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a remote check?"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across",
+    "A landlord brings in remotes for five garages, on one morning. Rosie finds counter spots side by side across"
+   ],
+   [
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Two remotes from one garage work the same way. Both are asked before the times."
+   ],
+   [
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Gina can still fit the setup if you're here by 11:20, or you can move to a later time."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Springs have a set price. A door off its track is priced at the visit. Someone pinned stops the booking."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company, and one for each door tech where the state asks."
+   ],
+   [
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "An opener rebuild can be a drop-off: Alex leaves the opener, and picks it up when it's ready."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A door tech's example: a broken spring gets 'don't lift the door or touch the springs'."
+   ],
+   [
+    "Lee Home Services can book you for plumbing and electrical from now on.",
+    "Lee Home Services can book you for doors and gates from now on."
+   ],
+   [
+    "Add photos of your hair, and a barber will price your color and cut",
+    "Add photos of your opener's board, and a counter tech will price your board repair"
+   ],
+   [
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Sam Lee added you to the team for garage door and gate jobs."
+   ],
+   [
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "Gina says to keep the remote out of the car and bring it in as booked. Or you can move your visit, with no fee."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "A barbershop's plug-in adds no danger words of its own.",
+    "The garage door plug-in adds its own: someone hurt or pinned under a door."
+   ],
+   [
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "Alex M. says the bench clamp cracked a remote's case today."
+   ],
+   [
+    "The rash on my scalp got worse. Can I still come in?",
+    "My remote's battery is swollen now. Can I still come in?"
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Door work takes jobs sent now. The counter takes none."
+   ],
+   [
+    "#2 on the sides, scissors on top, low beard line",
+    "3-button remote, code matched, new battery"
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Door work takes jobs sent now, like a door stuck shut."
+   ],
+   [
+    "A barbershop has none, so nothing is sent here.",
+    "Here, for a spring that broke at home: don't lift the door or touch the springs. A tech comes to the home for it."
+   ],
+   [
+    "The signed form this service needs is missing.",
+    "Some pieces of the opener are missing."
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A remote could mean a garage door remote or a gate remote."
+   ],
+   [
+    "Promises the $25 consult; priced at the chair",
+    "Promises the $25 bench check, then prices it"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "The counter's license, and each counter tech's, only where the state asks."
+   ],
+   [
+    "Can my son wait in the shop during my cut?",
+    "Can I drop the remote off and come back later?"
+   ],
+   [
+    "A beard trim is on the price board: $20.",
+    "A new remote battery is on the price list: $20."
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Doors DT031552 · gates GT30417"
+   ],
+   [
+    "The cape clip ripped my shirt collar.",
+    "The bench clamp cracked my remote's case."
+   ],
+   [
+    "Saturday's cut is uneven on one side",
+    "Saturday's remote still works only up close"
+   ],
+   [
+    "Do you do kids cuts? My son is 8.",
+    "Do you set up keypads too?"
+   ],
+   [
+    "Alex asks for a cut every 4 weeks",
+    "Alex rents out homes, and asks for a remote setup slot every 4 weeks"
+   ],
+   [
+    "Signature cut and hot towel shave",
+    "Opener gear kit, fitted"
+   ],
+   [
+    "a Kids cut (12 and under) is $25",
+    "a keypad setup is $25"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: doors and gates"
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a door stuck shut or a lockout"
+   ],
+   [
+    "like a 15-minute style consult",
+    "like a 15-minute video check of an opener"
+   ],
+   [
+    "The cut is uneven on one side.",
+    "The remote works only up close."
+   ],
+   [
+    "Color always stays with Riley",
+    "Board repairs always stay with Gina"
+   ],
+   [
+    "Electrical, set like plumbing",
+    "Gates, set like door work"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Remote setup, board test and battery"
+   ],
+   [
+    "I'd like a cut on Saturday.",
+    "I'd like a new remote set up on Saturday."
+   ],
+   [
+    "Does it work like haircuts?",
+    "Does it work like remote setups?"
+   ],
+   [
+    "Quiero un corte el sábado.",
+    "Quiero un control remoto nuevo el sábado."
+   ],
+   [
+    "Books a cut every 4 weeks",
+    "Books a setup slot every 4 weeks"
+   ],
+   [
+    "A haircut needs nothing.",
+    "A remote setup needs the old remote, or the opener's model."
+   ],
+   [
+    "once Riley sees the hair",
+    "once Gina sees the part"
+   ],
+   [
+    "like a skin-test result",
+    "like a model number"
+   ],
+   [
+    "Signature cut and shave",
+    "Opener gear kit, fitted"
+   ],
+   [
+    "Kids cut (12 and under)",
+    "Keypad setup"
+   ],
+   [
+    "color and house calls",
+    "board repairs and home visits"
+   ],
+   [
+    "pays for the consult",
+    "pays for the bench check"
+   ],
+   [
+    "The Groom's package",
+    "The opener rebuild"
+   ],
+   [
+    "the Groom's package",
+    "the opener rebuild"
+   ],
+   [
+    "photos of your hair",
+    "photos of your remote"
+   ],
+   [
+    "Plumbing price list",
+    "Door price list"
+   ],
+   [
+    "Sam adds massage to",
+    "Sam adds key cutting to"
+   ],
+   [
+    "Lee Home Services'",
+    "Bayside Garage Doors'"
+   ],
+   [
+    "color, house calls",
+    "board repairs, home visits"
+   ],
+   [
+    "a color correction",
+    "an opener part repair"
+   ],
+   [
+    "Casey for plumbing",
+    "Casey for doors"
+   ],
+   [
+    "On call · plumbing",
+    "On call · doors"
+   ],
+   [
+    "A color correction",
+    "An opener part repair"
+   ],
+   [
+    "Lee Home Services",
+    "Bayside Garage Doors"
+   ],
+   [
+    "like a burst pipe",
+    "like a door stuck shut"
+   ],
+   [
+    "doesn't do perms.",
+    "doesn't do car key fobs."
+   ],
+   [
+    "Groom's package ·",
+    "Opener rebuild ·"
+   ],
+   [
+    "Lee's Barbershop",
+    "Bayside Door Parts"
+   ],
+   [
+    "the shop's board",
+    "the shop's price list"
+   ],
+   [
+    "Color correction",
+    "Opener part repair"
+   ],
+   [
+    "color correction",
+    "opener part repair"
+   ],
+   [
+    "Shorter is fine",
+    "I'll be there"
+   ],
+   [
+    "Gloss to finish",
+    "New remote case"
+   ],
+   [
+    "Groom's package",
+    "Opener rebuild"
+   ],
+   [
+    "a color and cut",
+    "a board repair"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: doors"
+   ],
+   [
+    "Drain clearing",
+    "Spring replacement"
+   ],
+   [
+    "A water heater",
+    "A new opener"
+   ],
+   [
+    "Panel upgrade",
+    "New gate"
+   ],
+   [
+    "Alex M.'s cut",
+    "Alex M.'s remote setup"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "groom's party",
+    "landlord's remotes"
+   ],
+   [
+    "Signature cut",
+    "Opener gear kit"
+   ],
+   [
+    "signature cut",
+    "opener gear kit"
+   ],
+   [
+    "Color and cut",
+    "Board repair"
+   ],
+   [
+    "color and cut",
+    "board repair"
+   ],
+   [
+    "plumbing jobs",
+    "door jobs"
+   ],
+   [
+    "Lee Electric",
+    "Bayside Gates"
+   ],
+   [
+    "Lee Plumbing",
+    "Bayside Garage Doors"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "Jordan Price",
+    "Andre Willis"
+   ],
+   [
+    "water heater",
+    "opener"
+   ],
+   [
+    "a beard trim",
+    "a new remote battery"
+   ],
+   [
+    "a house call",
+    "a home visit"
+   ],
+   [
+    "Casey Moore",
+    "Luis Ortega"
+   ],
+   [
+    "color quote",
+    "board repair quote"
+   ],
+   [
+    "$25 consult",
+    "$25 bench check"
+   ],
+   [
+    "a skin fade",
+    "an opener board test"
+   ],
+   [
+    "A skin fade",
+    "An opener board test"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "price board",
+    "price list"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "NEW massage",
+    "NEW key cutting"
+   ],
+   [
+    "Massage for",
+    "Key cutting for"
+   ],
+   [
+    "electrical",
+    "gate work"
+   ],
+   [
+    "Electrical",
+    "Gate work"
+   ],
+   [
+    "Riley Chen",
+    "Gina Park"
+   ],
+   [
+    "Avery Diaz",
+    "Hector Ruiz"
+   ],
+   [
+    "does color",
+    "does board repairs"
+   ],
+   [
+    "Beard trim",
+    "New remote battery"
+   ],
+   [
+    "beard trim",
+    "new remote battery"
+   ],
+   [
+    "patch test",
+    "model check"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "barbershop",
+    "parts counter"
+   ],
+   [
+    "Barbershop",
+    "Parts counter"
+   ],
+   [
+    "color plan",
+    "repair plan"
+   ],
+   [
+    "Color plan",
+    "Repair plan"
+   ],
+   [
+    "Electric.",
+    "Double."
+   ],
+   [
+    "88 Elm St",
+    "16 Dock St"
+   ],
+   [
+    "Skin fade",
+    "Opener board test"
+   ],
+   [
+    "skin fade",
+    "opener board test"
+   ],
+   [
+    "Barbering",
+    "Counter work"
+   ],
+   [
+    "MP045210",
+    "GD045210"
+   ],
+   [
+    "JP031552",
+    "DT031552"
+   ],
+   [
+    "Haircuts",
+    "Remote setups"
+   ],
+   [
+    "haircuts",
+    "remote setups"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "a barber",
+    "a counter tech"
+   ],
+   [
+    "Plumbing",
+    "Door work"
+   ],
+   [
+    "plumbing",
+    "door work"
+   ],
+   [
+    "EC22871",
+    "GC22871"
+   ],
+   [
+    "JE30417",
+    "GT30417"
+   ],
+   [
+    "BS20981",
+    "DP20981"
+   ],
+   [
+    "plumber",
+    "door tech"
+   ],
+   [
+    "Plumber",
+    "Door tech"
+   ],
+   [
+    "Haircut",
+    "Remote setup"
+   ],
+   [
+    "haircut",
+    "remote setup"
+   ],
+   [
+    "barbers",
+    "counter techs"
+   ],
+   [
+    "the cut",
+    "the setup"
+   ],
+   [
+    "Elm St",
+    "Dock St"
+   ],
+   [
+    "Jordan",
+    "Andre"
+   ],
+   [
+    "a leak",
+    "a door off its track"
+   ],
+   [
+    "barber",
+    "counter tech"
+   ],
+   [
+    "Barber",
+    "Counter tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Riley",
+    "Gina"
+   ],
+   [
+    "Avery",
+    "Hector"
+   ],
+   [
+    "A cut",
+    "A setup"
+   ],
+   [
+    "gloss",
+    "new remote case"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "a cut",
+    "a setup"
+   ],
+   [
+    "cuts",
+    "setups"
+   ],
+   [
+    "Kids cut",
+    "Spring check"
+   ],
+   [
+    "kids cut",
+    "spring check"
+   ],
+   [
+    "water heaters",
+    "opener repairs"
+   ],
+   [
+    "water heater",
+    "opener"
+   ]
+  ],
+  "B": [
+   [
+    "a leak under the sink, today",
+    "a door off its track in the garage, today"
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a broken spring, gets the safety steps first."
+   ],
+   [
+    "under the sink, today",
+    "in the garage, today"
+   ],
+   [
+    "Real danger, like a broken spring or someone pinned under a door, gets the safety steps first.",
+    "Real danger, like a broken spring, gets the safety steps first."
+   ],
+   [
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "1-year labor warranty: reply here if there's a problem."
+   ],
+   [
+    "fades and hot towel shaves",
+    "opener tune-ups and remotes"
+   ],
+   [
+    "barbershops",
+    "door companies"
+   ],
+   [
+    "asks for a perm",
+    "asks for a driveway gate"
+   ],
+   [
+    "skin fades",
+    "tune-ups"
+   ],
+   [
+    "a leaking pipe under my sink",
+    "a spring that snapped"
+   ],
+   [
+    "water damage under the sink this morning",
+    "a cracked panel this morning"
+   ],
+   [
+    "a door off its track under the sink",
+    "a door off its track in the garage"
+   ],
+   [
+    "My sink won't drain",
+    "My door won't close"
+   ],
+   [
+    "wall pipe",
+    "wall track"
+   ],
+   [
+    "tapping a neighbor's water line without asking",
+    "opening a neighbor's garage without asking"
+   ],
+   [
+    "Adding a faucet check?",
+    "Adding a remote check?"
+   ],
+   [
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "May we call or text you if they miss a safety check?"
+   ],
+   [
+    "You can look for a roofer near you.",
+    "You can look for a locksmith near you."
+   ],
+   [
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "Andre finds the opener's ceiling outlet scorched. The plug-in says a door tech stops there, so Alex gets a written note and the photo."
+   ],
+   [
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "This sounds like an emergency. If anyone is hurt or pinned under the door, call 911 now. Don't try to lift the door yourself."
+   ],
+   [
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Safety stop: a customer's AI said someone is pinned under a door. They got the safety message, and nothing was booked."
+   ],
+   [
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Rosa is told not to lift the door or touch the springs, and to keep everyone clear of it."
+   ],
+   [
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Its questions: what the door does, if a car is stuck inside, and if a spring has a gap."
+   ],
+   [
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "No levante la puerta ni toque los resortes. Mantenga a todos lejos de la puerta."
+   ],
+   [
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Rosie loads the door plug-in now, and the gate and counter ones when Sam gets to them."
+   ],
+   [
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Don't use the door or the opener until the visit. Keep the car and everyone clear of it."
+   ],
+   [
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "Springs have a set price. A door off its track is priced at the visit. Someone pinned stops the booking."
+   ],
+   [
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "My garage door is getting hard to lift, and the springs look worn. Can someone replace them Thursday morning? I'm in Springfield."
+   ],
+   [
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "Don't lift the door or touch the springs. If anyone is hurt, call 911."
+   ],
+   [
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "The request turns out to be for work Bayside Garage Doors doesn't do, like a front door lock."
+   ],
+   [
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Andre found your opener's ceiling outlet scorched and stopped that part of the work."
+   ],
+   [
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "Real danger, like a broken spring or someone pinned under a door, gets the safety steps first."
+   ],
+   [
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A license behind the company, and one for each door tech where the state asks."
+   ],
+   [
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Morgan has a repeat plan: a door service at two rentals every 3 months."
+   ],
+   [
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "Bayside Garage Doors sent you a proposal for a new door, from Andre's notes."
+   ],
+   [
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "A door tech's example: a broken spring gets 'don't lift the door or touch the springs'."
+   ],
+   [
+    "Lee Home Services can book you for plumbing and electrical from now on.",
+    "Lee Home Services can book you for doors and gates from now on."
+   ],
+   [
+    "With Sam's yes, electrical and the shop now show to AI assistants too.",
+    "With Sam's yes, gates and the counter now show to AI assistants too."
+   ],
+   [
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "Hello, do you speak Spanish? A cable on my garage door snapped."
+   ],
+   [
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "My spring broke. Can I wind a new one on myself?"
+   ],
+   [
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Its danger words: someone hurt or pinned under the door."
+   ],
+   [
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Can someone replace my garage door springs this Thursday? What does it cost?"
+   ],
+   [
+    "Add photos of your water heater, and a plumber will price the job.",
+    "Add photos of your door, opener and ceiling outlet, and a door tech will price the job."
+   ],
+   [
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "NOTE springs sized for a 160 lb door. Rollers worn: check next time."
+   ],
+   [
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Sam Lee added you to the team for garage door and gate jobs."
+   ],
+   [
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "Gates and Lee's Barbershop now show to AI assistants too."
+   ],
+   [
+    "many barbers, salons and groomers are licensed to their shop",
+    "some trades are licensed only for work at their own shop"
+   ],
+   [
+    "Jordan finds the leak and texts the price with its lines.",
+    "Andre finds why the door came off and texts the price with its lines."
+   ],
+   [
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Andre found why the door came off. Here's the price to fix it today."
+   ],
+   [
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Yes. The noise is a door repair, quoted at the visit."
+   ],
+   [
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Alex M.'s springs, replaced Thu Oct 22, are out of balance."
+   ],
+   [
+    "Here are Jordan's next times for a bathroom drain.",
+    "Here are Andre's next times for a door off its track."
+   ],
+   [
+    "Jordan says no. Please wait until the job is done.",
+    "Andre says no. Please leave the door shut until he's there."
+   ],
+   [
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Door work takes jobs sent now. The counter takes none."
+   ],
+   [
+    "Told to leave, then call 911 and the gas company",
+    "Told to call 911, and not to lift the door"
+   ],
+   [
+    "Can Jordan also run a camera down my sewer line?",
+    "Can Andre also check my other garage door?"
+   ],
+   [
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Door work takes jobs sent now, like a door stuck shut."
+   ],
+   [
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "Hola, ¿habla español? Se rompió un cable de mi puerta de garaje."
+   ],
+   [
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "OK: Andre puts on the new cables today, $165."
+   ],
+   [
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "EXTRA 160 replace both lift cables, frayed"
+   ],
+   [
+    "Can you flush my water heater every year, too?",
+    "Can you tune up my garage door every year, too?"
+   ],
+   [
+    "Can Jordan look at my bathroom sink next week?",
+    "Can Andre look at my other garage door next week?"
+   ],
+   [
+    "does plumbing and electrical work, not roofing",
+    "does garage door and gate work, not front door locks"
+   ],
+   [
+    "A haircut could mean a salon or a barbershop.",
+    "A remote could mean a garage door remote or a gate remote."
+   ],
+   [
+    "Alex texts that the sink is now overflowing.",
+    "Alex texts that the door is now stuck halfway."
+   ],
+   [
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Primero: ¿hay alguien herido o atrapado bajo la puerta?"
+   ],
+   [
+    "Say Alex also asks about a dripping faucet.",
+    "Say Alex also asks about a noisy opener."
+   ],
+   [
+    "It's overflowing. Can someone come tonight?",
+    "My car is stuck inside. Can someone come tonight?"
+   ],
+   [
+    "The sink is overflowing onto the floor now.",
+    "Now the door is stuck halfway."
+   ],
+   [
+    "BEFORE old water stain on the cabinet floor",
+    "BEFORE old dent in the bottom panel"
+   ],
+   [
+    "A license for the shop and for each barber.",
+    "The counter's license, and each counter tech's, only where the state asks."
+   ],
+   [
+    "Can Jordan also look at a dripping faucet?",
+    "Can Andre also look at a noisy opener?"
+   ],
+   [
+    "HAZARD mold behind the sink wall, stopped",
+    "HAZARD opener outlet scorched, stopped"
+   ],
+   [
+    "Can I run the dishwasher before you come?",
+    "Can I pull the release cord before you come?"
+   ],
+   [
+    "Electrical and Lee's Barbershop are saved",
+    "Gates and Lee's Barbershop are saved"
+   ],
+   [
+    "First: is anyone hurt? Do you smell gas?",
+    "First: is anyone hurt, or pinned under the door?"
+   ],
+   [
+    "Please clear the cabinet under the sink.",
+    "Please clear the floor under the door."
+   ],
+   [
+    "Every plumbing job, and electrical jobs",
+    "Every door job, and gate jobs"
+   ],
+   [
+    "Plumbing JP031552 · electrical JE30417",
+    "Doors DT031552 · gates GT30417"
+   ],
+   [
+    "Jordan finds corroded shutoff valves.",
+    "Andre finds both lift cables frayed."
+   ],
+   [
+    "Next up: electrical, about 5 minutes.",
+    "Next up: gates, about 5 minutes."
+   ],
+   [
+    "The drain clogs again 2 weeks later.",
+    "The springs slip out of balance 2 weeks later."
+   ],
+   [
+    "replacing the old pipes Jordan noted",
+    "replacing the old door Andre noted"
+   ],
+   [
+    "The kitchen drain is clogged again.",
+    "My garage door springs are out of balance again."
+   ],
+   [
+    "QUOTE 245 valve 165 supply line 80",
+    "QUOTE 245 cables 165 rollers 80"
+   ],
+   [
+    "Not done: the pipe behind the wall",
+    "Not done: the opener hookup. It's unplugged."
+   ],
+   [
+    "Jordan left a mess under the sink.",
+    "Andre left grease on the garage floor."
+   ],
+   [
+    "Every plumbing job, and electrical",
+    "Every door job, and gates"
+   ],
+   [
+    "Call a mold cleanup company first",
+    "Get the outlet repaired first"
+   ],
+   [
+    "Is the sink still full of water?",
+    "Is the door shut all the way?"
+   ],
+   [
+    "Found: mold behind the sink wall",
+    "Found: the opener's ceiling outlet is scorched"
+   ],
+   [
+    "I've set each one like plumbing.",
+    "I've set each one like door work."
+   ],
+   [
+    "Every plumbing service, to start",
+    "Every door service, to start"
+   ],
+   [
+    "The before photo shows no crack.",
+    "The before photo shows no dent."
+   ],
+   [
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "BOOK Tessa springs Thu 12-2 Luis"
+   ],
+   [
+    "Jordan cracks the cabinet floor",
+    "Andre dents the trim beside the door"
+   ],
+   [
+    "Jordan: plumbing and electrical",
+    "Jordan: doors and gates"
+   ],
+   [
+    "No. It doesn't smell like gas.",
+    "No. Nobody is near the door."
+   ],
+   [
+    "like a burst pipe or a lockout",
+    "like a door stuck shut or a lockout"
+   ],
+   [
+    "Yearly water heater flush plan",
+    "Yearly door tune-up plan"
+   ],
+   [
+    "HURT cut my hand, need to stop",
+    "HURT pinched my hand, need to stop"
+   ],
+   [
+    "The $80 supply line stays good",
+    "The $80 rollers quote stays good"
+   ],
+   [
+    "replacing both shutoff valves",
+    "replacing both lift cables"
+   ],
+   [
+    "can cut your hair at the shop",
+    "can set up your remote at the counter"
+   ],
+   [
+    "Electrical, set like plumbing",
+    "Gates, set like door work"
+   ],
+   [
+    "Your drain is under warranty",
+    "Your springs are under warranty"
+   ],
+   [
+    "Haircut, fade and beard trim",
+    "Remote setup, board test and battery"
+   ],
+   [
+    "replace both shutoff valves",
+    "replace both lift cables"
+   ],
+   [
+    "Replace both shutoff valves",
+    "Replace both lift cables"
+   ],
+   [
+    "QUOTE 2400 repipe, 3 stages",
+    "QUOTE 2400 new double door, 3 stages"
+   ],
+   [
+    "Does it work like plumbing?",
+    "Does it work like your door work?"
+   ],
+   [
+    "$800 when the pipes are in",
+    "$800 when the door is hung"
+   ],
+   [
+    "a water heater replacement",
+    "a new opener"
+   ],
+   [
+    "cuts a hand and texts HURT",
+    "pinches a hand and texts HURT"
+   ],
+   [
+    "Overflowing kitchen drain",
+    "Door stuck shut, car inside"
+   ],
+   [
+    "like an overflowing drain",
+    "like a door stuck shut with a car inside"
+   ],
+   [
+    "Mold behind the sink wall",
+    "Scorched opener outlet"
+   ],
+   [
+    "cracked the cabinet floor",
+    "dented the trim beside the door"
+   ],
+   [
+    "water heater replacement",
+    "new opener"
+   ],
+   [
+    "Water heater replacement",
+    "New opener"
+   ],
+   [
+    "Video and Jordan's notes",
+    "Photos and Andre's notes"
+   ],
+   [
+    "Plumbing works like this",
+    "Door work goes like this"
+   ],
+   [
+    "A gas smell at the home",
+    "Someone pinned under a door"
+   ],
+   [
+    "sewer camera inspection",
+    "door safety inspection"
+   ],
+   [
+    "Sewer camera inspection",
+    "Door safety inspection"
+   ],
+   [
+    "NEW heating and cooling",
+    "NEW fence repair"
+   ],
+   [
+    "Under the sink, before",
+    "Springs, before"
+   ],
+   [
+    "Kitchen drain clearing",
+    "Spring replacement"
+   ],
+   [
+    "replaces water heaters",
+    "puts in openers"
+   ],
+   [
+    "the plumbing plug-in's",
+    "the garage door plug-in's"
+   ],
+   [
+    "Just the kitchen sink.",
+    "No gap, they just look worn. My car is outside."
+   ],
+   [
+    "Replace the old pipes",
+    "Replace the old door"
+   ],
+   [
+    "Cabinet floor, before",
+    "Door trim, before"
+   ],
+   [
+    "Cracked cabinet floor",
+    "Dented door trim"
+   ],
+   [
+    "color and house calls",
+    "board repairs and home visits"
+   ],
+   [
+    "Electrical price list",
+    "Gate price list"
+   ],
+   [
+    "Drain clearing plans",
+    "Door service plans"
+   ],
+   [
+    "a water heater flush",
+    "a tune-up"
+   ],
+   [
+    "leehomeservices.com",
+    "baysidegaragedoors.com"
+   ],
+   [
+    "No. No huele a gas.",
+    "No. Nadie está cerca de la puerta."
+   ],
+   [
+    "sewer camera report",
+    "door safety report"
+   ],
+   [
+    "Sewer camera report",
+    "Door safety report"
+   ],
+   [
+    "heating and cooling",
+    "fence repair"
+   ],
+   [
+    "Heating and cooling",
+    "Fence repair"
+   ],
+   [
+    "Plumbing price list",
+    "Door price list"
+   ],
+   [
+    "Plumbing · live now",
+    "Doors · live now"
+   ],
+   [
+    "Lee Home Services'",
+    "Bayside Garage Doors'"
+   ],
+   [
+    "the shutoff valves",
+    "the lift cables"
+   ],
+   [
+    "water heater flush",
+    "tune-up"
+   ],
+   [
+    "Water heater flush",
+    "Tune-up"
+   ],
+   [
+    "color, house calls",
+    "board repairs, home visits"
+   ],
+   [
+    "Every plumbing job",
+    "Every door job"
+   ],
+   [
+    "Casey for plumbing",
+    "Casey for doors"
+   ],
+   [
+    "On call · plumbing",
+    "On call · doors"
+   ],
+   [
+    "Lee Home Services",
+    "Bayside Garage Doors"
+   ],
+   [
+    "like a burst pipe",
+    "like a door stuck shut"
+   ],
+   [
+    "yearly flush plan",
+    "yearly tune-up plan"
+   ],
+   [
+    "camera inspection",
+    "safety inspection"
+   ],
+   [
+    "electrical prices",
+    "gate prices"
+   ],
+   [
+    "Lee's Barbershop",
+    "Bayside Door Parts"
+   ],
+   [
+    "$160 valve quote",
+    "$160 cable quote"
+   ],
+   [
+    "a drain clearing",
+    "a spring replacement"
+   ],
+   [
+    "A drain clearing",
+    "A spring replacement"
+   ],
+   [
+    "Plumbing license",
+    "Door license"
+   ],
+   [
+    "plumbing license",
+    "door license"
+   ],
+   [
+    "plumbing plug-in",
+    "garage door plug-in"
+   ],
+   [
+    "service call fee",
+    "visit fee"
+   ],
+   [
+    "Service call fee",
+    "Visit fee"
+   ],
+   [
+    "a $2,400 repipe",
+    "a $2,400 new door"
+   ],
+   [
+    "clear the drain",
+    "replace the springs"
+   ],
+   [
+    "Drain clearings",
+    "Spring replacements"
+   ],
+   [
+    "Casey: plumbing",
+    "Casey: doors"
+   ],
+   [
+    "DONE 179 drain",
+    "DONE 179 springs"
+   ],
+   [
+    "drain cleaning",
+    "door service"
+   ],
+   [
+    "drain clearing",
+    "spring replacement"
+   ],
+   [
+    "Drain clearing",
+    "Spring replacement"
+   ],
+   [
+    "The $179 drain",
+    "The $179 spring replacement"
+   ],
+   [
+    "a water heater",
+    "a new opener"
+   ],
+   [
+    "A water heater",
+    "A new opener"
+   ],
+   [
+    "plumbing visit",
+    "garage door visit"
+   ],
+   [
+    "Panel upgrade",
+    "New gate"
+   ],
+   [
+    "shutoff valve",
+    "lift cables"
+   ],
+   [
+    "Shutoff valve",
+    "Lift cables"
+   ],
+   [
+    "kitchen drain",
+    "spring job"
+   ],
+   [
+    "Kitchen drain",
+    "Spring job"
+   ],
+   [
+    "a leak repair",
+    "a door repair"
+   ],
+   [
+    "A leak repair",
+    "A door repair"
+   ],
+   [
+    "camera report",
+    "safety report"
+   ],
+   [
+    "rents a chair",
+    "rents bench space"
+   ],
+   [
+    "plumbing jobs",
+    "door jobs"
+   ],
+   [
+    "Lee Electric",
+    "Bayside Gates"
+   ],
+   [
+    "Lee Plumbing",
+    "Bayside Garage Doors"
+   ],
+   [
+    "1200 Main St",
+    "9 Harbor Rd"
+   ],
+   [
+    "Jordan Price",
+    "Andre Willis"
+   ],
+   [
+    "water heater",
+    "opener"
+   ],
+   [
+    "Water heater",
+    "Opener"
+   ],
+   [
+    "service call",
+    "visit fee"
+   ],
+   [
+    "Service call",
+    "Visit fee"
+   ],
+   [
+    "Casey Moore",
+    "Luis Ortega"
+   ],
+   [
+    "supply line",
+    "rollers"
+   ],
+   [
+    "Supply line",
+    "Rollers"
+   ],
+   [
+    "leak repair",
+    "door repair"
+   ],
+   [
+    "Leak repair",
+    "Door repair"
+   ],
+   [
+    "house calls",
+    "home visits"
+   ],
+   [
+    "House calls",
+    "Home visits"
+   ],
+   [
+    "Price board",
+    "Price list"
+   ],
+   [
+    "electrical",
+    "gate work"
+   ],
+   [
+    "Electrical",
+    "Gate work"
+   ],
+   [
+    "Riley Chen",
+    "Gina Park"
+   ],
+   [
+    "Avery Diaz",
+    "Hector Ruiz"
+   ],
+   [
+    "valve work",
+    "cable work"
+   ],
+   [
+    "yard drain",
+    "new door"
+   ],
+   [
+    "Yard drain",
+    "New door"
+   ],
+   [
+    "does color",
+    "does board repairs"
+   ],
+   [
+    "beard trim",
+    "new remote battery"
+   ],
+   [
+    "house call",
+    "home visit"
+   ],
+   [
+    "barbershop",
+    "parts counter"
+   ],
+   [
+    "Barbershop",
+    "Parts counter"
+   ],
+   [
+    "Electric.",
+    "Double."
+   ],
+   [
+    "88 Elm St",
+    "16 Dock St"
+   ],
+   [
+    "42 Oak St",
+    "27 Cedar Ct"
+   ],
+   [
+    "a plumber",
+    "a door tech"
+   ],
+   [
+    "MP045210",
+    "GD045210"
+   ],
+   [
+    "JP031552",
+    "DT031552"
+   ],
+   [
+    "the leak",
+    "the door"
+   ],
+   [
+    "cut hair",
+    "work the counter"
+   ],
+   [
+    "a barber",
+    "a counter tech"
+   ],
+   [
+    "Plumbing",
+    "Door work"
+   ],
+   [
+    "plumbing",
+    "door work"
+   ],
+   [
+    "EC22871",
+    "GC22871"
+   ],
+   [
+    "JE30417",
+    "GT30417"
+   ],
+   [
+    "BS20981",
+    "DP20981"
+   ],
+   [
+    "a drain",
+    "a spring job"
+   ],
+   [
+    "plumber",
+    "door tech"
+   ],
+   [
+    "Plumber",
+    "Door tech"
+   ],
+   [
+    "Haircut",
+    "Remote setup"
+   ],
+   [
+    "haircut",
+    "remote setup"
+   ],
+   [
+    "barbers",
+    "counter techs"
+   ],
+   [
+    "the cut",
+    "the setup"
+   ],
+   [
+    "Elm St",
+    "Dock St"
+   ],
+   [
+    "Jordan",
+    "Andre"
+   ],
+   [
+    "repipe",
+    "new door"
+   ],
+   [
+    "Repipe",
+    "New door"
+   ],
+   [
+    "a leak",
+    "a door off its track"
+   ],
+   [
+    "barber",
+    "counter tech"
+   ],
+   [
+    "Barber",
+    "Counter tech"
+   ],
+   [
+    "chairs",
+    "counter spots"
+   ],
+   [
+    "Casey",
+    "Luis"
+   ],
+   [
+    "Riley",
+    "Gina"
+   ],
+   [
+    "Avery",
+    "Hector"
+   ],
+   [
+    "drain",
+    "spring job"
+   ],
+   [
+    "flush",
+    "tune-up"
+   ],
+   [
+    "chair",
+    "counter"
+   ],
+   [
+    "cuts",
+    "setups"
+   ],
+   [
+    "Kids cut",
+    "Spring check"
+   ],
+   [
+    "kids cut",
+    "spring check"
+   ],
+   [
+    "water heaters",
+    "opener repairs"
+   ],
+   [
+    "water heater",
+    "opener"
+   ]
+  ]
+ },
+ "cast": {
+  "A": {
+   "staff": "Gina and Hector (techs at the parts counter)"
+  },
+  "B": {
+   "staff": "Andre and Luis (garage door techs)"
+  }
+ },
+ "names": {
+  "A": {
+   "staff": "Gina"
+  },
+  "B": {
+   "staff": "Andre"
+  }
+ },
+ "keep": [],
+ "story": {
+  "A": "Sam Lee signs up two companies by text. Then Alex brings an old remote to the counter at Bayside Door Parts, Sam's opener parts and repair counter, and Gina sets up a new one on Sat Oct 24 at 11:00am. The service depends on the money choice you pick.",
+  "B": "Sam Lee signs up two companies by text. Then Alex books Bayside Garage Doors at 27 Cedar Ct, and Andre comes Thu Oct 22 between 8 and 10am. The job depends on the money choice you pick: a broken spring, a door off its track, a tune-up or a new opener."
+ },
+ "money": {
+  "A": {
+   "main": "list|card|counter",
+   "combos": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ],
+   "examples": {
+    "list|card|counter": "The main story: a $35 remote set up at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+    "list|none|counter": "A $35 remote set up. Nothing is taken: a YES books it. Alex pays at the counter.",
+    "list|full|none": "The $55 opener gear kit, fitted, paid in full when booking.",
+    "photos|card|counter": "An older opener's board repair, priced from Alex's photos at $90. A card is saved for the $20 fee. Booked once Sam OKs it.",
+    "visit|card|counter": "An opener part repair, priced at the counter. A card is saved for the $20 fee; only the $25 bench check is promised."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$20",
+     "name": "Remote set-up"
+    },
+    "list|*|*": {
+     "price": "$35",
+     "name": "Remote set-up"
+    },
+    "list|full|*": {
+     "price": "$55",
+     "paid": "$55",
+     "name": "Opener gear kit"
+    },
+    "photos|*|*": {
+     "price": "$90",
+     "name": "Opener board repair"
+    },
+    "visit|*|*": {
+     "name": "Opener part repair"
+    }
+   },
+   "services": {
+    "a-add": {
+     "flow": "A",
+     "name": "Remote set-up",
+     "price": "list",
+     "before": "card",
+     "after": "counter",
+     "amounts": {
+      "price": "$35",
+      "fee": "$20"
+     }
+    },
+    "a-full": {
+     "flow": "A",
+     "name": "Opener gear kit",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$55",
+      "paid": "$55",
+      "fee": "$20"
+     }
+    }
+   }
+  },
+  "B": {
+   "main": "list|card|bill",
+   "combos": [
+    "list|card|bill",
+    "list|none|bill",
+    "list|card|card",
+    "visit|card|bill",
+    "visit|card|card",
+    "photos|deposit|bill",
+    "list|full|none"
+   ],
+   "examples": {
+    "list|card|bill": "A $179 spring replacement. A card is saved for the $89 visit fee; Rosie texts the bill after the job.",
+    "list|none|bill": "A $179 spring replacement. Nothing is taken before. Rosie texts the bill after the job.",
+    "list|card|card": "A $179 spring replacement. A card is saved and charged $179 when Andre texts DONE.",
+    "visit|card|bill": "A door off its track, priced at the visit. Only a card is saved. Andre quotes it, and Rosie texts the bill.",
+    "visit|card|card": "A door off its track, priced at the visit. A card is saved, and the price Alex OKs is charged to it when Andre texts DONE.",
+    "photos|deposit|bill": "A new opener, priced from photos at $640 (Sam OKs it). A $160 deposit now, the $480 rest on the bill.",
+    "list|full|none": "A $150 tune-up and safety check, paid in full when booking."
+   },
+   "amounts": {
+    "*": {
+     "fee": "$89",
+     "name": "Spring replacement"
+    },
+    "list|*|*": {
+     "price": "$179",
+     "name": "Spring replacement"
+    },
+    "list|full|*": {
+     "price": "$150",
+     "paid": "$150",
+     "name": "Tune-up and safety check"
+    },
+    "photos|deposit|*": {
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "fee": "$89",
+     "name": "New opener"
+    },
+    "visit|*|*": {
+     "name": "Door off its track"
+    }
+   },
+   "services": {
+    "b-add": {
+     "flow": "B",
+     "name": "Spring replacement",
+     "price": "list",
+     "before": "card",
+     "after": "bill",
+     "amounts": {
+      "price": "$179",
+      "fee": "$89"
+     }
+    },
+    "b-full": {
+     "flow": "B",
+     "name": "Tune-up and safety check",
+     "price": "list",
+     "before": "full",
+     "after": "none",
+     "amounts": {
+      "price": "$150",
+      "paid": "$150",
+      "fee": "$89"
+     }
+    }
+   }
+  }
+ },
+ "splitsKept": {
+  "A": [
+   "S1-60",
+   "S2-28",
+   "A7-59",
+   "A7-15",
+   "A8-02",
+   "A8-53",
+   "S11-87",
+   "S11-90"
+  ],
+  "B": [
+   "S1-60",
+   "S1-38",
+   "S2-28",
+   "B4-81",
+   "B5-34",
+   "B7-55",
+   "B8-58",
+   "B8-71",
+   "B8-72",
+   "B10-29"
+  ]
+ },
+ "A": {
+  "ops": [
+   {
+    "op": "more",
+    "at": "A4-36",
+    "more": [
+     "A counter tech's video check looks at an opener or a remote on the call. Gina says what to bring, or if a tech should come to the home.",
+     "Springs and cables are never talked through by video."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "A4-85",
+    "more": [
+     "Springs and lift cables are never sold at the counter for a customer to put on. Rosie offers a home visit with a tech instead."
+    ]
+   },
+   {
+    "op": "words",
+    "at": "A4-14",
+    "more": [
+     "The owner sets the daily number at sign-up. A full day isn't shown.",
+     "Pick-up comes once it's READY, in the pick-up hours.",
+     "At the counter, an opener left for a rebuild is a drop-off: the shop takes a few a day."
+    ]
+   },
+   {
+    "op": "branch",
+    "at": "A8-32",
+    "branch": {
+     "label": "The remote can't be matched",
+     "end": "merge",
+     "steps": [
+      {
+       "id": "A8-x01",
+       "line": [
+        "8.19",
+        "8.10"
+       ],
+       "who": "san",
+       "to": "cust",
+       "via": "msg",
+       "t": "Sat Oct 24, 11:15am",
+       "title": "Offers a receiver kit, or a tech at home",
+       "does": "Gina finds Alex's opener is too old for any new remote. Nothing is charged for the setup. Alex picks a receiver kit at the counter, or a tech at home.",
+       "more": [
+        "A receiver kit lets new remotes work with an old opener. It's sold at the shop's own price, once Alex says yes.",
+        "A tech at home is a new booking with Bayside Garage Doors, at the customer's place.",
+        "Sam sets any price for the time spent, as with a visit stopped early.",
+        "No answer: nothing more is done, and Alex takes the old remote home."
+       ],
+       "say": [
+        [
+         "staff",
+         "san",
+         "Alex M.'s opener is too old for a new remote. Can't match it."
+        ],
+        [
+         "san",
+         "cust",
+         "Gina found your opener is too old for any new remote. Nothing is charged for the setup. What would you like?",
+         {
+          "buttons": [
+           "A receiver kit here",
+           "A tech at home",
+           "Take it back"
+          ]
+         }
+        ]
+       ],
+       "needs": [
+        "pf.services"
+       ],
+       "tells": [
+        "cust"
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A seat in a session",
+    "why": "The counter books a tech's time, or a drop-off slot for an opener. No class seats."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A space or a table",
+    "why": "The counter books a tech's time, or a drop-off slot for an opener. No spaces."
+   },
+   {
+    "op": "off",
+    "at": "A4-66",
+    "label": "A stay, start to end",
+    "why": "Nothing at the parts counter is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "A4-43",
+    "label": "A form signed on the secure page",
+    "why": "The counter's plug-in names no form to sign. Its first steps are a model check, or a paper the shop gets, like a maker's warranty number."
+   },
+   {
+    "op": "off",
+    "at": "A10-34",
+    "label": "No: named-only work",
+    "why": "Counter work is rated, like every set up and repair."
+   },
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Garage door work and counter work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Garage door work books techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Garage door work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Garage door work takes urgent jobs sent now, like a door stuck shut with a car inside."
+   },
+   {
+    "op": "off",
+    "at": "A8-67",
+    "label": "Yes: a child may be left",
+    "why": "Garage door work: no child is left with the crew or alone at the counter; minors are never booked"
+   }
+  ]
+ },
+ "B": {
+  "ops": [
+   {
+    "op": "off",
+    "at": "S1-62",
+    "label": "2 No $2, so no monthly bill",
+    "why": "Garage door work and counter work pay Rosfield's $2, so the bill branch applies."
+   },
+   {
+    "op": "off",
+    "at": "S1-29",
+    "label": "2 Left unsigned",
+    "why": "No agreement to sign, so none can be left unsigned."
+   },
+   {
+    "op": "off",
+    "at": "S1-80",
+    "label": "Yes: spaces or things",
+    "why": "Garage door work books techs, never a table, court or room."
+   },
+   {
+    "op": "off",
+    "at": "S1-82",
+    "label": "2 Yes: classes on a timetable",
+    "why": "Garage door work runs no classes, so no timetable is set."
+   },
+   {
+    "op": "off",
+    "at": "S2-30",
+    "label": "2 No: never sent now",
+    "why": "Garage door work takes urgent jobs sent now, like a door stuck shut with a car inside."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "2 A set start time",
+    "why": "Garage door work books a tech in an arrival window."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "3 A stay: a start and an end",
+    "why": "Nothing in garage door work is booked as a stay."
+   },
+   {
+    "op": "off",
+    "at": "B4-83",
+    "label": "4 A seat in a session",
+    "why": "Garage door work at the home books a tech in an arrival window, never a seat in a session."
+   },
+   {
+    "op": "off",
+    "at": "B8-67",
+    "label": "2 The child is in the pro's care",
+    "why": "Garage door work is never left with a child: the tech waits for the adult on the booking."
+   },
+   {
+    "op": "off",
+    "at": "B8-69",
+    "label": "1 Nobody needs to be home",
+    "why": "An adult must be home for the whole visit (ticked on the booking page): a door and its springs are never worked on with nobody there."
+   },
+   {
+    "op": "words",
+    "at": "B4-91",
+    "does": "Say a spring snaps at 6:40pm, and Alex's car is stuck inside. The plug-in marks it urgent, and Sam has a door tech on call tonight. So the AI offers to send someone now, with an arrival estimate, not a window.",
+    "more": [
+     "An urgent visit is $129, not $89. A card is saved for it, not taken, and it comes off the repair.",
+     "Alex sees the urgent price before booking, with the plug-in's safety words.",
+     "The door tech on call takes it once Alex books. If nobody does, the card saved for it is released, and Alex is told.",
+     "Sam set who's on call with his team: open hours too, plus nights, weekends and holidays, with a backup.",
+     "Nobody on call right now: the soonest times show first, as for work that's never sent now.",
+     "A job sent now gets no reminder or day list. Free cancel ends when the pro texts he's on the way.",
+     "Where the state's rules limit prices in a declared emergency, those limits apply."
+    ],
+    "say": [
+     [
+      "cust",
+      "agent",
+      "A spring snapped, and my car is stuck in the garage. Can someone come tonight?"
+     ],
+     [
+      "agent",
+      "cust",
+      "Bayside Garage Doors has a door tech on call tonight. Sent now, they'd arrive in about 60 to 90 minutes. The urgent visit is $129, with a card saved for it, taken off the repair. Until then, don't lift the door or pull the red release cord.",
+      {
+       "buttons": [
+        "Send someone now",
+        "See the soonest times"
+       ]
+      }
+     ]
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B6-16",
+    "more": [
+     "Alex also gets the safety steps again: don't lift the door, pull the red release cord, or touch the springs."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B7-16",
+    "more": [
+     "Safety answers come word for word from Bayside's own safety notes. Rosie never explains how to release, adjust or wind a spring."
+    ]
+   },
+   {
+    "op": "more",
+    "at": "B8-21",
+    "more": [
+     "A part Andre marks as a danger, like frayed cables, is left safe. The door stays shut, and Alex gets a written safety note."
+    ]
+   },
+   {
+    "op": "after",
+    "at": "B8-39",
+    "steps": [
+     {
+      "id": "B8-x01",
+      "type": "split",
+      "line": [
+       "8.22"
+      ],
+      "who": "staff",
+      "to": "san",
+      "via": "visit",
+      "t": "Thu Oct 22, 9:05am",
+      "title": "Andre runs the auto-reverse test",
+      "q": "Does the door go back up?",
+      "does": "After every repair or new opener, before DONE, Andre tests the safety reverse. The door must go back up when it touches a board laid flat under it, and when the light beam is blocked.",
+      "more": [
+       "The plug-in names this test. DONE waits for a pass, and the result goes on the job record.",
+       "New springs change the door's balance, so the test runs after every spring job too.",
+       "The care tips remind Alex to run the board test once a month."
+      ],
+      "say": [
+       [
+        "staff",
+        "san",
+        "TEST passed: board and beam"
+       ],
+       [
+        "san",
+        "staff",
+        "Saved with Alex M.'s job. You can text DONE now."
+       ]
+      ],
+      "needs": [
+       "pf.visit"
+      ],
+      "tells": [
+       "staff"
+      ],
+      "branches": [
+       {
+        "label": "Passes both tests",
+        "steps": [],
+        "end": "merge"
+       },
+       {
+        "label": "Fails, then passes after a reset",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x02",
+          "line": [
+           "8.22"
+          ],
+          "who": "staff",
+          "to": "san",
+          "via": "visit",
+          "title": "Resets the force, then tests again",
+          "does": "The door didn't go back up at the board. Andre resets the opener's force and travel limits, then runs both tests again. It passes on the second try.",
+          "more": [
+           "Nothing extra is charged for the reset. It's part of the repair."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "TEST failed at the board. Reset force and limits. TEST passed: board and beam"
+           ],
+           [
+            "san",
+            "staff",
+            "Saved with Alex M.'s job. You can text DONE now."
+           ]
+          ],
+          "needs": [
+           "pf.visit"
+          ],
+          "tells": [
+           "staff"
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Still fails: opener unplugged",
+        "end": "merge",
+        "steps": [
+         {
+          "id": "B8-x03",
+          "line": [
+           "8.22",
+           "8.19",
+           "8.10"
+          ],
+          "who": "san",
+          "to": "cust",
+          "via": "msg",
+          "title": "Unplugs the opener; sends a safety note",
+          "does": "The opener's reverse is worn out, so it fails again. Andre unplugs it so it can't close on anyone, and the door works by hand. Alex gets a written safety note.",
+          "more": [
+           "Only the repair that was done is billed. Nothing is charged for the opener.",
+           "A new opener gets its own quote, priced from photos, with Sam's OK over $500.",
+           "A new job sold at the home gets its written right to cancel, where the rules require it.",
+           "Sam is told, and the note and photos stay with the job."
+          ],
+          "say": [
+           [
+            "staff",
+            "san",
+            "TEST failed twice. Opener unplugged, door works by hand"
+           ],
+           [
+            "san",
+            "cust",
+            "Andre's safety test found that your opener doesn't go back up when it should. He unplugged it, so it can't close on anyone.",
+            {
+             "card": {
+              "title": "Safety note · 27 Cedar Ct",
+              "lines": [
+               "Found: the opener's safety reverse is worn out",
+               "Done: the opener is unplugged",
+               "Open and close the door by hand until it's replaced"
+              ]
+             }
+            }
+           ],
+           [
+            "san",
+            "owner",
+            "Andre unplugged Alex M.'s opener: it failed the safety test twice. Alex has the safety note."
+           ]
+          ],
+          "needs": [
+           "pf.safety"
+          ],
+          "tells": [
+           "cust",
+           "owner"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "op": "off",
+    "at": "B10-32",
+    "label": "No: named-only work",
+    "why": "Door jobs are not named-only work: every finished job asks for a rating (the plug-in's answer)"
+   }
+  ]
+ },
+ "notes": "Pilot: contractor-style project work at the home, with a shop counter (the example: Bayside Garage Doors and its Bayside Door Parts counter). Flow A: the customer comes to the counter (remote set-up, opener parts, the bench check); flow B: a door tech goes to the home (spring replacement, opener, door repair, visit fee, quotes).\nPlug-in facts: photos, documents, extrawork, firststeps. Switches: cancelright on in flow B only (the master's B8-78 cancel window for a new job sold at the home); sensitive, welfare and no2 off (the $2 is paid, D97). Settings: arrive setstart in flow A (a counter time), window in flow B; cutoff 24 hours before.\nFlow A money: list|card|counter (main; $35 remote set-up, a card saved for the shop's $20 fee, paid at the counter), list|none|counter (nothing taken), list|full|none ($55 opener gear kit, paid in full), photos|card|counter ($90 board repair from photos; Sam OKs; $20 fee), visit|card|counter (opener part repair, priced at the counter; $20 fee). The old $140 rebuild with its $40 fee is gone; a card is saved instead of any hold.\nFlow B money: list|card|bill (main; $179 spring replacement; a card saved for the $89 visit fee; the bill after the job), list|none|bill ($179, nothing taken), list|card|card ($179, the card charged when DONE), visit|card|bill and visit|card|card (door off its track, priced at the visit; card saved; charged at DONE only the price OK'd), photos|deposit|bill ($640 new opener from photos; $160 deposit; $480 rest on the bill), list|full|none ($150 tune-up and safety check, paid in full). The $89 is the trip fee (the late-cancel and no-show fee), kept only up to what was paid now where money was paid.\nRemoved in this refit: every legacy money words op (vary keys by price, before, after), all dead off ops (branches the master no longer has), the pickup-day words of A7-13 (money variant), the B4-14 fee-range line ($150 to $350 visit fee), the $2 and license-lookup ops, the duplicate counter-hold wording. Own steps kept: B8-x01 (the auto-reverse test before DONE), with its safety words.\nLicenses: optional and never checked by Rosie (D96); pf.license.check and blocks reworded; the electrical license is the business's own word where the place requires one.\nChildren: 'Yes: a child may be left' is off at the counter (no child left with the crew); the rating split: 'No: named-only work' is off (every job asks a rating).\nRenames: the example's trade words (barbershop, perm, skin fades, hot towel, water heater, sink, pipe, faucet, water line) renamed to door words; 'color' is left as the master's own word (no check flags it as a trade word for this work).",
+ "basis": {
+  "renameMatched": {
+   "A": [
+    "fades and hot towel shaves",
+    "barbershops",
+    "asks for a perm",
+    "skin fades",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "A groom books cuts for himself and four friends on one morning. Rosie finds chairs side by side across",
+    "A haircut for Alex and a kids cut for a child work the same way. Both are asked before the times.",
+    "Riley can do a shorter cut in the time left, at the same price, or you can move to a later time.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "A barbershop takes no drop-offs. A repair shop, a tailor or a groomer does.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Lee Home Services can book you for plumbing and electrical from now on.",
+    "Add photos of your hair, and a barber will price your color and cut",
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Riley suggests moving your visit until it clears, with no fee.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "A barbershop's plug-in adds no danger words of its own.",
+    "Alex M. says the cape clip ripped a shirt collar today.",
+    "The rash on my scalp got worse. Can I still come in?",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "#2 on the sides, scissors on top, low beard line",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "A barbershop has none, so nothing is sent here.",
+    "The signed form this service needs is missing.",
+    "A haircut could mean a salon or a barbershop.",
+    "Promises the $25 consult; priced at the chair",
+    "A license for the shop and for each barber.",
+    "Can my son wait in the shop during my cut?",
+    "A beard trim is on the price board: $20.",
+    "Plumbing JP031552 · electrical JE30417",
+    "The cape clip ripped my shirt collar.",
+    "Saturday's cut is uneven on one side",
+    "Do you do kids cuts? My son is 8.",
+    "Alex asks for a cut every 4 weeks",
+    "Signature cut and hot towel shave",
+    "a Kids cut (12 and under) is $25",
+    "Jordan: plumbing and electrical",
+    "like a burst pipe or a lockout",
+    "like a 15-minute style consult",
+    "The cut is uneven on one side.",
+    "Color always stays with Riley",
+    "Electrical, set like plumbing",
+    "Haircut, fade and beard trim",
+    "I'd like a cut on Saturday.",
+    "Does it work like haircuts?",
+    "Quiero un corte el sábado.",
+    "Books a cut every 4 weeks",
+    "A haircut needs nothing.",
+    "once Riley sees the hair",
+    "like a skin-test result",
+    "Signature cut and shave",
+    "Kids cut (12 and under)",
+    "color and house calls",
+    "pays for the consult",
+    "The Groom's package",
+    "the Groom's package",
+    "photos of your hair",
+    "Plumbing price list",
+    "Sam adds massage to",
+    "Lee Home Services'",
+    "color, house calls",
+    "a color correction",
+    "Casey for plumbing",
+    "On call · plumbing",
+    "A color correction",
+    "Lee Home Services",
+    "like a burst pipe",
+    "doesn't do perms.",
+    "Groom's package ·",
+    "Lee's Barbershop",
+    "the shop's board",
+    "Color correction",
+    "color correction",
+    "Shorter is fine",
+    "Gloss to finish",
+    "Groom's package",
+    "a color and cut",
+    "Casey: plumbing",
+    "Drain clearing",
+    "A water heater",
+    "Panel upgrade",
+    "Alex M.'s cut",
+    "rents a chair",
+    "groom's party",
+    "Signature cut",
+    "signature cut",
+    "Color and cut",
+    "color and cut",
+    "plumbing jobs",
+    "Lee Electric",
+    "Lee Plumbing",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "a beard trim",
+    "a house call",
+    "Casey Moore",
+    "color quote",
+    "$25 consult",
+    "a skin fade",
+    "A skin fade",
+    "house calls",
+    "House calls",
+    "price board",
+    "Price board",
+    "NEW massage",
+    "Massage for",
+    "electrical",
+    "Electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "does color",
+    "Beard trim",
+    "beard trim",
+    "patch test",
+    "house call",
+    "barbershop",
+    "Barbershop",
+    "color plan",
+    "Color plan",
+    "Electric.",
+    "88 Elm St",
+    "Skin fade",
+    "skin fade",
+    "Barbering",
+    "MP045210",
+    "JP031552",
+    "Haircuts",
+    "haircuts",
+    "cut hair",
+    "a barber",
+    "Plumbing",
+    "plumbing",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "plumber",
+    "Plumber",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "the cut",
+    "Elm St",
+    "Jordan",
+    "a leak",
+    "barber",
+    "Barber",
+    "chairs",
+    "Casey",
+    "Riley",
+    "Avery",
+    "A cut",
+    "gloss",
+    "chair",
+    "a cut",
+    "cuts",
+    "Kids cut",
+    "kids cut",
+    "water heaters",
+    "water heater"
+   ],
+   "B": [
+    "a leak under the sink, today",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "under the sink, today",
+    "1-year labor warranty: if there's a problem with the work, reply here.",
+    "fades and hot towel shaves",
+    "barbershops",
+    "a leaking pipe under my sink",
+    "water damage under the sink this morning",
+    "My sink won't drain",
+    "wall pipe",
+    "tapping a neighbor's water line without asking",
+    "Adding a faucet check?",
+    "May we call or text you if they miss a safety check, or can't be reached while care is due?",
+    "You can look for a roofer near you.",
+    "Jordan finds mold behind the sink wall. The plug-in says a plumber stops there, so Alex gets a written note and the photo.",
+    "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+    "Safety stop: a customer's AI said they smell gas. They got the safety message, and nothing was booked.",
+    "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+    "Its questions: where the clog or leak is, if water is still coming, and if the valve is off.",
+    "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+    "Rosie loads plumbing's now, and electrical's and the barbershop's when Sam gets to them.",
+    "Turn off the water valve under the sink, and keep away from any outlet the water reaches.",
+    "Drains have a set price. Leaks are priced at the visit. A gas smell stops the booking.",
+    "My kitchen drain is clogged. Can a plumber come Thursday morning? I'm in Springfield.",
+    "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+    "The request turns out to be for work Lee Home Services doesn't do, like a roof leak.",
+    "Jordan found mold behind the wall under your sink and stopped that part of the work.",
+    "Real danger, like water near outlets or a gas smell, gets the safety steps first.",
+    "A license behind the company, and one for each plumber where the state asks.",
+    "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+    "Lee Home Services sent you a proposal for new pipes, from Jordan's notes.",
+    "A plumber's example: water near outlets gets 'shut off the main valve'.",
+    "Lee Home Services can book you for plumbing and electrical from now on.",
+    "With Sam's yes, electrical and the shop now show to AI assistants too.",
+    "Hello, do you speak Spanish? Water is coming out of the water heater.",
+    "My gas water heater got wet in a flood. Is it safe to turn back on?",
+    "Its danger words: a gas smell, hissing or a carbon monoxide alarm.",
+    "Can a plumber clear a yard drain this Thursday? What does it cost?",
+    "Add photos of your water heater, and a plumber will price the job.",
+    "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+    "Sam Lee added you to the team for plumbing and electrical jobs.",
+    "Electrical and Lee's Barbershop now show to AI assistants too.",
+    "many barbers, salons and groomers are licensed to their shop",
+    "Jordan finds the leak and texts the price with its lines.",
+    "Jordan found the leak. Here's the price to fix it today.",
+    "Yes. The faucet is a leak repair, quoted at the visit.",
+    "Alex M.'s drain, cleared Thu Oct 22, is clogged again.",
+    "Here are Jordan's next times for a bathroom drain.",
+    "Jordan says no. Please wait until the job is done.",
+    "Plumbing takes jobs sent now. The shop takes none.",
+    "Told to leave, then call 911 and the gas company",
+    "Can Jordan also run a camera down my sewer line?",
+    "Plumbing takes jobs sent now, like a burst pipe.",
+    "Hola, ¿habla español? Sale agua del calentador.",
+    "OK: Jordan fixes the shutoff valve today, $165.",
+    "EXTRA 160 replace both shutoff valves, corroded",
+    "Can you flush my water heater every year, too?",
+    "Can Jordan look at my bathroom sink next week?",
+    "does plumbing and electrical work, not roofing",
+    "A haircut could mean a salon or a barbershop.",
+    "Alex texts that the sink is now overflowing.",
+    "Primero: ¿hay alguien herido? ¿Huele a gas?",
+    "Say Alex also asks about a dripping faucet.",
+    "It's overflowing. Can someone come tonight?",
+    "The sink is overflowing onto the floor now.",
+    "BEFORE old water stain on the cabinet floor",
+    "A license for the shop and for each barber.",
+    "Can Jordan also look at a dripping faucet?",
+    "HAZARD mold behind the sink wall, stopped",
+    "Can I run the dishwasher before you come?",
+    "Electrical and Lee's Barbershop are saved",
+    "First: is anyone hurt? Do you smell gas?",
+    "Please clear the cabinet under the sink.",
+    "Every plumbing job, and electrical jobs",
+    "Plumbing JP031552 · electrical JE30417",
+    "Jordan finds corroded shutoff valves.",
+    "Next up: electrical, about 5 minutes.",
+    "The drain clogs again 2 weeks later.",
+    "replacing the old pipes Jordan noted",
+    "The kitchen drain is clogged again.",
+    "QUOTE 245 valve 165 supply line 80",
+    "Not done: the pipe behind the wall",
+    "Jordan left a mess under the sink.",
+    "Every plumbing job, and electrical",
+    "Call a mold cleanup company first",
+    "Is the sink still full of water?",
+    "Found: mold behind the sink wall",
+    "I've set each one like plumbing.",
+    "Every plumbing service, to start",
+    "The before photo shows no crack.",
+    "BOOK Tessa drain Thu 12-2 Casey",
+    "Jordan cracks the cabinet floor",
+    "Jordan: plumbing and electrical",
+    "No. It doesn't smell like gas.",
+    "like a burst pipe or a lockout",
+    "Yearly water heater flush plan",
+    "HURT cut my hand, need to stop",
+    "The $80 supply line stays good",
+    "replacing both shutoff valves",
+    "can cut your hair at the shop",
+    "Electrical, set like plumbing",
+    "Your drain is under warranty",
+    "Haircut, fade and beard trim",
+    "replace both shutoff valves",
+    "Replace both shutoff valves",
+    "QUOTE 2400 repipe, 3 stages",
+    "Does it work like plumbing?",
+    "$800 when the pipes are in",
+    "a water heater replacement",
+    "cuts a hand and texts HURT",
+    "Overflowing kitchen drain",
+    "like an overflowing drain",
+    "Mold behind the sink wall",
+    "cracked the cabinet floor",
+    "water heater replacement",
+    "Water heater replacement",
+    "Video and Jordan's notes",
+    "Plumbing works like this",
+    "A gas smell at the home",
+    "sewer camera inspection",
+    "Sewer camera inspection",
+    "NEW heating and cooling",
+    "Under the sink, before",
+    "Kitchen drain clearing",
+    "replaces water heaters",
+    "the plumbing plug-in's",
+    "Just the kitchen sink.",
+    "Replace the old pipes",
+    "Cabinet floor, before",
+    "Cracked cabinet floor",
+    "color and house calls",
+    "Electrical price list",
+    "Drain clearing plans",
+    "a water heater flush",
+    "leehomeservices.com",
+    "No. No huele a gas.",
+    "sewer camera report",
+    "Sewer camera report",
+    "heating and cooling",
+    "Heating and cooling",
+    "Plumbing price list",
+    "Plumbing · live now",
+    "Lee Home Services'",
+    "the shutoff valves",
+    "water heater flush",
+    "Water heater flush",
+    "color, house calls",
+    "Every plumbing job",
+    "Casey for plumbing",
+    "On call · plumbing",
+    "Lee Home Services",
+    "like a burst pipe",
+    "yearly flush plan",
+    "camera inspection",
+    "electrical prices",
+    "Lee's Barbershop",
+    "$160 valve quote",
+    "a drain clearing",
+    "A drain clearing",
+    "Plumbing license",
+    "plumbing license",
+    "plumbing plug-in",
+    "service call fee",
+    "Service call fee",
+    "a $2,400 repipe",
+    "clear the drain",
+    "Drain clearings",
+    "Casey: plumbing",
+    "DONE 179 drain",
+    "drain cleaning",
+    "drain clearing",
+    "Drain clearing",
+    "The $179 drain",
+    "a water heater",
+    "A water heater",
+    "plumbing visit",
+    "Panel upgrade",
+    "shutoff valve",
+    "Shutoff valve",
+    "kitchen drain",
+    "Kitchen drain",
+    "a leak repair",
+    "A leak repair",
+    "camera report",
+    "rents a chair",
+    "plumbing jobs",
+    "Lee Electric",
+    "Lee Plumbing",
+    "1200 Main St",
+    "Jordan Price",
+    "water heater",
+    "Water heater",
+    "service call",
+    "Service call",
+    "Casey Moore",
+    "supply line",
+    "Supply line",
+    "leak repair",
+    "Leak repair",
+    "house calls",
+    "House calls",
+    "Price board",
+    "electrical",
+    "Electrical",
+    "Riley Chen",
+    "Avery Diaz",
+    "valve work",
+    "yard drain",
+    "Yard drain",
+    "does color",
+    "beard trim",
+    "house call",
+    "barbershop",
+    "Barbershop",
+    "Electric.",
+    "88 Elm St",
+    "42 Oak St",
+    "a plumber",
+    "MP045210",
+    "JP031552",
+    "the leak",
+    "cut hair",
+    "a barber",
+    "Plumbing",
+    "plumbing",
+    "EC22871",
+    "JE30417",
+    "BS20981",
+    "a drain",
+    "plumber",
+    "Plumber",
+    "Haircut",
+    "haircut",
+    "barbers",
+    "the cut",
+    "Elm St",
+    "Jordan",
+    "repipe",
+    "Repipe",
+    "a leak",
+    "barber",
+    "Barber",
+    "chairs",
+    "Casey",
+    "Riley",
+    "Avery",
+    "drain",
+    "flush",
+    "chair",
+    "cuts",
+    "water heaters",
+    "water heater"
+   ]
+  },
+  "A": {
+   "A4-36": "f261af1660",
+   "A4-85": "f164e7b264",
+   "A4-14": "95c7ffcfab",
+   "A8-32": "632f2b5b40",
+   "A4-66": "f622d7fe12",
+   "A4-43": "c17d56f766",
+   "A10-34": "78c2d9a6a3",
+   "S1-62": "c4f497de12",
+   "S1-29": "ed36650e05",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "A8-67": "e9fd748fc5"
+  },
+  "B": {
+   "S1-62": "c4f497de12",
+   "S1-29": "69d8f12a68",
+   "S1-80": "1d7be919fe",
+   "S1-82": "5fac7742c5",
+   "S2-30": "3a9ee593f3",
+   "B4-83": "a7473a80ea",
+   "B8-67": "b66ffbd04d",
+   "B8-69": "5d0e4c0045",
+   "B4-91": "eb948968a8",
+   "B6-16": "d428d8c29e",
+   "B7-16": "3177c3701b",
+   "B8-21": "43557106b2",
+   "B8-39": "aa75251207",
+   "B10-32": "7713bff255"
+  }
+ }
+}
