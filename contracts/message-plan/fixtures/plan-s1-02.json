@@ -1,0 +1,19 @@
+{
+  "formats": ["text"],
+  "lines": [
+    {
+      "role": "first",
+      "text": "I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you."
+    },
+    {
+      "role": "fact",
+      "text": "About 15 minutes for your first kind of work · Free to use · $2 a booking, counted at its check-in or DONE, explained before you go live"
+    }
+  ],
+  "question": {
+    "text": "What kinds of work do you do? Just type them.",
+    "optionIds": []
+  },
+  "pageType": null,
+  "threadReplyTo": null
+}

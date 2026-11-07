@@ -1,0 +1,37 @@
+{
+  "row": "outbox-a6-14-alex-email",
+  "channel": "email",
+  "copyOf": "outbox-a6-14-alex-text",
+  "plan": {
+    "formats": ["text", "calendarFile", "linkCard"],
+    "lines": [
+      {
+        "role": "first",
+        "text": "You're booked at {{biz.name}}. Give this code at the chair when you arrive: {{visit.code}}"
+      },
+      {
+        "role": "fact",
+        "text": "{{svc.intext}} · {{day}} · {{visit.time}} · {{pro.name}}"
+      },
+      {
+        "role": "fact",
+        "text": "{{visit.place}}"
+      },
+      {
+        "role": "fact",
+        "text": "{{pay.price}} · {{pay.took}}"
+      },
+      {
+        "role": "fact",
+        "text": "{{pay.cancel}}"
+      },
+      {
+        "role": "action",
+        "text": "Change the time or call off the visit: {{link.secure}}"
+      }
+    ],
+    "question": null,
+    "pageType": null,
+    "threadReplyTo": null
+  }
+}

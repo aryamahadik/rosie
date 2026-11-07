@@ -1,0 +1,40 @@
+{
+  "row": "outbox-a6-30-alex-text",
+  "attempt": "composed",
+  "checked": {
+    "row": "outbox-a6-30-alex-text",
+    "channel": "imessage",
+    "sends": [
+      {
+        "kind": "words",
+        "text": "A reminder: your {{svc.intext}} at Lee's Barbershop is Sat Oct 24 at 11:00am.",
+        "calendarFile": "none",
+        "options": [],
+        "link": null
+      }
+    ],
+    "fixedLines": [],
+    "slotValues": [
+      { "slot": "biz.name", "value": "Lee's Barbershop" },
+      { "slot": "day", "value": "Sat Oct 24" },
+      { "slot": "visit.time", "value": "11:00am" }
+    ],
+    "threadReplyTo": null
+  },
+  "checks": [
+    { "check": "fixedLines", "passed": true, "detail": null },
+    {
+      "check": "values",
+      "passed": false,
+      "detail": "The slot {{svc.intext}} has no value, so '{{' is left in the text."
+    },
+    { "check": "oneQuestion", "passed": true, "detail": null },
+    { "check": "neverInMessage", "passed": true, "detail": null },
+    { "check": "shape", "passed": true, "detail": null },
+    { "check": "lengthAndReading", "passed": true, "detail": null },
+    { "check": "format", "passed": true, "detail": null }
+  ],
+  "outcome": "rewrite",
+  "questionWithdrawn": false,
+  "teamPaged": false
+}

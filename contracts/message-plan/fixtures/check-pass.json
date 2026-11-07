@@ -1,0 +1,32 @@
+{
+  "row": "outbox-a7-12-alex-reply",
+  "attempt": "composed",
+  "checked": {
+    "row": "outbox-a7-12-alex-reply",
+    "channel": "imessage",
+    "sends": [
+      {
+        "kind": "words",
+        "text": "Riley says yes.",
+        "calendarFile": "none",
+        "options": [],
+        "link": null
+      }
+    ],
+    "fixedLines": [],
+    "slotValues": [{ "slot": "pro.name", "value": "Riley" }],
+    "threadReplyTo": null
+  },
+  "checks": [
+    { "check": "fixedLines", "passed": true, "detail": null },
+    { "check": "values", "passed": true, "detail": null },
+    { "check": "oneQuestion", "passed": true, "detail": null },
+    { "check": "neverInMessage", "passed": true, "detail": null },
+    { "check": "shape", "passed": true, "detail": null },
+    { "check": "lengthAndReading", "passed": true, "detail": null },
+    { "check": "format", "passed": true, "detail": null }
+  ],
+  "outcome": "send",
+  "questionWithdrawn": false,
+  "teamPaged": false
+}

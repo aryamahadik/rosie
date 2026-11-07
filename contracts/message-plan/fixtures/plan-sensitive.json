@@ -1,0 +1,16 @@
+{
+  "formats": ["text"],
+  "lines": [
+    {
+      "role": "first",
+      "text": "New booking: {{alex.staff}} · {{svc.intext:First session}} · {{day}} · {{visit.time}}"
+    },
+    {
+      "role": "action",
+      "text": "The details are on the secure page: {{link.secure}}"
+    }
+  ],
+  "question": null,
+  "pageType": null,
+  "threadReplyTo": null
+}

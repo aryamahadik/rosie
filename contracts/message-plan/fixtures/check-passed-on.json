@@ -1,0 +1,40 @@
+{
+  "row": "outbox-a7-17-alex-text",
+  "attempt": "fallback",
+  "checked": {
+    "row": "outbox-a7-17-alex-text",
+    "channel": "imessage",
+    "sends": [
+      {
+        "kind": "words",
+        "text": "Sorry, Riley can't be in on Sat Oct 24. {{name.staff}} can come in early to do your visit, same time and price. Please reply by 7pm.",
+        "calendarFile": "none",
+        "options": [],
+        "link": null
+      }
+    ],
+    "fixedLines": [],
+    "slotValues": [
+      { "slot": "pro.name", "value": "Riley" },
+      { "slot": "day", "value": "Sat Oct 24" },
+      { "slot": "ask.by", "value": "7pm" }
+    ],
+    "threadReplyTo": null
+  },
+  "checks": [
+    { "check": "fixedLines", "passed": true, "detail": null },
+    {
+      "check": "values",
+      "passed": false,
+      "detail": "The slot {{name.staff}} has no value, so '{{' is left in the text."
+    },
+    { "check": "oneQuestion", "passed": true, "detail": null },
+    { "check": "neverInMessage", "passed": true, "detail": null },
+    { "check": "shape", "passed": true, "detail": null },
+    { "check": "lengthAndReading", "passed": true, "detail": null },
+    { "check": "format", "passed": true, "detail": null }
+  ],
+  "outcome": "passedOn",
+  "questionWithdrawn": true,
+  "teamPaged": true
+}

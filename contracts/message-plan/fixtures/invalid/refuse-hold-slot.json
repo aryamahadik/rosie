@@ -1,0 +1,16 @@
+{
+  "formats": ["text"],
+  "lines": [
+    {
+      "role": "first",
+      "text": "You're booked at {{biz.name}} for {{day}} at {{visit.time}}."
+    },
+    {
+      "role": "fact",
+      "text": "{{hold:$89}} is held on your card until the visit."
+    }
+  ],
+  "question": null,
+  "pageType": null,
+  "threadReplyTo": null
+}

@@ -1,0 +1,934 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/message-plan/message-plan.v1.schema.json",
+  "title": "MessagePlanV1",
+  "description": "K-03 v1, the composer's message plan and slots (02-contracts K-03; arch 07 lines 345 to 417; arch 01 line 97; arch 12 line 590; BP section 10: 'freeze the message-plan contract first'). The root is any one of K-03's six documents, each a definition under $defs that every fixture names: the plan (the composer's structured output), the composer's input, the plan an outbox row stores, the slot vocabulary, the final parts after code and the check result. The root lists them so the type generator writes a type for each (ADR-005). Only $defs/plan and the definitions it refers to go to the model, and they stay inside the model API's structured-outputs subset (02-contracts section 2 item 7; contracts/README.md convention 7); the root and the other documents are code's and are never sent.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/plan"
+    },
+    {
+      "$ref": "#/$defs/composeInput"
+    },
+    {
+      "$ref": "#/$defs/rowPlan"
+    },
+    {
+      "$ref": "#/$defs/slotVocabulary"
+    },
+    {
+      "$ref": "#/$defs/finalParts"
+    },
+    {
+      "$ref": "#/$defs/checkResult"
+    }
+  ],
+  "$defs": {
+    "format": {
+      "title": "Format",
+      "description": "A format the composer may pick, from the closed list of arch 07 lines 373 to 393: text (always), poll (iMessage, an existing chat, a closed question with 2 to 5 options), linkCard (iMessage or RCS, an action on a secure page), calendarFile (iMessage, with a confirmation, move or call-off) and tapback (iMessage, every part of the turn no_op, no question open, tag routine; arch 07 line 391). Not formats: bold text decorations and read receipts, off until tested (MC 8 'iPhone tests'); typing dots, which code sends (arch 07 line 385); a threaded reply, which is the plan's threadReplyTo (arch 07 line 389); contact cards, screen effects, stickers, voice memos and the rest of arch 07 line 393's Never row (Q-43). Whether a format is allowed for this row right now is the input's allowedFormats, checked against the plan in code (C-092, C-128), not here.",
+      "type": "string",
+      "enum": ["text", "poll", "linkCard", "calendarFile", "tapback"]
+    },
+    "slotName": {
+      "title": "SlotName",
+      "description": "A slot of the vocabulary (02-contracts K-03 'The slot vocabulary'; fixtures/slots.json lists each with its meaning and source): the record's 16 named slots (master-A.json and master-B.json record.slots); the auto-fill slots (SPEC-master 5h; overlay-core.js SLOTS line 1285); the amount slots (overlay-core.js AMOUNTS line 981) and the ledger amounts (LEDGER_AMOUNTS line 597; AMOUNT_RE line 983); today and tomorrow, filled at send (arch 07 line 409); the link slots (C9; 02-contracts K-03) and the slots for the sample cast's names, dates, times, prices and places (arch 12 line 592; MC C6), whose names no source gives and are proposed under CQ-17. hold is not a slot: refused since D66 (SPEC-master D66 amendments, #3 and the 5h amendment).",
+      "type": "string",
+      "enum": [
+        "pay.asks",
+        "pay.price",
+        "pay.took",
+        "pay.left",
+        "pay.cancel",
+        "pay.late",
+        "pay.noshow",
+        "pay.back",
+        "pay.after",
+        "pay.staff",
+        "pay.failed",
+        "clock.pay",
+        "two.count",
+        "reach.way",
+        "reach.to",
+        "who.ok",
+        "alex.staff",
+        "name.staff",
+        "svc.intext",
+        "arrive",
+        "window",
+        "cutoff",
+        "day",
+        "keep",
+        "price",
+        "fee",
+        "deposit",
+        "rest",
+        "paid",
+        "name",
+        "paidnow",
+        "due",
+        "back",
+        "later",
+        "backlate",
+        "today",
+        "tomorrow",
+        "link.secure",
+        "link.pay",
+        "link.chat",
+        "link.chatqr",
+        "biz.name",
+        "biz.phone",
+        "owner.name",
+        "pro.name",
+        "visit.time",
+        "visit.place",
+        "visit.code",
+        "ask.by",
+        "change.when",
+        "change.price",
+        "relay.quote"
+      ]
+    },
+    "linkSlot": {
+      "title": "LinkSlot",
+      "description": "A link slot: link.secure (the secure page: payments, forms and private details; RULES 4.1; S13-05), link.pay (a pay link; D104 as MC C9 cites it), link.chat (the chat link that opens Messages to Rosie's number with a ready text and a short code; MC C9; RULES 4.1b) and link.chatqr (that link's QR code, beside it wherever a screen shows it; MC C9). The names are proposed under CQ-17 (no source names them; 02-contracts K-03 'links').",
+      "type": "string",
+      "enum": ["link.secure", "link.pay", "link.chat", "link.chatqr"]
+    },
+    "slottedText": {
+      "title": "SlottedText",
+      "description": "Words with slots, written {{name}}, {{name:example words}} or {{name:example|other words}}, the master's slot syntax (SPEC-master 5h; overlay-core.js SLOT_RE line 1284; arch 01 line 97: 'lines with slots such as {{due}}'). Every {{ must open a slot of the vocabulary (slotName's list), so a slot outside it, such as {{hold}} (D66), is refused; the example words are illustrations the slot filler replaces (MC C6). Code fills every slot (C-088); a {{ left after the fill fails the Values check (arch 07 line 409). The pattern uses no lookaround, inside the structured-outputs subset.",
+      "type": "string",
+      "pattern": "^([^{]|\\{[^{]|\\{\\{(pay\\.asks|pay\\.price|pay\\.took|pay\\.left|pay\\.cancel|pay\\.late|pay\\.noshow|pay\\.back|pay\\.after|pay\\.staff|pay\\.failed|clock\\.pay|two\\.count|reach\\.way|reach\\.to|who\\.ok|alex\\.staff|name\\.staff|svc\\.intext|arrive|window|cutoff|day|keep|price|fee|deposit|rest|paidnow|paid|name|due|backlate|back|later|today|tomorrow|link\\.secure|link\\.pay|link\\.chatqr|link\\.chat|biz\\.name|biz\\.phone|owner\\.name|pro\\.name|visit\\.time|visit\\.place|visit\\.code|ask\\.by|change\\.when|change\\.price|relay\\.quote)(:[^{}|]*)?(\\|[^{}]*)?\\}\\})*\\{?$"
+    },
+    "lineRole": {
+      "title": "LineRole",
+      "description": "Where a line sits in the message's shape (arch 07 line 353): first (what happened or what is needed, as a preview often shows only that), fact (a fact line joining facts with ' · ': the business, what, when and where, who, the price, and on a confirmation the code; up to four) or action (the one action line and its link). The counts (one first line, at most four fact lines, one action line) are Shape checks in code (C-092; arch 07 line 417: a message past four fact lines is only logged).",
+      "type": "string",
+      "enum": ["first", "fact", "action"]
+    },
+    "line": {
+      "title": "PlanLine",
+      "description": "One line of the plan, in the order it is sent (arch 07 line 353; arch 01 line 97).",
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/$defs/lineRole"
+        },
+        "text": {
+          "description": "The line's words with slots (arch 07 line 401: keep the master line's meaning and order, fill its slots; arch 01 line 97). Only <facts> may be stated (arch 07 line 403); each value a slot (arch 07 line 409).",
+          "$ref": "#/$defs/slottedText"
+        }
+      },
+      "required": ["role", "text"],
+      "additionalProperties": false
+    },
+    "question": {
+      "title": "PlanQuestion",
+      "description": "The plan's one question (S13-28 rule 50: at most one question per text; arch 07 line 353), with the open question's option ids (arch 01 line 97; 02-contracts K-03).",
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "The question's words with slots; with a clock, its deadline as a slot, such as {{ask.by}} (arch 07 line 409; RULES 4.2: what silence does). With a poll, it goes as text first (arch 07 line 379).",
+          "$ref": "#/$defs/slottedText"
+        },
+        "optionIds": {
+          "description": "The ids of the open question's options this question offers, in order, from the input's options (02-contracts K-03; arch 01 line 97). Empty for an open-ended question. Code inserts each option's label word for word (arch 07 line 361; HANDOFF 15 as arch 07 line 379 cites it); 2 to 5 for a poll and at most 5 buttons are code checks (C-128; arch 07 line 353).",
+          "type": "array",
+          "items": {
+            "description": "One option id, as the input's options give it (02-contracts K-03; K-02 owns the choices' ids).",
+            "type": "string"
+          }
+        }
+      },
+      "required": ["text", "optionIds"],
+      "additionalProperties": false
+    },
+    "plan": {
+      "title": "Plan",
+      "description": "The message plan: the composer's structured output for one outbox row (arch 07 line 397: 'It returns the plan as structured output'; arch 01 line 97: 'format, lines with slots such as {{due}}, the question, option ids and one page type the step allows, or none'; 02-contracts K-03 'The plan'). Inside the structured-outputs subset: every property required (none optional), three unions, no number, length or array limits beyond minItems 1, additionalProperties false (02-contracts section 2 item 7).",
+      "type": "object",
+      "properties": {
+        "formats": {
+          "description": "The formats this plan uses, from the input's allowedFormats (arch 07 line 365: code lists what this phone allows, the AI picks from it). At most two sends: the words, carrying any calendar file, then one poll or card (arch 07 line 367); a tapback alone (arch 07 line 391). A plan outside the allowed list goes as text alone and is logged (arch 07 line 365; DD): a code check (C-092, C-128).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/format"
+          },
+          "minItems": 1
+        },
+        "lines": {
+          "description": "The lines in order: the first line, up to four fact lines, one action line with its link (arch 07 line 353). Empty only for a tapback (arch 07 line 391). Fixed lines are not here: code adds them (arch 07 line 361).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/line"
+          }
+        },
+        "question": {
+          "description": "The one question, or null when the message asks nothing (S13-28 rule 50; arch 07 line 353).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/question"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pageType": {
+          "description": "One page type the step allows, from the input's pageTypes, or null for none (arch 01 line 97). A free string in v1: no source lists the page types (CQ-16); K-21 names the closed list, and that the pick is one of the input's is a code check (C-092).",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "threadReplyTo": {
+          "description": "The open question this reply threads under, one of the input's openQuestions ids, when the reply answers one of several open questions (arch 07 line 389); else null.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["formats", "lines", "question", "pageType", "threadReplyTo"],
+      "additionalProperties": false
+    },
+    "readerRole": {
+      "title": "ReaderRole",
+      "description": "Who reads the message: owner (the owner or office manager), staff, customer (SPEC-master 4 'who / to': owner, staff, cust; arch 07 line 359 'Each reader'). The customer's own AI gets structured data as the tool's answer, not a composed message (arch 07 line 371).",
+      "type": "string",
+      "enum": ["owner", "staff", "customer"]
+    },
+    "audienceKind": {
+      "title": "AudienceKind",
+      "description": "Who may see a slot's field: customer, staff, owner, securePageOnly or never (RULES 4.5; arch 06 line 311, limit 7; 02-contracts section 2 item 3).",
+      "type": "string",
+      "enum": ["customer", "staff", "owner", "securePageOnly", "never"]
+    },
+    "channel": {
+      "title": "Channel",
+      "description": "The channel the row goes on: imessage, rcs or sms through Linq (arch 07 line 365: from the service of the text a reply answers, else Linq's capability check, else text alone), or email, its own row with the text row's plan (arch 07 line 371). sms here is Linq's SMS service for a chat on an Android phone on the same number (RULES 4.1b), never an SMS provider (MC C9; DL-012).",
+      "type": "string",
+      "enum": ["imessage", "rcs", "sms", "email"]
+    },
+    "situation": {
+      "title": "Situation",
+      "description": "Code's tone tag, the first that fits (arch 07 line 357; C-090): gentle (grief, safety or sensitive work: a safety outcome other than No, a death report, the sensitive switch; S13-22), problem (one getting worse, a payment problem, a complaint, damage, lateness, a business that can't make it, a platform failure; S13-29 rule 59), moneyOrConsent (a read-back, charge, refund or fee: exact amounts and dates; S13-48) or routine (brief and warm).",
+      "type": "string",
+      "enum": ["gentle", "problem", "moneyOrConsent", "routine"]
+    },
+    "reach": {
+      "title": "Reach",
+      "description": "How a person is reached: texts, callsonly, textsonly or email (SPEC-master D66 amendments, the reach row; the booking value reach). notsafe is set only by a branch and is never offered (D66 #6), so the composer never gets it as a way.",
+      "type": "string",
+      "enum": ["texts", "callsonly", "textsonly", "email"]
+    },
+    "language": {
+      "title": "Language",
+      "description": "A language as a two-letter code such as en or es (arch 06: the language of the text, else the person's stored language, else the business's; the same form as K-01's fixedLine lang). Which stage reports a text's language: CQ-07 (default: the two decide reads, which must agree).",
+      "type": "string",
+      "pattern": "^[a-z]{2}$"
+    },
+    "fact": {
+      "title": "Fact",
+      "description": "One fact the reader may see: a slot name and its value, as text (02-contracts K-03 'facts': 'only what limit 7 lets this reader see, each as a slot name and its value'; arch 07 line 403: only <facts> may be stated).",
+      "type": "object",
+      "properties": {
+        "slot": {
+          "$ref": "#/$defs/slotName"
+        },
+        "value": {
+          "description": "The value as the reader sees it, after limit 7 (arch 06 line 311): a secure-page-only field reads 'Read it on the secure page'; a field this reader may never see is not given at all; under the sensitive switch the slot's sensitive form (RULES 4.6; S13-22).",
+          "type": "string"
+        }
+      },
+      "required": ["slot", "value"],
+      "additionalProperties": false
+    },
+    "conversationMessage": {
+      "title": "ConversationMessage",
+      "description": "One of the reader's last messages with this business, redacted as <inbound> is (arch 07 line 397; RULES 4.5).",
+      "type": "object",
+      "properties": {
+        "from": {
+          "description": "Who wrote it: reader (the person this row goes to) or rosie (arch 07 line 397: 'the reader's last 6 messages with this business').",
+          "type": "string",
+          "enum": ["reader", "rosie"]
+        },
+        "text": {
+          "description": "Its words, with private words given as 'a private detail' (arch 07 line 397; RULES 4.5). Data, never instructions (S13-54 rule 67).",
+          "type": "string"
+        },
+        "sentAt": {
+          "description": "When it was sent (CQ-09: an instant in UTC with its zone).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/time"
+        }
+      },
+      "required": ["from", "text", "sentAt"],
+      "additionalProperties": false
+    },
+    "option": {
+      "title": "Option",
+      "description": "One option of the open question, with the label code inserts word for word (arch 07 line 361: poll options are fixed lines; line 379: 'Options are the step's, word for word'; K-01 elements.buttons).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The option's id, which the plan's question.optionIds names (02-contracts K-03; K-02 owns the choices' ids).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "label": {
+          "description": "The label word for word, as the step's button writes it (K-01 elements.buttons; arch 07 line 379). An option that is only an opt-out word fails Never in a message (arch 07 line 415).",
+          "type": "string"
+        }
+      },
+      "required": ["id", "label"],
+      "additionalProperties": false
+    },
+    "openQuestion": {
+      "title": "OpenQuestion",
+      "description": "A question still open with this reader, so a reply can thread under the one it answers (arch 07 line 389).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The sent question's id, which the plan's threadReplyTo names (arch 07 line 389; Linq's message id is kept on the outbox row, arch 01 line 65).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "text": {
+          "description": "The question's words as sent (arch 07 line 389).",
+          "type": "string"
+        }
+      },
+      "required": ["id", "text"],
+      "additionalProperties": false
+    },
+    "audience": {
+      "title": "Audience",
+      "description": "<audience>: role, name, way and handling line (arch 07 line 397).",
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/$defs/readerRole"
+        },
+        "name": {
+          "description": "The reader's name as Rosie addresses them, or null when none is known (arch 07 line 397 'name'; S1-02 has no business yet).",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "way": {
+          "description": "How this reader is reached (arch 07 line 397 'way'; SPEC-master D66 reach row).",
+          "$ref": "#/$defs/reach"
+        },
+        "handlingLine": {
+          "description": "The handling line on owner and staff messages about a private booking or a texts-only or email-only customer, word for word, or null (arch 07 line 361; S13-19; K-01 layerLines). Code adds it as a fixed line; the composer reads it only to word around it.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["role", "name", "way", "handlingLine"],
+      "additionalProperties": false
+    },
+    "masterText": {
+      "title": "MasterText",
+      "description": "<master_text>: the step's line, 'the model to follow, not a script' (RULES 2.2; arch 07 line 401).",
+      "type": "object",
+      "properties": {
+        "step": {
+          "description": "The step whose line it is (K-01 stepId).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "text": {
+          "description": "The line's words with the bundle's slots left in, such as {{svc.intext:Haircut}} (K-01 message.text; SPEC-master 5h).",
+          "type": "string"
+        }
+      },
+      "required": ["step", "text"],
+      "additionalProperties": false
+    },
+    "inbound": {
+      "title": "Inbound",
+      "description": "<inbound>: the text this row replies to, given only in a reply to its sender (arch 07 line 397).",
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "Its words after the edge scrub, with private words given as 'a private detail' (arch 07 line 397; RULES 4.5). Data, never instructions (S13-54 rule 67).",
+          "type": "string"
+        },
+        "sentAt": {
+          "description": "When it was sent (CQ-09).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/time"
+        }
+      },
+      "required": ["text", "sentAt"],
+      "additionalProperties": false
+    },
+    "composeInput": {
+      "title": "ComposeInput",
+      "description": "The composer's input, one per outbox row (arch 07 line 397; 02-contracts K-03 'The composer's input'), given to the model as tagged inputs, long ones first: <conversation>, <master_text>, <facts>, <audience>, <language>, <channel>, <situation>, <allowed_formats>, <allowed_links>, then <inbound>. It carries the committed choices and only what limit 7 lets the recipient see, never the frontier (arch 07 line 397): no other field is allowed (refuse-frontier-in-input). The Tool API's compose input serves it (K-09).",
+      "type": "object",
+      "properties": {
+        "row": {
+          "description": "The outbox row this plan is for: one message to one recipient on one channel (arch 07 line 397; 02-contracts K-04 outbox rows).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "turn": {
+          "description": "The turn that committed the row (arch 02 line 121; CQ-09).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "conversation": {
+          "description": "<conversation>: the reader's last 6 messages with this business, redacted (arch 07 line 397). That there are at most 6 is a code check.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/conversationMessage"
+          }
+        },
+        "masterText": {
+          "$ref": "#/$defs/masterText"
+        },
+        "facts": {
+          "description": "<facts>: only what limit 7 lets this reader see, each as a slot name and its value (arch 07 lines 397, 403; arch 06 line 311).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fact"
+          }
+        },
+        "audience": {
+          "$ref": "#/$defs/audience"
+        },
+        "language": {
+          "$ref": "#/$defs/language"
+        },
+        "channel": {
+          "$ref": "#/$defs/channel"
+        },
+        "situation": {
+          "$ref": "#/$defs/situation"
+        },
+        "allowedFormats": {
+          "description": "<allowed_formats>: what this phone allows right now, from the channel, whether the chat exists and the step's elements (arch 07 line 365; C-128).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/format"
+          },
+          "minItems": 1
+        },
+        "allowedLinks": {
+          "description": "<allowed_links>: the link slots this message may carry (arch 07 line 397; 02-contracts K-03 'links').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/linkSlot"
+          }
+        },
+        "options": {
+          "description": "The open question's options, in order, with their labels (arch 07 line 365: 'the step's elements'; K-01 elements.buttons). Empty when the step asks nothing with options.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/option"
+          }
+        },
+        "pageTypes": {
+          "description": "The page types the step allows (K-01 step pageTypes; arch 01 line 97; arch 07 line 365: 'the step's page types'). Free strings until K-21 (CQ-16).",
+          "type": "array",
+          "items": {
+            "description": "One page type (K-01 step pageTypes; CQ-16).",
+            "type": "string"
+          }
+        },
+        "openQuestions": {
+          "description": "The questions still open with this reader, for a threaded reply (arch 07 line 389). Empty when none is open.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/openQuestion"
+          }
+        },
+        "inbound": {
+          "description": "<inbound>, only in a reply to its sender; else null (arch 07 line 397).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/inbound"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "row",
+        "turn",
+        "conversation",
+        "masterText",
+        "facts",
+        "audience",
+        "language",
+        "channel",
+        "situation",
+        "allowedFormats",
+        "allowedLinks",
+        "options",
+        "pageTypes",
+        "openQuestions",
+        "inbound"
+      ],
+      "additionalProperties": false
+    },
+    "rowPlan": {
+      "title": "RowPlan",
+      "description": "The plan as an outbox row stores it (arch 07 line 347: 'each outbox row stores it with Linq's ids'; 02-contracts K-04 and K-07: the outbox row holds a K-03 plan). An email copy is its own row that takes its text row's plan instead of a composer call (arch 07 lines 371 and 397).",
+      "type": "object",
+      "properties": {
+        "row": {
+          "description": "The outbox row (02-contracts K-04 outbox rows).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "channel": {
+          "$ref": "#/$defs/channel"
+        },
+        "copyOf": {
+          "description": "For an email copy, the text row whose plan it reuses; null for a row the composer planned itself (arch 07 line 397: 'an email copy takes its text row's plan instead').",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "plan": {
+          "$ref": "#/$defs/plan"
+        }
+      },
+      "required": ["row", "channel", "copyOf", "plan"],
+      "additionalProperties": false
+    },
+    "slotKind": {
+      "title": "SlotKind",
+      "description": "Where a slot comes from (02-contracts K-03 'The slot vocabulary'): record (the record's 16 named slots, record.slots), autofill (SPEC-master 5h), amount (overlay-core.js AMOUNTS line 981), ledger (LEDGER_AMOUNTS line 597), send ('today' and 'tomorrow', filled at send: arch 07 line 409), link (C9) or compiler (made by the compiler from the sample cast's names, dates, times, prices and places: arch 12 line 592; MC C6).",
+      "type": "string",
+      "enum": ["record", "autofill", "amount", "ledger", "send", "link", "compiler"]
+    },
+    "valueType": {
+      "title": "ValueType",
+      "description": "The kind of value a slot holds, as the Values check reads it (arch 07 line 409: 'each number, time, date, price, code, phone, link and name of a person or business matches a code-supplied fact'): phrase (words from a record row), personName, businessName, money, date, time, timeRange, deadline (a day and clock time, plus what silence does: arch 07 line 355), place, phone, code, link, words (example words kept as written).",
+      "type": "string",
+      "enum": [
+        "phrase",
+        "personName",
+        "businessName",
+        "money",
+        "date",
+        "time",
+        "timeRange",
+        "deadline",
+        "place",
+        "phone",
+        "code",
+        "link",
+        "words"
+      ]
+    },
+    "sensitiveForm": {
+      "title": "SensitiveForm",
+      "description": "What a slot shows with the sensitive switch on (RULES 4.6; S13-22; SPEC-master 5h; 02-contracts K-03 'its sensitive form'): asIs (unchanged), initials (A.M.; D41), emptyOrAlternate (nothing, and one ' · ' or ', ' next to it goes too, or the words after '|' such as 'visit'), displayName (the business's plain display name) or securePageOnly ('Read it on the secure page': arch 06 line 311).",
+      "type": "string",
+      "enum": ["asIs", "initials", "emptyOrAlternate", "displayName", "securePageOnly"]
+    },
+    "slotStatus": {
+      "title": "SlotStatus",
+      "description": "source: the slot's name is in the sources named in its source field. proposedCQ17: no source names it; this contract proposes the name until the CTO rules on CQ-17, and K-01's closed slot list gains it only in a K-01 v1.1 (CQ-17, raised by T-010).",
+      "type": "string",
+      "enum": ["source", "proposedCQ17"]
+    },
+    "slot": {
+      "title": "Slot",
+      "description": "One slot of the vocabulary: its value type, the record field or fact it reads, its audience and its sensitive form (02-contracts K-03 'The slot vocabulary').",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/slotName"
+        },
+        "kind": {
+          "$ref": "#/$defs/slotKind"
+        },
+        "status": {
+          "$ref": "#/$defs/slotStatus"
+        },
+        "means": {
+          "description": "What it means, in plain words: the record's means line, overlay-core.js SLOTS' means, or this contract's words for a proposed slot (record.slots.<slot>.means; overlay-core.js line 1285).",
+          "type": "string",
+          "pattern": "."
+        },
+        "valueType": {
+          "$ref": "#/$defs/valueType"
+        },
+        "reads": {
+          "description": "The record field, record slot rows or fact it reads, in plain words (02-contracts K-03: 'the record field or fact it reads'). The table and column names are K-04's and K-07's (F2, F3).",
+          "type": "string",
+          "pattern": "."
+        },
+        "audience": {
+          "description": "Who may see it (RULES 4.5; arch 06 line 311). For a slot the master uses in messages, the readers it sends it to there (counted in master-A.json and master-B.json by T-012); else its means line. That a slot is securePageOnly or never alone is a code check (C-091).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/audienceKind"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "sensitiveForm": {
+          "$ref": "#/$defs/sensitiveForm"
+        },
+        "filledBy": {
+          "description": "Who fills it: slotFiller (C-088, after the composer, before the checks) or send (at send time: 'today' and 'tomorrow', arch 07 line 409).",
+          "type": "string",
+          "enum": ["slotFiller", "send"]
+        },
+        "example": {
+          "description": "Example words from the master's sample cast (SPEC-master 6), illustrations only (MC C6), or null.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "description": "Where the slot comes from: a record slot, a SPEC-master section, an overlay-core.js line, an architecture line or a question row (02-contracts section 2 item 4).",
+          "type": "string",
+          "pattern": "."
+        }
+      },
+      "required": [
+        "name",
+        "kind",
+        "status",
+        "means",
+        "valueType",
+        "reads",
+        "audience",
+        "sensitiveForm",
+        "filledBy",
+        "example",
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "slotVocabulary": {
+      "title": "SlotVocabulary",
+      "description": "The whole slot vocabulary (02-contracts K-03 'The slot vocabulary'; fixtures/slots.json). That every name of slotName is here once, and every slot in the sample bundles is here, are contract-test checks (02-contracts K-03 'Contract test').",
+      "type": "object",
+      "properties": {
+        "slots": {
+          "description": "Every slot (02-contracts K-03).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slot"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["slots"],
+      "additionalProperties": false
+    },
+    "calendarFile": {
+      "title": "CalendarFile",
+      "description": "The calendar file the words carry: none, new (a confirmation), move (the same UID with a higher SEQUENCE) or cancel (STATUS:CANCELLED) (arch 07 line 383; RFC 5545). Built by code from the booking.",
+      "type": "string",
+      "enum": ["none", "new", "move", "cancel"]
+    },
+    "sendKind": {
+      "title": "SendKind",
+      "description": "What one send is (arch 07 line 367): words (the text, carrying any calendar file), poll, linkCard (the whole message: Linq 1004, arch 07 line 381) or tapback (a like in place of a reply: arch 07 line 391).",
+      "type": "string",
+      "enum": ["words", "poll", "linkCard", "tapback"]
+    },
+    "send": {
+      "title": "Send",
+      "description": "One send of the final message, in order; the second waits for the first's delivery receipt, at most 10 s (arch 07 line 367).",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/sendKind"
+        },
+        "text": {
+          "description": "The words as they go, with fixed lines added and slots filled (arch 02 line 123; arch 07 line 361); for a link card, its preview words (arch 07 line 381); null for a poll or a tapback.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "calendarFile": {
+          "$ref": "#/$defs/calendarFile"
+        },
+        "options": {
+          "description": "A poll's options, word for word (arch 07 line 379); empty for any other send. Until a handle has voted in a poll, the words also carry the options in msgtext.js's text form (arch 07 line 379).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/option"
+          }
+        },
+        "link": {
+          "description": "A link card's link, filled from its link slot; null for any other send (arch 07 line 381).",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["kind", "text", "calendarFile", "options", "link"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "A poll carries 2 to 5 options and no words of its own (arch 07 line 379); a link card carries its link (arch 07 line 381); only the words carry a calendar file (arch 07 line 367).",
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "A poll (arch 07 line 379).",
+                "const": "poll"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "options": {
+                "description": "2 to 5 options (arch 07 line 379).",
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 5
+              },
+              "text": {
+                "description": "The question went as text first (arch 07 line 379).",
+                "type": "null"
+              },
+              "calendarFile": {
+                "description": "Files ride with the words (arch 07 line 367).",
+                "const": "none"
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "properties": {
+                "kind": {
+                  "description": "A link card (arch 07 line 381).",
+                  "const": "linkCard"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "link": {
+                  "description": "A link card carries its link (arch 07 line 381).",
+                  "type": "string"
+                },
+                "calendarFile": {
+                  "description": "Files ride with the words (arch 07 line 367).",
+                  "const": "none"
+                },
+                "options": {
+                  "description": "No options on a card (arch 07 line 367).",
+                  "type": "array",
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "finalParts": {
+      "title": "FinalParts",
+      "description": "The message after code: options inserted word for word, fixed lines added, slots filled; at most two sends, the words (with any calendar file) and then one poll or card (02-contracts K-03 'Final parts'; arch 02 line 123; arch 07 lines 361, 367).",
+      "type": "object",
+      "properties": {
+        "row": {
+          "description": "The outbox row (02-contracts K-04 outbox rows).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "channel": {
+          "$ref": "#/$defs/channel"
+        },
+        "sends": {
+          "description": "The sends in order, at most two (arch 07 line 367).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/send"
+          },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "fixedLines": {
+          "description": "The fixed lines code added, by K-01 fixedLine id, such as opener or optOutLine (arch 07 line 361; Q-30 for where the opt-out line goes). They sit outside the Shape and Length counts (arch 07 line 361).",
+          "type": "array",
+          "items": {
+            "description": "One fixed line's id (K-01 fixedLine.id; C-089).",
+            "$ref": "../bundle/bundle.v1.schema.json#/$defs/fixedLine/properties/id"
+          },
+          "uniqueItems": true
+        },
+        "slotValues": {
+          "description": "Each slot filled and the code-supplied value it took, which the Values check matches every number, time, date, price, code, phone, link and name against (arch 07 line 409; C-088).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fact"
+          }
+        },
+        "threadReplyTo": {
+          "description": "The plan's thread target, kept (arch 07 line 389); null when none.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["row", "channel", "sends", "fixedLines", "slotValues", "threadReplyTo"],
+      "additionalProperties": false
+    },
+    "checkName": {
+      "title": "CheckName",
+      "description": "A check on every message (arch 07 lines 405 to 417): fixedLines (match their source word for word), values (arch 07 line 409), oneQuestion (S13-28 rule 50), neverInMessage (arch 07 line 415), shape (arch 07 line 353: the first line, at most four fact lines, one action line), lengthAndReading (arch 07 line 413) and format (a plan outside the allowed formats goes as text alone and is logged: arch 07 line 365). The first four block; the others never block (arch 07 line 417).",
+      "type": "string",
+      "enum": ["fixedLines", "values", "oneQuestion", "neverInMessage", "shape", "lengthAndReading", "format"]
+    },
+    "checkOutcome": {
+      "title": "CheckOutcome",
+      "description": "One check's result (arch 07 lines 405 to 417).",
+      "type": "object",
+      "properties": {
+        "check": {
+          "$ref": "#/$defs/checkName"
+        },
+        "passed": {
+          "description": "true when it passes (arch 07 lines 409 to 415).",
+          "type": "boolean"
+        },
+        "detail": {
+          "description": "What failed, in the words the rewrite is told (arch 02 line 123: 'One rewrite, told what failed'); null when it passed.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["check", "passed", "detail"],
+      "additionalProperties": false
+    },
+    "checkResult": {
+      "title": "CheckResult",
+      "description": "The result of the claim check's message checks on one attempt (02-contracts K-03 'The check result'; arch 02 line 123; arch 07 lines 405 to 417): pass; or the failed checks for the one rewrite; then the step's fallback text; then the passed-on line with the question withdrawn. QA's contract test runs the message checks on each check-* fixture's checked parts and expects its stated outcome (02-contracts K-03 'Contract test').",
+      "type": "object",
+      "properties": {
+        "row": {
+          "description": "The outbox row (02-contracts K-04 outbox rows).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "attempt": {
+          "description": "What was checked: composed (the composer's plan, filled), rewrite (the one rewrite, told what failed) or fallback (the step's fallback text: Jay's reviewed one, else its master line with slots filled) (arch 02 line 123).",
+          "type": "string",
+          "enum": ["composed", "rewrite", "fallback"]
+        },
+        "checked": {
+          "$ref": "#/$defs/finalParts"
+        },
+        "checks": {
+          "description": "Each check's result, each check once (arch 07 lines 405 to 417); that each is there once is a contract-test check.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/checkOutcome"
+          },
+          "minItems": 1
+        },
+        "outcome": {
+          "description": "What happens next (arch 02 line 123; arch 07 line 417): send (every check passed); sendAndLog (only shape, length and reading or format missed after the one rewrite, or a message past four fact lines: it sends and is logged); rewrite (a first miss: one rewrite, told what failed); fallback (the rewrite failed a blocking check: the step's fallback text, through the same checks); passedOn (nothing passed: 'I’ve passed this on. Rosie’s team will reply within 1 business day.', the question withdrawn, the team paged).",
+          "type": "string",
+          "enum": ["send", "sendAndLog", "rewrite", "fallback", "passedOn"]
+        },
+        "questionWithdrawn": {
+          "description": "true when the question is withdrawn, so no clock arms (arch 02 line 123; RULES 5.2).",
+          "type": "boolean"
+        },
+        "teamPaged": {
+          "description": "true when Rosie's team is paged (arch 02 line 123).",
+          "type": "boolean"
+        }
+      },
+      "required": ["row", "attempt", "checked", "checks", "outcome", "questionWithdrawn", "teamPaged"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "outcome": {
+          "description": "passedOn withdraws the question and pages the team; every other outcome does neither (arch 02 line 123).",
+          "if": {
+            "properties": {
+              "outcome": {
+                "description": "Nothing passed (arch 02 line 123).",
+                "const": "passedOn"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "questionWithdrawn": {
+                "description": "The question is withdrawn (arch 02 line 123; RULES 5.2).",
+                "const": true
+              },
+              "teamPaged": {
+                "description": "The team is paged (arch 02 line 123).",
+                "const": true
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "questionWithdrawn": {
+                "description": "Only passedOn withdraws the question (arch 02 line 123).",
+                "const": false
+              },
+              "teamPaged": {
+                "description": "Only passedOn pages the team (arch 02 line 123).",
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
