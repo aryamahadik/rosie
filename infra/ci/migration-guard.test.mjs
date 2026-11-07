@@ -143,16 +143,54 @@ describe("checkMigrations", () => {
     assert.deepEqual(checkMigrations(new Map(), branch).errors, []);
   });
 
-  it("notes CREATE INDEX CONCURRENTLY outside a -- migrate:no-transaction file, which migrate cannot run", () => {
-    const index = "CREATE INDEX CONCURRENTLY people_nickname_idx ON people (nickname);\n";
-    const without = checkMigrations(new Map(), new Map([["db/migrations/9999_idx.sql", file(index)]]));
-    assert.deepEqual(without.errors, []);
-    assert.equal(without.notices.length, 1);
-    assert.match(without.notices[0].message, /make "-- migrate:no-transaction" the first line/);
-    const marked = file(`-- migrate:no-transaction\n${index}`);
-    const withMarker = checkMigrations(new Map(), new Map([["db/migrations/9999_idx.sql", marked]]));
-    assert.deepEqual(withMarker.notices, []);
-    assert.deepEqual(withMarker.errors, []);
+  const run = (content) =>
+    checkMigrations(new Map(), new Map([["db/migrations/9999_idx.sql", file(content)]]));
+  const index = "CREATE INDEX CONCURRENTLY people_nickname_idx ON people (nickname);\n";
+  const index2 = "CREATE INDEX CONCURRENTLY people_age_idx ON people (age);\n";
+  const marker = "-- migrate:no-transaction\n";
+
+  it("accepts CREATE INDEX CONCURRENTLY alone, with or without the marker (T-724 runs it either way)", () => {
+    for (const content of [index, `${marker}${index}`]) {
+      const result = run(content);
+      assert.deepEqual(result.errors, []);
+      assert.deepEqual(result.notices, []);
+    }
+  });
+
+  it("gives no CONCURRENTLY notice for two CREATE INDEX CONCURRENTLY statements and no marker", () => {
+    const result = run(index + index2);
+    assert.deepEqual(result.errors, []);
+    assert.deepEqual(result.notices, []);
+  });
+
+  it("notes a file that mixes CREATE INDEX CONCURRENTLY with another statement, with or without the marker", () => {
+    const other = "ALTER TABLE people ADD COLUMN note text;\n";
+    for (const content of [index + other, `${marker}${index}${other}`]) {
+      const result = run(content);
+      assert.equal(result.notices.length, 1);
+      assert.match(result.notices[0].message, /migrate refuses this file/);
+    }
+  });
+
+  it("notes a marker file with two statements that are not CREATE INDEX CONCURRENTLY", () => {
+    const result = run(
+      `${marker}ALTER TABLE people ADD COLUMN a text;\nALTER TABLE people ADD COLUMN b text;\n`,
+    );
+    assert.equal(result.notices.length, 1);
+    assert.match(result.notices[0].message, /migrate refuses this file/);
+  });
+
+  it("accepts a marker file with exactly one statement of any kind", () => {
+    assert.deepEqual(run(`${marker}ALTER TABLE people ADD COLUMN a text;\n`).notices, []);
+  });
+
+  it("advises both forms of CREATE INDEX CONCURRENTLY when an index lacks CONCURRENTLY", () => {
+    const [error] = run("CREATE INDEX people_age_idx ON people (age);").errors;
+    assert.match(error.message, /only CREATE INDEX CONCURRENTLY statements \(no marker needed\)/);
+    assert.match(
+      error.message,
+      /first line is -- migrate:no-transaction that holds that one statement or several/,
+    );
   });
 
   it("fails a contracting statement in a new migration, naming the file and line", () => {
