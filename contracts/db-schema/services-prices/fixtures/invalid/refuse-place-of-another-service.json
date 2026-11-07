@@ -1,0 +1,26 @@
+{
+  "after": ["seed-service-money-paths.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "price_rules",
+    "values": {
+      "id": "price-lees-skin-fade-home",
+      "business_id": "biz-lees-barbershop",
+      "service_id": "svc-lees-skin-fade",
+      "service_money_id": "way-lees-haircut-home",
+      "price_cents": 7500,
+      "currency": "USD",
+      "set_by_person_id": "person-sam",
+      "effective_from": "2026-10-19T18:11:00Z"
+    },
+    "expect": {
+      "sqlstate": "23503",
+      "constraintOneOf": ["price_rules_place_fk"]
+    }
+  }
+}

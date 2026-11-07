@@ -1,0 +1,46 @@
+{
+  "after": ["seed-services-price-list.json"],
+  "rows": [
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-haircut-35",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-haircut",
+        "service_money_id": null,
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 3500,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "price_rules",
+    "values": {
+      "id": "price-lees-haircut-40",
+      "business_id": "biz-lees-barbershop",
+      "service_id": "svc-lees-haircut",
+      "price_cents": 4000,
+      "currency": "USD",
+      "set_by_person_id": "person-sam",
+      "effective_from": "2026-11-02T05:00:00Z"
+    },
+    "expect": {
+      "sqlstate": "23P01",
+      "constraintOneOf": ["price_rules_one_in_effect"]
+    }
+  }
+}

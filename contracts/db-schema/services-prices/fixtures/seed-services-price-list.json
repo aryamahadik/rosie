@@ -1,0 +1,168 @@
+{
+  "after": [
+    "../../kinds-of-work/fixtures/seed-kinds-sample.json",
+    "../../business-setup/fixtures/seed-business-demo-shop.json"
+  ],
+  "rows": [
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-haircut",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Haircut",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "30 minutes",
+        "position": 1,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Haircut\",\"price\":\"$35\",\"kind\":\"one price\",\"length\":\"30 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Skin fade",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "45 minutes",
+        "position": 2,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Skin fade\",\"price\":\"$40\",\"kind\":\"one price\",\"length\":\"45 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-beard-trim",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Beard trim",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "15 minutes",
+        "position": 3,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Beard trim\",\"price\":\"$20\",\"kind\":\"one price\",\"length\":\"15 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\",\"note\":\"a quick service: fills 15-minute gaps, bookable up to 30 minutes ahead\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-kids-cut",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Kids cut (12 and under)",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "30 minutes",
+        "position": 4,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Kids cut (12 and under)\",\"price\":\"$25\",\"kind\":\"one price\",\"length\":\"30 min\",\"where\":\"at the shop\",\"before\":\"a card saved\",\"after\":\"at the chair\",\"note\":\"a parent or guardian books it and stays\"},\"pf.questions\":{\"beforeTimes\":[\"for a kids cut: the child's age\"]}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-signature-cut",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Signature cut and hot towel shave",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "60 minutes",
+        "position": 5,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Signature cut and hot towel shave\",\"price\":\"$55\",\"kind\":\"one price\",\"length\":\"60 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-grooms-package",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Groom's package (cut, shave, facial)",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "2 hours 30 minutes",
+        "position": 6,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Groom's package (cut, shave, facial)\",\"price\":\"$140\",\"kind\":\"one price\",\"length\":\"2½ hours, one whole block\",\"where\":\"at the shop\",\"before\":\"a $40 deposit when booked\",\"after\":\"the $100 rest at the chair\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-style-consult",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Style consult",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "15 minutes",
+        "position": 7,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-home-grooming",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Home grooming visit (cut, beard trim, hot towel)",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "60 minutes",
+        "position": 8,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Home grooming visit (cut, beard trim, hot towel)\",\"price\":\"$179\",\"kind\":\"one price\",\"length\":\"60 min\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill, with a tip line\"},\"pf.questions\":{\"beforeTimes\":[\"for a house call or event: the kind of place, and the town or ZIP\"],\"afterTime\":[\"for a house call or event: parking, and a chair near an outlet with good light\"]}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-wedding-party",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Wedding party grooming",
+        "price_kind": "by_answers",
+        "unit": null,
+        "length": "35 minutes",
+        "position": 9,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Wedding party grooming\",\"price\":\"quoted from the party's details (the example: 4 people, $640)\",\"kind\":\"quoted from the details first\",\"length\":\"about 35 minutes a person\",\"where\":\"at the customer's home or the venue\",\"before\":\"a 25% deposit when booked\",\"after\":\"the rest on the bill\",\"note\":\"a signed contract; Sam OKs quotes over $500\"},\"pf.questions\":{\"beforeTimes\":[\"for a wedding party: how many people, what each wants, the date and the start time\"]}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lees-event-hours",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "name": "Event hours (a barber on site at an event)",
+        "price_kind": "per_hour",
+        "unit": null,
+        "length": "1 hour",
+        "position": 10,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Event hours (a barber on site at an event)\",\"price\":\"$120 an hour, 1-hour minimum ($140 with Andre)\",\"kind\":\"per hour\",\"length\":\"the hours booked\",\"where\":\"at the customer's place\",\"before\":\"added to the booking, and paid at the visit\",\"after\":\"on the bill\"},\"pf.questions\":{\"beforeTimes\":[\"for a house call or event: the kind of place, and the town or ZIP\"]}}",
+        "version": 1
+      }
+    }
+  ]
+}
