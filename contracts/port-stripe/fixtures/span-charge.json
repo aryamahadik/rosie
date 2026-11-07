@@ -1,0 +1,26 @@
+{
+  "trace_id": "trace-riley-0024",
+  "span_id": "span-riley-0024-14",
+  "seq": 14,
+  "hop": "effectRun",
+  "at": "2026-10-24T18:45:31.100Z",
+  "ms": 900,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": "turn-riley-done-1",
+  "job_id": null,
+  "handle_ref": "handle-riley",
+  "business_id": "biz-lees-barbershop",
+  "provider": "stripe",
+  "call": "charge",
+  "attempt": 2,
+  "got": {
+    "step": "A9-12",
+    "effect": "eff-alex-haircut-done",
+    "account": "business",
+    "purpose": "rest",
+    "customerPresent": false
+  },
+  "decided": { "result": "charged", "declineCode": null },
+  "outcome": "ok",
+  "error_code": null
+}

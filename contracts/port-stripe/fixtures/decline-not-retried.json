@@ -1,0 +1,31 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-11-07T15:30:01Z",
+    "note": "RULES 3.11; arch 10 line 542: the $40 Groom's package deposit, charged as the booking is written, is declined by the card's bank (K-07 v1 effect-charge-declined.json). A decline is never retried: Alex is still on the page, which shows 'Try another card'; another card is a new effect row with its own key."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-grooms-deposit-declined",
+      "idempotencyKey": "eff-alex-grooms-deposit-declined"
+    },
+    "amount": { "cents": 4000, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "purpose": "deposit",
+      "customerId": "stripe-customer-demo-alex",
+      "paymentMethodId": "stripe-card-demo-alex",
+      "customerPresent": true,
+      "description": "Lee's Barbershop: deposit for the Groom's package"
+    }
+  },
+  "outcome": {
+    "result": "failed",
+    "kind": "declined",
+    "httpStatus": 402,
+    "code": "card_declined",
+    "declineCode": "generic_decline",
+    "reason": "Your card was declined.",
+    "paymentId": "stripe-payment-demo-0002"
+  }
+}

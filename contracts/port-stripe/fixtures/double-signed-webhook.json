@@ -1,0 +1,34 @@
+{
+  "call": "doubleWebhook",
+  "given": {
+    "now": "2026-11-06T16:20:00Z",
+    "note": "The Stripe double (BP 9.4): on staging's pay page Alex pays his $25 Color correction link in time (charge-failed-pay-link.json; A6-32 'Paid in time: it's booked'). The double signs the paymentSucceeded event in Stripe's form under the test environment's secret, and verifyWebhook on it gives the same event back."
+  },
+  "request": {
+    "endpoint": "businesses",
+    "event": {
+      "eventId": "stripe-evt-double-0001",
+      "kind": "paymentSucceeded",
+      "stripeType": "payment_intent.succeeded",
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "testMode": true,
+      "occurredAt": "2026-11-06T16:20:00Z",
+      "effectId": "eff-alex-color-correction-pay-link",
+      "payload": {
+        "paymentId": "stripe-payment-demo-0007",
+        "chargeId": "stripe-charge-demo-0007",
+        "amount": { "cents": 2500, "currency": "USD" }
+      }
+    }
+  },
+  "outcome": {
+    "result": "signed",
+    "webhook": {
+      "endpoint": "businesses",
+      "signatureHeader": "t=1793982001,v1=COMPUTED-AT-TEST-TIME",
+      "raw": "{\"id\":\"stripe-evt-double-0001\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1793982000,\"livemode\":false,\"type\":\"payment_intent.succeeded\",\"data\":{\"object\":{\"id\":\"stripe-payment-demo-0007\",\"object\":\"payment_intent\",\"amount\":2500,\"amount_received\":2500,\"currency\":\"usd\",\"customer\":\"stripe-customer-demo-alex\",\"latest_charge\":\"stripe-charge-demo-0007\",\"metadata\":{\"rosie_effect_id\":\"eff-alex-color-correction-pay-link\"},\"status\":\"succeeded\"}}}",
+      "receivedAt": "2026-11-06T16:20:01Z",
+      "traceId": "trace-stripe-double-0001"
+    }
+  }
+}

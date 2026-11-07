@@ -1,0 +1,27 @@
+{
+  "call": "payLink",
+  "given": {
+    "now": "2026-11-04T16:00:03Z",
+    "note": "S11-68: Lee Home Services' October bill, $2, was declined on its bill card on Wed Nov 4, and Rosie never retries the card. Sam gets one pay link, with no chasing, to pay by Wed Nov 18 on Rosie's page rosfield.com/bill/pay (K-33 v1 seed-bill-unpaid-pause.json: its stripe_pay_link effect, key, amount and the link's Stripe id)."
+  },
+  "request": {
+    "effect": {
+      "effectId": "effect-bill-lee-home-services-2026-10-pay-link",
+      "idempotencyKey": "rosfield-bill-lee-home-services-2026-10-pay-link"
+    },
+    "amount": { "cents": 200, "currency": "USD" },
+    "port": {
+      "account": { "kind": "rosfield" },
+      "purpose": "rosfieldMonthlyBill",
+      "customerId": "stripe-customer-demo-sam-lee",
+      "saveCardForLater": false,
+      "description": "Rosfield's October bill for Lee Home Services"
+    }
+  },
+  "outcome": {
+    "result": "created",
+    "paymentId": "stripe-pay-link-demo-lee-home-services-2026-10",
+    "clientSecret": "demo-client-secret-pay-link-lee-home-services-2026-10",
+    "createdAt": "2026-11-04T16:00:04Z"
+  }
+}

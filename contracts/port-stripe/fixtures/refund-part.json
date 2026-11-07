@@ -1,0 +1,26 @@
+{
+  "call": "refund",
+  "given": {
+    "now": "2026-11-08T17:00:01Z",
+    "note": "A10-12: Alex asks for money back for his Signature cut and hot towel shave, paid in full ($55, full-price.json). Sam names $20 by text, it is read back first, and part of the payment goes back to the card, by the shop's own Stripe."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-signature-cut-part-refund",
+      "idempotencyKey": "eff-alex-signature-cut-part-refund"
+    },
+    "amount": { "cents": 2000, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "paymentId": "stripe-payment-demo-0003",
+      "reason": "requestedByCustomer"
+    }
+  },
+  "outcome": {
+    "result": "refunded",
+    "refundId": "stripe-refund-demo-0003",
+    "paymentId": "stripe-payment-demo-0003",
+    "state": "succeeded",
+    "refundedAt": "2026-11-08T17:00:02Z"
+  }
+}

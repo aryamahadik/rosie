@@ -1,0 +1,23 @@
+{
+  "call": "saveCard",
+  "given": {
+    "now": "2026-10-20T14:05:00Z",
+    "note": "A5-07: Alex books the $35 haircut with Riley at Lee's Barbershop, and the shop's $20 fee needs a card saved; nothing is charged now (fixture set v1 barber.json, the main story). Alex has no customer on the shop's own Stripe yet, so the adapter makes one, then the card save that the secure page's Stripe form finishes with the client secret."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-haircut-save-card",
+      "idempotencyKey": "eff-alex-haircut-save-card"
+    },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "customerId": null
+    }
+  },
+  "outcome": {
+    "result": "ready",
+    "setupId": "stripe-setup-demo-alex-1",
+    "customerId": "stripe-customer-demo-alex",
+    "clientSecret": "demo-client-secret-setup-alex-1"
+  }
+}

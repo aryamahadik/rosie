@@ -1,0 +1,69 @@
+{
+  "call": "listMoney",
+  "given": {
+    "now": "2026-11-09T03:00:01Z",
+    "note": "C-112, the daily reconciliation at 03:00 UTC over the last 48 hours (arch 10 line 550), on Lee's Barbershop's own Stripe: every charge and refund Rosie made there, each with the effect id it was made under, matched to its ledger line by it. The declined deposit left a failed charge, which gets no ledger line."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "from": "2026-11-07T03:00:00Z",
+    "to": "2026-11-09T03:00:00Z"
+  },
+  "outcome": {
+    "result": "listed",
+    "from": "2026-11-07T03:00:00Z",
+    "to": "2026-11-09T03:00:00Z",
+    "items": [
+      {
+        "kind": "charge",
+        "stripeId": "stripe-charge-demo-0001",
+        "paymentId": "stripe-payment-demo-0001",
+        "refundOf": null,
+        "effectId": "eff-alex-grooms-deposit",
+        "amount": { "cents": 4000, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-11-07T15:20:02Z"
+      },
+      {
+        "kind": "charge",
+        "stripeId": "stripe-charge-demo-0002",
+        "paymentId": "stripe-payment-demo-0002",
+        "refundOf": null,
+        "effectId": "eff-alex-grooms-deposit-declined",
+        "amount": { "cents": 4000, "currency": "USD" },
+        "state": "failed",
+        "createdAt": "2026-11-07T15:30:02Z"
+      },
+      {
+        "kind": "charge",
+        "stripeId": "stripe-charge-demo-0003",
+        "paymentId": "stripe-payment-demo-0003",
+        "refundOf": null,
+        "effectId": "eff-alex-signature-cut-full",
+        "amount": { "cents": 5500, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-11-07T16:10:02Z"
+      },
+      {
+        "kind": "refund",
+        "stripeId": "stripe-refund-demo-0001",
+        "paymentId": "stripe-payment-demo-0001",
+        "refundOf": "stripe-charge-demo-0001",
+        "effectId": "eff-alex-grooms-deposit-refund",
+        "amount": { "cents": 4000, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-11-08T16:00:02Z"
+      },
+      {
+        "kind": "refund",
+        "stripeId": "stripe-refund-demo-0003",
+        "paymentId": "stripe-payment-demo-0003",
+        "refundOf": "stripe-charge-demo-0003",
+        "effectId": "eff-alex-signature-cut-part-refund",
+        "amount": { "cents": 2000, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-11-08T17:00:02Z"
+      }
+    ]
+  }
+}

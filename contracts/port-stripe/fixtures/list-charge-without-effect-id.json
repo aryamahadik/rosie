@@ -1,0 +1,39 @@
+{
+  "call": "listMoney",
+  "given": {
+    "now": "2026-11-09T03:00:01Z",
+    "note": "CQ-15: the same 48 hours on Lee's Barbershop's Stripe list a $35 charge Rosie's platform made with no effect id on it (planted by the double: double-plant-charge-without-effect-id.json). CQ-15's default: never given a ledger line and never refunded by reconciliation; it goes to Rosie's team within 1 business day as 'anything else' (arch 10 line 550; S12-24). A charge Sam took in his own Stripe outside Rosie is not listed at all."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "from": "2026-11-07T03:00:00Z",
+    "to": "2026-11-09T03:00:00Z"
+  },
+  "outcome": {
+    "result": "listed",
+    "from": "2026-11-07T03:00:00Z",
+    "to": "2026-11-09T03:00:00Z",
+    "items": [
+      {
+        "kind": "charge",
+        "stripeId": "stripe-charge-demo-0001",
+        "paymentId": "stripe-payment-demo-0001",
+        "refundOf": null,
+        "effectId": "eff-alex-grooms-deposit",
+        "amount": { "cents": 4000, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-11-07T15:20:02Z"
+      },
+      {
+        "kind": "charge",
+        "stripeId": "stripe-charge-demo-0030",
+        "paymentId": "stripe-payment-demo-0030",
+        "refundOf": null,
+        "effectId": null,
+        "amount": { "cents": 3500, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-11-08T19:00:02Z"
+      }
+    ]
+  }
+}

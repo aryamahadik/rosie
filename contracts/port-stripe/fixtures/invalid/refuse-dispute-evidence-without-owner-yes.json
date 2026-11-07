@@ -1,0 +1,27 @@
+{
+  "call": "disputeEvidence",
+  "given": {
+    "now": "2026-11-02T14:40:01Z",
+    "note": "dispute-evidence-owner-yes.json with no owner's yes behind it. Refused: the record is sent only on the owner's yes (A10-16: 'Never: send the record without Sam'; safe default: nothing is sent)."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-haircut-dispute-evidence",
+      "idempotencyKey": "eff-alex-haircut-dispute-evidence"
+    },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "disputeId": "stripe-dispute-demo-0001",
+      "serviceDate": "2026-10-24",
+      "serviceDescription": "Haircut with Riley",
+      "customerName": "Alex M.",
+      "recordFileId": "file-dispute-record-alex-2026-10-24"
+    }
+  },
+  "outcome": {
+    "result": "submitted",
+    "disputeId": "stripe-dispute-demo-0001",
+    "submittedAt": "2026-11-02T14:40:02Z",
+    "dueBy": "2026-11-06T22:00:00Z"
+  }
+}

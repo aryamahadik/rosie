@@ -1,0 +1,29 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-10-24T18:45:31Z",
+    "note": "A9-12, Sat Oct 24: Riley texts DONE, and the agreed $35 for Alex's haircut goes on his saved card, without Alex on a page. Try 2 on the effect's one key, 30 s after try 1 got no answer (charge-network-error.json); Stripe makes the charge once."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-haircut-done",
+      "idempotencyKey": "eff-alex-haircut-done"
+    },
+    "amount": { "cents": 3500, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "purpose": "rest",
+      "customerId": "stripe-customer-demo-alex",
+      "paymentMethodId": "stripe-card-demo-alex",
+      "customerPresent": false,
+      "description": "Lee's Barbershop: haircut with Riley, Sat Oct 24"
+    }
+  },
+  "outcome": {
+    "result": "charged",
+    "paymentId": "stripe-payment-demo-0010",
+    "chargeId": "stripe-charge-demo-0010",
+    "card": { "brand": "visa", "last4": "4242" },
+    "chargedAt": "2026-10-24T18:45:32Z"
+  }
+}

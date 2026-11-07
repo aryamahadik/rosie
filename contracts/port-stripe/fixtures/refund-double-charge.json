@@ -1,0 +1,26 @@
+{
+  "call": "refund",
+  "given": {
+    "now": "2026-11-09T03:00:06Z",
+    "note": "S12-26: the daily reconciliation finds Dee W.'s $20 payment through Rosie charged twice (list-double-charge.json). The second charge was never agreed, so it is refunded at once, without waiting for Sam, and Dee and Sam are told: K-07 v1 effect-reconciliation-refund.json, written by the job."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-reconcile-dee-second-charge-refund",
+      "idempotencyKey": "eff-reconcile-dee-second-charge-refund"
+    },
+    "amount": { "cents": 2000, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "paymentId": "stripe-payment-demo-0021",
+      "reason": "duplicate"
+    }
+  },
+  "outcome": {
+    "result": "refunded",
+    "refundId": "stripe-refund-demo-0021",
+    "paymentId": "stripe-payment-demo-0021",
+    "state": "succeeded",
+    "refundedAt": "2026-11-09T03:00:07Z"
+  }
+}

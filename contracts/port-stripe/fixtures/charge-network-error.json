@@ -1,0 +1,31 @@
+{
+  "call": "charge",
+  "given": {
+    "now": "2026-10-24T18:45:01Z",
+    "note": "A9-12, try 1 of the $35 at Riley's DONE: no answer within the call's time budget. A network error, retried on the same key (arch 10 line 542; K-07 v1 retry rule 8): try 2 is off-session-at-done.json. Not a decline, so nothing is said to Alex."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-haircut-done",
+      "idempotencyKey": "eff-alex-haircut-done"
+    },
+    "amount": { "cents": 3500, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "purpose": "rest",
+      "customerId": "stripe-customer-demo-alex",
+      "paymentMethodId": "stripe-card-demo-alex",
+      "customerPresent": false,
+      "description": "Lee's Barbershop: haircut with Riley, Sat Oct 24"
+    }
+  },
+  "outcome": {
+    "result": "failed",
+    "kind": "transient",
+    "httpStatus": null,
+    "code": null,
+    "declineCode": null,
+    "reason": "No answer from Stripe within the time budget",
+    "paymentId": null
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "call": "onboardingLink",
+  "given": {
+    "now": "2026-10-19T18:10:00Z",
+    "note": "S1-27 at sign-up, Mon Oct 19, 2:10pm: Sam connects Stripe in Lee's Barbershop's own name, so cards can be saved for the $20 fee. The business has no Stripe account yet, so the adapter makes it, configured as a Standard account whose customer-facing name is Lee's Barbershop, then gives Stripe's single-use onboarding link, good for 5 minutes. The account id goes to K-23 v1 business_setup.stripe_account_id at once."
+  },
+  "request": {
+    "accountId": null,
+    "businessName": "Lee's Barbershop",
+    "returnUrl": "https://example.com/pay/s02/return",
+    "refreshUrl": "https://example.com/pay/s02/refresh",
+    "idempotencyKey": "onboard-biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "link",
+    "accountId": "stripe-acct-demo-lees-barbershop",
+    "accountCreated": true,
+    "url": "https://connect.stripe.com/setup/c/demo-lees-barbershop-onboarding",
+    "expiresAt": "2026-10-19T18:15:00Z"
+  }
+}

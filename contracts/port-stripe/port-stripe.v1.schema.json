@@ -1,0 +1,1748 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/port-stripe/port-stripe.v1.schema.json",
+  "title": "PortStripeV1",
+  "description": "K-14 v1, the Stripe port in Rosie's own terms (02-contracts K-14): the business's own connected account (an onboarding link and its status), money on that account (save a card, a charge, a pay link and closing it, removing a saved card, a refund, dispute evidence on the owner's yes), Rosfield's own billing on Rosfield's own account (the bill card, the monthly charge and its one pay link), webhooks in, and the listing of charges and refunds that daily reconciliation matches by effect id; with the Stripe double's signed webhook and its planted charges. Each call's request, response and errors are definitions under $defs named <call>.request, <call>.response and <call>.errors (02-contracts section 2 item 2); a call that runs from a K-07 v1 effect row also has <call>.portRequest, the part K-07's portRequest column holds, so no fact the effect row holds is stored twice; <call>.exchange pairs one request with its outcome, which is what every exchange fixture is. span is the K-08 v1 span every outside call writes. The root is any one exchange or span, so the type generator writes a type for each (ADR-005). Stripe's wire format (its paths, headers, field names and codes) stays inside the adapter (02-contracts section 5); the README records what the spike found in Stripe's public documents. Every amount is whole cents with its currency (CQ-09; K-07 v1; K-33 v1). No card number, expiry or CVC ever enters this contract, a fixture or a log: only Stripe's ids, and a card's brand and last four digits where a source shows them (RULES 3.12, 4.5; BP rule 7). Keys are named, never shown (rule 7): the calls read STRIPE_SECRET_KEY, pages read STRIPE_PUBLISHABLE_KEY, and the webhook check reads STRIPE_WEBHOOK_SECRET or STRIPE_CONNECT_WEBHOOK_SECRET from the environment; no request or response holds one. Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/onboardingLink.exchange" },
+    { "$ref": "#/$defs/accountStatus.exchange" },
+    { "$ref": "#/$defs/saveCard.exchange" },
+    { "$ref": "#/$defs/removeCard.exchange" },
+    { "$ref": "#/$defs/charge.exchange" },
+    { "$ref": "#/$defs/payLink.exchange" },
+    { "$ref": "#/$defs/closePayLink.exchange" },
+    { "$ref": "#/$defs/refund.exchange" },
+    { "$ref": "#/$defs/disputeEvidence.exchange" },
+    { "$ref": "#/$defs/listMoney.exchange" },
+    { "$ref": "#/$defs/verifyWebhook.exchange" },
+    { "$ref": "#/$defs/doubleWebhook.exchange" },
+    { "$ref": "#/$defs/doublePlant.exchange" },
+    { "$ref": "#/$defs/span" }
+  ],
+  "$defs": {
+    "utc": {
+      "title": "StripeUtc",
+      "description": "An instant in UTC (CQ-09). Stripe's own times are whole seconds since 1970 (README 'Spike findings' row 10); the adapter writes them as UTC instants.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "id": {
+      "title": "StripeRosieId",
+      "description": "One of Rosie's own opaque ids, such as a person, booking, trace or file id (CQ-09).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "stripeId": {
+      "title": "StripeId",
+      "description": "An id Stripe gave an object: an account, a customer, a saved card (payment method), a SetupIntent, a PaymentIntent, a charge, a refund, a dispute, a payout or an event. Opaque: compared as a whole and never parsed (CQ-09). Stripe's own ids carry a prefix (acct_, cus_, pm_, seti_, pi_, ch_, re_, du_, po_, evt_: README 'Spike findings'); the fixtures use readable placeholders, as K-07 v1 and K-33 v1 do. Never a card number: a run of 13 or more digits, with spaces or dashes between them or not, is refused (K-33 v1 bill_cards_no_card_number; RULES 4.5).",
+      "type": "string",
+      "pattern": ".",
+      "not": {
+        "description": "Thirteen or more digits in a row read as a card number (RULES 4.5; arch 02 line 109: card numbers are 13 to 19 digits).",
+        "pattern": "[0-9]([ -]?[0-9]){12,}"
+      }
+    },
+    "effectId": {
+      "title": "StripeEffectId",
+      "description": "A K-07 v1 effect id (effectRow.effectId). It rides on the Stripe object the call makes, as the metadata key rosie_effect_id, so the reconciliation listing gives it back (02-contracts K-14 'Every call'; arch 10 line 550; README 'Spike findings' rows 8 and 9). Stripe takes a metadata value of at most 500 characters.",
+      "type": "string",
+      "pattern": ".",
+      "maxLength": 500
+    },
+    "idempotencyKey": {
+      "title": "StripeIdempotencyKey",
+      "description": "The one idempotency key of a K-07 v1 effect row, sent on every try as Stripe's Idempotency-Key header (arch 10 line 542: 'retry network errors 5 times in 10 minutes on one idempotency key'; K-07 v1 retry rule 8). Stripe takes at most 255 characters and keeps a key for at least 24 hours; a repeat within that time gets the first answer back, and a repeat with other parameters is refused (README 'Spike findings' row 7). Never a person's details (Stripe: avoid sensitive data in keys).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "effectRef": {
+      "title": "StripeEffectRef",
+      "description": "The K-07 v1 effect row a call runs from, as K-07's own columns hold it: the effect id and its one idempotency key (02-contracts K-14 'Every call carries its effect's idempotency key ... and every charge and refund request also stores its effect id on the Stripe object it makes'). Both are required: a call without its key could charge twice on a retry, and a charge without its effect id could not be matched to its ledger line (refuse-charge-without-key, refuse-charge-without-effect-id).",
+      "type": "object",
+      "properties": {
+        "effectId": { "$ref": "#/$defs/effectId" },
+        "idempotencyKey": { "$ref": "#/$defs/idempotencyKey" }
+      },
+      "required": ["effectId", "idempotencyKey"],
+      "additionalProperties": false
+    },
+    "amount": {
+      "title": "StripeAmount",
+      "description": "An amount of money in whole cents with its three-letter currency code, never a decimal (CQ-09; K-07 v1 effectRow.amount; K-33 v1 'Money is whole cents'). Stripe's own amounts are integers in the currency's smallest unit, so the adapter sends the cents as they are, with the currency in lower case (README 'Spike findings' rows 2 and 10). At least one cent; Stripe's own minimum charge (50 cents in US dollars) is Stripe's refusal, which the adapter reports as refused.",
+      "allOf": [
+        { "$ref": "../common/formats.v1.schema.json#/$defs/money" },
+        {
+          "type": "object",
+          "properties": {
+            "cents": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ]
+    },
+    "httpsUrl": {
+      "title": "StripeHttpsUrl",
+      "description": "An https address.",
+      "type": "string",
+      "pattern": "^https://\\S+$"
+    },
+    "stripeCode": {
+      "title": "StripeCode",
+      "description": "A code Stripe gave, as text: an error code such as card_declined, rate_limit, idempotency_error or resource_missing, or a payout's failure code such as account_closed (README 'Spike findings' rows 6, 17 and 18). A label, never a message, a key or card data.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "declineCode": {
+      "title": "StripeDeclineCode",
+      "description": "Stripe's decline code for a card the bank or Stripe refused, such as generic_decline, insufficient_funds, expired_card or authentication_required (README 'Spike findings' row 6). A label; the customer is shown only 'Try another card' or the step's own words (RULES 3.11), never the code.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "cardShown": {
+      "title": "StripeCardShown",
+      "description": "What may be shown of a card: its brand and its last four digits, as Stripe reports them (A5-07's form: 'Card •••• 4242'; K-33 v1 open gap: 'The card's display (brand and last four on the owner's pages, FS M04): Stripe's, read through K-14'). Never the number, the expiry, the CVC or any other card detail (RULES 3.12, 4.5; BP rule 7): the card is typed into Stripe's own form and its details never reach Rosie. The brand list is Stripe's (README 'Spike findings' row 10); the adapter gives unknown for any other.",
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "enum": [
+            "amex",
+            "cartes_bancaires",
+            "diners",
+            "discover",
+            "eftpos_au",
+            "jcb",
+            "link",
+            "mastercard",
+            "unionpay",
+            "visa",
+            "unknown"
+          ]
+        },
+        "last4": {
+          "description": "The card's last four digits (A5-07).",
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        }
+      },
+      "required": ["brand", "last4"],
+      "additionalProperties": false
+    },
+    "clientSecret": {
+      "title": "StripeClientSecret",
+      "description": "The client secret of one SetupIntent or PaymentIntent. The page's Stripe form takes it, with the account's id and Rosie's publishable key (STRIPE_PUBLISHABLE_KEY), so the card goes from the person's browser straight to Stripe, never through Rosie (C-199 secure page: 'Card typed in the business's own Stripe'; C-200 pay page; C-190 bill card screen; A5-22: 'The card is typed on the page'; README 'Spike findings' row 5). It lets whoever holds it finish that one card save or payment, nothing more: it goes only to that page, and never into a log, a span, an event-log row, a message or K-07's effect row (README 'Keys and secrets'). Fixtures hold a placeholder.",
+      "type": "string",
+      "minLength": 1
+    },
+    "given": {
+      "title": "StripeGiven",
+      "description": "What a fixture assumes before the call: the moment it runs, a note, and for a webhook how it was signed. Fixtures only; never sent.",
+      "type": "object",
+      "properties": {
+        "now": { "$ref": "#/$defs/utc" },
+        "note": {
+          "description": "The case in plain words.",
+          "type": "string",
+          "minLength": 1
+        },
+        "signing": {
+          "description": "For a webhook: how its Stripe-Signature header was made. valid: the HMAC-SHA256 over '<t>.<raw>' under the test secret of the endpoint that received it; oneByteChanged: that signature with one byte changed. The fixture holds no secret and no real signature (rule 7): its header carries the timestamp and the placeholder COMPUTED-AT-TEST-TIME, and the contract test signs the fixture's own timestamp and raw body at run time (README 'Fixtures').",
+          "type": "string",
+          "enum": ["valid", "oneByteChanged"]
+        }
+      },
+      "required": ["now", "note"],
+      "additionalProperties": false
+    },
+
+    "account": {
+      "title": "StripeAccount",
+      "description": "The Stripe account a call runs on, or an event came from. business: the business's own connected account, in its own name, where every charge lands and where Rosie holds no customer money (RULES 3.1; S1-27; FS row M01); the adapter makes each call on it with Stripe's Stripe-Account header, so a charge is a direct charge on that account (README 'Spike findings' rows 1 and 2). rosfield: Rosfield's own account (the Connect platform), used only for Rosfield's own billing: the bill card, the monthly charge and its one pay link (S1-29; S11-66 to S11-68; FS row M04), never for a customer's money.",
+      "oneOf": [{ "$ref": "#/$defs/businessAccount" }, { "$ref": "#/$defs/rosfieldAccount" }]
+    },
+    "businessAccount": {
+      "title": "StripeBusinessAccount",
+      "description": "The business's own connected account (RULES 3.1; S1-27).",
+      "type": "object",
+      "properties": {
+        "kind": { "const": "business" },
+        "accountId": {
+          "description": "Stripe's id of the business's account, as K-23 v1 business_setup.stripe_account_id stores it (S1-27 gives stripe; FS row M01; its form is K-14's: an opaque Stripe id).",
+          "$ref": "#/$defs/stripeId"
+        }
+      },
+      "required": ["kind", "accountId"],
+      "additionalProperties": false
+    },
+    "rosfieldAccount": {
+      "title": "StripeRosfieldAccount",
+      "description": "Rosfield's own account, the platform: Rosfield's monthly bill only (S1-29; S11-66 to S11-68).",
+      "type": "object",
+      "properties": {
+        "kind": { "const": "rosfield" }
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    "purpose": {
+      "title": "StripePurpose",
+      "description": "What a charge or a pay link's money is for, so the ledger line (K-28) and the money words (RULES 3.14: 'Every charge says what it is for') follow it. deposit: a deposit at booking (A5-13); fullPrice: the full price at booking (A5-16); rest: the agreed price, or what is left of it, after the visit, with any extras the customer said yes to (A9-12; RULES 3.2, 3.8); extra: an extra paid apart by a link (S12-26); fee: the one late-cancel or no-show fee, only with the owner's yes (RULES 3.3; S11-22); tip: a tip by the receipt's tip link (A9-12); pack: a pack, membership or intro offer, charged when bought (A5-22; RULES 3.9); planCharge: one charge of a plan, after its own yes and its reminder (RULES 3.9); rosfieldMonthlyBill: Rosfield's monthly bill, on Rosfield's own account and the bill card only (S11-66 to S11-68).",
+      "type": "string",
+      "enum": [
+        "deposit",
+        "fullPrice",
+        "rest",
+        "extra",
+        "fee",
+        "tip",
+        "pack",
+        "planCharge",
+        "rosfieldMonthlyBill"
+      ]
+    },
+    "callFailure": {
+      "title": "StripeCallFailure",
+      "description": "The call failed, and nothing it would have made is promised to exist. transient: no answer in time, a network error, a 409 (a concurrent request on the same key), a 429 (a rate limit or a lock timeout: Stripe sends no Retry-After, so the caller backs off) or a 5xx; it may be tried again, on the same idempotency key where the call has one (arch 10 line 542; K-07 v1 retry rule 8; README 'Spike findings' rows 7 and 17). refused: any other 4xx, such as an invalid request, a key repeated with other parameters, an id Stripe does not know, or an account Rosie may no longer act on; never tried again as it is. The code is Stripe's; the reason is Stripe's words or the adapter's, never a key, a person's details or card data.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "failed" },
+        "kind": { "type": "string", "enum": ["transient", "refused"] },
+        "httpStatus": {
+          "description": "The HTTP status Stripe answered with; null when no answer came.",
+          "anyOf": [{ "type": "integer", "minimum": 400, "maximum": 599 }, { "type": "null" }]
+        },
+        "code": {
+          "description": "Stripe's error code, or null when it gave none.",
+          "anyOf": [{ "$ref": "#/$defs/stripeCode" }, { "type": "null" }]
+        },
+        "reason": {
+          "description": "What failed, for the team console (C-194).",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["result", "kind", "httpStatus", "code", "reason"],
+      "additionalProperties": false,
+      "if": { "properties": { "kind": { "const": "transient" } } },
+      "then": {
+        "properties": {
+          "httpStatus": {
+            "anyOf": [{ "enum": [409, 429] }, { "type": "integer", "minimum": 500 }, { "type": "null" }]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "httpStatus": { "type": "integer", "minimum": 400, "maximum": 499, "not": { "enum": [409, 429] } }
+        }
+      }
+    },
+
+    "onboardingLink.request": {
+      "title": "OnboardingLinkRequest",
+      "description": "A link to Stripe's own onboarding for the business's own account, in its own name (S1-27: 'Connects Stripe in the business's own name'; FS row M01; C-190 screen 19). Bank and tax details go to Stripe, never to Rosie (RULES 3.1). With no account yet (accountId null) the adapter first makes the business's account, configured as a Standard account (README 'Spike findings' rows 1 and 3), with its customer-facing business name set to businessName; then it makes a single-use onboarding link. Asked only when some service takes money through Rosie (S1-27); 'Left for later' asks again, and each ask makes a fresh link. A K-08 portCall span (provider stripe, call onboardingLink); not an effect row.",
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "description": "The business's account when it has one (K-23 v1 business_setup.stripe_account_id), so a second ask makes a fresh link to the same account; null the first time.",
+          "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }]
+        },
+        "businessName": {
+          "description": "The business's registered name, which the new account takes as its customer-facing name, so the name Stripe uses matches the registration (FS row M01: 'the name Stripe uses must match the registration'). Ignored for an account that exists: the owner changes it in their own Stripe.",
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "returnUrl": {
+          "description": "Rosie's page the owner comes back to from Stripe, finished or not (S1-27's link, rosfield.com/pay/s02; C-190).",
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "refreshUrl": {
+          "description": "Rosie's page an expired or already-used link sends the owner to; it asks for a fresh link (README 'Spike findings' row 3).",
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "idempotencyKey": {
+          "description": "A key for the account's creation, so a retry never makes a second account (README 'Spike findings' row 7). The caller derives it from the business id.",
+          "$ref": "#/$defs/idempotencyKey"
+        }
+      },
+      "required": ["accountId", "businessName", "returnUrl", "refreshUrl", "idempotencyKey"],
+      "additionalProperties": false
+    },
+    "onboardingLink.response": {
+      "title": "OnboardingLinkResponse",
+      "description": "The link, for the owner's own browser only (C-190): Stripe's single-use address, good for a few minutes (README 'Spike findings' row 3). The account id goes to K-23 v1 business_setup.stripe_account_id at once, so the next ask reuses it.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "link" },
+        "accountId": { "$ref": "#/$defs/stripeId" },
+        "accountCreated": {
+          "description": "True when this call made the account (the request's accountId was null).",
+          "type": "boolean"
+        },
+        "url": {
+          "description": "Stripe's onboarding address. Single-use: never texted, emailed or logged; the page sends the owner straight to it.",
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "expiresAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "accountId", "accountCreated", "url", "expiresAt"],
+      "additionalProperties": false
+    },
+    "onboardingLink.errors": {
+      "title": "OnboardingLinkErrors",
+      "description": "No link: the page says to try again (S1-27 'Left for later' holds meanwhile).",
+      "$ref": "#/$defs/callFailure"
+    },
+    "onboardingLink.exchange": {
+      "title": "OnboardingLinkExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "onboardingLink" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/onboardingLink.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/onboardingLink.response" },
+            { "$ref": "#/$defs/onboardingLink.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": { "accountId": { "type": "null" } }
+          },
+          "outcome": {
+            "type": "object",
+            "properties": { "result": { "const": "link" } },
+            "required": ["result"]
+          }
+        }
+      },
+      "then": {
+        "description": "A first ask makes the account.",
+        "properties": {
+          "outcome": { "type": "object", "properties": { "accountCreated": { "const": true } } }
+        }
+      },
+      "else": {
+        "properties": {
+          "outcome": { "type": "object", "properties": { "accountCreated": { "const": false } } }
+        }
+      }
+    },
+
+    "accountState": {
+      "title": "StripeAccountState",
+      "description": "Where the business's account stands (02-contracts K-14: 'its status (whether it can take charges; payout status: S11-63, S11-64)'), read from Stripe's account (README 'Spike findings' row 4). onboardingFinished: the owner finished Stripe's onboarding (details_submitted; until then S1-27's 'Left for later' holds); canTakeCharges: Stripe lets it take charges (charges_enabled); canPayOut: Stripe can pay its balance out to its bank (payouts_enabled; S11-64); infoDue: Stripe wants more from the owner now (requirements currently or past due), and infoDueBy is Stripe's deadline for it, or null (S11-65: 'If Stripe needs a document, Rosie passes the question on. Not answered by Stripe's deadline, card bookings can pause').",
+      "type": "object",
+      "properties": {
+        "onboardingFinished": { "type": "boolean" },
+        "canTakeCharges": { "type": "boolean" },
+        "canPayOut": { "type": "boolean" },
+        "infoDue": { "type": "boolean" },
+        "infoDueBy": { "anyOf": [{ "$ref": "#/$defs/utc" }, { "type": "null" }] }
+      },
+      "required": ["onboardingFinished", "canTakeCharges", "canPayOut", "infoDue", "infoDueBy"],
+      "additionalProperties": false,
+      "if": { "properties": { "infoDue": { "const": false } } },
+      "then": { "properties": { "infoDueBy": { "type": "null" } } }
+    },
+    "accountStatus.request": {
+      "title": "AccountStatusRequest",
+      "description": "Read the business's account as it stands (S11-63 Money page; S1-27 'Left for later'; C-190). A read with no side effect: repeating it is safe. A K-08 portCall span (provider stripe, call accountStatus). Changes also arrive as accountUpdated events.",
+      "type": "object",
+      "properties": {
+        "accountId": { "$ref": "#/$defs/stripeId" }
+      },
+      "required": ["accountId"],
+      "additionalProperties": false
+    },
+    "accountStatus.response": {
+      "title": "AccountStatusResponse",
+      "description": "status: the account and where it stands. disconnected: the owner disconnected Rosie from their Stripe, so Rosie can no longer act on the account (README 'Spike findings' row 4); nothing through Rosie can take money until the owner connects again (S1-27).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "status" },
+            "accountId": { "$ref": "#/$defs/stripeId" },
+            "checkedAt": { "$ref": "#/$defs/utc" },
+            "state": { "$ref": "#/$defs/accountState" }
+          },
+          "required": ["result", "accountId", "checkedAt", "state"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "disconnected" },
+            "accountId": { "$ref": "#/$defs/stripeId" },
+            "checkedAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["result", "accountId", "checkedAt"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "accountStatus.errors": {
+      "title": "AccountStatusErrors",
+      "description": "The read failed; the last known state stands.",
+      "$ref": "#/$defs/callFailure"
+    },
+    "accountStatus.exchange": {
+      "title": "AccountStatusExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "accountStatus" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/accountStatus.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/accountStatus.response" }, { "$ref": "#/$defs/accountStatus.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "saveCard.portRequest": {
+      "title": "SaveCardPortRequest",
+      "description": "The part of a saveCard request that K-07 v1's effect row holds as its portRequest (kind stripe_save_card).",
+      "type": "object",
+      "properties": {
+        "account": {
+          "description": "business: a customer's card in the business's own Stripe, for only what the customer ticks (A5-07; RULES 3.11: 'On a request ... the card is saved, then charged at the OK'). rosfield: the card for Rosfield's monthly bill, saved at S1-29 by the owner (FS row M04).",
+          "$ref": "#/$defs/account"
+        },
+        "customerId": {
+          "description": "The person's Stripe customer on that account when they have one; null makes one, and the response names it. A customer holds no name or contact detail from Rosie (README 'Open gaps'). For the bill card it is Rosfield's customer for the owner, K-33 v1 bill_cards.stripe_customer_id.",
+          "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }]
+        }
+      },
+      "required": ["account", "customerId"],
+      "additionalProperties": false
+    },
+    "saveCard.request": {
+      "title": "SaveCardRequest",
+      "description": "Make the card save that the page's Stripe form finishes: a SetupIntent for later off-session charges, carrying the effect id (README 'Spike findings' row 5). Nothing is charged (A5-07: 'A card saved; nothing taken'). The card is typed into Stripe's own form on the secure page or the bill card screen with the response's client secret; when it is saved, a cardSaved event comes, and cardDetails gives its brand and last four. Runs as K-07 v1's stripe_save_card effect.",
+      "type": "object",
+      "properties": {
+        "effect": { "$ref": "#/$defs/effectRef" },
+        "port": { "$ref": "#/$defs/saveCard.portRequest" }
+      },
+      "required": ["effect", "port"],
+      "additionalProperties": false
+    },
+    "saveCard.response": {
+      "title": "SaveCardResponse",
+      "description": "Ready for the card: the SetupIntent (K-07 providerObjectId), the customer it saves to, and the client secret the page's form takes.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "ready" },
+        "setupId": { "$ref": "#/$defs/stripeId" },
+        "customerId": { "$ref": "#/$defs/stripeId" },
+        "clientSecret": { "$ref": "#/$defs/clientSecret" }
+      },
+      "required": ["result", "setupId", "customerId", "clientSecret"],
+      "additionalProperties": false
+    },
+    "saveCard.errors": {
+      "title": "SaveCardErrors",
+      "description": "No card save made; K-07's effect rules apply (transient: retried on the same key; refused: never retried as it is).",
+      "$ref": "#/$defs/callFailure"
+    },
+    "saveCard.exchange": {
+      "title": "SaveCardExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "saveCard" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/saveCard.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/saveCard.response" }, { "$ref": "#/$defs/saveCard.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "removeCard.request": {
+      "title": "RemoveCardRequest",
+      "description": "Remove a saved card from its customer, so it can never be charged again (S13-55: 'A saved card is removed once nothing needs it. A booking that's declined or never made removes it at once'; A6-32: 'Not paid in time ... Any card saved for it is removed'; K-33 v1: a bill card replaced). Repeating it is safe: a card already removed answers alreadyRemoved. A K-08 portCall span (provider stripe, call removeCard), run by the turn or job that decides it (README 'Open gaps': K-07 v1 has no effect kind for it).",
+      "type": "object",
+      "properties": {
+        "account": { "$ref": "#/$defs/account" },
+        "customerId": { "$ref": "#/$defs/stripeId" },
+        "paymentMethodId": {
+          "description": "The saved card (Stripe's payment method).",
+          "$ref": "#/$defs/stripeId"
+        }
+      },
+      "required": ["account", "customerId", "paymentMethodId"],
+      "additionalProperties": false
+    },
+    "removeCard.response": {
+      "title": "RemoveCardResponse",
+      "type": "object",
+      "properties": {
+        "result": { "type": "string", "enum": ["removed", "alreadyRemoved"] },
+        "paymentMethodId": { "$ref": "#/$defs/stripeId" }
+      },
+      "required": ["result", "paymentMethodId"],
+      "additionalProperties": false
+    },
+    "removeCard.errors": {
+      "title": "RemoveCardErrors",
+      "description": "Not removed; the caller tries again as a job does (arch 10 line 540: 5 tries, then the dead-letter queue).",
+      "$ref": "#/$defs/callFailure"
+    },
+    "removeCard.exchange": {
+      "title": "RemoveCardExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "removeCard" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/removeCard.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/removeCard.response" }, { "$ref": "#/$defs/removeCard.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "charge.portRequest": {
+      "title": "ChargePortRequest",
+      "description": "The part of a charge request that K-07 v1's effect row holds as its portRequest (kind stripe_charge, or rosfield_monthly_charge for Rosfield's monthly bill). There is no field for a hold or a later capture: nothing is ever held on a card, and the adapter always captures at once (RULES 3.2: 'Nothing is ever held on a card'; D65; README 'Spike findings' row 6; refuse-card-hold).",
+      "type": "object",
+      "properties": {
+        "account": { "$ref": "#/$defs/account" },
+        "purpose": { "$ref": "#/$defs/purpose" },
+        "customerId": {
+          "description": "The customer the saved card belongs to on that account (saveCard's customerId; for the monthly bill, K-33 v1 bill_cards.stripe_customer_id).",
+          "$ref": "#/$defs/stripeId"
+        },
+        "paymentMethodId": {
+          "description": "The saved card charged (cardSaved's paymentMethodId; for the monthly bill, K-33 v1 bill_cards.stripe_payment_method_id). Only a card the person saved for this, under the words they ticked (A5-07: 'only what they ticked, under those rules, can ever be charged').",
+          "$ref": "#/$defs/stripeId"
+        },
+        "customerPresent": {
+          "description": "True when the person is on the page now, as when a booking made now is written (A6-10; S13-55: 'What's due now is taken once the booking is written') or a pack is bought on the page (A5-22). False for a charge without them: at the owner's OK (A6-03), at DONE (A9-12), a fee with the owner's yes (RULES 3.3), a plan's charge (RULES 3.9), Rosfield's monthly bill (S11-67). Stripe is told which, and only a charge with the person present can come back needsAuthentication (README 'Spike findings' row 6).",
+          "type": "boolean"
+        },
+        "description": {
+          "description": "What the charge is for, as the business's Stripe and the customer's receipt show it (RULES 3.14: 'Every charge says what it is for'). For sensitive work, only the display name and the visit's date (S13-22; S12-26: 'only the business, the date, the time and the place').",
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 500
+        }
+      },
+      "required": ["account", "purpose", "customerId", "paymentMethodId", "customerPresent", "description"],
+      "additionalProperties": false,
+      "if": { "properties": { "purpose": { "const": "rosfieldMonthlyBill" } } },
+      "then": {
+        "description": "Rosfield's monthly bill goes on the bill card on Rosfield's own account, never on a customer's card (S11-67), and the owner is not on a page.",
+        "properties": {
+          "account": { "$ref": "#/$defs/rosfieldAccount" },
+          "customerPresent": { "const": false }
+        }
+      },
+      "else": {
+        "description": "A customer's money lands in the business's own Stripe (RULES 3.1).",
+        "properties": { "account": { "$ref": "#/$defs/businessAccount" } }
+      }
+    },
+    "charge.request": {
+      "title": "ChargeRequest",
+      "description": "Charge a saved card what is due now, in one payment on one card (RULES 3.2: 'all that is due now is added up and taken in one payment, on one card'), captured at once: a deposit (A5-13) or the full price (A5-16) when the booking is written (A6-10), at the owner's OK (A6-03), the rest at DONE (A9-12), a pack when bought (A5-22), a plan's charge (RULES 3.9), a fee with the owner's yes (RULES 3.3), or Rosfield's monthly bill on the bill card (S11-67). Runs as K-07 v1's stripe_charge or rosfield_monthly_charge effect: the effect row's effect id, key and amount are effect and amount here, and its portRequest is port. The PaymentIntent it makes carries the effect id, which Stripe copies to the charge (README 'Spike findings' rows 8 and 9).",
+      "type": "object",
+      "properties": {
+        "effect": { "$ref": "#/$defs/effectRef" },
+        "amount": {
+          "description": "All that is due now, in cents (K-07 v1 effectRow.amount; for the monthly bill, K-33 v1's total when the charge is written).",
+          "$ref": "#/$defs/amount"
+        },
+        "port": { "$ref": "#/$defs/charge.portRequest" }
+      },
+      "required": ["effect", "amount", "port"],
+      "additionalProperties": false
+    },
+    "charge.response": {
+      "title": "ChargeResponse",
+      "description": "charged: the money is taken: the PaymentIntent (K-07 providerObjectId), its charge, the card as it may be shown, and when. needsAuthentication: only with the person present; their bank wants them to confirm it, so the page shows Stripe's check with the client secret, and the outcome comes later as paymentSucceeded or paymentFailed (README 'Effects': K-05 v1.1 records it as ok with no ledger line; money words wait for paymentSucceeded, RULES 3.14).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "charged" },
+            "paymentId": { "$ref": "#/$defs/stripeId" },
+            "chargeId": { "$ref": "#/$defs/stripeId" },
+            "card": {
+              "description": "The card charged, as it may be shown (A5-07); null when Stripe gives no card details for it.",
+              "anyOf": [{ "$ref": "#/$defs/cardShown" }, { "type": "null" }]
+            },
+            "chargedAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["result", "paymentId", "chargeId", "card", "chargedAt"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "needsAuthentication" },
+            "paymentId": { "$ref": "#/$defs/stripeId" },
+            "clientSecret": { "$ref": "#/$defs/clientSecret" }
+          },
+          "required": ["result", "paymentId", "clientSecret"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "charge.errors": {
+      "title": "ChargeErrors",
+      "description": "Not charged. declined: the card was refused (Stripe's card error, HTTP 402, with its decline code; authentication_required when the bank wants a person who is not there). A decline is never retried (RULES 3.11; arch 10 line 542; K-07 v1 effectState declined): 'Try another card' on the page, or one pay link after the owner's OK (A6-32), or A9-12's 'Declined or replaced card'. transient and refused as callFailure: transient is retried on the same key (K-07 v1 retry rule 8); refused never as it is (K-07 v1 open gap 5). paymentId names the PaymentIntent when Stripe made one.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "failed" },
+        "kind": { "type": "string", "enum": ["declined", "transient", "refused"] },
+        "httpStatus": {
+          "description": "The HTTP status Stripe answered with; null when no answer came.",
+          "anyOf": [{ "type": "integer", "minimum": 400, "maximum": 599 }, { "type": "null" }]
+        },
+        "code": {
+          "description": "Stripe's error code (card_declined, expired_card, rate_limit, idempotency_error ...), or null when it gave none.",
+          "anyOf": [{ "$ref": "#/$defs/stripeCode" }, { "type": "null" }]
+        },
+        "declineCode": {
+          "description": "For declined, Stripe's decline code; null for every other kind.",
+          "anyOf": [{ "$ref": "#/$defs/declineCode" }, { "type": "null" }]
+        },
+        "reason": {
+          "description": "What failed, for the team console (C-194); never card data.",
+          "type": "string",
+          "minLength": 1
+        },
+        "paymentId": {
+          "description": "The PaymentIntent Stripe made for the try, when it made one; else null.",
+          "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "kind", "httpStatus", "code", "declineCode", "reason", "paymentId"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "What each kind is read from (README 'Spike findings' rows 6, 7 and 17).",
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "declined" } } },
+              "then": {
+                "description": "A card error.",
+                "properties": {
+                  "httpStatus": { "const": 402 },
+                  "code": { "$ref": "#/$defs/stripeCode" },
+                  "declineCode": { "$ref": "#/$defs/declineCode" }
+                }
+              },
+              "else": { "properties": { "declineCode": { "type": "null" } } }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "transient" } } },
+              "then": {
+                "properties": {
+                  "httpStatus": {
+                    "anyOf": [
+                      { "enum": [409, 429] },
+                      { "type": "integer", "minimum": 500 },
+                      { "type": "null" }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "refused" } } },
+              "then": {
+                "properties": {
+                  "httpStatus": {
+                    "type": "integer",
+                    "minimum": 400,
+                    "maximum": 499,
+                    "not": { "enum": [402, 409, 429] }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "charge.exchange": {
+      "title": "ChargeExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "charge" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/charge.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/charge.response" }, { "$ref": "#/$defs/charge.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "description": "A charge without the person present.",
+        "properties": {
+          "request": {
+            "type": "object",
+            "properties": {
+              "port": {
+                "type": "object",
+                "properties": { "customerPresent": { "const": false } },
+                "required": ["customerPresent"]
+              }
+            },
+            "required": ["port"]
+          }
+        },
+        "required": ["request"]
+      },
+      "then": {
+        "description": "Nobody is there to confirm with their bank, so the bank's ask comes back as a decline (authentication_required), never as needsAuthentication (README 'Spike findings' row 6; refuse-off-session-needs-authentication).",
+        "properties": {
+          "outcome": {
+            "not": {
+              "type": "object",
+              "properties": { "result": { "const": "needsAuthentication" } },
+              "required": ["result"]
+            }
+          }
+        }
+      }
+    },
+
+    "payLink.portRequest": {
+      "title": "PayLinkPortRequest",
+      "description": "The part of a payLink request that K-07 v1's effect row holds as its portRequest (kind stripe_pay_link).",
+      "type": "object",
+      "properties": {
+        "account": { "$ref": "#/$defs/account" },
+        "purpose": { "$ref": "#/$defs/purpose" },
+        "customerId": {
+          "description": "The payer's customer on that account when they have one; null when the payer has none, such as someone else paying (RULES 3.13).",
+          "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }]
+        },
+        "saveCardForLater": {
+          "description": "True when the card that pays is saved for the booking, as after a failed charge (A6-32: 'Paid in time: it's booked ... and that card is the one saved for it'); needs customerId. False for a payer who approves nothing (RULES 3.13), a tip or Rosfield's bill.",
+          "type": "boolean"
+        },
+        "description": {
+          "description": "What the payment is for, as the business's Stripe and the receipt show it (RULES 3.14); for sensitive work, only the display name and the date (S13-22).",
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 500
+        }
+      },
+      "required": ["account", "purpose", "customerId", "saveCardForLater", "description"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "purpose": {
+          "description": "Rosfield's bill is paid into Rosfield's own account (S11-68); a customer's money into the business's own (RULES 3.1).",
+          "if": { "properties": { "purpose": { "const": "rosfieldMonthlyBill" } } },
+          "then": { "properties": { "account": { "$ref": "#/$defs/rosfieldAccount" } } },
+          "else": { "properties": { "account": { "$ref": "#/$defs/businessAccount" } } }
+        },
+        "saveCardForLater": {
+          "description": "A card is saved to a customer, so saving it needs one.",
+          "if": { "properties": { "saveCardForLater": { "const": true } } },
+          "then": { "properties": { "customerId": { "$ref": "#/$defs/stripeId" } } }
+        }
+      }
+    },
+    "payLink.request": {
+      "title": "PayLinkRequest",
+      "description": "Make the payment a pay link takes (A6-32 after a failed charge; A9-05 the bill; MC C3's 15-minute door; S12-17 Stripe coming back; S11-68 Rosfield's bill after a decline): a PaymentIntent for the amount due, not yet paid, carrying the effect id (README 'Spike findings' rows 9 and 11). The link itself is Rosie's own pay page (C-200; A6-32's rosfield.com/p/f4; S11-68's rosfield.com/bill/pay), where the person types a card into Stripe's form with the client secret. One link, never a second (S11-68: 'one pay link, with no chasing'; RULES 3.11). Its deadline is Rosie's, not Stripe's: the clock row (clock.pay; K-33 v1 pay_by) holds it, and closePayLink ends the payment at it. A late payment is still refunded at once (RULES 3.10). Runs as K-07 v1's stripe_pay_link effect.",
+      "type": "object",
+      "properties": {
+        "effect": { "$ref": "#/$defs/effectRef" },
+        "amount": {
+          "description": "What is due, in cents (K-07 v1 effectRow.amount).",
+          "$ref": "#/$defs/amount"
+        },
+        "port": { "$ref": "#/$defs/payLink.portRequest" }
+      },
+      "required": ["effect", "amount", "port"],
+      "additionalProperties": false
+    },
+    "payLink.response": {
+      "title": "PayLinkResponse",
+      "description": "The payment the pay page takes: its PaymentIntent (K-07 providerObjectId; K-33 v1 'the link's Stripe id is on it') and the client secret the page's form takes. Paid: a paymentSucceeded event carrying the effect id.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "created" },
+        "paymentId": { "$ref": "#/$defs/stripeId" },
+        "clientSecret": { "$ref": "#/$defs/clientSecret" },
+        "createdAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "paymentId", "clientSecret", "createdAt"],
+      "additionalProperties": false
+    },
+    "payLink.errors": {
+      "title": "PayLinkErrors",
+      "description": "No payment made; K-07's effect rules apply.",
+      "$ref": "#/$defs/callFailure"
+    },
+    "payLink.exchange": {
+      "title": "PayLinkExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "payLink" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/payLink.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/payLink.response" }, { "$ref": "#/$defs/payLink.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "closePayLink.request": {
+      "title": "ClosePayLinkRequest",
+      "description": "End a pay link's payment at its deadline, so nothing can be paid after it (A6-32: 'Not paid in time: not booked, and the time goes back'; RULES 3.11: 'Not paid: not booked, nothing taken'): the adapter cancels the PaymentIntent (README 'Spike findings' row 11). Run by the clock firing that finds it unpaid. Repeating it is safe. A K-08 portCall span (provider stripe, call closePayLink); K-07 v1 has no effect kind for it (README 'Open gaps').",
+      "type": "object",
+      "properties": {
+        "account": { "$ref": "#/$defs/account" },
+        "paymentId": {
+          "description": "The pay link's PaymentIntent (payLink's paymentId).",
+          "$ref": "#/$defs/stripeId"
+        }
+      },
+      "required": ["account", "paymentId"],
+      "additionalProperties": false
+    },
+    "closePayLink.response": {
+      "title": "ClosePayLinkResponse",
+      "description": "closed: it can no longer be paid (a paymentCanceled event follows). alreadyPaid: it was paid before it could be closed, at paidAt; the caller weighs paidAt against the deadline (paid in time: booked; late: refunded at once, RULES 3.10). alreadyClosed: closed before.",
+      "type": "object",
+      "properties": {
+        "result": { "type": "string", "enum": ["closed", "alreadyPaid", "alreadyClosed"] },
+        "paymentId": { "$ref": "#/$defs/stripeId" },
+        "paidAt": {
+          "description": "For alreadyPaid, when it was paid; else null.",
+          "anyOf": [{ "$ref": "#/$defs/utc" }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "paymentId", "paidAt"],
+      "additionalProperties": false,
+      "if": { "properties": { "result": { "const": "alreadyPaid" } } },
+      "then": { "properties": { "paidAt": { "$ref": "#/$defs/utc" } } },
+      "else": { "properties": { "paidAt": { "type": "null" } } }
+    },
+    "closePayLink.errors": {
+      "title": "ClosePayLinkErrors",
+      "description": "Not closed; the caller tries again as a job does (arch 10 line 540). While Stripe is down the deadline waits (S12-16: 'A deadline that needs Stripe or the secure page waits while either is down').",
+      "$ref": "#/$defs/callFailure"
+    },
+    "closePayLink.exchange": {
+      "title": "ClosePayLinkExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "closePayLink" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/closePayLink.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/closePayLink.response" }, { "$ref": "#/$defs/closePayLink.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "refund.portRequest": {
+      "title": "RefundPortRequest",
+      "description": "The part of a refund request that K-07 v1's effect row holds as its portRequest (kind stripe_refund).",
+      "type": "object",
+      "properties": {
+        "account": {
+          "description": "The account the payment was made on: the business's (RULES 3.10), or Rosfield's for its own bill.",
+          "$ref": "#/$defs/account"
+        },
+        "paymentId": {
+          "description": "The payment refunded: the charge's or the pay link's PaymentIntent (charge's or payLink's paymentId; a listed charge's paymentId).",
+          "$ref": "#/$defs/stripeId"
+        },
+        "reason": {
+          "description": "duplicate: a charge made twice by mistake, refunded at once (S12-26; RULES 3.10). requestedByCustomer: every other refund the terms or the owner give back (A10-09 to A10-12; RULES 3.10). Stripe's own refund reasons (README 'Spike findings' row 10).",
+          "type": "string",
+          "enum": ["duplicate", "requestedByCustomer"]
+        }
+      },
+      "required": ["account", "paymentId", "reason"],
+      "additionalProperties": false
+    },
+    "refund.request": {
+      "title": "RefundRequest",
+      "description": "Refund a payment, whole or in part (02-contracts K-14: 'refunds by effect id, whole or in part (S13-55; A10-09 to A10-12; S12-26 at once)'). Rosie never refunds on its own: what the terms give back, the owner's call, or a double charge at once (RULES 3.10). The refund carries its own effect id, which the listing gives back (README 'Spike findings' rows 9 and 10). Runs as K-07 v1's stripe_refund effect: the amount is the effect row's.",
+      "type": "object",
+      "properties": {
+        "effect": { "$ref": "#/$defs/effectRef" },
+        "amount": {
+          "description": "How much goes back, in cents: the whole payment, or the part the owner named and the read-back confirmed (A10-12).",
+          "$ref": "#/$defs/amount"
+        },
+        "port": { "$ref": "#/$defs/refund.portRequest" }
+      },
+      "required": ["effect", "amount", "port"],
+      "additionalProperties": false
+    },
+    "refund.response": {
+      "title": "RefundResponse",
+      "description": "The refund (K-07 providerObjectId) and where it stands: succeeded, or pending at Stripe; a later change comes as a refundChanged event (a card refund may still fail: README 'Spike findings' row 10).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "refunded" },
+        "refundId": { "$ref": "#/$defs/stripeId" },
+        "paymentId": { "$ref": "#/$defs/stripeId" },
+        "state": { "type": "string", "enum": ["pending", "succeeded"] },
+        "refundedAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "refundId", "paymentId", "state", "refundedAt"],
+      "additionalProperties": false
+    },
+    "refund.errors": {
+      "title": "RefundErrors",
+      "description": "Not refunded. refused includes a payment already refunded, an amount above what is left, or a payment under dispute (Stripe's codes, README 'Spike findings' row 10).",
+      "$ref": "#/$defs/callFailure"
+    },
+    "refund.exchange": {
+      "title": "RefundExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "refund" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/refund.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/refund.response" }, { "$ref": "#/$defs/refund.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "disputeEvidence.portRequest": {
+      "title": "DisputeEvidencePortRequest",
+      "description": "The part of a disputeEvidence request that K-07 v1's effect row holds as its portRequest (kind stripe_dispute_evidence). It holds no person's words: the record goes as a private file (K-13), so nothing the person wrote enters the effect row or a log (K-08 v1 'never the raw number or words').",
+      "type": "object",
+      "properties": {
+        "account": {
+          "description": "The business's own account, where the disputed payment was made (A10-15).",
+          "$ref": "#/$defs/businessAccount"
+        },
+        "disputeId": {
+          "description": "The dispute, as the disputeOpened event named it.",
+          "$ref": "#/$defs/stripeId"
+        },
+        "ownerYes": {
+          "description": "The owner's yes to send the record (A10-16: 'Means 1: send the record'; 'Never: send the record without Sam'), in K-08 v1's approval form. Required: no yes, no call (refuse-dispute-evidence-without-owner-yes).",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/approvalOwnerYes"
+        },
+        "serviceDate": {
+          "description": "The visit's date, in the business's zone (A10-16: 'the payment for Sat Oct 24').",
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "serviceDescription": {
+          "description": "What was booked and given, as the booking names it; for sensitive work only 'Visit' (S13-22).",
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 500
+        },
+        "customerName": {
+          "description": "The customer's name as the booking holds it (K-04 persons.name).",
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "recordFileId": {
+          "description": "The record Rosie built from its own texts and the check-in (A10-16: 'The booking, the check-in and every text'), as one private file (K-13, frozen at F8; an opaque id until then). The adapter uploads it to Stripe as dispute evidence (README 'Spike findings' row 12).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "account",
+        "disputeId",
+        "ownerYes",
+        "serviceDate",
+        "serviceDescription",
+        "customerName",
+        "recordFileId"
+      ],
+      "additionalProperties": false
+    },
+    "disputeEvidence.request": {
+      "title": "DisputeEvidenceRequest",
+      "description": "Send the record to the bank on the owner's yes (A10-16), once: the adapter puts it on the dispute and submits it at once, which Stripe allows a single time (README 'Spike findings' row 12). Nothing is sent without the owner; with no answer by the deadline, nothing goes and the bank decides without it (A10-19). Runs as K-07 v1's stripe_dispute_evidence effect.",
+      "type": "object",
+      "properties": {
+        "effect": { "$ref": "#/$defs/effectRef" },
+        "port": { "$ref": "#/$defs/disputeEvidence.portRequest" }
+      },
+      "required": ["effect", "port"],
+      "additionalProperties": false
+    },
+    "disputeEvidence.response": {
+      "title": "DisputeEvidenceResponse",
+      "description": "Sent: the dispute (K-07 providerObjectId), when, and the bank's deadline it met. The bank's decision comes as disputeClosed (A10-17).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "submitted" },
+        "disputeId": { "$ref": "#/$defs/stripeId" },
+        "submittedAt": { "$ref": "#/$defs/utc" },
+        "dueBy": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "disputeId", "submittedAt", "dueBy"],
+      "additionalProperties": false
+    },
+    "disputeEvidence.errors": {
+      "title": "DisputeEvidenceErrors",
+      "description": "Not sent. refused includes a dispute past its deadline or already answered (Stripe's codes); Sam is told (A10-19).",
+      "$ref": "#/$defs/callFailure"
+    },
+    "disputeEvidence.exchange": {
+      "title": "DisputeEvidenceExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "disputeEvidence" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/disputeEvidence.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/disputeEvidence.response" },
+            { "$ref": "#/$defs/disputeEvidence.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "listItem": {
+      "title": "StripeListItem",
+      "description": "One charge or refund, as reconciliation matches it to its ledger line (arch 10 line 550: 'each Stripe charge and refund matched to its ledger line by effect id'; 02-contracts K-14: 'each with the effect id it was made under, its amount, its state and its Stripe id'). A charge's states are Stripe's: succeeded, pending, failed (a declined card leaves a failed charge). A refund's: pending, requiresAction, succeeded, failed, canceled (README 'Spike findings' row 10).",
+      "type": "object",
+      "properties": {
+        "kind": { "type": "string", "enum": ["charge", "refund"] },
+        "stripeId": {
+          "description": "The charge's or the refund's own id.",
+          "$ref": "#/$defs/stripeId"
+        },
+        "paymentId": {
+          "description": "The PaymentIntent it belongs to (charge.response, payLink.response), or null when Stripe names none.",
+          "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }]
+        },
+        "refundOf": {
+          "description": "For a refund, the charge it refunds; null for a charge.",
+          "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }]
+        },
+        "effectId": {
+          "description": "The effect id it was made under (its rosie_effect_id), or null when it carries none: CQ-15's default holds, so reconciliation gives it no ledger line and no refund, and Rosie's team gets it within 1 business day as 'anything else' (arch 10 line 550; S12-24).",
+          "anyOf": [{ "$ref": "#/$defs/effectId" }, { "type": "null" }]
+        },
+        "amount": { "$ref": "#/$defs/amount" },
+        "state": {
+          "type": "string",
+          "enum": ["succeeded", "pending", "failed", "requiresAction", "canceled"]
+        },
+        "createdAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["kind", "stripeId", "paymentId", "refundOf", "effectId", "amount", "state", "createdAt"],
+      "additionalProperties": false,
+      "if": { "properties": { "kind": { "const": "charge" } } },
+      "then": {
+        "properties": {
+          "refundOf": { "type": "null" },
+          "state": { "enum": ["succeeded", "pending", "failed"] }
+        }
+      },
+      "else": { "properties": { "refundOf": { "$ref": "#/$defs/stripeId" } } }
+    },
+    "listMoney.request": {
+      "title": "ListMoneyRequest",
+      "description": "Every charge and refund made on one account between two times, for daily reconciliation (C-112: at 03:00 UTC over the last 48 hours; arch 10 line 550). Reconciliation reads Stripe through this call, not K-07's stored provider events, since it must also find a charge with no ledger line behind it (02-contracts K-14). A read: repeating it is safe; a K-08 portCall span (provider stripe, call listMoney).",
+      "type": "object",
+      "properties": {
+        "account": { "$ref": "#/$defs/account" },
+        "from": {
+          "description": "The window's start, included.",
+          "$ref": "#/$defs/utc"
+        },
+        "to": {
+          "description": "The window's end, left out; later than from (the contract test checks the order).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["account", "from", "to"],
+      "additionalProperties": false
+    },
+    "listMoney.response": {
+      "title": "ListMoneyResponse",
+      "description": "The whole window, every page of it (the adapter pages through Stripe's lists: README 'Spike findings' row 10), in no promised order. On a business's account only what Rosie's platform made: Stripe marks each charge with the Connect application that created it, so a charge the owner took in their own Stripe outside Rosie is left out (CQ-15's default), and each refund of a listed charge is listed. On Rosfield's own account, every charge and refund.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "listed" },
+        "from": { "$ref": "#/$defs/utc" },
+        "to": { "$ref": "#/$defs/utc" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/listItem" }
+        }
+      },
+      "required": ["result", "from", "to", "items"],
+      "additionalProperties": false
+    },
+    "listMoney.errors": {
+      "title": "ListMoneyErrors",
+      "description": "No listing; the job tries again (arch 10 line 540: 5 tries, then the dead-letter queue). A partial listing is never given.",
+      "$ref": "#/$defs/callFailure"
+    },
+    "listMoney.exchange": {
+      "title": "ListMoneyExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "listMoney" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/listMoney.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/listMoney.response" }, { "$ref": "#/$defs/listMoney.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "eventKind": {
+      "title": "StripeEventKind",
+      "description": "The Stripe events Rosie uses, in its own words (02-contracts K-14 'Webhooks in'; README 'Webhook events' gives each one's Stripe types and steps): accountUpdated, accountDisconnected (S1-27, S11-63 to S11-65); cardSaved, cardSaveFailed, cardDetails (A5-07, S1-29); paymentSucceeded, paymentFailed, paymentCanceled (A5-13, A5-16, A6-32, A9-06, S11-67, S11-68); refundChanged (A10-10, S12-26); disputeOpened, disputeClosed (A10-15, A10-17); payoutFailed (S11-64, S11-65).",
+      "type": "string",
+      "enum": [
+        "accountUpdated",
+        "accountDisconnected",
+        "cardSaved",
+        "cardSaveFailed",
+        "cardDetails",
+        "paymentSucceeded",
+        "paymentFailed",
+        "paymentCanceled",
+        "refundChanged",
+        "disputeOpened",
+        "disputeClosed",
+        "payoutFailed"
+      ]
+    },
+    "webhookEvent": {
+      "title": "StripeWebhookEvent",
+      "description": "One signed Stripe event, parsed into Rosie's terms. The gateway (C-044) stores it once as a K-07 v1 providerEvent: provider stripe, providerEventId the eventId, eventType the stripeType, occurredAt, effectId, and payload this object's kind, account, testMode and payload; businessId is the business whose K-23 v1 stripe_account_id is the account, or for Rosfield's own account the business of the effect it names (README 'Webhook events'). A known eventId is dropped (arch 02 line 109).",
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "description": "Stripe's event id, the key it is stored once by (K-07 v1 providerEvent.providerEventId; README 'Spike findings' row 13).",
+          "$ref": "#/$defs/stripeId"
+        },
+        "kind": { "$ref": "#/$defs/eventKind" },
+        "stripeType": {
+          "description": "Stripe's own event type (K-07 v1 providerEvent.eventType).",
+          "type": "string",
+          "pattern": "^[a-z][a-z_]*([.][a-z_]+)+$"
+        },
+        "account": {
+          "description": "Where it happened: a business's own account (the event's account, on the endpoint for connected accounts), or Rosfield's own (README 'Spike findings' row 14).",
+          "$ref": "#/$defs/account"
+        },
+        "testMode": {
+          "description": "True for a test-mode event. A production endpoint for connected accounts gets live and test events alike, so the gateway drops a live event on staging and a test one on production after launch (README 'Spike findings' row 14; BP 9.4; DL-020).",
+          "type": "boolean"
+        },
+        "occurredAt": { "$ref": "#/$defs/utc" },
+        "effectId": {
+          "description": "The effect id the object carries (its rosie_effect_id), linking the event to its K-07 effect row; null when it carries none (a dispute, an account's change, a card's details, a payout).",
+          "anyOf": [{ "$ref": "#/$defs/effectId" }, { "type": "null" }]
+        },
+        "payload": {
+          "description": "The kind's own fields: one of the definitions named event.<kind>, the one its kind names (the rules below).",
+          "anyOf": [
+            { "$ref": "#/$defs/event.accountUpdated" },
+            { "$ref": "#/$defs/event.accountDisconnected" },
+            { "$ref": "#/$defs/event.cardSaved" },
+            { "$ref": "#/$defs/event.cardSaveFailed" },
+            { "$ref": "#/$defs/event.cardDetails" },
+            { "$ref": "#/$defs/event.paymentSucceeded" },
+            { "$ref": "#/$defs/event.paymentFailed" },
+            { "$ref": "#/$defs/event.paymentCanceled" },
+            { "$ref": "#/$defs/event.refundChanged" },
+            { "$ref": "#/$defs/event.disputeOpened" },
+            { "$ref": "#/$defs/event.disputeClosed" },
+            { "$ref": "#/$defs/event.payoutFailed" }
+          ]
+        }
+      },
+      "required": [
+        "eventId",
+        "kind",
+        "stripeType",
+        "account",
+        "testMode",
+        "occurredAt",
+        "effectId",
+        "payload"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "Each kind's Stripe types, account, effect id and payload (README 'Webhook events').",
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "accountUpdated" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "account.updated" },
+                  "account": { "$ref": "#/$defs/businessAccount" },
+                  "effectId": { "type": "null" },
+                  "payload": { "$ref": "#/$defs/event.accountUpdated" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "accountDisconnected" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "account.application.deauthorized" },
+                  "account": { "$ref": "#/$defs/businessAccount" },
+                  "effectId": { "type": "null" },
+                  "payload": { "$ref": "#/$defs/event.accountDisconnected" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "cardSaved" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "setup_intent.succeeded" },
+                  "payload": { "$ref": "#/$defs/event.cardSaved" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "cardSaveFailed" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "setup_intent.setup_failed" },
+                  "payload": { "$ref": "#/$defs/event.cardSaveFailed" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "cardDetails" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "enum": ["payment_method.attached", "payment_method.updated"] },
+                  "effectId": { "type": "null" },
+                  "payload": { "$ref": "#/$defs/event.cardDetails" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "paymentSucceeded" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "payment_intent.succeeded" },
+                  "payload": { "$ref": "#/$defs/event.paymentSucceeded" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "paymentFailed" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "payment_intent.payment_failed" },
+                  "payload": { "$ref": "#/$defs/event.paymentFailed" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "paymentCanceled" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "payment_intent.canceled" },
+                  "payload": { "$ref": "#/$defs/event.paymentCanceled" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "refundChanged" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "enum": ["refund.created", "refund.updated", "refund.failed"] },
+                  "payload": { "$ref": "#/$defs/event.refundChanged" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "disputeOpened" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "charge.dispute.created" },
+                  "effectId": { "type": "null" },
+                  "payload": { "$ref": "#/$defs/event.disputeOpened" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "disputeClosed" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "charge.dispute.closed" },
+                  "effectId": { "type": "null" },
+                  "payload": { "$ref": "#/$defs/event.disputeClosed" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "payoutFailed" } } },
+              "then": {
+                "properties": {
+                  "stripeType": { "const": "payout.failed" },
+                  "account": { "$ref": "#/$defs/businessAccount" },
+                  "effectId": { "type": "null" },
+                  "payload": { "$ref": "#/$defs/event.payoutFailed" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "event.accountUpdated": {
+      "title": "StripeEventAccountUpdated",
+      "description": "The business's account changed: where it stands now (accountState; S1-27 finished, S11-65 Stripe needs a document).",
+      "type": "object",
+      "properties": {
+        "state": { "$ref": "#/$defs/accountState" }
+      },
+      "required": ["state"],
+      "additionalProperties": false
+    },
+    "event.accountDisconnected": {
+      "title": "StripeEventAccountDisconnected",
+      "description": "The owner disconnected Rosie from their Stripe account: nothing through Rosie can take money there until they connect again (S1-27; README 'Spike findings' row 4).",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "event.cardSaved": {
+      "title": "StripeEventCardSaved",
+      "description": "The card typed into Stripe's form is saved to the customer, for later charges without them (A5-07; S1-29 the bill card). The effect id is the saveCard effect's; the card's brand and last four come as cardDetails.",
+      "type": "object",
+      "properties": {
+        "setupId": { "$ref": "#/$defs/stripeId" },
+        "customerId": { "$ref": "#/$defs/stripeId" },
+        "paymentMethodId": { "$ref": "#/$defs/stripeId" }
+      },
+      "required": ["setupId", "customerId", "paymentMethodId"],
+      "additionalProperties": false
+    },
+    "event.cardSaveFailed": {
+      "title": "StripeEventCardSaveFailed",
+      "description": "The card could not be saved (the bank refused it at setup): the page shows 'Try another card' (RULES 3.11).",
+      "type": "object",
+      "properties": {
+        "setupId": { "$ref": "#/$defs/stripeId" },
+        "code": { "anyOf": [{ "$ref": "#/$defs/stripeCode" }, { "type": "null" }] },
+        "declineCode": { "anyOf": [{ "$ref": "#/$defs/declineCode" }, { "type": "null" }] }
+      },
+      "required": ["setupId", "code", "declineCode"],
+      "additionalProperties": false
+    },
+    "event.cardDetails": {
+      "title": "StripeEventCardDetails",
+      "description": "A saved card as it may be shown: its brand and last four, when it is saved to a customer or Stripe updates it (A5-07's 'Card •••• 4242'; K-33 v1's open gap on the bill card's display, FS row M04). Joined to cardSaved by paymentMethodId; it carries no effect id.",
+      "type": "object",
+      "properties": {
+        "paymentMethodId": { "$ref": "#/$defs/stripeId" },
+        "customerId": { "$ref": "#/$defs/stripeId" },
+        "card": { "$ref": "#/$defs/cardShown" }
+      },
+      "required": ["paymentMethodId", "customerId", "card"],
+      "additionalProperties": false
+    },
+    "event.paymentSucceeded": {
+      "title": "StripeEventPaymentSucceeded",
+      "description": "A payment went through: a charge after the bank's check, or a pay link paid (A6-32 'Paid in time'; A9-06; S11-68 'Paid'). The money lands in the account, less Stripe's own card fee (A9-06).",
+      "type": "object",
+      "properties": {
+        "paymentId": { "$ref": "#/$defs/stripeId" },
+        "chargeId": { "$ref": "#/$defs/stripeId" },
+        "amount": { "$ref": "#/$defs/amount" }
+      },
+      "required": ["paymentId", "chargeId", "amount"],
+      "additionalProperties": false
+    },
+    "event.paymentFailed": {
+      "title": "StripeEventPaymentFailed",
+      "description": "A payment try failed, such as a card refused on the pay page or after the bank's check; the payment stays open for another card until its deadline (README 'Spike findings' row 6).",
+      "type": "object",
+      "properties": {
+        "paymentId": { "$ref": "#/$defs/stripeId" },
+        "chargeId": { "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }] },
+        "code": { "anyOf": [{ "$ref": "#/$defs/stripeCode" }, { "type": "null" }] },
+        "declineCode": { "anyOf": [{ "$ref": "#/$defs/declineCode" }, { "type": "null" }] }
+      },
+      "required": ["paymentId", "chargeId", "code", "declineCode"],
+      "additionalProperties": false
+    },
+    "event.paymentCanceled": {
+      "title": "StripeEventPaymentCanceled",
+      "description": "A pay link's payment was closed (closePayLink) and can no longer be paid.",
+      "type": "object",
+      "properties": {
+        "paymentId": { "$ref": "#/$defs/stripeId" }
+      },
+      "required": ["paymentId"],
+      "additionalProperties": false
+    },
+    "event.refundChanged": {
+      "title": "StripeEventRefundChanged",
+      "description": "A refund was made or its state changed, such as a card refund that failed after it went (README 'Spike findings' row 10).",
+      "type": "object",
+      "properties": {
+        "refundId": { "$ref": "#/$defs/stripeId" },
+        "paymentId": { "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }] },
+        "amount": { "$ref": "#/$defs/amount" },
+        "state": {
+          "type": "string",
+          "enum": ["pending", "requiresAction", "succeeded", "failed", "canceled"]
+        }
+      },
+      "required": ["refundId", "paymentId", "amount", "state"],
+      "additionalProperties": false
+    },
+    "event.disputeOpened": {
+      "title": "StripeEventDisputeOpened",
+      "description": "A customer's bank opened a dispute about a payment through Rosie; Stripe takes the amount from the business's balance while the bank decides (A10-15). Rosie builds the record and asks the owner (A10-16), with the bank's deadline.",
+      "type": "object",
+      "properties": {
+        "disputeId": { "$ref": "#/$defs/stripeId" },
+        "chargeId": { "$ref": "#/$defs/stripeId" },
+        "paymentId": { "anyOf": [{ "$ref": "#/$defs/stripeId" }, { "type": "null" }] },
+        "amount": { "$ref": "#/$defs/amount" },
+        "evidenceDueBy": {
+          "description": "The bank's deadline for the record (A10-16: 'Answer by Fri Nov 6, 5pm').",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["disputeId", "chargeId", "paymentId", "amount", "evidenceDueBy"],
+      "additionalProperties": false
+    },
+    "event.disputeClosed": {
+      "title": "StripeEventDisputeClosed",
+      "description": "The bank decided (A10-17: 'The business wins: the money comes back. The customer wins: it stays with them. Sam is told either way'). businessWon and customerWon are Stripe's won and lost; inquiryClosed, an inquiry closed before it became a dispute.",
+      "type": "object",
+      "properties": {
+        "disputeId": { "$ref": "#/$defs/stripeId" },
+        "chargeId": { "$ref": "#/$defs/stripeId" },
+        "outcome": { "type": "string", "enum": ["businessWon", "customerWon", "inquiryClosed"] }
+      },
+      "required": ["disputeId", "chargeId", "outcome"],
+      "additionalProperties": false
+    },
+    "event.payoutFailed": {
+      "title": "StripeEventPayoutFailed",
+      "description": "Stripe could not pay the business's balance out to its bank, such as a closed bank account; the money waits in the business's Stripe balance and the owner fixes it at Stripe (S11-64 'A problem at Stripe'; S11-65).",
+      "type": "object",
+      "properties": {
+        "payoutId": { "$ref": "#/$defs/stripeId" },
+        "amount": { "$ref": "#/$defs/amount" },
+        "failureCode": {
+          "description": "Stripe's failure code, such as account_closed (README 'Spike findings' row 18).",
+          "anyOf": [{ "$ref": "#/$defs/stripeCode" }, { "type": "null" }]
+        }
+      },
+      "required": ["payoutId", "amount", "failureCode"],
+      "additionalProperties": false
+    },
+
+    "endpoint": {
+      "title": "StripeEndpoint",
+      "description": "The webhook endpoint that received it: rosfield, the endpoint for Rosfield's own account (its bill card, monthly charge and bill pay link), checked with STRIPE_WEBHOOK_SECRET; businesses, the endpoint for connected accounts (every business's charges, cards, disputes, payouts and account changes), checked with STRIPE_CONNECT_WEBHOOK_SECRET. Each endpoint has its own signing secret (README 'Spike findings' rows 13 and 14).",
+      "type": "string",
+      "enum": ["rosfield", "businesses"]
+    },
+    "verifyWebhook.request": {
+      "title": "VerifyWebhookRequest",
+      "description": "One Stripe webhook as the gateway (C-044) received it, before any parsing (arch 02 line 109: 'The gateway checks ... the Stripe signature'). The signature is checked first, within 300 s of receipt (Stripe's libraries default to 5 minutes; arch 02 line 109's window for Linq); the body is parsed only after.",
+      "type": "object",
+      "properties": {
+        "endpoint": { "$ref": "#/$defs/endpoint" },
+        "signatureHeader": {
+          "description": "The Stripe-Signature header exactly as sent: t=<seconds>, then one or more v1=<signature> (one per active secret while a secret is rolled), maybe v0= on test events, which is ignored (README 'Spike findings' row 13). Empty when the header is missing.",
+          "type": "string"
+        },
+        "raw": {
+          "description": "The body exactly as received, byte for byte as text: Stripe signs '<t>.<raw>'.",
+          "type": "string"
+        },
+        "receivedAt": {
+          "description": "When the gateway received it, the 'now' the 300 s window is measured from.",
+          "$ref": "#/$defs/utc"
+        },
+        "traceId": {
+          "description": "The trace id the gateway opened at receipt (K-08 v1; arch 10 line 548); the stored provider event carries it.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["endpoint", "signatureHeader", "raw", "receivedAt", "traceId"],
+      "additionalProperties": false
+    },
+    "verifyWebhook.response": {
+      "title": "VerifyWebhookResponse",
+      "description": "The signature passed. event: the parsed event, which the gateway stores once as a K-07 v1 provider event and answers 200 in under 1 s; a known event id also gets 200 and is dropped, and a failed write gets 503 so Stripe retries (arch 02 line 109; Stripe retries for up to 3 days live: README 'Spike findings' row 13). ignored: a signed event of a type Rosie does not use, answered 200 and dropped.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "event" },
+            "httpStatus": { "const": 200 },
+            "event": { "$ref": "#/$defs/webhookEvent" }
+          },
+          "required": ["result", "httpStatus", "event"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "ignored" },
+            "httpStatus": { "const": 200 },
+            "stripeType": {
+              "type": "string",
+              "pattern": "^[a-z][a-z_]*([.][a-z_]+)+$"
+            }
+          },
+          "required": ["result", "httpStatus", "stripeType"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "verifyWebhook.errors": {
+      "title": "VerifyWebhookErrors",
+      "description": "The webhook is rejected: the gateway answers 401 and drops it (arch 02 line 109: 'Bad signature: 401, dropped'). badHeader: no t= or no v1= in the header; staleTimestamp: t lies more than 300 s from receivedAt; badSignature: no v1 matches '<t>.<raw>' under the endpoint's secret, compared in constant time. A label only: never the secret, the body or the signature (rule 7).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "rejected" },
+        "httpStatus": { "const": 401 },
+        "reason": { "type": "string", "enum": ["badHeader", "staleTimestamp", "badSignature"] }
+      },
+      "required": ["result", "httpStatus", "reason"],
+      "additionalProperties": false
+    },
+    "verifyWebhook.exchange": {
+      "title": "VerifyWebhookExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "verifyWebhook" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/verifyWebhook.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/verifyWebhook.response" }, { "$ref": "#/$defs/verifyWebhook.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "doubleWebhook.request": {
+      "title": "DoubleWebhookRequest",
+      "description": "Ask the Stripe double (C-214's and C-215's test double; test code only) for a signed webhook in Stripe's form carrying one event: a card saved, a payment paid on the pay page, a refund changed, a dispute opened or closed, an account's change, a payout failed (02-contracts K-14 'The double: fakes ... webhook events'; BP 9.4). The double's other hooks answer every call with any outcome this contract defines, as the test chooses, and plant charges for reconciliation (doublePlant; README 'The double').",
+      "type": "object",
+      "properties": {
+        "endpoint": { "$ref": "#/$defs/endpoint" },
+        "event": {
+          "description": "The event the gateway must get back from verifyWebhook, given the same receivedAt.",
+          "$ref": "#/$defs/webhookEvent"
+        }
+      },
+      "required": ["endpoint", "event"],
+      "additionalProperties": false
+    },
+    "doubleWebhook.response": {
+      "title": "DoubleWebhookResponse",
+      "description": "The signed webhook, ready for the gateway: verifyWebhook on it, inside the 300 s window, gives back the request's event (the contract test's round trip). Signed with the test environment's secret, never Stripe's (rule 7).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "signed" },
+        "webhook": { "$ref": "#/$defs/verifyWebhook.request" }
+      },
+      "required": ["result", "webhook"],
+      "additionalProperties": false
+    },
+    "doubleWebhook.exchange": {
+      "title": "DoubleWebhookExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "doubleWebhook" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/doubleWebhook.request" },
+        "outcome": { "$ref": "#/$defs/doubleWebhook.response" }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "doublePlant.request": {
+      "title": "DoublePlantRequest",
+      "description": "The Stripe double's reconciliation hook (test code only; 02-contracts K-14: 'it can plant a charge with no effect id and a booking charged twice'): chargeWithoutEffectId plants a charge Rosie's platform made with no effect id on it (CQ-15); secondCharge plants a second charge under an effect id that already has one, as when an effect runs again after Stripe let its key go (README 'Spike findings' row 7; S12-26). The planted charge then comes back from listMoney.",
+      "type": "object",
+      "properties": {
+        "account": { "$ref": "#/$defs/account" },
+        "plant": { "type": "string", "enum": ["chargeWithoutEffectId", "secondCharge"] },
+        "amount": { "$ref": "#/$defs/amount" },
+        "createdAt": { "$ref": "#/$defs/utc" },
+        "effectId": {
+          "description": "For secondCharge, the effect whose charge is made again; null for chargeWithoutEffectId.",
+          "anyOf": [{ "$ref": "#/$defs/effectId" }, { "type": "null" }]
+        }
+      },
+      "required": ["account", "plant", "amount", "createdAt", "effectId"],
+      "additionalProperties": false,
+      "if": { "properties": { "plant": { "const": "secondCharge" } } },
+      "then": { "properties": { "effectId": { "$ref": "#/$defs/effectId" } } },
+      "else": { "properties": { "effectId": { "type": "null" } } }
+    },
+    "doublePlant.response": {
+      "title": "DoublePlantResponse",
+      "description": "The planted charge, as listMoney will list it.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "planted" },
+        "item": { "$ref": "#/$defs/listItem" }
+      },
+      "required": ["result", "item"],
+      "additionalProperties": false
+    },
+    "doublePlant.exchange": {
+      "title": "DoublePlantExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "doublePlant" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/doublePlant.request" },
+        "outcome": { "$ref": "#/$defs/doublePlant.response" }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "span": {
+      "title": "StripeSpan",
+      "description": "The span an outside call to Stripe writes: a K-08 v1 span with provider stripe, the call and its attempt (K-08 v1 README 'Outside calls'). A call that runs from a K-07 effect row (saveCard, charge, payLink, refund, disputeEvidence) is an effectRun hop; the rest (onboardingLink, accountStatus, removeCard, closePayLink, listMoney) a portCall hop (K-08 v1: 'portCall covers ... Stripe's onboarding, account-status and reconciliation-listing calls'). What it got and decided is a closed list here, so no amount, card detail, name or id of Stripe's enters a span: got names the step, the effect, whose account, the purpose and whether the person was there; decided names the result, a decline code, and for a listing how many items and how many carried no effect id (K-08 v1 'never the raw number or words'; refuse-card-in-span). The webhook's own span is K-08's providerWebhook hop, the gateway's.",
+      "allOf": [
+        { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/span" },
+        {
+          "type": "object",
+          "properties": {
+            "hop": { "enum": ["effectRun", "portCall"] },
+            "provider": { "const": "stripe" },
+            "call": {
+              "enum": [
+                "onboardingLink",
+                "accountStatus",
+                "saveCard",
+                "removeCard",
+                "charge",
+                "payLink",
+                "closePayLink",
+                "refund",
+                "disputeEvidence",
+                "listMoney"
+              ]
+            },
+            "got": {
+              "description": "What the call was asked, in labels and flags (K-08 v1).",
+              "type": "object",
+              "properties": {
+                "step": {
+                  "description": "The step or job that asked, such as A9-12, S11-67 or C-112 (a K-08 v1 label).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label"
+                },
+                "effect": {
+                  "description": "The effect id, for a call that runs from an effect row (a K-08 v1 label).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/label"
+                },
+                "account": { "type": "string", "enum": ["business", "rosfield"] },
+                "purpose": { "$ref": "#/$defs/purpose" },
+                "customerPresent": { "type": "boolean" }
+              },
+              "required": ["account"],
+              "additionalProperties": false
+            },
+            "decided": {
+              "description": "The outcome in labels and counts (K-08 v1); an error's code is the span's error_code.",
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "enum": [
+                    "link",
+                    "status",
+                    "disconnected",
+                    "ready",
+                    "removed",
+                    "alreadyRemoved",
+                    "charged",
+                    "needsAuthentication",
+                    "created",
+                    "closed",
+                    "alreadyPaid",
+                    "alreadyClosed",
+                    "refunded",
+                    "submitted",
+                    "listed",
+                    "declined",
+                    "transient",
+                    "refused"
+                  ]
+                },
+                "declineCode": {
+                  "anyOf": [{ "$ref": "#/$defs/declineCode" }, { "type": "null" }]
+                },
+                "items": {
+                  "description": "For listMoney, how many charges and refunds it listed.",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "withoutEffectId": {
+                  "description": "For listMoney, how many of them carried no effect id (CQ-15).",
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": ["result"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["hop", "provider", "call", "attempt", "got"],
+          "if": {
+            "properties": {
+              "call": { "enum": ["saveCard", "charge", "payLink", "refund", "disputeEvidence"] }
+            }
+          },
+          "then": {
+            "properties": {
+              "hop": { "const": "effectRun" },
+              "got": { "type": "object", "required": ["effect"] }
+            }
+          },
+          "else": { "properties": { "hop": { "const": "portCall" } } }
+        }
+      ]
+    }
+  }
+}

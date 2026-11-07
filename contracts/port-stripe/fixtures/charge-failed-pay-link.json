@@ -1,0 +1,27 @@
+{
+  "call": "payLink",
+  "given": {
+    "now": "2026-11-06T15:00:01Z",
+    "note": "A6-32: Sam OK'd Alex's request for a Color correction, and the $25 deposit charged on his saved card was declined. The decline is never retried; Alex gets one link to pay what is due, by the request's latest answer time (clock.pay, 17:00Z here, held by the clock row). This makes the payment Rosie's own pay page takes, rosfield.com/p/f4; paid in time, it is booked and that card is the one saved for it."
+  },
+  "request": {
+    "effect": {
+      "effectId": "eff-alex-color-correction-pay-link",
+      "idempotencyKey": "eff-alex-color-correction-pay-link"
+    },
+    "amount": { "cents": 2500, "currency": "USD" },
+    "port": {
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "purpose": "deposit",
+      "customerId": "stripe-customer-demo-alex",
+      "saveCardForLater": true,
+      "description": "Lee's Barbershop: deposit for Color correction"
+    }
+  },
+  "outcome": {
+    "result": "created",
+    "paymentId": "stripe-payment-demo-0007",
+    "clientSecret": "demo-client-secret-payment-0007",
+    "createdAt": "2026-11-06T15:00:02Z"
+  }
+}

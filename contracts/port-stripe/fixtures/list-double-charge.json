@@ -1,0 +1,39 @@
+{
+  "call": "listMoney",
+  "given": {
+    "now": "2026-11-09T03:00:01Z",
+    "note": "S12-26; arch 10 line 550: Dee W.'s $20 late-cancel fee at Lee's Barbershop was charged twice under one effect id, as when an effect runs again after Stripe let its idempotency key go (planted by the double: double-plant-second-charge.json). The first charge matches its ledger line; the second has none and no agreed booking behind it, so its line is written and it is refunded at once (refund-double-charge.json), and Dee and Sam are told."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "from": "2026-11-07T03:00:00Z",
+    "to": "2026-11-09T03:00:00Z"
+  },
+  "outcome": {
+    "result": "listed",
+    "from": "2026-11-07T03:00:00Z",
+    "to": "2026-11-09T03:00:00Z",
+    "items": [
+      {
+        "kind": "charge",
+        "stripeId": "stripe-charge-demo-0020",
+        "paymentId": "stripe-payment-demo-0020",
+        "refundOf": null,
+        "effectId": "eff-dee-late-cancel-fee",
+        "amount": { "cents": 2000, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-11-07T14:00:02Z"
+      },
+      {
+        "kind": "charge",
+        "stripeId": "stripe-charge-demo-0021",
+        "paymentId": "stripe-payment-demo-0021",
+        "refundOf": null,
+        "effectId": "eff-dee-late-cancel-fee",
+        "amount": { "cents": 2000, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-11-08T14:05:02Z"
+      }
+    ]
+  }
+}

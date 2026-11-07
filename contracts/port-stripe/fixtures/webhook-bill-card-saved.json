@@ -1,0 +1,33 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-10-19T18:18:01Z",
+    "note": "S1-29; FS row M04: Sam's card for Rosfield's monthly bill is saved on Rosfield's own account at 2:18pm Mon Oct 19 (bill-card.json). The event comes to the endpoint for Rosfield's own account, with no business account on it; its saved card is K-33 v1 seed-bill-card.json's stripe_customer_id and stripe_payment_method_id.",
+    "signing": "valid"
+  },
+  "request": {
+    "endpoint": "rosfield",
+    "signatureHeader": "t=1792433881,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0201\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"created\":1792433880,\"livemode\":false,\"type\":\"setup_intent.succeeded\",\"data\":{\"object\":{\"id\":\"stripe-setup-demo-sam-lee-1\",\"object\":\"setup_intent\",\"customer\":\"stripe-customer-demo-sam-lee\",\"metadata\":{\"rosie_effect_id\":\"eff-sam-bill-card-lees-barbershop\"},\"payment_method\":\"stripe-card-demo-sam-lee-1\",\"status\":\"succeeded\",\"usage\":\"off_session\"}}}",
+    "receivedAt": "2026-10-19T18:18:01Z",
+    "traceId": "trace-stripe-0201"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "stripe-evt-demo-0201",
+      "kind": "cardSaved",
+      "stripeType": "setup_intent.succeeded",
+      "account": { "kind": "rosfield" },
+      "testMode": true,
+      "occurredAt": "2026-10-19T18:18:00Z",
+      "effectId": "eff-sam-bill-card-lees-barbershop",
+      "payload": {
+        "setupId": "stripe-setup-demo-sam-lee-1",
+        "customerId": "stripe-customer-demo-sam-lee",
+        "paymentMethodId": "stripe-card-demo-sam-lee-1"
+      }
+    }
+  }
+}
