@@ -4,6 +4,8 @@ export {
   CUSTOMER_OPENS,
   STAFF_OPENS,
   decideLimit8,
+  isSafety,
+  isSmsPort,
   isStopReply,
   versionsChanged,
   type Limit8Decision,

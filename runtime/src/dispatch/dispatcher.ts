@@ -25,7 +25,7 @@
 //
 // No words, number or key is logged: spans carry ids, counts and labels only (runtime/src/trace; K-08 v1).
 
-import { decideLimit8 } from "./limit8";
+import { decideLimit8, isSafety, isSmsPort, isStopReply } from "./limit8";
 import type { Outcome, SpanFields, TraceContext } from "../trace";
 import type {
   CalendarFileBuilder,
@@ -106,9 +106,9 @@ export type RowOutcome =
   | "stale"
   /** Limit 8 found it stale and its booking or question closed: it is never sent. */
   | "withdrawn"
-  /** Limit 8 found a customer mobile with no open chat: no text, no clock, the row waits. */
+  /** Limit 8 found a phone, not stopped, with no open chat: no text, no clock, the row waits (MC C9). */
   | "waitingChat"
-  /** An SMS channel: refused, nothing sent (DL-012). */
+  /** A row by an SMS port: refused, nothing sent (DL-012); later rows pass it. */
   | "refusedSms"
   /** Limit 8 could not read the send state or its zone and hours: nothing was sent. */
   | "unreadable";
@@ -120,6 +120,8 @@ const LETS_LATER_PASS: ReadonlySet<RowOutcome> = new Set<RowOutcome>([
   "waitingChat",
   "droppedStopped",
   "withdrawn",
+  // A refused SMS-port row has no K-05 move (CQ-55 (1)), but it never holds back the recipient's later rows.
+  "refusedSms",
 ]);
 
 /** How a limit-8 outcome shows in the dispatch span (K-08 v1 outcomes). */
@@ -293,7 +295,18 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
 
     attempted = part;
     const request = await buildRequest(deps, row, part, send, chat, overrideOptout);
-    const outcome = await deps.linq.sendPart(request);
+
+    // The stopped flag again, immediately before the send: a stop that committed during the chat lookup, the renewal or
+    // the calendar build lets no part out. What is left is the read to Linq's acceptance (K-05 v1.2, T-072, folds it in).
+    const recheck = await checkStoppedAgain(deps, row, version);
+    if (!recheck.go) {
+      errorCode = recheck.errorCode;
+      limit8 = recheck.limit;
+      return end(recheck.outcome);
+    }
+    const outcome = await deps.linq.sendPart(
+      recheck.overrideOptout && !request.overrideOptout ? { ...request, overrideOptout: true } : request,
+    );
 
     if (outcome.result === "failed") {
       errorCode = failureCode(outcome);
@@ -353,7 +366,7 @@ async function checkLimit8(
   partOut: boolean,
 ): Promise<Limit8Gate> {
   // No SMS provider exists (DL-012): refused before anything is read, with no K-05 move to record it (open question).
-  if (row.channel === "sms") {
+  if (isSmsPort(row)) {
     return { go: false, outcome: "refusedSms", errorCode: "smsRefused", limit: limit8Failed("refusedSms") };
   }
   const state = await untilNotTransient(() => deps.sendState.sendStateFor(row));
@@ -399,6 +412,39 @@ async function checkLimit8(
       return { go: false, outcome: decision.outcome, errorCode: null, limit };
     }
   }
+}
+
+type StoppedRecheck =
+  | { go: true; overrideOptout: boolean }
+  | { go: false; outcome: RowOutcome; errorCode: string | null; limit: LimitResult | null };
+
+/**
+ * Reads the stopped flag once more just before a send. Stopped: only a safety line and a stop reply still go (with the
+ * opt-out override); any other row is dropped as limit 8 drops it. A read that stays transient sends nothing.
+ */
+async function checkStoppedAgain(
+  deps: DispatchDeps,
+  row: ClaimedRow,
+  version: number,
+): Promise<StoppedRecheck> {
+  const state = await untilNotTransient(() => deps.sendState.sendStateFor(row));
+  if ("error" in state)
+    return { go: false, outcome: "storeError", errorCode: "sendStateUnavailable", limit: null };
+  if (!state.stopped) return { go: true, overrideOptout: false };
+  if (isSafety(row) || isStopReply(row)) return { go: true, overrideOptout: true };
+
+  const marked = await untilNotTransient(() =>
+    deps.store.markRow({
+      outboxRowId: row.outboxRowId,
+      expectVersion: version,
+      outcome: "droppedStopped",
+      heldUntil: null,
+      at: deps.now(),
+    }),
+  );
+  const limit = limit8Failed("droppedStopped");
+  if ("error" in marked) return { go: false, outcome: "storeError", errorCode: marked.error, limit };
+  return { go: false, outcome: "droppedStopped", errorCode: null, limit };
 }
 
 /** What Linq's failure is recorded as: its code, else its kind (K-04 `outbox_parts.error_code`, a label). */

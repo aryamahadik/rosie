@@ -481,7 +481,7 @@ describe("a mobile with no open chat gets no text and no clock (mark-waiting-cha
     expect(t.linq.requests).toEqual([]);
   });
 
-  it("lets a later row of the same recipient pass a waiting row", async () => {
+  it("parks a safety line too when the phone is not stopped and has no open chat (MC C9: Rosie never writes first)", async () => {
     const t = setup(
       [reminder(), reminder({ id: "out-ben-safety", commitSeq: 2, sendClass: "safety" })],
       NINE_NY,
@@ -492,15 +492,48 @@ describe("a mobile with no open chat gets no text and no clock (mark-waiting-cha
 
     expect(report.rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([
       ["out-ben-reminder", "waitingChat"],
-      ["out-ben-safety", "sent"],
+      ["out-ben-safety", "waitingChat"],
     ]);
+    expect(t.linq.requests).toEqual([]);
+  });
+
+  it("parks a stop reply too when the phone is not stopped and has no open chat", async () => {
+    const t = setup([reminder({ sendClass: "quick_reply", fixedLines: ["stopReply"] })], NINE_NY);
+    t.state.forHandle("handle-ben", { chatOpen: false });
+
+    expect((await runDispatch(t.deps())).rows.map((row) => row.outcome)).toEqual(["waitingChat"]);
+    expect(t.linq.requests).toEqual([]);
+  });
+
+  for (const audience of ["owner", "team"] as const) {
+    for (const sendClass of ["routine", "quick_reply", "visit_now", "safety"]) {
+      it(`parks a ${sendClass} row to a ${audience} phone with no open chat, at any hour`, async () => {
+        for (const at of [NINE_NY, NIGHT_NY, SEVEN_THIRTY_NY]) {
+          const t = setup([reminder({ recipient: "handle-sam", sendClass })], at);
+          t.state.forHandle("handle-sam", { audience, chatOpen: false });
+
+          const report = await runDispatch(t.deps());
+
+          expect(report.rows.map((row) => [row.outcome, row.partsSent])).toEqual([["waitingChat", 0]]);
+          expect(t.linq.requests).toEqual([]);
+          expect(t.store.row("out-ben-reminder")).toMatchObject({ state: "waiting_chat", claim: null });
+        }
+      });
+    }
+  }
+
+  it("sends to an owner phone with an open chat, as before", async () => {
+    const t = setup([reminder({ recipient: "handle-sam", sendClass: "quick_reply" })], NIGHT_NY);
+    t.state.forHandle("handle-sam", { audience: "owner", chatOpen: true });
+
+    expect((await runDispatch(t.deps())).rows.map((row) => row.outcome)).toEqual(["sent"]);
   });
 });
 
-describe("never SMS (refuse-sms-channel.json; C-241; DL-012)", () => {
-  it("refuses a row on an SMS channel: nothing is sent, nothing is read, nothing is marked", async () => {
+describe("never an SMS port (refuse-sms-channel.json; C-241; DL-012; DL-031)", () => {
+  it("refuses a row sent by an SMS port: nothing is sent, nothing is read, nothing is marked", async () => {
     const t = setup(
-      [reminder({ id: "out-alex-booked-riley", channel: "sms", sendClass: "quick_reply" })],
+      [reminder({ id: "out-alex-booked-riley", channel: "sms", port: "sms", sendClass: "quick_reply" })],
       NINE_NY,
     );
 
@@ -516,11 +549,16 @@ describe("never SMS (refuse-sms-channel.json; C-241; DL-012)", () => {
     ]);
   });
 
-  it("refuses an SMS safety line as well, and holds the recipient's later rows back", async () => {
+  it("refuses a safety line sent by an SMS port as well, and lets the recipient's later rows pass it", async () => {
     const t = setup(
       [
-        reminder({ channel: "sms", sendClass: "safety" }),
-        reminder({ id: "out-ben-next", commitSeq: 2, sendClass: "quick_reply" }),
+        reminder({ channel: "sms", port: "sms", sendClass: "safety" }),
+        reminder({
+          id: "out-ben-safety-2",
+          commitSeq: 2,
+          sendClass: "safety",
+          sends: [words("Safety line.")],
+        }),
       ],
       NINE_NY,
     );
@@ -529,8 +567,69 @@ describe("never SMS (refuse-sms-channel.json; C-241; DL-012)", () => {
 
     expect(report.rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([
       ["out-ben-reminder", "refusedSms"],
-      ["out-ben-next", "notReached"],
+      ["out-ben-safety-2", "sent"],
     ]);
+    expect(t.linq.requests.map((request) => request.text)).toEqual(["Safety line."]);
+  });
+
+  it("lets a row on the sms channel through the linq port go, text only (K-07 README; DL-031)", async () => {
+    const t = setup([reminder({ channel: "sms", port: "linq", sendClass: "quick_reply" })], NINE_NY);
+
+    const report = await runDispatch(t.deps());
+
+    expect(report.rows.map((row) => [row.outcome, row.partsSent])).toEqual([["sent", 1]]);
+    expect(t.linq.requests).toHaveLength(1);
+    expect(t.linq.requests[0]).toMatchObject({ kind: "words", options: [], link: null, calendarFile: null });
+  });
+
+  it("lets a row on the sms channel with no port named go too (the linq port is the only one)", async () => {
+    const t = setup([reminder({ channel: "sms" })], NINE_NY);
+
+    expect((await runDispatch(t.deps())).rows.map((row) => row.outcome)).toEqual(["sent"]);
+  });
+});
+
+describe("the stopped flag is read again just before each send", () => {
+  it("a stop that commits during the chat lookup lets no part out, and the row is dropped", async () => {
+    const t = setup([reminder()], NINE_NY);
+    const recipients = new FakeRecipients({ "handle-ben": BEN });
+    recipients.beforeAnswer = (): Promise<void> => {
+      t.state.forHandle("handle-ben", { stopped: true });
+      return Promise.resolve();
+    };
+
+    const report = await runDispatch({ ...t.deps(), recipients });
+
+    expect(report.rows.map((row) => [row.outcome, row.partsSent])).toEqual([["droppedStopped", 0]]);
+    expect(t.linq.requests).toEqual([]);
+    expect(t.store.row("out-ben-reminder").state).toBe("dropped_stopped");
+  });
+
+  it("a stop that commits meanwhile still lets a safety line out, with the opt-out override", async () => {
+    const t = setup([reminder({ sendClass: "safety", sends: [words("Safety line.")] })], NINE_NY);
+    const recipients = new FakeRecipients({ "handle-ben": BEN });
+    recipients.beforeAnswer = (): Promise<void> => {
+      t.state.forHandle("handle-ben", { stopped: true });
+      return Promise.resolve();
+    };
+
+    const report = await runDispatch({ ...t.deps(), recipients });
+
+    expect(report.rows.map((row) => row.outcome)).toEqual(["sent"]);
+    expect(t.linq.requests[0]).toMatchObject({ overrideOptout: true, text: "Safety line." });
+  });
+
+  it("a read that keeps answering transient sends nothing", async () => {
+    const t = setup([reminder()], NINE_NY);
+    const recipients = new FakeRecipients({ "handle-ben": BEN });
+    recipients.beforeAnswer = (): Promise<void> => {
+      t.state.failReads = 3;
+      return Promise.resolve();
+    };
+
+    const report = await runDispatch({ ...t.deps(), recipients });
+
+    expect(report.rows.map((row) => [row.outcome, row.partsSent])).toEqual([["storeError", 0]]);
     expect(t.linq.requests).toEqual([]);
   });
 });
@@ -589,13 +688,13 @@ describe("limit 8 fails closed", () => {
     expect((await runDispatch(t.deps())).rows.map((row) => row.outcome)).toEqual(["sent"]);
   });
 
-  it("reads the send state before each part, and sends only after a passing read", async () => {
+  it("reads the send state before each part and again just before its send, and sends only after both pass", async () => {
     const t = setup([reminder({ sends: [words("First part."), words("Second part.")] })], NINE_NY);
 
     const report = await runDispatch(t.deps());
 
     expect(report.rows.map((row) => [row.outcome, row.partsSent])).toEqual([["sent", 2]]);
-    expect(t.state.reads).toEqual(["out-ben-reminder", "out-ben-reminder"]);
+    expect(t.state.reads).toEqual(Array.from({ length: 4 }, () => "out-ben-reminder"));
   });
 });
 

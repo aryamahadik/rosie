@@ -83,6 +83,7 @@ export interface SeedRow {
   /** A Retry-After an earlier failure left on the row's claim (K-07 rule 6); kept at the first claim here. */
   nextTryNotBefore?: Utc;
   channel?: string;
+  port?: string;
   bookingId?: string | null;
   versionsRead?: readonly VersionRef[];
   fixedLines?: readonly string[];
@@ -242,6 +243,7 @@ export class FakeOutboxStore implements OutboxStore {
       bookingId: row.seed.bookingId ?? null,
       openQuestionId: row.seed.openQuestionId ?? null,
       channel: row.seed.channel ?? "imessage",
+      ...(row.seed.port === undefined ? {} : { port: row.seed.port }),
       sendClass: row.seed.sendClass ?? "routine",
       versionsRead: row.versionsRead,
       finalParts: {

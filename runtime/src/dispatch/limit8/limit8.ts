@@ -3,13 +3,15 @@
 // `decideLimit8` is pure: a claimed row, its recipient's send state and the clock go in, one decision comes out. The
 // dispatcher calls it before each send and carries the decision out (markRow, or the send). In arch 06's order:
 //
-//   0. A row on an SMS channel is refused: there is no SMS provider (DL-012; MC C9), so nothing is sent by it, ever.
-//   1. A safety line and a stop reply go at once, whatever else is true: to a stopped phone (with the opt-out override
-//      on the send), at any hour, with no check of versions or chat (RULES 4.3, 4.12; arch 02 line 125).
-//   2. Stopped: the row is dropped, and its question takes step 9's never-delivered path (T-255 fires it).
-//   3. Stale: a row whose read versions changed is composed again from today's record (S13-57), or withdrawn when its
+//   0. A send by an SMS port is refused (refuse-sms-channel.json; DL-012): there is no SMS port. A row on the `sms`
+//      channel through the linq port goes like any other, text only (K-07 README; DL-031).
+//   1. Stopped: only a safety line and a stop reply go, with the opt-out override on the send, at any hour (RULES 4.3,
+//      4.12; arch 02 line 125); any other row is dropped, and its question takes step 9's never-delivered path (T-255).
+//   2. Not stopped and no open chat: every row waits, whatever its class (a safety line too) and audience (customer,
+//      owner, team), with no text and no clock: Rosie never writes first (RULES 4.1b; MC C9; CQ-37).
+//   3. A safety line and a stop reply then go at any hour, with no check of versions.
+//   4. Stale: a row whose read versions changed is composed again from today's record (S13-57), or withdrawn when its
 //      booking or question has closed.
-//   4. A customer mobile with no open chat gets no text and no clock: the row waits (RULES 4.1b; MC C9; CQ-37).
 //   5. Text hours: only a routine row waits for them. 9am to 8pm in the visit's zone, else the business's (CQ-05); the
 //      owner and team from 8am (RULES 4.3). A reply in the same turn (Q-15's default) and a visit happening now go at
 //      any hour. The staging test phone's override opens the hours on staging only (BP 9.4).
@@ -26,7 +28,7 @@ export type Limit8Decision =
   | { action: "send"; reason: SendReason; overrideOptout: boolean }
   /** Mark the row with this limit-8 outcome and send nothing. */
   | { action: "mark"; outcome: MarkRowRequest["outcome"]; heldUntil: Utc | null }
-  /** An SMS channel: nothing is sent and the row is not marked (no K-05 move exists for it; open question). */
+  /** An SMS port: nothing is sent and the row is not marked (no K-05 move exists for it; CQ-55 (1)). */
   | { action: "refuseSms" }
   /** The send state cannot be read as it is (a zone or hours that are not valid): nothing is sent. */
   | { action: "unreadable" };
@@ -51,7 +53,13 @@ export const STAFF_OPENS = "08:00";
 
 export const isStopReply = (row: ClaimedRow): boolean => row.finalParts.fixedLines.includes("stopReply");
 
-const isSafety = (row: ClaimedRow): boolean => row.sendClass === "safety";
+export const isSafety = (row: ClaimedRow): boolean => row.sendClass === "safety";
+
+/**
+ * A send by an SMS port is refused (refuse-sms-channel.json: `port` "sms"; DL-012). A row on the `sms` channel through the
+ * `linq` port is Linq's SMS service in the same chat, text only, and goes (K-07 README; DL-031).
+ */
+export const isSmsPort = (row: ClaimedRow): boolean => row.port === "sms";
 
 /** The row's read versions that moved: any not found in the current versions, or found at another version. */
 export function versionsChanged(row: ClaimedRow, state: SendState): boolean {
@@ -76,23 +84,28 @@ function windowFor(state: SendState): TextWindow | null {
 
 export function decideLimit8(input: Limit8Input): Limit8Decision {
   const { row, state, now } = input;
-  if (row.channel === "sms") return { action: "refuseSms" };
+  if (isSmsPort(row)) return { action: "refuseSms" };
 
-  if (isSafety(row)) return { action: "send", reason: "safety", overrideOptout: state.stopped };
-  if (isStopReply(row)) return { action: "send", reason: "stopReply", overrideOptout: state.stopped };
-
-  if (state.stopped) return { action: "mark", outcome: "droppedStopped", heldUntil: null };
+  // A stopped phone: only a safety line and a stop reply go, with the opt-out override (STOP clears chat_open).
+  if (state.stopped) {
+    if (isSafety(row)) return { action: "send", reason: "safety", overrideOptout: true };
+    if (isStopReply(row)) return { action: "send", reason: "stopReply", overrideOptout: true };
+    return { action: "mark", outcome: "droppedStopped", heldUntil: null };
+  }
   if (input.partOut) return { action: "send", reason: "partOut", overrideOptout: false };
+
+  // Rosie never writes first, to anyone (MC C9): a phone not stopped and with no open chat has not texted Rosie, so every
+  // row waits, whatever its class (a safety line too) and its audience (customer, owner, team).
+  if (!state.chatOpen) return { action: "mark", outcome: "waitingChat", heldUntil: null };
+
+  if (isSafety(row)) return { action: "send", reason: "safety", overrideOptout: false };
+  if (isStopReply(row)) return { action: "send", reason: "stopReply", overrideOptout: false };
 
   if (versionsChanged(row, state)) {
     const closed =
       (row.bookingId !== null && state.closed.booking) ||
       (row.openQuestionId !== null && state.closed.question);
     return { action: "mark", outcome: closed ? "withdrawn" : "stale", heldUntil: null };
-  }
-
-  if (state.audience === "customer" && !state.chatOpen) {
-    return { action: "mark", outcome: "waitingChat", heldUntil: null };
   }
 
   // Only these two classes skip the hours; a class K-07 does not name is held to them like a routine row.

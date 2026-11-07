@@ -70,6 +70,11 @@ export interface ClaimedRow {
   bookingId: string | null;
   openQuestionId: string | null;
   channel: string;
+  /**
+   * The port the row goes by (K-07 `outboxRow.port`; K-05 v1's claimedRow does not carry it yet: K-05 v1.2). Left out, it
+   * is `linq`. Only `sms` is refused (refuse-sms-channel.json).
+   */
+  port?: string;
   sendClass: string;
   /** The rows the plan rested on, at the versions read: limit 8 checks them unchanged at send. */
   versionsRead: readonly VersionRef[];
