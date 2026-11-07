@@ -1,0 +1,27 @@
+{
+  "call": "armClock",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["commit-opens-question.json"],
+    "now": "2026-10-23T14:05:04Z",
+    "note": "A7-03's first delivery receipt came at 14:05:04 (markPart delivered said firstDelivery); clock arming applies the step's Clock line, 24 h."
+  },
+  "request": {
+    "openQuestionId": "oq-a7-03-alex",
+    "deliveredAt": "2026-10-23T14:05:04Z",
+    "dueAt": "2026-10-24T14:05:04Z",
+    "dueZone": "America/New_York"
+  },
+  "outcome": {
+    "result": "armed",
+    "repeated": false,
+    "clock": {
+      "clockRowId": "clock-oq-a7-03-alex",
+      "version": 2,
+      "armedAt": "2026-10-23T14:05:04Z",
+      "dueAt": "2026-10-24T14:05:04Z",
+      "dueZone": "America/New_York",
+      "handleId": "handle-alex"
+    }
+  }
+}

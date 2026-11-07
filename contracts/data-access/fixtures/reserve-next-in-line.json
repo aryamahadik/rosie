@@ -1,0 +1,30 @@
+{
+  "call": "reserve",
+  "given": {
+    "k04Seeds": ["seed-reservation.json"],
+    "after": [],
+    "now": "2026-11-07T15:06:00Z",
+    "note": "Tomás wants Avery at 10:00am on Sat Nov 14, which Alex has saved: he waits next in line, behind the two agent tokens queued at 15:02 and 15:04."
+  },
+  "request": {
+    "reservationId": "rsv-tomas-avery-nov14",
+    "businessId": "biz-lees-barbershop",
+    "resourceId": "res-avery",
+    "during": { "start": "2026-11-14T15:00:00Z", "end": "2026-11-14T15:30:00Z" },
+    "seats": 1,
+    "for": { "phoneNumber": "+15555550105" },
+    "door": "standard",
+    "holdMinutes": null,
+    "waitIfSaved": true,
+    "at": "2026-11-07T15:06:00Z"
+  },
+  "outcome": {
+    "result": "waiting",
+    "reservationId": "rsv-tomas-avery-nov14",
+    "version": 1,
+    "resourceId": "res-avery",
+    "during": { "start": "2026-11-14T15:00:00Z", "end": "2026-11-14T15:30:00Z" },
+    "queuedAt": "2026-11-07T15:06:00Z",
+    "repeated": false
+  }
+}

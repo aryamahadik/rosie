@@ -1,0 +1,7 @@
+{
+  "outboxRowId": "out-sam-passon-evening",
+  "expectVersion": 3,
+  "outcome": "held",
+  "heldUntil": null,
+  "at": "2026-11-08T01:30:04Z"
+}

@@ -1,0 +1,22 @@
+{
+  "call": "cancelClock",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["commit-opens-question.json"],
+    "now": "2026-10-23T14:05:03Z",
+    "note": "A7-03's message failed every check and the passed-on line went instead, so the question is withdrawn and no clock arms (arch 02 line 123; RULES 5.2)."
+  },
+  "request": {
+    "clockRowId": "clock-oq-a7-03-alex",
+    "expectVersion": 1,
+    "withdrawQuestion": { "openQuestionId": "oq-a7-03-alex", "expectVersion": 1 },
+    "at": "2026-10-23T14:05:03Z"
+  },
+  "outcome": {
+    "result": "cancelled",
+    "clockRowId": "clock-oq-a7-03-alex",
+    "version": 2,
+    "cancelledAt": "2026-10-23T14:05:03Z",
+    "repeated": false
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "reservationId": "rsv-agent-truck-20-nov20",
+  "businessId": "biz-movers",
+  "resourceId": "res-truck-20",
+  "during": { "start": "2026-11-20T13:00:00Z", "end": "2026-11-20T21:00:00Z" },
+  "seats": 1,
+  "for": { "agentToken": "agent-token-demo-1" },
+  "door": "ownAi",
+  "holdMinutes": 30,
+  "waitIfSaved": false,
+  "at": "2026-11-07T15:05:00Z"
+}

@@ -1,0 +1,53 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["mark-held-for-text-hours.json"],
+    "now": "2026-11-08T01:31:05Z",
+    "note": "8:31pm: Sam texts Rosie; the reply in the same turn is a quick reply, which goes at any hour (RULES 4.3; Q-15)."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-sam-evening-1",
+      "handleId": "handle-sam",
+      "eventIds": ["evt-sam-0031"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-sam-0031",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [],
+    "writes": {
+      "state": [],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-sam-reply-evening",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": []
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": []
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-sam-evening-1",
+    "committedAt": "2026-11-08T01:31:05Z",
+    "repeated": false,
+    "committed": {
+      "written": [],
+      "outboxRows": [{ "id": "out-sam-reply-evening", "commitSeq": 2 }],
+      "promoted": []
+    }
+  }
+}

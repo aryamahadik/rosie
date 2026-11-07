@@ -1,0 +1,22 @@
+{
+  "call": "readBundleValue",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "after": [],
+    "now": "2026-11-07T15:06:29Z",
+    "note": "KV missed the manifest (KV takes about 60 s to propagate: arch 10 line 518), so the actor reads PostgreSQL's copy."
+  },
+  "request": {
+    "key": "bundle/93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037/1/manifest"
+  },
+  "outcome": {
+    "result": "value",
+    "value": {
+      "key": "bundle/93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037/1/manifest",
+      "kind": "manifest",
+      "bytes": 121,
+      "sha256": "80faf33c7cf1f52519432d27116699cb4045818f23667dedf3c08df977df2e63",
+      "text": "{\"contract\":\"bundle.v1\",\"note\":\"K-04 seed stand-in for the manifest of K-01 bundle-v0-skeleton.json; not its real bytes\"}"
+    }
+  }
+}

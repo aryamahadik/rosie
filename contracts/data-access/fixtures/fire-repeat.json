@@ -1,0 +1,81 @@
+{
+  "call": "fireClock",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["fire-once.json"],
+    "now": "2026-10-24T14:06:30Z",
+    "note": "The actor sends fire-once's request again after a lost reply: nothing fires twice, and the first firing comes back."
+  },
+  "request": {
+    "clockRowId": "clock-oq-a7-03-alex",
+    "expectVersion": 2,
+    "firedAt": "2026-10-24T14:05:31Z",
+    "by": "alarm",
+    "jobId": "job-fire-clock-oq-a7-03-alex",
+    "turn": {
+      "id": "turn-clock-oq-a7-03-alex",
+      "handleId": "handle-alex",
+      "eventIds": ["clock-oq-a7-03-alex"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-clock-oq-a7-03-alex",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
+    "writes": {
+      "state": [],
+      "openQuestions": {
+        "open": [],
+        "close": [{ "id": "oq-a7-03-alex", "expectVersion": 2, "status": "defaulted", "answeredOptionId": null }]
+      },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-sam-a7-03-defaulted",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-haircut",
+          "channel": "imessage",
+          "sendClass": "routine",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }]
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-oq-a7-03-alex-defaulted",
+          "kind": "question.defaulted",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "job",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "open_questions",
+          "rowId": "oq-a7-03-alex",
+          "oldValues": { "status": "open" },
+          "newValues": { "status": "defaulted" },
+          "sealed": null,
+          "why": { "step": "A7-03", "safeDefault": "the time stays as booked" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "fired",
+    "clockRowId": "clock-oq-a7-03-alex",
+    "version": 3,
+    "firedAt": "2026-10-24T14:05:31Z",
+    "turnId": "turn-clock-oq-a7-03-alex",
+    "repeated": true,
+    "committed": {
+      "written": [],
+      "outboxRows": [{ "id": "out-sam-a7-03-defaulted", "commitSeq": 2 }],
+      "promoted": []
+    }
+  }
+}

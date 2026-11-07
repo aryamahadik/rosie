@@ -1,0 +1,16 @@
+{
+  "call": "readActiveBundle",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "after": [],
+    "now": "2026-11-07T15:06:29Z",
+    "note": "At turn start Alex's actor pins the active bundle id from PostgreSQL (arch 10 line 536)."
+  },
+  "request": {},
+  "outcome": {
+    "result": "active",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "manifestKey": "bundle/93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037/1/manifest",
+    "activatedAt": "2026-11-07T08:06:00Z"
+  }
+}

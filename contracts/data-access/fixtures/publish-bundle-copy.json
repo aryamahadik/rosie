@@ -1,0 +1,30 @@
+{
+  "call": "publishBundleCopy",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-11-07T08:05:00Z",
+    "note": "The deploy script publishes K-01's bundle-v0-skeleton id before switching to it (BP 5.4). The value is K-04's seed stand-in for the manifest, not its real bytes."
+  },
+  "request": {
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "builtAt": "2026-11-07T08:00:00Z",
+    "manifestKey": "bundle/93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037/1/manifest",
+    "values": [
+      {
+        "key": "bundle/93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037/1/manifest",
+        "kind": "manifest",
+        "bytes": 121,
+        "sha256": "80faf33c7cf1f52519432d27116699cb4045818f23667dedf3c08df977df2e63",
+        "text": "{\"contract\":\"bundle.v1\",\"note\":\"K-04 seed stand-in for the manifest of K-01 bundle-v0-skeleton.json; not its real bytes\"}"
+      }
+    ]
+  },
+  "outcome": {
+    "result": "published",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "publishedAt": "2026-11-07T08:05:00Z",
+    "values": 1,
+    "repeated": false
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "call": "dueClocks",
+  "given": {
+    "k04Seeds": ["seed-clock-row.json"],
+    "after": [],
+    "now": "2026-12-01T13:00:30Z",
+    "note": "The minute sweep: monthly billing, which no handle owns, is due; A7-03's row was due long ago and its actor never fired it, so it counts as missed."
+  },
+  "request": {
+    "for": "sweep",
+    "now": "2026-12-01T13:00:30Z",
+    "missedBefore": "2026-12-01T12:59:30Z",
+    "limit": 100
+  },
+  "outcome": {
+    "result": "due",
+    "rows": [
+      {
+        "clockRowId": "clock-oq-a7-03-alex",
+        "version": 2,
+        "kind": "question",
+        "handleId": "handle-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-haircut",
+        "openQuestionId": "oq-a7-03-alex",
+        "reservationId": null,
+        "dueAt": "2026-10-24T14:05:04Z",
+        "dueZone": "America/New_York",
+        "fires": { "step": "A7-03", "safeDefault": "the time stays as booked" }
+      },
+      {
+        "clockRowId": "clock-monthly-billing-2026-12",
+        "version": 1,
+        "kind": "job",
+        "handleId": null,
+        "businessId": null,
+        "bookingId": null,
+        "openQuestionId": null,
+        "reservationId": null,
+        "dueAt": "2026-12-01T13:00:00Z",
+        "dueZone": "America/New_York",
+        "fires": { "job": "monthly-billing" }
+      }
+    ],
+    "nextDueAt": null
+  }
+}

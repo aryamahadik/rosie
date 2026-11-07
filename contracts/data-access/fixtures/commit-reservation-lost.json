@@ -1,0 +1,57 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["release-expired-promotes.json"],
+    "now": "2026-11-07T15:10:30Z",
+    "note": "Alex's yes to the saved time with Avery comes 30 s after it ended and was released."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-book-2",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0014"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0014",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "businesses", "rowId": "biz-lees-barbershop", "version": 3 }],
+    "writes": {
+      "state": [
+        {
+          "op": "insert",
+          "table": "bookings",
+          "values": {
+            "id": "booking-alex-avery-nov14",
+            "business_id": "biz-lees-barbershop",
+            "flow": "A",
+            "stage": "booked",
+            "booker_person_id": "person-alex",
+            "served_person_id": "person-alex",
+            "payer_person_id": "person-alex"
+          }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [],
+      "reservations": {
+        "confirm": [{ "id": "rsv-alex-saved-avery", "expectVersion": 1, "bookingId": "booking-alex-avery-nov14" }],
+        "release": []
+      },
+      "events": []
+    }
+  },
+  "outcome": {
+    "error": "reservationLost",
+    "reservations": [
+      {
+        "id": "rsv-alex-saved-avery",
+        "state": "released",
+        "heldUntil": "2026-11-07T15:10:00Z",
+        "releasedWhy": "expired"
+      }
+    ]
+  }
+}

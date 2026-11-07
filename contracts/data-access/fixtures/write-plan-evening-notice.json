@@ -1,0 +1,45 @@
+{
+  "call": "writePlan",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["commit-evening-notice.json"],
+    "now": "2026-11-08T01:30:03Z"
+  },
+  "request": {
+    "outboxRowId": "out-sam-passon-evening",
+    "expectVersion": 1,
+    "plan": {
+      "row": "out-sam-passon-evening",
+      "channel": "imessage",
+      "copyOf": null,
+      "plan": {
+        "formats": ["text"],
+        "lines": [{ "role": "first", "text": "{{name:Alex M.}} has a question about the haircut." }],
+        "question": null,
+        "pageType": null,
+        "threadReplyTo": null
+      }
+    },
+    "finalParts": {
+      "row": "out-sam-passon-evening",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Alex M. has a question about the haircut.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [{ "slot": "name", "value": "Alex M." }],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "outboxRowId": "out-sam-passon-evening",
+    "version": 2
+  }
+}

@@ -1,0 +1,364 @@
+{
+  "fixtures": [
+    {
+      "file": "commit-first.json",
+      "version": "v1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Alex's exact yes commits once: the turn row, a new booking head, the saved time with Riley confirmed (its saved-time clock row cancelled with it), Alex's confirmation and Sam's notice as outbox rows with no plan and their commit order, and the event-log entry, all in one transaction",
+      "source": "02-contracts K-05 item 1 and Fixtures; arch 01 lines 39 to 41; arch 02 line 121; arch 10 line 508; arch 04 line 223 (gate and commit within 300 ms); K-04 v1 turns, bookings, reservations, outbox_rows, event_log"
+    },
+    {
+      "file": "commit-repeat-same-turn.json",
+      "version": "v1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "The same turn id sent again writes nothing (written and promoted empty) and returns the first commit's turn id, time and outbox rows with their commit order, with repeated true",
+      "source": "02-contracts K-05 item 1 ('repeating a committed turn id returns the first result'); tour line 418; arch 10 line 508; K-04 v1 turns primary key"
+    },
+    {
+      "file": "commit-version-changed.json",
+      "version": "v1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "A turn that read Alex's haircut booking at v6, now v7, is refused with the row that changed and writes nothing (limit 4)",
+      "source": "02-contracts K-05 item 1 ('Refused with the rows that changed (limit 4)'); arch 06 line 305; arch 10 line 506; K-04 seed-booking-head (booking v7)"
+    },
+    {
+      "file": "commit-reservation-lost.json",
+      "version": "v1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "A yes that arrives after the saved time ended and was released is refused with the reservation no longer held (limit 5), and nothing is booked",
+      "source": "02-contracts K-05 item 1 ('or the reservation no longer held (limit 5)'); arch 06 line 307; arch 05 line 249 ('No yes before the saved time ends: nothing booked')"
+    },
+    {
+      "file": "commit-opens-question.json",
+      "version": "v1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "The tour's A7-03 turn: an open question with the options as sent, booking v7 read and a 24 h Clock line, its question clock row written waiting (no due time until delivery), and the outbox row that asks it",
+      "source": "tour lines 423 to 427; arch 01 lines 63, 83; arch 02 line 127; 02-contracts K-05 item 1 ('open questions opened ... clock rows made'); K-04 seed-open-question and seed-clock-row (the same rows, armed)"
+    },
+    {
+      "file": "write-plan.json",
+      "version": "v1",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "After the commit, K-03's row plan and final parts go into Alex's confirmation row, raising its version",
+      "source": "02-contracts K-05 item 2; arch 01 lines 39 to 41 ('Words are written into those rows after the commit'); K-03 v1 rowPlan, finalParts; K-04 outbox_rows.plan, final_parts"
+    },
+    {
+      "file": "write-plan-repeat.json",
+      "version": "v1",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "The same plan sent again finds the row already planned: the first plan stays and nothing is written",
+      "source": "arch 11 line 576 ('only rows without a plan are composed'); 02-contracts K-05 item 2"
+    },
+    {
+      "file": "write-plan-owner.json",
+      "version": "v1",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "Sam's owner notice from the same commit gets its plan and final parts",
+      "source": "02-contracts K-05 item 2; K-03 v1 rowPlan, finalParts; SPEC-master 6 (Sam, Lee's Barbershop, Alex M., Riley)"
+    },
+    {
+      "file": "unplanned-after-crash.json",
+      "version": "v1",
+      "def": "unplannedRows.exchange",
+      "expect": "accept",
+      "shows": "After a crash past the commit, only the turn's row without a plan (Sam's) is listed for composing; Alex's planned row is not",
+      "source": "arch 11 line 576; K-04 index outbox_rows_unplanned_idx"
+    },
+    {
+      "file": "claim-in-order.json",
+      "version": "v1",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "The dispatcher claims the sendable rows in commit order, each with its final parts, the versions limit 8 checks, and its part's idempotency key (row/part/try) written at the claim",
+      "source": "02-contracts K-05 item 3; arch 02 line 125 ('sends each recipient's rows in commit order'); arch 01 line 65; arch 04 line 227 (send within 1 s); K-04 outbox_rows.commit_seq, outbox_parts"
+    },
+    {
+      "file": "mark-sent.json",
+      "version": "v1",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "Linq accepts Alex's confirmation under its key: the part is marked sent with Linq's message id",
+      "source": "02-contracts K-05 item 3 ('mark a part sent (provider ids, the try's key)'); arch 01 line 65; K-04 outbox_parts.linq_message_id, sent_at"
+    },
+    {
+      "file": "mark-delivered.json",
+      "version": "v1",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "Linq's delivery receipt, found by its message id, marks the part delivered and says it is the row's first, so the caller would arm a question's clock",
+      "source": "02-contracts K-05 items 3 and 4; arch 02 line 127; K-04 outbox_parts_linq_message_idx, delivered_at"
+    },
+    {
+      "file": "reserve-10-min.json",
+      "version": "v1",
+      "def": "reserve.exchange",
+      "expect": "accept",
+      "shows": "Alex's mobile saves Riley's Sat Nov 14 11:00am for 10 minutes, its second saved time, with a saved-time clock row for its end",
+      "source": "02-contracts K-05 item 6; arch 05 line 247 ('Saved time: 10 minutes (S12-01)'); S12-01; A4-21; K-04 reservations, clock_rows kind saved_time; fixture set v1 barber shop (test-kit/shops/barber.json)"
+    },
+    {
+      "file": "reserve-ai-door-15-min.json",
+      "version": "v1",
+      "def": "reserve.exchange",
+      "expect": "accept",
+      "shows": "A customer's own AI saves the movers' 20-ft truck for 15 minutes (D104's door), for its agent token",
+      "source": "02-contracts K-05 item 6 ('15 for C3's door'); MC C3; D104; arch 05 line 247; fixture set v1 movers shop (test-kit/shops/movers.json)"
+    },
+    {
+      "file": "reserve-overlap-refused.json",
+      "version": "v1",
+      "def": "reserve.exchange",
+      "expect": "accept",
+      "shows": "Tomás asks for a time overlapping Alex's saved time with Riley and does not ask to wait: refused as an overlap, never saying whose",
+      "source": "02-contracts K-05 item 6 ('refused (an overlap ...)'); arch 05 line 255; arch 10 line 510; K-04 reservations_no_overlap_per_resource (23P01)"
+    },
+    {
+      "file": "reserve-next-in-line.json",
+      "version": "v1",
+      "def": "reserve.exchange",
+      "expect": "accept",
+      "shows": "Tomás asks for Alex's saved time with Avery and waits next in line: a waiting row whose queued_at is its place, behind the two agent tokens already waiting",
+      "source": "02-contracts K-05 item 6 ('or next in line (A4-18)'); A4-18; arch 05 line 247; K-04 reservations.queued_at"
+    },
+    {
+      "file": "reserve-third-refused.json",
+      "version": "v1",
+      "def": "reserve.exchange",
+      "expect": "accept",
+      "shows": "A third saved time for Alex's mobile, at another business, is refused with the end time of each of the two it holds",
+      "source": "02-contracts K-05 item 6 ('a third saved time for one mobile ... with each one's end time'); arch 05 line 247 ('At most 2 saved times per mobile ... a third is refused with the time each one ends'); fixture set v1 yoga studio (test-kit/shops/yoga.json)"
+    },
+    {
+      "file": "release-expired-promotes.json",
+      "version": "v1",
+      "def": "release.exchange",
+      "expect": "accept",
+      "shows": "Alex's saved time with Avery ends unanswered: released as expired, and the next in line, the agent token queued at 15:02 (inserted after the 15:04 one), is promoted to a 10-minute saved time with its own clock row",
+      "source": "02-contracts K-05 item 6 ('Release: expired ... promoting the next in line'); A4-18; arch 05 line 247; K-04 reservations.queued_at, reservations_waiting_queue_idx, reservations_held_has_end; CQ-09; K-04 seed-reservation"
+    },
+    {
+      "file": "extend-once.json",
+      "version": "v1",
+      "def": "extend.exchange",
+      "expect": "accept",
+      "shows": "Alex takes the one extension before the saved time ends: 10 more minutes",
+      "source": "02-contracts K-05 item 6 ('Extend: once, 10 more minutes (Q-12)'); Q-12; arch 05 line 247; K-04 reservations.extended"
+    },
+    {
+      "file": "extend-ai-door-refused.json",
+      "version": "v1",
+      "def": "extend.exchange",
+      "expect": "accept",
+      "shows": "The customer's own AI's 15-minute saved time is never extended",
+      "source": "02-contracts K-05 item 6 ('never for C3's door'); MC C3 ('the 15 minutes are never extended'); D104; Q-12"
+    },
+    {
+      "file": "arm-clock.json",
+      "version": "v1",
+      "def": "armClock.exchange",
+      "expect": "accept",
+      "shows": "A7-03's clock row arms at the first delivery receipt, due 24 hours later in New York time, named by its question",
+      "source": "02-contracts K-05 item 4 ('Arm a clock row at its first delivery receipt, with its due time'); arch 02 line 127; tour line 425; K-04 clock_rows.armed_at, due_at, due_zone"
+    },
+    {
+      "file": "cancel-clock.json",
+      "version": "v1",
+      "def": "cancelClock.exchange",
+      "expect": "accept",
+      "shows": "On the passed-on path the question is withdrawn and its waiting clock row cancelled together, so no clock arms",
+      "source": "02-contracts K-05 item 4 ('cancel one when its question is answered or withdrawn'); arch 02 line 123; RULES 5.2"
+    },
+    {
+      "file": "due-for-handle.json",
+      "version": "v1",
+      "def": "dueClocks.exchange",
+      "expect": "accept",
+      "shows": "Alex's actor's alarm lists its due clock row with what it fires, and no later row for the next alarm",
+      "source": "02-contracts K-05 item 5 ('for one handle's alarm'); arch 10 line 540 ('each actor keeps one alarm at its earliest row'); K-04 clock_rows_handle_due_idx"
+    },
+    {
+      "file": "due-for-sweep.json",
+      "version": "v1",
+      "def": "dueClocks.exchange",
+      "expect": "accept",
+      "shows": "The minute sweep lists monthly billing, which no handle owns, and A7-03's row, which its actor missed, earliest first",
+      "source": "02-contracts K-05 item 5 ('for the minute sweep (missed rows and rows no handle owns)'); arch 10 line 540; K-04 seed-clock-row; K-04 clock_rows_due_idx"
+    },
+    {
+      "file": "fire-once.json",
+      "version": "v1",
+      "def": "fireClock.exchange",
+      "expect": "accept",
+      "shows": "At the deadline the row fires once, and in the same transaction the question is defaulted and the owner's notice is written as an outbox row of the firing's turn",
+      "source": "02-contracts K-05 item 5 ('fire a clock row, once'); arch 02 line 127 ('At the deadline: the step's safe default, then the owner is told'); QUESTIONS.md NQ-RT-4; arch 10 line 508; K-04 clock_rows.fired_at"
+    },
+    {
+      "file": "fire-repeat.json",
+      "version": "v1",
+      "def": "fireClock.exchange",
+      "expect": "accept",
+      "shows": "The same firing sent again fires nothing twice and returns the first firing's time, turn and outbox row with repeated true",
+      "source": "02-contracts K-05 item 5 ('once'); arch 10 line 508 ('A crash or retry never doubles or loses an effect'); K-04 clock_rows_fired_has_time"
+    },
+    {
+      "file": "commit-evening-notice.json",
+      "version": "v1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "At 8:30pm Alex's question is passed on to Sam as a routine outbox row",
+      "source": "02-contracts K-05 item 1; RULES 4.3; arch 06 line 313; K-02 v1 pass_on"
+    },
+    {
+      "file": "write-plan-evening-notice.json",
+      "version": "v1",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "The pass-on row gets its plan and final parts",
+      "source": "02-contracts K-05 item 2; K-03 v1 rowPlan, finalParts"
+    },
+    {
+      "file": "claim-evening-notice.json",
+      "version": "v1",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "The dispatcher claims Sam's one sendable row for limit 8",
+      "source": "02-contracts K-05 item 3; arch 02 line 125"
+    },
+    {
+      "file": "mark-held-for-text-hours.json",
+      "version": "v1",
+      "def": "markRow.exchange",
+      "expect": "accept",
+      "shows": "Limit 8 holds the routine row to Sam until 8am in New York, outside his text hours",
+      "source": "02-contracts K-05 item 3 ('held until a time'); arch 06 line 313 ('Outside text hours: held to 9am, or 8am for owner and team'); RULES 4.3; K-04 outbox_rows.held_until"
+    },
+    {
+      "file": "commit-sam-quick-reply.json",
+      "version": "v1",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Sam texts at 8:31pm; the reply in the same turn is a quick-reply row, committed after the held one",
+      "source": "RULES 4.3 ('a quick reply' goes at any hour); Q-15 (a reply in the same turn); 02-contracts K-05 item 1"
+    },
+    {
+      "file": "write-plan-sam-quick-reply.json",
+      "version": "v1",
+      "def": "writePlan.exchange",
+      "expect": "accept",
+      "shows": "The quick reply gets its plan and final parts",
+      "source": "02-contracts K-05 item 2; K-03 v1 rowPlan, finalParts"
+    },
+    {
+      "file": "claim-held-lets-later-pass.json",
+      "version": "v1",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's earlier row is held to 8am, so the later quick reply passes it and is claimed; the held row is reported, not claimed",
+      "source": "02-contracts K-05 item 3 ('a row held for text hours lets later rows pass (arch 02 line 125, DD)'); arch 02 line 125"
+    },
+    {
+      "file": "publish-bundle-copy.json",
+      "version": "v1",
+      "def": "publishBundleCopy.exchange",
+      "expect": "accept",
+      "shows": "The deploy script writes a bundle's registry row and PostgreSQL's copy of its values once, before the switch",
+      "source": "QUESTIONS.md NQ-PB-5 (K-05 v1 item 7 also carries publishBundleCopy()); BP 5.4; arch 10 line 536; K-01 v1 storedValue, kvKey; K-04 bundles, bundle_values; K-04 seed-bundle-registry (the stand-in manifest value)"
+    },
+    {
+      "file": "set-active-bundle.json",
+      "version": "v1",
+      "def": "setActiveBundle.exchange",
+      "expect": "accept",
+      "shows": "The deploy script's step 3 switches the active bundle id, compared against the active id it read (none)",
+      "source": "QUESTIONS.md NQ-PB-5 (setActiveBundle(), called only by the deploy script's step 3); BP 5.4; K-04 bundles_one_active"
+    },
+    {
+      "file": "active-bundle.json",
+      "version": "v1",
+      "def": "readActiveBundle.exchange",
+      "expect": "accept",
+      "shows": "At turn start the actor reads the active bundle id and its manifest's key from the primary",
+      "source": "02-contracts K-05 item 7 ('Read the active bundle id'); arch 10 line 536; K-04 seed-bundle-registry"
+    },
+    {
+      "file": "bundle-value-on-miss.json",
+      "version": "v1",
+      "def": "readBundleValue.exchange",
+      "expect": "accept",
+      "shows": "On a KV miss the actor reads the value from PostgreSQL's copy, with its size and sha256 to check",
+      "source": "02-contracts K-05 item 7 ('and a bundle part on a KV miss'); arch 10 lines 518, 536; K-01 v1 storedValue; K-04 bundle_values"
+    },
+    {
+      "file": "park-turn.json",
+      "version": "v1",
+      "def": "parkTurn.exchange",
+      "expect": "accept",
+      "shows": "After a third crash before its commit Maya's turn is parked, with the one message that nothing changed and the event-log entry",
+      "source": "02-contracts K-05 item 8; arch 11 line 576; K-04 turns.state parked, turns_tries_range; QUESTIONS.md NQ-RT-3; fixture set v1 yoga studio (test-kit/shops/yoga.json)"
+    },
+    {
+      "file": "invalid/refuse-commit-outbox-with-plan.json",
+      "version": "v1",
+      "def": "commitTurn.request",
+      "expect": "refuse",
+      "shows": "A commit whose outbox row carries a plan: the commit writes rows with no plan, the plan comes after (outboxRowNew has no plan field)",
+      "source": "arch 01 lines 39 to 41 ('Words are written into those rows after the commit'); 02-contracts K-05 item 1 ('outbox rows (with no plan yet)')"
+    },
+    {
+      "file": "invalid/refuse-commit-state-write-to-reservations.json",
+      "version": "v1",
+      "def": "commitTurn.request",
+      "expect": "refuse",
+      "shows": "A state write that books a reservation by hand: reservations change only through confirm and release (and reserve), so limit 5 and the next in line hold (stateTable refuses reservations)",
+      "source": "02-contracts K-05 items 1 and 6; arch 06 line 307 (limit 5); A4-18"
+    },
+    {
+      "file": "invalid/refuse-turn-fourth-try.json",
+      "version": "v1",
+      "def": "commitTurn.request",
+      "expect": "refuse",
+      "shows": "A turn on its fourth try: a third crash before the commit parks it, so tries never pass 3",
+      "source": "arch 11 line 576; K-04 turns_tries_range"
+    },
+    {
+      "file": "invalid/refuse-reserve-document-over-24-hours.json",
+      "version": "v1",
+      "def": "reserve.request",
+      "expect": "refuse",
+      "shows": "A document's saved time of 25 hours: at most 24 hours while a document is signed",
+      "source": "arch 05 line 247 ('24 hours while a document is signed (A4-21)'); A4-21; MC C3"
+    },
+    {
+      "file": "invalid/refuse-reserve-ai-door-with-minutes.json",
+      "version": "v1",
+      "def": "reserve.request",
+      "expect": "refuse",
+      "shows": "The customer's own AI's door asking for 30 minutes: its saved time is 15 minutes, set by the door, never longer",
+      "source": "MC C3 ('the time is saved for 15 minutes in place of the 10'; 'The longer saves ... do not apply to this door'); D104"
+    },
+    {
+      "file": "invalid/refuse-fire-without-turn-writes-outbox.json",
+      "version": "v1",
+      "def": "fireClock.request",
+      "expect": "refuse",
+      "shows": "A firing with no turn that writes an outbox row: an outbox row needs its turn (K-04 outbox_rows.turn_id is not null), so a turnless firing writes none",
+      "source": "K-04 v1 outbox_rows.turn_id (null false); QUESTIONS.md NQ-RT-4; arch 10 line 540"
+    },
+    {
+      "file": "invalid/refuse-mark-held-without-time.json",
+      "version": "v1",
+      "def": "markRow.request",
+      "expect": "refuse",
+      "shows": "A row marked held with no time to hold it until",
+      "source": "arch 06 line 313 ('held to 9am, or 8am for owner and team'); K-04 outbox_rows.held_until"
+    }
+  ]
+}

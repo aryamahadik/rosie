@@ -1,0 +1,20 @@
+{
+  "turn": {
+    "id": "turn-maya-0004",
+    "handleId": "handle-maya",
+    "eventIds": ["evt-maya-0004"],
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "traceId": "trace-maya-0004",
+    "joinedTraceIds": [],
+    "tries": 4
+  },
+  "versionsRead": [],
+  "writes": {
+    "state": [],
+    "openQuestions": { "open": [], "close": [] },
+    "clockRows": { "make": [], "cancel": [] },
+    "outboxRows": [],
+    "reservations": { "confirm": [], "release": [] },
+    "events": []
+  }
+}

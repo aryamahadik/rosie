@@ -1,0 +1,25 @@
+{
+  "call": "reserve",
+  "given": {
+    "k04Seeds": ["seed-reservation.json"],
+    "after": ["reserve-10-min.json"],
+    "now": "2026-11-07T15:06:00Z",
+    "note": "Tomás asks for Riley at 11:15am on Sat Nov 14, which overlaps Alex's saved 11:00 to 11:30, and does not ask to wait."
+  },
+  "request": {
+    "reservationId": "rsv-tomas-riley-nov14",
+    "businessId": "biz-lees-barbershop",
+    "resourceId": "res-riley",
+    "during": { "start": "2026-11-14T16:15:00Z", "end": "2026-11-14T16:45:00Z" },
+    "seats": 1,
+    "for": { "phoneNumber": "+15555550105" },
+    "door": "standard",
+    "holdMinutes": null,
+    "waitIfSaved": false,
+    "at": "2026-11-07T15:06:00Z"
+  },
+  "outcome": {
+    "error": "overlap",
+    "resourceId": "res-riley"
+  }
+}
