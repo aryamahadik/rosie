@@ -1,0 +1,20 @@
+{
+  "after": ["seed-chat-link.json"],
+  "rows": [
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-ben-stop",
+        "person_id": "person-ben",
+        "business_id": null,
+        "kind": "texts",
+        "revoked": true,
+        "handle_id": "handle-ben",
+        "exact_words": "STOP",
+        "words_sha256": "04dedf8afeb8a4177a009f41bb78018af601e341ed4322d4073911c9ac879726",
+        "at": "2026-10-20T13:00:00Z",
+        "channel": "text"
+      }
+    }
+  ]
+}

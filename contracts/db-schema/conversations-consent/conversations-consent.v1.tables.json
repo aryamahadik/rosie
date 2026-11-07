@@ -1,0 +1,469 @@
+{
+  "part": "conversations-consent",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "chat_links",
+      "description": "Each chat link issued: a link that opens Messages to Rosie's number with a ready text and a short code. Sending it opens the chat (RULES 4.1b). Rosie never writes first, so the link reaches the person through whoever is in front of them: the booking page and the confirmation email, the customer's own AI, or the owner, for staff (S2-05) and for a booking the business adds (MC C9). Rows are updated as the link is given in a new place, the owner is told again, or the ready text arrives.",
+      "source": "MC C9; RULES 4.1b; S2-05; Q-03; 02-contracts section 7 row K-29 ('chat links issued, with their short code and ready text')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The link's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "short_code",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The short code in the ready text, which matches a sent ready text to this link (for a booking, RULES 4.1b's short booking ref). Unique across every link. Its form is not in the sources (README, open gaps); code makes it and never parses it.",
+          "source": "MC C9 ('a ready text and a short code'); RULES 4.1b ('a short booking ref'); CQ-09"
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "booking: a booking's link (RULES 4.1b), shown on the booking page and in the confirmation email, passed on by the customer's own AI, or given to the owner for a booking the business adds; staff_invite: the link the owner passes to a person added to the team, whose sent ready text is their yes to join (S2-05 under C9).",
+          "source": "MC C9; RULES 4.1b; S2-05"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business the link is for (businesses.id). Row-level security scopes by it.",
+          "source": "MC C9; arch 10 line 546"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a booking link, its booking (bookings.id); null for a staff invite. Each new booking's confirmation carries a link again while the chat is never opened (C9: 'Never opened').",
+          "source": "RULES 4.1b; MC C9 ('Never opened')"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person the link is for (persons.id): the customer whose mobile the booking gives, or the person the owner added to the team.",
+          "source": "MC C9; S2-05; FS line 743"
+        },
+        {
+          "name": "phone_number",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "The mobile the link is for (phones.number): its ready text counts only when it comes from this number. The link is shown only once this mobile is a Linq contact (phones.linq_contact_added_at), which code checks before issuing (Q-03).",
+          "source": "MC C9 ('Each mobile is added as a Linq contact when it is saved'); Q-03; FS line 728; RULES 6.1"
+        },
+        {
+          "name": "ready_text",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The text the link puts ready to send to Rosie's number, with the short code in it: for a booking, \"Hey, send me further updates about my booking\" and the short booking ref (RULES 4.1b). Kept as issued, so the text that arrives can be matched to it.",
+          "source": "RULES 4.1b; MC C9 ('The link opens Messages to Rosie's number with a ready text and a short code')"
+        },
+        {
+          "name": "given_via",
+          "type": "text[]",
+          "null": false,
+          "audience": "never",
+          "description": "Where the link has been given: booking_page, confirmation_email, customer_ai (the customer's own AI gets it with the booking's answer and passes it on) and owner (for staff and for a booking the business adds). A new place is added to the list; none is removed.",
+          "source": "MC C9 ('reaches the person through whoever is in front of them'); D104 (as with the pay link)"
+        },
+        {
+          "name": "issued_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When the link was made. A booking's first link time is also K-30's first_link_given_at (Q-33).",
+          "source": "MC C9; Q-33 (first_sms_at becomes first_link_given_at)"
+        },
+        {
+          "name": "owner_retold_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "For a staff invite still unanswered 48 hours after it was issued: when the owner was told once and given the link again, in place of S2-05's reminder text. Null: not yet, or not needed.",
+          "source": "MC C9 ('After 48 hours with none, the owner is told once and given the link again'); S2-05"
+        },
+        {
+          "name": "used_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the ready text arrived from phone_number: the chat opened and was saved, and Rosie answers once with the booking as it stands (RULES 4.1b); for a staff invite it is also their yes to join (C9). Null: never sent.",
+          "source": "RULES 4.1b; MC C9"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "chat_links_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "chat_links_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "chat_links_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "chat_links_phone_fk",
+          "columns": ["phone_number"],
+          "references": {
+            "table": "phones",
+            "columns": ["number"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "chat_links_short_code_key",
+          "columns": ["short_code"],
+          "source": "MC C9 (the short code finds its link)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "chat_links_purpose_known",
+          "expression": "purpose in ('booking', 'staff_invite')",
+          "source": "MC C9; RULES 4.1b; S2-05"
+        },
+        {
+          "name": "chat_links_booking_only_for_booking",
+          "expression": "(purpose = 'booking') = (booking_id is not null)",
+          "source": "RULES 4.1b (a booking's link); S2-05 (a staff invite has no booking)"
+        },
+        {
+          "name": "chat_links_short_code_form",
+          "expression": "short_code ~ '^[^[:space:]]+$'",
+          "source": "MC C9 (a short code inside the ready text); CQ-09"
+        },
+        {
+          "name": "chat_links_ready_text_has_code",
+          "expression": "strpos(ready_text, short_code) > 0",
+          "source": "MC C9 ('a ready text and a short code'); RULES 4.1b"
+        },
+        {
+          "name": "chat_links_given_via_known",
+          "expression": "cardinality(given_via) >= 1 and given_via <@ array['booking_page', 'confirmation_email', 'customer_ai', 'owner']::text[]",
+          "source": "MC C9"
+        },
+        {
+          "name": "chat_links_retold_only_staff",
+          "expression": "owner_retold_at is null or purpose = 'staff_invite'",
+          "source": "MC C9 (the owner is told once, for staff)"
+        },
+        {
+          "name": "chat_links_used_after_issued",
+          "expression": "used_at is null or used_at >= issued_at",
+          "source": "RULES 4.1b"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_links_phone_idx",
+          "columns": ["phone_number"],
+          "why": "A mobile's links, when its first text arrives without the code or a new booking asks whether its chat was ever opened (RULES 4.1b; MC C9 'Never opened')."
+        },
+        {
+          "name": "chat_links_booking_idx",
+          "columns": ["booking_id"],
+          "where": "booking_id is not null",
+          "why": "A booking's link, for its page, its confirmation email and its customer's AI (MC C9)."
+        },
+        {
+          "name": "chat_links_open_invites_idx",
+          "columns": ["issued_at"],
+          "where": "purpose = 'staff_invite' and used_at is null and owner_retold_at is null",
+          "why": "Staff invites still unanswered, so the owner is told once after 48 hours (MC C9)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "consents",
+      "description": "Every yes, and every stop, as its own row: the person, the business, the kind, the exact words shown, the time, the channel, and whether the row withdraws it. Consent rows are never edited (the application roles may insert and read, never update or delete); a STOP or a switch of contact adds a row (FS lines 735, 753, 756). The proof of every yes and the \"don't text me\" record stay through a 45-day delete and for 7 years (RULES 4.10).",
+      "source": "FS lines 735, 753, 756; arch 09 lines 457 ('Consent: bound to read-back'), 492; RULES 4.10, 6.7, 7.1 to 7.5, 9.1; 02-contracts section 7 row K-29",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The consent row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "FS line 735 (id); CQ-09"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person whose own yes or stop it is (persons.id). A yes counts only from the person themself, never on someone else's word (RULES 7.1; S13-32).",
+          "source": "FS line 735 (person); RULES 7.1; S13-32; FS line 743"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business the yes is for (businesses.id). Null only on a texts row from a STOP or a START, which covers every business at once, since one number serves them all (D102; RULES 7.2, 7.5). Row-level security scopes by it, so a Tool API call sees no such row; the guard reads them unscoped (K-04 v1 rule 4).",
+          "source": "FS line 735 (business_id); RULES 4.1, 7.2, 7.5; MC C1; arch 10 line 546"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "texts, photos_shown, ticked_terms, plan_terms, fee_ok or health_agreement. FS line 735's automated calls and face match are refused: there is no voice provider (Q-05; arch 12 'Phone calls (D5)') and C10 removed face matching.",
+          "source": "FS line 735 (kind); MC C10; Q-05; arch 12 'Phone calls (D5)'; 02-contracts section 7 row K-29"
+        },
+        {
+          "name": "revoked",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "True when this row withdraws a consent of its kind: a stop word in any words, by any channel (RULES 7.2), or the old contact when updates move to a new one (RULES 9.1). Rows are never edited, so FS line 735's revoked_at is the at of the row that withdraws; for a person, kind, business and contact the newest row (by at, then id) decides. START, or a fresh yes on a new booking from that number, is a new row with revoked false (RULES 7.5).",
+          "source": "FS line 735 (revoked_at); FS lines 753, 756; RULES 7.2, 7.5, 9.1"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The contact the row is about (handles.id): for texts, the mobile or email the yes or stop covers. A stop stops texts to the number it answers (RULES 7.2); a contact switch adds a revoked row for the old contact and a yes for the new one (FS line 756; RULES 9.1). Required for texts; null where the yes is not about a contact.",
+          "source": "FS line 756; RULES 7.2, 9.1, 9.4; arch 01 line 55"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking the yes was given for (bookings.id): the terms ticked for it (A5-07), the person's own number given for it (RULES 7.1), or a fresh yes on a new booking (RULES 7.5). Null otherwise.",
+          "source": "A5-07; FS line 752 (terms_text: the exact words the customer ticked); RULES 7.1, 7.5; S13-32"
+        },
+        {
+          "name": "exact_words",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The exact words shown when the yes was given (the read-back, the card or the terms ticked); for a row that withdraws, the person's own words that did it. Never sealed: consent proofs survive a person's key being deleted, as hashes and the words shown.",
+          "source": "FS line 735 (exact words); RULES 6.7 ('Each yes is kept with the words shown'); arch 01 line 89 (exact yes); arch 09 line 492"
+        },
+        {
+          "name": "words_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of exact_words in UTF-8, in lowercase hex: the proof's hash, which the event log's proofs can carry.",
+          "source": "arch 09 line 492 ('consent proofs survive as hashes and the words shown'); 02-contracts K-08 (proofs)"
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the yes was given, or when the stop came.",
+          "source": "FS line 735 (at); RULES 6.7 ('the time')"
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Where it was given: text, email, page (the secure page's yes) or ai (the customer's own AI's confirm). No call: nothing goes by voice (Q-05).",
+          "source": "FS line 735 (channel); RULES 6.7 ('where it was given'), 7.2; arch 06 line 303; Q-05"
+        },
+        {
+          "name": "chat_link_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The chat link whose ready text gave this yes (chat_links.id): a staff member's sent ready text is their yes to join, and a customer's opens the chat for their booking (MC C9; RULES 7.1, 'a yes on a forwarded link').",
+          "source": "MC C9; RULES 4.1b, 7.1"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that committed the row (turns.id): an exact yes is bound to the exact text and versions of the read-back it answers (arch 01 line 89; arch 06 line 303), which that turn's open question holds. Null for a row no turn wrote.",
+          "source": "arch 01 line 89; arch 06 line 303; arch 09 line 457 ('Consent: bound to read-back'); K-04 v1 turns"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "consents_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "consents_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "consents_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "consents_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "consents_chat_link_fk",
+          "columns": ["chat_link_id"],
+          "references": {
+            "table": "chat_links",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "consents_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "consents_kind_known",
+          "expression": "kind in ('texts', 'photos_shown', 'ticked_terms', 'plan_terms', 'fee_ok', 'health_agreement')",
+          "source": "FS line 735; MC C10 (no face match); Q-05 (no automated calls); 02-contracts section 7 row K-29"
+        },
+        {
+          "name": "consents_channel_known",
+          "expression": "channel in ('text', 'email', 'page', 'ai')",
+          "source": "FS lines 734, 735; Q-05"
+        },
+        {
+          "name": "consents_words_given",
+          "expression": "length(btrim(exact_words)) > 0",
+          "source": "RULES 6.7 (each yes is kept with the words shown)"
+        },
+        {
+          "name": "consents_words_sha256_match",
+          "expression": "words_sha256 = encode(sha256(convert_to(exact_words, 'UTF8')), 'hex')",
+          "source": "arch 09 line 492"
+        },
+        {
+          "name": "consents_every_business_only_texts",
+          "expression": "business_id is not null or kind = 'texts'",
+          "source": "D102; RULES 7.2, 7.5 (one number: a STOP or START covers every business)"
+        },
+        {
+          "name": "consents_texts_has_contact",
+          "expression": "kind <> 'texts' or handle_id is not null",
+          "source": "RULES 7.2 ('It stops texts from the number it answers'); FS line 756"
+        },
+        {
+          "name": "consents_ticked_terms_has_booking",
+          "expression": "kind <> 'ticked_terms' or booking_id is not null",
+          "source": "A5-07; FS line 752 (terms_text, the exact words the customer ticked)"
+        },
+        {
+          "name": "consents_chat_link_only_texts",
+          "expression": "chat_link_id is null or kind = 'texts'",
+          "source": "MC C9 (a ready text is a yes to texts); RULES 7.1"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "consents_person_kind_at_idx",
+          "columns": ["person_id", "kind", "at"],
+          "why": "A person's newest row of a kind decides (FS line 753)."
+        },
+        {
+          "name": "consents_handle_kind_at_idx",
+          "columns": ["handle_id", "kind", "at"],
+          "where": "handle_id is not null",
+          "why": "The guard's STOP record and limit 8's texts check read a contact's newest texts row (RULES 7.1, 7.2; arch 02 line 115)."
+        },
+        {
+          "name": "consents_business_kind_idx",
+          "columns": ["business_id", "kind"],
+          "why": "A business's fee OK and agreements, which Go live checks (S1-29, S1-25, S1-72)."
+        },
+        {
+          "name": "consents_booking_idx",
+          "columns": ["booking_id"],
+          "where": "booking_id is not null",
+          "why": "A booking's terms ticked and texts yes (A5-07; RULES 7.5)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    }
+  ]
+}

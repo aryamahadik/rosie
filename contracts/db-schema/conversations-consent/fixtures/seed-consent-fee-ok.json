@@ -1,0 +1,19 @@
+{
+  "after": ["../../core/fixtures/seed-phone-chat-open.json"],
+  "rows": [
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-sam-fee-ok-barbershop",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "kind": "fee_ok",
+        "revoked": false,
+        "exact_words": "Rosfield charges $2 per booking its AI makes for you: a flat service fee, not a share of your prices. Memberships and repeat plans billed through Rosie: 1%, a payment-processing fee. OK? / What Rosfield costs / $2 for each booking through Rosie, counted at its first check-in, or at DONE with no code / No visit, no $2 / Never added to your customer's price / Never more than $49 a month per person / Walk-ins and jobs you add yourself are free / Card payments: Stripe's own fee / Reply 1 OK.",
+        "words_sha256": "1c065e4d9d3e2a53701ddf2b34ff3458938c9a123574777f29f9511f45c5d290",
+        "at": "2026-10-19T14:20:00Z",
+        "channel": "text"
+      }
+    }
+  ]
+}

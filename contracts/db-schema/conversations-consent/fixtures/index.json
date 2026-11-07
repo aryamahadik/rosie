@@ -1,0 +1,52 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-consent-fee-ok.json",
+      "version": "v1",
+      "table": "consents",
+      "expect": "accept",
+      "shows": "Sam's fee OK for Lee's Barbershop: S1-25's cost card shown in the chat, word for word, with its sha256, and Sam's reply 1 at its time, by text",
+      "source": "S1-25 (the card and 'owner → san: 1'); FS line 735; FS line 721 (fee_consent_at and by, M03); RULES 6.7; arch 09 line 492; SPEC-master 6 (Sam, Lee's Barbershop)"
+    },
+    {
+      "file": "seed-consent-stop-row.json",
+      "version": "v1",
+      "table": "consents",
+      "expect": "accept",
+      "shows": "Ben T.'s STOP as a new row (revoked, kind texts, his mobile, every business at once, so no business), added after his texts yes and never editing it; its time matches the phone's stop_at",
+      "source": "FS lines 735, 753 ('A STOP or a switch of contact adds a row'); RULES 7.2, 7.5; D102; MC C1; S13-32; SPEC-master 6 (Ben T.); K-04 v1 seed-phone-stopped"
+    },
+    {
+      "file": "seed-consent-health-agreement.json",
+      "version": "v1",
+      "table": "consents",
+      "expect": "accept",
+      "shows": "Sam signs the health privacy agreement on the secure page for Lee Nutrition Clinic (the dietitian demo shop), whose health work stays saved until it is signed (the words are S1-72's card; the agreement's own text is the lawyer's)",
+      "source": "S1-72; RULES 4.10 (health privacy agreement before health work goes live); FS line 735; fixtures/v1/test-kit/shops/dietitian.json (Lee Nutrition Clinic)"
+    },
+    {
+      "file": "seed-chat-link.json",
+      "version": "v1",
+      "table": "chat_links",
+      "expect": "accept",
+      "shows": "Chat links with their short code and ready text: Ben's booking link, given on the booking page and in the confirmation email, whose sent ready text opened his chat and is his texts yes; Avery's staff invite, given to the owner, whose ready text is her yes to join; Pat's staff invite, unanswered after 48 hours, so the owner was told once and given it again",
+      "source": "MC C9; RULES 4.1b ('Hey, send me further updates about my booking' and a short booking ref), 7.1; S2-05 ('Pat too'; 'Reply YES to join'); Q-03 (a Linq contact before the link); Q-33 (first_link_given_at); SPEC-master 6 (Ben T., Avery)"
+    },
+    {
+      "file": "invalid/refuse-consent-update.json",
+      "version": "v1",
+      "table": "consents",
+      "expect": "refuse",
+      "shows": "Editing a consent row (marking Sam's fee OK revoked in place) is refused: the application roles may insert and read consents, never update or delete them (SQLSTATE 42501); the same change as a new row passes",
+      "source": "FS line 753 ('consent rows are never edited'); FS line 756; RULES 4.10 (the proof of every yes stays); arch 09 line 492"
+    },
+    {
+      "file": "invalid/refuse-face-match-kind.json",
+      "version": "v1",
+      "table": "consents",
+      "expect": "refuse",
+      "shows": "A consent row of kind face_match is refused (CHECK consents_kind_known, SQLSTATE 23514): C10 removed face matching; the same row as photos_shown passes",
+      "source": "MC C10 ('No face match or video check runs'); FS line 735; S1-10 (the face-match words); 02-contracts section 7 row K-29"
+    }
+  ]
+}
