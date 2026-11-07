@@ -1,0 +1,52 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json", "../../core/fixtures/seed-phone-chat-open.json"],
+  "rows": [
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-sam-email",
+        "kind": "email",
+        "address": "sam@example.com"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-sam",
+        "handle_id": "handle-sam-email"
+      }
+    },
+    {
+      "table": "sealing_keys",
+      "values": {
+        "person_id": "person-sam",
+        "wrapped_key": "\\x6b32322d736565642d777261707065642d6b65792d73616d2d6e6f742d612d7265616c2d6b6579",
+        "wrapping_key_name": "SEALING_WRAP_KEY",
+        "created_at": "2026-10-19T14:05:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "accounts",
+      "values": {
+        "person_id": "person-sam",
+        "mobile": "+15555550100",
+        "mobile_proven_at": "2026-10-19T14:00:00Z",
+        "email": "sam@example.com",
+        "email_proven_at": "2026-10-19T14:12:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "id_uploads",
+      "values": {
+        "id": "idup-sam-sign-up",
+        "person_id": "person-sam",
+        "purpose": "sign_up",
+        "object_key": "\\x6b32322d736565642d7365616c65642d69642d6f626a6563742d6b65792d6e6f742d7265616c",
+        "content_type": "image/jpeg",
+        "uploaded_at": "2026-10-19T14:10:00Z"
+      }
+    }
+  ]
+}

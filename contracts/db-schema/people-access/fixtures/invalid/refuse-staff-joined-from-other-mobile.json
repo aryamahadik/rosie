@@ -1,0 +1,25 @@
+{
+  "after": ["seed-staff-invited.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "update",
+    "table": "staff",
+    "set": {
+      "status": "joined",
+      "joined_at": "2026-10-19T15:02:00Z",
+      "joined_from_number": "+15555550101",
+      "version": 2
+    },
+    "where": {
+      "id": "staff-pat-home-services"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["staff_joined_from_own_mobile"]
+    }
+  }
+}

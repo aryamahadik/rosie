@@ -1,0 +1,224 @@
+{
+  "after": ["../../business-setup/fixtures/seed-company-two-kinds.json", "../../core/fixtures/seed-phone-chat-open.json"],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-jordan",
+        "name": "Jordan",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-casey",
+        "name": "Casey",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-jordan",
+        "kind": "phone",
+        "address": "+15555550111"
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-casey",
+        "kind": "phone",
+        "address": "+15555550112"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-jordan",
+        "handle_id": "handle-jordan"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-casey",
+        "handle_id": "handle-casey"
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550111",
+        "handle_id": "handle-jordan",
+        "chat_open": true,
+        "chat_open_at": "2026-10-19T14:58:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-19T14:37:00Z",
+        "optout_line_delivered_at": "2026-10-19T14:58:02Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550112",
+        "handle_id": "handle-casey",
+        "chat_open": true,
+        "chat_open_at": "2026-10-19T15:01:00Z",
+        "chat_way": "rcs",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-19T14:37:00Z",
+        "optout_line_delivered_at": "2026-10-19T15:01:02Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-jordan-home-services",
+        "person_id": "person-jordan",
+        "business_id": "biz-lee-home-services",
+        "role": "staff",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-casey-home-services",
+        "person_id": "person-casey",
+        "business_id": "biz-lee-home-services",
+        "role": "staff",
+        "version": 1
+      }
+    },
+    {
+      "table": "staff",
+      "values": {
+        "id": "staff-jordan-home-services",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-jordan",
+        "mobile": "+15555550111",
+        "agreed_to_text_ticked_at": "2026-10-19T14:36:00Z",
+        "agreed_ticked_by_person_id": "person-sam",
+        "status": "joined",
+        "added_at": "2026-10-19T14:36:00Z",
+        "joined_at": "2026-10-19T14:58:00Z",
+        "joined_from_number": "+15555550111",
+        "languages": ["en"],
+        "day_list_time": "07:00",
+        "calls_customer_mobile": false,
+        "bookable_at": "2026-10-19T15:10:00Z",
+        "bookable_by_person_id": "person-sam",
+        "version": 4
+      }
+    },
+    {
+      "table": "staff",
+      "values": {
+        "id": "staff-casey-home-services",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-casey",
+        "mobile": "+15555550112",
+        "agreed_to_text_ticked_at": "2026-10-19T14:36:00Z",
+        "agreed_ticked_by_person_id": "person-sam",
+        "status": "joined",
+        "added_at": "2026-10-19T14:36:00Z",
+        "joined_at": "2026-10-19T15:01:00Z",
+        "joined_from_number": "+15555550112",
+        "languages": ["en"],
+        "day_list_time": null,
+        "calls_customer_mobile": false,
+        "bookable_at": "2026-10-19T15:10:00Z",
+        "bookable_by_person_id": "person-sam",
+        "version": 3
+      }
+    },
+    {
+      "table": "staff",
+      "values": {
+        "id": "staff-riley-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-riley",
+        "mobile": "+15555550102",
+        "agreed_to_text_ticked_at": "2026-10-19T14:36:00Z",
+        "agreed_ticked_by_person_id": "person-sam",
+        "status": "joined",
+        "added_at": "2026-10-19T14:36:00Z",
+        "joined_at": "2026-10-19T15:00:00Z",
+        "joined_from_number": "+15555550102",
+        "languages": ["en", "es"],
+        "day_list_time": "08:00",
+        "calls_customer_mobile": false,
+        "bookable_at": "2026-10-19T15:10:00Z",
+        "bookable_by_person_id": "person-sam",
+        "version": 4
+      }
+    },
+    {
+      "table": "staff_skills",
+      "values": {
+        "id": "skill-jordan-plumber",
+        "staff_id": "staff-jordan-home-services",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "plumber",
+        "skill": null
+      }
+    },
+    {
+      "table": "staff_skills",
+      "values": {
+        "id": "skill-jordan-electrician",
+        "staff_id": "staff-jordan-home-services",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "electrician",
+        "skill": null
+      }
+    },
+    {
+      "table": "staff_skills",
+      "values": {
+        "id": "skill-casey-plumber",
+        "staff_id": "staff-casey-home-services",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "plumber",
+        "skill": null
+      }
+    },
+    {
+      "table": "staff_skills",
+      "values": {
+        "id": "skill-riley-barber",
+        "staff_id": "staff-riley-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "skill": null
+      }
+    },
+    {
+      "table": "staff_skills",
+      "values": {
+        "id": "skill-riley-beard-color",
+        "staff_id": "staff-riley-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "skill": "beard color"
+      }
+    },
+    {
+      "table": "staff_skills",
+      "values": {
+        "id": "skill-riley-house-calls",
+        "staff_id": "staff-riley-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "kind_id": "barber",
+        "skill": "house calls"
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "after": ["seed-proof-code.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "sessions",
+    "values": {
+      "id": "session-sam-raw-token",
+      "person_id": "person-sam",
+      "token_sha256": "k22-seed-session-token-sam-oct26-not-real",
+      "device_sha256": null,
+      "proven_via": "code",
+      "proof_code_id": "code-sam-sign-in-oct26",
+      "started_at": "2026-10-26T08:21:00Z",
+      "last_seen_at": "2026-10-26T08:21:00Z",
+      "expires_at": "2026-11-25T08:21:00Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["sessions_token_hash_form"]
+    }
+  }
+}

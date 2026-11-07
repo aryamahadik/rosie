@@ -1,0 +1,57 @@
+{
+  "after": ["seed-staff-joined.json"],
+  "rows": [
+    {
+      "table": "sealing_keys",
+      "values": {
+        "person_id": "person-jordan",
+        "wrapped_key": "\\x6b32322d736565642d777261707065642d6b65792d6a6f7264616e2d6e6f742d612d7265616c2d6b6579",
+        "wrapping_key_name": "SEALING_WRAP_KEY",
+        "created_at": "2026-10-19T14:58:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "sealing_keys",
+      "values": {
+        "person_id": "person-riley",
+        "wrapped_key": "\\x6b32322d736565642d777261707065642d6b65792d72696c65792d6e6f742d612d7265616c2d6b6579",
+        "wrapping_key_name": "SEALING_WRAP_KEY",
+        "created_at": "2026-10-19T15:00:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "emergency_contacts",
+      "values": {
+        "id": "ec-jordan-home-services",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-jordan",
+        "name": "\\x6b32322d736565642d7365616c65642d636f6e746163742d6e616d652d6a6f7264616e2d6e6f742d7265616c",
+        "mobile": "\\x6b32322d736565642d7365616c65642d636f6e746163742d6d6f62696c652d6a6f7264616e2d6e6f742d7265616c",
+        "agreed_ticked_at": "2026-10-19T14:59:00Z",
+        "added_at": "2026-10-19T14:59:00Z",
+        "contact_person_id": "person-casey",
+        "contact_handle_id": "handle-casey",
+        "contact_yes_at": "2026-10-19T15:05:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "emergency_contacts",
+      "values": {
+        "id": "ec-riley-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-riley",
+        "name": "\\x6b32322d736565642d7365616c65642d636f6e746163742d6e616d652d72696c65792d6e6f742d7265616c",
+        "mobile": "\\x6b32322d736565642d7365616c65642d636f6e746163742d6d6f62696c652d72696c65792d6e6f742d7265616c",
+        "agreed_ticked_at": "2026-10-19T15:00:00Z",
+        "added_at": "2026-10-19T15:00:00Z",
+        "contact_person_id": null,
+        "contact_handle_id": null,
+        "contact_yes_at": null,
+        "version": 1
+      }
+    }
+  ]
+}

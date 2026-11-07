@@ -1,0 +1,29 @@
+{
+  "after": ["seed-staff-joined.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "insert",
+    "table": "emergency_contacts",
+    "values": {
+      "id": "ec-casey-home-services",
+      "business_id": "biz-lee-home-services",
+      "person_id": "person-casey",
+      "name": "\\x6b32322d736565642d7365616c65642d636f6e746163742d6e616d652d63617365792d6e6f742d7265616c",
+      "mobile": "\\x6b32322d736565642d7365616c65642d636f6e746163742d6d6f62696c652d63617365792d6e6f742d7265616c",
+      "agreed_ticked_at": "2026-10-19T15:02:00Z",
+      "added_at": "2026-10-19T15:02:00Z",
+      "contact_person_id": "person-casey",
+      "contact_handle_id": "handle-casey",
+      "contact_yes_at": "2026-10-19T15:03:00Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["emergency_contacts_not_the_pro"]
+    }
+  }
+}

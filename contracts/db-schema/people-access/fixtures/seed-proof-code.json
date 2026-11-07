@@ -1,0 +1,80 @@
+{
+  "after": ["seed-owner-id-upload.json", "seed-staff-joined.json"],
+  "rows": [
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-sam-owner-email",
+        "purpose": "owner_email",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "sent_to_handle_id": "handle-sam-email",
+        "channel": "email",
+        "code_hash": "607b8e3270e735d630d2659926e7861f8e25a0b79e7eba4ac962d0cb61441c91",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-19T14:11:00Z",
+        "expires_at": "2026-10-19T14:21:00Z",
+        "wrong_tries": 0,
+        "used_at": "2026-10-19T14:12:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-sam-sign-in-oct20",
+        "purpose": "sign_in",
+        "person_id": "person-sam",
+        "business_id": null,
+        "sent_to_handle_id": "handle-sam",
+        "channel": "text",
+        "code_hash": "c098b2933fb8633055eebba03be35b6afc4d09775fbb36d848ec1f0d2eef3745",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-20T07:50:00Z",
+        "expires_at": "2026-10-20T08:00:00Z",
+        "wrong_tries": 0,
+        "used_at": "2026-10-20T07:51:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-sam-sign-in-oct26",
+        "purpose": "sign_in",
+        "person_id": "person-sam",
+        "business_id": null,
+        "sent_to_handle_id": "handle-sam",
+        "channel": "text",
+        "code_hash": "66e18645a5900399b5fb2c3dff4cf7fb22da3e7193e9f0c918b8033eea573110",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-26T08:20:00Z",
+        "expires_at": "2026-10-26T08:30:00Z",
+        "wrong_tries": 1,
+        "last_wrong_at": "2026-10-26T08:20:40Z",
+        "used_at": "2026-10-26T08:21:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-jordan-sign-in-paused",
+        "purpose": "sign_in",
+        "person_id": "person-jordan",
+        "business_id": null,
+        "sent_to_handle_id": "handle-jordan",
+        "channel": "text",
+        "code_hash": "51cc43388048fca54b64e6dd573b643a55f11bfed83d71fbaa1f23358fe8ed00",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-26T07:00:00Z",
+        "expires_at": "2026-10-26T07:10:00Z",
+        "wrong_tries": 5,
+        "last_wrong_at": "2026-10-26T07:04:00Z",
+        "paused_until": "2026-10-26T07:19:00Z",
+        "used_at": null,
+        "version": 6
+      }
+    }
+  ]
+}

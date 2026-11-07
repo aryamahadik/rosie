@@ -1,0 +1,1763 @@
+{
+  "part": "people-access",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "accounts",
+      "description": "How a person on the business side signs in, one row per person across every business: the owner's one mobile, proven by their own text to Rosie's number (C9), and the owner's email, proven by a code typed on the page (B12, B13; S1-10). Owners, admins and staff sign in by a code to the phone or email on file, with no password (FS section 8; S11-52). The person, the handles and the phone rows are K-04 core's; this row only says which of them is the sign-in and when each was proven.",
+      "source": "FS rows B11 to B13; FS section 8 ('Owner and staff log in by a code sent to the phone or email on file'); S1-10 (gives mobile); S11-52; S13-45 rows 8 and 9; MC C9; 02-contracts section 8 (mobile: K-04 phone row and K-22)",
+      "columns": [
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person who signs in (persons.id); one account per person, for every company (S1-10: 'Done once, for every company').",
+          "source": "S1-10; FS line 743 (a person is one row)"
+        },
+        {
+          "name": "mobile",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The one mobile only they use, their sign-in (B12), as core's phones.number. Never the listing's number. Texts and pages say 'on file', never the number (S2-06). Null: none given yet.",
+          "source": "FS row B12 ('the one only they use; it is their sign-in; never the listing's number'); S1-10 ('Never suggest the number on the card or the listing'); S2-06 ('Texts say on file, never a number')"
+        },
+        {
+          "name": "mobile_proven_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the mobile was proven: by the person's own text from it to Rosie's number, since no code is texted to a mobile that has not texted in (C9). Null: not proven, so it is not the sign-in yet.",
+          "source": "MC C9 ('A code meant for a mobile that has not texted in: Rosie asks them to text from that mobile instead, since that text proves it'); S1-10 (gives mobile); 02-contracts section 8 (mobile: proven by their own text)"
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The owner's one email for notices, sign-in help and answers by email (B13), in lower case, as a core handles.address. Null: none given.",
+          "source": "FS row B13; S1-10 ('The secure page also asks one owner email, for notices, sign-in recovery and answers by email'); S13-32"
+        },
+        {
+          "name": "email_proven_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When a code sent to the email was typed back on the page (a proof_codes row of purpose owner_email). Until then it is not used.",
+          "source": "S1-10 ('The email is proven with a code sent to it, typed on the page. Until then it isn't used'); FS row B13"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["person_id"],
+      "foreignKeys": [
+        {
+          "name": "accounts_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "accounts_mobile_fk",
+          "columns": ["mobile"],
+          "references": {
+            "table": "phones",
+            "columns": ["number"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "accounts_email_fk",
+          "columns": ["email"],
+          "references": {
+            "table": "handles",
+            "columns": ["address"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "accounts_mobile_key",
+          "columns": ["mobile"],
+          "source": "FS row B12 (the one mobile only they use)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "accounts_email_form",
+          "expression": "email is null or (email ~ '^[^@[:space:]]+@[^@[:space:]]+$' and email = lower(email))",
+          "source": "FS row B13; K-04 v1 handles_address_form"
+        },
+        {
+          "name": "accounts_mobile_proven_has_mobile",
+          "expression": "mobile_proven_at is null or mobile is not null",
+          "source": "S1-10; MC C9"
+        },
+        {
+          "name": "accounts_email_proven_has_email",
+          "expression": "email_proven_at is null or email is not null",
+          "source": "S1-10"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "One sign-in per person across every business (S1-10 'Done once, for every company'; S11-52 'every booking for both businesses'), as K-04's persons."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "id_uploads",
+      "description": "An ID document the person uploaded on the secure page, never in the chat (C10). Any document is accepted as given, with no check, and a sign_up upload counts as 'the ID confirmed' wherever the master asks for it (S1-10 gives id_checked; S1-32). No face match or video check runs, so no face data is kept. A re_check upload is S13-45 row 8's ID re-check (a new owner mobile or email, a new device, a hand-over). The file stays private in R2 (Q-31); its object key is sealed under the person's key.",
+      "source": "MC C10; S1-10 (gives id_checked); S1-32; S13-45 row 8; S11-100; FS row B14; RULES 9.5; Q-31; 02-contracts section 5 K-19 and section 8 (id_checked: K-22)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The upload's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person whose ID it is (persons.id), and whose key seals the file's key.",
+          "source": "MC C10; S1-10"
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "sign_up: the ID at sign-up, done once for every company, which counts as the ID confirmed (S1-10; C10); re_check: the ID re-check S13-45 row 8 asks for a new owner mobile or email, a new device or a hand-over.",
+          "source": "S1-10 ('Done once, for every company'); S13-45 row 8 ('the ID re-check'); S11-100; RULES 9.5"
+        },
+        {
+          "name": "object_key",
+          "type": "bytea",
+          "null": false,
+          "audience": "secure-page-only",
+          "sealedBy": "person_id",
+          "description": "The uploaded file's object key in R2 (K-13), sealed under the person's key, so deleting the key erases the way to the file. Seen only on the secure page; never in a text, an email or a summary.",
+          "source": "MC C10 ('Uploads stay private in R2'); MC 8 'Files'; Q-31; RULES 4.5 (ID numbers stay on the secure page), 4.10; arch 01 line 93"
+        },
+        {
+          "name": "content_type",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The file's media type: a photo (image/...) or a file such as a PDF (application/...).",
+          "source": "MC C10 ('a photo or file of an ID document')"
+        },
+        {
+          "name": "uploaded_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When it was uploaded; the go-live gate reads it as the ID half of S1-32.",
+          "source": "MC C10; S1-32; S1-10 ('The result comes back at S1-32')"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "id_uploads_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "id_uploads_one_sign_up",
+          "columns": ["person_id"],
+          "where": "purpose = 'sign_up'",
+          "source": "S1-10 ('Checks the owner's mobile and ID, once'; 'Done once, for every company')"
+        }
+      ],
+      "checks": [
+        {
+          "name": "id_uploads_purpose_known",
+          "expression": "purpose in ('sign_up', 're_check')",
+          "source": "S1-10; S13-45 row 8"
+        },
+        {
+          "name": "id_uploads_content_type_form",
+          "expression": "content_type ~ '^(image|application)/[a-z0-9.+-]+$'",
+          "source": "MC C10 ('a photo or file')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "id_uploads_person_idx",
+          "columns": ["person_id", "uploaded_at"],
+          "why": "Whether a person's ID is confirmed (S1-32's gate) and their latest re-check (S13-45 row 8)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "The ID is the person's, done once for every company (S1-10); its file key is sealed under that person's key (arch 01 line 93)."
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "staff",
+      "description": "A team member at one business (FS staff row): their mobile, the owner's yes that they agreed to a text, their status (invited, joined, stopped, removed), languages, day-list time, video link or 'the pro calls', supervisor, and when the owner let them take bookings. The person and their name are K-04 core's persons row and their role (owner, admin, staff, own business) is core's person_roles row; a role that ends (removed) keeps core's ended_at. Skills are staff_skills, what they may OK team_powers, on call on_call, an emergency contact emergency_contacts. A price by person (T06) is K-25's, a calendar link K-27's, a license K-35's.",
+      "source": "FS line 723 (staff); FS rows T01 to T03, T07, T09, T10, L06; S2-02 (gives added), S2-05 to S2-09, S2-15, S2-21, S2-22, S2-24 (gives staff_live); FS line 743; 02-contracts section 7 row K-22 and section 8 (added, team, staff_live)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The team member's id at this business: an opaque string code makes and never parses (CQ-09).",
+          "source": "FS line 723 (id); CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "FS line 723 (business_id); arch 10 line 546"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person (persons.id): one person row across every business they work in, on one calendar (FS line 743).",
+          "source": "FS lines 723, 743; S2-02 ('One person has one calendar across both companies')"
+        },
+        {
+          "name": "mobile",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The mobile the owner gave for them (T02), as core's phones.number: the phone their own ready text must come from to join (Q-08). Not shown to customers; their texts say 'on file', never the number.",
+          "source": "FS row T02 ('the phone Rosie texts'; 'not shown to customers'); FS line 723 (mobile); S2-02; S2-06; Q-08; MC C9 ('Each mobile is added as a Linq contact when it is saved')"
+        },
+        {
+          "name": "agreed_to_text_ticked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the owner said this person agreed to a text from Rosie (T03; S2-02's '1 Yes, all agreed'). Required: nobody is added before it (S2-02's safe default). Q-08 keeps this tick beside the person's own ready text.",
+          "source": "FS row T03; FS line 723 (agreed_to_text_at); S2-02; S1-70 ('Nobody is texted before the owner says they agreed'); Q-08"
+        },
+        {
+          "name": "agreed_ticked_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who said so (persons.id): the account owner, or an admin the owner lets add people.",
+          "source": "S2-02 (RULE: only the account owner, or an admin for what the owner lets them, adds people)"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "null": false,
+          "default": "'invited'",
+          "audience": ["staff", "owner"],
+          "description": "invited: added, the owner given their chat link to pass on (C9); joined: their own ready text came from their mobile (S2-06); stopped: they replied STOP (S2-08; RULES 7.7); removed: taken off the team (core person_roles.ended_at holds when).",
+          "source": "FS line 723 (status invited, joined, stopped, removed); S2-05 to S2-08; MC C9; RULES 7.7, 8.7"
+        },
+        {
+          "name": "added_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When they were added to the team (S2-02 gives added).",
+          "source": "S2-02 (gives added); 02-contracts section 8 (added: K-22 staff rows, status invited)"
+        },
+        {
+          "name": "joined_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When their own ready text arrived and they joined (S2-05's 'Says yes'; C9: that person's sent ready text is their yes to join). Null: not joined.",
+          "source": "S2-05, S2-06; MC C9; Q-08"
+        },
+        {
+          "name": "joined_from_number",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The phone the joining ready text came from; it must be this row's mobile, since a ready text from another mobile takes the wrong-number path and nobody joins on another person's word (Q-08).",
+          "source": "Q-08; S2-05 ('Never: join someone on another person's word'); S2-09"
+        },
+        {
+          "name": "stopped_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When they last replied STOP; the owner is told, and they are not offered for new bookings until START (S2-08; RULES 7.7).",
+          "source": "S2-08; RULES 7.5, 7.7"
+        },
+        {
+          "name": "wrong_number_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the invite reached the wrong person (S2-09), including a ready text from another mobile (Q-08); nothing more goes there until the owner sends the right mobile.",
+          "source": "S2-09; Q-08"
+        },
+        {
+          "name": "languages",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": ["staff", "owner"],
+          "description": "Languages the person speaks (T09), as BCP 47 tags such as en and es, from their secure page; shown in the job text to the owner and the read-back to them.",
+          "source": "FS row T09; FS line 723 (languages); S2-06 ('Languages: English and Spanish')"
+        },
+        {
+          "name": "day_list_time",
+          "type": "time",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "The time their day list comes (T10), in the business's zone, such as 08:00. Null: the default time.",
+          "source": "FS row T10 ('O (default)'); FS line 723 (day_list_time); S2-06 ('Day list at 8am'); S2-24"
+        },
+        {
+          "name": "video_link",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "Their video link for video or phone work (L06), shown in the confirmation and reminder. Null: none, or the pro calls the customer's mobile.",
+          "source": "FS row L06 ('Video link, or the pro calls the customer's mobile, per person'; confirmation, reminder); FS line 723 (video_link); S2-15; S2-21"
+        },
+        {
+          "name": "calls_customer_mobile",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": ["customer", "staff", "owner"],
+          "description": "L06's other choice: the pro calls the customer's mobile instead of a video link.",
+          "source": "FS row L06; S2-15 ('or says the pro calls the customer's mobile'); S2-21"
+        },
+        {
+          "name": "supervisor_staff_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Their supervisor on this team (T07), asked only where the plug-in has that rule; they are offered only while the supervisor works. Null: none needed.",
+          "source": "FS row T07; FS line 723 (supervisor); S2-15 ('Supervisor needed: asked only where the plug-in has that rule'); pf.staff supervision (barber.json)"
+        },
+        {
+          "name": "bookable_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the owner let them take bookings (S2-22's yes); from then they are offered to customers and told so (S2-24 gives staff_live). Null: nobody offers them yet.",
+          "source": "S2-22 ('Nobody is offered to customers until Sam says yes'); S2-23; S2-24 (gives staff_live); 02-contracts section 8 (staff_live: K-22 staff status, can be booked)"
+        },
+        {
+          "name": "bookable_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who gave that yes (persons.id).",
+          "source": "S2-22 ('Each person is who Sam says: Sam confirms it with this yes'); S2-15"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "staff_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "staff_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "staff_mobile_fk",
+          "columns": ["mobile"],
+          "references": {
+            "table": "phones",
+            "columns": ["number"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "staff_joined_from_fk",
+          "columns": ["joined_from_number"],
+          "references": {
+            "table": "phones",
+            "columns": ["number"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "staff_agreed_by_fk",
+          "columns": ["agreed_ticked_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "staff_bookable_by_fk",
+          "columns": ["bookable_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "staff_supervisor_fk",
+          "columns": ["supervisor_staff_id", "business_id"],
+          "references": {
+            "table": "staff",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "staff_business_person_key",
+          "columns": ["business_id", "person_id"],
+          "source": "S2-02 ('A mobile already on the team isn't added twice'); FS line 743 (staff links that person to each business)"
+        },
+        {
+          "name": "staff_business_mobile_key",
+          "columns": ["business_id", "mobile"],
+          "source": "S2-02 ('A mobile already on the team isn't added twice')"
+        },
+        {
+          "name": "staff_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "S2-15 (a supervisor, skills and powers on the same team, for row-level security)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "staff_status_known",
+          "expression": "status in ('invited', 'joined', 'stopped', 'removed')",
+          "source": "FS line 723 (status invited, joined, stopped, removed)"
+        },
+        {
+          "name": "staff_joined_from_own_mobile",
+          "expression": "(joined_at is null) = (joined_from_number is null) and (joined_from_number is null or joined_from_number = mobile)",
+          "source": "Q-08 ('a ready text from another mobile takes S2-09's wrong-number path'); S2-05 ('Never: join someone on another person's word')"
+        },
+        {
+          "name": "staff_joined_has_time",
+          "expression": "status <> 'joined' or joined_at is not null",
+          "source": "S2-06; MC C9"
+        },
+        {
+          "name": "staff_stopped_has_time",
+          "expression": "status <> 'stopped' or stopped_at is not null",
+          "source": "S2-08"
+        },
+        {
+          "name": "staff_bookable_after_join",
+          "expression": "bookable_at is null or (joined_at is not null and bookable_at >= joined_at)",
+          "source": "S2-07 ('Avery can't be booked until Avery replies YES'); S2-22 ('Nobody is offered to customers until Sam says yes')"
+        },
+        {
+          "name": "staff_bookable_with_who",
+          "expression": "(bookable_at is null) = (bookable_by_person_id is null)",
+          "source": "S2-22"
+        },
+        {
+          "name": "staff_times_in_order",
+          "expression": "added_at >= agreed_to_text_ticked_at and (joined_at is null or joined_at >= added_at)",
+          "source": "S2-02 (the tick comes first: 'With no yes, nobody gets an invite'); S2-05"
+        },
+        {
+          "name": "staff_supervisor_not_self",
+          "expression": "supervisor_staff_id is null or supervisor_staff_id <> id",
+          "source": "FS row T07; S2-15"
+        },
+        {
+          "name": "staff_video_link_form",
+          "expression": "video_link is null or video_link ~ '^https://[^[:space:]]+$'",
+          "source": "FS row L06 (a link); S13-45 ('Notes and updates carry no link but Rosie's own secure links and the booking's video link')"
+        },
+        {
+          "name": "staff_video_or_call",
+          "expression": "not (video_link is not null and calls_customer_mobile)",
+          "source": "FS row L06 ('Video link, or the pro calls the customer's mobile')"
+        },
+        {
+          "name": "staff_languages_form",
+          "expression": "array_to_string(languages, ',') ~ '^([a-z]{2,3}(-[A-Za-z0-9]+)*(,[a-z]{2,3}(-[A-Za-z0-9]+)*)*)?$'",
+          "source": "FS row T09; K-04 v1 persons_language_form (BCP 47)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "staff_person_idx",
+          "columns": ["person_id"],
+          "why": "A person's teams across businesses: one calendar (FS line 743), 'Which business?' on OFF, LATE or DONE (S11-43)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "staff_skills",
+      "description": "Which work each team member takes (T04): a kind of work as a whole, or a named skill of it from the plug-in's pf.staff (such as beard color or house calls). Only people with the skill are offered for it (T04), and a skill is never offered where the business says that person's license doesn't cover it (S2-15; RULES 10.2). Rows are added or removed, never updated.",
+      "source": "FS row T04; FS line 723 (skills); S2-02 ('Jordan and Casey do plumbing; Jordan does electrical too'; 'Riley also does color and house calls'); S2-15 (gives team); pf.staff skills (barber.json, plumber.json); 02-contracts section 8 (team: K-22 skills)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The skill row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "staff_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The team member (staff.id).",
+          "source": "FS row T04"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The team member's business, copied from staff and held to it by a foreign key, so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "kind_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind of work: its profession file's id, such as plumber or barber (B09), as K-23's company_kinds.kind_id. K-24 names the 243 kinds and adds the foreign key.",
+          "source": "FS rows B09, T04; S2-02; K-23 v1 company_kinds; 02-contracts row K-24"
+        },
+        {
+          "name": "skill",
+          "type": "text",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "A named skill of that kind, in the plug-in's pf.staff words, such as beard color or house calls; null: every service of the kind. The read-back to the person names them (S2-06: 'Every shop service, color and house calls').",
+          "source": "FS row T04; pf.staff skills ('cuts, fades, beard work, razor shaves, kids cuts, beard color, house calls and events': barber.json); S2-02; S2-06"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "staff_skills_staff_fk",
+          "columns": ["staff_id", "business_id"],
+          "references": {
+            "table": "staff",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "staff_skills_kind_key",
+          "columns": ["staff_id", "kind_id"],
+          "where": "skill is null",
+          "source": "FS row T04 (each kind once per person)"
+        },
+        {
+          "name": "staff_skills_skill_key",
+          "columns": ["staff_id", "kind_id", "skill"],
+          "where": "skill is not null",
+          "source": "FS row T04 (each skill once per person)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "staff_skills_kind_id_form",
+          "expression": "kind_id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'",
+          "source": "fixtures/v1/test-kit/shops (profession file ids); K-23 v1 company_kinds_kind_id_form"
+        },
+        {
+          "name": "staff_skills_skill_given",
+          "expression": "skill is null or length(btrim(skill)) > 0",
+          "source": "FS row T04"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "staff_skills_business_kind_idx",
+          "columns": ["business_id", "kind_id"],
+          "why": "Who may be offered for a kind of work on the times card (T04: only people with the skill are offered)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "team_powers",
+      "description": "What a team member other than the account owner may OK or do (T05), as the owner named it: an admin acts only for what the owner lets them, and never closes the business, exports, hands it over or removes the account owner, so those are not powers here (S13-45 row 8; RULES 6.8). A price power can carry the amount over which it applies (S2-02: Pat OKs Lee Home Services prices over $500). Ending a power closes its row.",
+      "source": "FS row T05; S2-02; S2-15 ('An office manager answers only what Sam named, for the company named'); S13-45 rows 8 and 9; RULES 6.8; FS line 630; 02-contracts section 7 row K-22 ('admins' powers (S13-45 row 8)') and section 8 (team: who OKs what)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The power's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "staff_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The team member it is given to (staff.id), usually an admin (an office manager).",
+          "source": "FS row T05; S2-02 ('Pat is my office manager')"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business it applies to, copied from staff and held to it by a foreign key: the company named (S2-15).",
+          "source": "S2-15 ('for the company named'); arch 10 line 546"
+        },
+        {
+          "name": "power",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "prices: OK a price or quote (S2-02; S1-21's price OK limit); money: fees and refunds; team: people and their roles; settings: the business's settings; cancels: cancel bookings (S13-45 row 8's owner powers an admin can be let do). Closing, export, hand-over and removing the account owner stay the account owner's alone.",
+          "source": "S13-45 row 8 ('Owner powers: money, the team and settings. Also cancels, closing, export and hand-over'; 'Admins never close the business, export, hand it over, or remove the account owner'); S2-02; RULES 6.8"
+        },
+        {
+          "name": "over_cents",
+          "type": "integer",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "For a prices power, the amount over which it applies, in whole cents (S2-02: over $500 is 50000). Null: any amount.",
+          "source": "S2-02 ('for prices over $500'); SPEC-master 6 ('Sam's price OK limit: $500'); CQ-09 (integer cents)"
+        },
+        {
+          "name": "over_currency",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The amount's currency code, such as USD; set with over_cents.",
+          "source": "CQ-09 ('money in integer cents with a currency code')"
+        },
+        {
+          "name": "granted_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the owner gave it, after the read-back (S2-02, S2-15).",
+          "source": "S2-02; S2-21 ('Every change is logged: who made it, when')"
+        },
+        {
+          "name": "granted_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who gave it (persons.id): the account owner, or an admin the owner lets set the team.",
+          "source": "S2-15 ('Only the account owner, or an admin for what the owner lets them, sets who takes bookings and who may OK them')"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner took it back; null while it holds.",
+          "source": "S11-20 (settings changes, read back first); S2-21"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "team_powers_staff_fk",
+          "columns": ["staff_id", "business_id"],
+          "references": {
+            "table": "staff",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_powers_granted_by_fk",
+          "columns": ["granted_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "team_powers_one_live",
+          "columns": ["staff_id", "power"],
+          "where": "ended_at is null",
+          "source": "FS row T05 (one rule per person and power)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "team_powers_power_known",
+          "expression": "power in ('prices', 'money', 'team', 'settings', 'cancels')",
+          "source": "S13-45 row 8 ('Admins never close the business, export, hand it over, or remove the account owner'); RULES 6.8"
+        },
+        {
+          "name": "team_powers_amount_for_prices",
+          "expression": "over_cents is null or power = 'prices'",
+          "source": "S2-02 ('for prices over $500')"
+        },
+        {
+          "name": "team_powers_amount_money",
+          "expression": "(over_cents is null) = (over_currency is null) and (over_cents is null or over_cents >= 0) and (over_currency is null or over_currency ~ '^[A-Z]{3}$')",
+          "source": "CQ-09"
+        },
+        {
+          "name": "team_powers_times_in_order",
+          "expression": "ended_at is null or ended_at >= granted_at",
+          "source": "S2-21"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "team_powers_business_power_idx",
+          "columns": ["business_id", "power"],
+          "why": "Who may answer a request waiting for an OK (FS 6.2 'Needs you'; S11-03)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "on_call",
+      "description": "Who takes jobs sent now (T12; S2-27), for a kind of work the plug-in sends now: in open hours a named person or, with no one named, the nearest free person cleared for it; while closed, the person on call on the days and between the times the owner set, holidays included where named. A job sent now goes to one person, who has 5 minutes to take it by reply. Hours with nobody on call offer no jobs sent now.",
+      "source": "FS row T12; FS line 723 (on_call); S2-27 (gives on_call); S2-30, S2-31; S1-21; 02-contracts section 8 (on_call: K-22, FS staff.on_call)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The on-call row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "S2-27; arch 10 line 546"
+        },
+        {
+          "name": "kind_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind of work whose jobs are sent now, such as plumber (S2-30: 'Plumbing takes jobs sent now. The shop takes none').",
+          "source": "S2-27, S2-30; FS row B09"
+        },
+        {
+          "name": "staff_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person on call (staff.id); null only in open hours, meaning the nearest free person cleared for that service.",
+          "source": "S2-27 ('In open hours, it goes to whoever Sam names: here, the nearest free plumber cleared for it'; 'Jordan weeknights. Casey weekends and holidays')"
+        },
+        {
+          "name": "hours",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "open: the business's open hours; closed: while it is closed.",
+          "source": "S2-27 ('who takes them in open hours and who's on call while closed')"
+        },
+        {
+          "name": "days",
+          "type": "smallint[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": ["staff", "owner"],
+          "description": "The days of the week it covers, ISO numbers 1 (Monday) to 7 (Sunday), such as {1,2,3,4,5} for weeknights.",
+          "source": "S2-27 ('Weeknights'; 'Weekends')"
+        },
+        {
+          "name": "holidays",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": ["staff", "owner"],
+          "description": "Whether it also covers holidays.",
+          "source": "S2-27 ('Weekends and holidays · Casey')"
+        },
+        {
+          "name": "from_time",
+          "type": "time",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When it starts on each day it covers, in the business's zone, such as 17:30; null with until_time: all of those hours.",
+          "source": "S2-27 ('Weeknights, 5:30pm to 7:30am · Jordan')"
+        },
+        {
+          "name": "until_time",
+          "type": "time",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When it ends, such as 07:30 the next morning when earlier than from_time.",
+          "source": "S2-27 ('5:30pm to 7:30am')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "on_call_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "on_call_staff_fk",
+          "columns": ["staff_id", "business_id"],
+          "references": {
+            "table": "staff",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "on_call_hours_known",
+          "expression": "hours in ('open', 'closed')",
+          "source": "S2-27"
+        },
+        {
+          "name": "on_call_closed_names_person",
+          "expression": "staff_id is not null or hours = 'open'",
+          "source": "S2-27 (the nearest free person in open hours; a named person on call while closed)"
+        },
+        {
+          "name": "on_call_days_known",
+          "expression": "days <@ '{1,2,3,4,5,6,7}'::smallint[] and (cardinality(days) > 0 or holidays)",
+          "source": "S2-27"
+        },
+        {
+          "name": "on_call_times_pair",
+          "expression": "(from_time is null) = (until_time is null) and (from_time is null or from_time <> until_time)",
+          "source": "S2-27 ('5:30pm to 7:30am')"
+        },
+        {
+          "name": "on_call_kind_id_form",
+          "expression": "kind_id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'",
+          "source": "fixtures/v1/test-kit/shops (profession file ids)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "on_call_business_kind_idx",
+          "columns": ["business_id", "kind_id"],
+          "why": "Who takes a job sent now for this kind of work, now (S2-27; B4-91)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "emergency_contacts",
+      "description": "The one person a pro who works alone names for their safety (T11): a solo owner on S1-70's page (S1-78), or a team member on their secure page where their work uses a check-out timer (S2-06). The page asks the contact's name and mobile and a tick that they agreed; both are sealed under the pro's key. The contact is on file only once their own yes comes by texting Rosie (S1-78; Q-06); until then, or with none, no safety timer runs (K-34's safety_timers copy the yes). A STOP or removal ends their yes (S13-10).",
+      "source": "FS row T11 ('none means no safety timer'; 'not shown'); FS line 723 (emergency_contact); S1-70, S1-78, S2-06, S2-21, S2-22; S13-10; RULES 4.9, 4.12; Q-06; 02-contracts section 7 rows K-22 ('emergency contact with their own yes') and K-34",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The contact row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose page asked for it (S1-70's page, or the team member's secure page for this business).",
+          "source": "S1-70; S2-06; arch 10 line 546"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pro who works alone and named the contact (persons.id); their key seals the name and mobile.",
+          "source": "S1-78 ('names one person Rosie may call for their safety'); S2-06"
+        },
+        {
+          "name": "name",
+          "type": "bytea",
+          "null": false,
+          "audience": "secure-page-only",
+          "sealedBy": "person_id",
+          "description": "The contact's name as the pro typed it, sealed under the pro's key; seen only on the pro's secure page (T11: not shown).",
+          "source": "S1-70's page ('Name'); FS row T11 ('not shown'); arch 01 line 93; RULES 4.5 ('When unsure, treat it as private')"
+        },
+        {
+          "name": "mobile",
+          "type": "bytea",
+          "null": false,
+          "audience": "secure-page-only",
+          "sealedBy": "person_id",
+          "description": "The contact's mobile as the pro typed it, in E.164 form, sealed under the pro's key. Rosie never texts it first (C9): the contact's own text gives the yes.",
+          "source": "S1-70's page ('Mobile'); FS row T11; MC C9; Q-06; arch 01 line 93"
+        },
+        {
+          "name": "agreed_ticked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When the pro ticked that the contact agreed to a call or text from Rosie; required, since Rosie never reaches a contact before the pro says they agreed.",
+          "source": "S1-70's page ('They agreed to a call or text from Rosie'); S1-78 ('Never: text the contact before the owner says they agreed')"
+        },
+        {
+          "name": "added_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When the pro saved it on the page.",
+          "source": "S1-78; S2-06"
+        },
+        {
+          "name": "contact_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The contact's own person row (persons.id) once they text Rosie; never the pro.",
+          "source": "02-contracts row K-34 ('an emergency contact is a person row in core; K-22 adds the staff link'); S1-78"
+        },
+        {
+          "name": "contact_handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The handle the contact's own text came from (handles.id); the timer's alerts and the one address after a missed check go there.",
+          "source": "Q-06 ('The timer runs only with an emergency contact who said yes by texting Rosie'); S13-10; K-34 v1 safety_timers.emergency_contact_handle_id"
+        },
+        {
+          "name": "contact_yes_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the contact's own yes came; only then is a contact on file and may a timer run. The Team page shows who has one (S2-21), and anyone without one is named on S2-22's card.",
+          "source": "S1-78 ('Until that yes, no contact is on file'); Q-06; S2-21 ('Safety contact shows who has an emergency contact'); S2-22; K-34 v1 safety_timers.contact_yes_at"
+        },
+        {
+          "name": "contact_no_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When the contact said no; no contact is on file, and the pro is told plainly.",
+          "source": "S1-78 ('Reply 1 Yes, 2 No'; 'With none ... the pro is told plainly')"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["staff", "owner"],
+          "description": "When their yes ended or the pro replaced or removed them; null while it holds.",
+          "source": "S13-10 ('An emergency contact's STOP or removal ends their yes. No timer runs')"
+        },
+        {
+          "name": "ended_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "stop: the contact's STOP; removed: the pro removed them; replaced: the pro named another.",
+          "source": "S13-10; S1-78 ('Add one any time')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "emergency_contacts_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "emergency_contacts_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "emergency_contacts_contact_person_fk",
+          "columns": ["contact_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "emergency_contacts_contact_handle_fk",
+          "columns": ["contact_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "emergency_contacts_one_live",
+          "columns": ["business_id", "person_id"],
+          "where": "ended_at is null",
+          "source": "S1-78 ('names one person Rosie may call for their safety')"
+        }
+      ],
+      "checks": [
+        {
+          "name": "emergency_contacts_not_the_pro",
+          "expression": "contact_person_id is null or contact_person_id <> person_id",
+          "source": "S1-78 ('names one person Rosie may call for their safety'; 'We can't reach Sam ... Can you check on them?'); K-34 v1 README ('The contact is not the pro')"
+        },
+        {
+          "name": "emergency_contacts_contact_with_handle",
+          "expression": "(contact_person_id is null) = (contact_handle_id is null)",
+          "source": "Q-06 (the yes comes by texting Rosie)"
+        },
+        {
+          "name": "emergency_contacts_answer_from_contact",
+          "expression": "(contact_yes_at is null and contact_no_at is null) or contact_handle_id is not null",
+          "source": "S1-78 ('Rosie texts the contact once for their own yes'); Q-06"
+        },
+        {
+          "name": "emergency_contacts_one_answer",
+          "expression": "contact_yes_at is null or contact_no_at is null",
+          "source": "S1-78 ('Reply 1 Yes, 2 No')"
+        },
+        {
+          "name": "emergency_contacts_ended_has_why",
+          "expression": "(ended_at is null) = (ended_why is null) and (ended_why is null or ended_why in ('stop', 'removed', 'replaced'))",
+          "source": "S13-10"
+        },
+        {
+          "name": "emergency_contacts_times_in_order",
+          "expression": "added_at >= agreed_ticked_at and (contact_yes_at is null or contact_yes_at >= agreed_ticked_at) and (ended_at is null or ended_at >= added_at)",
+          "source": "S1-78 ('Never: text the contact before the owner says they agreed')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "emergency_contacts_contact_handle_idx",
+          "columns": ["contact_handle_id"],
+          "why": "A contact's STOP ends every yes given from that handle (S13-10)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "proof_codes",
+      "description": "Each code Rosie sends to prove a contact (RULES 6.1, 6.2; S13-45): a sign-in code, the owner email's code, a new device's code, a contact change's code (D75, D77, D100), the listing's control code (S13-45 row 10), the fresh code before closing or an export, the new owner's code at a hand-over, or the code that lets a phone link to an old record. Never the code itself (rule 7): only its keyed hash. A code works 10 minutes; five wrong codes pause it 15 minutes (RULES 6.2). Rosie never asks for a code by text or call.",
+      "source": "RULES 6.1, 6.2, 6.5, 6.9, 6.10, 9.1, 9.2, 9.2b; S13-45 (rows 3, 8, 10); S11-52; S1-10; FS section 8; BP rule 7; 02-contracts section 7 row K-22 ('proof codes (10 minutes, 5 tries: RULES 6.2)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The code row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "sign_in (S11-52), owner_email (S1-10), new_device (S13-45 row 8), contact_change (D75, D77, D100; FS section 8 for staff), listing_control (S13-45 row 10; S1-75), closing_or_export (S13-45 row 8's fresh code to the owner's phone), hand_over (S11-100: the new owner's own phone), link_record (S13-45: before a phone links to an old record).",
+          "source": "S11-52; S1-10; S13-45 rows 3, 8, 10; S1-75; S11-100; RULES 6.5, 6.9, 6.10, 9.1 to 9.2b"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person the code proves (persons.id); null for a listing's control code, which proves a business.",
+          "source": "S13-45 ('a code is sent to the contact on file'); S1-75"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business the code's text names ('Your Lee's Barbershop code is 4829'); null for a sign-in code, which covers every business of the person.",
+          "source": "S13-45 (the code text); S11-52; S1-75"
+        },
+        {
+          "name": "sent_to_handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Where the code went (handles.id): the contact on file, or for a contact change the new phone or email (D75), or the email on file when the phone was lost (D100).",
+          "source": "RULES 9.1, 9.2b; S13-45 row 3 ('The code goes only to the new contact, never the old one'); FS section 8"
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "text or email. No code is texted to a mobile that has not texted Rosie (C9), and there are no calls (Q-05).",
+          "source": "MC C9; FS section 8; Q-05"
+        },
+        {
+          "name": "code_hash",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The code's HMAC-SHA-256 under the Workers secret named in hash_key_name, in lowercase hex; never the code (rule 7). A typed code is checked by hashing it the same way.",
+          "source": "BP rule 7; RULES 6.2 ('Rosie never asks for a code'); arch 09 line 492 (proofs survive as hashes)"
+        },
+        {
+          "name": "hash_key_name",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The name of the Workers secret the hash is keyed with: a name, never a value.",
+          "source": "BP rule 7; arch 10 line 546 (secrets in Workers secrets); K-04 v1 sealing_keys.wrapping_key_name"
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the code was sent.",
+          "source": "RULES 6.2"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it stops working: 10 minutes after it was sent.",
+          "source": "RULES 6.2 ('A code works 10 minutes'); S11-52 ('It works for 10 minutes')"
+        },
+        {
+          "name": "wrong_tries",
+          "type": "integer",
+          "null": false,
+          "default": "0",
+          "audience": "never",
+          "description": "Wrong codes typed for it, 0 to 5.",
+          "source": "RULES 6.2 ('Five wrong codes pause it 15 minutes'); S11-52"
+        },
+        {
+          "name": "last_wrong_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the last wrong code was typed; null with no wrong try.",
+          "source": "RULES 6.2"
+        },
+        {
+          "name": "paused_until",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "Set at the fifth wrong code: 15 minutes after it, during which no code for this purpose and contact is sent or taken.",
+          "source": "RULES 6.2; S11-52 ('Five wrong codes pause sign-in for 15 minutes'); S13-45"
+        },
+        {
+          "name": "used_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the right code was typed back, within its 10 minutes; a code works once.",
+          "source": "RULES 6.1, 6.2"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "proof_codes_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "proof_codes_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "proof_codes_sent_to_fk",
+          "columns": ["sent_to_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "proof_codes_purpose_known",
+          "expression": "purpose in ('sign_in', 'owner_email', 'new_device', 'contact_change', 'listing_control', 'closing_or_export', 'hand_over', 'link_record')",
+          "source": "S11-52; S1-10; S13-45 rows 3, 8, 10; S11-100"
+        },
+        {
+          "name": "proof_codes_channel_known",
+          "expression": "channel in ('text', 'email')",
+          "source": "MC C9; Q-05"
+        },
+        {
+          "name": "proof_codes_hash_form",
+          "expression": "code_hash ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7 (never the code itself)"
+        },
+        {
+          "name": "proof_codes_key_name_form",
+          "expression": "hash_key_name ~ '^[A-Z][A-Z0-9_]*$'",
+          "source": "BP rule 7; K-04 v1 sealing_keys_name_form"
+        },
+        {
+          "name": "proof_codes_who",
+          "expression": "person_id is not null or (purpose = 'listing_control' and business_id is not null)",
+          "source": "S13-45 rows 1 to 10 (a code proves a person, or at sign-up a business)"
+        },
+        {
+          "name": "proof_codes_ten_minutes",
+          "expression": "expires_at = sent_at + interval '10 minutes'",
+          "source": "RULES 6.2 ('A code works 10 minutes')"
+        },
+        {
+          "name": "proof_codes_wrong_tries_range",
+          "expression": "wrong_tries between 0 and 5 and (wrong_tries = 0) = (last_wrong_at is null)",
+          "source": "RULES 6.2 ('Five wrong codes pause it')"
+        },
+        {
+          "name": "proof_codes_pause_after_five",
+          "expression": "(wrong_tries = 5) = (paused_until is not null) and (paused_until is null or paused_until = last_wrong_at + interval '15 minutes')",
+          "source": "RULES 6.2 ('Five wrong codes pause it 15 minutes')"
+        },
+        {
+          "name": "proof_codes_used_in_time",
+          "expression": "used_at is null or (used_at >= sent_at and used_at <= expires_at and wrong_tries < 5)",
+          "source": "RULES 6.2 ('A code works 10 minutes'; five wrong codes pause it)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "proof_codes_sent_to_idx",
+          "columns": ["sent_to_handle_id", "sent_at"],
+          "why": "The live code for a contact, its pause, and 'at most a few codes a day per contact' (S13-45)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Codes are sent, typed back and checked on the runtime side only, across businesses (a sign-in covers every business: S11-52); the Tool API role has no grant on this table, so no business reads a hash (README rule 5; BP rule 7)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "sessions",
+      "description": "A signed-in session on the owner's and staff's portal (S11-52 gives signed_in): who, how the sign-in was proven, a hash of the session token (never the token: rule 7), a hash of the device's id so a new device is known (S13-45 row 8), when it started, was last seen and expires, and when and why it ended. A new owner mobile or email needs a signed-in session plus the ID re-check (S13-45 row 8); someone who leaves loses sign-in (RULES 8.7).",
+      "source": "S11-52 (gives signed_in); FS section 8; S13-45 row 8; RULES 6.9, 8.7, 9.5; BP rule 7; 02-contracts section 7 row K-22 ('sign-in sessions (S11-52)') and section 8 (signed_in: K-22)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The session's id: an opaque string code makes and never parses (CQ-09); not the token.",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who signed in (persons.id): an owner, admin or staff member; customers have no login (FS section 8).",
+          "source": "S11-52; FS section 8 ('Customers have no login and no password')"
+        },
+        {
+          "name": "token_sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of the session token, in lowercase hex. The token itself lives only with the signed-in browser and is never stored.",
+          "source": "BP rule 7 (never a key or token); S11-52"
+        },
+        {
+          "name": "device_sha256",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The sha256 of the device's own id, in lowercase hex, so a sign-in from a device not seen before asks the extra proof (a code to the owner's email typed back, or the ID re-check). Null: not known.",
+          "source": "S13-45 row 8 ('A new device needs a code to the owner's email, typed back, or the ID re-check'); S11-52 ('A new device ... follows the business side of S13-45'); BP rule 7"
+        },
+        {
+          "name": "proven_via",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "code: a sign-in code to the phone or email on file, typed back (S11-52); code_and_email_code: plus a code to the owner's email for a new device; code_and_id_re_check: plus the ID re-check.",
+          "source": "S11-52; S13-45 row 8; FS section 8"
+        },
+        {
+          "name": "proof_code_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sign-in code it was proven by (proof_codes.id).",
+          "source": "S11-52 ('Sam types his mobile, and a code comes by text')"
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it started.",
+          "source": "S11-52"
+        },
+        {
+          "name": "last_seen_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it was last used.",
+          "source": "S11-52"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it stops working unless ended first. Its length is a setting, not in the sources (README open gaps).",
+          "source": "S11-52; README open gaps"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it ended before expiring; null while live or once expired.",
+          "source": "RULES 8.7; RULES 9.1 ('the way apps sign out old sessions')"
+        },
+        {
+          "name": "ended_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "signed_out; contact_changed (the sign-in mobile or email changed: old sessions sign out, as D75 says of links); left (the person left the team or lost the role: RULES 8.7); handed_over (the business changed owner: S11-100).",
+          "source": "RULES 8.7 ('Sign-in ... end'), 9.1; S13-45 row 8; S11-100"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "sessions_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "sessions_proof_code_fk",
+          "columns": ["proof_code_id"],
+          "references": {
+            "table": "proof_codes",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "sessions_token_key",
+          "columns": ["token_sha256"],
+          "source": "S11-52 (a token finds one session)"
+        },
+        {
+          "name": "sessions_proof_code_key",
+          "columns": ["proof_code_id"],
+          "source": "RULES 6.2 (a code works once)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "sessions_token_hash_form",
+          "expression": "token_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7 (never a raw token)"
+        },
+        {
+          "name": "sessions_device_hash_form",
+          "expression": "device_sha256 is null or device_sha256 ~ '^[0-9a-f]{64}$'",
+          "source": "BP rule 7"
+        },
+        {
+          "name": "sessions_proven_via_known",
+          "expression": "proven_via in ('code', 'code_and_email_code', 'code_and_id_re_check')",
+          "source": "S11-52; S13-45 row 8"
+        },
+        {
+          "name": "sessions_times_in_order",
+          "expression": "last_seen_at >= started_at and expires_at > started_at and (ended_at is null or ended_at >= started_at)",
+          "source": "S11-52"
+        },
+        {
+          "name": "sessions_ended_has_why",
+          "expression": "(ended_at is null) = (ended_why is null) and (ended_why is null or ended_why in ('signed_out', 'contact_changed', 'left', 'handed_over'))",
+          "source": "RULES 8.7, 9.1; S11-100"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sessions_person_idx",
+          "columns": ["person_id"],
+          "why": "End a person's sessions when their sign-in contact changes or they leave (RULES 8.7, 9.1)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "A session covers every business of the person (S11-52: 'every booking for both businesses') and is read on the runtime side only; the Tool API role has no grant on this table, so no business reads a token hash (README rule 5; BP rule 7)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "contact_changes",
+      "description": "A change of where a person's updates go (D75, D77, D100; RULES 9.1 to 9.3; S13-45 row 3), or of an owner's or staff member's own phone or email on file (S13-45 row 8; FS section 8): the old and new contact, the way it was proven, the code or ID re-check that proved it, who made it and when. Never edited; the old contact stays on record only for the 'don't text me' proof, and owner and staff views show the new contact only, with 'Contact details changed.' (FS line 756; RULES 9.3). The two consent rows a switch adds are K-29's.",
+      "source": "FS line 756 ('a contact switched (D75) adds a consent and a contact change'); FS section 8; RULES 9.1, 9.2, 9.2b, 9.3; S13-45 rows 3, 8; S13-19; A7-98; D75, D77, D100; 02-contracts section 7 row K-22 ('contact changes (D75, D77, D100; FS section 8)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The change's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person whose contact it is (persons.id); staff change a contact only for that person (RULES 9.3).",
+          "source": "RULES 9.3 ('Staff change a contact only for the person whose contact it is'); S13-45 row 3"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business whose desk or team page made it (in person, D77; the owner's team edit, S11-20); null for a change from the person's own chat or sign-in, which covers every business (one number: D102).",
+          "source": "D77 ('Staff updating a customer's details in person'); FS section 8 (the owner's team edit, S11-20); D102"
+        },
+        {
+          "name": "old_handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The contact updates went to before (handles.id); after the change it is never messaged again, and it comes off every owner and staff view (S13-19).",
+          "source": "RULES 9.1 ('Rosie never messages the old number again'); S13-19; FS line 756 ('the old number stays on record only for the don't text me proof')"
+        },
+        {
+          "name": "new_handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The new phone or email (handles.id) every update goes to from now on.",
+          "source": "RULES 9.1"
+        },
+        {
+          "name": "way",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "own_chat: asked in the person's own chat and proven by a code to the new contact typed back there (D75); email_on_file: a lost phone, proven by a code to the email on file typed back in the new chat (D100); in_person: at the desk, by a code to the new contact read or typed there (D77); own_code: a staff member's own change by a code to the phone or email on file (FS section 8); signed_in_id_re_check: an owner's new mobile or email from a signed-in session plus the ID re-check (S13-45 row 8); owner_team_edit: the owner's edit of a team member's contact, read back first (S11-20). No reason is asked or shown.",
+          "source": "D75; D77; D100; RULES 9.1 to 9.3; FS section 8; S13-45 rows 3, 8; S11-20"
+        },
+        {
+          "name": "proof_code_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The code that proved it (proof_codes.id), for every way but the ID re-check and the owner's team edit.",
+          "source": "D75 ('Rosie sends a code there; they type the code back in this chat'); D77; D100"
+        },
+        {
+          "name": "id_upload_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The ID re-check that proved an owner's new mobile or email (id_uploads.id).",
+          "source": "S13-45 row 8 ('A new owner mobile or email only from a signed-in session plus the ID re-check')"
+        },
+        {
+          "name": "changed_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who made it (persons.id): the person themselves, the staff member at the desk, or the owner for a team edit.",
+          "source": "D77; RULES 9.3; S2-21 ('Every change shows who made it')"
+        },
+        {
+          "name": "changed_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "When it took effect. Owner and staff views show only the note 'Contact details changed.' with the new contact.",
+          "source": "RULES 9.3 ('Owner and staff views then show the new contact only, with one note: Contact details changed.')"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "contact_changes_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "contact_changes_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "contact_changes_old_handle_fk",
+          "columns": ["old_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "contact_changes_new_handle_fk",
+          "columns": ["new_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "contact_changes_proof_code_fk",
+          "columns": ["proof_code_id"],
+          "references": {
+            "table": "proof_codes",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "contact_changes_id_upload_fk",
+          "columns": ["id_upload_id"],
+          "references": {
+            "table": "id_uploads",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "contact_changes_changed_by_fk",
+          "columns": ["changed_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "contact_changes_way_known",
+          "expression": "way in ('own_chat', 'email_on_file', 'in_person', 'own_code', 'signed_in_id_re_check', 'owner_team_edit')",
+          "source": "D75; D77; D100; FS section 8; S13-45 row 8; S11-20"
+        },
+        {
+          "name": "contact_changes_new_contact",
+          "expression": "old_handle_id <> new_handle_id",
+          "source": "RULES 9.1 ('another phone number or an email')"
+        },
+        {
+          "name": "contact_changes_code_proof",
+          "expression": "(way in ('own_chat', 'email_on_file', 'in_person', 'own_code')) = (proof_code_id is not null)",
+          "source": "D75; D77 ('One rule everywhere'); D100; FS section 8"
+        },
+        {
+          "name": "contact_changes_id_proof",
+          "expression": "(way = 'signed_in_id_re_check') = (id_upload_id is not null)",
+          "source": "S13-45 row 8"
+        },
+        {
+          "name": "contact_changes_by_whom",
+          "expression": "(way in ('in_person', 'owner_team_edit')) = (changed_by_person_id <> person_id)",
+          "source": "D75 ('the request counts only from the customer's own chat'); D77 (staff at the desk); RULES 9.3; S11-20"
+        },
+        {
+          "name": "contact_changes_desk_has_business",
+          "expression": "way not in ('in_person', 'owner_team_edit') or business_id is not null",
+          "source": "D77; S11-20"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "contact_changes_person_idx",
+          "columns": ["person_id", "changed_at"],
+          "why": "A person's contact history: the 'don't text me' proof (FS line 756) and 'Contact details changed.' (RULES 9.3)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    }
+  ]
+}
