@@ -86,7 +86,7 @@
     },
     "price": {
       "title": "PriceChoice",
-      "description": "The price choice of a money path: list (from the price list), photos (quoted from photos first), visit (quoted at the visit) (SPEC-master 5; the flow file's money.dims.price).",
+      "description": "The price choice of a money path: list (from the price list), photos (quoted from photos first), visit (quoted at the visit) (SPEC-master 5; master-A.json and master-B.json money.dims.price).",
       "type": "string",
       "enum": ["list", "photos", "visit"]
     },
@@ -98,7 +98,7 @@
     },
     "after": {
       "title": "AfterChoice",
-      "description": "What is paid after: none, counter (flow A only), bill, card (the saved card charged at DONE), own (flow B only) (SPEC-master 5; the flow file's money.after).",
+      "description": "What is paid after: none, counter (flow A only), bill, card (the saved card charged at DONE), own (flow B only) (SPEC-master 5; master-A.json and master-B.json money.after).",
       "type": "string",
       "enum": ["none", "counter", "bill", "card", "own"]
     },
@@ -116,9 +116,10 @@
     },
     "stringList": {
       "title": "StringList",
-      "description": "A list of plain strings (the master's own lists: more lines, needs and gives keys, labels).",
+      "description": "A list of plain strings, kept as the master writes them: more lines, needs and gives keys, labels (SPEC-master 4; master-A.json and master-B.json; engine/work/prof/<id>.json).",
       "type": "array",
       "items": {
+        "description": "One string of the list, kept as written (SPEC-master 4; master-A.json and master-B.json; engine/work/prof/<id>.json).",
         "type": "string"
       }
     },
@@ -127,6 +128,7 @@
       "description": "Two strings: a screen row (label, value), a rename pair or a swap pair (from, to) (SPEC-master 5f 'swap'; SPEC-prof 3 'rename'; a step's 'form').",
       "type": "array",
       "items": {
+        "description": "One of the pair's two strings: the label or value of a screen row, or the from or to of a rename or swap pair (SPEC-master 5f 'swap'; SPEC-prof 3 'rename' and 'Screens').",
         "type": "string"
       },
       "minItems": 2,
@@ -145,6 +147,7 @@
           "description": "The rows, each a list of cells (a step's table.rows; SPEC-prof 3 'Screens').",
           "type": "array",
           "items": {
+            "description": "One row of cells (a step's table.rows[]; SPEC-prof 3 'Screens').",
             "$ref": "#/$defs/stringList"
           }
         }
@@ -284,6 +287,7 @@
           "description": "The rows, each a list of cells (master-A.json list elements).",
           "type": "array",
           "items": {
+            "description": "One row of cells (master-A.json list elements' rows[]; SPEC-master 4 'list').",
             "$ref": "#/$defs/stringList"
           }
         },
@@ -407,14 +411,14 @@
           }
         },
         "rec": {
-          "description": "A record gate: lit when the booking holds any of these record values, such as credit, card, paid or keep (arch 03 line 161: 'a record gate when the booking holds the value'; the flow file's record; overlay-core.js line 437).",
+          "description": "A record gate: lit when the booking holds any of these record values, such as credit, card, paid or keep (arch 03 line 161: 'a record gate when the booking holds the value'; master-A.json and master-B.json record; overlay-core.js line 437).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/name"
           }
         },
         "recOff": {
-          "description": "Lit when the booking holds none of these record values (the flow file's record slot rows; overlay-core.js line 437).",
+          "description": "Lit when the booking holds none of these record values (master-A.json and master-B.json record slot rows; overlay-core.js line 437).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/name"
@@ -577,6 +581,7 @@
             "$ref": "#/$defs/name"
           },
           "additionalProperties": {
+            "description": "true: the switch is on for this path; a switch left out is off (overlay-core.js line 10, 'pf'; SPEC-master 5b).",
             "type": "boolean"
           }
         },
@@ -602,7 +607,7 @@
           }
         },
         "fixture": {
-          "description": "The record fixture the path rides, such as two-card, when it names one (lib.js parsePath line 348, '+<fixture id>'; the flow file's record.fixtures).",
+          "description": "The record fixture the path rides, such as two-card, when it names one (lib.js parsePath line 348, '+<fixture id>'; master-A.json and master-B.json record.fixtures).",
           "type": "string",
           "pattern": "^[a-z0-9][a-z0-9-]*$"
         }
@@ -706,6 +711,7 @@
           "description": "One definition per branch (arch 12 line 592: '48 lack a Means line; the first sentence of the step it leads to stands in').",
           "type": "array",
           "items": {
+            "description": "One branch's definition: its Means line, or the first sentence of the step it leads to standing in (arch 12 line 592; 02-contracts K-01).",
             "type": "object",
             "properties": {
               "branch": {
@@ -747,7 +753,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The field's name: a gives key such as time_saved, or a record value (SPEC-master 4 'gives'; the flow file's record).",
+          "description": "The field's name: a gives key such as time_saved, or a record value (SPEC-master 4 'gives'; master-A.json and master-B.json record).",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_.]*$"
         },
@@ -771,7 +777,7 @@
           "enum": ["recordWrite", "message", "clock", "charge", "refund", "calendarWrite", "flag"]
         },
         "ref": {
-          "description": "What it acts on: the gives key or record field written, the step whose message goes, the Clock line armed, the record amount charged or refunded (02-contracts K-01; SPEC-master 4 'gives', 'tells'; the flow file's record).",
+          "description": "What it acts on: the gives key or record field written, the step whose message goes, the Clock line armed, the record amount charged or refunded (02-contracts K-01; SPEC-master 4 'gives', 'tells'; master-A.json and master-B.json record).",
           "type": "string"
         },
         "to": {
@@ -894,7 +900,7 @@
           "$ref": "#/$defs/stepId"
         },
         "section": {
-          "description": "Its section, 1 to 13, in the order of engine/design/LINES.md (the flow file's 'sec'; SPEC-master 1).",
+          "description": "Its section, 1 to 13, in the order of engine/design/LINES.md (master-A.json and master-B.json 'sec'; SPEC-master 1).",
           "type": "integer",
           "minimum": 1,
           "maximum": 13
@@ -978,7 +984,7 @@
           }
         },
         "reads": {
-          "description": "The record homes it reads, such as stop or contact (the flow file's 'reads'; names of the routing tables' homes).",
+          "description": "The record homes it reads, such as stop or contact (master-A.json and master-B.json steps[].reads; the names of the routing tables' homes, master-A.json and master-B.json record.homes; 02-contracts K-01).",
           "$ref": "#/$defs/stringList"
         },
         "when": {
@@ -996,7 +1002,7 @@
           "$ref": "#/$defs/stepId"
         },
         "visit": {
-          "description": "The visit's day and time in the sample story, where the master states one on the step (the flow file's 'visit'). An illustration (MC C6).",
+          "description": "The visit's day and time in the sample story, where the master states one on the step (master-A.json and master-B.json 'visit'). An illustration (MC C6).",
           "type": "string"
         },
         "took": {
@@ -1016,7 +1022,7 @@
           "$ref": "#/$defs/flowLetter"
         },
         "rec": {
-          "description": "The stamp that the step reads the record of this flow: the flow letter (the flow file's 'rec'; overlay-core.js line 1120).",
+          "description": "The stamp that the step reads the record of this flow: the flow letter (master-A.json and master-B.json 'rec'; overlay-core.js line 1120).",
           "$ref": "#/$defs/flowLetter"
         },
         "wr": {
@@ -1033,9 +1039,10 @@
           "$ref": "#/$defs/amountTable"
         },
         "layerLines": {
-          "description": "The ids of the flow's layer lines stamped on this step (the flow file's 'layerAdd'; lib.js stampFlow line 906; overlay-core.js line 810). The lines themselves are in the flow's layerLines.",
+          "description": "The ids of the flow's layer lines stamped on this step (master-A.json and master-B.json 'layerAdd'; lib.js stampFlow line 906; overlay-core.js line 810). The lines themselves are in the flow's layerLines.",
           "type": "array",
           "items": {
+            "description": "One layer line id, one of the flow's layerLines[].id (master-A.json and master-B.json steps[].layerAdd and layerLines; SPEC-master 5e and its FIX7 amendments: contactchanged is gone).",
             "type": "string",
             "enum": ["private", "privatecall", "textsonly", "emailonly"]
           }
@@ -1068,7 +1075,7 @@
           "$ref": "#/$defs/stringList"
         },
         "next": {
-          "description": "The next step on this step's own list (its section's main path, or its branch), in the flow file's order; null at the end of the list, where the enclosing branch's end or rejoinAt decides (SPEC-master 4: 'Steps in a section are the main path'; arch 03 line 191).",
+          "description": "The next step on this step's own list (its section's main path, or its branch), in master-A.json and master-B.json order; null at the end of the list, where the enclosing branch's end or rejoinAt decides (SPEC-master 4: 'Steps in a section are the main path'; arch 03 line 191).",
           "anyOf": [
             {
               "$ref": "#/$defs/stepId"
@@ -1128,17 +1135,17 @@
     },
     "serviceId": {
       "title": "ServiceId",
-      "description": "A record service id, such as a-add or b-plan (the flow file's record.services; a trade's money.<flow>.services).",
+      "description": "A record service id, such as a-add or b-plan (master-A.json and master-B.json record.services; engine/work/prof/<id>.json money.<flow>.services).",
       "type": "string",
       "pattern": "^[ab]-[a-z0-9-]+$"
     },
     "service": {
       "title": "Service",
-      "description": "A service the record's fixtures add to a booking (the flow file's record.services; a trade's money.<flow>.services, joined to the record's by overlay-core.js profRecord, line 1867).",
+      "description": "A service the record's fixtures add to a booking (master-A.json and master-B.json record.services; a trade's money.<flow>.services, joined to the record's by overlay-core.js profRecord, line 1867).",
       "type": "object",
       "properties": {
         "flow": {
-          "description": "The flow it is booked in (record.services).",
+          "description": "The flow it is booked in (master-A.json and master-B.json record.services.<id>.flow).",
           "$ref": "#/$defs/flowLetter"
         },
         "name": {
@@ -1167,15 +1174,15 @@
     },
     "slotRow": {
       "title": "SlotRow",
-      "description": "One row of a named record slot: the first row whose when fits gives the slot's text (the flow file's record.slots.<slot>.rows; overlay-core.js line 770).",
+      "description": "One row of a named record slot: the first row whose when fits gives the slot's text (master-A.json and master-B.json record.slots.<slot>.rows; overlay-core.js line 770).",
       "type": "object",
       "properties": {
         "when": {
-          "description": "The paths and record values that pick this row (record.slots rows).",
+          "description": "The paths and record values that pick this row (master-A.json and master-B.json record.slots.<slot>.rows[].when; overlay-core.js line 770).",
           "$ref": "#/$defs/gate"
         },
         "text": {
-          "description": "The slot's text on those paths (record.slots rows).",
+          "description": "The slot's text on those paths (master-A.json and master-B.json record.slots.<slot>.rows[].text; overlay-core.js line 770).",
           "type": "string"
         }
       },
@@ -1184,13 +1191,14 @@
     },
     "slotRows": {
       "title": "SlotRows",
-      "description": "Rows by named slot, such as pay.price (the flow file's record.slots; a trade's slots.<flow>, laid before the master's rows by overlay-core.js profRecord).",
+      "description": "Rows by named slot, such as pay.price (master-A.json and master-B.json record.slots; a trade's slots.<flow>, laid before the master's rows by overlay-core.js profRecord).",
       "type": "object",
       "propertyNames": {
         "type": "string",
         "pattern": "^[a-z]+\\.[a-z]+$"
       },
       "additionalProperties": {
+        "description": "One named slot's rows, first fit wins (master-A.json and master-B.json record.slots.<slot>.rows; engine/work/prof/<id>.json slots.<flow>.<slot>; overlay-core.js profRecord, line 1867).",
         "type": "array",
         "items": {
           "$ref": "#/$defs/slotRow"
@@ -1199,7 +1207,7 @@
     },
     "namedSlot": {
       "title": "NamedSlot",
-      "description": "One of the record's 16 named slots (the flow file's record.slots; K-03's slot vocabulary).",
+      "description": "One of the record's 16 named slots (master-A.json and master-B.json record.slots; K-03's slot vocabulary).",
       "type": "object",
       "properties": {
         "home": {
@@ -1207,11 +1215,11 @@
           "$ref": "#/$defs/stepId"
         },
         "means": {
-          "description": "What the slot means, in plain words (record.slots.<slot>.means).",
+          "description": "What the slot means, in plain words (master-A.json and master-B.json record.slots.<slot>.means).",
           "type": "string"
         },
         "rows": {
-          "description": "Its rows, first fit wins (record.slots.<slot>.rows).",
+          "description": "Its rows, first fit wins (master-A.json and master-B.json record.slots.<slot>.rows; overlay-core.js line 770).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/slotRow"
@@ -1223,7 +1231,7 @@
     },
     "homes": {
       "title": "Homes",
-      "description": "The homes: the one step that holds each kind of fact (the flow file's record.homes: money S13-55, contact S13-19, proof S13-45, stop S13-32, clock S13-35, who S13-31, safety S13-10, change S13-56, record S13-57, two A9-21; 02-contracts K-01 routing tables; arch 02 line 117: each fact once, from its home).",
+      "description": "The homes: the one step that holds each kind of fact (master-A.json and master-B.json record.homes: money S13-55, contact S13-19, proof S13-45, stop S13-32, clock S13-35, who S13-31, safety S13-10, change S13-56, record S13-57, two A9-21; 02-contracts K-01 routing tables; arch 02 line 117: each fact once, from its home).",
       "type": "object",
       "properties": {
         "money": {
@@ -1272,7 +1280,7 @@
     },
     "record": {
       "title": "Record",
-      "description": "The booking record's one home, copied from the flow file's record (02-contracts K-01 'The record': money ways, the 16 named slots and their rows, ledger rules, one fee, the live switches and facts, the cut values, merged names and the 11 fixtures). Its _about note is authoring text and is left out (MC R2).",
+      "description": "The booking record's one home, copied from master-A.json and master-B.json record (02-contracts K-01 'The record': money ways, the 16 named slots and their rows, ledger rules, one fee, the live switches and facts, the cut values, merged names and the 11 fixtures). Its _about note is authoring text and is left out (MC R2).",
       "type": "object",
       "properties": {
         "from": {
@@ -1304,20 +1312,21 @@
           "additionalProperties": false
         },
         "ways": {
-          "description": "The money ways by before choice (and credit): what is paid now, whether a card is saved, which fee is kept and what goes back (record.ways).",
+          "description": "The money ways by before choice (none, card, deposit, full) and credit: what is paid now, whether a card is saved, which fee is kept and what goes back (master-A.json and master-B.json record.ways; SPEC-master D66 amendments #3; S13-55, the money home).",
           "type": "object",
           "propertyNames": {
             "$ref": "#/$defs/name"
           },
           "additionalProperties": {
+            "description": "One money way: now, card, fee and back (master-A.json and master-B.json record.ways.<way>).",
             "type": "object",
             "properties": {
               "now": {
-                "description": "What is paid now: 0, deposit or paid (record.ways.<way>.now).",
+                "description": "What is paid now: 0, deposit or paid (master-A.json and master-B.json record.ways.<way>.now).",
                 "type": "string"
               },
               "card": {
-                "description": "Whether a card is saved, or asis (record.ways.<way>.card).",
+                "description": "Whether a card is saved: true, false, or asis (the credit way) (master-A.json and master-B.json record.ways.<way>.card).",
                 "anyOf": [
                   {
                     "type": "boolean"
@@ -1329,11 +1338,11 @@
                 ]
               },
               "fee": {
-                "description": "Which fee applies (record.ways.<way>.fee).",
+                "description": "Which fee applies, such as fee, fee|deposit or credit (master-A.json and master-B.json record.ways.<way>.fee).",
                 "type": "string"
               },
               "back": {
-                "description": "What goes back on a refund (record.ways.<way>.back).",
+                "description": "What goes back on a refund, such as 0, deposit, paid or credit (master-A.json and master-B.json record.ways.<way>.back).",
                 "type": "string"
               }
             },
@@ -1418,7 +1427,7 @@
           "additionalProperties": false
         },
         "services": {
-          "description": "The services the fixtures add, by id (record.services).",
+          "description": "The services the fixtures add, by id (master-A.json and master-B.json record.services).",
           "type": "object",
           "propertyNames": {
             "$ref": "#/$defs/serviceId"
@@ -1431,37 +1440,38 @@
           "description": "The record's 11 fixtures: a path variant a booking can ride, such as two-card or payer-other (record.fixtures; lib.js parsePath line 366).",
           "type": "array",
           "items": {
+            "description": "One record fixture: a path variant a booking can ride (master-A.json and master-B.json record.fixtures[]; lib.js parsePath line 366).",
             "type": "object",
             "properties": {
               "id": {
-                "description": "The fixture id (record.fixtures[].id).",
+                "description": "The fixture id, such as two-card (master-A.json and master-B.json record.fixtures[].id; lib.js parsePath line 348, '+<fixture id>').",
                 "type": "string",
                 "pattern": "^[a-z0-9][a-z0-9-]*$"
               },
               "label": {
-                "description": "What it is, in plain words (record.fixtures[].label).",
+                "description": "What it is, in plain words (master-A.json and master-B.json record.fixtures[].label).",
                 "type": "string"
               },
               "add": {
-                "description": "The services it adds, by id (record.fixtures[].add).",
+                "description": "The services it adds, by id (master-A.json and master-B.json record.fixtures[].add).",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/serviceId"
                 }
               },
               "on": {
-                "description": "Which money paths it rides, such as paid-or-card (record.fixtures[].on).",
+                "description": "Which money paths it rides, such as paid-or-card (master-A.json and master-B.json record.fixtures[].on).",
                 "type": "string"
               },
               "facts": {
-                "description": "The facts it needs (record.fixtures[].facts).",
+                "description": "The facts it needs (master-A.json and master-B.json record.fixtures[].facts).",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/name"
                 }
               },
               "booking": {
-                "description": "The booking and event values it sets (record.fixtures[].booking).",
+                "description": "The booking and event values it sets (master-A.json and master-B.json record.fixtures[].booking; overlay-core.js BOOKING and EVENT_GROUPS).",
                 "$ref": "#/$defs/bookingValues"
               }
             },
@@ -1474,27 +1484,29 @@
           "type": "object",
           "properties": {
             "phrases": {
-              "description": "Regular expressions by home: money, contact, proof, stop (record.lint.phrases).",
+              "description": "Regular expressions by home: money, contact, proof, stop (master-A.json and master-B.json record.lint.phrases; read by the compiler's lint, C-065 to C-070).",
               "type": "object",
               "additionalProperties": {
+                "description": "One home's regular expressions (master-A.json and master-B.json record.lint.phrases.<home>).",
                 "$ref": "#/$defs/stringList"
               }
             },
             "pointers": {
-              "description": "Regular expressions for the pointer lines that name a home (record.lint.pointers).",
+              "description": "Regular expressions for the pointer lines that name a home (master-A.json and master-B.json record.lint.pointers).",
               "$ref": "#/$defs/stringList"
             },
             "allow": {
-              "description": "Exceptions by step id: the lint rule allowed and why (record.lint.allow).",
+              "description": "Exceptions by step id: the lint rule allowed and why (master-A.json and master-B.json record.lint.allow).",
               "type": "object",
               "propertyNames": {
                 "$ref": "#/$defs/stepId"
               },
               "additionalProperties": {
+                "description": "One step's exception: the rule allowed and why (master-A.json and master-B.json record.lint.allow.<step>).",
                 "type": "object",
                 "properties": {
                   "rule": {
-                    "description": "The record lint rule or rules allowed, such as L1 or [L1, L2] (record.lint.allow.<step>.rule).",
+                    "description": "The record lint rule or rules allowed, such as L1 or [L1, L2] (master-A.json and master-B.json record.lint.allow.<step>.rule).",
                     "anyOf": [
                       {
                         "type": "string"
@@ -1505,7 +1517,7 @@
                     ]
                   },
                   "why": {
-                    "description": "Why (record.lint.allow.<step>.why).",
+                    "description": "Why the step is allowed (master-A.json and master-B.json record.lint.allow.<step>.why).",
                     "type": "string"
                   }
                 },
@@ -1514,41 +1526,42 @@
               }
             },
             "banned": {
-              "description": "Old phrases of rules the redesign changed, which fail any step that holds one (record.lint.banned), kept as written."
+              "description": "Old phrases of rules the redesign changed, which fail any step that holds one (master-A.json and master-B.json record.lint.banned), kept as written."
             }
           },
           "required": ["phrases", "pointers", "allow", "banned"],
           "additionalProperties": false
         },
         "onefee": {
-          "description": "One fee per booking: the largest service fee (record.onefee; record.ledger_rules).",
+          "description": "One fee per booking: the largest service fee (master-A.json and master-B.json record.onefee and record.ledger_rules; FRONTEND-SPEC.md line 378; S13-55).",
           "type": "boolean"
         },
         "live": {
-          "description": "What is live: the switches and facts in use, the booking values cut, and the names merged into others (record.live).",
+          "description": "What is live: the switches and facts in use, the booking values cut, and the names merged into others (master-A.json and master-B.json record.live).",
           "type": "object",
           "properties": {
             "switches": {
-              "description": "The live switches (record.live.switches).",
+              "description": "The live switches (master-A.json and master-B.json record.live.switches; SPEC-master 5b).",
               "type": "array",
               "items": {
                 "$ref": "#/$defs/name"
               }
             },
             "facts": {
-              "description": "The live facts (record.live.facts).",
+              "description": "The live facts (master-A.json and master-B.json record.live.facts; SPEC-master 5d).",
               "type": "array",
               "items": {
                 "$ref": "#/$defs/name"
               }
             },
             "off": {
-              "description": "Booking values cut, by group (record.live.off: reach notsafe, times noperson and line, approval expert).",
+              "description": "Booking values cut, by group (master-A.json and master-B.json record.live.off: reach notsafe, times noperson and line, approval expert).",
               "type": "object",
               "propertyNames": {
                 "$ref": "#/$defs/name"
               },
               "additionalProperties": {
+                "description": "One booking group's cut values (master-A.json and master-B.json record.live.off.<group>).",
                 "type": "array",
                 "items": {
                   "$ref": "#/$defs/name"
@@ -1556,20 +1569,22 @@
               }
             },
             "merged": {
-              "description": "Names merged into others: facts to the fact that replaced them, switches to what replaced them, in words (record.live.merged).",
+              "description": "Names merged into others: facts to the fact that replaced them, switches to what replaced them, in words (master-A.json and master-B.json record.live.merged).",
               "type": "object",
               "properties": {
                 "facts": {
-                  "description": "record.live.merged.facts.",
+                  "description": "Merged facts: old fact name to the fact that replaced it (master-A.json and master-B.json record.live.merged.facts).",
                   "type": "object",
                   "additionalProperties": {
+                    "description": "The fact that replaced this one (master-A.json and master-B.json record.live.merged.facts.<name>).",
                     "type": "string"
                   }
                 },
                 "switches": {
-                  "description": "record.live.merged.switches.",
+                  "description": "Merged switches: old switch name to what replaced it, in words (master-A.json and master-B.json record.live.merged.switches).",
                   "type": "object",
                   "additionalProperties": {
+                    "description": "What replaced this switch, in words (master-A.json and master-B.json record.live.merged.switches.<name>).",
                     "type": "string"
                   }
                 }
@@ -1582,7 +1597,7 @@
           "additionalProperties": false
         },
         "ledger_rules": {
-          "description": "The ledger rules, in words (record.ledger_rules).",
+          "description": "The ledger rules, in words (master-A.json and master-B.json record.ledger_rules).",
           "type": "string"
         }
       },
@@ -1603,11 +1618,11 @@
     },
     "masterMoney": {
       "title": "MasterMoney",
-      "description": "A flow's money block: the choices, the after list, the valid paths, one example per path and the ways (the flow file's money; SPEC-master 5 and its D66 amendments: 28 paths per flow, free ones included).",
+      "description": "A flow's money block: the choices, the after list, the valid paths, one example per path and the ways (master-A.json and master-B.json money; SPEC-master 5 and its D66 amendments: 28 paths per flow, free ones included).",
       "type": "object",
       "properties": {
         "dims": {
-          "description": "Each money question's choices with their labels (money.dims: price, before, after).",
+          "description": "Each money question's choices with their labels (master-A.json and master-B.json money.dims: price, before, after; SPEC-master 5; FRONTEND-SPEC.md V02, V05, V07).",
           "type": "object",
           "properties": {
             "price": {
@@ -1624,7 +1639,7 @@
           "additionalProperties": false
         },
         "after": {
-          "description": "The after choices this flow has (money.after: counter in A, own in B).",
+          "description": "The after choices this flow has (master-A.json and master-B.json money.after: counter in A, own in B; SPEC-master 5).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/after"
@@ -1644,6 +1659,7 @@
             "$ref": "#/$defs/combo"
           },
           "additionalProperties": {
+            "description": "One path's plain line (master-A.json and master-B.json money.examples.<combo>). An illustration (MC C6).",
             "type": "string"
           }
         },
@@ -1672,17 +1688,18 @@
     },
     "dimChoices": {
       "title": "DimChoices",
-      "description": "One money question's choices: each value k and its label (the flow file's money.dims.<dim>).",
+      "description": "One money question's choices: each value k and its label (master-A.json and master-B.json money.dims.<dim>; SPEC-master 5).",
       "type": "array",
       "items": {
+        "description": "One choice: its value and label (master-A.json and master-B.json money.dims.<dim>[]).",
         "type": "object",
         "properties": {
           "k": {
-            "description": "The choice's value (money.dims.<dim>[].k).",
+            "description": "The choice's value (master-A.json and master-B.json money.dims.<dim>[].k).",
             "$ref": "#/$defs/name"
           },
           "label": {
-            "description": "Its label (money.dims.<dim>[].label).",
+            "description": "Its label (master-A.json and master-B.json money.dims.<dim>[].label).",
             "type": "string"
           }
         },
@@ -1692,7 +1709,7 @@
     },
     "catalogEntry": {
       "title": "CatalogEntry",
-      "description": "A switch or fact with its label and meaning (overlay-core.js SWITCHES and FACT_LIST; the flow file's header 'switches' and 'facts'; SPEC-master 5b, 5d).",
+      "description": "A switch or fact with its label and meaning (overlay-core.js SWITCHES and FACT_LIST; master-A.json and master-B.json header 'switches' and 'facts'; SPEC-master 5b, 5d).",
       "type": "object",
       "properties": {
         "label": {
@@ -1709,16 +1726,16 @@
     },
     "layerLine": {
       "title": "LayerLine",
-      "description": "A layer line added to Rosie's messages to the people named, when its booking values hold: private, privatecall, textsonly, emailonly (the flow file's layerLines; SPEC-master 5e, the layer lines paragraph, and the FIX7 amendments: contactchanged is gone).",
+      "description": "A layer line added to Rosie's messages to the people named, when its booking values hold: private, privatecall, textsonly, emailonly (master-A.json and master-B.json layerLines; SPEC-master 5e, the layer lines paragraph, and the FIX7 amendments: contactchanged is gone).",
       "type": "object",
       "properties": {
         "id": {
-          "description": "The line's id (layerLines[].id).",
+          "description": "The line's id (master-A.json and master-B.json layerLines[].id; SPEC-master FIX7 amendments: contactchanged is gone).",
           "type": "string",
           "enum": ["private", "privatecall", "textsonly", "emailonly"]
         },
         "when": {
-          "description": "The booking values that turn it on (layerLines[].when).",
+          "description": "The booking values that turn it on (master-A.json and master-B.json layerLines[].when; SPEC-master 5e).",
           "$ref": "#/$defs/gate"
         },
         "to": {
@@ -1729,30 +1746,32 @@
           }
         },
         "line": {
-          "description": "The line, with <way> where the reach's words go (layerLines[].line).",
+          "description": "The line, with <way> where the reach's words go (master-A.json and master-B.json layerLines[].line).",
           "type": "string"
         },
         "way": {
-          "description": "The words for <way>, by reach value (layerLines[].way).",
+          "description": "The words for <way>, by reach value (master-A.json and master-B.json layerLines[].way; SPEC-master FIX7 amendments: the private line's way has no notsafe key).",
           "type": "object",
           "propertyNames": {
             "$ref": "#/$defs/name"
           },
           "additionalProperties": {
+            "description": "The words for one reach value (master-A.json and master-B.json layerLines[].way.<reach>).",
             "type": "string"
           }
         },
         "sections": {
-          "description": "The sections it applies in (layerLines[].sections).",
+          "description": "The sections it applies in (master-A.json and master-B.json layerLines[].sections).",
           "type": "array",
           "items": {
+            "description": "A section number, 1 to 13 (master-A.json and master-B.json layerLines[].sections[]; SPEC-master 1).",
             "type": "integer",
             "minimum": 1,
             "maximum": 13
           }
         },
         "more": {
-          "description": "true: it also goes on the step's more lines (layerLines[].more).",
+          "description": "true: it also goes on the step's more lines (master-A.json and master-B.json layerLines[].more; lib.js stampFlow line 906).",
           "type": "boolean"
         }
       },
@@ -1765,13 +1784,13 @@
       "type": "object",
       "properties": {
         "n": {
-          "description": "The section number (the flow file's 'sec').",
+          "description": "The section number (master-A.json and master-B.json 'sec').",
           "type": "integer",
           "minimum": 1,
           "maximum": 13
         },
         "title": {
-          "description": "The section's title, such as '4. Booking' (the flow file's 'phase').",
+          "description": "The section's title, such as '4. Booking' (master-A.json and master-B.json 'phase').",
           "type": "string"
         },
         "steps": {
@@ -2024,18 +2043,18 @@
           }
         },
         "tookAt": {
-          "description": "The money step from which what the booking took is read (the flow file's 'took': A5-04 in flow A; lib.js stampFlow line 893).",
+          "description": "The money step from which what the booking took is read (master-A.json and master-B.json 'took': A5-04 in flow A; lib.js stampFlow line 893).",
           "$ref": "#/$defs/stepId"
         },
         "money": {
           "$ref": "#/$defs/masterMoney"
         },
         "amounts": {
-          "description": "The flow's example amount table (the flow file's 'amounts'; SPEC-master 5h). Illustrations (MC C6).",
+          "description": "The flow's example amount table (master-A.json and master-B.json 'amounts'; SPEC-master 5h). Illustrations (MC C6).",
           "$ref": "#/$defs/amountTable"
         },
         "switches": {
-          "description": "Every switch a trade may turn on, by name: overlay-core.js SWITCHES with the flow file's header switches, such as verify, which stays off (SPEC-master 5b; MC C4).",
+          "description": "Every switch a trade may turn on, by name: overlay-core.js SWITCHES with master-A.json and master-B.json header switches, such as verify, which stays off (SPEC-master 5b; MC C4).",
           "type": "object",
           "propertyNames": {
             "$ref": "#/$defs/name"
@@ -2045,7 +2064,7 @@
           }
         },
         "facts": {
-          "description": "Every fact a trade may list, by name: overlay-core.js FACT_LIST with the flow file's header facts (SPEC-master 5d).",
+          "description": "Every fact a trade may list, by name: overlay-core.js FACT_LIST with master-A.json and master-B.json header facts (SPEC-master 5d).",
           "type": "object",
           "propertyNames": {
             "$ref": "#/$defs/name"
@@ -2055,7 +2074,7 @@
           }
         },
         "layerLines": {
-          "description": "The flow's layer lines (the flow file's layerLines).",
+          "description": "The flow's layer lines (master-A.json and master-B.json layerLines).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/layerLine"
@@ -2196,7 +2215,7 @@
       "type": "object",
       "properties": {
         "main": {
-          "description": "The main path (money.<flow>.main).",
+          "description": "The main path (engine/work/prof/<id>.json money.<flow>.main; SPEC-prof 3 'money').",
           "$ref": "#/$defs/combo"
         },
         "combos": {
@@ -2213,6 +2232,7 @@
             "$ref": "#/$defs/combo"
           },
           "additionalProperties": {
+            "description": "One path's plain line (engine/work/prof/<id>.json money.<flow>.examples.<combo>). An illustration (MC C6).",
             "type": "string"
           }
         },
@@ -2237,6 +2257,7 @@
             "$ref": "#/$defs/name"
           },
           "additionalProperties": {
+            "description": "The values the trade uses in one booking group (engine/work/prof/<id>.json money.<flow>.booking.<group>; SPEC-master 5e).",
             "type": "array",
             "items": {
               "$ref": "#/$defs/name"
@@ -2251,8 +2272,10 @@
             "enum": ["price", "before", "after"]
           },
           "additionalProperties": {
+            "description": "One money question's labels by value (engine/work/prof/<id>.json money.<flow>.labels.<question>; overlay-core.js line 1808).",
             "type": "object",
             "additionalProperties": {
+              "description": "The trade's label for one value (engine/work/prof/<id>.json money.<flow>.labels.<question>.<value>; overlay-core.js line 1808).",
               "type": "string"
             }
           }
@@ -2427,6 +2450,7 @@
             "$ref": "#/$defs/name"
           },
           "additionalProperties": {
+            "description": "true: the switch is on in this flow for this trade (engine/work/prof/<id>.json pf.switches; SPEC-prof 3; SPEC-master 5b).",
             "type": "boolean"
           }
         },
@@ -2871,6 +2895,7 @@
               "description": "Each rule run, with its count of failing steps (arch 12 line 592).",
               "type": "array",
               "items": {
+                "description": "One lint rule run and its count of failing steps (arch 12 line 592; 02-contracts K-01 'the lint summary').",
                 "type": "object",
                 "properties": {
                   "rule": {
