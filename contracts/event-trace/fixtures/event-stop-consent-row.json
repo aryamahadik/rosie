@@ -1,0 +1,33 @@
+{
+  "id": "evlog-ben-stop-1",
+  "at": "2026-10-20T13:00:00Z",
+  "zone": "America/New_York",
+  "turn_id": "turn-ben-stop-1",
+  "job_id": null,
+  "trace_id": "trace-ben-0003",
+  "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+  "bundle_build": 1,
+  "business_id": null,
+  "actor_kind": "person",
+  "actor_person_id": "person-ben",
+  "actor_role": null,
+  "kind": "phone.stopped",
+  "table_name": "phones",
+  "row_id": "handle-ben",
+  "old_values": { "stopped": false, "chat_open": true, "stop_at": null },
+  "new_values": { "stopped": true, "chat_open": false, "stop_at": "2026-10-20T13:00:00Z" },
+  "sealed_values": "\\x6b30382d666978747572652d7365616c65642d62797465732d6e6f742d7265616c2d63697068657274657874",
+  "sealed_for_person_id": "person-ben",
+  "why": { "choice": "optOut" },
+  "approved_by": { "kind": "consentRow", "consent_id": "consent-ben-stop" },
+  "proofs": [
+    {
+      "what": "optOut",
+      "text_hash": "04dedf8afeb8a4177a009f41bb78018af601e341ed4322d4073911c9ac879726",
+      "words_shown": "Reply STOP to opt out. Msg & data rates may apply. Reply HELP for help.",
+      "shown_at": "2026-10-05T17:00:02Z",
+      "open_question_id": null,
+      "fixed_line": "optOutLine"
+    }
+  ]
+}

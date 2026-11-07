@@ -1,0 +1,140 @@
+{
+  "fixtures": [
+    {
+      "file": "event-commit.json",
+      "version": "v1",
+      "def": "eventLogBatch",
+      "expect": "accept",
+      "shows": "The rows one commit appends under one turn id and trace id when Alex's poll vote picks A7-03's Sat 2:00pm: the question answered (Alex, customer, with the exact-yes proof: the hash of the vote's words and the words shown), the held reservation booked and the question's clock cancelled (Rosie, approved by the answer), and the phone's poll vote recorded on the phone row named by its handle id, never the number",
+      "source": "02-contracts K-08 Fixtures; arch 02 line 121; arch 09 lines 457, 490, 492; arch 01 line 89; arch 07 line 379; K-05 v1 item 1; K-04 v1 seed-open-question.json, seed-clock-row.json, seed-outbox-row.json, seed-phone-chat-open.json; A7-03 in master-A.json"
+    },
+    {
+      "file": "event-stop-consent-row.json",
+      "version": "v1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Ben T.'s STOP, acted on by the guard alone: the phone row (by handle id) stopped and its chat closed, approved by the STOP's consent row, his own words sealed under his key, and the opt-out proof kept as the hash of his words and the opt-out line he was shown",
+      "source": "02-contracts K-08 Fixtures; arch 02 line 115; arch 03 line 175; arch 09 lines 457, 492; RULES 4.1b; K-01 v1 keywords.optOut and fixed line optOutLine; K-04 v1 seed-phone-stopped.json"
+    },
+    {
+      "file": "event-owner-yes.json",
+      "version": "v1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Sam, the owner, answers S11-13's read-back poll with 'Block; offer new times': the question answered, approved by the owner's yes, with the proof of the words he was shown",
+      "source": "02-contracts K-08 Fixtures ('the owner's yes'); S11-13 in master-A.json; arch 04 line 199; arch 09 line 457; K-03 v1 plan-block-readback-poll.json"
+    },
+    {
+      "file": "event-erased-person.json",
+      "version": "v1",
+      "def": "exportRow",
+      "expect": "accept",
+      "shows": "The export of Ben T.'s STOP row after his sealing key was deleted: the row unchanged, its sealed values unreadable for good (sealed_key erased), the opt-out proof's hash and words kept",
+      "source": "02-contracts K-08 Fixtures; arch 09 line 492; arch 10 lines 516, 544; K-04 v1 sealing_keys"
+    },
+    {
+      "file": "trace-skeleton.json",
+      "version": "v1",
+      "def": "trace",
+      "expect": "accept",
+      "shows": "The walking skeleton's trace: Sam's first text in, S1-02's question out, under one trace id and one bundle id (bundle v0), every hop of D-017 once, in order: receive, scrub, safetyRead, batch, lease, guard, frontier, decideReads, gate, commit, compose, fillAndChecks, dispatch, providerAccepted, delivered, clockArmed",
+      "source": "02-contracts K-08 Fixtures and section 11; BP section 10 D-017; arch 02 lines 109 to 127; K-01 v1 bundle-v0-skeleton.json; K-02 v1 context-s1-02.json"
+    },
+    {
+      "file": "trace-duplicate-webhook.json",
+      "version": "v1",
+      "def": "trace",
+      "expect": "accept",
+      "shows": "Linq repeats the webhook of Alex's poll vote: its own trace has one receive span, a known event id, answered 200 and dropped",
+      "source": "02-contracts K-08 Fixtures; arch 02 line 109 ('Known event id: 200, dropped'); arch 11 line 584; BP section 10 D-017 ('a repeated webhook sends nothing twice')"
+    },
+    {
+      "file": "trace-batch-three-texts.json",
+      "version": "v1",
+      "def": "traceSet",
+      "expect": "accept",
+      "shows": "Alex sends three texts; the batch closes at the third. The turn carries the first text's trace id and lists the other two, each of whose own trace ends at its batch span, joinedTurn (CQ-06)",
+      "source": "02-contracts K-08 Fixtures; CQ-06 default; arch 02 line 113; K-04 v1 turns.trace_id and joined_trace_ids"
+    },
+    {
+      "file": "trace-clock-fire.json",
+      "version": "v1",
+      "def": "trace",
+      "expect": "accept",
+      "shows": "A question's clock fires with no answer: the firing opens its own trace under its job id, with no turn and no decide reads; the gate and commit apply A7-03's safe default and the owner is told",
+      "source": "02-contracts K-08 Fixtures; CQ-06 default; QUESTIONS.md M2-runtime-ai.4 default; arch 02 line 127; K-04 v1 seed-clock-row.json (fires.safeDefault)"
+    },
+    {
+      "file": "trace-model-call-cost.json",
+      "version": "v1",
+      "def": "trace",
+      "expect": "accept",
+      "shows": "Sam's high-stakes poll vote: each model call's model id, tokens, cached tokens, cache writes and cost in micro-dollars on its span (the safety read, Sonnet first with Haiku checking, the one Sonnet re-read, the composer writing the cache, its one rewrite), 27300 micro-dollars in all",
+      "source": "02-contracts K-08 Fixtures; arch 10 lines 520, 552; arch 06 lines 279, 283; arch 02 lines 119, 123; Q-26 default; Q-41 default"
+    },
+    {
+      "file": "measure-reply-time.json",
+      "version": "v1",
+      "def": "replyTime",
+      "expect": "accept",
+      "shows": "The reply time of trace-batch-three-texts.json's turn: from the third text's arrival to Linq accepting the reply's first part, 6800 ms",
+      "source": "02-contracts K-08 'Measures read from traces'; Q-41 default; CQ-06 default; arch 04 line 229"
+    },
+    {
+      "file": "measure-invariant-run.json",
+      "version": "v1",
+      "def": "invariantRun",
+      "expect": "accept",
+      "shows": "One hourly run of the three hard-invariant checks, no breaches, with the bundle in force",
+      "source": "02-contracts K-08 'the hard-invariant checks of the hourly monitor'; arch 08 lines 427, 445; BP 5.4"
+    },
+    {
+      "file": "span-effect-run-retry.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "accept",
+      "shows": "The effects runner's second try at moving Alex's haircut on the business's Google calendar after his A7-03 vote (booking-alex-haircut), on the effect's one idempotency key after a network error on the first: provider google_calendar, call calendarUpdate, attempt 2, ok, no outage row",
+      "source": "02-contracts K-08 hop 'effect run'; arch 10 lines 508, 542 (5 tries in 10 minutes on one idempotency key, then the outage row); arch 05 line 267; 02-contracts K-07 effect rows (calendar update, tries); K-04 v1 seed-booking-head.json; event-commit.json"
+    },
+    {
+      "file": "span-places-call.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "accept",
+      "shows": "At sign-up's S1-09, a Google Places search for Sam's business by name and town, the words left out of the span: provider google_places, call search, attempt 1, one candidate, the double's fixed listing for Lee's Barbershop",
+      "source": "02-contracts K-15 (search by a business name and town; the double's fixed listings for the demo shops; C-218); S1-09 in master-A.json; arch 02 diagram line 105 ('Google Places', 'business lookup'); 02-contracts K-08 ('never the raw number or words')"
+    },
+    {
+      "file": "invalid/refuse-raw-phone-in-span.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "refuse",
+      "shows": "A span whose handle reference is the raw phone number instead of the handle id (the rest is the skeleton's receive span)",
+      "source": "02-contracts K-08 ('a handle reference (never the raw number or words)'); arch 02 diagram line 105; arch 10 line 516"
+    },
+    {
+      "file": "invalid/refuse-raw-text-in-span.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "refuse",
+      "shows": "A span that carries the person's words in what it got (Sam's 'Barbershop, plumbing, electrical'); a span value is a count, a yes or no, or a label, never words",
+      "source": "02-contracts K-08 ('never the raw number or words'; contract test: 'no span carries a raw number or text'); ADR-009 ('never message text')"
+    },
+    {
+      "file": "invalid/refuse-span-without-bundle-id.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "refuse",
+      "shows": "The skeleton's decide span with its bundle id left out",
+      "source": "02-contracts K-08 ('Each span carries the bundle id'); arch 10 line 548; BP 5.5"
+    },
+    {
+      "file": "invalid/refuse-event-update.json",
+      "version": "v1",
+      "def": "eventLogRow",
+      "expect": "refuse",
+      "shows": "A row that records an edit of an earlier event-log row (adding approved_by to evlog-alex-0008-1): the event log is never edited, so no row's table is event_log",
+      "source": "arch 09 lines 457, 492 ('never edited'); K-04 v1 README rule 5 and refuse-event-log-update.json"
+    }
+  ]
+}

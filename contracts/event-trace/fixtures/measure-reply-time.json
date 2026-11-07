@@ -1,0 +1,13 @@
+{
+  "trace_id": "trace-alex-0003",
+  "turn_id": "turn-alex-three-1",
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "texts": 3,
+  "last_text_event_id": "evt-alex-0005",
+  "last_text_at": "2026-10-22T16:00:04Z",
+  "first_part_row_id": "out-a7-03-alex-first",
+  "first_part_accepted_at": "2026-10-22T16:00:10.800Z",
+  "ms": 6800,
+  "reread": false,
+  "rewrite": false
+}
