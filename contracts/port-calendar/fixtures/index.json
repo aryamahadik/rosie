@@ -65,6 +65,14 @@
       "source": "02-contracts K-16; arch 05 lines 261, 271; README spike row 8 (Outlook event: 10,080 minutes, under seven days)"
     },
     {
+      "file": "watch-microsoft-existing.json",
+      "version": "v1",
+      "def": "watch.exchange",
+      "expect": "accept",
+      "shows": "Sam's first watch is tried again after its first try's answer was lost: Graph answers 409 for a duplicate, and the watch answers the existing subscription, watching, with its own expiry and renewAt halfway, so no renewal drops the working link",
+      "source": "README spike rows 8 ('the same changeType and resource again is 409') and 17 (Graph lists the subscriptions the app made for the signed-in user); arch 05 line 271; arch 10 line 542; action-layer engineer's note on T-025 at 45b0c7b"
+    },
+    {
       "file": "renew-google.json",
       "version": "v1",
       "def": "renew.exchange",
@@ -225,6 +233,38 @@
       "source": "arch 05 line 267; README default 12 and open gap (an event the person deleted)"
     },
     {
+      "file": "event-move-no-id.json",
+      "version": "v1",
+      "def": "calendarUpdate.exchange",
+      "expect": "accept",
+      "shows": "Alex moves a haircut while Riley's calendar write is still retrying: the move's update names no event id, runs after the write in commit order, finds Rosie's event by booking, visit and person, and moves it",
+      "source": "arch 05 line 267 ('keyed by the booking id, visit and person: a move updates that visit's event'); K-07 v1 effect-calendar-move (the event found by booking, visit and person; effects_calendar_event_idx); action-layer engineer's FAIL 1 on T-025 at 45b0c7b"
+    },
+    {
+      "file": "event-delete-no-id.json",
+      "version": "v1",
+      "def": "calendarDelete.exchange",
+      "expect": "accept",
+      "shows": "Ben T. calls a visit off while Sam's calendar write waits out a rate limit: the call-off's delete names no event id, runs after the write in commit order, finds Rosie's event by its key and deletes it, so the called-off visit does not stay on Sam's calendar",
+      "source": "arch 05 line 267 ('a call-off or a change of person deletes it'); K-07 v1 effect-calendar-delete and effects_calendar_event_idx; arch 10 line 540 (Retry-After); action-layer engineer's FAIL 1 on T-025 at 45b0c7b"
+    },
+    {
+      "file": "event-write-again.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "accept",
+      "shows": "Alex's visit goes from Riley to Sam and back to Riley: the new write has the same key as Riley's first one, whose event was deleted, so it makes a new event, written and not alreadyWritten",
+      "source": "arch 05 line 267 ('a call-off or a change of person deletes it'); K-07 v1 rule 8 (one idempotency key over all tries); action-layer engineer's note on T-025 at 45b0c7b (changing a visit's person back reuses the event key)"
+    },
+    {
+      "file": "event-sensitive-no-case.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "accept",
+      "shows": "Lee Associates has the sensitive switch on and Alex gave the name in Hebrew script, which has no capital letters: Alex's session goes on Maya's calendar as 'Visit' and the Hebrew initials only",
+      "source": "RULES 4.6; S13-22; arch 05 line 267; arch 06 line 341 ('It answers in the language of the text'); K-03 v1 initials form (A.M.); fixture set v1 test-kit/shops/therapist.json (sensitive; weekly sessions with Maya); action-layer engineer's FAIL 2 on T-025 at 45b0c7b"
+    },
+    {
       "file": "effect-row-calendar-write.json",
       "version": "v1",
       "def": "calendarEffect.row",
@@ -303,6 +343,22 @@
       "expect": "refuse",
       "shows": "event-sensitive.json that also names the service: refused, since a sensitive event shows only Visit and initials (without the service it is event-sensitive.json)",
       "source": "RULES 4.6 ('Never the service or the reason'); arch 05 line 267; S13-22"
+    },
+    {
+      "file": "invalid/refuse-initials-full-name.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "refuse",
+      "shows": "event-sensitive-no-case.json with the client's name as written in Hebrew script in place of its initials: refused, since a script with no capitals still gives initials only, one letter and a dot per name part (with the initials it is event-sensitive-no-case.json)",
+      "source": "RULES 4.6 ('show only the display name, times and initials'); arch 05 line 267 ('only Visit and initials'); S13-22"
+    },
+    {
+      "file": "invalid/refuse-updated-without-event-id.json",
+      "version": "v1",
+      "def": "calendarUpdate.exchange",
+      "expect": "refuse",
+      "shows": "event-move-no-id.json answered updated with no event id: refused, since an event found by its key and updated is always named, so the effect's providerObjectId is known (with the id it is event-move-no-id.json)",
+      "source": "K-07 v1 effectRow providerObjectId ('The provider's id of what it made or changed'); arch 05 line 267"
     },
     {
       "file": "invalid/refuse-title-in-span.json",

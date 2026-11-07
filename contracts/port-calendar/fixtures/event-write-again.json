@@ -1,0 +1,30 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-11-24T14:00:03Z",
+    "note": "Alex's haircut on Sat Nov 28, moved to 11:30am (event-move-no-id.json). On Mon Nov 23 the shop gives the visit to Sam: Riley's event is deleted and Sam's written (arch 05 line 267: 'a change of person deletes it'). On Tue Nov 24 it goes back to Riley, so this calendar_write has the same key as Riley's first write (booking, visit and Riley) but is a new effect with its own idempotency key. Riley's earlier event for the key was deleted, so the write makes a new event: written, not alreadyWritten (README 'Rosie's own events'). The changes of person are an illustration."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov28",
+      "visitId": "visit-alex-riley-nov28",
+      "personId": "person-riley"
+    },
+    "start": "2026-11-28T16:30:00Z",
+    "end": "2026-11-28T17:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": false,
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "firstName": "Alex"
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "gcal-event-demo-0003",
+    "alreadyWritten": false
+  }
+}

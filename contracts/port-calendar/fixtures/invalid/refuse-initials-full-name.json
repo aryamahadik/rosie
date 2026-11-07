@@ -1,0 +1,28 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-10-26T14:00:05Z",
+    "note": "event-sensitive-no-case.json with one fault: the sensitive event carries the client's name as written in Hebrew script, not its initials. Refused: a script with no capital letters still gives initials only, one letter and a dot per name part, never a full name (RULES 4.6; arch 05 line 267)."
+  },
+  "request": {
+    "calendarLinkId": "callink-maya-microsoft",
+    "provider": "microsoft",
+    "eventKey": {
+      "bookingId": "booking-alex-maya-oct31",
+      "visitId": "visit-alex-maya-oct31",
+      "personId": "person-maya"
+    },
+    "start": "2026-10-31T15:00:00Z",
+    "end": "2026-10-31T16:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": true,
+      "initials": "אלכס מ."
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "graph-event-demo-0004",
+    "alreadyWritten": false
+  }
+}

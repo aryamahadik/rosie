@@ -1,0 +1,28 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-10-26T14:00:05Z",
+    "note": "Lee Associates has the sensitive switch on. In this example Alex writes to Rosie in Hebrew and gave the name in Hebrew script, which has no capital letters (Unicode Lo); Rosie answers in the language of the text (arch 06 line 341). Alex's weekly session with Maya on Sat Oct 31 at 11:00am goes on Maya's Outlook calendar as 'Visit' and the initials of the name as written, one letter and a dot per name part, and nothing else (RULES 4.6; S13-22; K-03 v1's initials form; arch 05 line 267). The Hebrew spelling of Alex M. is a transliteration made for this fixture; the session's date and length are an illustration (the shop's sessions are weekly)."
+  },
+  "request": {
+    "calendarLinkId": "callink-maya-microsoft",
+    "provider": "microsoft",
+    "eventKey": {
+      "bookingId": "booking-alex-maya-oct31",
+      "visitId": "visit-alex-maya-oct31",
+      "personId": "person-maya"
+    },
+    "start": "2026-10-31T15:00:00Z",
+    "end": "2026-10-31T16:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": true,
+      "initials": "א.מ."
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "graph-event-demo-0004",
+    "alreadyWritten": false
+  }
+}

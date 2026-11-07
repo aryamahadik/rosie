@@ -52,12 +52,12 @@
     },
     "providerEventId": {
       "title": "ProviderEventId",
-      "description": "The provider's id of the event Rosie wrote for a visit, kept as the K-07 v1 effect row's providerObjectId, so a move or a call-off finds it (K-07 effects_calendar_event_idx; arch 05 line 267). Opaque.",
+      "description": "The provider's id of the event Rosie wrote for a visit, kept as the K-07 v1 calendar_write effect row's providerObjectId (K-07 effects_calendar_event_idx; arch 05 line 267). A move or a call-off names it when its commit knew it, and otherwise names the event by its eventKey alone (calendarUpdate.request, calendarDelete.request). Opaque.",
       "$ref": "#/$defs/id"
     },
     "eventKey": {
       "title": "CalendarEventKey",
-      "description": "What Rosie's event for a visit is keyed by: the booking, the visit and the booked person whose calendar holds it (arch 05 line 267: 'an effect row writes one event per visit to each booked person's calendar, keyed by the booking id, visit and person'; K-07 v1 effect rows' bookingId, visitId and personId). The adapter makes the provider's own repeat guard from it: Google's client-chosen event id, Graph's transactionId (README 'Rosie's own events').",
+      "description": "What Rosie's event for a visit is keyed by: the booking, the visit and the booked person whose calendar holds it (arch 05 line 267: 'an effect row writes one event per visit to each booked person's calendar, keyed by the booking id, visit and person'; K-07 v1 effect rows' bookingId, visitId and personId). Each of Rosie's events carries its key in a private marker, so an update or delete with no providerEventId finds the visit's event by its key on the link, and the reads leave Rosie's events out (README 'Rosie's own events'). A key's calendar effects run in commit order (calendarEffect.row). A key can be written again: a visit's person changed back reuses it, and that write makes a new event (calendarWrite.response).",
       "type": "object",
       "properties": {
         "bookingId": { "description": "The booking (K-04 bookings).", "$ref": "#/$defs/id" },
@@ -189,9 +189,9 @@
           "properties": {
             "sensitive": { "const": true },
             "initials": {
-              "description": "The initials of the person served, such as A.M. (RULES 4.6: 'Link previews, day lists and job offers show only the display name, times and initials'; arch 05 line 267: 'with the sensitive switch on, only Visit and initials'). The adapter writes 'Visit' with them.",
+              "description": "The initials of the person served, one letter and a dot for each of one to four name parts, such as A.M. (RULES 4.6: 'Link previews, day lists and job offers show only the display name, times and initials'; arch 05 line 267: 'with the sensitive switch on, only Visit and initials'; K-03 v1's initials form). Each letter is a capital (Unicode Lu or Lt) or a letter of a script with no capitals, such as Hebrew, Arabic or Chinese (Lo), since Rosie answers in the language of the text (arch 06 line 341) and S13-22 limits no script (event-sensitive-no-case.json); never a full name (refuse-initials-full-name.json). The adapter writes 'Visit' with them.",
               "type": "string",
-              "pattern": "^(\\p{Lu}\\.){1,4}$"
+              "pattern": "^([\\p{Lu}\\p{Lt}\\p{Lo}]\\.){1,4}$"
             }
           },
           "required": ["sensitive", "initials"],
@@ -507,7 +507,7 @@
 
     "watch.request": {
       "title": "WatchRequest",
-      "description": "Start a link's change subscription, so changes come as pushes (02-contracts K-16 'Watch and renew'; arch 05 line 261: 'Google sends change notifications ... Microsoft 365 and Outlook send Graph change notifications'). Google: a channel on the person's primary calendar's events; Graph: a subscription to /me/events for created, updated and deleted, with lifecycle notifications, both to the gateway's address on the Workers host (README spike rows 1, 8, 9). Not safe to repeat: Google makes a second channel and Graph answers 409 for a duplicate, so the caller calls it once per link and otherwise renews. A K-08 portCall span.",
+      "description": "Start a link's change subscription, so changes come as pushes (02-contracts K-16 'Watch and renew'; arch 05 line 261: 'Google sends change notifications ... Microsoft 365 and Outlook send Graph change notifications'). Google: a channel on the person's primary calendar's events; Graph: a subscription to /me/events for created, updated and deleted, with lifecycle notifications, both to the gateway's address on the Workers host (README spike rows 1, 8, 9). The caller calls it once per link and otherwise renews; a failed try is retried as a renewal is (renewal.life with watchId null). A retry after a lost answer: Google makes a new channel on each try, so the channel whose answer was lost lapses unused (its pushes count in unknownWatches); Graph answers 409 for a duplicate, and the adapter answers the existing subscription (watch.response). A K-08 portCall span.",
       "type": "object",
       "properties": {
         "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
@@ -518,7 +518,7 @@
     },
     "watch.response": {
       "title": "WatchResponse",
-      "description": "The subscription is live: its id, when it started and expires, and renewAt, the moment half its life is left, when it is renewed (arch 05 line 271: 'Each change subscription is renewed when half its life is left'). The adapter asks for the longest life each allows: Google's channel time-to-live (default 604800 s, 7 days), Graph's 10,080 minutes less a minute for events (README spike rows 1, 8).",
+      "description": "The subscription is live: its id, when it started and expires, and renewAt, the moment half its life is left, when it is renewed (arch 05 line 271: 'Each change subscription is renewed when half its life is left'). The adapter asks for the longest life each allows: Google's channel time-to-live (default 604800 s, 7 days), Graph's 10,080 minutes less a minute for events (README spike rows 1, 8). Graph's 409 for a duplicate (README spike row 8) means the link's subscription is already there, made by an earlier try whose answer was lost: the adapter finds it in Graph's list of the subscriptions Rosie's app made for the signed-in person (README spike row 17) and answers it, watching, with its own id and expiresAt, startedAt the moment of this answer and renewAt halfway (watch-microsoft-existing.json). The adapter does the same wherever it makes a Graph subscription, as renew does for one Graph removed. So a duplicate is never an error, and renewal.life never drops a working link as renewalFailed.",
       "type": "object",
       "properties": {
         "result": { "const": "watching" },
@@ -536,7 +536,7 @@
     },
     "watch.errors": {
       "title": "WatchError",
-      "description": "The link dropped, or a transient failure; Graph's failed validation handshake is badRequest (README spike row 9). A first watch is retried as a renewal is (renewal.life with watchId null).",
+      "description": "The link dropped, or a transient failure; Graph's failed validation handshake is badRequest (README spike row 9), and Graph's 409 for a duplicate is not an error (watch.response). A first watch is retried as a renewal is (renewal.life with watchId null).",
       "$ref": "#/$defs/linkError"
     },
     "watch.exchange": {
@@ -1200,7 +1200,7 @@
 
     "calendarWrite.request": {
       "title": "CalendarWriteRequest",
-      "description": "Write one event for one visit on one booked person's calendar, after the commit (arch 05 line 267: 'After the commit, an effect row writes one event per visit to each booked person's calendar'; A6-10 'It shows on Riley's phone calendar too'). Run as K-07 v1's calendar_write effect, whose portRequest this is. Repeating it is safe: the event key makes the provider's repeat guard, so a repeat answers the same event (README 'Rosie's own events'). A K-08 effectRun span.",
+      "description": "Write one event for one visit on one booked person's calendar, after the commit (arch 05 line 267: 'After the commit, an effect row writes one event per visit to each booked person's calendar'; A6-10 'It shows on Riley's phone calendar too'). Run as K-07 v1's calendar_write effect, whose portRequest this is. Repeating it is safe: the effect's one idempotency key (K-07 v1 rule 8; the span's got.idempotencyKey) makes the provider's repeat guard, so a retry answers the event an earlier try made. A later write of the same key, a new effect, makes a new event when the key's earlier event was deleted, as when a visit's person is changed back (README 'Rosie's own events'; event-write-again.json). A K-08 effectRun span.",
       "type": "object",
       "properties": {
         "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
@@ -1221,7 +1221,10 @@
       "properties": {
         "result": { "const": "written" },
         "providerEventId": { "$ref": "#/$defs/providerEventId" },
-        "alreadyWritten": { "type": "boolean" }
+        "alreadyWritten": {
+          "description": "true: an earlier try of this write made the event, and this try found it by the repeat guard. false: this try made it, also when an earlier write of the same key made an event that was deleted since, by Rosie's calendarDelete or by the person; that deleted event is never answered as written (event-write-again.json).",
+          "type": "boolean"
+        }
       },
       "required": ["result", "providerEventId", "alreadyWritten"],
       "additionalProperties": false
@@ -1248,13 +1251,16 @@
 
     "calendarUpdate.request": {
       "title": "CalendarUpdateRequest",
-      "description": "Update a visit's event: a move changes its times (arch 05 line 267: 'a move updates that visit's event'; B8-37), a change to what is booked its content. Run as K-07 v1's calendar_update effect. Repeating it is safe. A K-08 effectRun span.",
+      "description": "Update a visit's event: a move changes its times (arch 05 line 267: 'a move updates that visit's event'; B8-37), a change to what is booked its content. The event is named by its providerEventId when the commit knew it, else by its eventKey alone: the adapter finds Rosie's own event by that key on that link (README 'Rosie's own events'; event-move-no-id.json). Run as K-07 v1's calendar_update effect, after every earlier calendar effect of its key (calendarEffect.row). Repeating it is safe. A K-08 effectRun span.",
       "type": "object",
       "properties": {
         "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
         "provider": { "$ref": "#/$defs/provider" },
         "eventKey": { "$ref": "#/$defs/eventKey" },
-        "providerEventId": { "$ref": "#/$defs/providerEventId" },
+        "providerEventId": {
+          "description": "The event's id when the commit knew it (the key's calendar_write had succeeded: its providerObjectId); null when the commit came while that write was pending, retrying or waiting out an outage, since K-05 v1.1 gives a commit no way to amend a written portRequest. Null: the event is found by eventKey.",
+          "anyOf": [{ "$ref": "#/$defs/providerEventId" }, { "type": "null" }]
+        },
         "start": { "$ref": "#/$defs/utc" },
         "end": { "$ref": "#/$defs/utc" },
         "zone": { "$ref": "#/$defs/zone" },
@@ -1274,14 +1280,16 @@
     },
     "calendarUpdate.response": {
       "title": "CalendarUpdateResponse",
-      "description": "updated; or gone: the person deleted the event from their own calendar, so nothing is updated and it is not written again (README default 12; open gap).",
+      "description": "updated: the event, found by its id or its key, has the request's times and content, and providerEventId names it (refuse-updated-without-event-id.json). gone: the link has no live event of Rosie's for the request's id or key, as when the person deleted it from their own calendar, so nothing is updated and it is not written again (README default 12; open gap); providerEventId is the request's, null when the request named none.",
       "type": "object",
       "properties": {
         "result": { "type": "string", "enum": ["updated", "gone"] },
-        "providerEventId": { "$ref": "#/$defs/providerEventId" }
+        "providerEventId": { "anyOf": [{ "$ref": "#/$defs/providerEventId" }, { "type": "null" }] }
       },
       "required": ["result", "providerEventId"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": { "properties": { "result": { "const": "updated" } } },
+      "then": { "properties": { "providerEventId": { "$ref": "#/$defs/providerEventId" } } }
     },
     "calendarUpdate.errors": {
       "title": "CalendarUpdateError",
@@ -1308,28 +1316,33 @@
 
     "calendarDelete.request": {
       "title": "CalendarDeleteRequest",
-      "description": "Delete a visit's event: a call-off, or a change of person (arch 05 line 267: 'a call-off or a change of person deletes it'). Run as K-07 v1's calendar_delete effect. Repeating it is safe: an event already gone answers deleted. A K-08 effectRun span.",
+      "description": "Delete a visit's event: a call-off, or a change of person (arch 05 line 267: 'a call-off or a change of person deletes it'). The event is named by its providerEventId when the commit knew it, else by its eventKey alone: the adapter finds Rosie's own event by that key on that link (README 'Rosie's own events'; event-delete-no-id.json). Run as K-07 v1's calendar_delete effect, after every earlier calendar effect of its key (calendarEffect.row). Repeating it is safe: an event already gone, or no event for the key, answers deleted with alreadyGone. A K-08 effectRun span.",
       "type": "object",
       "properties": {
         "calendarLinkId": { "$ref": "#/$defs/calendarLinkId" },
         "provider": { "$ref": "#/$defs/provider" },
         "eventKey": { "$ref": "#/$defs/eventKey" },
-        "providerEventId": { "$ref": "#/$defs/providerEventId" }
+        "providerEventId": {
+          "description": "The event's id when the commit knew it (the key's calendar_write had succeeded: its providerObjectId); null when the commit came while that write was pending, retrying or waiting out an outage, since K-05 v1.1 gives a commit no way to amend a written portRequest. Null: the event is found by eventKey.",
+          "anyOf": [{ "$ref": "#/$defs/providerEventId" }, { "type": "null" }]
+        }
       },
       "required": ["calendarLinkId", "provider", "eventKey", "providerEventId"],
       "additionalProperties": false
     },
     "calendarDelete.response": {
       "title": "CalendarDeleteResponse",
-      "description": "Deleted, and whether it was gone already (the person deleted it, or an earlier try did).",
+      "description": "Deleted, and whether it was gone already (the person deleted it, an earlier try did, or the key never had an event). alreadyGone false: this try deleted the event, found by its id or its key, and providerEventId names it. alreadyGone true: providerEventId is the request's, null when the request named none.",
       "type": "object",
       "properties": {
         "result": { "const": "deleted" },
-        "providerEventId": { "$ref": "#/$defs/providerEventId" },
+        "providerEventId": { "anyOf": [{ "$ref": "#/$defs/providerEventId" }, { "type": "null" }] },
         "alreadyGone": { "type": "boolean" }
       },
       "required": ["result", "providerEventId", "alreadyGone"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": { "properties": { "alreadyGone": { "const": false } } },
+      "then": { "properties": { "providerEventId": { "$ref": "#/$defs/providerEventId" } } }
     },
     "calendarDelete.errors": {
       "title": "CalendarDeleteError",
@@ -1356,7 +1369,7 @@
 
     "calendarEffect.row": {
       "title": "CalendarEffectRow",
-      "description": "A K-07 v1 calendar effect row with this port's request as its portRequest (K-07 v1: 'the request in the port's terms ... whose shape K-14, K-16 and K-11 give'): calendar_write carries calendarWrite.request, calendar_update calendarUpdate.request, calendar_delete calendarDelete.request. The effects runner (C-109) sends it as it stands; that its eventKey and provider match the row's bookingId, visitId, personId and calendarProvider is the contract test's check.",
+      "description": "A K-07 v1 calendar effect row with this port's request as its portRequest (K-07 v1: 'the request in the port's terms ... whose shape K-14, K-16 and K-11 give'): calendar_write carries calendarWrite.request, calendar_update calendarUpdate.request, calendar_delete calendarDelete.request. The effects runner (C-109) sends it as it stands, with the effect's one idempotency key on each try (calendarWrite.request); that its eventKey and provider match the row's bookingId, visitId, personId and calendarProvider is the contract test's check. Order: for one eventKey (the row's booking, visit and person), the runner runs the calendar effects in commit order, starting one only when every earlier effect of that key has ended (succeeded, or cancelled by letGo). So a write still pending, retrying or waiting out an outage holds a later update or delete of its key behind it, and that update or delete, committed before the write's event id was known, names the event by its key (providerEventId null) and finds the event the write made (arch 05 line 267: 'a move updates that visit's event, a call-off or a change of person deletes it'; K-07 v1 effect-calendar-move: the event found by booking, visit and person). Effects of different keys, such as the delete for the old person and the write for the new one at a change of person, do not wait for each other.",
       "allOf": [
         { "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectRow" },
         {
