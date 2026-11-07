@@ -1,0 +1,27 @@
+{
+  "row": "outbox-a7-12-riley-1",
+  "turn": "turn-a7-12-alex-ask",
+  "conversation": [],
+  "masterText": {
+    "step": "A7-12",
+    "text": "{{alex.staff:Alex M.}} asks: {{relay.quote:Can my son wait in the shop during my cut?}}"
+  },
+  "facts": [
+    { "slot": "alex.staff", "value": "Alex M." },
+    { "slot": "relay.quote", "value": "Read it on the secure page" }
+  ],
+  "audience": { "role": "staff", "name": "Riley", "way": "texts", "handlingLine": null },
+  "language": "en",
+  "channel": "imessage",
+  "situation": "routine",
+  "allowedFormats": ["text", "poll"],
+  "allowedLinks": ["link.secure"],
+  "options": [
+    { "id": "A7-12/1", "label": "Yes" },
+    { "id": "A7-12/2", "label": "No" },
+    { "id": "A7-12/3", "label": "Call Alex" }
+  ],
+  "pageTypes": [],
+  "openQuestions": [],
+  "inbound": null
+}

@@ -1,0 +1,42 @@
+{
+  "row": "outbox-s11-13-sam-1",
+  "turn": "turn-s11-13-block-a",
+  "conversation": [
+    {
+      "from": "reader",
+      "text": "BLOCK Thu 2-5",
+      "sentAt": { "utc": "2026-10-26T15:30:00Z", "zone": "America/New_York" }
+    },
+    {
+      "from": "rosie",
+      "text": "Block which business?",
+      "sentAt": { "utc": "2026-10-26T15:30:05Z", "zone": "America/New_York" }
+    }
+  ],
+  "masterText": {
+    "step": "S11-13",
+    "text": "Block {{change.when:Thu Oct 29, 2–5pm}} at {{biz.name:Lee's Barbershop}}? {{name.staff:Ben T.}} is booked at {{visit.time:3:00pm}}."
+  },
+  "facts": [
+    { "slot": "change.when", "value": "Thu Oct 29, 2–5pm" },
+    { "slot": "biz.name", "value": "Lee's Barbershop" },
+    { "slot": "name.staff", "value": "Ben T." },
+    { "slot": "visit.time", "value": "3:00pm" }
+  ],
+  "audience": { "role": "owner", "name": "Sam", "way": "texts", "handlingLine": null },
+  "language": "en",
+  "channel": "imessage",
+  "situation": "routine",
+  "allowedFormats": ["text", "poll"],
+  "allowedLinks": [],
+  "options": [
+    { "id": "S11-13/1", "label": "Block; offer new times" },
+    { "id": "S11-13/2", "label": "Block around it" }
+  ],
+  "pageTypes": [],
+  "openQuestions": [],
+  "inbound": {
+    "text": "A",
+    "sentAt": { "utc": "2026-10-26T15:30:30Z", "zone": "America/New_York" }
+  }
+}

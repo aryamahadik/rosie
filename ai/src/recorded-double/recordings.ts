@@ -61,21 +61,21 @@ const SEED_DEF: Record<RecordingKind, string> = {
   plannerOutput: "plannerOutput",
 };
 
-function isObject(value: unknown): value is Record<string, unknown> {
+export function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function onlyKeys(value: Record<string, unknown>, allowed: readonly string[]): string | undefined {
+export function onlyKeys(value: Record<string, unknown>, allowed: readonly string[]): string | undefined {
   const extra = Object.keys(value).filter((key) => !allowed.includes(key));
   return extra.length > 0 ? `holds ${extra.join(", ")}, which it does not take` : undefined;
 }
 
-function describe(error: unknown): string {
+export function describe(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
 /** A file under the recordings folder, by a relative path that stays inside it. */
-function readRecordingFile(recordingsRoot: string, relative: string): unknown {
+export function readRecordingFile(recordingsRoot: string, relative: string): unknown {
   const absolute = path.resolve(recordingsRoot, relative);
   if (path.relative(recordingsRoot, absolute).startsWith("..") || path.isAbsolute(relative))
     throw new Error(`the file ${relative} is outside ai/recordings`);

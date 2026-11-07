@@ -1,0 +1,43 @@
+{
+  "version": "v1",
+  "contract": "message-plan.v1",
+  "about": "Recordings for the composer's call of the recorded-model double (T-1071, C-123). Each is one plan answer keyed by the sha256 of its canonical composer input (K-03 v1: $defs/composeInput in, $defs/plan out). They are seeded from K-03 v1's plan fixtures (contracts/message-plan/fixtures), not recorded live: no model call is made (J-02a). The s1-02 pair is K-03's own (input-s1-02, plan-s1-02). K-03 has no input for its other five plans, so each has a small synthetic input in ai/recordings/composer-inputs, written from the master's sample cast (Sam, Lee's Barbershop, Alex M., Riley, Ben T., the 5160 code, 88 Elm St) and fixture set v1's therapist demo shop (Lee Associates, Maya); no real person or customer appears (rule 9). Slot values in the inputs' facts are the slot examples of slots.json.",
+  "recordings": [
+    {
+      "id": "composer-s1-02",
+      "kind": "composerPlan",
+      "request": { "fixture": "input-s1-02.json" },
+      "seed": { "fixture": "plan-s1-02.json" }
+    },
+    {
+      "id": "composer-block-readback-poll",
+      "kind": "composerPlan",
+      "request": { "file": "composer-inputs/block-readback-poll.json" },
+      "seed": { "fixture": "plan-block-readback-poll.json" }
+    },
+    {
+      "id": "composer-confirmation-a6-14",
+      "kind": "composerPlan",
+      "request": { "file": "composer-inputs/confirmation-a6-14.json" },
+      "seed": { "fixture": "plan-confirmation-a6-14.json" }
+    },
+    {
+      "id": "composer-relay-private-a7-12",
+      "kind": "composerPlan",
+      "request": { "file": "composer-inputs/relay-private-a7-12.json" },
+      "seed": { "fixture": "plan-relay-private-a7-12.json" }
+    },
+    {
+      "id": "composer-sensitive-a6-15",
+      "kind": "composerPlan",
+      "request": { "file": "composer-inputs/sensitive-a6-15.json" },
+      "seed": { "fixture": "plan-sensitive.json" }
+    },
+    {
+      "id": "composer-tapback-thanks",
+      "kind": "composerPlan",
+      "request": { "file": "composer-inputs/tapback-thanks.json" },
+      "seed": { "fixture": "plan-tapback-thanks.json" }
+    }
+  ]
+}

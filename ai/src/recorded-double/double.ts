@@ -3,6 +3,7 @@
 
 import { NoRecordingError } from "./errors";
 import { requestKey } from "./key";
+import { COMPOSER_KIND, type ComposeInput, type MessagePlan, type RecordedComposer } from "./composer-types";
 import type {
   DecideRead,
   DecideRequest,
@@ -24,15 +25,27 @@ const settle = <T>(fn: () => T): Promise<T> =>
     resolve(fn());
   });
 
+/** The recorded answer for exactly this request, as a fresh copy, or a rejection (NoRecordingError): never a fallback. */
+function replayFrom<T>(held: ReadonlyMap<string, Held>, kind: string, request: unknown): Promise<T> {
+  return settle(() => {
+    const key = requestKey(kind, request);
+    const found = held.get(key);
+    if (found === undefined) throw new NoRecordingError(kind, key);
+    return structuredClone(found.output) as T;
+  });
+}
+
+/** Builds the composer's double over plans already checked and keyed (composer-recordings.ts is the only caller that checks them). */
+export function createRecordedComposer(held: ReadonlyMap<string, Held>): RecordedComposer {
+  return {
+    composer: (input: ComposeInput): Promise<MessagePlan> => replayFrom(held, COMPOSER_KIND, input),
+    size: held.size,
+  };
+}
+
 /** Builds the double over recordings already checked and keyed (recordings.ts is the only caller that checks them). */
 export function createRecordedModel(held: ReadonlyMap<string, Held>): RecordedModel {
-  const replay = <T>(kind: RecordingKind, request: unknown): Promise<T> =>
-    settle(() => {
-      const key = requestKey(kind, request);
-      const found = held.get(key);
-      if (found === undefined) throw new NoRecordingError(kind, key);
-      return structuredClone(found.output) as T;
-    });
+  const replay = <T>(kind: RecordingKind, request: unknown): Promise<T> => replayFrom(held, kind, request);
   return {
     safetyRead: (request: SafetyReadRequest): Promise<SafetyRead> =>
       replay("safetyRead", { text: request.text }),

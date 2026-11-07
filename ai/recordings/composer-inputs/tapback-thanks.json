@@ -1,0 +1,29 @@
+{
+  "row": "outbox-a6-14-alex-2",
+  "turn": "turn-a6-14-alex-thanks",
+  "conversation": [
+    {
+      "from": "rosie",
+      "text": "You're booked! Give this code at the chair when you arrive.",
+      "sentAt": { "utc": "2026-10-20T14:03:00Z", "zone": "America/New_York" }
+    }
+  ],
+  "masterText": {
+    "step": "A6-14",
+    "text": "You're booked! Give this code at the chair when you arrive."
+  },
+  "facts": [],
+  "audience": { "role": "customer", "name": "Alex", "way": "texts", "handlingLine": null },
+  "language": "en",
+  "channel": "imessage",
+  "situation": "routine",
+  "allowedFormats": ["text", "tapback"],
+  "allowedLinks": [],
+  "options": [],
+  "pageTypes": [],
+  "openQuestions": [],
+  "inbound": {
+    "text": "thanks!",
+    "sentAt": { "utc": "2026-10-20T14:03:30Z", "zone": "America/New_York" }
+  }
+}
