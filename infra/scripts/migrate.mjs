@@ -10,11 +10,13 @@
 //
 // Each file runs in its own transaction, together with its row in <schema>.schema_migrations (version, name,
 // sha256, applied_at); 0001_init.sql creates that table. Files hold no BEGIN or COMMIT of their own.
-// A file that holds only CREATE INDEX CONCURRENTLY statements (or whose first line is
-// `-- migrate:no-transaction`, which then requires exactly that) runs outside a transaction, one statement at a
-// time, because PostgreSQL refuses it inside one (the migration guard asks for it on existing tables). The file is
-// recorded after its last statement. A file that mixes such statements with others is refused before anything
-// runs. A failed concurrent build leaves an invalid index: the next run drops it first, then builds again.
+// Two kinds of file run outside a transaction, one statement at a time, because PostgreSQL refuses these inside one
+// (the migration guard asks for CONCURRENTLY on existing tables): (1) a file of only CREATE INDEX CONCURRENTLY
+// statements, found by itself; (2) a file whose first line is `-- migrate:no-transaction` and that holds exactly one
+// statement of any kind (DROP INDEX CONCURRENTLY, REINDEX CONCURRENTLY, DETACH PARTITION ... CONCURRENTLY), or
+// several that are all CREATE INDEX CONCURRENTLY. The file is recorded after its last statement. A file that mixes
+// CREATE INDEX CONCURRENTLY with other statements, or a marker file with several other statements, is refused
+// before anything runs. A failed concurrent build leaves an invalid index: the next run drops it first, then builds again.
 // Write the statements with IF NOT EXISTS, so a rerun after a partial failure skips the ones already built.
 // The runner refuses to apply anything while an applied file has changed or is missing.
 import { createHash } from "node:crypto";
@@ -116,6 +118,9 @@ function concurrentIndexStatements(file, marker) {
   if (concurrent.length === statements.length && statements.length > 0) {
     return statements;
   }
+  if (marker && statements.length === 1) {
+    return statements;
+  }
   if (concurrent.length > 0 || marker) {
     return undefined;
   }
@@ -144,8 +149,9 @@ function readMigrationFiles() {
       const statements = concurrentIndexStatements(text, marker);
       if (statements === undefined) {
         throw new UsageError(
-          `${file}: CREATE INDEX CONCURRENTLY cannot run in a transaction, so a file with it holds only ` +
-            `CREATE INDEX CONCURRENTLY statements; put the other statements in another file. Nothing was run.`,
+          `${file}: a statement that cannot run in a transaction needs its own file: either only CREATE INDEX ` +
+            `CONCURRENTLY statements, or one statement under a first line "-- migrate:no-transaction". ` +
+            `Put the other statements in another file. Nothing was run.`,
         );
       }
       return {
@@ -225,17 +231,32 @@ async function takeLock(sql, schema) {
 }
 
 // A concurrent build that failed leaves an invalid index of that name; IF NOT EXISTS would then skip it for good.
-async function dropInvalidIndex(sql, statement) {
-  const name = CONCURRENT_INDEX.exec(statement)[1];
+// Only the target schema is searched (an unqualified name never reaches public's index of the same name).
+async function dropInvalidIndex(sql, schema, statement) {
+  const match = CONCURRENT_INDEX.exec(statement);
+  if (!match) {
+    return;
+  }
+  const parts = [...match[1].matchAll(/"((?:[^"]|"")+)"|([a-z_][a-z0-9_$]*)/gi)].map((part) =>
+    part[1] === undefined ? part[2].toLowerCase() : part[1].replaceAll('""', '"'),
+  );
+  const indexSchema = parts.length > 1 ? parts[0] : schema;
+  const indexName = parts.at(-1);
   const [row] = await sql`
-    select i.indisvalid as valid, to_regclass(${name})::text as shown
+    select i.indisvalid as valid
     from pg_index i
-    where i.indexrelid = to_regclass(${name})
+    join pg_class c on c.oid = i.indexrelid
+    join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = ${indexSchema} and c.relname = ${indexName}
   `;
   if (row && !row.valid) {
-    console.log(`migrate: dropping invalid index ${row.shown} left by a failed run`);
-    await sql.unsafe(`drop index concurrently if exists ${name}`);
+    console.log(`migrate: dropping invalid index ${indexSchema}.${indexName} left by a failed run`);
+    await sql.unsafe(`drop index concurrently if exists ${quoteIdent(indexSchema)}.${quoteIdent(indexName)}`);
   }
+}
+
+function quoteIdent(name) {
+  return `"${name.replaceAll('"', '""')}"`;
 }
 
 async function applyFile(sql, schema, file) {
@@ -247,7 +268,7 @@ async function applyFile(sql, schema, file) {
   if (file.noTransaction) {
     await sql.unsafe(`set search_path to ${searchPath}`);
     for (const statement of file.statements) {
-      await dropInvalidIndex(sql, statement);
+      await dropInvalidIndex(sql, schema, statement);
       await sql.unsafe(statement);
     }
     await record(sql);

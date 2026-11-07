@@ -138,6 +138,60 @@ describe("migrate.mjs: files of only CREATE INDEX CONCURRENTLY", () => {
       true,
     );
   });
+
+  it("applies and records a marker file with one DROP INDEX CONCURRENTLY", async () => {
+    freshSchema("drop");
+    const make = "create index concurrently if not exists items_code_idx on items (code);\n";
+    const drop = "-- migrate:no-transaction\ndrop index concurrently if exists items_code_idx;\n";
+    const dir = folder({ "0002_items.sql": TABLE, "0003_make.sql": make, "0004_drop.sql": drop });
+    const result = run(dir);
+    assert.equal(result.code, 0, result.out);
+    assert.deepEqual(await indexState("items_code_idx"), []);
+    assert.equal(
+      (await recorded()).some((row) => row.version === "0004"),
+      true,
+    );
+  });
+
+  it("refuses a marker file with several statements that are not all CREATE INDEX CONCURRENTLY", async () => {
+    freshSchema("marker2");
+    const two =
+      "-- migrate:no-transaction\ndrop index concurrently if exists a_idx;\ndrop index concurrently if exists b_idx;\n";
+    const dir = folder({ "0002_items.sql": TABLE, "0003_two.sql": two });
+    const result = run(dir);
+    assert.notEqual(result.code, 0);
+    assert.match(result.out, /0003_two\.sql/);
+    const [present] = await sql`select to_regclass(${`${schema}.schema_migrations`}) as t`;
+    assert.equal(present.t, null);
+  });
+
+  it("leaves an invalid index of the same name in another schema alone", async () => {
+    freshSchema("other");
+    const table = `t724_pub_${randomBytes(3).toString("hex")}`;
+    await sql.unsafe(`create table public.${table} (code text)`);
+    try {
+      await sql.unsafe(`insert into public.${table} values ('a'), ('a')`);
+      await assert.rejects(
+        sql.unsafe(`create unique index concurrently items_pub_idx on public.${table} (code)`),
+      );
+      const invalid = async () =>
+        Array.from(
+          await sql`select i.indisvalid as valid from pg_index i join pg_class c on c.oid = i.indexrelid
+            join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname = 'items_pub_idx'`,
+          (row) => ({ valid: row.valid }),
+        );
+      assert.deepEqual(await invalid(), [{ valid: false }]);
+      const text = "create unique index concurrently if not exists items_pub_idx on items (code);\n";
+      const dir = folder({ "0002_items.sql": TABLE, "0003_idx.sql": text });
+      const result = run(dir);
+      assert.equal(result.code, 0, result.out);
+      assert.doesNotMatch(result.out, /dropping invalid index/);
+      assert.deepEqual(await invalid(), [{ valid: false }]);
+      assert.deepEqual(await indexState("items_pub_idx"), [{ valid: true }]);
+    } finally {
+      await sql.unsafe(`drop table if exists public.${table}`);
+    }
+  });
 });
 
 describe("npm run guard:migrations", () => {
