@@ -1,0 +1,6 @@
+{
+  "quote": "q-0002",
+  "price": { "cents": 45.5, "currency": "USD" },
+  "at": { "utc": "2026-11-07T15:30:00Z", "zone": "America/New_York" },
+  "kind": "visit"
+}

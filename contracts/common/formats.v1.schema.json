@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/common/formats.v1.schema.json",
+  "title": "Formats v1",
+  "description": "Shared formats every contract refers to with $ref (ops/QUESTIONS.md CQ-09, default in use until the CTO rules: ids, money and times). Written inside the model API's structured-outputs subset (02-contracts section 2 item 7), so a model-facing schema may refer to them: no number, length or count limits here; those are code checks.",
+  "$defs": {
+    "id": {
+      "title": "Id",
+      "description": "An opaque id: a non-empty string that code compares as a whole and never parses (CQ-09: 'other ids opaque strings').",
+      "type": "string",
+      "pattern": "."
+    },
+    "turnId": {
+      "title": "TurnId",
+      "description": "A turn's id: a hash of the event ids of the texts it joins (CQ-09; architecture 01 line 59). The hash itself is computed in code; to the schema it is an opaque, non-empty string.",
+      "type": "string",
+      "pattern": "."
+    },
+    "bundleId": {
+      "title": "BundleId",
+      "description": "A bundle's id: a content hash of the compiled files plus a build number (CQ-09; architecture 01 line 87; tour line 658: every published bundle stays readable for replay). The hash's algorithm and spelling belong to the bundle contract (K-01).",
+      "type": "object",
+      "properties": {
+        "hash": {
+          "description": "The content hash of the bundle's compiled files (CQ-09).",
+          "type": "string",
+          "pattern": "."
+        },
+        "build": {
+          "description": "The build number (CQ-09).",
+          "type": "integer"
+        }
+      },
+      "required": ["hash", "build"],
+      "additionalProperties": false
+    },
+    "currency": {
+      "title": "Currency",
+      "description": "A currency code: three capital letters, as ISO 4217 writes them, for example USD (CQ-09: 'money in integer cents with a currency code').",
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "money": {
+      "title": "Money",
+      "description": "An amount of money: whole cents with its currency code, never a decimal (CQ-09). Whether an amount may be zero or negative is each field's rule, checked in code.",
+      "type": "object",
+      "properties": {
+        "cents": {
+          "description": "The amount in the currency's cents, as an integer (CQ-09).",
+          "type": "integer"
+        },
+        "currency": {
+          "$ref": "#/$defs/currency"
+        }
+      },
+      "required": ["cents", "currency"],
+      "additionalProperties": false
+    },
+    "utc": {
+      "title": "Utc",
+      "description": "An instant in UTC, written as an RFC 3339 date-time ending in Z, for example 2026-11-07T15:30:00Z (CQ-09: 'every time in UTC'). Whether the date exists is a code check.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?Z$"
+    },
+    "zone": {
+      "title": "Zone",
+      "description": "An IANA time zone name, for example America/New_York (CQ-09; S13-03: a visit's time is read in the visit's zone). Whether the zone exists in the IANA database is a code check.",
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$"
+    },
+    "time": {
+      "title": "Time",
+      "description": "A time: the instant in UTC together with the IANA zone it is shown and reasoned in (CQ-09: 'every time in UTC with its IANA zone'; S13-03).",
+      "type": "object",
+      "properties": {
+        "utc": {
+          "$ref": "#/$defs/utc"
+        },
+        "zone": {
+          "$ref": "#/$defs/zone"
+        }
+      },
+      "required": ["utc", "zone"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,417 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/db-schema/tables.meta.schema.json",
+  "title": "Database part table list",
+  "description": "The shape of every contracts/db-schema/<part>/<part>.v<N>.tables.json (02-contracts section 2 item 3): per table, its columns (type, null, default), keys, unique, EXCLUDE and CHECK constraints, indexes, row-level security scope (architecture 10 line 546), whether rows carry a version (architecture 01 line 85) or effective dates (architecture 09 line 488), which fields are sealed under a per-person key (architecture 01 line 93), each field's audience (RULES 4.5; architecture 06 line 311) and whether it is written once at booking (FS line 750). The database engineer's migrations must produce exactly this list (BP section 4); `npm run contracts:check` checks the list's shape and that every column it names exists.",
+  "type": "object",
+  "properties": {
+    "part": {
+      "description": "The database part, the same as its folder under contracts/db-schema/ (for example core).",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "version": {
+      "description": "The part's version, the same as the one in the file name (BP 6.4).",
+      "type": "string",
+      "pattern": "^v[0-9]+([.][0-9]+)?$"
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/table"
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["part", "version", "tables"],
+  "additionalProperties": false,
+  "$defs": {
+    "identifier": {
+      "description": "A PostgreSQL identifier written in lower case, unquoted.",
+      "type": "string",
+      "pattern": "^[a-z_][a-z0-9_]*$"
+    },
+    "columnList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "sql": {
+      "description": "A SQL expression, as the migration writes it.",
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "description": "Where it comes from: a step id, an architecture line, a RULES section, an FS row or a decision (item 4).",
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "description": "Who may see the field (RULES 4.5; architecture 01 line 91, 06 line 311): in a message to the customer, staff or owner (one or more); only on the secure page; or never.",
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "enum": ["customer", "staff", "owner"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        {
+          "const": "secure-page-only"
+        },
+        {
+          "const": "never"
+        }
+      ]
+    },
+    "column": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "description": "The PostgreSQL type, for example text, bigint, timestamptz, tstzrange, geography(Point,4326).",
+          "type": "string",
+          "minLength": 1
+        },
+        "null": {
+          "description": "Whether the column may hold null.",
+          "type": "boolean"
+        },
+        "default": {
+          "$ref": "#/$defs/sql"
+        },
+        "audience": {
+          "$ref": "#/$defs/audience"
+        },
+        "sealedBy": {
+          "description": "Set when the field is sealed: encrypted under a per-person key, so deleting the key erases it (architecture 01 line 93; RULES 4.10). Names the column of this table that holds the person whose key seals it.",
+          "$ref": "#/$defs/identifier"
+        },
+        "writtenOnceAtBooking": {
+          "description": "True when the value is copied in when the booking is made and never changed after (FS line 750; RULES 3.7: a booking keeps the price it was made with).",
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        }
+      },
+      "required": ["name", "type", "null", "audience", "description", "source"],
+      "additionalProperties": false
+    },
+    "foreignKey": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/identifier"
+        },
+        "columns": {
+          "$ref": "#/$defs/columnList"
+        },
+        "references": {
+          "type": "object",
+          "properties": {
+            "table": {
+              "description": "The referenced table, as schema.table when it lives in another part's schema.",
+              "type": "string",
+              "pattern": "^[a-z_][a-z0-9_]*([.][a-z_][a-z0-9_]*)?$"
+            },
+            "columns": {
+              "$ref": "#/$defs/columnList"
+            }
+          },
+          "required": ["table", "columns"],
+          "additionalProperties": false
+        },
+        "onDelete": {
+          "enum": ["no action", "restrict", "cascade", "set null", "set default"]
+        }
+      },
+      "required": ["columns", "references"],
+      "additionalProperties": false
+    },
+    "unique": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/identifier"
+        },
+        "columns": {
+          "$ref": "#/$defs/columnList"
+        },
+        "where": {
+          "description": "Set for a partial unique index.",
+          "$ref": "#/$defs/sql"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        }
+      },
+      "required": ["columns"],
+      "additionalProperties": false
+    },
+    "exclude": {
+      "description": "An EXCLUDE constraint, for example no two reservations of one worker overlap (BP section 10, T-041).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/identifier"
+        },
+        "using": {
+          "description": "The index method, for example gist.",
+          "$ref": "#/$defs/identifier"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "column": {
+                "$ref": "#/$defs/identifier"
+              },
+              "expression": {
+                "$ref": "#/$defs/sql"
+              },
+              "operator": {
+                "description": "The operator, for example = or &&.",
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": ["operator"],
+            "oneOf": [
+              {
+                "required": ["column"]
+              },
+              {
+                "required": ["expression"]
+              }
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "where": {
+          "$ref": "#/$defs/sql"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        }
+      },
+      "required": ["name", "using", "elements", "source"],
+      "additionalProperties": false
+    },
+    "check": {
+      "description": "A CHECK constraint, for example class seats never exceed capacity (BP section 10, T-041).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/identifier"
+        },
+        "expression": {
+          "$ref": "#/$defs/sql"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        }
+      },
+      "required": ["name", "expression", "source"],
+      "additionalProperties": false
+    },
+    "index": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/identifier"
+        },
+        "columns": {
+          "$ref": "#/$defs/columnList"
+        },
+        "expression": {
+          "$ref": "#/$defs/sql"
+        },
+        "using": {
+          "$ref": "#/$defs/identifier"
+        },
+        "where": {
+          "$ref": "#/$defs/sql"
+        },
+        "why": {
+          "description": "The read it serves.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["name"],
+      "oneOf": [
+        {
+          "required": ["columns"]
+        },
+        {
+          "required": ["expression"]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "rowLevelSecurity": {
+      "description": "The row-level security scope (architecture 10 line 546: row-level security per business on every Tool API call). business: rows are seen only within the business in `column`. none: the table is not per business, and `why` says so.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "const": "business"
+            },
+            "column": {
+              "$ref": "#/$defs/identifier"
+            }
+          },
+          "required": ["scope", "column"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "const": "none"
+            },
+            "why": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["scope", "why"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "table": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/identifier"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/column"
+          },
+          "minItems": 1
+        },
+        "primaryKey": {
+          "$ref": "#/$defs/columnList"
+        },
+        "foreignKeys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/foreignKey"
+          }
+        },
+        "unique": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/unique"
+          }
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/exclude"
+          }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        },
+        "indexes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/index"
+          }
+        },
+        "rowLevelSecurity": {
+          "$ref": "#/$defs/rowLevelSecurity"
+        },
+        "versioned": {
+          "description": "True when rows carry a version: an integer every update raises, which commits compare and set (architecture 01 line 85). `versionColumn` names it.",
+          "type": "boolean"
+        },
+        "versionColumn": {
+          "$ref": "#/$defs/identifier"
+        },
+        "effectiveDates": {
+          "description": "True when rows carry effective dates: a change closes one row and opens the next (architecture 09 line 488). `effectiveColumns` names the columns that hold them.",
+          "type": "boolean"
+        },
+        "effectiveColumns": {
+          "$ref": "#/$defs/columnList"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "source",
+        "columns",
+        "primaryKey",
+        "rowLevelSecurity",
+        "versioned",
+        "effectiveDates"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "versioned": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": ["versionColumn"]
+          },
+          "else": {
+            "not": {
+              "required": ["versionColumn"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "effectiveDates": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": ["effectiveColumns"]
+          },
+          "else": {
+            "not": {
+              "required": ["effectiveColumns"]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "fixtures": [
+    {
+      "file": "quote.ok.json",
+      "version": "v1",
+      "expect": "accept",
+      "shows": "A quote in whole cents with a currency code, at a UTC time with its zone",
+      "source": "CQ-09 (money in integer cents; every time in UTC with its IANA zone)"
+    },
+    {
+      "file": "invalid/quote.decimal-cents.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "A price written with a decimal is refused: money is whole cents",
+      "source": "CQ-09 (money in integer cents)"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "fixtures": [
+    {
+      "file": "id.ok.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "id",
+      "expect": "accept",
+      "shows": "An opaque id",
+      "source": "CQ-09 (other ids opaque strings)"
+    },
+    {
+      "file": "invalid/id.empty.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "id",
+      "expect": "refuse",
+      "shows": "An empty id is refused",
+      "source": "CQ-09 (other ids opaque strings)"
+    },
+    {
+      "file": "bundle-id.ok.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "bundleId",
+      "expect": "accept",
+      "shows": "A bundle id: a content hash plus a build number",
+      "source": "CQ-09; tour line 658"
+    },
+    {
+      "file": "invalid/bundle-id.no-build.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "bundleId",
+      "expect": "refuse",
+      "shows": "A bundle id without its build number is refused",
+      "source": "CQ-09"
+    },
+    {
+      "file": "money.ok.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "money",
+      "expect": "accept",
+      "shows": "Money in whole cents with a currency code",
+      "source": "CQ-09 (money in integer cents with a currency code)"
+    },
+    {
+      "file": "invalid/money.decimal.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "money",
+      "expect": "refuse",
+      "shows": "Money written as a decimal amount is refused",
+      "source": "CQ-09 (money in integer cents)"
+    },
+    {
+      "file": "invalid/money.no-currency.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "money",
+      "expect": "refuse",
+      "shows": "Money without its currency code is refused",
+      "source": "CQ-09 (with a currency code)"
+    },
+    {
+      "file": "invalid/money.lowercase-currency.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "money",
+      "expect": "refuse",
+      "shows": "A currency code that is not three capital letters is refused",
+      "source": "CQ-09 (a currency code)"
+    },
+    {
+      "file": "time.ok.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "time",
+      "expect": "accept",
+      "shows": "A time in UTC with its IANA zone",
+      "source": "CQ-09 (every time in UTC with its IANA zone); S13-03"
+    },
+    {
+      "file": "invalid/time.offset.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "time",
+      "expect": "refuse",
+      "shows": "A time written with an offset instead of in UTC is refused",
+      "source": "CQ-09 (every time in UTC)"
+    },
+    {
+      "file": "invalid/time.no-zone.json",
+      "version": "v1",
+      "schema": "formats.v1.schema.json",
+      "def": "time",
+      "expect": "refuse",
+      "shows": "A time without its zone is refused",
+      "source": "CQ-09 (with its IANA zone); S13-03"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/common/frozen.meta.schema.json",
+  "title": "Frozen versions",
+  "description": "The shape of every contracts/<name>/frozen.json: the versions of that contract that are frozen (BP 3.3; 02-contracts section 2 items 10 and 11). The frozen-contract guard (infra/ci/contract-freeze-guard.mjs) reads it as it is on the base branch and fails a branch that edits or removes a file or fixture of a listed version, or drops a version from the list. The freeze record in words (date, consumer roles that reviewed) goes in the contract's README.md (item 11).",
+  "type": "object",
+  "properties": {
+    "frozen": {
+      "description": "Frozen versions, oldest first. A version is only ever added, never removed.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^v[0-9]+([.][0-9]+)?$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": ["frozen"],
+  "additionalProperties": false
+}
