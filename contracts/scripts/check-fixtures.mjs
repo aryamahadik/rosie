@@ -9,8 +9,10 @@
 //     its schema (or one $defs entry of it): "accept" must pass, "refuse" must fail. An accepted fixture must also pass
 //     every later minor version of the same schema (BP 6.4: a minor version only adds). Every .json file in fixtures/
 //     must be listed. A database seed row (an entry with "table") is left to its part's contract test;
-//   - every frozen.json against common/frozen.meta.schema.json, only at contracts/<name>/frozen.json (where the
-//     frozen-contract guard reads it), with a file for each frozen version;
+//   - every frozen.json against common/frozen.meta.schema.json, only at contracts/<name>/frozen.json or at
+//     contracts/db-schema/<part>/frozen.json (the guard takes a file's nearest frozen.json, so a part's own file
+//     governs that part alone; T-1061), with a file for each frozen version: for a part, its table list of that
+//     version in the part's own folder;
 //   - every *.tables.json against db-schema/tables.meta.schema.json, and that each column a key, constraint, index,
 //     row-level security scope, version, effective-date or sealing entry names exists in its table.
 //
@@ -48,6 +50,22 @@ function versionedName(file) {
   const match = VERSIONED_NAME.exec(baseName(file));
   if (match === null) return undefined;
   return { name: match[1], major: Number(match[2]), minor: match[3] === undefined ? 0 : Number(match[3]) };
+}
+
+/**
+ * The folder a frozen.json at `file` (contracts-relative) governs, as "<name>/" or "db-schema/<part>/"; undefined
+ * where the convention puts no frozen.json. The guard reads the nearest frozen.json between a file's folder and
+ * contracts/<name>/ (T-1061); the convention allows exactly two places, so a freeze is never hidden in a fixtures/
+ * folder or below a part.
+ */
+export function frozenFolder(file) {
+  const parts = file.split("/");
+  if (parts[parts.length - 1] !== "frozen.json") return undefined;
+  if (parts.length === 2 && parts[0] !== "scripts") return `${parts[0]}/`;
+  if (parts.length === 3 && parts[0] === "db-schema" && parts[1] !== "fixtures") {
+    return `db-schema/${parts[1]}/`;
+  }
+  return undefined;
 }
 
 /**
@@ -242,12 +260,17 @@ export function checkContracts(contractsDir = CONTRACTS_DIR) {
     }
   }
 
-  // 3. frozen.json: only where the guard reads it, in its shape, with a file for each frozen version.
+  // 3. frozen.json: only in the two places the convention allows, in its shape, with a file for each frozen
+  //    version (for a database part, its table list of that version in the part's own folder).
   const checkFrozen = metaValidator(FROZEN_META);
   for (const file of files.filter((name) => baseName(name) === "frozen.json")) {
-    const parts = file.split("/");
-    if (parts.length !== 2 || parts[0] === "scripts") {
-      fail(file, "the frozen-contract guard reads frozen.json only at contracts/<name>/frozen.json");
+    const folder = frozenFolder(file);
+    if (folder === undefined) {
+      fail(
+        file,
+        "a frozen.json sits only at contracts/<name>/frozen.json or contracts/db-schema/<part>/frozen.json " +
+          "(the frozen-contract guard takes a file's nearest frozen.json)",
+      );
       continue;
     }
     let data;
@@ -263,7 +286,16 @@ export function checkContracts(contractsDir = CONTRACTS_DIR) {
     }
     counts.frozen += 1;
     const versions = parseFrozen(JSON.stringify(data), file);
-    const folder = `${parts[0]}/`;
+    if (folder.startsWith("db-schema/") && folder !== "db-schema/") {
+      for (const version of versions) {
+        const owned = files.some(
+          (other) =>
+            isTablesFile(other) && `${posixDir(other)}/` === folder && versionOfFile(other) === version,
+        );
+        if (!owned) fail(file, `freezes v${version}, but no table list of v${version} is in ${folder}`);
+      }
+      continue;
+    }
     for (const version of versions) {
       const owned = files.some(
         (other) =>
