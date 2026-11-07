@@ -1,0 +1,797 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/port-linq/port-linq.v1.schema.json",
+  "title": "PortLinqV1",
+  "description": "K-11 v1, the Linq port in Rosie's own terms (02-contracts K-11): verify and parse a webhook, send one part, add a contact, the capability check, and the Linq double's signed webhook. Each call's request, response and errors are definitions under $defs named <call>.request, <call>.response and <call>.errors (02-contracts section 2 item 2), and <call>.exchange pairs one request with its outcome, which is what every fixture is. The root is any one exchange, so the type generator writes a type for every call (ADR-005). Linq's wire format (its paths, headers, field names and codes) stays inside the adapter, with recorded vendor samples beside this contract in vendor-samples/ (02-contracts section 5); the README records what the spike found in Linq's documents. Keys are named, never shown (rule 7): the calls read LINQ_API_TOKEN and the webhook check reads LINQ_WEBHOOK_SECRET from the environment, and no request or response holds either. Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/verifyWebhook.exchange" },
+    { "$ref": "#/$defs/sendPart.exchange" },
+    { "$ref": "#/$defs/contactAdd.exchange" },
+    { "$ref": "#/$defs/capabilityCheck.exchange" },
+    { "$ref": "#/$defs/doubleWebhook.exchange" }
+  ],
+  "$defs": {
+    "id": {
+      "title": "Id",
+      "description": "An opaque id code compares as a whole and never parses (CQ-09). Linq's own ids (event, chat, message, poll option) are UUIDs (README 'Spike findings'); fixtures use readable placeholders, as K-06 and K-07 do.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "utc": {
+      "title": "Utc",
+      "description": "An instant in UTC (CQ-09).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "phone": {
+      "title": "Phone",
+      "description": "A mobile number in E.164 form, as K-04's handles.address and phones.number write it (K-04 handles_address_form; Linq error 1002 refuses any other form: README 'Spike findings').",
+      "type": "string",
+      "pattern": "^\\+[1-9][0-9]{6,14}$"
+    },
+    "service": {
+      "title": "LinqService",
+      "description": "The service of a Linq chat, as Linq reports it: imessage, rcs or sms (K-06 v1 service without email; Q-33's default: K-04 phones.chat_way holds the service Linq reports; DL-031: a chat Linq reports as SMS or RCS gets its reply in that chat, text only, and sms is never a channel Rosie picks: DL-012).",
+      "type": "string",
+      "enum": ["imessage", "rcs", "sms"]
+    },
+    "partKey": {
+      "title": "PartKey",
+      "description": "The part's idempotency key, '<row>/<part>/<try>', K-07 v1's (arch 01 line 65). Linq stores it on the message (its idempotency_key) and reports it back on message.sent and message.delivered, so a receipt after a 4001 or 4006 finds its part by it (README 'Spike findings').",
+      "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/idempotencyKey"
+    },
+    "echoedKey": {
+      "title": "EchoedKey",
+      "description": "The part key a receipt echoes, beside the K-06 event: Linq's idempotency_key on message.sent and message.delivered (README spike row 7), or null when the event carries none. A part that failed with 4001 or 4006 has no Linq message id (sendPart.errors providerMessageId null), so the dispatcher (C-124) finds the part by this key when it holds no message id for it, and a receipt within 1 minute moves the failed part to delivered (arch 01 line 65; K-07 v1 retry rule 2 and open gap 8). K-06 v1 has no field for it, so it travels beside the event, never in it.",
+      "anyOf": [{ "$ref": "#/$defs/partKey" }, { "type": "null" }]
+    },
+    "given": {
+      "title": "Given",
+      "description": "What a fixture assumes before the call: the moment it runs, a note, and for a webhook how it was signed. Fixtures only; never sent.",
+      "type": "object",
+      "properties": {
+        "now": { "$ref": "#/$defs/utc" },
+        "note": {
+          "description": "The case in plain words.",
+          "type": "string",
+          "minLength": 1
+        },
+        "signing": {
+          "description": "For a webhook: how its signature header was made. valid: the HMAC over id.timestamp.raw under the test secret of the environment the test runs in (the Linq double's, C-211); oneByteChanged: that signature with one byte changed. The fixture holds no secret and no real signature (rule 7): the contract test signs the fixture's own webhook id, timestamp and raw body at run time and, for oneByteChanged, changes one byte (README 'Fixtures').",
+          "type": "string",
+          "enum": ["valid", "oneByteChanged"]
+        }
+      },
+      "required": ["now", "note"],
+      "additionalProperties": false
+    },
+
+    "verifyWebhook.request": {
+      "title": "VerifyWebhookRequest",
+      "description": "One webhook as the gateway (C-044) received it, before any parsing (arch 02 line 109: 'The gateway checks the Linq signature (HMAC over id.ts.raw, 300 s window)'). The adapter reads Linq's headers into these fields; README 'Spike findings' names them.",
+      "type": "object",
+      "properties": {
+        "webhookId": {
+          "description": "The webhook's id header, the 'id' of id.ts.raw (arch 02 line 109). Linq sends the event id in it, and it is the dedupe key (README 'Spike findings').",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "The timestamp header as sent, whole seconds since 1970: the 'ts' of id.ts.raw, which must lie within 300 s of receivedAt (arch 02 line 109). Kept as text, so a header that is not whole seconds is refused rather than read.",
+          "type": "string"
+        },
+        "signature": {
+          "description": "The signature header exactly as sent; its encoding is the adapter's (README 'Spike findings'). Empty when the header is missing.",
+          "type": "string"
+        },
+        "raw": {
+          "description": "The body exactly as received, byte for byte as text: the 'raw' of id.ts.raw (arch 02 line 109). Never parsed before the signature passes.",
+          "type": "string"
+        },
+        "receivedAt": {
+          "description": "When the gateway received it (K-06 receivedAt), the 'now' the 300 s window is measured from (arch 02 line 109).",
+          "$ref": "#/$defs/utc"
+        },
+        "traceId": {
+          "description": "The trace id the gateway opened at receipt (K-08 v1; arch 10 line 548: 'One trace id from webhook to delivery receipt'); the parsed event carries it as K-06 traceId.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["webhookId", "timestamp", "signature", "raw", "receivedAt", "traceId"],
+      "additionalProperties": false
+    },
+    "verifyWebhook.response": {
+      "title": "VerifyWebhookResponse",
+      "description": "The signature passed. event: the webhook parsed into one K-06 event, with the part key a receipt echoes beside it (partKey), which the gateway seals and writes to the handle's actor, then answers 200 in under 1 s; a known event id also gets 200 and is dropped, and a failed write gets 503 so Linq retries for 30 minutes (arch 02 line 109; those three answers are the gateway's, after this call). ignored: a signed event of a type Rosie does not use (README default 2), answered 200 and dropped.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "event" },
+            "httpStatus": {
+              "description": "What the gateway answers once the event is written (arch 02 line 109).",
+              "const": 200
+            },
+            "event": {
+              "description": "One K-06 v1 inbound event, its provider linq (02-contracts K-11: 'gives K-06 events'). K-06 v1.1 has the same shape with a wider scrub rule, which the gateway's scrub (C-045) makes hold before any write.",
+              "$ref": "../inbound-event/inbound-event.v1.schema.json"
+            },
+            "partKey": {
+              "description": "For message.sent and message.delivered, the part key Linq echoes (its idempotency_key); else null. The gateway hands it on with the event, for the dispatcher (C-124) to find a part that has no message id (arch 01 line 65; K-07 v1 retry rule 2).",
+              "$ref": "#/$defs/echoedKey"
+            }
+          },
+          "required": ["result", "httpStatus", "event", "partKey"],
+          "additionalProperties": false,
+          "if": {
+            "description": "Only message.sent and message.delivered echo a key (README spike row 7: message.received, message.failed and the poll and reaction events carry none), so partKey is null for every other K-06 kind.",
+            "properties": {
+              "event": {
+                "type": "object",
+                "properties": { "kind": { "not": { "enum": ["sent", "delivered"] } } }
+              }
+            }
+          },
+          "then": { "properties": { "partKey": { "type": "null" } } }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "result": { "const": "ignored" },
+            "httpStatus": { "const": 200 },
+            "eventType": {
+              "description": "Linq's event type, for the log (README 'Spike findings' lists them).",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["result", "httpStatus", "eventType"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "verifyWebhook.errors": {
+      "title": "VerifyWebhookErrors",
+      "description": "The webhook is rejected: the gateway answers 401 and drops it, and it never becomes an event (arch 02 line 109: 'Bad signature: 401, dropped'). badTimestamp: the timestamp header is not whole seconds; staleTimestamp: it lies more than 300 s from receivedAt; badSignature: the signature does not match id.timestamp.raw (T-410's verifyWebhookSignature reasons). The reason is a label only: never the key, the body or the signature (rule 7).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "rejected" },
+        "httpStatus": { "const": 401 },
+        "reason": {
+          "type": "string",
+          "enum": ["badTimestamp", "staleTimestamp", "badSignature"]
+        }
+      },
+      "required": ["result", "httpStatus", "reason"],
+      "additionalProperties": false
+    },
+    "verifyWebhook.exchange": {
+      "title": "VerifyWebhookExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "verifyWebhook" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/verifyWebhook.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/verifyWebhook.response" }, { "$ref": "#/$defs/verifyWebhook.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "sendKind": {
+      "title": "LinqSendKind",
+      "description": "What one send is. words, poll, linkCard and tapback are K-03 v1's send kinds, which K-07 v1's parts carry (arch 07 line 367); a calendar file rides with the words and a threaded reply is words under a message (K-07 'Parts'). photo and typing are the two formats tested on Nov 5 that K-03 v1 has no send kind for (MC 8 'iPhone tests'; K-07 open gap 6): the port carries them so a later K-03 minor version can use them. Not in v1: bold text decorations and read receipts (untested: MC 8), message edits and contact files (tested, no step uses them), and an SMS channel (DL-012) (02-contracts K-11 'Not in v1').",
+      "type": "string",
+      "enum": ["words", "poll", "linkCard", "tapback", "photo", "typing"]
+    },
+    "calendarFile": {
+      "title": "LinqCalendarFile",
+      "description": "The calendar file the words carry (arch 07 line 383; K-03 calendarFile): new with a confirmation, move under the same UID with a higher SEQUENCE, cancel with STATUS:CANCELLED (RFC 5545). Built by code from the booking; iMessage only ('Files do not reach SMS': arch 07 line 383).",
+      "type": "object",
+      "properties": {
+        "action": {
+          "description": "K-03 calendarFile without none: new, move or cancel (arch 07 line 383).",
+          "type": "string",
+          "enum": ["new", "move", "cancel"]
+        },
+        "fileName": {
+          "description": "The file's name as the phone shows it.",
+          "type": "string",
+          "pattern": "^[^/\\\\]+[.]ics$"
+        },
+        "ics": {
+          "description": "The file's text (RFC 5545), with its UID and SEQUENCE (arch 07 line 383). For sensitive work it names only the display name and 'your visit' (S13-22).",
+          "type": "string",
+          "pattern": "^BEGIN:VCALENDAR"
+        }
+      },
+      "required": ["action", "fileName", "ics"],
+      "additionalProperties": false
+    },
+    "photo": {
+      "title": "LinqPhoto",
+      "description": "A photo Rosie sends (MC 8 'iPhone tests': a photo). The file reference is K-13's (F8); until K-13 freezes it is an opaque id the adapter reads the bytes by.",
+      "type": "object",
+      "properties": {
+        "fileId": { "$ref": "#/$defs/id" },
+        "mediaType": {
+          "description": "The image's media type, such as image/jpeg.",
+          "type": "string",
+          "pattern": "^image/[a-z0-9.+-]+$"
+        }
+      },
+      "required": ["fileId", "mediaType"],
+      "additionalProperties": false
+    },
+    "tapback": {
+      "title": "LinqTapback",
+      "description": "Rosie's tapback: a like in place of a reply, when every part of the turn maps to no_op, no question is open and the tag is routine (arch 07 line 391; MC 8 'iPhone tests': Rosie's tapback, a like).",
+      "type": "object",
+      "properties": {
+        "reaction": {
+          "description": "Rosie's only tapback is a like (arch 07 line 391; MC 8). The reactions a person can send are listed in the README (K-06 keeps them a plain string; CQ-21).",
+          "const": "like"
+        },
+        "onMessageId": {
+          "description": "Linq's id of the message liked: the person's message, as K-06 messageId gave it.",
+          "$ref": "#/$defs/id"
+        },
+        "onPoll": {
+          "description": "Whether the message liked is a poll. Never: Linq rejects any tapback on a poll (arch 07 line 391; Linq: 'Polls take stickers only', a 400). The caller knows from K-04's part kind or the event it answers.",
+          "const": false
+        }
+      },
+      "required": ["reaction", "onMessageId", "onPoll"],
+      "additionalProperties": false
+    },
+    "threadedReplyTo": {
+      "title": "LinqThreadedReplyTo",
+      "description": "The message a threaded reply sits under: iMessage, when a reply answers one of several open questions (arch 07 line 389; K-03 threadReplyTo).",
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "description": "Linq's id of the message it answers (K-06 messageId, or K-04 outbox_parts.linq_message_id for one of Rosie's).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["messageId"],
+      "additionalProperties": false
+    },
+    "sendPart.request": {
+      "title": "SendPartRequest",
+      "description": "Send one part, to a number in a chat that already exists: Rosie never opens an iMessage chat (arch 07 line 369; RULES 4.1b; MC C9), so the chat id is always given. Each part carries its K-07 idempotency key, except typing dots, which belong to no outbox row (arch 07 line 385). What each kind carries, and which kinds each service allows, are the dependent rules below (arch 07 lines 365 to 393; DL-031). There is no field for bold text decorations, for choosing a service (Linq's deprecated preferred_service) or for an edit: none is in v1 (MC 8; DL-012).",
+      "type": "object",
+      "properties": {
+        "idempotencyKey": {
+          "description": "The part's K-07 key; null only for typing dots.",
+          "anyOf": [{ "$ref": "#/$defs/partKey" }, { "type": "null" }]
+        },
+        "to": {
+          "description": "The mobile the chat is with (K-04 phones.number). Staging sends only to roster phones (Q-44's default, the adapter's allow-list C-210).",
+          "$ref": "#/$defs/phone"
+        },
+        "chatId": {
+          "description": "Linq's id of the existing chat with that mobile (K-04 threads.linq_chat_id; K-06 chatId).",
+          "$ref": "#/$defs/id"
+        },
+        "service": {
+          "description": "The chat's service: from the text the reply answers, else the capability check, cached 10 minutes (arch 07 line 365).",
+          "$ref": "#/$defs/service"
+        },
+        "kind": { "$ref": "#/$defs/sendKind" },
+        "text": {
+          "description": "The words as they go (K-03 final parts: fixed lines added, slots filled), plain or long, sent in order (MC 8 'iPhone tests'); null for every other kind. A link card's preview comes from the linked page itself, not from words sent with it (README 'Spike findings': a link part must be the only part).",
+          "anyOf": [{ "type": "string", "pattern": "\\S" }, { "type": "null" }]
+        },
+        "calendarFile": {
+          "description": "The calendar file the words carry, or null (arch 07 lines 367, 383).",
+          "anyOf": [{ "$ref": "#/$defs/calendarFile" }, { "type": "null" }]
+        },
+        "options": {
+          "description": "A poll's options, word for word, 2 to 5 (arch 07 line 379); empty for every other kind. The question goes as text first, in its own words part (arch 07 line 379; Linq's poll has no question field).",
+          "type": "array",
+          "items": { "type": "string", "pattern": "\\S" }
+        },
+        "link": {
+          "description": "A link card's link, the whole message (arch 07 line 381: 'Linq 1004'); null for every other kind.",
+          "anyOf": [{ "type": "string", "pattern": "^https://\\S+$" }, { "type": "null" }]
+        },
+        "photo": {
+          "description": "The photo, for kind photo; else null.",
+          "anyOf": [{ "$ref": "#/$defs/photo" }, { "type": "null" }]
+        },
+        "tapback": {
+          "description": "Rosie's tapback, for kind tapback; else null.",
+          "anyOf": [{ "$ref": "#/$defs/tapback" }, { "type": "null" }]
+        },
+        "threadedReplyTo": {
+          "description": "For words: the message this reply threads under, or null (arch 07 line 389).",
+          "anyOf": [{ "$ref": "#/$defs/threadedReplyTo" }, { "type": "null" }]
+        },
+        "typing": {
+          "description": "For typing dots: start (re-sent every 60 s, for at most 2 minutes, from the turn lease to the reply) or stop (the DELETE when no reply goes; a reply clears them by itself) (arch 07 line 385); else null.",
+          "anyOf": [{ "type": "string", "enum": ["start", "stop"] }, { "type": "null" }]
+        },
+        "overrideOptout": {
+          "description": "True only for a send the rules allow after an exact STOP, UNSUBSCRIBE, OPTOUT, CANCEL, END or QUIT, which Linq otherwise blocks with 403 and code 2024 (arch 10 line 524): stop replies and safety lines (arch 02 step S: 'past any opt-out'; QUESTIONS 'Raised by readers'). The guard (C-052) and the dispatcher decide it, never the composer. It applies to that one request and does not lift Linq's block (README 'Spike findings').",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "idempotencyKey",
+        "to",
+        "chatId",
+        "service",
+        "kind",
+        "text",
+        "calendarFile",
+        "options",
+        "link",
+        "photo",
+        "tapback",
+        "threadedReplyTo",
+        "typing",
+        "overrideOptout"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "What each kind carries (arch 07 lines 367 to 391).",
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "words" } } },
+              "then": {
+                "description": "Words: the text, with any calendar file and thread target (arch 07 lines 367, 383, 389).",
+                "properties": {
+                  "idempotencyKey": { "$ref": "#/$defs/partKey" },
+                  "text": { "type": "string" },
+                  "options": { "type": "array", "maxItems": 0 },
+                  "link": { "type": "null" },
+                  "photo": { "type": "null" },
+                  "tapback": { "type": "null" },
+                  "typing": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "poll" } } },
+              "then": {
+                "description": "A poll: 2 to 5 options, iMessage only, in an existing chat (arch 07 line 379).",
+                "properties": {
+                  "idempotencyKey": { "$ref": "#/$defs/partKey" },
+                  "service": { "const": "imessage" },
+                  "text": { "type": "null" },
+                  "calendarFile": { "type": "null" },
+                  "options": { "type": "array", "minItems": 2, "maxItems": 5 },
+                  "link": { "type": "null" },
+                  "photo": { "type": "null" },
+                  "tapback": { "type": "null" },
+                  "threadedReplyTo": { "type": "null" },
+                  "typing": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "linkCard" } } },
+              "then": {
+                "description": "A link card: the whole message, iMessage or RCS (arch 07 line 381).",
+                "properties": {
+                  "idempotencyKey": { "$ref": "#/$defs/partKey" },
+                  "service": { "enum": ["imessage", "rcs"] },
+                  "text": { "type": "null" },
+                  "calendarFile": { "type": "null" },
+                  "options": { "type": "array", "maxItems": 0 },
+                  "link": { "type": "string" },
+                  "photo": { "type": "null" },
+                  "tapback": { "type": "null" },
+                  "threadedReplyTo": { "type": "null" },
+                  "typing": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "tapback" } } },
+              "then": {
+                "description": "Rosie's tapback, iMessage only (arch 07 line 391).",
+                "properties": {
+                  "idempotencyKey": { "$ref": "#/$defs/partKey" },
+                  "service": { "const": "imessage" },
+                  "text": { "type": "null" },
+                  "calendarFile": { "type": "null" },
+                  "options": { "type": "array", "maxItems": 0 },
+                  "link": { "type": "null" },
+                  "photo": { "type": "null" },
+                  "tapback": { "$ref": "#/$defs/tapback" },
+                  "threadedReplyTo": { "type": "null" },
+                  "typing": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "photo" } } },
+              "then": {
+                "description": "A photo, iMessage only: the one service it was tested on (MC 8 'iPhone tests': a format not tested gets its test first).",
+                "properties": {
+                  "idempotencyKey": { "$ref": "#/$defs/partKey" },
+                  "service": { "const": "imessage" },
+                  "text": { "type": "null" },
+                  "calendarFile": { "type": "null" },
+                  "options": { "type": "array", "maxItems": 0 },
+                  "link": { "type": "null" },
+                  "photo": { "$ref": "#/$defs/photo" },
+                  "tapback": { "type": "null" },
+                  "threadedReplyTo": { "type": "null" },
+                  "typing": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "typing" } } },
+              "then": {
+                "description": "Typing dots, iMessage only, from the turn lease to the reply; no outbox row, so no key, and never past an opt-out (arch 07 line 385).",
+                "properties": {
+                  "idempotencyKey": { "type": "null" },
+                  "service": { "const": "imessage" },
+                  "text": { "type": "null" },
+                  "calendarFile": { "type": "null" },
+                  "options": { "type": "array", "maxItems": 0 },
+                  "link": { "type": "null" },
+                  "photo": { "type": "null" },
+                  "tapback": { "type": "null" },
+                  "threadedReplyTo": { "type": "null" },
+                  "typing": { "enum": ["start", "stop"] },
+                  "overrideOptout": { "const": false }
+                }
+              }
+            }
+          ]
+        },
+        "service": {
+          "description": "What each service allows (arch 07 lines 377 to 391): a chat Linq reports as SMS gets text only, with no file and no thread (DL-031; 'Files do not reach SMS'); RCS gets words and link cards, with no file and no thread.",
+          "allOf": [
+            {
+              "if": { "properties": { "service": { "const": "sms" } } },
+              "then": {
+                "properties": {
+                  "kind": { "const": "words" },
+                  "calendarFile": { "type": "null" },
+                  "threadedReplyTo": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "service": { "const": "rcs" } } },
+              "then": {
+                "properties": {
+                  "kind": { "enum": ["words", "linkCard"] },
+                  "calendarFile": { "type": "null" },
+                  "threadedReplyTo": { "type": "null" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "sendPart.response": {
+      "title": "SendPartResponse",
+      "description": "Linq accepted the part. Its message id goes to K-04 outbox_parts.linq_message_id through K-05 markPart sent, so receipts, reactions, edits and threaded replies can name it (arch 01 line 65). Accepted is not delivered: delivery comes later as a K-06 delivered receipt (arch 02 line 127).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "accepted" },
+        "providerMessageId": {
+          "description": "Linq's message id (for a poll, the poll message's id: K-06 poll.pollId); null for a tapback and typing dots, which make no message (README 'Spike findings').",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        },
+        "providerOptionIds": {
+          "description": "For a poll, Linq's option ids in the order of the request's options (K-04 outbox_parts.linq_option_ids; K-06 poll.optionId); null for every other kind.",
+          "anyOf": [
+            { "type": "array", "items": { "$ref": "#/$defs/id" }, "minItems": 2, "maxItems": 5 },
+            { "type": "null" }
+          ]
+        },
+        "chatId": {
+          "description": "The chat it went to (the request's).",
+          "$ref": "#/$defs/id"
+        },
+        "service": {
+          "description": "The service Linq says carries it, or null when it does not say (for a tapback or typing dots).",
+          "anyOf": [{ "$ref": "#/$defs/service" }, { "type": "null" }]
+        },
+        "acceptedAt": {
+          "description": "When Linq accepted it (K-08 providerAccepted; reply time ends at the first part's: CQ-06).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "providerMessageId", "providerOptionIds", "chatId", "service", "acceptedAt"],
+      "additionalProperties": false
+    },
+    "sendPart.errors": {
+      "title": "SendPartErrors",
+      "description": "Linq refused or failed the part. The kind tells the dispatcher which K-07 retry rule applies: optedOut, a 403 with code 2024 after an exact STOP, UNSUBSCRIBE, OPTOUT, CANCEL, END or QUIT (arch 10 line 524), never retried as it was; mayStillDeliver, a 4001 or 4006, retried with a new key only if no delivery receipt comes within 1 minute (arch 01 line 65); rateLimited, a 429, retried after any Retry-After (arch 10 line 540); refused, any other request error, such as a part Linq rejects, which goes again plain (arch 07 line 367); transient, a server or network error, retried by K-07's rules (arch 02 line 125). The code is Linq's, as text (K-04 outbox_parts.error_code; K-06 failure.code).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "failed" },
+        "kind": {
+          "type": "string",
+          "enum": ["optedOut", "mayStillDeliver", "rateLimited", "refused", "transient"]
+        },
+        "httpStatus": {
+          "description": "The HTTP status Linq answered with; null when no answer came (a timeout or a network error).",
+          "anyOf": [{ "type": "integer", "minimum": 100, "maximum": 599 }, { "type": "null" }]
+        },
+        "code": {
+          "description": "Linq's error code as text, such as 2024, 4006 or 1007; null when it gave none.",
+          "anyOf": [{ "type": "string", "pattern": "^[0-9]+$" }, { "type": "null" }]
+        },
+        "reason": {
+          "description": "What failed, in Linq's words or the adapter's, for the team console's failed rows (C-194). Never a key, a phone number or the message's words.",
+          "type": "string",
+          "minLength": 1
+        },
+        "retryAfterSeconds": {
+          "description": "For rateLimited: the wait Linq gave (its Retry-After), which K-07 stores as the claim's nextTryNotBefore; null when it gave none, and for every other kind (arch 10 line 540).",
+          "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }]
+        },
+        "providerMessageId": {
+          "description": "Linq's message id when the answer names one; else null.",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        }
+      },
+      "required": [
+        "result",
+        "kind",
+        "httpStatus",
+        "code",
+        "reason",
+        "retryAfterSeconds",
+        "providerMessageId"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "The codes each kind is read from (arch 10 lines 524, 540; arch 01 line 65; README 'Spike findings').",
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "optedOut" } } },
+              "then": {
+                "properties": {
+                  "httpStatus": { "const": 403 },
+                  "code": { "const": "2024" },
+                  "retryAfterSeconds": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "mayStillDeliver" } } },
+              "then": {
+                "properties": {
+                  "code": { "enum": ["4001", "4006"] },
+                  "retryAfterSeconds": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "rateLimited" } } },
+              "then": {
+                "properties": {
+                  "httpStatus": { "const": 429 }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "enum": ["refused", "transient"] } } },
+              "then": {
+                "properties": {
+                  "code": {
+                    "anyOf": [{ "not": { "enum": ["2024", "4001", "4006"] } }, { "type": "null" }]
+                  },
+                  "retryAfterSeconds": { "type": "null" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "sendPart.exchange": {
+      "title": "SendPartExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "sendPart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/sendPart.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/sendPart.response" }, { "$ref": "#/$defs/sendPart.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "contactAdd.request": {
+      "title": "ContactAddRequest",
+      "description": "Add a mobile as a Linq contact when the reach card saves it, since Linq drops a non-contact's texts before the safety read, danger included (arch 11 line 572; MC C9; DL-013). It runs as K-07's linq_contact_add effect row, whose portRequest is exactly this object and whose one idempotency key covers every try (CQ-04's default; arch 10 line 542). Repeating it for a mobile already added answers added.",
+      "type": "object",
+      "properties": {
+        "phone": {
+          "description": "The mobile saved (K-04 phones.number; K-07 effect-linq-contact-add portRequest.phone).",
+          "$ref": "#/$defs/phone"
+        }
+      },
+      "required": ["phone"],
+      "additionalProperties": false
+    },
+    "contactAdd.response": {
+      "title": "ContactAddResponse",
+      "description": "Added: K-04 phones.linq_contact_added_at is set, and only now may the chat link and its QR code be shown (Q-03's default).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "added" },
+        "phone": { "$ref": "#/$defs/phone" },
+        "alreadyContact": {
+          "description": "True when the mobile was a contact already, so nothing changed.",
+          "type": "boolean"
+        },
+        "providerContactId": {
+          "description": "Linq's id for the contact when it gives one (K-07 effect providerObjectId); else null.",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "phone", "alreadyContact", "providerContactId"],
+      "additionalProperties": false
+    },
+    "contactAdd.errors": {
+      "title": "ContactAddErrors",
+      "description": "Not added: no chat link is shown, and the person uses the booking page, email or their own AI (Q-03's default; MC 8 'Texting'). retryable: a network or server error, which K-07's effect rules retry on the same key (arch 10 line 542); not retryable: Linq refused the number (such as a full contact list on the line's plan: arch 11 line 572).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "failed" },
+        "phone": { "$ref": "#/$defs/phone" },
+        "retryable": { "type": "boolean" },
+        "code": {
+          "description": "Linq's code as text, or null when it gave none.",
+          "anyOf": [{ "type": "string", "pattern": "^[0-9]+$" }, { "type": "null" }]
+        },
+        "reason": {
+          "description": "Why, in Linq's words or the adapter's; never a key.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["result", "phone", "retryable", "code", "reason"],
+      "additionalProperties": false
+    },
+    "contactAdd.exchange": {
+      "title": "ContactAddExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "contactAdd" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/contactAdd.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/contactAdd.response" }, { "$ref": "#/$defs/contactAdd.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "capabilityCheck.request": {
+      "title": "CapabilityCheckRequest",
+      "description": "What a number supports now, when no text from it says (arch 07 line 365: the channel comes from the service of the text a reply answers, 'else Linq's capability check, cached 10 minutes'). A K-08 portCall span (provider linq, call capabilityCheck).",
+      "type": "object",
+      "properties": {
+        "phone": { "$ref": "#/$defs/phone" }
+      },
+      "required": ["phone"],
+      "additionalProperties": false
+    },
+    "capabilityCheck.response": {
+      "title": "CapabilityCheckResponse",
+      "description": "The answer, which the caller caches for 10 minutes (arch 07 line 365).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "checked" },
+        "phone": { "$ref": "#/$defs/phone" },
+        "imessage": {
+          "description": "Whether the number takes iMessage now.",
+          "type": "boolean"
+        },
+        "service": {
+          "description": "The service a message to it would go by now, or null when Linq cannot tell.",
+          "anyOf": [{ "$ref": "#/$defs/service" }, { "type": "null" }]
+        },
+        "checkedAt": { "$ref": "#/$defs/utc" },
+        "cacheSeconds": {
+          "description": "How long the caller keeps the answer: 10 minutes (arch 07 line 365).",
+          "const": 600
+        }
+      },
+      "required": ["result", "phone", "imessage", "service", "checkedAt", "cacheSeconds"],
+      "additionalProperties": false
+    },
+    "capabilityCheck.errors": {
+      "title": "CapabilityCheckErrors",
+      "description": "The check failed: the reply goes as text alone (arch 07 line 365, DD).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "failed" },
+        "phone": { "$ref": "#/$defs/phone" },
+        "code": {
+          "anyOf": [{ "type": "string", "pattern": "^[0-9]+$" }, { "type": "null" }]
+        },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "required": ["result", "phone", "code", "reason"],
+      "additionalProperties": false
+    },
+    "capabilityCheck.exchange": {
+      "title": "CapabilityCheckExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "capabilityCheck" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/capabilityCheck.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/capabilityCheck.response" },
+            { "$ref": "#/$defs/capabilityCheck.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "doubleWebhook.request": {
+      "title": "DoubleWebhookRequest",
+      "description": "Ask the Linq double (C-211; test code only) for a signed webhook that carries one event: a text from the test-phone page (C-205), a delivery receipt, a poll vote, a failure (02-contracts K-11 'The double's test hooks': 'fakes delivery receipts, poll votes, failures ... and makes signed webhooks for the test-phone page'; BP 9.4). The double's other hooks answer sendPart and contactAdd with any outcome this contract defines, as the test chooses, and record every sendPart request in order (README 'The double').",
+      "type": "object",
+      "properties": {
+        "event": {
+          "description": "The K-06 v1 event the gateway must get back from verifyWebhook, given the same receivedAt and traceId; its provider is linq.",
+          "$ref": "../inbound-event/inbound-event.v1.schema.json"
+        },
+        "partKey": {
+          "description": "For a faked sent or delivered receipt, the part key the webhook echoes, so a test can fake a late receipt after a 4001 or 4006 (K-07 v1 retry rule 2); else null. verifyWebhook gives it back as its partKey.",
+          "$ref": "#/$defs/echoedKey"
+        }
+      },
+      "required": ["event", "partKey"],
+      "additionalProperties": false,
+      "if": {
+        "description": "As verifyWebhook.response: only a sent or delivered receipt echoes a key (README spike row 7).",
+        "properties": {
+          "event": {
+            "type": "object",
+            "properties": { "kind": { "not": { "enum": ["sent", "delivered"] } } }
+          }
+        }
+      },
+      "then": { "properties": { "partKey": { "type": "null" } } }
+    },
+    "doubleWebhook.response": {
+      "title": "DoubleWebhookResponse",
+      "description": "The signed webhook, ready for the gateway: verifyWebhook on it, inside the 300 s window, gives back the request's event and partKey (the contract test's round trip). Signed with the test environment's webhook secret, never Linq's (rule 7).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "signed" },
+        "webhook": { "$ref": "#/$defs/verifyWebhook.request" }
+      },
+      "required": ["result", "webhook"],
+      "additionalProperties": false
+    },
+    "doubleWebhook.exchange": {
+      "title": "DoubleWebhookExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "doubleWebhook" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/doubleWebhook.request" },
+        "outcome": { "$ref": "#/$defs/doubleWebhook.response" }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}

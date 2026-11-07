@@ -1,0 +1,35 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-23T14:08:03Z",
+    "note": "send-tapback.json aimed at A7-03's poll message instead of Alex's 'thanks!': Linq rejects any tapback on a poll."
+  },
+  "request": {
+    "idempotencyKey": "out-alex-thanks-like/1/1",
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "kind": "tapback",
+    "text": null,
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": {
+      "reaction": "like",
+      "onMessageId": "linq-msg-demo-0002",
+      "onPoll": true
+    },
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": null,
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-alex",
+    "service": null,
+    "acceptedAt": "2026-10-23T14:08:03Z"
+  }
+}

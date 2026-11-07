@@ -1,0 +1,17 @@
+{
+  "api_version": "v3",
+  "webhook_version": "2026-02-03",
+  "event_type": "message.edited",
+  "event_id": "evt-alex-0015",
+  "created_at": "2026-10-23T14:07:31Z",
+  "trace_id": "linq-trace-demo-0006",
+  "partner_id": "partner-demo",
+  "data": {
+    "chat": { "id": "linq-chat-demo-alex", "is_group": false },
+    "id": "linq-msg-demo-in-alex-0014",
+    "direction": "inbound",
+    "sender_handle": { "handle": "+15555550101", "is_me": false, "service": "iMessage" },
+    "part": { "index": 0, "text": "Actually 3:30 works better" },
+    "edited_at": "2026-10-23T14:07:30Z"
+  }
+}

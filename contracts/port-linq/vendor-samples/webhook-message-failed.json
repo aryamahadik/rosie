@@ -1,0 +1,17 @@
+{
+  "api_version": "v3",
+  "webhook_version": "2026-02-03",
+  "event_type": "message.failed",
+  "event_id": "evt-linq-failed-0001",
+  "created_at": "2026-11-07T15:06:36Z",
+  "trace_id": "linq-trace-demo-0005",
+  "partner_id": "partner-demo",
+  "data": {
+    "chat_id": "linq-chat-demo-sam",
+    "message_id": "linq-msg-demo-0050",
+    "code": 4006,
+    "reason": "Message send timed out",
+    "service": null,
+    "failed_at": "2026-11-07T15:06:36Z"
+  }
+}

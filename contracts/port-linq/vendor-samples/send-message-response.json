@@ -1,0 +1,17 @@
+{
+  "chat_id": "linq-chat-demo-alex",
+  "message": {
+    "id": "linq-msg-demo-0001",
+    "created_at": "2026-10-23T14:05:03Z",
+    "delivery_status": "pending",
+    "is_read": false,
+    "parts": [
+      {
+        "type": "text",
+        "value": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?"
+      }
+    ],
+    "service": "iMessage",
+    "preferred_service": null
+  }
+}

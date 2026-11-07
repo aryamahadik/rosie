@@ -1,0 +1,32 @@
+{
+  "api_version": "v3",
+  "webhook_version": "2026-02-03",
+  "event_type": "message.received",
+  "event_id": "evt-sam-photo-0001",
+  "created_at": "2026-10-19T14:10:01Z",
+  "trace_id": "linq-trace-demo-0002",
+  "partner_id": "partner-demo",
+  "data": {
+    "chat": { "id": "linq-chat-demo-sam", "is_group": false },
+    "id": "linq-msg-demo-in-sam-0001",
+    "direction": "inbound",
+    "sender_handle": { "handle": "+15555550100", "is_me": false, "service": "iMessage" },
+    "parts": [
+      { "type": "text", "value": "Here's my price list" },
+      {
+        "type": "media",
+        "id": "linq-att-demo-0001",
+        "filename": "price-list.jpg",
+        "mime_type": "image/jpeg",
+        "size_bytes": 204800,
+        "url": "https://cdn.example.com/linq-att-demo-0001"
+      }
+    ],
+    "device_status": "known",
+    "reply_to": null,
+    "sent_at": "2026-10-19T14:10:00Z",
+    "delivered_at": null,
+    "read_at": null,
+    "service": "iMessage"
+  }
+}

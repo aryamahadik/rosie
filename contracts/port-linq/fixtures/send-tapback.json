@@ -1,0 +1,35 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-23T14:08:03Z",
+    "note": "Alex texts 'thanks!' with no question open: every part maps to no_op, so Rosie likes the message in place of a reply. Linq reports the like back as K-06 reaction-from-rosie (fromRosie true), which starts no turn."
+  },
+  "request": {
+    "idempotencyKey": "out-alex-thanks-like/1/1",
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "kind": "tapback",
+    "text": null,
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": {
+      "reaction": "like",
+      "onMessageId": "linq-msg-demo-in-alex-0012",
+      "onPoll": false
+    },
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": null,
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-alex",
+    "service": null,
+    "acceptedAt": "2026-10-23T14:08:03Z"
+  }
+}

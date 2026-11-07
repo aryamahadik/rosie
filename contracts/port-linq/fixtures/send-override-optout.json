@@ -1,0 +1,31 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-21T09:00:01Z",
+    "note": "Ben T.'s phone is stopped and he texts STOP again, an exact stop word, so Linq's block still holds. The guard's one reply to a stopped number (K-01 stopLaterReply) is a send the rules allow, so it goes with override_optout, for this one request only."
+  },
+  "request": {
+    "idempotencyKey": "out-ben-stop-later/1/1",
+    "to": "+15555550106",
+    "chatId": "linq-chat-demo-ben",
+    "service": "imessage",
+    "kind": "words",
+    "text": "Texts are off. Reply START, or call the business.",
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": true
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "linq-msg-demo-0030",
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-ben",
+    "service": "imessage",
+    "acceptedAt": "2026-10-21T09:00:01Z"
+  }
+}

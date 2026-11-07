@@ -1,0 +1,204 @@
+{
+  "fixtures": [
+    {
+      "file": "verify-ok.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "Alex's first iMessage text, signed over id.timestamp.raw and received within the 300 s window: verified and parsed into K-06 text-imessage.json, which the gateway writes and answers 200.",
+      "source": "02-contracts K-11 Fixtures and 'Verify and parse a webhook'; arch 02 line 109; K-06 text-imessage.json"
+    },
+    {
+      "file": "verify-bad-signature.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "The same webhook with one byte of its signature changed: rejected badSignature, 401, dropped; no event.",
+      "source": "02-contracts K-11 Fixtures; arch 02 line 109 ('Bad signature: 401, dropped'); T-410 verifyWebhookSignature"
+    },
+    {
+      "file": "verify-stale-timestamp.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "A correctly signed webhook whose timestamp is 900 s before receipt, outside the 300 s window: rejected staleTimestamp, 401, dropped.",
+      "source": "02-contracts K-11 Fixtures ('outside 300 s'); arch 02 line 109"
+    },
+    {
+      "file": "verify-delivered-after-4006.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "Linq's message.delivered for Sam's text 25 s after error-4006.json's 4006: parsed into a K-06 delivered event with the echoed key out-sam-booked-riley/1/1 beside it as partKey, by which the dispatcher finds the failed part that has no message id and moves it to delivered; no new key goes.",
+      "source": "arch 01 line 65; K-07 v1 retry rule 2 and open gap 8; README spike row 7; vendor-samples/webhook-message-delivered.json; K-11 error-4006.json"
+    },
+    {
+      "file": "send-text.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "A7-03's words to Alex in the existing chat under key out-a7-03-alex/1/1: accepted with Linq's message id linq-msg-demo-0001 (K-04 seed-outbox-row part 1).",
+      "source": "02-contracts K-11 'Send one part'; arch 07 lines 367, 369; MC 8 'iPhone tests' (plain and long text, send order); K-04 seed-outbox-row"
+    },
+    {
+      "file": "send-poll.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "A7-03's poll with three times, word for word, iMessage only: accepted with the poll's message id and Linq's option ids in the options' order (linq-opt-demo-1 to 3).",
+      "source": "02-contracts K-11; arch 07 line 379; MC 8 'iPhone tests' (a poll); K-04 seed-outbox-row part 2"
+    },
+    {
+      "file": "send-link-card.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "The secure page link for Alex's haircut as a link card, the whole message, on iMessage.",
+      "source": "02-contracts K-11; arch 07 line 381 ('the whole message (Linq 1004)'); MC 8 'iPhone tests' (a link card); Q-51"
+    },
+    {
+      "file": "send-calendar-file.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "Alex's confirmation words carrying a new calendar file (UID and SEQUENCE 0, Sat Nov 14 11:00am with Riley at Lee's Barbershop).",
+      "source": "02-contracts K-11; arch 07 lines 367, 383; RFC 5545; MC 8 'iPhone tests' (calendar file new, moved, cancelled); K-07 out-alex-booked-riley"
+    },
+    {
+      "file": "send-photo.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "A photo to Sam on iMessage, by a K-13 placeholder file id: the tested format the port carries ahead of a K-03 send kind.",
+      "source": "02-contracts K-11 ('photo'); MC 8 'iPhone tests' (a photo); K-07 open gap 6"
+    },
+    {
+      "file": "send-typing.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "Typing dots started for Alex, with no key and no message id: re-sent every 60 s for at most 2 minutes, cleared by the reply or a stop.",
+      "source": "02-contracts K-11; arch 07 line 385; MC 8 'iPhone tests' (typing dots)"
+    },
+    {
+      "file": "send-tapback.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "Rosie's like on Alex's 'thanks!' (not a poll), in place of a reply; Linq reports it back as K-06 reaction-from-rosie.",
+      "source": "02-contracts K-11; arch 07 line 391; MC 8 'iPhone tests' (Rosie's tapback, a like); K-06 reaction-from-rosie.json"
+    },
+    {
+      "file": "send-threaded-reply.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "Words to Alex threaded under the question they answer, when two questions are open.",
+      "source": "02-contracts K-11; arch 07 line 389; MC 8 'iPhone tests' (a threaded reply)"
+    },
+    {
+      "file": "send-override-optout.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "The guard's one reply to Ben T.'s second STOP, a send the rules allow while Linq blocks the phone, with overrideOptout true.",
+      "source": "02-contracts K-11; arch 10 line 524; K-01 fixed line stopLaterReply; QUESTIONS 'Raised by readers' (sends the rules allow after an exact STOP)"
+    },
+    {
+      "file": "error-403-2024.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "A reminder to Ben T. claimed just before his STOP reached Rosie: Linq refuses it, 403 with code 2024, kind optedOut, not retried.",
+      "source": "02-contracts K-11; arch 10 line 524; K-07 retry rule 7"
+    },
+    {
+      "file": "error-4006.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "Sam's new-booking text times out with 4006, kind mayStillDeliver: a new key only if no receipt within 1 minute.",
+      "source": "02-contracts K-11; arch 01 line 65; K-07 outbox-4006-new-key.json"
+    },
+    {
+      "file": "error-rate-limit.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "accept",
+      "shows": "Avery's text meets Linq's rate limit: 429, code 1007, Retry-After 65 s, kind rateLimited.",
+      "source": "02-contracts K-11; arch 10 lines 540, 556; K-07 outbox-retry-after-reclaimed.json"
+    },
+    {
+      "file": "contact-add-ok.json",
+      "version": "v1",
+      "def": "contactAdd.exchange",
+      "expect": "accept",
+      "shows": "Alex's saved mobile added as a Linq contact; its request is K-07 effect-linq-contact-add's portRequest.",
+      "source": "02-contracts K-11 'Add a contact'; arch 11 line 572; MC C9; CQ-04; Q-03; K-07 effect-linq-contact-add.json"
+    },
+    {
+      "file": "contact-add-failed.json",
+      "version": "v1",
+      "def": "contactAdd.exchange",
+      "expect": "accept",
+      "shows": "A walk-in's mobile that Linq will not add: failed, not retryable, so no chat link is shown.",
+      "source": "02-contracts K-11; arch 11 line 572; Q-03; DL-013"
+    },
+    {
+      "file": "capability.json",
+      "version": "v1",
+      "def": "capabilityCheck.exchange",
+      "expect": "accept",
+      "shows": "Tomás's number takes no iMessage now, RCS instead; the caller caches the answer for 10 minutes.",
+      "source": "02-contracts K-11 'Capability check'; arch 07 line 365; K-04 seed-phone-chat-open (Tomás on rcs)"
+    },
+    {
+      "file": "double-signed-webhook.json",
+      "version": "v1",
+      "def": "doubleWebhook.exchange",
+      "expect": "accept",
+      "shows": "The Linq double signs a webhook for the test-phone page carrying K-06 test-phone-page.json; verifyWebhook on it gives that event back.",
+      "source": "02-contracts K-11 'The double's test hooks'; BP 9.4; C-205, C-211; K-06 test-phone-page.json"
+    },
+    {
+      "file": "invalid/refuse-poll-six-options.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "refuse",
+      "shows": "send-poll.json with six options: refused, a poll carries 2 to 5.",
+      "source": "02-contracts K-11 Fixtures; arch 07 line 379"
+    },
+    {
+      "file": "invalid/refuse-tapback-on-poll.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "refuse",
+      "shows": "send-tapback.json aimed at a poll message (onPoll true): refused, Linq rejects any tapback on a poll.",
+      "source": "02-contracts K-11 Fixtures; arch 07 line 391"
+    },
+    {
+      "file": "invalid/refuse-bold.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "refuse",
+      "shows": "send-text.json with bold text decorations: refused, v1 has no field for bold until its test passes.",
+      "source": "02-contracts K-11 Fixtures ('until tested') and 'Not in v1'; MC 8 'iPhone tests'"
+    },
+    {
+      "file": "invalid/refuse-sms-channel.json",
+      "version": "v1",
+      "def": "sendPart.exchange",
+      "expect": "refuse",
+      "shows": "send-text.json asking Linq to send by SMS (preferredService sms): refused, no SMS channel in v1.",
+      "source": "02-contracts K-11 Fixtures and 'Not in v1'; DL-012; DL-031; MC C9"
+    },
+    {
+      "file": "invalid/refuse-key-on-text.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "refuse",
+      "shows": "verify-ok.json with a part key beside Alex's received text: refused, only message.sent and message.delivered echo a key.",
+      "source": "README spike row 7; arch 01 line 65"
+    }
+  ]
+}

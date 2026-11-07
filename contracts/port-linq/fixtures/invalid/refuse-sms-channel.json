@@ -1,0 +1,32 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-23T14:05:03Z",
+    "note": "send-text.json asking Linq to carry it by SMS (Linq's preferred_service): no SMS channel in v1. A chat Linq itself reports as SMS gets its reply in that chat, text only, with service sms and nothing chosen."
+  },
+  "request": {
+    "idempotencyKey": "out-a7-03-alex/1/1",
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "preferredService": "sms",
+    "kind": "words",
+    "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "linq-msg-demo-0001",
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "acceptedAt": "2026-10-23T14:05:03Z"
+  }
+}

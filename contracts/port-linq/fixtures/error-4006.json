@@ -1,0 +1,32 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-11-07T15:06:35Z",
+    "note": "Sam's new-booking text times out with 4006, which may still deliver: a new key (try 2) goes only if no delivery receipt comes within 1 minute (K-07 outbox-4006-new-key)."
+  },
+  "request": {
+    "idempotencyKey": "out-sam-booked-riley/1/1",
+    "to": "+15555550100",
+    "chatId": "linq-chat-demo-sam",
+    "service": "imessage",
+    "kind": "words",
+    "text": "New booking: Alex M. with Riley.\nSat Nov 14, 11:00am",
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "failed",
+    "kind": "mayStillDeliver",
+    "httpStatus": 500,
+    "code": "4006",
+    "reason": "Message send timed out",
+    "retryAfterSeconds": null,
+    "providerMessageId": null
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-20T13:00:03Z",
+    "note": "Ben T.'s reminder was claimed a moment before his exact STOP reached Rosie, so limit 8 did not drop it; Linq already blocks the phone and refuses the send with 403 and code 2024. It is not retried as it was: the row is dropped as stopped."
+  },
+  "request": {
+    "idempotencyKey": "out-ben-reminder/1/1",
+    "to": "+15555550106",
+    "chatId": "linq-chat-demo-ben",
+    "service": "imessage",
+    "kind": "words",
+    "text": "Reminder: your haircut at Lee's Barbershop is tomorrow at 11:00am.",
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "failed",
+    "kind": "optedOut",
+    "httpStatus": 403,
+    "code": "2024",
+    "reason": "Recipient asked you to stop messaging them",
+    "retryAfterSeconds": null,
+    "providerMessageId": null
+  }
+}

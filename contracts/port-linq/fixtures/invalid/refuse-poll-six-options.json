@@ -1,0 +1,31 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-23T14:05:05Z",
+    "note": "send-poll.json with six options: a poll carries 2 to 5."
+  },
+  "request": {
+    "idempotencyKey": "out-a7-03-alex/2/1",
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "kind": "poll",
+    "text": null,
+    "calendarFile": null,
+    "options": ["Sat 12:00pm", "Sat 2:00pm", "Sat 3:30pm", "Sat 4:00pm", "Sat 4:30pm", "Sat 5:00pm"],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "linq-msg-demo-0002",
+    "providerOptionIds": ["linq-opt-demo-1", "linq-opt-demo-2", "linq-opt-demo-3"],
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "acceptedAt": "2026-10-23T14:05:05Z"
+  }
+}

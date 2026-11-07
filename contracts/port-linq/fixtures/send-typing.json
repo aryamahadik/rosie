@@ -1,0 +1,31 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-23T14:05:00Z",
+    "note": "Typing dots to Alex from the turn lease; re-sent every 60 s for at most 2 minutes and cleared by the reply. No outbox row, so no key; Linq makes no message."
+  },
+  "request": {
+    "idempotencyKey": null,
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "kind": "typing",
+    "text": null,
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": "start",
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": null,
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-alex",
+    "service": null,
+    "acceptedAt": "2026-10-23T14:05:00Z"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "webhook-id": "evt-alex-0001",
+  "webhook-timestamp": "1791822001",
+  "webhook-signature": "v1,COMPUTED-AT-TEST-TIME",
+  "x-webhook-event": "message.received",
+  "x-webhook-subscription-id": "linq-sub-demo-0001",
+  "x-webhook-timestamp": "1791822001",
+  "x-webhook-signature": "COMPUTED-AT-TEST-TIME"
+}

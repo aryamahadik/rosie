@@ -1,0 +1,16 @@
+{
+  "call": "contactAdd",
+  "given": {
+    "now": "2026-10-05T17:00:01Z",
+    "note": "The reach card saves Alex's mobile, so its linq_contact_add effect runs: added (K-07 effect-linq-contact-add, whose portRequest is this request). Only now may the chat link be shown (Q-03)."
+  },
+  "request": {
+    "phone": "+15555550101"
+  },
+  "outcome": {
+    "result": "added",
+    "phone": "+15555550101",
+    "alreadyContact": false,
+    "providerContactId": "linq-contact-demo-alex"
+  }
+}
