@@ -15,7 +15,7 @@ db/
 
 - **Expand only:** new tables, nullable columns, indexes built concurrently. Dropping or renaming ships later in its own deployment, once no live code uses the old shape, in a file whose name contains `_contract_` (reviewed by the architect and the lead). `npm run guard:migrations` checks every branch.
 - **Names:** a new file on a task branch is `9999_<slug>.sql`; the lead renumbers it to the next free 4-digit number at merge. A merged migration is never edited: `migrate` refuses to run when an applied file's sha256 has changed.
-- **Transactions:** each file runs in one transaction, together with its row in `schema_migrations`, so a file holds no `BEGIN` or `COMMIT`. `CREATE INDEX CONCURRENTLY` cannot run inside a transaction: put it alone in a file whose first line is `-- migrate:no-transaction`, written with `IF NOT EXISTS`.
+- **Transactions:** each file runs in one transaction, together with its row in `schema_migrations`, so a file holds no `BEGIN` or `COMMIT`. PostgreSQL refuses some statements inside a transaction, so two kinds of file run outside one, a statement at a time: (1) a file of only `CREATE INDEX CONCURRENTLY` statements, found by itself; (2) a file whose first line is `-- migrate:no-transaction`, holding exactly one statement of any kind (`DROP INDEX CONCURRENTLY`, `REINDEX CONCURRENTLY`, `DETACH PARTITION ... CONCURRENTLY`) or several that are all `CREATE INDEX CONCURRENTLY`. A file that mixes `CREATE INDEX CONCURRENTLY` with other statements is refused before anything runs. Write the statements with `IF NOT EXISTS`.
 - `0001_init.sql` creates `schema_migrations` and the extensions `postgis`, `btree_gist` and `pgcrypto`, all in `public`.
 
 ## Local database (Docker)
