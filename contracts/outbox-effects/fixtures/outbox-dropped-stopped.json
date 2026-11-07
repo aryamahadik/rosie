@@ -58,7 +58,9 @@
     "claimer": "dispatcher-1",
     "claimedAt": "2026-11-06T19:00:04Z",
     "lapsesAt": "2026-11-06T19:01:04Z",
-    "claimNo": 1
+    "claimNo": 1,
+    "firstTryAt": null,
+    "nextTryNotBefore": null
   },
   "moves": [
     {

@@ -144,12 +144,54 @@ function outboxLifeProblems(life) {
     }
   }
 
-  // A row fails only after 15 minutes of tries (arch 02 line 125).
+  // The claim's firstTryAt: when the first part went to the provider, kept across re-claims (arch 02 line 125). It
+  // falls between the first part move and the first part outcome (sent, failed or delivered), and is set once a part
+  // has had one.
+  const allPartMoves = moves.filter((move) => move.subject === "part");
+  const firstOutcome = allPartMoves.find((move) => ["sent", "failed", "delivered"].includes(move.to));
+  if (claim !== null) {
+    if (claim.firstTryAt === null) {
+      if (firstOutcome !== undefined)
+        problems.push(
+          `claim: firstTryAt is null, but a part reached ${firstOutcome.to} at ${firstOutcome.at}`,
+        );
+    } else if (allPartMoves.length === 0 || time(claim.firstTryAt) < time(allPartMoves[0].at)) {
+      problems.push("claim: firstTryAt comes before any part was written");
+    } else if (firstOutcome !== undefined && time(claim.firstTryAt) > time(firstOutcome.at)) {
+      problems.push(`claim: firstTryAt is after the first part outcome (${firstOutcome.at})`);
+    }
+  }
+
+  // A row fails only after 15 minutes of tries, counted from the claim's firstTryAt (arch 02 line 125).
   const failedMove = rowMoves.find((move) => move.to === "failed");
   if (failedMove !== undefined) {
-    const firstSending = rowMoves.find((move) => move.to === "sending");
-    if (firstSending === undefined || time(failedMove.at) - time(firstSending.at) < GIVE_UP_AFTER_MS) {
-      problems.push(`row ${row.id}: fails only after 15 minutes of tries (arch 02 line 125)`);
+    const firstTryAt = claim?.firstTryAt ?? null;
+    if (firstTryAt === null || time(failedMove.at) - time(firstTryAt) < GIVE_UP_AFTER_MS) {
+      problems.push(
+        `row ${row.id}: fails only after 15 minutes of tries from the claim's firstTryAt (arch 02 line 125)`,
+      );
+    }
+  }
+
+  // The claim's nextTryNotBefore (the provider's Retry-After: arch 10 line 540) is set only while a next try waits:
+  // the row is sending, a part is pending, and that part has not moved since it was set (the try clears it).
+  if (claim !== null && claim.nextTryNotBefore !== null) {
+    const waiting = parts.filter((part) => part.state === "pending");
+    const lastMoveAt = (key) => {
+      const own = partMoves.get(key) ?? [];
+      return own.length > 0 ? own[own.length - 1].at : undefined;
+    };
+    if (row.state !== "sending" || waiting.length === 0) {
+      problems.push("claim: nextTryNotBefore is set only while the row is sending with a part pending");
+    } else if (
+      !waiting.some((part) => {
+        const at = lastMoveAt(part.idempotencyKey);
+        return at !== undefined && time(at) < time(claim.nextTryNotBefore);
+      })
+    ) {
+      problems.push(
+        "claim: nextTryNotBefore must come after the pending part's latest move (a try clears it)",
+      );
     }
   }
 
@@ -171,6 +213,22 @@ function outboxLifeProblems(life) {
     }
     if (followUp.why === "safetyOtherWay" && row.sendClass !== "safety") {
       problems.push("followUps: safetyOtherWay follows only a safety line (arch 02 line 125)");
+    }
+    if (followUp.why === "chatOpenAnswer" && row.state !== "superseded") {
+      problems.push("followUps: chatOpenAnswer follows only a superseded row (arch 06 line 313)");
+    }
+  }
+  // A superseded row gave way to exactly one message, written in the same commit (arch 06 line 313: 'then one
+  // message gives each booking as it stands'; RULES 4.1b).
+  if (row.state === "superseded") {
+    const answers = followUps.filter((followUp) => followUp.why === "chatOpenAnswer");
+    const superseded = rowMoves.find((move) => move.to === "superseded");
+    if (answers.length !== 1) {
+      problems.push(`row ${row.id}: a superseded row names the one message it gave way to (chatOpenAnswer)`);
+    } else if (superseded !== undefined && answers[0].at !== superseded.at) {
+      problems.push(`row ${row.id}: the one message is written in the commit that supersedes the row`);
+    } else if (answers[0].recipientHandleId !== row.recipientHandleId) {
+      problems.push(`row ${row.id}: the one message goes to the same mobile that texted in`);
     }
   }
   return problems;
@@ -230,8 +288,8 @@ function effectLifeProblems(life) {
 
 /**
  * lifeChain: one record's moves chain together under the retry rules. Sources: 02-contracts K-07 ("every state move
- * in the fixtures is allowed and no other"; the retry rules); arch 01 line 65; arch 02 line 125; arch 07 line 367;
- * arch 10 line 542; arch 11 lines 576, 582. A provider event has no moves and always passes.
+ * in the fixtures is allowed and no other"; the retry rules); arch 01 line 65; arch 02 line 125; arch 06 line 313;
+ * arch 07 line 367; arch 10 lines 540, 542; arch 11 lines 576, 582. A provider event has no moves and always passes.
  */
 export function lifeChain(record) {
   if (record.record === "outboxRow") return outboxLifeProblems(record);

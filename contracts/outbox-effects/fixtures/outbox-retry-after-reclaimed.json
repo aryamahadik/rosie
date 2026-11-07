@@ -1,0 +1,144 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-avery-new-booking-alex",
+    "turnId": "turn-alex-book-3",
+    "commitSeq": 14,
+    "recipientHandleId": "handle-avery",
+    "recipientPersonId": "person-avery",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-avery-nov21",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "sending",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-avery-new-booking-alex",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "New booking: Alex M. at Sat Nov 21, 11:00am.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "name", "value": "Alex M." },
+        { "slot": "visit.time", "value": "Sat Nov 21, 11:00am" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0120"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-avery-new-booking-alex",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-avery-new-booking-alex/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "failed",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": "2026-11-07T19:00:05Z",
+      "errorCode": "429"
+    },
+    {
+      "outboxRowId": "out-avery-new-booking-alex",
+      "partNo": 1,
+      "tryNo": 2,
+      "idempotencyKey": "out-avery-new-booking-alex/1/2",
+      "attempts": 1,
+      "kind": "words",
+      "state": "pending",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-2",
+    "claimedAt": "2026-11-07T19:01:10Z",
+    "lapsesAt": "2026-11-07T19:02:10Z",
+    "claimNo": 2,
+    "firstTryAt": "2026-11-07T19:00:04Z",
+    "nextTryNotBefore": "2026-11-07T19:02:05Z"
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-07T19:00:00Z",
+      "by": "commitTurn",
+      "note": "Alex books a haircut with Avery at Lee's Barbershop; a routine row tells Avery."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-07T19:00:03Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-07T19:00:04Z",
+      "by": "claimOutbox",
+      "note": "dispatcher-1 claims it (claim 1); the first part goes at once, so the claim's firstTryAt is 19:00:04."
+    },
+    {
+      "subject": "part",
+      "key": "out-avery-new-booking-alex/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T19:00:04Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "Try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-avery-new-booking-alex/1/1",
+      "from": "pending",
+      "to": "failed",
+      "at": "2026-11-07T19:00:05Z",
+      "by": "markPart",
+      "errorCode": "429",
+      "note": "Linq refuses it with a Retry-After of 120 s: a reported failure, so the next try gets a new key (arch 01 line 65)."
+    },
+    {
+      "subject": "part",
+      "key": "out-avery-new-booking-alex/1/2",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T19:00:05Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Try 2, written with the failure; the claim's nextTryNotBefore holds 19:02:05, the Retry-After, since each try goes after any Retry-After (arch 10 line 540)."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sending",
+      "at": "2026-11-07T19:01:10Z",
+      "by": "claimOutbox",
+      "note": "dispatcher-1 dies while it waits; its claim lapses at 19:01:04 (60 s after its try) and dispatcher-2 claims the row again (claim 2). The claim's nextTryNotBefore tells it to send try 2 at 19:02:05, not now, and firstTryAt stays 19:00:04, so the 15 minutes before the next way still count from the first try (arch 02 line 125)."
+    }
+  ],
+  "followUps": []
+}

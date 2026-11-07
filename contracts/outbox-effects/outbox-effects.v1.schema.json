@@ -50,7 +50,7 @@
     },
     "rowState": {
       "title": "OutboxRowState",
-      "description": "Where an outbox row stands (02-contracts K-07 'The outbox row's life'; arch 02 lines 123 to 127; arch 06 line 313; K-04 outbox_rows.state, default planned). planned: committed, final parts not written (the plan may be stored: an email copy's, K-04 seed-outbox-row). checked: the final parts are written and passed the message checks (K-05 v1 writePlan writes the plan and the final parts together, after the checks, so the plan's 'composed' and 'checked' are one stored state; a passed-on row carries K-01's fixed line passedOn in its final parts). sending: claimed by one dispatcher, which sends its parts in order (K-05 v1 claimOutbox: 'K-07's claimed state'). sent: every part accepted by the provider. delivered: every part's delivery receipt came (on SMS, Linq's sent receipt is the receipt: arch 02 line 127). held: limit 8 held it for text hours until held_until (arch 06 line 313). dropped_stopped: the phone is stopped; its question takes step 9's never-delivered path. stale: versions changed at send; its plan and final parts are cleared and it is composed again from today's record (S13-57). withdrawn: stale and its booking or question has closed. failed: sends still failing after 15 minutes of tries; the next way follows (S12-09, S12-10).",
+      "description": "Where an outbox row stands (02-contracts K-07 'The outbox row's life'; arch 02 lines 123 to 127; arch 06 line 313; K-04 outbox_rows.state, default planned). planned: committed, final parts not written (the plan may be stored: an email copy's, K-04 seed-outbox-row). checked: the final parts are written and passed the message checks (K-05 v1 writePlan writes the plan and the final parts together, after the checks, so the plan's 'composed' and 'checked' are one stored state; a passed-on row carries K-01's fixed line passedOn in its final parts). sending: claimed by one dispatcher, which sends its parts in order (K-05 v1 claimOutbox: 'K-07's claimed state'). sent: every part accepted by the provider. delivered: every part's delivery receipt came (on SMS, Linq's sent receipt is the receipt: arch 02 line 127). held: limit 8 held it for text hours until held_until (arch 06 line 313). dropped_stopped: the phone is stopped; its question takes step 9's never-delivered path. stale: versions changed at send; its plan and final parts are cleared and it is composed again from today's record (S13-57). withdrawn: stale and its booking or question has closed, or a waiting_chat row whose booking or question closed before the chat opened. failed: sends still failing after 15 minutes of tries; the next way follows (S12-09, S12-10). waiting_chat: limit 8 found a customer mobile with no open chat, so the row waits, with no claim, no clock and no held_until, until the mobile texts in (arch 06 line 313: 'other rows wait, with no clock, until it texts in'; RULES 4.1b; MC C9: Rosie never writes first, so no first-contact SMS goes either). superseded: a waiting_chat row whose mobile texted in; the one message that gives each booking as it stands took its place, and it is never sent (arch 06 line 313; RULES 4.1b: 'Rosie answers once with the booking as it stands now ... Nothing sent before is sent again').",
       "type": "string",
       "enum": [
         "planned",
@@ -62,7 +62,9 @@
         "dropped_stopped",
         "stale",
         "withdrawn",
-        "failed"
+        "failed",
+        "waiting_chat",
+        "superseded"
       ]
     },
     "partState": {
@@ -84,7 +86,7 @@
     },
     "outboxActor": {
       "title": "OutboxActor",
-      "description": "What made a move (K-05 v1 calls, 02-contracts K-05 items 1 to 3): commitTurn writes the row; writePlan writes its plan and final parts; claimOutbox claims it (and, from K-05 v1.1, claims a row whose claim lapsed); markPart marks a part and moves the row as its parts move; markRow is limit 8's outcome at send; dispatcherGivesUp is the dispatcher ending a row after 15 minutes of failing tries (arch 02 line 125), whose K-05 call is K-05 v1.1's (open gap).",
+      "description": "What made a move (K-05 v1 calls, 02-contracts K-05 items 1 to 3): commitTurn writes the row (and, from K-05 v1.1, moves a waiting_chat row: to superseded in the commit of the turn that answers the mobile's first text, or to withdrawn in the commit that closes its booking or question); writePlan writes its plan and final parts; claimOutbox claims it (and, from K-05 v1.1, claims a row whose claim lapsed); markPart marks a part and moves the row as its parts move; markRow is limit 8's outcome at send (its waitingChat outcome is K-05 v1.1's); dispatcherGivesUp is the dispatcher ending a row after 15 minutes of failing tries (arch 02 line 125), whose K-05 call is K-05 v1.1's (open gap).",
       "type": "string",
       "enum": ["commitTurn", "writePlan", "claimOutbox", "markPart", "markRow", "dispatcherGivesUp"]
     },
@@ -226,6 +228,30 @@
             "to": { "const": "failed" },
             "by": { "const": "dispatcherGivesUp" }
           }
+        },
+        {
+          "description": "Limit 8 at send, a customer mobile with no open chat: the row waits, its claim let go, with no clock and no held_until, until the mobile texts in (arch 06 line 313; RULES 4.1b; MC C9; K-05 v1.1 markRow waitingChat).",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "waiting_chat" },
+            "by": { "const": "markRow" }
+          }
+        },
+        {
+          "description": "The mobile texted in: the commit of the turn that answers it writes the one message giving each booking as it stands, and every waiting row of that mobile gives way to it (arch 06 line 313: 'then one message gives each booking as it stands'; RULES 4.1b; K-05 v1.1).",
+          "properties": {
+            "from": { "const": "waiting_chat" },
+            "to": { "const": "superseded" },
+            "by": { "const": "commitTurn" }
+          }
+        },
+        {
+          "description": "No longer needed before the chat opened: a later turn's commit closed its booking or question, so it is withdrawn, as a stale row whose booking or question closed is (arch 06 line 313; K-05 v1.1).",
+          "properties": {
+            "from": { "const": "waiting_chat" },
+            "to": { "const": "withdrawn" },
+            "by": { "const": "commitTurn" }
+          }
         }
       ]
     },
@@ -353,7 +379,7 @@
         },
         "state": { "$ref": "#/$defs/rowState" },
         "heldUntil": {
-          "description": "Held for text hours until this time (outbox_rows.held_until; arch 02 line 125); set when held, kept after.",
+          "description": "Held for text hours until this time (outbox_rows.held_until; arch 02 line 125); set when held, kept after, except that a move to waiting_chat clears it (no clock: arch 06 line 313).",
           "$ref": "#/$defs/nullableUtc"
         },
         "finalParts": {
@@ -469,6 +495,11 @@
                 "properties": { "state": { "enum": ["checked", "sending", "sent", "delivered", "held"] } }
               },
               "then": { "properties": { "finalParts": { "type": "object" } } }
+            },
+            {
+              "description": "A row waiting for the chat to open, or superseded after it opened, has no held_until: it waits with no clock (arch 06 line 313).",
+              "if": { "properties": { "state": { "enum": ["waiting_chat", "superseded"] } } },
+              "then": { "properties": { "heldUntil": { "type": "null" } } }
             }
           ]
         }
@@ -600,17 +631,25 @@
           "description": "1 for the first claim, raised by each re-claim (held, lapsed or reopened).",
           "type": "integer",
           "minimum": 1
+        },
+        "firstTryAt": {
+          "description": "When the row's first part went to the provider (outbox_claims.first_try_at), kept across re-claims, so the 15 minutes of tries before the next way count from it although claimedAt changes at each re-claim (arch 02 line 125: 'Sends still failing after 15 minutes of tries'); null until a part goes (a row limit 8 held, dropped or withdrew before any send). Written by the dispatcher at its first send (K-05 v1.1).",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "nextTryNotBefore": {
+          "description": "The earliest time the row's pending next try may go: the provider's Retry-After on its last failure (outbox_claims.next_try_not_before; arch 10 line 540: 'sends follow step 8, each try after any Retry-After'), so a dispatcher that claims the row again after a lapse knows when to send. Null when the provider gave none, and cleared when the try goes. Written with the failure (K-05 v1.1 markPart failed).",
+          "$ref": "#/$defs/nullableUtc"
         }
       },
-      "required": ["claimer", "claimedAt", "lapsesAt", "claimNo"],
+      "required": ["claimer", "claimedAt", "lapsesAt", "claimNo", "firstTryAt", "nextTryNotBefore"],
       "additionalProperties": false
     },
     "followUp": {
       "title": "OutboxFollowUp",
-      "description": "A row written because of this one (arch 02 line 125): nextWay, the next way the person allows after the row failed for 15 minutes (S12-10: email); ownerGetsNumber, none left, so the owner gets the number to call (S12-10); safetyOtherWay, a safety line also sent at once every other way the person allows (RULES 4.12). K-04 v1 stores no link between the rows: the event log holds it until a K-04 or K-05 minor version adds one (open gap).",
+      "description": "A row written because of this one (arch 02 line 125): nextWay, the next way the person allows after the row failed for 15 minutes (S12-10: email); ownerGetsNumber, none left, so the owner gets the number to call (S12-10); safetyOtherWay, a safety line also sent at once every other way the person allows (RULES 4.12); chatOpenAnswer, on a superseded row, the one message that gives each booking as it stands, written when the mobile texted in, which every waiting row of that mobile gave way to (arch 06 line 313; RULES 4.1b). K-04 v1 stores no link between the rows: the event log holds it until a K-04 or K-05 minor version adds one (open gap).",
       "type": "object",
       "properties": {
-        "why": { "enum": ["nextWay", "ownerGetsNumber", "safetyOtherWay"] },
+        "why": { "enum": ["nextWay", "ownerGetsNumber", "safetyOtherWay", "chatOpenAnswer"] },
         "outboxRowId": { "$ref": "#/$defs/id" },
         "recipientHandleId": { "$ref": "#/$defs/id" },
         "channel": { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/channel" },
@@ -621,7 +660,7 @@
     },
     "outboxLife": {
       "title": "OutboxLife",
-      "description": "One outbox row's life: the row and its parts as they stand, the claim, every move in order, and the rows that followed it. The fixtures are these records (02-contracts K-07 Fixtures). The named rule lifeChain checks what one schema cannot: each subject's moves chain in time order and end in its state, keys follow (row, part, try), a new key comes only after a reported failure (and after a 4001 or 4006 only when no receipt came within 1 minute), the second send waits for the first's receipt or 10 s, and a row fails only after 15 minutes of tries.",
+      "description": "One outbox row's life: the row and its parts as they stand, the claim, every move in order, and the rows that followed it. The fixtures are these records (02-contracts K-07 Fixtures). The named rule lifeChain checks what one schema cannot: each subject's moves chain in time order and end in its state, keys follow (row, part, try), a new key comes only after a reported failure (and after a 4001 or 4006 only when no receipt came within 1 minute), the second send waits for the first's receipt or 10 s, a row fails only after 15 minutes of tries counted from the claim's firstTryAt, the claim's firstTryAt and nextTryNotBefore agree with the moves, and a superseded row names the one message it gave way to (chatOpenAnswer).",
       "type": "object",
       "properties": {
         "record": { "const": "outboxRow" },
@@ -641,7 +680,16 @@
         "followUps": { "type": "array", "items": { "$ref": "#/$defs/followUp" } }
       },
       "required": ["record", "row", "parts", "claim", "moves", "followUps"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "row": { "type": "object", "properties": { "state": { "enum": ["waiting_chat", "superseded"] } } }
+        }
+      },
+      "then": {
+        "description": "A row waiting for the chat to open keeps no claim: the move to waiting_chat lets its outbox_claims row go, so nothing lapses or re-claims it (arch 06 line 313: 'wait, with no clock').",
+        "properties": { "claim": { "type": "null" } }
+      }
     },
 
     "effectKind": {
@@ -663,15 +711,23 @@
     },
     "effectState": {
       "title": "EffectState",
-      "description": "Where an effect row stands (02-contracts K-07 'Effect rows'; arch 10 lines 508, 542; arch 11 line 582): pending (written by the commit, or by a clock firing with no turn); running (claimed by the effects runner, a try in flight or a network error being retried on the same key); succeeded; declined (a card decline: never retried, RULES 3.11); outage (5 tries in 10 minutes failed: that service's outage row, S12-16 to S12-18; it waits and then runs once); cancelled (let go while its service was down: S12-17).",
+      "description": "Where an effect row stands (02-contracts K-07 'Effect rows'; arch 10 lines 508, 542; arch 11 line 582): pending (written by the commit, by a clock firing with no turn, or by the daily reconciliation); running (claimed by the effects runner, a try in flight or a network error being retried on the same key); succeeded; declined (a card decline: never retried, RULES 3.11); outage (5 tries in 10 minutes failed: that service's outage row, S12-16 to S12-18; it waits and then runs once); cancelled (let go while its service was down: S12-17).",
       "type": "string",
       "enum": ["pending", "running", "succeeded", "declined", "outage", "cancelled"]
     },
     "effectActor": {
       "title": "EffectActor",
-      "description": "What made an effect move: commitTurn or fireClock writes it (K-05 v1); claimEffects, recordEffectResult and serviceBack are K-05 v1.1's effect calls (claim effect rows, record an effect's result: 02-contracts K-05 v1.1); letGo is the outage path letting a booking go (S12-17).",
+      "description": "What made an effect move: commitTurn or fireClock writes it (K-05 v1); claimEffects, recordEffectResult and serviceBack are K-05 v1.1's effect calls (claim effect rows, record an effect's result: 02-contracts K-05 v1.1); letGo is the outage path letting a booking go (S12-17); reconciliationJob is the daily reconciliation (C-112), a job with no turn, writing the refund of a charge with no agreed booking behind it (arch 10 line 550; S12-26), whose K-05 call is K-05 v1.1's.",
       "type": "string",
-      "enum": ["commitTurn", "fireClock", "claimEffects", "recordEffectResult", "serviceBack", "letGo"]
+      "enum": [
+        "commitTurn",
+        "fireClock",
+        "claimEffects",
+        "recordEffectResult",
+        "serviceBack",
+        "letGo",
+        "reconciliationJob"
+      ]
     },
     "effectMove": {
       "title": "EffectMove",
@@ -762,6 +818,15 @@
             "by": { "const": "letGo" },
             "tryOutcome": { "type": "null" }
           }
+        },
+        {
+          "description": "Written by the daily reconciliation, a job with no turn: a charge with no agreed booking behind it is refunded at once (arch 10 line 550; S12-26). Only a stripe_refund, written by a job (effectLife).",
+          "properties": {
+            "from": { "type": "null" },
+            "to": { "const": "pending" },
+            "by": { "const": "reconciliationJob" },
+            "tryOutcome": { "type": "null" }
+          }
         }
       ]
     },
@@ -775,11 +840,11 @@
           "$ref": "#/$defs/id"
         },
         "turnId": {
-          "description": "The turn whose commit wrote it (arch 10 line 508); null for one a clock firing with no turn wrote (jobId).",
+          "description": "The turn whose commit wrote it (arch 10 line 508); null for one a job wrote with no turn, a clock firing or the daily reconciliation (jobId).",
           "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/turnId" }, { "type": "null" }]
         },
         "jobId": {
-          "description": "The job that wrote it when no turn did, such as the minute sweep firing monthly billing (arch 10 line 540; K-04 event_log.job_id); null otherwise.",
+          "description": "The job that wrote it when no turn did, such as the minute sweep firing monthly billing (arch 10 line 540) or the daily reconciliation refunding a charge with no agreed booking (arch 10 line 550) (K-04 event_log.job_id); null otherwise.",
           "$ref": "#/$defs/nullableId"
         },
         "businessId": {
@@ -965,7 +1030,33 @@
         }
       },
       "required": ["record", "effect", "moves", "providerEventIds"],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "moves": {
+            "type": "array",
+            "contains": {
+              "type": "object",
+              "properties": { "by": { "const": "reconciliationJob" } },
+              "required": ["by"]
+            }
+          }
+        },
+        "required": ["moves"]
+      },
+      "then": {
+        "description": "Reconciliation writes only the refund of a charge with no agreed booking behind it, and as a job, never a turn (arch 10 line 550: 'with no agreed booking behind it, refunded at once'; S12-26). A charge with no line gets its line, and a line with no charge takes the charge-failed path (A6-32), whose one pay link waits for the owner's OK in a turn: neither is an effect row reconciliation writes.",
+        "properties": {
+          "effect": {
+            "type": "object",
+            "properties": {
+              "kind": { "const": "stripe_refund" },
+              "turnId": { "type": "null" },
+              "jobId": { "$ref": "#/$defs/id" }
+            }
+          }
+        }
+      }
     },
 
     "providerEvent": {

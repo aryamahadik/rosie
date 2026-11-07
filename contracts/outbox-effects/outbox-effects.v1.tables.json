@@ -4,7 +4,7 @@
   "tables": [
     {
       "name": "effects",
-      "description": "One effect row per Stripe, calendar or Linq contact call a commit (or a clock firing with no turn) causes: the call runs from this row, so a crash or retry never doubles or loses it (arch 10 line 508). One idempotency key over all its tries; 5 tries in 10 minutes, then that service's outage row; a card decline never retried (arch 10 line 542). Reconciliation matches Stripe charges and refunds to ledger lines by its id (arch 10 line 550). K-07's schema (effectRow) gives each column's meaning and the state moves.",
+      "description": "One effect row per Stripe, calendar or Linq contact call a commit (or a job with no turn: a clock firing, or the daily reconciliation's refund of a charge with no agreed booking) causes: the call runs from this row, so a crash or retry never doubles or loses it (arch 10 line 508). One idempotency key over all its tries; 5 tries in 10 minutes, then that service's outage row; a card decline never retried (arch 10 line 542). Reconciliation matches Stripe charges and refunds to ledger lines by its id (arch 10 line 550). K-07's schema (effectRow) gives each column's meaning and the state moves.",
       "source": "02-contracts K-07 'Effect rows' and its schema addition (migrated with K-05 v1.1); arch 01 line 77; arch 05 line 267; arch 10 lines 508, 542, 550; arch 11 lines 572, 582; CQ-04",
       "columns": [
         {
@@ -28,8 +28,8 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "The job that wrote it when no turn did, such as the minute sweep firing monthly billing (K-04 event_log.job_id).",
-          "source": "arch 10 line 540; K-04 v1 event_log_turn_or_job"
+          "description": "The job that wrote it when no turn did, such as the minute sweep firing monthly billing or the daily reconciliation refunding a charge with no agreed booking (K-04 event_log.job_id).",
+          "source": "arch 10 lines 540, 550; K-04 v1 event_log_turn_or_job"
         },
         {
           "name": "business_id",
@@ -514,7 +514,7 @@
     },
     {
       "name": "outbox_claims",
-      "description": "The claim on an outbox row in state sending: who holds it and when it lapses, so a dispatcher that died never strands its recipient's later rows (K-04 v1 has no claim-time column; K-05 v1 open gap 1). One row per outbox row, written at its first claim and updated at each re-claim.",
+      "description": "The claim on an outbox row in state sending: who holds it and when it lapses, so a dispatcher that died never strands its recipient's later rows (K-04 v1 has no claim-time column; K-05 v1 open gap 1). One row per outbox row, written at its first claim and updated at each re-claim; a row's move to waiting_chat deletes it (no claim kept while it waits for the chat to open: arch 06 line 313).",
       "source": "02-contracts K-05 item 3 ('with a claim so no row is sent twice'); K-05 v1 open gap 1; arch 11 line 576; README 'How a claim lapses'",
       "columns": [
         {
@@ -557,6 +557,22 @@
           "audience": "never",
           "description": "1 for the first claim, raised by each re-claim.",
           "source": "README 'How a claim lapses'"
+        },
+        {
+          "name": "first_try_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the row's first part went to the provider, kept across re-claims: the 15 minutes of tries before the next way count from it, although claimed_at changes at a re-claim. Null until a part goes.",
+          "source": "arch 02 line 125 ('Sends still failing after 15 minutes of tries')"
+        },
+        {
+          "name": "next_try_not_before",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "The earliest time the row's pending next try may go: the provider's Retry-After on its last failure, so a dispatcher that claims the row again after a lapse knows when to send. Null when none was given; cleared when the try goes.",
+          "source": "arch 10 line 540 ('each try after any Retry-After')"
         },
         {
           "name": "version",

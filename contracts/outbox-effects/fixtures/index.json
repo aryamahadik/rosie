@@ -105,6 +105,30 @@
       "source": "arch 06 line 313; K-05 v1 markRow withdrawn"
     },
     {
+      "file": "outbox-waiting-chat-superseded.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Sam adds Dee W.'s booking with Riley; Dee's mobile has no open chat, so limit 8 puts the row to waiting_chat (markRow; claim let go, no clock, no held_until, no SMS). When Dee sends the ready text, the commit of the turn that answers it writes one message giving the booking as it stands (chatOpenAnswer) and the row is superseded, never sent.",
+      "source": "arch 06 line 313; RULES 4.1b; MC C9; K-05 v1.1"
+    },
+    {
+      "file": "outbox-waiting-chat-withdrawn.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Dee W.'s booking with Avery: the row waits for Dee's chat to open (waiting_chat), then Sam calls the visit off before Dee texts in, and that turn's commit withdraws it (waiting_chat to withdrawn), never sent.",
+      "source": "arch 06 line 313; RULES 4.1b; K-05 v1.1"
+    },
+    {
+      "file": "outbox-retry-after-reclaimed.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Avery's new-booking row: try 1 refused with a Retry-After of 120 s, so try 2 waits under a new key and the claim holds nextTryNotBefore; the dispatcher dies, its claim lapses and dispatcher-2 claims the row again (claim 2), keeping nextTryNotBefore and the claim's firstTryAt, which the 15 minutes count from.",
+      "source": "arch 10 line 540 ('each try after any Retry-After'); arch 02 line 125; arch 01 line 65; arch 11 line 576"
+    },
+    {
       "file": "effect-charge.json",
       "version": "v1",
       "rule": "lifeChain",
@@ -127,6 +151,14 @@
       "expect": "accept",
       "shows": "Alex calls the Groom's package off before the 24-hour cutoff: the $40 deposit refunded once, matched to its ledger line by effect id.",
       "source": "02-contracts K-07 Fixtures; arch 10 line 550; fixture set v1 barber.json"
+    },
+    {
+      "file": "effect-reconciliation-refund.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The daily reconciliation (a job, no turn) finds Dee W.'s $20 payment charged twice, the second with no agreed booking behind it: it writes a stripe_refund effect (reconciliationJob), which is claimed and succeeds on its one key.",
+      "source": "arch 10 line 550; S12-26; 02-contracts K-14 list-double-charge.json"
     },
     {
       "file": "effect-gave-up-outage.json",
@@ -249,6 +281,20 @@
       "expect": "refuse",
       "shows": "A declined card tried again (declined to running): no such move, so it is refused.",
       "source": "arch 10 line 542; RULES 3.11"
+    },
+    {
+      "file": "invalid/refuse-waiting-with-claim.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "Dee W.'s row waiting for the chat to open but keeping its claim: refused, since a waiting row keeps no claim. The same row with its claim let go (null) passes.",
+      "source": "arch 06 line 313 ('wait, with no clock')"
+    },
+    {
+      "file": "invalid/refuse-waiting-by-wrong-actor.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "Dee W.'s row put to waiting_chat by markPart: no such move, since only limit 8 at send (markRow) does it. The same move by markRow passes.",
+      "source": "arch 06 line 313; 02-contracts K-07 Contract test ('every state move ... is allowed and no other')"
     }
   ]
 }
