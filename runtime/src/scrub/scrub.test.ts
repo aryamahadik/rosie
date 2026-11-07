@@ -674,42 +674,66 @@ describe("properties", () => {
 
 // The time is held by its growth, not by a bound in milliseconds: a bound in milliseconds fails on a busy machine
 // (T-242's 5 ms failed at 7.9 ms with 17 parallel workers, and passed alone). The text is made 4 times as long and the
-// median of several timed runs of each length is compared: a scrub linear in the text takes about 4 times as long,
-// one quadratic in it about 16 times, and the fixed limit is 8 times: twice the linear figure and half the quadratic
-// one, so noise has to double the time of one length and not the other to fail a linear scrub, and a quadratic scrub
-// cannot pass. The runs of the two lengths alternate, so a machine that gets busy for a while slows both medians alike
-// and the ratio holds; the median ignores a pause that hits one run.
+// timed runs of each length are compared: a scrub linear in the text takes about 4 times as long, one quadratic in it
+// about 16 times, and the fixed limit is 8 times: twice the linear figure and half the quadratic one.
+//
+// What is timed is the scrub's own cost (T-1074; a median of wall-clock times still failed with 5 builders running
+// vitest at once: 10.27 against 8 in T-143, a 5 s timeout in T-182):
+//  - each run is timed by the CPU this process spends (process.cpuUsage, user plus system), not by the wall clock, so
+//    the time a busy machine keeps the process waiting is not counted. Vitest's unit project runs each test file in its
+//    own forked process (the default pool is forks, with isolation, and vitest.config.ts sets neither), and the tests
+//    of one file run one after another, so no other file's work and no other test's work is in the figure;
+//  - the fastest run of each length is kept, not the median: noise only ever adds time, so the fastest run is the
+//    closest to the scrub's own cost;
+//  - the runs of the two lengths alternate, so a change in the machine's speed (a clock that steps down, a hotter
+//    cache) over the measure reaches both lengths alike.
 
-/** The time in milliseconds the scrub takes on `text`. */
-function timed(text: string): number {
-  const started = performance.now();
-  scrub(text);
-  return performance.now() - started;
+/** The CPU time in microseconds this process spends running `run`. */
+function cpuTimed(run: () => unknown): number {
+  const before = process.cpuUsage();
+  run();
+  const spent = process.cpuUsage(before);
+  return spent.user + spent.system;
 }
 
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  return sorted[Math.floor(sorted.length / 2)] ?? 0;
+/**
+ * How many times as long `run` takes on the `large` text as on the `small` one, by the CPU time of the fastest of
+ * `runs` alternating runs of each (after `warmups` runs of each that are not kept).
+ */
+function growthOf(
+  run: (text: string) => unknown,
+  small: string,
+  large: string,
+  runs: number,
+  warmups: number,
+): number {
+  for (let warm = 0; warm < warmups; warm += 1) {
+    run(small);
+    run(large);
+  }
+  let fastestSmall = Number.POSITIVE_INFINITY;
+  let fastestLarge = Number.POSITIVE_INFINITY;
+  for (let at = 0; at < runs; at += 1) {
+    fastestSmall = Math.min(
+      fastestSmall,
+      cpuTimed(() => run(small)),
+    );
+    fastestLarge = Math.min(
+      fastestLarge,
+      cpuTimed(() => run(large)),
+    );
+  }
+  // A CPU clock that reads 0 for a very short run must not divide by zero: 1 microsecond is below what a run takes.
+  return fastestLarge / Math.max(fastestSmall, 1);
 }
 
-/** How many times as long the scrub takes on `text` made 4 times as long, by the median of alternating runs. */
+/** How many times as long the scrub takes on `text` made 4 times as long, by the fastest of alternating runs. */
 function growth(make: (length: number) => string, length: number): number {
   const small = make(length);
   const large = make(length * 4);
   expect(small.length).toBeGreaterThanOrEqual(length);
   expect(large.length).toBeGreaterThanOrEqual(length * 4);
-  for (let warm = 0; warm < 5; warm += 1) {
-    timed(small);
-    timed(large);
-  }
-  const smallTimes: number[] = [];
-  const largeTimes: number[] = [];
-  for (let run = 0; run < 15; run += 1) {
-    smallTimes.push(timed(small));
-    largeTimes.push(timed(large));
-  }
-  // A clock that reads 0 for a very short run must not divide by zero: 1 microsecond is below what a run takes.
-  return median(largeTimes) / Math.max(median(smallTimes), 0.001);
+  return growthOf(scrub, small, large, 15, 5);
 }
 
 const LINEAR_LIMIT_FOR_4X = 8;
@@ -751,22 +775,10 @@ describe("speed: the time grows in step with the length of the text", () => {
       return seen;
     };
     const make = repeated("Order 4242424242424241 total $1,250.00 call 555-0104. ");
-    const small = make(3_000);
-    const large = make(12_000);
-    for (let warm = 0; warm < 2; warm += 1) {
-      quadratic(small);
-      quadratic(large);
-    }
-    const smallTimes: number[] = [];
-    const largeTimes: number[] = [];
-    for (let run = 0; run < 7; run += 1) {
-      let started = performance.now();
-      quadratic(small);
-      smallTimes.push(performance.now() - started);
-      started = performance.now();
-      quadratic(large);
-      largeTimes.push(performance.now() - started);
-    }
-    expect(median(largeTimes) / Math.max(median(smallTimes), 0.001)).toBeGreaterThan(LINEAR_LIMIT_FOR_4X);
+    // The texts are shorter than the shapes' (1 000 and 4 000 characters), so the stand-in finishes in well under a
+    // second of CPU even on a loaded machine; its ratio still reads 14 to 16, nearly twice the limit.
+    const small = make(1_000);
+    const large = make(4_000);
+    expect(growthOf(quadratic, small, large, 7, 2)).toBeGreaterThan(LINEAR_LIMIT_FOR_4X);
   });
 });
