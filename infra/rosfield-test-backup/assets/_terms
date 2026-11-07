@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Terms · Rosfield</title>
+    <meta
+      name="description"
+      content="Customer terms and business terms for Rosie, Rosfield&#x27;s automated AI booking assistant: bookings, payments, fees and messages."
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f8f3f7" />
+    <link rel="canonical" href="https://rosfield.com/terms" />
+    <link rel="preload" href="/assets/fonts/spacegrotesk-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/assets/home/home.1fab1fbcad.css" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/assets/brand/rosfield-app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Rosfield" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://rosfield.com/terms" />
+    <meta property="og:title" content="Terms · Rosfield" />
+    <meta
+      property="og:description"
+      content="Customer terms and business terms for Rosie, Rosfield&#x27;s automated AI booking assistant: bookings, payments, fees and messages."
+    />
+    <meta property="og:image" content="https://rosfield.com/assets/home/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Rosfield. Coming soon. The front desk every human and AI books through." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Terms · Rosfield" />
+    <script src="/assets/ga.js" async></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="mast">
+      <a class="lockup" href="/" aria-label="Rosfield, home"
+        ><svg viewBox="25.744 3.861 549.821 111.247" width="129" height="26" aria-hidden="true" focusable="false">
+          <path
+            fill="currentColor"
+            d="M46.271,16.761 L50.186,20.113 L55.081,46.960 L41.026,23.569 L41.752,18.466 L36.602,9.894 L34.248,17.142 L26.744,15.817 L31.895,24.389 L36.741,26.144 L52.126,51.750 L67.874,51.750 L83.259,26.144 L88.105,24.389 L93.256,15.817 L85.752,17.142 L83.398,9.894 L78.248,18.466 L78.974,23.569 L64.919,46.960 L69.814,20.113 L73.729,16.761 L75.522,6.923 L68.969,10.811 L64.209,4.861 L62.415,14.698 L64.895,19.217 L60.000,46.063 L55.105,19.217 L57.585,14.698 L55.791,4.861 L51.031,10.811 L44.478,6.923 Z M40.000,65.250 L80.000,65.250 L80.000,54.750 L40.000,54.750 Z M31.673,107.144 L44.884,98.749 L38.883,95.144 L41.026,96.431 L55.081,73.040 L50.186,99.887 L45.759,99.079 L50.134,114.108 L59.532,101.591 L52.646,100.335 L55.105,100.783 L60.000,73.937 L64.895,100.783 L67.354,100.335 L60.468,101.591 L69.866,114.108 L74.241,99.079 L69.814,99.887 L64.919,73.040 L78.974,96.431 L81.117,95.144 L75.116,98.749 L88.327,107.144 L87.117,91.539 L83.259,93.856 L67.874,68.250 L52.126,68.250 L36.741,93.856 L32.883,91.539 Z"
+          />
+          <path
+            fill="currentColor"
+            d="M144.03110634428273 98.37125138198655V20.597344748873084H176.69614713019038Q183.9180098889795 20.597344748873084 189.41773614374966 23.09722031922316Q194.91746239851983 25.59709588957324 197.97286587339215 30.263530287560048Q201.02826934826447 34.92996468554686 201.02826934826447 41.37408837800483V42.59624976795376Q201.02826934826447 49.92921810764731 197.52844354977435 54.317888553372995Q194.02861775128423 58.70655899909869 189.0288666105841 60.484248293569856V62.261937588041015Q193.2508786849531 62.484148749849915 195.80630704575543 65.09512990110444Q198.36173540655773 67.70611105235896 198.36173540655773 72.59475661215467V98.37125138198655H186.2512270879729V74.26134032572138Q186.2512270879729 71.2614896413013 184.69574895531062 69.48380034683012Q183.14027082264835 67.70611105235896 179.69599781461048 67.70611105235896H156.0305090819631V98.37125138198655ZM156.0305090819631 56.81776412372307H175.362880159337Q181.807003851795 56.81776412372307 185.36238244073732 53.54014948704186Q188.91776102967964 50.26253485036065 188.91776102967964 44.59615022423382V43.70730557699824Q188.91776102967964 38.040920950871396 185.41793523118955 34.76330631419019Q181.91810943269945 31.48569167750898 175.362880159337 31.48569167750898H156.0305090819631Z M240.24853940753454 99.92672951464883Q232.0267264206054 99.92672951464883 225.63815551859966 96.53800929706317Q219.2495846165939 93.14928907947751 215.58310044674712 86.81627096792398Q211.91661627690036 80.48325285637046 211.91661627690036 71.81701754582353V70.15043383225681Q211.91661627690036 61.484198521709885 215.58310044674712 55.20673320060858Q219.2495846165939 48.92926787950728 225.63815551859966 45.4849948714694Q232.0267264206054 42.040721863431514 240.24853940753454 42.040721863431514Q248.47035239446367 42.040721863431514 254.91447608692164 45.4849948714694Q261.35859977937963 48.92926787950728 265.0250839492264 55.20673320060858Q268.69156811907317 61.484198521709885 268.69156811907317 70.15043383225681V71.81701754582353Q268.69156811907317 80.48325285637046 265.0250839492264 86.81627096792398Q261.35859977937963 93.14928907947751 254.91447608692164 96.53800929706317Q248.47035239446367 99.92672951464883 240.24853940753454 99.92672951464883ZM240.24853940753454 89.70501607143963Q247.803718909037 89.70501607143963 252.52570609747602 84.87192330209615Q257.24769328591503 80.03883053275267 257.24769328591503 71.48370080311018V70.48375057497016Q257.24769328591503 61.92862084532767 252.58125888792824 57.09552807598419Q247.91482448994145 52.26243530664072 240.24853940753454 52.26243530664072Q232.80446548693652 52.26243530664072 228.0824782984975 57.09552807598419Q223.36049111005846 61.92862084532767 223.36049111005846 70.48375057497016V71.48370080311018Q223.36049111005846 80.03883053275267 228.0824782984975 84.87192330209615Q232.80446548693652 89.70501607143963 240.24853940753454 89.70501607143963Z M305.35640981754096 99.92672951464883Q294.9124852125229 99.92672951464883 288.02393919644715 95.26029511666201Q281.13539318037135 90.5938607186752 279.57991504770905 81.14988634179714L290.24605081453603 78.59445798099485Q291.13489546177163 83.1497867980772 293.24590149895613 85.81632073978395Q295.3569075361406 88.48285468149069 298.5234165919174 89.59391049053517Q301.68992564769417 90.70496629957965 305.35640981754096 90.70496629957965Q310.8005832818589 90.70496629957965 313.7448811758268 88.59396026239514Q316.68917906979465 86.48295422521063 316.68917906979465 83.1497867980772Q316.68917906979465 79.81661937094377 313.91153954718345 78.26114123828151Q311.13390002457226 76.70566310561924 305.6897265602543 75.7057128774792L301.91213680950307 75.03907939205251Q296.3568577642807 74.03912916391249 291.80152894719834 72.15033428853687Q287.24620013011594 70.26153941316126 284.5796661884092 66.92837198602783Q281.91313224670245 63.59520455889439 281.91313224670245 58.373242256385346Q281.91313224670245 50.595851593073995 287.69062245373374 46.31828672825276Q293.46811266076503 42.040721863431514 303.02319261854757 42.040721863431514Q312.2449558336167 42.040721863431514 318.18910441200467 46.20718114734831Q324.13325299039263 50.3736404312651 325.9109422848638 57.48439760914976L315.2448065180368 60.484248293569856Q314.2448562898968 55.4844971528697 311.0227944436678 53.429043906137416Q307.8007325974388 51.37359065940513 303.02319261854757 51.37359065940513Q298.3567582205607 51.37359065940513 295.690224278854 53.09572716342407Q293.02369033714723 54.817863667443014 293.02369033714723 57.92881993276755Q293.02369033714723 61.261987359900985 295.63467148840175 62.81746549256326Q298.24565263965627 64.37294362522553 302.6898758758342 65.15068269155665L306.57857120748986 65.81731617698335Q312.4671669954256 66.81726640512338 317.3558125552213 68.59495569959455Q322.24445811501704 70.37264499406571 325.07765042808046 73.70581242119914Q327.9108427411438 77.03897984833257 327.9108427411438 82.59425889355497Q327.9108427411438 90.8160718804841 321.8000357913992 95.37140069756646Q315.6892288416546 99.92672951464883 305.35640981754096 99.92672951464883Z M351.13190915017344 98.37125138198655V53.26238553478075H335.79933898535967V43.59619999609379H351.13190915017344V31.596797258413417Q351.13190915017344 26.597046117713276 354.13175983459354 23.59719543329318Q357.13161051901363 20.597344748873084 362.1313616597138 20.597344748873084H376.24177043457865V30.263530287560044H365.7978458295606Q362.5757839833316 30.263530287560044 362.5757839833316 33.59669771469349V43.59619999609379H378.35277647176315V53.26238553478075H362.5757839833316V98.37125138198655Z M390.0188624667302 98.37125138198655V43.59619999609379H401.4627372998883V98.37125138198655ZM395.7963526737615 36.15212607549579Q392.46318524662803 36.15212607549579 390.18552083808686 33.98556724785905Q387.9078564295457 31.819008420222318 387.9078564295457 28.374735412184435Q387.9078564295457 24.930462404146553 390.18552083808686 22.76390357650982Q392.46318524662803 20.597344748873084 395.7963526737615 20.597344748873084Q399.2406256817994 20.597344748873084 401.4627372998883 22.76390357650982Q403.68484891797726 24.930462404146553 403.68484891797726 28.374735412184435Q403.68484891797726 31.819008420222318 401.4627372998883 33.98556724785905Q399.2406256817994 36.15212607549579 395.7963526737615 36.15212607549579Z M443.57175246267406 99.92672951464883Q435.23883389484047 99.92672951464883 429.0169213641914 96.42690371615872Q422.7950088335423 92.92707791766861 419.2951830350522 86.53850701566286Q415.7953572365621 80.1499361136571 415.7953572365621 71.70591196491908V70.37264499406571Q415.7953572365621 61.81751526442323 419.2396302446 55.42894436241748Q422.68390325263783 49.04037346041173 428.8502629928347 45.54054766192162Q435.01662273303157 42.040721863431514 443.12733013905626 42.040721863431514Q451.01582638327204 42.040721863431514 456.95997496166 45.54054766192162Q462.904123540048 49.04037346041173 466.23729096718137 55.26228599106081Q469.5704583943148 61.484198521709885 469.5704583943148 69.81711708954347V74.15023474481693H427.46144323152913Q427.68365439333803 81.37209750360604 432.2945360008726 85.64966236842727Q436.90541760840716 89.92722723324852 443.79396362448296 89.92722723324852Q450.2380873169409 89.92722723324852 453.5157019536221 87.03848212973287Q456.79331659030333 84.14973702621724 458.5710058847745 80.372147275466L468.01498026165257 85.26079283526171Q466.45950212899027 88.37174910058626 463.5152042350224 91.81602210862414Q460.5709063410545 95.26029511666202 455.7933663621633 97.59351231565543Q451.01582638327204 99.92672951464883 443.57175246267406 99.92672951464883ZM427.5725488124336 65.37289385336555H457.90437239934784Q457.45995007573003 59.150981322716476 453.46014916316994 55.65115552422637Q449.4603482506098 52.15132972573627 443.0162245581518 52.15132972573627Q436.5721008656938 52.15132972573627 432.51674716268144 55.65115552422637Q428.4613934596691 59.150981322716476 427.5725488124336 65.37289385336555Z M483.34755042646634 98.37125138198655V20.597344748873084H494.7914252596245V98.37125138198655Z M534.4561176425124 99.92672951464883Q527.678677207341 99.92672951464883 521.9011870003097 96.59356208751538Q516.1236967932784 93.26039466038195 512.6238709947884 86.98292933928064Q509.12404519629825 80.70546401817936 509.12404519629825 71.81701754582353V70.15043383225681Q509.12404519629825 61.373092940805435 512.5683182043362 55.04007482925191Q516.012591212374 48.707056717698386 521.7900814194053 45.37388929056495Q527.5675716264366 42.040721863431514 534.4561176425124 42.040721863431514Q539.7891855259259 42.040721863431514 543.4001169053204 43.37398883428489Q547.011048284715 44.70725580513827 549.3442654837083 46.76270905187055Q551.6774826827018 48.818162298602836 552.8996440726506 51.04027391669179H554.6773333671218V20.597344748873084H566.12120820028V98.37125138198655H554.8995445289307V90.5938607186752H553.1218552344595Q551.0108491972751 94.14923930761753 546.7332843324539 97.03798441113318Q542.4557194676325 99.92672951464883 534.4561176425124 99.92672951464883ZM537.6781794887413 89.92722723324852Q545.1222534093394 89.92722723324852 549.9553461786828 85.14968725435726Q554.7884389480263 80.372147275466 554.7884389480263 71.48370080311018V70.48375057497016Q554.7884389480263 61.70640968351878 550.010898969135 56.92886970462752Q545.2333589902438 52.15132972573627 537.6781794887413 52.15132972573627Q530.3452111490478 52.15132972573627 525.5121183797044 56.92886970462752Q520.6790256103608 61.70640968351878 520.6790256103608 70.48375057497016V71.48370080311018Q520.6790256103608 80.372147275466 525.5121183797044 85.14968725435726Q530.3452111490478 89.92722723324852 537.6781794887413 89.92722723324852Z"
+          /></svg
+      ></a>
+      <nav aria-label="Legal">
+        <ul>
+          <li><a href="/terms" aria-current="page">Terms</a></li>
+          <li><a href="/privacy">Privacy</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main id="main" class="legal" tabindex="-1">
+      <h1>Terms</h1>
+      <p class="meta">
+        Effective date: <span class="placeholder">[effective date: to be set]</span>. Governing law:
+        <span class="placeholder">[governing law: to be set]</span>. Version provisional-0.1.
+      </p>
+      <div class="note" role="note">
+        <p>
+          <strong>Draft.</strong> Provisional draft provisional-0.1, not yet reviewed by a lawyer, not legal advice. For
+          testing with the founders' numbers only.
+        </p>
+      </div>
+      <p>
+        These terms have two parts: <a href="#customer">customer terms</a> for people who book through Rosie, and
+        <a href="#business">business terms</a> for businesses that take bookings through Rosie. Text messages are also
+        covered by the <a href="/sms">SMS terms</a>, and your information by the <a href="/privacy">privacy notice</a>.
+      </p>
+
+      <h2 id="customer">Customer terms</h2>
+
+      <h3 id="booking">Booking</h3>
+      <p>
+        Rosie books services for businesses. The business, not Rosfield, provides the service and sets its prices, hours
+        and rules. Rosie does not recommend or endorse a business. It shows businesses that fit what you asked, and you
+        choose. A booking keeps the price, fees and cancel rules it was made with; a change applies to new bookings
+        only.
+      </p>
+
+      <h3 id="yes">Your yes</h3>
+      <p>
+        A booking counts only after your clear yes to the exact read-back. A tapback or a reaction is never a yes.
+        Silence is never a yes and never charges you. A new or higher amount, an extra or a plan needs your own yes in
+        your own chat. We keep your yes with the words shown, the time and where you gave it.
+      </p>
+
+      <h3 id="fees-cancel">Cancellation and no-show fees</h3>
+      <p>
+        Each business sets its own, and Rosie shows them before your yes. One fee per booking, and it never exceeds what
+        you paid now. If you paid nothing now, a fee can be charged to a saved card only with the owner's yes. A booking
+        made after free cancel ends says "no free cancel" before your yes. No fee follows a text sent outside text
+        hours. If you send STOP or ask to cancel, no late or no-show fee applies until a person has reached you.
+      </p>
+
+      <h3 id="payment">Payment</h3>
+      <p>
+        Payment goes to the business's own Stripe account. Rosie never holds your money or your card number, and never
+        takes a card number by voice or text. Rosfield charges you no fee. Every charge says what it is for and how to
+        question it. Refunds: what these terms give back goes back; a cancel in time or a business cancel is refunded in
+        full; a charge made twice by mistake is refunded at once; any other refund is the business's call.
+      </p>
+
+      <h3 id="messages">Messages and STOP</h3>
+      <p>
+        By giving your number for a booking you agree to booking texts from Rosie at that number. Message and data rates
+        may apply. Rosie sends booking messages only: no offers or ads. One Rosie number serves every business, so STOP
+        stops Rosie's texts to that phone for every business. STOP alone does not cancel a visit. START turns texts back
+        on. Texts that can wait go between 9am and 8pm in your time zone. The full program terms are in the
+        <a href="/sms">SMS terms</a>.
+      </p>
+
+      <h3 id="ai">The AI assistant</h3>
+      <p>
+        Rosie is an automated AI assistant. It gives no health, legal, money, tax, safety or repair advice; those
+        questions go to the business. If a message is wrong, say so and Rosie corrects it.
+      </p>
+
+      <h3 id="limits">Limits</h3>
+      <p>
+        Rosie is the first step: it gets the appointment. It does not run the business behind it.
+        <span class="placeholder">[Limits of liability, disputes and governing law: for the lawyer to write.]</span>
+      </p>
+
+      <h2 id="business">Business terms</h2>
+      <p class="meta">Fee words are the master's, kept exactly.</p>
+
+      <h3 id="cost">What Rosfield costs</h3>
+      <blockquote>
+        <p>
+          "Rosfield charges $2 per booking its AI makes for you: a flat service fee, not a share of your prices.
+          Memberships and repeat plans billed through Rosie: 1%, a payment-processing fee."
+        </p>
+      </blockquote>
+      <ul>
+        <li>
+          $2 for each booking made through Rosie: a text to Rosie's number, the booking page, or the customer's own AI.
+          The business pays it. It is never added to your customer's price.
+        </li>
+        <li>It is a flat fee: the same for every booking, whatever the business charges.</li>
+        <li>
+          Never more than $49 a month per person, per business, across its kinds of work. A booking with no named person
+          counts for whoever gives the work; with nobody giving it, toward the owner's cap.
+        </li>
+        <li>
+          A membership or repeat plan charged monthly through Rosfield pays 1% of each monthly charge instead of the $2,
+          on top of Stripe's own fee. Its visits carry no $2. The 1% is not under the $49 cap.
+        </li>
+        <li>
+          A plan paid per visit pays $2 per visit at check-in. A member who pays outside Rosie: each class booked
+          through Rosie is $2 at check-in. You can turn those bookings off.
+        </li>
+        <li>Walk-ins and jobs you add yourself are free. Card payments carry Stripe's own fee, paid to Stripe.</li>
+      </ul>
+
+      <h3 id="when">When the $2 counts</h3>
+      <p>
+        At the first check-in code, or at DONE if there was no code. No visit, no $2. "I came but nobody served me"
+        counts none. Cancelled and missed visits count none. One $2 per booking, however many visits or days. A free
+        visit that belongs to an earlier booking adds none; a free booking that stands alone counts one. A visit that
+        happened keeps its $2 even if you let a bank dispute go or part of a plan is refunded.
+      </p>
+      <p>
+        How it is collected: "It comes out of one payment made through Rosie, or goes on the monthly bill. Cash, the
+        business's own way, or a credit: the monthly bill." Never both.
+        <span class="placeholder">[Which payment, and when: to be set.]</span>
+      </p>
+
+      <h3 id="billing">Billing</h3>
+      <p>
+        The bill goes out on the 1st (or the next weekday) for last month's $2s, and is charged 2 days later to the card
+        you saved at sign-up. You can question a line first; a wrong line comes off. Every bill line says what it is
+        for. A failed charge gets one pay link. Rosie never retries the card on its own. Unpaid by the date on the link:
+        new bookings through Rosie pause. Bookings already made go ahead.
+      </p>
+
+      <h3 id="no-referrals">No referrals, no paid placement, no ranking for money</h3>
+      <p>
+        Rosie runs no referrals and no paid placement. Nobody can pay to be listed first or shown more. Order and
+        matching never depend on any fee: not the $2, not the 1%, not a commission, not a network. Rosie does not
+        recommend or endorse a business. It sends no marketing.
+      </p>
+
+      <h3 id="licences">Licences and documents</h3>
+      <p>
+        Licences, insurance and other documents are optional. Rosie never verifies one. It shows each as the business's
+        own word and never says "checked by Rosie". Rosie acts on your word only. If you say a job needs a licence a
+        person lacks, that person is not booked for it. You are responsible for your licences and for following your
+        state's rules for your trade; you confirm this at sign-up.
+      </p>
+
+      <h3 id="refunds">Refunds and your customers' money</h3>
+      <p>
+        Every customer payment goes to your own Stripe account; Rosie never holds it. Rosie never makes a charge or
+        refund on its own. What the terms give back goes back. Other refunds are your call, and you answer within a day;
+        with no answer, one reminder, and the payment stays. If you close, a single future visit gets everything back;
+        with no visit there is no $2.
+      </p>
+
+      <h3 id="health">Health privacy agreement</h3>
+      <p>
+        A business that gives health care signs Rosie's health privacy agreement before its health work goes live.
+        <span class="placeholder">[Form of the agreement: to be set.]</span>
+      </p>
+
+      <h3 id="data">Who is responsible for which data</h3>
+      <p>
+        Your customers' data is yours. Rosfield uses it only for your business: never sold, never for ads or AI
+        training, never joined across businesses. Someone who leaves or starts their own business takes no customer. You
+        tell us your customers' texting yes for numbers you add yourself; Rosie texts them only after that. You follow
+        your trade's privacy and record rules. Rosfield keeps records and every yes for 7 years, or longer where the
+        trade's rules say.
+      </p>
+
+      <h3 id="tax">Sales tax</h3>
+      <p><span class="placeholder">[Sales tax wording: to be set.]</span></p>
+
+      <h2 id="contact">Contact</h2>
+      <p>
+        Questions about these terms: <span class="placeholder">[support email: to be set]</span>, or text HELP to
+        Rosie's number. <span class="placeholder">[Postal address: to be set]</span>.
+      </p>
+      <div class="legal-foot">
+        <p>Rosfield. <span class="placeholder">[Postal address: to be set]</span></p>
+        <p class="draft">
+          Provisional draft provisional-0.1, not yet reviewed by a lawyer, not legal advice. For testing with the
+          founders' numbers only.
+        </p>
+      </div>
+    </main>
+    <footer class="foot">
+      <p>© 2026 Rosfield</p>
+      <nav aria-label="Footer">
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms" aria-current="page">Terms</a></li>
+          <li><a href="/sms">SMS terms</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </body>
+</html>

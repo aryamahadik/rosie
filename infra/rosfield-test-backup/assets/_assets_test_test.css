@@ -1,0 +1,937 @@
+/* rosfield.com/test: Ask Rosie. At rest only the bar; it opens into the conversation, right on the page.
+   No background (Jay, 2026-11-02): no sheet behind the chat. The chat itself is defined: Rosie in frosted white glass,
+   you in coral glass (our iMessage blue), listings as photo cards with the name on a frosted corner, a frosted bar.
+   Light only. Behaviour lives in /assets/test/open.js, the chat itself in /assets/chat.js. */
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("../fonts/spacegrotesk-latin.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Pixel";
+  src: url("../fonts/geistpixel-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Grotesk Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 110%;
+  ascent-override: 89.5%;
+  descent-override: 26.5%;
+  line-gap-override: 0%;
+}
+
+:root {
+  color-scheme: only light;
+  --paper: #f8f3f7;
+  --ink: #0b0b0c;
+  --ink-2: #2b282c;
+  --muted: #6b646a;
+  --faint: #6f676e; /* AA: 4.99:1 on the paper, 5.47:1 on white */
+  --surface: #ffffff;
+  --tint: #f4eff3;
+  --tint-2: #ede6eb;
+  --hair: rgba(11, 11, 12, 0.08);
+  --hair-2: rgba(11, 11, 12, 0.13);
+  --coral: #ff5a5f; /* the deck's coral, Airbnb's own */
+  --coral-ink: #c8333a; /* the deck's deeper coral: white text on it passes AA */
+  --coral-tint: #ffe3e4; /* the deck's soft coral */
+  --you: linear-gradient(180deg, rgba(206, 52, 60, 0.95), rgba(188, 40, 48, 0.97)); /* coral glass: AA (4.7:1+) with white */
+  --you-lift: inset 0 1px 0 rgba(255, 255, 255, 0.32), inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 10px 22px -12px rgba(200, 51, 58, 0.55);
+  --glass: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.64));
+  --glass-lift: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 0 0 1px rgba(11, 11, 12, 0.05), 0 8px 22px -14px rgba(70, 30, 55, 0.3);
+  --frost: saturate(170%) blur(16px);
+  --you-solid: #d63a41;
+  --lift: 0 0 0 1px rgba(11, 11, 12, 0.05), 0 1px 2px rgba(11, 11, 12, 0.05);
+  --card-lift: 0 0 0 1px rgba(11, 11, 12, 0.06), 0 1px 2px rgba(11, 11, 12, 0.04), 0 16px 36px -18px rgba(70, 30, 55, 0.28);
+  --bar-lift: 0 0 0 1px rgba(11, 11, 12, 0.08), 0 1px 2px rgba(11, 11, 12, 0.04), 0 10px 28px -12px rgba(70, 30, 55, 0.22);
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --sans: "Space Grotesk", "Grotesk Fallback", ui-sans-serif, system-ui, sans-serif;
+  --mono: "Geist Pixel", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --col: 720px; /* the conversation's column */
+  --pad: 24px; /* the column's side padding, so the docked composer is exactly the rest bar's width */
+  --bar-h: 60px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+}
+body {
+  font: 400 16px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+}
+[hidden] {
+  display: none !important;
+}
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--coral-ink);
+  outline-offset: 2px;
+}
+
+/* ---------- The column: the whole page height, with nothing drawn around it ---------- */
+.stage {
+  position: fixed;
+  inset: 0;
+  animation: arrive 0.6s cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+  }
+}
+.sheet {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  left: max(24px, calc((100% - var(--col)) / 2));
+  right: max(24px, calc((100% - var(--col)) / 2));
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.sheet-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  background: transparent; /* kept for open.js's motion, never painted */
+  pointer-events: none;
+}
+
+/* Head: the mark on the left, close on the right */
+.sheet-head {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 14px 0 var(--pad);
+}
+.head-mark {
+  display: block;
+  width: 14px;
+  height: 22px;
+  color: var(--ink);
+  border-radius: 4px;
+  transform-origin: 0 0;
+}
+.head-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.close {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.close svg {
+  width: 20px;
+  height: 20px;
+}
+@media (hover: hover) {
+  .close:hover {
+    background: var(--tint);
+  }
+}
+
+/* The conversation */
+.scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tint-2) transparent;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 10px), transparent);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 10px), transparent);
+}
+.log {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px var(--pad) 8px;
+}
+
+.msg {
+  max-width: 100%;
+  margin: 0;
+}
+.msg p {
+  margin: 0;
+}
+.msg-rosie {
+  max-width: min(85%, 34em);
+  padding: 10px 15px 11px;
+  border-radius: 20px 20px 20px 6px;
+  background: var(--glass);
+  box-shadow: var(--glass-lift);
+  -webkit-backdrop-filter: var(--frost);
+  backdrop-filter: var(--frost);
+  color: var(--ink);
+  font-size: 15.5px;
+  line-height: 1.5;
+  letter-spacing: -0.003em;
+}
+.msg-rosie p a {
+  text-decoration: underline;
+  text-decoration-color: var(--hair-2);
+  text-underline-offset: 3px;
+}
+.msg-rosie p a:hover {
+  text-decoration-color: currentColor;
+}
+.msg strong {
+  font-weight: 600;
+}
+.msg-you {
+  align-self: flex-end;
+  max-width: min(80%, 30em);
+  padding: 10px 15px 11px;
+  border-radius: 20px 20px 6px 20px;
+  background: var(--you);
+  box-shadow: var(--you-lift);
+  -webkit-backdrop-filter: var(--frost);
+  backdrop-filter: var(--frost);
+  color: #fff;
+  font-size: 15.5px;
+  line-height: 1.45;
+  letter-spacing: -0.003em;
+  overflow-wrap: anywhere;
+}
+/* A turn change breathes a little more than two lines from the same speaker */
+.msg-rosie + .msg-you,
+.msg-you + .msg-rosie,
+.times + .msg-you,
+.msg-you + .msg-card {
+  margin-top: 8px;
+}
+.msg-card + .msg,
+.msg-card + .times {
+  margin-top: 8px;
+}
+.msg-rosie + .msg-card,
+.msg-rosie + .times {
+  margin-top: 2px;
+}
+
+.msg-in {
+  animation: rise 0.42s var(--ease) both;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Cards: listings and bookings */
+.msg-card {
+  width: min(100%, 440px);
+  padding: 18px 20px 16px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--card-lift);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.card-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: 400 11px/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.card-listing .card-kicker::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+.booked-mark {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+}
+.booked-mark svg {
+  width: 11px;
+  height: 11px;
+}
+.msg-card h3 {
+  margin: 10px 0 2px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+}
+.card-addr {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.card-rows {
+  margin: 16px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--hair);
+}
+.card-rows > div {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 14px;
+  padding: 6px 0;
+}
+.card-rows dt {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.card-rows dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.card-rows ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.card-rows li + li {
+  margin-top: 3px;
+}
+.price {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.card-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px var(--ink);
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 0.2s,
+    transform 0.15s;
+}
+@media (hover: hover) {
+  .btn:hover {
+    background: #f7f4f6;
+  }
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn-solid {
+  background: var(--you);
+  box-shadow: none;
+  color: #fff;
+}
+@media (hover: hover) {
+  .btn-solid:hover {
+    background: #c8333a;
+  }
+}
+.card-booked .card-kicker {
+  color: var(--ink);
+}
+
+/* Listings, Airbnb-style: the photo is the card and the name sits on its frosted corner. Nothing boxes them in */
+.card-listing {
+  width: min(100%, 380px);
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.card-pic {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--tint-2);
+  box-shadow:
+    0 1px 2px rgba(40, 18, 30, 0.08),
+    0 14px 30px -16px rgba(40, 18, 30, 0.42);
+  isolation: isolate;
+}
+.card-pic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease);
+}
+.card-pic h3 {
+  position: absolute;
+  z-index: 1;
+  left: 10px;
+  bottom: 10px;
+  max-width: calc(100% - 20px);
+  margin: 0;
+  padding: 7px 12px 8px;
+  border-radius: 12px;
+  background: rgba(24, 14, 20, 0.5); /* readable on any photo an owner uploads: 5:1 or more, even over white */
+  -webkit-backdrop-filter: saturate(150%) brightness(0.8) blur(16px);
+  backdrop-filter: saturate(150%) brightness(0.8) blur(16px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-pic .card-kicker {
+  position: absolute;
+  z-index: 1;
+  left: 10px;
+  top: 10px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  -webkit-backdrop-filter: var(--frost);
+  backdrop-filter: var(--frost);
+  color: var(--ink);
+}
+.card-listing .card-addr {
+  margin: 11px 2px 0;
+  font-size: 14px;
+}
+.card-listing .card-rows {
+  margin: 10px 2px 0;
+}
+.card-listing .card-actions {
+  margin-top: 12px;
+}
+.msg-rosie.card-listing {
+  max-width: 100%;
+}
+/* Two or more listings: one borderless strip that swipes, each photo opening its listing */
+.results-wrap {
+  position: relative;
+  align-self: stretch;
+}
+.results {
+  display: flex;
+  gap: 12px;
+  width: calc(100% + 2 * var(--pad));
+  margin: -2px calc(-1 * var(--pad)) -18px; /* room for the focus ring and the shadows, with the same footprint */
+  padding: 6px var(--pad) 32px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--pad);
+  scrollbar-width: none;
+}
+.results::-webkit-scrollbar {
+  display: none;
+}
+.results .card-listing {
+  position: relative;
+  flex: 0 0 72%; /* one card and a clear peek of the next */
+  margin-top: 0;
+  scroll-snap-align: start;
+}
+@media (min-width: 641px) {
+  .results .card-listing {
+    flex-basis: calc((100% - 24px) / 2.6); /* two and a bit: the strip always reads as one you swipe */
+  }
+  .results {
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
+  }
+}
+.results .card-kicker,
+.results .card-addr,
+.results .card-rows {
+  display: none;
+}
+.results .card-actions {
+  margin: 0;
+}
+.results .card-actions .btn {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  min-height: 0;
+  border-radius: 20px;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+  font-size: 0;
+}
+.results .card-listing:focus-within .card-pic {
+  outline: 2px solid var(--coral-ink);
+  outline-offset: 2px;
+}
+.results .card-actions .btn:focus-visible {
+  outline: none; /* the photo carries the ring */
+}
+/* Previous and next, for a mouse: frosted, over the photos, gone at each end */
+.rs-btn {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .rs-btn {
+    position: absolute;
+    z-index: 3;
+    top: calc(50% - 23px);
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: var(--frost);
+    backdrop-filter: var(--frost);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+      0 2px 10px rgba(40, 18, 30, 0.2);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      opacity 0.25s,
+      transform 0.15s;
+  }
+  .rs-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .rs-btn:active {
+    transform: scale(0.94);
+  }
+  .rs-prev {
+    left: 8px;
+  }
+  .rs-next {
+    right: 8px;
+  }
+  .results-wrap.at-start .rs-prev,
+  .results-wrap.at-end .rs-next {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+@media (hover: hover) {
+  .results .card-listing:hover img {
+    transform: scale(1.035);
+  }
+}
+.results-wrap + .msg,
+.results-wrap + .times {
+  margin-top: 6px;
+}
+
+/* Time slots */
+.times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(11, 11, 12, 0.1),
+    0 1px 2px rgba(11, 11, 12, 0.05);
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s,
+    background-color 0.2s,
+    color 0.2s,
+    opacity 0.2s,
+    transform 0.15s;
+}
+@media (hover: hover) {
+  .chip:hover:not(:disabled) {
+    box-shadow:
+      0 0 0 1.5px var(--ink),
+      0 1px 2px rgba(11, 11, 12, 0.05);
+  }
+}
+.chip:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.time-btn[aria-pressed="true"] {
+  background: var(--you-solid);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(150, 30, 40, 0.2);
+}
+.time-btn:disabled {
+  cursor: default;
+}
+.time-btn:disabled:not([aria-pressed="true"]) {
+  opacity: 0.38;
+}
+
+/* Typing */
+.typing {
+  display: flex;
+  gap: 5px;
+  width: max-content;
+  margin: 2px var(--pad) 16px;
+  padding: 13px 15px;
+  border-radius: 20px 20px 20px 6px;
+  background: var(--glass);
+  box-shadow: var(--glass-lift);
+}
+.typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0.2;
+  animation: dot 1.2s ease-in-out infinite;
+}
+.typing i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.2;
+    transform: none;
+  }
+  30% {
+    opacity: 0.75;
+    transform: translateY(-2px);
+  }
+}
+
+/* The composer: the rest bar, docked at the foot of the open sheet */
+.composer {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: var(--bar-h);
+  margin: 8px var(--pad) 0;
+  border-radius: calc(var(--bar-h) / 2);
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
+  backdrop-filter: saturate(140%) blur(18px);
+  box-shadow: var(--bar-lift);
+  transition: box-shadow 0.4s var(--ease);
+}
+@media (hover: hover) {
+  .composer:hover {
+    box-shadow:
+      0 0 0 1px rgba(11, 11, 12, 0.12),
+      0 1px 2px rgba(11, 11, 12, 0.04),
+      0 14px 32px -12px rgba(70, 30, 55, 0.26);
+  }
+}
+.composer:focus-within {
+  box-shadow:
+    0 0 0 1px rgba(255, 90, 95, 0.6),
+    0 1px 2px rgba(11, 11, 12, 0.04),
+    0 10px 28px -12px rgba(70, 30, 55, 0.22);
+}
+.composer input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 8px 0 24px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  font-size: 16px; /* 16px: no iOS zoom on focus */
+  letter-spacing: -0.003em;
+  outline: none;
+  cursor: text;
+}
+.composer input::placeholder {
+  color: var(--faint);
+  opacity: 1;
+}
+.send {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--you-solid);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    transform 0.15s;
+}
+@media (hover: hover) {
+  .send:hover:not(:disabled) {
+    background: #c8333a;
+  }
+}
+.send svg {
+  width: 20px;
+  height: 20px;
+}
+.send:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.send:disabled {
+  cursor: default;
+}
+/* Nothing to send: only the coral arrow. Something typed: the button fills */
+.composer.is-empty .send,
+.send:disabled {
+  background: transparent;
+  color: var(--coral-ink);
+}
+
+.sheet-foot {
+  position: relative;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 10px 0 12px;
+  font-size: 11.5px;
+  line-height: 16px;
+}
+.sheet-foot a {
+  color: var(--faint);
+  text-decoration: none;
+}
+@media (hover: hover) {
+  .sheet-foot a:hover {
+    color: var(--ink);
+  }
+}
+
+/* The opening "code": the greeting decoding in from pixel glyphs */
+.boot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+.boot-line {
+  position: absolute;
+  white-space: pre;
+  font: 400 15px/1 var(--mono);
+  letter-spacing: 0.02em;
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    #d9d1d7 0%,
+    #d9d1d7 30%,
+    var(--ink) 44%,
+    var(--coral) 50%,
+    var(--ink) 56%,
+    #d9d1d7 70%,
+    #d9d1d7 100%
+  );
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* ---------- At rest: only the bar ---------- */
+.is-rest .sheet-bg {
+  opacity: 0;
+}
+.is-rest .close,
+.is-rest .scroll,
+.is-rest .sheet-foot {
+  visibility: hidden;
+  opacity: 0;
+}
+.is-rest .composer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(46% - var(--bar-h) / 2);
+}
+.is-rest .sheet-head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(46% - var(--bar-h) / 2 - 40px - 34px);
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+}
+.is-rest .close {
+  position: absolute;
+  right: 0;
+}
+.is-rest .head-mark {
+  width: 25px;
+  height: 40px;
+}
+.is-rest .composer,
+.is-rest .composer input {
+  cursor: text;
+}
+
+
+/* ---------- Phone: the sheet is the screen ---------- */
+@media (max-width: 640px) {
+  :root {
+    --pad: 16px;
+    --bar-h: 56px;
+  }
+  .sheet {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .is-open .sheet,
+  .is-morph .sheet {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .sheet-head {
+    height: 56px;
+    padding-left: 20px;
+    padding-right: 8px;
+  }
+  .composer input {
+    padding-left: 20px;
+  }
+  .send {
+    width: 40px;
+    height: 40px;
+  }
+  .is-rest .composer {
+    top: calc(44% - var(--bar-h) / 2);
+  }
+  .is-rest .sheet-head {
+    top: calc(44% - var(--bar-h) / 2 - 36px - 30px);
+    height: 36px;
+  }
+  .is-rest .head-mark {
+    width: 22px;
+    height: 36px;
+  }
+  .msg-you {
+    max-width: 85%;
+  }
+  .msg-card {
+    width: 100%;
+  }
+  .sheet-foot {
+    padding: 8px 0 10px;
+  }
+}
+
+/* Reduced motion: no movement, only crossfades */
+@media (prefers-reduced-motion: reduce) {
+  .msg-in {
+    animation-name: fade;
+    animation-duration: 0.2s;
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+  .typing i {
+    animation: none;
+    opacity: 0.4;
+  }
+  .composer,
+  .chip,
+  .btn,
+  .send {
+    transition: none;
+  }
+}
