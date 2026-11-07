@@ -1,6 +1,6 @@
 # T-1068 findings: how decide reaches the model (CQ-25)
 
-**Status: offline work done; the live results wait on the lead's one run (NQ-R2).** Everything below the "Live results" heading is to be filled from `results.jsonl` after that run. The sections before it come from the documentation, the probe's dry run and its tests against a fake API (no network, no key).
+**Status: round 1 is live and decided for Haiku: choose (c), the two-step form. The Sonnet cell of (c) waits on the lead's round 2 (`--live --round two-step-sonnet`, 3 calls; NQ-R2).** The "Live results" section is filled from `results.jsonl` for round 1. The sections before it come from the documentation, the probe's dry run and its tests against a fake API (no network, no key).
 
 Card: T-1068 (C-121, C-115; M1; deployment ai-spikes). Question (QUESTIONS.md CQ-25; DL-083): K-02 v1's `decideRead`, sent bundled as one structured output, is refused as "Schema is too complex." on claude-haiku-5-5 (T-1066), and T-360's smaller candidate on both models. Which wire form does the AI gateway (C-121) use for decide, so that the model's answer maps by code into K-02 v1's `decideRead` unchanged?
 
@@ -88,7 +88,11 @@ What stays in code whichever form wins (as before):
 | 7-8  | the two strongest one-call candidates | Sonnet | two-requests | the same on claude-sonnet-5-5                                                   |
 | 9-10 | the same two                          | Haiku  | s1-02        | a second case, one part with a text field                                       |
 
-The probe picks the "strongest" from calls 1 to 3 (`chooseStrongest()`): first those accepted with a valid mapped read, then those accepted, in the order `tools`, `tools-flat`, `envelope`, at most two. A form Haiku refuses is not sent to Sonnet: T-360 saw the same refusal on both models, because compiling is per schema. The two-step candidate is not sent to Sonnet: it costs 3 calls a read, and each of its schemas is smaller than the one-call forms'. Expected cost at the listed prices (Haiku 5.5 $0.10/$0.50, Sonnet 5.5 $2/$10 per million input/output tokens) is under $0.05.
+The probe picks the "strongest" from calls 1 to 3 (`chooseStrongest()`): first those accepted with a valid mapped read, then those accepted, in the order `tools`, `tools-flat`, `envelope`, at most two. A form Haiku refuses is not sent to Sonnet: T-360 saw the same refusal on both models, because compiling is per schema. The two-step candidate is not in this plan's Sonnet calls (it costs 3 calls a read); it is sent on Sonnet by round two below, or at the end of a full run when no one-call form was accepted. Expected cost at the listed prices (Haiku 5.5 $0.10/$0.50, Sonnet 5.5 $2/$10 per million input/output tokens) is under $0.05.
+
+### Round two for (c): `--live --round two-step-sonnet`
+
+Added after round 1 found only (c) accepted. It sends the two-step candidate on claude-sonnet-5-5 with the two-requests case: stage 1, then stage 2 for each part (3 calls). Every safety property above holds: it refuses when `CI` is set or the key is missing, reads the key only from the environment, calls only the Messages API, saves bodies only, scrubs the key, and counts toward the same cap of 12 (6 logged after round 1, so 3 are left for retries after round 2's 3). It appends to the same `results.jsonl` and `samples/` with new ids: `two-step-1-two-requests-sonnet-5-5`, `two-step-2-p1-two-requests-sonnet-5-5`, `two-step-2-p2-two-requests-sonnet-5-5`. It refuses to run when `results.jsonl` already holds the first of those ids, so it cannot be spent twice. A full `--live` run does the same at its end when no one-call form was accepted. `--dry-run` plans it (3 calls) and lints its requests.
 
 ### Offline proof (run 2026-11-07)
 
@@ -100,7 +104,7 @@ The probe picks the "strongest" from calls 1 to 3 (`chooseStrongest()`): first t
 - Each candidate maps 28 of 28 reads there and back to the same `decideRead`, valid against the frozen schema. The 28 are the 27 reads of the 14 accepted K-02 decide fixtures (`decide-s1-02-choose`, `decide-two-requests`, `decide-hand-off`, `decide-hand-off-owner-or-staff`, `decide-redact` and the rest) plus one made-up `enter` read.
 - Every candidate refuses both invalid `decideRead` fixtures (`refuse-unknown-verb`, `refuse-value-without-words`), in the encoder, the wire schema or `decideRead`.
 
-`node --test ai/spikes/decide-wire/probe.test.mjs`: 14 of 14 pass. They cover:
+`node --test ai/spikes/decide-wire/probe.test.mjs`: 19 of 19 pass. They cover:
 
 - the wire schemas, and the tools cut from K-02;
 - the per-request counts;
@@ -113,7 +117,8 @@ The probe picks the "strongest" from calls 1 to 3 (`chooseStrongest()`): first t
 - live refusing in CI, without a key and with 12 calls spent;
 - live against a fake API: 10 calls, every answer valid on the wire, mapped valid and the same as the fixture, with no key or header in any file written;
 - a "too complex" refusal saved with its text and kept from Sonnet, with the cap counting earlier lines;
-- one retry after a 529, and a stop after a 401.
+- one retry after a 529, and a stop after a 401;
+- round two: its plan and ids, 3 Sonnet calls appended after 6 logged lines (mapped valid and the same as the fixture, no key or header written), its refusals (CI, no key, cap spent, already run), its stop at the cap and one retry after a 529, the full run that sends (c) on Sonnet when only (c) is accepted, and the flag forms.
 
 **Fixture gap (for the architect):** no K-02 fixture holds an `enter` part, or an integer, boolean or time value. The probe adds one made-up `enter` read (`MADE_UP_READS` in `probe.mjs`) so every verb and every `fieldValue` branch goes through each wire form offline. A K-02 fixture with an `enter` would be a minor, additive change.
 
@@ -132,16 +137,40 @@ Round 2 (the plan's Sonnet calls) did not run as planned: no one-call candidate 
 
 What it shows: every one-call form is refused, including the flat envelope with no union and no optional property (3.3 KB), which the documentation's advice suggested; the strict-tool forms hit a different limit ("compiled grammar is too large"). Splitting decide into two calls (the documentation's last advice, "split into multiple requests") is the only form accepted, its outputs are valid on the wire, and the mapped read is valid against K-02 v1's decideRead and equal to the fixture.
 
-## Recommendation for CQ-25 (provisional until the live table is filled)
+## Recommendation for CQ-25
 
-Choose **(b) the flat envelope**, mapped by code into K-02 v1's `decideRead`, if the live run shows it accepted on both models with a mapped read valid against `decideRead`. The reasons, from the offline work:
+**Choose (c), the two-step form, for claude-haiku-5-5.** Decide reaches the model as stage 1 (one structured output: the language and each part's quote and verb) and then one structured output per part that is not `no_op` (the verb's own K-02 schema less `verb` and `quote`), mapped by code into K-02 v1's `decideRead` unchanged. No K-02 change is proposed. The Sonnet cell of (c) is pending the lead's round 2 (`--live --round two-step-sonnet`); until it is filled, the choice is settled for Haiku and open for Sonnet. If Sonnet refuses a stage, the architect and the lead decide whether the Sonnet re-read uses another form; this spike does not guess.
+
+### The decision rule applied
+
+The rule written before the run (below, rule 4): "Only (c) works: choose (c), and size its cost (1 + parts calls a read) against the decide budget before C-115 starts." Round 1 gave exactly that case: (a) and (a') refused ("The compiled grammar is too large..."), (b) refused ("Schema is too complex."), (c) accepted with every output valid on the wire, mapped valid against `decideRead` and the same as the fixture. So rules 1 to 3 do not apply and rule 5 (a K-02 change) is not needed.
+
+### Cost of (c), from results.jsonl (Haiku, the two-requests case: 2 parts, 3 calls)
+
+| Call                   | Input tokens | Output tokens | Elapsed                                                                                                         |
+| ---------------------- | ------------ | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| stage 1                | 1,834        | 238           | 6.3 s                                                                                                           |
+| stage 2, part 1        | 2,762        | 273           | 3.8 s                                                                                                           |
+| stage 2, part 2        | 2,768        | 390           | 2.6 s                                                                                                           |
+| **one read (3 calls)** | **7,364**    | **901**       | 12.7 s one after another; about 10.1 s if the stage-2 calls run side by side (stage 1, then the slower stage 2) |
+
+- **Calls.** A read is 1 + parts calls (3 for two parts; at most 1 + the parts a turn holds). Decide runs at least two reads a turn (arch 02 line 119), so a two-part turn is at least 6 model calls, and a re-read by Sonnet when the two reads disagree or a part is unmapped adds 3 more. The two reads are independent, so they can run side by side.
+- **Tokens.** At the listed Haiku prices ($0.10 in and $0.50 out per million tokens), one two-part read costs about $0.0012 (7,364 x 0.10/1e6 + 901 x 0.50/1e6 = $0.00074 + $0.00045), so two reads about $0.0024. The input is the larger part: every stage-2 call carries the whole context again (about 2.7K tokens against stage 1's 1.8K). A one-part read would be 2 calls and about 4.6K input tokens. These are single measurements from one run, not an average.
+- **Time.** About 10 to 13 s for a read on Haiku with `effort` low, one case, one run: a measurement, not a distribution; C-115 checks it against its own time budget. Two reads side by side cost the slower of the two, not the sum. The one-call forms were refused, so there is no faster accepted form to compare with.
+- **Sonnet.** Not measured yet. If Sonnet's tokens match Haiku's (they will not exactly), one read at $2 and $10 per million tokens would be about $0.024. The round 2 lines replace this guess.
+- **Levers for C-115 (not measured here):** run stage 2 for all parts side by side; cache the shared context so the stage-2 calls do not pay for it in full each time (the documentation's prompt caching; the compiled grammar is already cached for 24 hours [S1], and each stage-2 schema is static); skip stage 2 for `no_op` (already done).
+- **What the form gives up.** The model's verb choice is made before its fields, in a separate call, so the fields of part k cannot change part k's verb. That is what the documentation's "split into multiple requests" advice trades for acceptance; a part whose stage 2 fails to map becomes an unmapped part, which already sends the turn to the one Sonnet re-read (arch 02 line 119; Q-41).
+
+### What was written before the run (kept for the record)
+
+Before round 1 the offline work favoured (b), the flat envelope, if it had been accepted on both models. It was refused, so this is history, not the recommendation. The reasons given then:
 
 - It is one structured output, the same gateway path as the safety read and the planner, both accepted live in T-1066. It needs no tool loop and does not depend on the model choosing to call a tool (`auto` is the only choice on claude-sonnet-5-5 [S3]).
 - It is the smallest and simplest schema: 3.3 KB, with no union and no optional property. Its only objects are the envelope, the part and the field. That is what the documentation advises when a schema is too complex ("simplify nested structures" [S1]), and it is far from every explicit limit.
 - It is the cheapest per read. Decide runs at least two reads a turn (arch 02 line 119), and the eight tools add about 15 to 19 KB of tool schema to every request (cacheable, but sent and counted).
 - Its cost is code. The grammar does not enforce each verb's own fields (a `choose` carries a question and a choice, a `hand_off` an `about`); `mapEnvelope()` checks them, then Ajv against `decideRead`. A part that fails becomes "an unmapped part", which already sends the turn to the one Sonnet re-read (arch 02 line 119; Q-41), so no new path is needed.
 
-When the table is filled, the lead or the architect applies this rule:
+The rule written for when the table was filled (rule 4 is the one that applied):
 
 1. (b) accepted on both models and mapped valid: choose (b).
 2. (b) refused or its mapping fails, and (a') accepted and mapped valid: choose (a'), the eight strict tools with typed-text fields. Strict mode guarantees each part's own fields, and the gateway must treat "no tool call" as an unmapped part.

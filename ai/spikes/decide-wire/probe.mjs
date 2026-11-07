@@ -8,6 +8,10 @@
 //                                                    fixture through each candidate offline; no network, no key
 //   node ai/spikes/decide-wire/probe.mjs --live      the lead's one run, with ANTHROPIC_API_KEY in the environment
 //                                                    (never from a file this script opens)
+//   node ai/spikes/decide-wire/probe.mjs --live --round two-step-sonnet
+//                                                    round two for (c): the two-step candidate on claude-sonnet-5-5
+//                                                    (stage 1, then stage 2 for each part: 3 calls for the
+//                                                    two-requests case), appended to results.jsonl and samples/
 //
 // Live rules (DL-027, NQ-R2, hard rule 7): only https://api.anthropic.com/v1/messages; at most 12 calls in total,
 // counting every line already in this folder's results.jsonl, so a second run can never pass 12; refuses to start
@@ -27,9 +31,11 @@ import {
   MAX_CALLS,
   MODELS,
   ONE_CALL,
+  ROUND_TWO,
   agreementKey,
   buildCalls,
   buildFollowUps,
+  buildSonnetTwoStep,
   buildStage2Calls,
   chooseStrongest,
   checkWire,
@@ -47,7 +53,7 @@ import {
 } from "./lib.mjs";
 import { lintSchema } from "../../../contracts/scripts/structured-subset-lint.mjs";
 
-const USAGE = "Usage: node ai/spikes/decide-wire/probe.mjs --dry-run | --live";
+const USAGE = `Usage: node ai/spikes/decide-wire/probe.mjs --dry-run | --live | --live --round ${ROUND_TWO}`;
 const DEFAULT_OUT = new URL("./", import.meta.url);
 const REQUEST_TIMEOUT_MS = 200_000; // the compile timeout is 180 s (Anthropic, "Structured outputs")
 const RETRY_WAIT_MS = 20_000;
@@ -59,6 +65,22 @@ function existingCalls(resultsPath) {
   return readFileSync(resultsPath, "utf8")
     .split("\n")
     .filter((line) => line.trim() !== "").length;
+}
+
+/** The ids already logged in results.jsonl (a line that is not JSON or has no id counts as a call, not an id). */
+function loggedIds(resultsPath) {
+  if (!existsSync(resultsPath)) return new Set();
+  const ids = new Set();
+  for (const line of readFileSync(resultsPath, "utf8").split("\n")) {
+    if (line.trim() === "") continue;
+    try {
+      const id = JSON.parse(line)?.id;
+      if (typeof id === "string") ids.add(id);
+    } catch {
+      // not JSON: counted by existingCalls, carries no id
+    }
+  }
+  return ids;
 }
 
 /** Removes the key from any text before it is written, in case a service ever echoed it. */
@@ -222,6 +244,15 @@ function dryRun(write, outDir) {
       `${2 * FOLLOW_UPS} second-round), ${MAX_CALLS - planned} left for retries (limit ${MAX_CALLS}; results.jsonl logs ${already}); no network, no key`,
   );
   if (planned >= MAX_CALLS) fail(`the plan leaves no retry slot under ${MAX_CALLS}`);
+  // Round two for (c): the two-step candidate on Sonnet (stage 1, then stage 2 for each part of the expected read).
+  const roundTwoHead = buildSonnetTwoStep();
+  const roundTwoStage2 = buildStage2Calls(roundTwoHead, toTwoStep(expected).stage1);
+  const roundTwoCalls = 1 + roundTwoStage2.length;
+  write(
+    `round two (--live --round ${ROUND_TWO}): ${roundTwoCalls} live calls planned on ${roundTwoHead.model} ` +
+      `(1 stage 1, ${roundTwoStage2.length} stage 2); results.jsonl logs ${already}, so ${MAX_CALLS - already - roundTwoCalls} would be left for retries`,
+  );
+  if (roundTwoCalls >= MAX_CALLS) fail(`round two leaves no retry slot under ${MAX_CALLS}`);
   write(`wire schemas compiled with Ajv 2020 strict: ${Object.keys(wire).join(", ")}`);
   for (const [name, schema] of Object.entries(wireSchemas())) {
     const { errors } = lintSchema(schema);
@@ -231,7 +262,7 @@ function dryRun(write, outDir) {
   // 1. Each request (every second-round call any choice could make): models, banned fields, the subset lint and
   //    the per-request limits.
   const followUps = buildFollowUps(ONE_CALL, calls.length + 1);
-  for (const call of [...calls, ...stage2, ...followUps]) {
+  for (const call of [...calls, ...stage2, ...followUps, roundTwoHead, ...roundTwoStage2]) {
     const lint = lintRequest(call.body);
     const wireText = JSON.stringify(call.body);
     const banned = BANNED_BODY_WORDS.filter((word) => wireText.includes(word));
@@ -271,7 +302,7 @@ function dryRun(write, outDir) {
 // ---------------------------------------------------------------------------------------------------------
 // Live run.
 
-async function live({ env, fetchImpl, write, outDir, sleep }) {
+async function live({ env, fetchImpl, write, outDir, sleep, round }) {
   if (env.CI) {
     write("refused: CI is set; this probe never runs in CI (T-1068, NQ-R2).");
     return 2;
@@ -291,6 +322,11 @@ async function live({ env, fetchImpl, write, outDir, sleep }) {
     );
     return 2;
   }
+  const roundTwoHead = buildSonnetTwoStep();
+  if (round === ROUND_TWO && loggedIds(resultsPath).has(roundTwoHead.id)) {
+    write(`refused: results.jsonl already logs ${roundTwoHead.id}; round ${ROUND_TWO} runs once.`);
+    return 2;
+  }
   mkdirSync(samplesDir, { recursive: true });
   const scrub = scrubber(key);
   const wire = compileWire();
@@ -300,7 +336,9 @@ async function live({ env, fetchImpl, write, outDir, sleep }) {
   let made = 0;
   let stopped = false;
   write(
-    `live: ${calls.length} first-round calls and their stage 2, then ${2 * FOLLOW_UPS} second-round calls; ${remaining} of ${MAX_CALLS} left (${already} already logged)`,
+    round === ROUND_TWO
+      ? `live, round ${ROUND_TWO}: the two-step candidate on ${roundTwoHead.model}, stage 1 then stage 2 for each part; ${remaining} of ${MAX_CALLS} left (${already} already logged)`
+      : `live: ${calls.length} first-round calls and their stage 2, then ${2 * FOLLOW_UPS} second-round calls; ${remaining} of ${MAX_CALLS} left (${already} already logged)`,
   );
 
   const record = async (call, attempt, outcome, checks) => {
@@ -402,6 +440,16 @@ async function live({ env, fetchImpl, write, outDir, sleep }) {
     }
   };
 
+  // Round two for (c), asked for by flag: only the two-step candidate, on Sonnet (the lead's round 1 found no
+  // one-call form accepted, so nothing else is sent).
+  if (round === ROUND_TWO) {
+    await runOne(roundTwoHead);
+    write(
+      `live: ${made} calls made; ${already + made} of ${MAX_CALLS} used. Results: results.jsonl, samples/`,
+    );
+    return 0;
+  }
+
   // First round: every candidate on Haiku. Second round: the strongest one-call candidates on Sonnet, then on Haiku
   // with the second case. Compiling is per schema, so a form Haiku refuses is not sent to Sonnet.
   for (const call of calls) await runOne(call);
@@ -410,6 +458,20 @@ async function live({ env, fetchImpl, write, outDir, sleep }) {
     `second round: ${chosen.length > 0 ? chosen.join(", ") : "none (no one-call candidate was accepted)"}`,
   );
   for (const call of buildFollowUps(chosen, calls.length + 1)) await runOne(call);
+  // When only (c) was accepted, it is the one candidate left to try on Sonnet: the same as round two by flag.
+  const twoStepAccepted = lines.some(
+    (line) =>
+      line.candidate === "two-step" &&
+      line.stage === 1 &&
+      line.model === MODELS[0] &&
+      line.wire_valid === true,
+  );
+  if (chosen.length === 0 && twoStepAccepted) {
+    write(
+      `only the two-step candidate was accepted: sending it on ${roundTwoHead.model} (round ${ROUND_TWO})`,
+    );
+    await runOne(roundTwoHead);
+  }
   write(`live: ${made} calls made; ${already + made} of ${MAX_CALLS} used. Results: results.jsonl, samples/`);
   return 0;
 }
@@ -425,12 +487,15 @@ export async function main(
     sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   } = {},
 ) {
-  if (argv.length !== 1 || !["--dry-run", "--live"].includes(argv[0])) {
+  const plain = argv.length === 1 && ["--dry-run", "--live"].includes(argv[0]);
+  const roundTwo =
+    argv.length === 3 && argv[0] === "--live" && argv[1] === "--round" && argv[2] === ROUND_TWO;
+  if (!plain && !roundTwo) {
     write(USAGE);
     return 2;
   }
   if (argv[0] === "--dry-run") return dryRun(write, outDir);
-  return live({ env, fetchImpl, write, outDir, sleep });
+  return live({ env, fetchImpl, write, outDir, sleep, round: roundTwo ? ROUND_TWO : undefined });
 }
 
 function runAsScript() {

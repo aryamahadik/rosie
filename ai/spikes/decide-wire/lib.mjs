@@ -660,6 +660,18 @@ export function buildCalls() {
   return CANDIDATES.map((candidate, k) => buildCall(k + 1, candidate, MODELS[0], "two-requests"));
 }
 
+/** The name of the live round that sends the two-step candidate on Sonnet (`--live --round two-step-sonnet`). */
+export const ROUND_TWO = "two-step-sonnet";
+
+/**
+ * Round two for (c): the two-step candidate's stage 1 on claude-sonnet-5-5 with the two-requests case; its stage-2
+ * calls (one per part that needs one, at most MAX_STAGE2) follow at run time. Its ids end in sonnet-5-5, so they are
+ * new in results.jsonl and samples/ (for example two-step-1-two-requests-sonnet-5-5).
+ */
+export function buildSonnetTwoStep() {
+  return buildCall(CANDIDATES.length + 1, "two-step", MODELS[1], "two-requests");
+}
+
 /** How many one-call candidates the second round takes. */
 export const FOLLOW_UPS = 2;
 

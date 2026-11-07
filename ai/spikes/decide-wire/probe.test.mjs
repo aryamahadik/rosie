@@ -16,6 +16,7 @@ import {
   VERBS,
   buildCalls,
   buildFollowUps,
+  buildSonnetTwoStep,
   buildStage2Calls,
   chooseStrongest,
   compileDecideRead,
@@ -496,13 +497,214 @@ test("live retries an outside failure once and stops at a key problem", async ()
   }
 });
 
-test("the flags: exactly one of --dry-run and --live", async () => {
+test("round two: the plan is the two-step candidate on Sonnet, 3 calls for two parts, 3 left for retries", () => {
+  const head = buildSonnetTwoStep();
+  assert.equal(head.id, "two-step-1-two-requests-sonnet-5-5");
+  assert.deepEqual(
+    [head.candidate, head.stage, head.model, head.caseName],
+    ["two-step", 1, MODELS[1], "two-requests"],
+  );
+  assert.equal(head.body.model, MODELS[1]);
+  assert.equal(head.body.tools, undefined);
+  const stage2 = buildStage2Calls(head, toTwoStep(expectedRead("two-requests")).stage1);
+  assert.deepEqual(
+    stage2.map((call) => [call.id, call.model, call.stage]),
+    [
+      ["two-step-2-p1-two-requests-sonnet-5-5", MODELS[1], 2],
+      ["two-step-2-p2-two-requests-sonnet-5-5", MODELS[1], 2],
+    ],
+  );
+  assert.ok(1 + stage2.length + 1 <= MAX_CALLS - 6, "with 6 calls logged, at least 1 slot stays free");
+  for (const call of [head, ...stage2]) {
+    assert.deepEqual(lintRequest(call.body).errors, [], call.id);
+    for (const banned of ["temperature", "top_p", "top_k", "x-api-key", "headers", "undefined", "[object"]) {
+      assert.ok(!JSON.stringify(call.body).includes(banned), `${call.id} body carries ${banned}`);
+    }
+  }
+});
+
+test("round two live against a fake API: 3 Sonnet calls appended after the 6 logged, mapped valid and equal to the fixture", async () => {
+  const { dir, url } = tempOut(6);
+  try {
+    const seen = [];
+    const fetchImpl = async (target, init) => {
+      const body = JSON.parse(init.body);
+      seen.push({ target, model: body.model, tools: body.tools });
+      return fakeResponse(200, fakeAnswer(body));
+    };
+    const lines = [];
+    const code = await main(["--live", "--round", "two-step-sonnet"], {
+      env: { ANTHROPIC_API_KEY: FAKE_KEY },
+      fetchImpl,
+      write: (l) => lines.push(l),
+      outDir: url,
+      sleep: noWait,
+    });
+    assert.equal(code, 0, lines.join("\n"));
+    assert.equal(seen.length, 3);
+    assert.ok(seen.every((s) => s.target === API_URL && s.model === MODELS[1] && s.tools === undefined));
+    const results = readLines(dir).slice(6);
+    assert.deepEqual(
+      results.map((r) => [r.id, r.call_number, r.accepted, r.wire_valid, r.mapped_valid, r.same_as_fixture]),
+      [
+        ["two-step-1-two-requests-sonnet-5-5", 7, true, true, null, null],
+        ["two-step-2-p1-two-requests-sonnet-5-5", 8, true, true, null, null],
+        ["two-step-2-p2-two-requests-sonnet-5-5", 9, true, true, true, true],
+      ],
+    );
+    assert.equal(readLines(dir).length, 9);
+    const files = readdirSync(path.join(dir, "samples"));
+    assert.equal(files.length, 6);
+    for (const text of [
+      lines.join("\n"),
+      ...results.map((r) => JSON.stringify(r)),
+      ...files.map((f) => readFileSync(path.join(dir, "samples", f), "utf8")),
+    ]) {
+      assert.ok(!text.includes(FAKE_KEY), "the key was written");
+      assert.ok(!text.includes("x-api-key"), "a header was written");
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("round two refuses in CI, without a key, with the cap spent and when it already ran, and calls nothing", async () => {
+  const fresh = tempOut();
+  const spent = tempOut(MAX_CALLS);
+  const done = tempOut();
+  try {
+    writeFileSync(
+      path.join(done.dir, "results.jsonl"),
+      `${JSON.stringify({ id: "two-step-1-two-requests-sonnet-5-5" })}\n`,
+    );
+    const lines = [];
+    const write = (l) => lines.push(l);
+    const argv = ["--live", "--round", "two-step-sonnet"];
+    const withKey = { ANTHROPIC_API_KEY: FAKE_KEY };
+    assert.equal(
+      await main(argv, { env: { CI: "1", ...withKey }, fetchImpl: noFetch, write, outDir: fresh.url }),
+      2,
+    );
+    assert.equal(await main(argv, { env: {}, fetchImpl: noFetch, write, outDir: fresh.url }), 2);
+    assert.equal(await main(argv, { env: withKey, fetchImpl: noFetch, write, outDir: spent.url }), 2);
+    assert.equal(await main(argv, { env: withKey, fetchImpl: noFetch, write, outDir: done.url }), 2);
+    assert.ok(lines.some((l) => l.includes("runs once")));
+    assert.deepEqual(readdirSync(fresh.dir), []);
+    assert.deepEqual(readdirSync(done.dir), ["results.jsonl"]);
+  } finally {
+    for (const t of [fresh, spent, done]) rmSync(t.dir, { recursive: true, force: true });
+  }
+});
+
+test("round two stops at the cap and retries an outside failure once", async () => {
+  const { dir, url } = tempOut(MAX_CALLS - 2);
+  try {
+    let count = 0;
+    const fetchImpl = async (_target, init) => {
+      count += 1;
+      return fakeResponse(200, fakeAnswer(JSON.parse(init.body)));
+    };
+    await main(["--live", "--round", "two-step-sonnet"], {
+      env: { ANTHROPIC_API_KEY: FAKE_KEY },
+      fetchImpl,
+      write: ignore,
+      outDir: url,
+      sleep: noWait,
+    });
+    assert.equal(count, 2, "only the 2 calls left under the cap are made");
+    assert.equal(readLines(dir).length, MAX_CALLS);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+
+  const flaky = tempOut(6);
+  try {
+    let calls = 0;
+    const fetchImpl = async (_target, init) => {
+      calls += 1;
+      if (calls === 1)
+        return fakeResponse(529, {
+          type: "error",
+          error: { type: "overloaded_error", message: "Overloaded" },
+        });
+      return fakeResponse(200, fakeAnswer(JSON.parse(init.body)));
+    };
+    await main(["--live", "--round", "two-step-sonnet"], {
+      env: { ANTHROPIC_API_KEY: FAKE_KEY },
+      fetchImpl,
+      write: ignore,
+      outDir: flaky.url,
+      sleep: noWait,
+    });
+    const results = readLines(flaky.dir).slice(6);
+    assert.deepEqual(
+      results.map((r) => [r.id, r.attempt, r.http_status]),
+      [
+        ["two-step-1-two-requests-sonnet-5-5", 1, 529],
+        ["two-step-1-two-requests-sonnet-5-5", 2, 200],
+        ["two-step-2-p1-two-requests-sonnet-5-5", 1, 200],
+        ["two-step-2-p2-two-requests-sonnet-5-5", 1, 200],
+      ],
+    );
+    assert.equal(results.at(-1).mapped_valid, true);
+  } finally {
+    rmSync(flaky.dir, { recursive: true, force: true });
+  }
+});
+
+test("a full run where only the two-step form is accepted also sends it on Sonnet, within the cap", async () => {
+  const { dir, url } = tempOut();
+  try {
+    const fetchImpl = async (_target, init) => {
+      const body = JSON.parse(init.body);
+      const oneCall = Array.isArray(body.tools) || body.output_config.format.schema.$defs?.part !== undefined;
+      if (oneCall)
+        return fakeResponse(400, {
+          type: "error",
+          error: { type: "invalid_request_error", message: "Schema is too complex." },
+        });
+      return fakeResponse(200, fakeAnswer(body));
+    };
+    await main(["--live"], {
+      env: { ANTHROPIC_API_KEY: FAKE_KEY },
+      fetchImpl,
+      write: ignore,
+      outDir: url,
+      sleep: noWait,
+    });
+    const results = readLines(dir);
+    assert.deepEqual(
+      results.map((r) => [r.id, r.accepted]),
+      [
+        ["tools-two-requests-haiku-5-5", false],
+        ["tools-flat-two-requests-haiku-5-5", false],
+        ["envelope-two-requests-haiku-5-5", false],
+        ["two-step-1-two-requests-haiku-5-5", true],
+        ["two-step-2-p1-two-requests-haiku-5-5", true],
+        ["two-step-2-p2-two-requests-haiku-5-5", true],
+        ["two-step-1-two-requests-sonnet-5-5", true],
+        ["two-step-2-p1-two-requests-sonnet-5-5", true],
+        ["two-step-2-p2-two-requests-sonnet-5-5", true],
+      ],
+    );
+    assert.ok(results.length < MAX_CALLS);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("the flags: exactly one of --dry-run and --live, or --live --round two-step-sonnet", async () => {
   for (const argv of [
     [],
     ["--dry-run", "--live"],
     ["--live", "--live"],
     ["--frozen"],
     ["--dry-run", "--x"],
+    ["--live", "--round"],
+    ["--live", "--round", "other"],
+    ["--dry-run", "--round", "two-step-sonnet"],
+    ["--round", "two-step-sonnet", "--live"],
+    ["--live", "--round", "two-step-sonnet", "--live"],
   ]) {
     const lines = [];
     assert.equal(
