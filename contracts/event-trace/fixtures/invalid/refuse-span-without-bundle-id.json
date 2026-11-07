@@ -1,0 +1,39 @@
+{
+  "trace_id": "trace-sam-0000",
+  "span_id": "span-sam-0000-08",
+  "seq": 8,
+  "hop": "decideReads",
+  "at": "2026-10-19T14:01:53.260Z",
+  "ms": 2600,
+  "turn_id": "turn-s1-01-sam-join",
+  "handle_ref": "handle-sam",
+  "decided": { "readsAgree": true, "verb": "enter", "choice": "S1-01", "reread": false },
+  "model_calls": [
+    {
+      "model": "claude-haiku-5-5",
+      "role": "haiku",
+      "purpose": "decideFirst",
+      "input_tokens": 900,
+      "cached_tokens": 4200,
+      "cache_write_tokens": 0,
+      "output_tokens": 120,
+      "cost_micro_usd": 1920,
+      "ms": 1250,
+      "outcome": "ok"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "role": "haiku",
+      "purpose": "decideCheck",
+      "input_tokens": 900,
+      "cached_tokens": 4200,
+      "cache_write_tokens": 0,
+      "output_tokens": 118,
+      "cost_micro_usd": 1910,
+      "ms": 1300,
+      "outcome": "ok"
+    }
+  ],
+  "outcome": "ok",
+  "error_code": null
+}

@@ -1,0 +1,25 @@
+{
+  "id": "evlog-alex-0008-9",
+  "at": "2026-10-23T14:20:00Z",
+  "zone": "America/New_York",
+  "turn_id": "turn-alex-move-2",
+  "trace_id": "trace-alex-0008",
+  "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+  "bundle_build": 1,
+  "business_id": "biz-lees-barbershop",
+  "actor_kind": "rosie",
+  "kind": "open_question.answered",
+  "table_name": "event_log",
+  "row_id": "evlog-alex-0008-1",
+  "old_values": { "kind": "open_question.answered", "approved_by": null },
+  "new_values": {
+    "kind": "open_question.answered",
+    "approved_by": {
+      "kind": "answer",
+      "open_question_id": "oq-a7-03-alex",
+      "option_id": "A7-03/2",
+      "event_id": "evt-alex-0008"
+    }
+  },
+  "why": { "step": "A7-03" }
+}

@@ -1,0 +1,1473 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/event-trace/event-trace.v1.schema.json",
+  "title": "Event trace v1",
+  "description": "K-08, the event log and trace format, v1 (written and frozen by T-017; contracts/event-trace/README.md holds the freeze record). Two halves: the event log, where every write appends a row and none is edited, private values sealed per person (arch 09 lines 457, 492; arch 10 line 516), whose rows land in K-04 v1's event_log table column for column; and the traces, one trace id from webhook to delivery receipt, each step adding what it got, what it decided and how long it took, with the bundle id on every trace (arch 10 line 548; tour lines 656 to 658; BP 5.5). Plus the measures read from traces (reply time, CQ-06 and Q-41; the hourly hard-invariant checks, arch 08 line 427) and the export row (arch 10 line 544). The root is any one of the documents; every fixture names its definition. Field names are snake_case, as the event_log columns and ADR-009's log lines spell them.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/eventLogRow"
+    },
+    {
+      "$ref": "#/$defs/eventLogBatch"
+    },
+    {
+      "$ref": "#/$defs/exportRow"
+    },
+    {
+      "$ref": "#/$defs/span"
+    },
+    {
+      "$ref": "#/$defs/trace"
+    },
+    {
+      "$ref": "#/$defs/traceSet"
+    },
+    {
+      "$ref": "#/$defs/replyTime"
+    },
+    {
+      "$ref": "#/$defs/invariantRun"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "title": "Id",
+      "description": "An opaque id (CQ-09; common/formats.v1 id).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "traceId": {
+      "title": "TraceId",
+      "description": "A trace id: opaque to every reader (CQ-09). One per inbound request or event, carried in x-trace-id and made with crypto.randomUUID() when none valid comes in (ADR-009); the fixtures use readable placeholders, as K-04's seeds do.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "turnId": {
+      "title": "TurnId",
+      "description": "A turn id, a hash of its texts' event ids (CQ-09; arch 01 line 59; K-04 turns.id).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+    },
+    "utc": {
+      "title": "Utc",
+      "description": "An instant in UTC (CQ-09).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "zone": {
+      "title": "Zone",
+      "description": "An IANA zone (CQ-09; S13-03).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/zone"
+    },
+    "sha256": {
+      "title": "Sha256",
+      "description": "A sha256 in lowercase hex, as K-01 spells it (K-01 v1 sha256).",
+      "$ref": "../bundle/bundle.v1.schema.json#/$defs/sha256"
+    },
+    "stepId": {
+      "title": "StepId",
+      "description": "A step id, as K-01 spells it (K-01 v1 stepId; SPEC-master 4).",
+      "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+    },
+    "bundleId": {
+      "title": "BundleId",
+      "description": "The bundle id, as K-01's manifest spells it: the content hash of the compiled files, 64 lowercase hex characters, and the build number from 1 (K-01 v1 manifest.bundleId; CQ-09; arch 10 line 548: the bundle id on every turn, open question and trace).",
+      "type": "object",
+      "properties": {
+        "hash": {
+          "description": "The content hash (K-01 v1 manifest.bundleId.hash).",
+          "$ref": "#/$defs/sha256"
+        },
+        "build": {
+          "description": "The build number, counting publishes from 1 (K-01 v1 manifest.bundleId.build; C-072).",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["hash", "build"],
+      "additionalProperties": false
+    },
+    "tableName": {
+      "title": "TableName",
+      "description": "A table name as the database part spells it, such as reservations or open_questions (K-04 v1 table list; 02-contracts section 7 for the domain parts).",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "role": {
+      "title": "Role",
+      "description": "A person's role at a business, as K-04 person_roles.role names it (FS line 723; arch 09 line 457 'Person & role').",
+      "type": "string",
+      "enum": ["owner", "admin", "staff", "own_business", "customer"]
+    },
+    "rowRef": {
+      "title": "RowRef",
+      "description": "The row a write touched: its table and its id (02-contracts K-08 'the row it touched'). A phone row is named by its handle id (K-04 phones.handle_id, unique), never by its number, so no raw number enters a log or a trace (arch 10 line 516; arch 02 diagram line 105).",
+      "type": "object",
+      "properties": {
+        "table": {
+          "description": "The table (K-04 v1).",
+          "$ref": "#/$defs/tableName"
+        },
+        "id": {
+          "description": "The row's id (CQ-09); for phones, the phone's handle id (README default 3).",
+          "$ref": "#/$defs/safeId"
+        }
+      },
+      "required": ["table", "id"],
+      "additionalProperties": false
+    },
+    "safeId": {
+      "title": "SafeId",
+      "description": "An id that is never a raw phone number, email address or words: letters, digits and _ . : / # -, starting with a letter or digit, and not a run of digits that reads as a number (arch 02 diagram line 105: full detail only in sealed traces; arch 10 line 516; 02-contracts K-08 'never the raw number or words').",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:/#-]*$",
+      "not": {
+        "description": "A run of digits and phone punctuation, seven or more long, reads as a number (02-contracts K-08).",
+        "pattern": "^[0-9().+ -]{7,}$"
+      }
+    },
+    "handleRef": {
+      "title": "HandleRef",
+      "description": "A handle reference: the handle's id in K-04's handles table, never the raw number or address (02-contracts K-08; arch 02 diagram line 105, 'sealed traces'; K-04 v1 handles.id).",
+      "$ref": "#/$defs/safeId"
+    },
+    "eventKind": {
+      "title": "EventKind",
+      "description": "What happened: the closed list of event kinds, <subject>.<move> (02-contracts K-08 'what (a closed list of kinds, and the row it touched)'; arch 09 line 457). Each kind and its source is in the README's kinds table; v1 covers K-04 v1's core rows, the commit's writes (K-05 v1 item 1), K-07's effect and provider-event rows and consent rows. A new kind is a minor version (an additive change).",
+      "type": "string",
+      "enum": [
+        "business.status_changed",
+        "person.created",
+        "person.language_stored",
+        "person_role.added",
+        "person_role.ended",
+        "handle.created",
+        "phone.chat_opened",
+        "phone.stopped",
+        "phone.started",
+        "phone.contact_added",
+        "phone.poll_voted",
+        "phone.optout_line_delivered",
+        "thread.created",
+        "opener.sent",
+        "message.logged",
+        "booking.created",
+        "booking.stage_changed",
+        "booking.flagged",
+        "booking.note_sealed",
+        "pause.set",
+        "pause.cleared",
+        "resource.added",
+        "resource.changed",
+        "class_seats.taken",
+        "class_seats.freed",
+        "reservation.held",
+        "reservation.queued",
+        "reservation.promoted",
+        "reservation.extended",
+        "reservation.booked",
+        "reservation.released",
+        "turn.leased",
+        "turn.committed",
+        "turn.parked",
+        "open_question.opened",
+        "open_question.delivered",
+        "open_question.asked_again",
+        "open_question.answered",
+        "open_question.defaulted",
+        "open_question.withdrawn",
+        "clock_row.created",
+        "clock_row.armed",
+        "clock_row.fired",
+        "clock_row.cancelled",
+        "outbox_row.created",
+        "outbox_row.planned",
+        "outbox_row.state_changed",
+        "outbox_part.state_changed",
+        "effect.created",
+        "effect.result",
+        "provider_event.recorded",
+        "consent.given",
+        "consent.withdrawn",
+        "bundle.published",
+        "bundle.activated",
+        "release_flag.set",
+        "sealing_key.created",
+        "sealing_key.erased"
+      ]
+    },
+    "fieldValues": {
+      "title": "FieldValues",
+      "description": "Old or new values field by field, keyed by column name; private values are left out here and sealed in sealed_values (arch 09 line 457 'old → new'; arch 09 line 492; K-04 event_log.old_values and new_values).",
+      "type": "object",
+      "propertyNames": {
+        "description": "A column name (K-04 v1).",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/plainValue"
+      }
+    },
+    "plainValue": {
+      "title": "PlainValue",
+      "description": "One plain field value: any JSON value whose strings hold no phone number in E.164 form and no email address, since those are private and sealed (arch 09 line 492; arch 10 line 516; README default 4). Words a person wrote are private too; that is the writer's duty and the contract test's check, as no schema can tell words from a label.",
+      "anyOf": [
+        {
+          "description": "None (arch 09 line 457).",
+          "type": "null"
+        },
+        {
+          "description": "A yes or no (arch 09 line 457).",
+          "type": "boolean"
+        },
+        {
+          "description": "A number (arch 09 line 457).",
+          "type": "number"
+        },
+        {
+          "$ref": "#/$defs/plainString"
+        },
+        {
+          "$ref": "#/$defs/plainList"
+        },
+        {
+          "$ref": "#/$defs/plainObject"
+        }
+      ]
+    },
+    "plainList": {
+      "title": "PlainList",
+      "description": "A list of plain items (arch 09 line 457).",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/plainItem"
+      }
+    },
+    "plainObject": {
+      "title": "PlainObject",
+      "description": "An object of plain items, such as a jsonb column (arch 09 line 457).",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/plainItem"
+      }
+    },
+    "plainItem": {
+      "title": "PlainItem",
+      "description": "One item inside a plain list or object: its strings are checked as plain values are; a list or object nested deeper is not checked here, which is the contract test's (README 'The event log'). Not recursive, so the generated types stay finite.",
+      "anyOf": [
+        {
+          "description": "None (arch 09 line 457).",
+          "type": "null"
+        },
+        {
+          "description": "A yes or no (arch 09 line 457).",
+          "type": "boolean"
+        },
+        {
+          "description": "A number (arch 09 line 457).",
+          "type": "number"
+        },
+        {
+          "$ref": "#/$defs/plainString"
+        },
+        {
+          "description": "A nested list (arch 09 line 457).",
+          "type": "array"
+        },
+        {
+          "description": "A nested object (arch 09 line 457).",
+          "type": "object"
+        }
+      ]
+    },
+    "plainString": {
+      "title": "PlainString",
+      "description": "A string with no E.164 phone number and no email address in it (arch 10 line 516; README default 4).",
+      "type": "string",
+      "not": {
+        "description": "A phone number in E.164 form or an email address anywhere in the string (K-04 v1 handles_address_form).",
+        "anyOf": [
+          {
+            "description": "E.164 (K-04 v1 phones_number_form).",
+            "pattern": "[+][1-9][0-9]{6,14}"
+          },
+          {
+            "description": "An email address (K-04 v1 handles_address_form).",
+            "pattern": "[^@\\s]+@[^@\\s]+[.][^@\\s]+"
+          }
+        ]
+      }
+    },
+    "why": {
+      "title": "Why",
+      "description": "Why a write happened: the step, the choice, a limit's outcome, a safe default, an outage path, or the provider event behind it (arch 09 line 457 'why'; 02-contracts K-08). At least one is given. K-04 event_log.why holds it.",
+      "type": "object",
+      "properties": {
+        "step": {
+          "description": "The step whose branch made the write (02-contracts K-08 'the step').",
+          "$ref": "#/$defs/stepId"
+        },
+        "choice": {
+          "description": "The choice taken: its id (an option id such as A7-03/2) or its label as the bundle writes it, never a person's own words (02-contracts K-08 'choice'; K-04 v1 seed-event-log.json).",
+          "type": "string",
+          "minLength": 1
+        },
+        "limit": {
+          "description": "A limit and its outcome when a limit decided the write (02-contracts K-08 'limit outcome'; arch 06).",
+          "$ref": "#/$defs/limitResult"
+        },
+        "safe_default": {
+          "description": "The safe default applied at a deadline, as the bundle writes it (arch 02 line 127; K-04 clock_rows.fires.safeDefault).",
+          "type": "string",
+          "minLength": 1
+        },
+        "outage_path": {
+          "description": "The outage step taken, such as S12-16 (arch 11; arch 10 line 542: 'then take that service's outage row').",
+          "$ref": "#/$defs/stepId"
+        },
+        "provider_event": {
+          "description": "The provider event behind the write (arch 02 line 109: Stripe and calendar events go to PostgreSQL), by its provider and event id.",
+          "type": "object",
+          "properties": {
+            "provider": {
+              "description": "The provider (02-contracts K-07; arch 02 line 109).",
+              "$ref": "#/$defs/provider"
+            },
+            "event_id": {
+              "description": "The provider's event id, stored once (arch 02 line 109).",
+              "$ref": "#/$defs/safeId"
+            }
+          },
+          "required": ["provider", "event_id"],
+          "additionalProperties": false
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "provider": {
+      "title": "Provider",
+      "description": "An outside service Rosie talks to (arch 02 diagram line 105; 02-contracts sections 5 and K-07): linq, resend (email), stripe, google_calendar, microsoft_calendar, google_places, geo, r2, anthropic.",
+      "type": "string",
+      "enum": [
+        "linq",
+        "resend",
+        "stripe",
+        "google_calendar",
+        "microsoft_calendar",
+        "google_places",
+        "geo",
+        "r2",
+        "anthropic"
+      ]
+    },
+    "limitResult": {
+      "title": "LimitResult",
+      "description": "One limit's result: limits 1 to 6 at the gate, 7 at the claim check, 8 at send (arch 02 lines 121 to 125; arch 06; 02-contracts K-08 'gate (each limit's outcome)').",
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "The limit's number, 1 to 8 (arch 06; arch 02 diagram line 105: 'limits 1–6', limit 7, limit 8).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "result": {
+          "description": "pass, fail, or notChecked when the turn has nothing it applies to (arch 06).",
+          "type": "string",
+          "enum": ["pass", "fail", "notChecked"]
+        },
+        "outcome": {
+          "description": "On a fail, the limit's own outcome as a label, such as versionChanged or held (arch 02 line 121: 'A failed limit runs its own outcome'); null otherwise.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/label"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["limit", "result", "outcome"],
+      "additionalProperties": false
+    },
+    "approval": {
+      "title": "Approval",
+      "description": "Approved by: the exact yes behind a write, as an answer to an open question, a consent row, or the owner's yes (arch 09 line 457 'approved by'; arch 01 line 89; 02-contracts K-08). K-04 event_log.approved_by holds it.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/approvalAnswer"
+        },
+        {
+          "$ref": "#/$defs/approvalConsentRow"
+        },
+        {
+          "$ref": "#/$defs/approvalOwnerYes"
+        }
+      ]
+    },
+    "approvalAnswer": {
+      "title": "ApprovalAnswer",
+      "description": "An answer to an open question: the question, the option picked, and the inbound event that carried it (arch 01 line 89; limit 3, exact yes).",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "An answer (02-contracts K-08).",
+          "const": "answer"
+        },
+        "open_question_id": {
+          "description": "The question answered (K-04 open_questions.id).",
+          "$ref": "#/$defs/safeId"
+        },
+        "option_id": {
+          "description": "The option picked, as sent (K-04 open_questions.options; K-02 choice id); null for an open-ended answer.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event_id": {
+          "description": "The inbound event that answered (K-06 event id; arch 02 line 109).",
+          "$ref": "#/$defs/safeId"
+        }
+      },
+      "required": ["kind", "open_question_id", "option_id", "event_id"],
+      "additionalProperties": false
+    },
+    "approvalConsentRow": {
+      "title": "ApprovalConsentRow",
+      "description": "A consent row: the person's own consent or opt-out, recorded in the conversations and consent part (arch 09 'Consent bound to read-back'; 02-contracts K-08 'a consent row'; K-29).",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "A consent row (02-contracts K-08).",
+          "const": "consentRow"
+        },
+        "consent_id": {
+          "description": "The consent row's id (K-29 consents.id; 02-contracts K-08 'a consent row').",
+          "$ref": "#/$defs/safeId"
+        }
+      },
+      "required": ["kind", "consent_id"],
+      "additionalProperties": false
+    },
+    "approvalOwnerYes": {
+      "title": "ApprovalOwnerYes",
+      "description": "The owner's yes: an owner or admin answering the question that asked them (02-contracts K-08 'the owner's yes'; RULES 3.11: one pay link after the owner's OK).",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "The owner's yes (02-contracts K-08).",
+          "const": "ownerYes"
+        },
+        "person_id": {
+          "description": "The owner or admin who said yes (K-04 persons.id).",
+          "$ref": "#/$defs/safeId"
+        },
+        "role": {
+          "description": "Their role at the business (K-04 person_roles.role).",
+          "type": "string",
+          "enum": ["owner", "admin"]
+        },
+        "open_question_id": {
+          "description": "The question that asked them (K-04 open_questions.id).",
+          "$ref": "#/$defs/safeId"
+        },
+        "option_id": {
+          "description": "The option they picked, as sent; null for a typed yes (K-04 open_questions.options).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event_id": {
+          "description": "The inbound event that carried the yes (K-06 event id).",
+          "$ref": "#/$defs/safeId"
+        }
+      },
+      "required": ["kind", "person_id", "role", "open_question_id", "option_id", "event_id"],
+      "additionalProperties": false
+    },
+    "proof": {
+      "title": "Proof",
+      "description": "A consent proof that survives a deleted key: the hash of the person's own words and the words Rosie showed them (arch 09 line 492: 'consent proofs survive as hashes and the words shown'; arch 10 line 516).",
+      "type": "object",
+      "properties": {
+        "what": {
+          "description": "What the proof is for: an exact yes to a read-back or option, an opt-out, an opt-in, or a consent (arch 01 line 89; RULES 4.1b; arch 09 'Consent bound to read-back').",
+          "type": "string",
+          "enum": ["exactYes", "optOut", "optIn", "consent"]
+        },
+        "text_hash": {
+          "description": "The sha256 of the person's own words, as UTF-8 (arch 09 line 492 'hashes'; README default 5).",
+          "$ref": "#/$defs/sha256"
+        },
+        "words_shown": {
+          "description": "The words Rosie showed, as sent, slots filled (arch 09 line 492 'the words shown').",
+          "type": "string",
+          "minLength": 1
+        },
+        "shown_at": {
+          "description": "When those words were delivered (arch 02 line 127; CQ-09).",
+          "$ref": "#/$defs/utc"
+        },
+        "open_question_id": {
+          "description": "The question the words asked, or null (K-04 open_questions.id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fixed_line": {
+          "description": "The K-01 fixed line the words were, such as optOutLine, or null (K-01 v1 fixedLine id; arch 07 line 361).",
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][A-Za-z0-9]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["what", "text_hash", "words_shown", "shown_at", "open_question_id", "fixed_line"],
+      "additionalProperties": false
+    },
+    "sealedBytes": {
+      "title": "SealedBytes",
+      "description": "Sealed bytes as PostgreSQL writes a bytea in hex: \\x and an even number of hex digits (K-04 v1 event_log.sealed_values; arch 01 line 93).",
+      "type": "string",
+      "pattern": "^\\\\x([0-9a-f]{2})+$"
+    },
+    "eventLogRow": {
+      "title": "EventLogRow",
+      "description": "One event-log row, as it lands in K-04 v1's event_log table, column for column. Every write appends one; none is ever edited, so the log never records a change to itself (arch 09 lines 457, 492; K-04 v1 README rule 5). The columns the table holds as not null are required; the rest may be left out, meaning null.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The event id (K-04 event_log.id; CQ-09).",
+          "$ref": "#/$defs/safeId"
+        },
+        "at": {
+          "description": "When, in UTC (arch 09 line 457 'when'; K-04 event_log.at).",
+          "$ref": "#/$defs/utc"
+        },
+        "zone": {
+          "description": "The IANA zone the event is read in; null means UTC (S13-03; K-04 event_log.zone).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/zone"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "turn_id": {
+          "description": "The turn that wrote it, or null for a job (02-contracts K-08; K-04 event_log.turn_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "job_id": {
+          "description": "For a clock firing, a webhook, a page or Agent API request, a sweep or reconciliation: the job's id (02-contracts K-08; K-04 event_log.job_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trace_id": {
+          "description": "The trace id it was written under (arch 10 line 548; K-04 event_log.trace_id).",
+          "$ref": "#/$defs/traceId"
+        },
+        "bundle_hash": {
+          "description": "The bundle in force, as K-01's bundleId hash; null for a write outside a turn (arch 10 line 548; K-04 event_log.bundle_hash).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bundle_build": {
+          "description": "The bundle's build number; null with bundle_hash (K-01 v1 bundleId; K-04 event_log.bundle_build).",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "business_id": {
+          "description": "The business the write belongs to, or null (arch 10 line 546; K-04 event_log.business_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actor_kind": {
+          "description": "Who: a person, Rosie, a job or a provider (arch 09 line 457 'who'; 02-contracts K-08; K-04 event_log_actor_kind_known).",
+          "type": "string",
+          "enum": ["person", "rosie", "job", "provider"]
+        },
+        "actor_person_id": {
+          "description": "For a person, who (K-04 event_log.actor_person_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actor_role": {
+          "description": "The person's role at the business (02-contracts K-08 'a person and role'; K-04 event_log.actor_role).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/role"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "description": "What happened (arch 09 line 457 'what'; K-04 event_log.kind).",
+          "$ref": "#/$defs/eventKind"
+        },
+        "table_name": {
+          "description": "The table of the row it touched; never event_log, since the log is never edited (arch 09 lines 457, 492; K-04 event_log.table_name).",
+          "anyOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/tableName"
+                },
+                {
+                  "not": {
+                    "description": "The event log never records an edit of itself: none happens (arch 09 line 457 'never edited').",
+                    "const": "event_log"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "row_id": {
+          "description": "The row it touched; for a phone row, its handle id (02-contracts K-08; K-04 event_log.row_id; README default 3).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "old_values": {
+          "description": "Old values field by field, private ones left out (arch 09 line 457; K-04 event_log.old_values).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/fieldValues"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "new_values": {
+          "description": "New values field by field, private ones left out (arch 09 line 457; K-04 event_log.new_values).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/fieldValues"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sealed_values": {
+          "description": "The private old and new values, sealed under the key of sealed_for_person_id; unreadable once that key is deleted (arch 09 line 492; arch 01 line 93; K-04 event_log.sealed_values).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sealedBytes"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sealed_for_person_id": {
+          "description": "The person whose key seals sealed_values; one person per row (arch 09 line 492; K-04 event_log.sealed_for_person_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "why": {
+          "description": "Why (arch 09 line 457; K-04 event_log.why).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/why"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "approved_by": {
+          "description": "Approved by (arch 09 line 457; K-04 event_log.approved_by).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/approval"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proofs": {
+          "description": "Consent proofs that survive a deleted key (arch 09 line 492; arch 10 line 516; K-04 event_log.proofs).",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/proof"
+              },
+              "minItems": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["id", "at", "trace_id", "actor_kind", "kind"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "actor_kind": {
+          "description": "A person actor names the person (arch 09 line 457 'who'; K-04 event_log_person_actor).",
+          "if": {
+            "properties": {
+              "actor_kind": {
+                "description": "arch 09 line 457.",
+                "const": "person"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "actor_person_id": {
+                "description": "K-04 event_log_person_actor.",
+                "type": "string"
+              }
+            },
+            "required": ["actor_person_id"]
+          }
+        },
+        "sealed_values": {
+          "description": "Sealed values name the person whose key seals them (arch 09 line 492; K-04 event_log_sealed_has_person).",
+          "if": {
+            "properties": {
+              "sealed_values": {
+                "description": "arch 09 line 492.",
+                "type": "string"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sealed_for_person_id": {
+                "description": "K-04 event_log_sealed_has_person.",
+                "type": "string"
+              }
+            },
+            "required": ["sealed_for_person_id"]
+          }
+        },
+        "trace_id": {
+          "description": "Every row names its turn or its job (02-contracts K-08 'the turn id, or a job id'; K-04 event_log_turn_or_job).",
+          "anyOf": [
+            {
+              "properties": {
+                "turn_id": {
+                  "description": "K-04 event_log_turn_or_job.",
+                  "type": "string"
+                }
+              },
+              "required": ["turn_id"]
+            },
+            {
+              "properties": {
+                "job_id": {
+                  "description": "K-04 event_log_turn_or_job.",
+                  "type": "string"
+                }
+              },
+              "required": ["job_id"]
+            }
+          ]
+        }
+      }
+    },
+    "eventLogBatch": {
+      "title": "EventLogBatch",
+      "description": "The rows one commit appends, in order, under one turn id and one trace id (arch 02 line 121: 'One transaction writes state, one outbox row per message, clock rows and the event log, under the turn id'; K-05 v1 item 1, event-log entries).",
+      "type": "object",
+      "properties": {
+        "rows": {
+          "description": "The rows, in the order the commit writes them (arch 02 line 121).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventLogRow"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["rows"],
+      "additionalProperties": false
+    },
+    "exportRow": {
+      "title": "ExportRow",
+      "description": "One row of the event-log export to R2 Parquet, which reports and evals read instead of the primary (arch 10 line 544). It carries the row as stored, sealed values still sealed, and whether the sealing key was still held when it was read, so a reader knows erased values are gone for good while the proofs' hashes and words stay (arch 09 line 492; arch 10 line 516).",
+      "type": "object",
+      "properties": {
+        "row": {
+          "description": "The event-log row as stored (K-04 event_log; never edited).",
+          "$ref": "#/$defs/eventLogRow"
+        },
+        "sealed_key": {
+          "description": "For a row with sealed values: held, or erased once the person's key is deleted, so they can never be read again; null for a row with none (arch 09 line 492; K-04 sealing_keys.erased_at).",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["held", "erased"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exported_at": {
+          "description": "When the export read the row (arch 10 line 544; CQ-09).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["row", "sealed_key", "exported_at"],
+      "additionalProperties": false
+    },
+    "hop": {
+      "title": "Hop",
+      "description": "A hop a trace passes through (02-contracts K-08 'Hops'; arch 02 steps 1 to 9, S and Q, lines 109 to 129; BP section 10 D-017): receive, scrub, safetyRead, batch, lease, guard, frontier, search, decideReads, reread, planner, gate, commit, compose, fillAndChecks, rewriteOrFallback, dispatch, providerAccepted, delivered, clockArmed, clockFired, effectRun, providerWebhook, pageRequest, agentApiRequest. The README's hop table gives each one's source.",
+      "type": "string",
+      "enum": [
+        "receive",
+        "scrub",
+        "safetyRead",
+        "batch",
+        "lease",
+        "guard",
+        "frontier",
+        "search",
+        "decideReads",
+        "reread",
+        "planner",
+        "gate",
+        "commit",
+        "compose",
+        "fillAndChecks",
+        "rewriteOrFallback",
+        "dispatch",
+        "providerAccepted",
+        "delivered",
+        "clockArmed",
+        "clockFired",
+        "effectRun",
+        "providerWebhook",
+        "pageRequest",
+        "agentApiRequest"
+      ]
+    },
+    "label": {
+      "title": "Label",
+      "description": "A label in a span: an id, a step id, an option id, a code or an outcome name; never words, a number or an address (02-contracts K-08 'never the raw number or words'). The same form as a safe id.",
+      "$ref": "#/$defs/safeId"
+    },
+    "spanValue": {
+      "title": "SpanValue",
+      "description": "One value of what a hop got or decided: a count, a yes or no, a label or a list of labels; never raw words or numbers (tour line 656; 02-contracts K-08).",
+      "anyOf": [
+        {
+          "description": "A count (tour line 656).",
+          "type": "integer"
+        },
+        {
+          "description": "A yes or no (tour line 656).",
+          "type": "boolean"
+        },
+        {
+          "description": "None (tour line 656).",
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/label"
+        },
+        {
+          "description": "A list of labels, such as event ids or option ids (tour line 656).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/label"
+          }
+        }
+      ]
+    },
+    "spanFacts": {
+      "title": "SpanFacts",
+      "description": "What a hop got, or what it decided, as named values (tour line 656: 'Each step adds what it got, what it decided and how long it took').",
+      "type": "object",
+      "propertyNames": {
+        "description": "A camelCase name (tour line 656).",
+        "pattern": "^[a-z][A-Za-z0-9]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/spanValue"
+      }
+    },
+    "modelCall": {
+      "title": "ModelCall",
+      "description": "One model call in a hop: the model id, what it was for, tokens, cached tokens and cost, for the $0.16-per-booking gate (02-contracts K-08; arch 10 lines 520, 552; arch 06 lines 279 to 291).",
+      "type": "object",
+      "properties": {
+        "model": {
+          "description": "The model id, as the bundle names it (K-01 v1 manifest.models; arch 11 line 564: claude-haiku-5-5 and claude-sonnet-5-5).",
+          "type": "string",
+          "pattern": "^claude-[a-z0-9-]+$"
+        },
+        "role": {
+          "description": "Which of the bundle's two models (K-01 v1 modelRole).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/modelRole"
+        },
+        "purpose": {
+          "description": "What the call was: the safety read (Haiku, then Sonnet: arch 06 line 283), the first or checking decide read (arch 02 line 119), the one Sonnet re-read (arch 06 line 279), the Sonnet planner (arch 06 line 291), the Haiku composer (arch 06 line 279) or its one rewrite (arch 02 line 123).",
+          "type": "string",
+          "enum": ["safetyRead", "decideFirst", "decideCheck", "reread", "planner", "compose", "rewrite"]
+        },
+        "input_tokens": {
+          "description": "Input tokens not read from the cache (02-contracts K-08 'tokens').",
+          "type": "integer",
+          "minimum": 0
+        },
+        "cached_tokens": {
+          "description": "Input tokens read from the prompt cache (02-contracts K-08 'cached tokens'; arch 10 line 536: prompt caching covers the rules and static card text).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "cache_write_tokens": {
+          "description": "Input tokens written to the prompt cache, priced apart from the others, so the cost can be checked (arch 10 line 536; README default 6).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "description": "Output tokens (02-contracts K-08 'tokens').",
+          "type": "integer",
+          "minimum": 0
+        },
+        "cost_micro_usd": {
+          "description": "The call's cost in millionths of a US dollar, as a whole number; one call costs well under a cent, below the cents of CQ-09's money format (arch 10 line 552: at most $0.16, 160000 micro-dollars, per completed booking; CQ-12; README default 7).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "ms": {
+          "description": "How long the call took, in milliseconds (tour line 656; arch 04 'Latency budget targets').",
+          "type": "integer",
+          "minimum": 0
+        },
+        "outcome": {
+          "description": "ok; timedOut past twice its stage's budget (2 s for the safety read); or failed, a refusal or a cut-off output included, which is a failed read and never a verdict (arch 04 line 231; arch 02 line 111; K-02 v1 README).",
+          "type": "string",
+          "enum": ["ok", "timedOut", "failed"]
+        }
+      },
+      "required": [
+        "model",
+        "role",
+        "purpose",
+        "input_tokens",
+        "cached_tokens",
+        "cache_write_tokens",
+        "output_tokens",
+        "cost_micro_usd",
+        "ms",
+        "outcome"
+      ],
+      "additionalProperties": false
+    },
+    "span": {
+      "title": "Span",
+      "description": "One step of a trace, written as one log line (ADR-009: one JSON object per event with level, msg, trace_id, environment and version beside these fields). It carries the bundle id, the turn id and a handle reference, never the raw number or words; timings; for model calls the model id, tokens, cached tokens and cost; its outcome or error code (02-contracts K-08 'Trace spans'; tour line 656; arch 10 line 548).",
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "description": "The trace it belongs to (arch 10 line 548; ADR-009).",
+          "$ref": "#/$defs/traceId"
+        },
+        "span_id": {
+          "description": "The span's own id (02-contracts K-08).",
+          "$ref": "#/$defs/safeId"
+        },
+        "seq": {
+          "description": "Its place in the trace, from 1, in the order the hops ran (BP section 10 D-017: 'the trace shows every hop once, in order').",
+          "type": "integer",
+          "minimum": 1
+        },
+        "hop": {
+          "description": "The hop (02-contracts K-08).",
+          "$ref": "#/$defs/hop"
+        },
+        "at": {
+          "description": "When the hop started, in UTC (tour line 656; CQ-09).",
+          "$ref": "#/$defs/utc"
+        },
+        "ms": {
+          "description": "How long it took, in milliseconds (tour line 656 'how long it took'; arch 04 'Latency budget targets').",
+          "type": "integer",
+          "minimum": 0
+        },
+        "bundle_id": {
+          "description": "The bundle in force: the turn's pinned bundle, or for a hop before the pin or outside a turn the active bundle id read at that moment (arch 10 lines 536, 548; 02-contracts K-08 'Each span carries the bundle id'; README default 1).",
+          "$ref": "#/$defs/bundleId"
+        },
+        "turn_id": {
+          "description": "The turn, or null before the batch closes and for a job (02-contracts K-08 'the turn id'; CQ-06).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "job_id": {
+          "description": "For a clock firing, a sweep, a webhook, a page or Agent API request or reconciliation: the job's id, as on its event-log rows (02-contracts K-08; K-04 event_log.job_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event_id": {
+          "description": "The inbound event the hop works on, before a turn exists (K-06 event id; arch 02 line 109).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "handle_ref": {
+          "description": "The handle, by its K-04 handles id, never the raw number or address; null for a job with no handle (02-contracts K-08; arch 02 diagram line 105).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/handleRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "business_id": {
+          "description": "The business, when the hop knows it (arch 10 line 546).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "got": {
+          "description": "What the hop got (tour line 656).",
+          "$ref": "#/$defs/spanFacts"
+        },
+        "decided": {
+          "description": "What the hop decided (tour line 656).",
+          "$ref": "#/$defs/spanFacts"
+        },
+        "limits": {
+          "description": "Each limit's result: limits 1 to 6 at the gate, 7 at fill and checks, 8 at dispatch (02-contracts K-08 'gate (each limit's outcome)', 'dispatch (limit 8)'; arch 02 lines 121 to 125).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/limitResult"
+          }
+        },
+        "rows": {
+          "description": "The rows the hop wrote, such as the commit's (arch 02 line 121; K-05 v1 item 1).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rowRef"
+          }
+        },
+        "model_calls": {
+          "description": "The model calls the hop made, in order (02-contracts K-08 'for model calls the model id, tokens, cached tokens and cost'; arch 06 line 279: the AI gateway keeps traces of every call).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/modelCall"
+          }
+        },
+        "outcome": {
+          "description": "How the hop ended: ok; dropped (a bad signature or a known event id: arch 02 line 109; a stopped phone at send); joinedTurn, where a batched text's own trace ends (CQ-06); refused (a failed limit or a refused commit: arch 02 line 121); held (text hours: arch 02 line 125); timedOut; failed (02-contracts K-08 'its outcome or error code').",
+          "type": "string",
+          "enum": ["ok", "dropped", "joinedTurn", "refused", "held", "timedOut", "failed"]
+        },
+        "error_code": {
+          "description": "A provider's or HTTP error code, such as 401, 503, 2024 or 4006; null when none (02-contracts K-08; arch 02 line 109; arch 10 line 524; arch 01 line 65).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/label"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "trace_id",
+        "span_id",
+        "seq",
+        "hop",
+        "at",
+        "ms",
+        "bundle_id",
+        "turn_id",
+        "handle_ref",
+        "outcome"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "hop": {
+          "description": "A hop that calls a model lists its calls, and the gate lists its limits (02-contracts K-08; arch 06 lines 279 to 291; arch 02 line 121).",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "hop": {
+                    "description": "arch 06 lines 279 to 291.",
+                    "enum": ["safetyRead", "decideReads", "reread", "planner", "compose"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "model_calls": {
+                    "description": "02-contracts K-08.",
+                    "type": "array",
+                    "minItems": 1
+                  }
+                },
+                "required": ["model_calls"]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "hop": {
+                    "description": "arch 02 line 121.",
+                    "const": "gate"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "limits": {
+                    "description": "02-contracts K-08 'gate (each limit's outcome)'.",
+                    "type": "array",
+                    "minItems": 1
+                  }
+                },
+                "required": ["limits"]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "trace": {
+      "title": "Trace",
+      "description": "One trace: the spans of one trace id in order, from what opened it to its last hop, such as the delivery receipt (arch 10 line 548; BP 5.5; tour lines 656 to 658). A text's webhook opens one; so do a page or Agent API request, a clock firing, a sweep, a Stripe or calendar webhook and reconciliation. A turn of several texts carries the first text's trace id and lists the others, whose own traces end at 'joined turn T' (CQ-06).",
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "description": "The trace id (arch 10 line 548).",
+          "$ref": "#/$defs/traceId"
+        },
+        "opened_by": {
+          "description": "What opened it: a text's webhook (Linq, or an email reply), a provider's webhook (Stripe or calendar), a page request, an Agent API request, a clock firing, the minute sweep, or reconciliation (CQ-06; arch 02 lines 109, 127, 129; arch 10 lines 540, 550).",
+          "type": "string",
+          "enum": [
+            "textWebhook",
+            "providerWebhook",
+            "pageRequest",
+            "agentApiRequest",
+            "clockFiring",
+            "sweep",
+            "reconciliation"
+          ]
+        },
+        "bundle_id": {
+          "description": "The bundle the trace ran on: one per trace (arch 10 line 548; BP section 10 D-017; 02-contracts section 11 'trace-skeleton.json: every hop once, in order').",
+          "$ref": "#/$defs/bundleId"
+        },
+        "turn_id": {
+          "description": "The turn it carries, or null (CQ-06; K-04 turns.trace_id).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "job_id": {
+          "description": "The job it runs, or null (02-contracts K-08).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/safeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "handle_ref": {
+          "description": "The handle it is about, by id, or null (02-contracts K-08).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/handleRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "joined_trace_ids": {
+          "description": "For a turn of several texts, the other texts' trace ids (CQ-06; K-04 turns.joined_trace_ids).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/traceId"
+          }
+        },
+        "spans": {
+          "description": "Its spans in order of seq (BP section 10 D-017).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/span"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "trace_id",
+        "opened_by",
+        "bundle_id",
+        "turn_id",
+        "job_id",
+        "handle_ref",
+        "joined_trace_ids",
+        "spans"
+      ],
+      "additionalProperties": false
+    },
+    "traceSet": {
+      "title": "TraceSet",
+      "description": "Several traces read together, such as a batched turn's trace with the traces of the texts it joined (CQ-06).",
+      "type": "object",
+      "properties": {
+        "traces": {
+          "description": "The traces (CQ-06).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/trace"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["traces"],
+      "additionalProperties": false
+    },
+    "replyTime": {
+      "title": "ReplyTime",
+      "description": "Reply time read from a turn's traces: from the arrival of the turn's last text to the moment Linq accepts the reply's first part, a re-read and a rewrite counting on top (Q-41 default; CQ-06 default; arch 04 line 229: reply p50 at most 10 s, p95 at most 18 s; arch 10 line 552: p95 over 18 s rolls a bundle back).",
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "description": "The turn's trace id, the first text's (CQ-06).",
+          "$ref": "#/$defs/traceId"
+        },
+        "turn_id": {
+          "description": "The turn (K-04 turns.id).",
+          "$ref": "#/$defs/turnId"
+        },
+        "bundle_id": {
+          "description": "The bundle it ran on, so a canary's reply times are read per bundle (arch 10 lines 548, 552).",
+          "$ref": "#/$defs/bundleId"
+        },
+        "texts": {
+          "description": "How many texts the turn joined (arch 02 line 113).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "last_text_event_id": {
+          "description": "The last text's event id (Q-41: 'from the last text's arrival').",
+          "$ref": "#/$defs/safeId"
+        },
+        "last_text_at": {
+          "description": "Its arrival: the start of its receive span (Q-41; CQ-06).",
+          "$ref": "#/$defs/utc"
+        },
+        "first_part_row_id": {
+          "description": "The outbox row whose first part ended it (CQ-06; K-04 outbox_rows.id).",
+          "$ref": "#/$defs/safeId"
+        },
+        "first_part_accepted_at": {
+          "description": "When Linq accepted that first part: the start of its providerAccepted span (CQ-06).",
+          "$ref": "#/$defs/utc"
+        },
+        "ms": {
+          "description": "The reply time in milliseconds (Q-41; arch 04 line 229).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "reread": {
+          "description": "Whether the one Sonnet re-read ran, counted inside (Q-41; arch 02 line 119).",
+          "type": "boolean"
+        },
+        "rewrite": {
+          "description": "Whether the one rewrite ran, counted on top (Q-41: 'a rewrite counts on top'; arch 02 line 123).",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "trace_id",
+        "turn_id",
+        "bundle_id",
+        "texts",
+        "last_text_event_id",
+        "last_text_at",
+        "first_part_row_id",
+        "first_part_accepted_at",
+        "ms",
+        "reread",
+        "rewrite"
+      ],
+      "additionalProperties": false
+    },
+    "invariantRun": {
+      "title": "InvariantRun",
+      "description": "One run of the hourly hard-invariant checks in production, read from the event log and traces: no charge without a bound yes, no double booking, no text after STOP beyond what the stopped flag allows (arch 08 line 427: target 100%, checked hourly). A breach pages Rosie's team at once and rolls back to the last passing bundle, with trace ids in the alert (arch 08 line 445; arch 10 line 552; BP 5.4).",
+      "type": "object",
+      "properties": {
+        "checked_at": {
+          "description": "When the run ended (arch 08 line 427; CQ-09).",
+          "$ref": "#/$defs/utc"
+        },
+        "window_from": {
+          "description": "The start of the hour checked (arch 08 line 427).",
+          "$ref": "#/$defs/utc"
+        },
+        "window_to": {
+          "description": "Its end (arch 08 line 427).",
+          "$ref": "#/$defs/utc"
+        },
+        "checks": {
+          "description": "One result per hard invariant (arch 08 line 427).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/invariantCheck"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["checked_at", "window_from", "window_to", "checks"],
+      "additionalProperties": false
+    },
+    "invariantCheck": {
+      "title": "InvariantCheck",
+      "description": "One hard invariant's result for the hour (arch 08 line 427).",
+      "type": "object",
+      "properties": {
+        "invariant": {
+          "description": "noChargeWithoutBoundYes, noDoubleBooking or noTextAfterStop (arch 08 line 427).",
+          "type": "string",
+          "enum": ["noChargeWithoutBoundYes", "noDoubleBooking", "noTextAfterStop"]
+        },
+        "breaches": {
+          "description": "How many breaches were found (arch 08 line 427: the target is 100%, so any breach is one too many).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "trace_ids": {
+          "description": "The trace id of each breach, for the page and the rollback alert (BP 5.4: rollbacks alert with trace ids).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/traceId"
+          }
+        },
+        "bundle_ids": {
+          "description": "The bundles in force over the hour, so a breach is pinned to its bundle (arch 08 line 445: roll back to the last passing bundle; arch 10 line 548).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/bundleId"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["invariant", "breaches", "trace_ids", "bundle_ids"],
+      "additionalProperties": false
+    }
+  }
+}

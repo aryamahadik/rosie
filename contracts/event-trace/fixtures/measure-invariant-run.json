@@ -1,0 +1,25 @@
+{
+  "checked_at": "2026-10-23T15:00:40Z",
+  "window_from": "2026-10-23T14:00:00Z",
+  "window_to": "2026-10-23T15:00:00Z",
+  "checks": [
+    {
+      "invariant": "noChargeWithoutBoundYes",
+      "breaches": 0,
+      "trace_ids": [],
+      "bundle_ids": [{ "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 }]
+    },
+    {
+      "invariant": "noDoubleBooking",
+      "breaches": 0,
+      "trace_ids": [],
+      "bundle_ids": [{ "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 }]
+    },
+    {
+      "invariant": "noTextAfterStop",
+      "breaches": 0,
+      "trace_ids": [],
+      "bundle_ids": [{ "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 }]
+    }
+  ]
+}

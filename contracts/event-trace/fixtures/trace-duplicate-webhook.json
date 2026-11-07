@@ -1,0 +1,27 @@
+{
+  "trace_id": "trace-alex-0008-repeat",
+  "opened_by": "textWebhook",
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": null,
+  "job_id": null,
+  "handle_ref": "handle-alex",
+  "joined_trace_ids": [],
+  "spans": [
+    {
+      "trace_id": "trace-alex-0008-repeat",
+      "span_id": "span-alex-0008-repeat-01",
+      "seq": 1,
+      "hop": "receive",
+      "at": "2026-10-23T14:06:41Z",
+      "ms": 35,
+      "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "turn_id": null,
+      "event_id": "evt-alex-0008",
+      "handle_ref": "handle-alex",
+      "got": { "provider": "linq", "kind": "pollVote", "service": "imessage" },
+      "decided": { "signatureValid": true, "knownEventId": true, "firstTrace": "trace-alex-0008", "answered": 200 },
+      "outcome": "dropped",
+      "error_code": null
+    }
+  ]
+}

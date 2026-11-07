@@ -1,0 +1,99 @@
+{
+  "rows": [
+    {
+      "id": "evlog-alex-0008-1",
+      "at": "2026-10-23T14:06:14Z",
+      "zone": "America/New_York",
+      "turn_id": "turn-alex-move-2",
+      "job_id": null,
+      "trace_id": "trace-alex-0008",
+      "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "bundle_build": 1,
+      "business_id": "biz-lees-barbershop",
+      "actor_kind": "person",
+      "actor_person_id": "person-alex",
+      "actor_role": "customer",
+      "kind": "open_question.answered",
+      "table_name": "open_questions",
+      "row_id": "oq-a7-03-alex",
+      "old_values": { "status": "open", "answered_option_id": null, "closed_at": null },
+      "new_values": { "status": "answered", "answered_option_id": "A7-03/2", "closed_at": "2026-10-23T14:06:14Z" },
+      "why": { "step": "A7-03", "choice": "A7-03/2" },
+      "approved_by": {
+        "kind": "answer",
+        "open_question_id": "oq-a7-03-alex",
+        "option_id": "A7-03/2",
+        "event_id": "evt-alex-0008"
+      },
+      "proofs": [
+        {
+          "what": "exactYes",
+          "text_hash": "e5519135c032f8d94baab1478e41168abc15ce6d710c9fd50f90255e0fa480f0",
+          "words_shown": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+          "shown_at": "2026-10-23T14:05:04Z",
+          "open_question_id": "oq-a7-03-alex",
+          "fixed_line": null
+        }
+      ]
+    },
+    {
+      "id": "evlog-alex-0008-2",
+      "at": "2026-10-23T14:06:14Z",
+      "zone": "America/New_York",
+      "turn_id": "turn-alex-move-2",
+      "trace_id": "trace-alex-0008",
+      "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "bundle_build": 1,
+      "business_id": "biz-lees-barbershop",
+      "actor_kind": "rosie",
+      "kind": "reservation.booked",
+      "table_name": "reservations",
+      "row_id": "rsv-alex-sat-2pm",
+      "old_values": { "state": "held", "booking_id": null },
+      "new_values": { "state": "booked", "booking_id": "booking-alex-haircut" },
+      "why": { "step": "A7-03", "choice": "A7-03/2" },
+      "approved_by": {
+        "kind": "answer",
+        "open_question_id": "oq-a7-03-alex",
+        "option_id": "A7-03/2",
+        "event_id": "evt-alex-0008"
+      }
+    },
+    {
+      "id": "evlog-alex-0008-3",
+      "at": "2026-10-23T14:06:14Z",
+      "zone": "America/New_York",
+      "turn_id": "turn-alex-move-2",
+      "trace_id": "trace-alex-0008",
+      "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "bundle_build": 1,
+      "business_id": "biz-lees-barbershop",
+      "actor_kind": "rosie",
+      "kind": "clock_row.cancelled",
+      "table_name": "clock_rows",
+      "row_id": "clock-oq-a7-03-alex",
+      "old_values": { "state": "armed", "cancelled_at": null },
+      "new_values": { "state": "cancelled", "cancelled_at": "2026-10-23T14:06:14Z" },
+      "why": { "step": "A7-03", "choice": "A7-03/2" }
+    },
+    {
+      "id": "evlog-alex-0008-4",
+      "at": "2026-10-23T14:06:14Z",
+      "zone": "America/New_York",
+      "turn_id": "turn-alex-move-2",
+      "trace_id": "trace-alex-0008",
+      "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "bundle_build": 1,
+      "business_id": null,
+      "actor_kind": "person",
+      "actor_person_id": "person-alex",
+      "actor_role": null,
+      "kind": "phone.poll_voted",
+      "table_name": "phones",
+      "row_id": "handle-alex",
+      "old_values": { "poll_voted_at": null },
+      "new_values": { "poll_voted_at": "2026-10-23T14:06:10Z" },
+      "why": { "step": "A7-03" }
+    }
+  ]
+}

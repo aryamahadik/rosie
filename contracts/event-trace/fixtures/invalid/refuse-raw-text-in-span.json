@@ -1,0 +1,16 @@
+{
+  "trace_id": "trace-sam-0001",
+  "span_id": "span-sam-0001-01",
+  "seq": 1,
+  "hop": "receive",
+  "at": "2026-10-19T14:05:00.100Z",
+  "ms": 170,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": null,
+  "event_id": "evt-sam-0001",
+  "handle_ref": "handle-sam",
+  "got": { "provider": "linq", "kind": "text", "words": "Barbershop, plumbing, electrical" },
+  "decided": { "signatureValid": true, "knownEventId": false, "sealedToActor": true },
+  "outcome": "ok",
+  "error_code": null
+}

@@ -1,0 +1,16 @@
+{
+  "trace_id": "trace-sam-0000",
+  "span_id": "span-sam-0000-01",
+  "seq": 1,
+  "hop": "receive",
+  "at": "2026-10-19T14:01:50.100Z",
+  "ms": 180,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": null,
+  "event_id": "evt-sam-0000",
+  "handle_ref": "+15555550100",
+  "got": { "provider": "linq", "kind": "text", "service": "imessage" },
+  "decided": { "signatureValid": true, "knownEventId": false, "sealedToActor": true },
+  "outcome": "ok",
+  "error_code": null
+}
