@@ -5,6 +5,9 @@
 
 import { handleLinqWebhook, LINQ_WEBHOOK_PATH, unconfiguredGateway, type GatewayDeps } from "./gateway";
 
+// The HandleActor Durable Object (T-244): the Workers runtime finds the class named in wrangler.jsonc here.
+export { HandleActor } from "./actor";
+
 declare global {
   namespace Cloudflare {
     interface Env {
