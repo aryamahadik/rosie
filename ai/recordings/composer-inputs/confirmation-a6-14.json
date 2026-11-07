@@ -1,0 +1,47 @@
+{
+  "row": "outbox-a6-14-alex-1",
+  "turn": "turn-a6-14-alex-book",
+  "conversation": [
+    {
+      "from": "reader",
+      "text": "Can I get a haircut Saturday at 11?",
+      "sentAt": { "utc": "2026-10-20T14:02:00Z", "zone": "America/New_York" }
+    },
+    {
+      "from": "rosie",
+      "text": "Saturday Oct 24 at 11:00am works. Want me to book it?",
+      "sentAt": { "utc": "2026-10-20T14:02:20Z", "zone": "America/New_York" }
+    },
+    {
+      "from": "reader",
+      "text": "Yes please",
+      "sentAt": { "utc": "2026-10-20T14:02:50Z", "zone": "America/New_York" }
+    }
+  ],
+  "masterText": {
+    "step": "A6-14",
+    "text": "You're booked! Give this code at the chair when you arrive."
+  },
+  "facts": [
+    { "slot": "biz.name", "value": "Lee's Barbershop" },
+    { "slot": "visit.code", "value": "5160" },
+    { "slot": "svc.intext", "value": "Haircut" },
+    { "slot": "day", "value": "Sat Oct 24" },
+    { "slot": "visit.time", "value": "11:00am" },
+    { "slot": "pro.name", "value": "Riley" },
+    { "slot": "visit.place", "value": "88 Elm St, Springfield" },
+    { "slot": "pay.price", "value": "Paid with 1 credit from your pack" },
+    { "slot": "pay.took", "value": "Nothing to pay at the visit" },
+    { "slot": "pay.cancel", "value": "No fee to cancel or miss. Please tell us before Fri 11am" }
+  ],
+  "audience": { "role": "customer", "name": "Alex", "way": "texts", "handlingLine": null },
+  "language": "en",
+  "channel": "imessage",
+  "situation": "moneyOrConsent",
+  "allowedFormats": ["text", "calendarFile", "linkCard"],
+  "allowedLinks": ["link.secure"],
+  "options": [],
+  "pageTypes": [],
+  "openQuestions": [],
+  "inbound": null
+}

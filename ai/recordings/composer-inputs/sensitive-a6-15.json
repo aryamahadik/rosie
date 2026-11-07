@@ -1,0 +1,25 @@
+{
+  "row": "outbox-a6-15-maya-1",
+  "turn": "turn-a6-15-alex-book",
+  "conversation": [],
+  "masterText": {
+    "step": "A6-15",
+    "text": "New booking: Sat 11:00am, {{alex.staff}} Answers and notes: open the job."
+  },
+  "facts": [
+    { "slot": "alex.staff", "value": "A.M." },
+    { "slot": "svc.intext", "value": "" },
+    { "slot": "day", "value": "Sat Oct 24" },
+    { "slot": "visit.time", "value": "11:00am" }
+  ],
+  "audience": { "role": "staff", "name": "Maya", "way": "texts", "handlingLine": null },
+  "language": "en",
+  "channel": "imessage",
+  "situation": "gentle",
+  "allowedFormats": ["text"],
+  "allowedLinks": ["link.secure"],
+  "options": [],
+  "pageTypes": [],
+  "openQuestions": [],
+  "inbound": null
+}
