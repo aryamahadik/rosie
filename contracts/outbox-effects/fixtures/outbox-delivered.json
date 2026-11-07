@@ -1,0 +1,136 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-alex-booked-riley",
+    "turnId": "turn-alex-book-1",
+    "commitSeq": 1,
+    "recipientHandleId": "handle-alex",
+    "recipientPersonId": "person-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-riley-nov14",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "quick_reply",
+    "copyOfRowId": null,
+    "state": "delivered",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-alex-booked-riley",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am",
+          "calendarFile": "new",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "pro.name", "value": "Riley" },
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0012"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-alex-booked-riley",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-alex-booked-riley/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0012",
+      "providerOptionIds": null,
+      "sentAt": "2026-11-07T15:06:36Z",
+      "deliveredAt": "2026-11-07T15:06:37Z",
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-11-07T15:06:35Z",
+    "lapsesAt": "2026-11-07T15:07:35Z",
+    "claimNo": 1
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-07T15:06:31Z",
+      "by": "commitTurn",
+      "note": "Alex's booking with Riley commits one row to Alex with no plan (arch 01 lines 39 to 41; K-05 commit)."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-07T15:06:34Z",
+      "by": "writePlan",
+      "note": "The confirmation's plan and final parts, with the calendar file, after the checks (arch 02 line 123)."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-07T15:06:35Z",
+      "by": "claimOutbox",
+      "note": "dispatcher-1 claims it, first in Alex's commit order (arch 02 line 125)."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-booked-riley/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T15:06:35Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The words part, try 1, written at the claim (K-05 claimOutbox)."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-booked-riley/1/1",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-11-07T15:06:36Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Linq accepts it with its message id."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sent",
+      "at": "2026-11-07T15:06:36Z",
+      "by": "markPart",
+      "note": "Its only part is accepted, so the row is sent."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-booked-riley/1/1",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T15:06:37Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "message.delivered on iMessage (arch 02 line 127)."
+    },
+    {
+      "subject": "row",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T15:06:37Z",
+      "by": "markPart",
+      "note": "Every part delivered."
+    }
+  ],
+  "followUps": []
+}

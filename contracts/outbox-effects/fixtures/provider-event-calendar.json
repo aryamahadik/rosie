@@ -1,0 +1,14 @@
+{
+  "record": "providerEvent",
+  "event": {
+    "provider": "google_calendar",
+    "providerEventId": "gcal-push-demo-0001",
+    "eventType": "calendar.changed",
+    "occurredAt": null,
+    "receivedAt": "2026-11-12T21:15:00Z",
+    "businessId": "biz-lees-barbershop",
+    "effectId": null,
+    "payload": { "calendarOf": "person-riley", "busy": [{ "start": "2026-11-14T15:30:00Z", "end": "2026-11-14T17:00:00Z" }] },
+    "traceId": "trace-gcal-0001"
+  }
+}

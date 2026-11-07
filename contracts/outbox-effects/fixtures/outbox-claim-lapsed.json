@@ -1,0 +1,150 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-maya-class-joined",
+    "turnId": "turn-maya-class-1",
+    "commitSeq": 10,
+    "recipientHandleId": "handle-maya",
+    "recipientPersonId": "person-maya",
+    "businessId": "biz-yoga-studio",
+    "bookingId": null,
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "delivered",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-maya-class-joined",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Alex M. joined your class.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [{ "slot": "name", "value": "Alex M." }],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0080"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-maya-class-joined",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-maya-class-joined/1/1",
+      "attempts": 2,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0080",
+      "providerOptionIds": null,
+      "sentAt": "2026-11-07T18:01:07Z",
+      "deliveredAt": "2026-11-07T18:01:08Z",
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-2",
+    "claimedAt": "2026-11-07T18:01:06Z",
+    "lapsesAt": "2026-11-07T18:02:06Z",
+    "claimNo": 2
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-07T18:00:00Z",
+      "by": "commitTurn",
+      "note": "Alex joins a class at the yoga studio; a routine row tells Maya, who teaches it."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-07T18:00:03Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-07T18:00:04Z",
+      "by": "claimOutbox",
+      "note": "dispatcher-1 claims it; its claim lapses at 18:01:04 unless renewed."
+    },
+    {
+      "subject": "part",
+      "key": "out-maya-class-joined/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T18:00:04Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "Try 1. dispatcher-1 dies before Linq answers, so nobody knows whether it was sent."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sending",
+      "at": "2026-11-07T18:01:06Z",
+      "by": "claimOutbox",
+      "note": "The claim lapsed at 18:01:04: dispatcher-2 claims the row again (claim 2), so Maya's later rows are not held back for ever (K-05 v1 open gap 1)."
+    },
+    {
+      "subject": "part",
+      "key": "out-maya-class-joined/1/1",
+      "from": "pending",
+      "to": "pending",
+      "at": "2026-11-07T18:01:06Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "Unsent parts go under their stored keys, attempts raised, so a send the dead dispatcher made is not doubled (arch 11 line 576; arch 01 line 65)."
+    },
+    {
+      "subject": "part",
+      "key": "out-maya-class-joined/1/1",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-11-07T18:01:07Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Linq accepts it under the same key."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sent",
+      "at": "2026-11-07T18:01:07Z",
+      "by": "markPart",
+      "note": "Its only part is accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-maya-class-joined/1/1",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T18:01:08Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "message.delivered."
+    },
+    {
+      "subject": "row",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T18:01:08Z",
+      "by": "markPart",
+      "note": "Delivered."
+    }
+  ],
+  "followUps": []
+}

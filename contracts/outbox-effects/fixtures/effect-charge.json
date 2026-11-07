@@ -1,0 +1,54 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-alex-grooms-deposit",
+    "turnId": "turn-alex-grooms-1",
+    "jobId": null,
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-grooms-package",
+    "kind": "stripe_charge",
+    "port": "stripe",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-alex",
+    "handleId": null,
+    "amount": { "cents": 4000, "currency": "USD" },
+    "portRequest": { "purpose": "deposit", "savedCard": "card-demo-alex" },
+    "idempotencyKey": "eff-alex-grooms-deposit",
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 1,
+    "firstTryAt": "2026-11-07T15:20:01Z",
+    "providerObjectId": "stripe-charge-demo-0001",
+    "errorCode": null,
+    "ledgerLineId": "ledger-alex-grooms-deposit",
+    "traceId": "trace-alex-0100"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T15:20:00Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "Alex books the $140 Groom's package at Lee's Barbershop; Sam takes a $40 deposit now (barber.json, flow A). The charge is an effect row in the turn's commit (arch 10 line 508)."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-07T15:20:01Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "The effects runner claims it; try 1 goes on its one key."
+    },
+    {
+      "from": "running",
+      "to": "succeeded",
+      "at": "2026-11-07T15:20:02Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "ok",
+      "note": "Stripe charges the saved card; the deposit's ledger line is written with the effect id (arch 10 line 550)."
+    }
+  ],
+  "providerEventIds": ["stripe-evt-demo-0001"]
+}

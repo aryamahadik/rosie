@@ -1,0 +1,158 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-sam-passon-evening",
+    "turnId": "turn-alex-evening-1",
+    "commitSeq": 1,
+    "recipientHandleId": "handle-sam",
+    "recipientPersonId": "person-sam",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-haircut",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "delivered",
+    "heldUntil": "2026-11-08T13:00:00Z",
+    "finalParts": {
+      "row": "out-sam-passon-evening",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Alex M. has a question about the haircut.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [{ "slot": "name", "value": "Alex M." }],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0020"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-sam-passon-evening",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-sam-passon-evening/1/1",
+      "attempts": 2,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0020",
+      "providerOptionIds": null,
+      "sentAt": "2026-11-08T13:00:06Z",
+      "deliveredAt": "2026-11-08T13:00:07Z",
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-11-08T13:00:05Z",
+    "lapsesAt": "2026-11-08T13:01:05Z",
+    "claimNo": 2
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-08T01:30:00Z",
+      "by": "commitTurn",
+      "note": "8:30pm in New York: Alex's question passed on to Sam, a routine row to the owner (K-05 commit-evening-notice)."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-08T01:30:03Z",
+      "by": "writePlan",
+      "note": "K-05 write-plan-evening-notice."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-08T01:30:03Z",
+      "by": "claimOutbox",
+      "note": "Claimed (K-05 claim-evening-notice)."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-passon-evening/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-08T01:30:03Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The words part, try 1, written at the claim."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "held",
+      "at": "2026-11-08T01:30:04Z",
+      "by": "markRow",
+      "note": "Limit 8 at send: a routine row to the owner outside text hours is held to 8am in New York (arch 06 line 313; K-05 mark-held-for-text-hours)."
+    },
+    {
+      "subject": "row",
+      "from": "held",
+      "to": "sending",
+      "at": "2026-11-08T13:00:05Z",
+      "by": "claimOutbox",
+      "note": "held_until has passed: the row is claimed again (K-05 v1 item 4)."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-passon-evening/1/1",
+      "from": "pending",
+      "to": "pending",
+      "at": "2026-11-08T13:00:05Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The re-claim keeps the part's stored key and raises its attempts, as K-05 v1's claim does for a part the provider never accepted (arch 11 line 576)."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-passon-evening/1/1",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-11-08T13:00:06Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Linq accepts it at 8am."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sent",
+      "at": "2026-11-08T13:00:06Z",
+      "by": "markPart",
+      "note": "Its only part is accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-passon-evening/1/1",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-08T13:00:07Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "message.delivered (arch 02 line 127)."
+    },
+    {
+      "subject": "row",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-08T13:00:07Z",
+      "by": "markPart",
+      "note": "Every part delivered."
+    }
+  ],
+  "followUps": []
+}

@@ -1,0 +1,171 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-sam-booked-riley",
+    "turnId": "turn-alex-book-1",
+    "commitSeq": 2,
+    "recipientHandleId": "handle-sam",
+    "recipientPersonId": "person-sam",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-riley-nov14",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "delivered",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-sam-booked-riley",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "New booking: Alex M. with Riley.\nSat Nov 14, 11:00am",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "name", "value": "Alex M." },
+        { "slot": "pro.name", "value": "Riley" },
+        { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0012"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-sam-booked-riley",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-sam-booked-riley/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "failed",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": "2026-11-07T15:06:36Z",
+      "errorCode": "4006"
+    },
+    {
+      "outboxRowId": "out-sam-booked-riley",
+      "partNo": 1,
+      "tryNo": 2,
+      "idempotencyKey": "out-sam-booked-riley/1/2",
+      "attempts": 1,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0014",
+      "providerOptionIds": null,
+      "sentAt": "2026-11-07T15:06:57Z",
+      "deliveredAt": "2026-11-07T15:06:58Z",
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-11-07T15:06:35Z",
+    "lapsesAt": "2026-11-07T15:08:37Z",
+    "claimNo": 1
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-07T15:06:31Z",
+      "by": "commitTurn",
+      "note": "Alex's booking commits a routine row telling Sam (K-05 claim-in-order's second row)."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-07T15:06:34Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-07T15:06:35Z",
+      "by": "claimOutbox",
+      "note": "Claimed."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-booked-riley/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T15:06:35Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "Try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-booked-riley/1/1",
+      "from": "pending",
+      "to": "failed",
+      "at": "2026-11-07T15:06:36Z",
+      "by": "markPart",
+      "errorCode": "4006",
+      "note": "Linq reports 4006, which may still deliver: a new key only if no delivery receipt comes within 1 minute (arch 01 line 65)."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-booked-riley/1/2",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T15:06:56Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Try 2 under a new key only 20 s after the 4006, before the minute for a receipt has passed (arch 01 line 65): refused by lifeChain."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-booked-riley/1/2",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-11-07T15:06:57Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Linq accepts it."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sent",
+      "at": "2026-11-07T15:06:57Z",
+      "by": "markPart",
+      "note": "The row's part is accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-sam-booked-riley/1/2",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T15:06:58Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "message.delivered."
+    },
+    {
+      "subject": "row",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T15:06:58Z",
+      "by": "markPart",
+      "note": "Delivered."
+    }
+  ],
+  "followUps": []
+}

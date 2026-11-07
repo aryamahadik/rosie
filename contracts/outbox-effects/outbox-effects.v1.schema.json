@@ -1,0 +1,1032 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/outbox-effects/outbox-effects.v1.schema.json",
+  "title": "OutboxEffectsV1",
+  "description": "K-07 v1, the outbox rows and the effect rows (02-contracts K-07): the state words and the only state moves of an outbox row and its parts, the retry rules, the email copy row, the effect rows that Stripe, calendar and Linq contact calls run from, and the provider events stored once by their event id. Every fixture is one record: an outbox row's life (the row, its parts, its claim and every move it made), an effect row's life, or a provider event. The root is any one record, so the type generator writes a type for each (ADR-005). The rows live in K-04 v1's outbox_rows and outbox_parts (state and kind held there as text) and in this contract's own tables (outbox-effects.v1.tables.json: effects, provider_events, outbox_claims), migrated with K-05 v1.1. Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/outboxLife" },
+    { "$ref": "#/$defs/effectLife" },
+    { "$ref": "#/$defs/providerEventRecord" }
+  ],
+  "$defs": {
+    "id": {
+      "title": "Id",
+      "description": "An opaque id code makes and never parses (CQ-09; K-04 v1 rule 3: ids are text).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "title": "NullableId",
+      "description": "An opaque id, or null where the column is nullable (CQ-09).",
+      "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/id" }, { "type": "null" }]
+    },
+    "utc": {
+      "title": "Utc",
+      "description": "An instant in UTC ending in Z (CQ-09); a timestamptz column.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "title": "NullableUtc",
+      "description": "An instant in UTC, or null (CQ-09).",
+      "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/utc" }, { "type": "null" }]
+    },
+    "note": {
+      "title": "Note",
+      "description": "Why the move happened, in plain words, with its source (02-contracts section 2 item 4).",
+      "type": "string",
+      "minLength": 1
+    },
+
+    "sendClass": {
+      "title": "SendClass",
+      "description": "The row's send class (RULES 4.3; arch 01 line 65; arch 06 line 313; K-04 outbox_rows_send_class_known): routine (waits for text hours); quick_reply (a reply in the same turn as the person's text: Q-15's default); visit_now (a visit happening now); safety (a safety line: retried every 10 s for 15 minutes and sent at once every other way the person allows, arch 02 line 125). Only routine waits for text hours.",
+      "type": "string",
+      "enum": ["routine", "quick_reply", "visit_now", "safety"]
+    },
+    "port": {
+      "title": "Port",
+      "description": "The port a row goes through (02-contracts K-07 'An email copy row'; arch 02 line 125: 'iMessage first for texts, email only for the email way'): linq for the imessage, rcs and sms channels (Linq's own services on Rosie's one number: K-03 v1 channel; DL-031), email (Resend: K-12) for the email channel. There is no SMS port: no SMS provider (DL-012; MC C9; MC 8 'SMS').",
+      "type": "string",
+      "enum": ["linq", "email"]
+    },
+    "rowState": {
+      "title": "OutboxRowState",
+      "description": "Where an outbox row stands (02-contracts K-07 'The outbox row's life'; arch 02 lines 123 to 127; arch 06 line 313; K-04 outbox_rows.state, default planned). planned: committed, final parts not written (the plan may be stored: an email copy's, K-04 seed-outbox-row). checked: the final parts are written and passed the message checks (K-05 v1 writePlan writes the plan and the final parts together, after the checks, so the plan's 'composed' and 'checked' are one stored state; a passed-on row carries K-01's fixed line passedOn in its final parts). sending: claimed by one dispatcher, which sends its parts in order (K-05 v1 claimOutbox: 'K-07's claimed state'). sent: every part accepted by the provider. delivered: every part's delivery receipt came (on SMS, Linq's sent receipt is the receipt: arch 02 line 127). held: limit 8 held it for text hours until held_until (arch 06 line 313). dropped_stopped: the phone is stopped; its question takes step 9's never-delivered path. stale: versions changed at send; its plan and final parts are cleared and it is composed again from today's record (S13-57). withdrawn: stale and its booking or question has closed. failed: sends still failing after 15 minutes of tries; the next way follows (S12-09, S12-10).",
+      "type": "string",
+      "enum": [
+        "planned",
+        "checked",
+        "sending",
+        "sent",
+        "delivered",
+        "held",
+        "dropped_stopped",
+        "stale",
+        "withdrawn",
+        "failed"
+      ]
+    },
+    "partState": {
+      "title": "OutboxPartState",
+      "description": "Where one part, under one idempotency key, stands (02-contracts K-07 'Parts'; arch 01 line 65; arch 02 line 127; K-04 outbox_parts.state). pending: written at the claim (or by a failure's next try), not yet accepted. sent: the provider accepted it (sent_at, the provider's ids). delivered: its delivery receipt came (delivered_at; on SMS, Linq's sent receipt: arch 02 line 127). failed: a failure was reported (failed_at, error_code); a 4001 or 4006 may still deliver (arch 01 line 65).",
+      "type": "string",
+      "enum": ["pending", "sent", "delivered", "failed"]
+    },
+    "partKind": {
+      "title": "OutboxPartKind",
+      "description": "What one part is: K-03 v1's send kind, which the claim copies from the final parts (K-05 v1 item 3: 'its K-03 send kind'; K-04 outbox_parts.kind; K-04 seed-outbox-row): words (the text, carrying any calendar file), poll, linkCard or tapback. Of the formats tested on Nov 5 (MC 8 'iPhone tests'), a calendar file rides with the words (K-03 calendarFile), a threaded reply is the final parts' threadReplyTo, and a photo and typing dots are no part in v1 (K-03 v1 has no such format: open gap).",
+      "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/sendKind"
+    },
+    "idempotencyKey": {
+      "title": "PartIdempotencyKey",
+      "description": "A part's idempotency key, '<row>/<part>/<try>' (arch 01 line 65: 'an idempotency key (row, part, try)'; K-04 outbox_parts_key_form). A retry after a timeout or crash reuses it; one after a reported failure gets a new key, the next try.",
+      "type": "string",
+      "pattern": "^.+/[12]/[1-9][0-9]*$"
+    },
+    "outboxActor": {
+      "title": "OutboxActor",
+      "description": "What made a move (K-05 v1 calls, 02-contracts K-05 items 1 to 3): commitTurn writes the row; writePlan writes its plan and final parts; claimOutbox claims it (and, from K-05 v1.1, claims a row whose claim lapsed); markPart marks a part and moves the row as its parts move; markRow is limit 8's outcome at send; dispatcherGivesUp is the dispatcher ending a row after 15 minutes of failing tries (arch 02 line 125), whose K-05 call is K-05 v1.1's (open gap).",
+      "type": "string",
+      "enum": ["commitTurn", "writePlan", "claimOutbox", "markPart", "markRow", "dispatcherGivesUp"]
+    },
+
+    "rowMove": {
+      "title": "OutboxRowMove",
+      "description": "One move of an outbox row's state. Only the moves listed here are allowed (02-contracts K-07 'Contract test': 'every state move in the fixtures is allowed and no other'); the README's moves table gives each one's source.",
+      "type": "object",
+      "properties": {
+        "subject": { "const": "row" },
+        "from": {
+          "description": "The state before, or null when the commit writes the row.",
+          "anyOf": [{ "$ref": "#/$defs/rowState" }, { "type": "null" }]
+        },
+        "to": { "$ref": "#/$defs/rowState" },
+        "at": { "$ref": "#/$defs/utc" },
+        "by": { "$ref": "#/$defs/outboxActor" },
+        "note": { "$ref": "#/$defs/note" }
+      },
+      "required": ["subject", "from", "to", "at", "by", "note"],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "description": "The commit writes the row with no plan (arch 01 lines 39 to 41; K-04 default).",
+          "properties": {
+            "from": { "type": "null" },
+            "to": { "const": "planned" },
+            "by": { "const": "commitTurn" }
+          }
+        },
+        {
+          "description": "Plan and final parts written after the checks (arch 02 line 123; K-05 v1 writePlan).",
+          "properties": {
+            "from": { "const": "planned" },
+            "to": { "const": "checked" },
+            "by": { "const": "writePlan" }
+          }
+        },
+        {
+          "description": "A stale row composed again from today's record (arch 06 line 313; S13-57).",
+          "properties": {
+            "from": { "const": "stale" },
+            "to": { "const": "checked" },
+            "by": { "const": "writePlan" }
+          }
+        },
+        {
+          "description": "Claimed in commit order (arch 02 line 125; K-05 v1 claimOutbox).",
+          "properties": {
+            "from": { "const": "checked" },
+            "to": { "const": "sending" },
+            "by": { "const": "claimOutbox" }
+          }
+        },
+        {
+          "description": "A held row claimed again once its held_until has passed (arch 02 line 125; K-05 v1 item 4).",
+          "properties": {
+            "from": { "const": "held" },
+            "to": { "const": "sending" },
+            "by": { "const": "claimOutbox" }
+          }
+        },
+        {
+          "description": "A claim that lapsed (its dispatcher died) claimed again; unsent parts go under their stored keys (arch 11 line 576; README 'How a claim lapses').",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "sending" },
+            "by": { "const": "claimOutbox" }
+          }
+        },
+        {
+          "description": "The provider accepted the row's last part (arch 02 line 127; K-05 v1 markPart sent).",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "sent" },
+            "by": { "const": "markPart" }
+          }
+        },
+        {
+          "description": "Every part's delivery receipt came (arch 02 line 127; K-05 v1 markPart delivered).",
+          "properties": {
+            "from": { "const": "sent" },
+            "to": { "const": "delivered" },
+            "by": { "const": "markPart" }
+          }
+        },
+        {
+          "description": "The last part's receipt came after a 4001 or 4006, which may still deliver, with no acceptance recorded (arch 01 line 65).",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "delivered" },
+            "by": { "const": "markPart" }
+          }
+        },
+        {
+          "description": "A part the provider had accepted reported failed: the next try's part row is written under a new key and the row is open again for the next claim (arch 01 line 65; arch 07 line 367: 'A refused part goes again plain').",
+          "properties": {
+            "from": { "const": "sent" },
+            "to": { "const": "checked" },
+            "by": { "const": "markPart" }
+          }
+        },
+        {
+          "description": "Limit 8 at send, outside text hours: held to 9am, or 8am for owner and team (arch 06 line 313; K-05 v1 markRow held).",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "held" },
+            "by": { "const": "markRow" }
+          }
+        },
+        {
+          "description": "Limit 8 at send, the phone stopped: dropped (arch 06 line 313; K-05 v1 markRow droppedStopped).",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "dropped_stopped" },
+            "by": { "const": "markRow" }
+          }
+        },
+        {
+          "description": "Limit 8 at send, versions changed: stale (arch 06 line 313; K-05 v1 markRow stale).",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "stale" },
+            "by": { "const": "markRow" }
+          }
+        },
+        {
+          "description": "Limit 8 at send, versions changed and its booking or question closed: withdrawn (arch 06 line 313; K-05 v1 markRow withdrawn).",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "withdrawn" },
+            "by": { "const": "markRow" }
+          }
+        },
+        {
+          "description": "Sends still failing after 15 minutes of tries (arch 02 line 125; S12-09, S12-10).",
+          "properties": {
+            "from": { "const": "sending" },
+            "to": { "const": "failed" },
+            "by": { "const": "dispatcherGivesUp" }
+          }
+        }
+      ]
+    },
+    "partMove": {
+      "title": "OutboxPartMove",
+      "description": "One move of a part under one key. Only the moves listed here are allowed (02-contracts K-07 'Contract test'); attempts under the same key are the pending to pending move.",
+      "type": "object",
+      "properties": {
+        "subject": { "const": "part" },
+        "key": { "$ref": "#/$defs/idempotencyKey" },
+        "from": {
+          "description": "The state before, or null when the part's row under this key is written.",
+          "anyOf": [{ "$ref": "#/$defs/partState" }, { "type": "null" }]
+        },
+        "to": { "$ref": "#/$defs/partState" },
+        "at": { "$ref": "#/$defs/utc" },
+        "by": { "$ref": "#/$defs/outboxActor" },
+        "errorCode": {
+          "description": "For a move to failed, the provider's error code, such as 4001 or 4006 (K-04 outbox_parts.error_code); null otherwise.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "note": { "$ref": "#/$defs/note" }
+      },
+      "required": ["subject", "key", "from", "to", "at", "by", "errorCode", "note"],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "description": "The claim writes a new part's row, try 1 (K-05 v1 claimOutbox), or a reported failure writes the next try's row under a new key (arch 01 line 65; K-05 v1 markPart failed with retry).",
+          "properties": {
+            "from": { "type": "null" },
+            "to": { "const": "pending" },
+            "by": { "enum": ["claimOutbox", "markPart"] },
+            "errorCode": { "type": "null" }
+          }
+        },
+        {
+          "description": "Another send under the same key after a timeout or crash; attempts rises (arch 01 line 65; arch 11 line 576; K-05 v1 markPart attempt, or a re-claim).",
+          "properties": {
+            "from": { "const": "pending" },
+            "to": { "const": "pending" },
+            "by": { "enum": ["claimOutbox", "markPart"] },
+            "errorCode": { "type": "null" }
+          }
+        },
+        {
+          "description": "Accepted by the provider (K-05 v1 markPart sent).",
+          "properties": {
+            "from": { "const": "pending" },
+            "to": { "const": "sent" },
+            "by": { "const": "markPart" },
+            "errorCode": { "type": "null" }
+          }
+        },
+        {
+          "description": "Its delivery receipt (arch 02 line 127; K-05 v1 markPart delivered).",
+          "properties": {
+            "from": { "const": "sent" },
+            "to": { "const": "delivered" },
+            "by": { "const": "markPart" },
+            "errorCode": { "type": "null" }
+          }
+        },
+        {
+          "description": "A failure reported before or after acceptance (arch 01 line 65; arch 07 line 367; K-05 v1 markPart failed).",
+          "properties": {
+            "from": { "enum": ["pending", "sent"] },
+            "to": { "const": "failed" },
+            "by": { "const": "markPart" },
+            "errorCode": { "type": "string" }
+          }
+        },
+        {
+          "description": "A 4001 or 4006 that delivered anyway: its receipt came (arch 01 line 65: 'which may still deliver').",
+          "properties": {
+            "from": { "const": "failed" },
+            "to": { "const": "delivered" },
+            "by": { "const": "markPart" },
+            "errorCode": { "type": "null" }
+          }
+        }
+      ]
+    },
+
+    "outboxRow": {
+      "title": "OutboxRow",
+      "description": "An outbox row as it stands after its moves: K-04 v1 outbox_rows, in K-05's names (arch 01 line 65: 'One message to one recipient on one channel: send class, versions read, question and plan'). The versions read and the stored plan are K-04's and K-05's; this record carries what the row's life needs.",
+      "type": "object",
+      "properties": {
+        "id": { "description": "outbox_rows.id (CQ-09).", "$ref": "#/$defs/id" },
+        "turnId": {
+          "description": "The turn whose commit wrote it (outbox_rows.turn_id; arch 02 line 121).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "commitSeq": {
+          "description": "Commit order (outbox_rows.commit_seq; arch 02 line 125). Values assume a fresh database: compare their order.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "recipientHandleId": {
+          "description": "The recipient's handle (outbox_rows.recipient_handle_id; arch 01 line 65).",
+          "$ref": "#/$defs/id"
+        },
+        "recipientPersonId": {
+          "description": "outbox_rows.recipient_person_id.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "businessId": {
+          "description": "outbox_rows.business_id (arch 10 line 546).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": { "description": "outbox_rows.booking_id.", "$ref": "#/$defs/nullableId" },
+        "openQuestionId": {
+          "description": "The open question it asks (outbox_rows.open_question_id); its clock arms at the first delivery receipt (arch 02 line 127).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "channel": {
+          "description": "imessage, rcs or sms through Linq, or email (K-03 v1 channel; K-04 outbox_rows.channel; DL-031).",
+          "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/channel"
+        },
+        "port": { "$ref": "#/$defs/port" },
+        "sendClass": { "$ref": "#/$defs/sendClass" },
+        "copyOfRowId": {
+          "description": "For an email copy, the text row whose plan it reuses (outbox_rows.copy_of_row_id; arch 07 lines 371, 397; RULES 4.1).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "state": { "$ref": "#/$defs/rowState" },
+        "heldUntil": {
+          "description": "Held for text hours until this time (outbox_rows.held_until; arch 02 line 125); set when held, kept after.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "finalParts": {
+          "description": "K-03 v1's finalParts (outbox_rows.final_parts), null while planned or stale (K-05 v1 markRow stale clears it).",
+          "anyOf": [
+            { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/finalParts" },
+            { "type": "null" }
+          ]
+        },
+        "traceId": {
+          "description": "The trace it rides under, from webhook to delivery receipt (outbox_rows.trace_id; arch 10 line 548; K-08 gives its form).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "id",
+        "turnId",
+        "commitSeq",
+        "recipientHandleId",
+        "recipientPersonId",
+        "businessId",
+        "bookingId",
+        "openQuestionId",
+        "channel",
+        "port",
+        "sendClass",
+        "copyOfRowId",
+        "state",
+        "heldUntil",
+        "finalParts",
+        "traceId"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "channel": {
+          "description": "The port follows the channel; an SMS or email row is text only.",
+          "allOf": [
+            {
+              "description": "Email goes by the email port, as one text with its options typed (arch 07 line 371).",
+              "if": { "properties": { "channel": { "const": "email" } } },
+              "then": {
+                "properties": {
+                  "port": { "const": "email" },
+                  "finalParts": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "sends": {
+                            "type": "array",
+                            "maxItems": 1,
+                            "items": { "type": "object", "properties": { "kind": { "const": "words" } } }
+                          }
+                        }
+                      },
+                      { "type": "null" }
+                    ]
+                  }
+                }
+              },
+              "else": {
+                "description": "imessage, rcs and sms go through Linq, never an SMS port (DL-012; DL-031).",
+                "properties": { "port": { "const": "linq" }, "copyOfRowId": { "type": "null" } }
+              }
+            },
+            {
+              "description": "A reply on Linq's SMS service goes back in that chat as text only (DL-031: CQ-11's default): words with no calendar file.",
+              "if": { "properties": { "channel": { "const": "sms" } } },
+              "then": {
+                "properties": {
+                  "finalParts": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "sends": {
+                            "type": "array",
+                            "maxItems": 1,
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "kind": { "const": "words" },
+                                "calendarFile": { "const": "none" }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      { "type": "null" }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "state": {
+          "description": "What each state holds.",
+          "allOf": [
+            {
+              "description": "A held row has its time (arch 06 line 313; K-05 refuse-mark-held-without-time).",
+              "if": { "properties": { "state": { "const": "held" } } },
+              "then": { "properties": { "heldUntil": { "$ref": "#/$defs/utc" } } }
+            },
+            {
+              "description": "Planned and stale rows have no final parts (K-05 v1 items 2 and 4).",
+              "if": { "properties": { "state": { "enum": ["planned", "stale"] } } },
+              "then": { "properties": { "finalParts": { "type": "null" } } }
+            },
+            {
+              "description": "A row that is checked, sending, sent, delivered or held has its final parts (K-05 v1 claimOutbox: a row with no final parts stops the walk).",
+              "if": {
+                "properties": { "state": { "enum": ["checked", "sending", "sent", "delivered", "held"] } }
+              },
+              "then": { "properties": { "finalParts": { "type": "object" } } }
+            }
+          ]
+        }
+      }
+    },
+    "outboxPart": {
+      "title": "OutboxPart",
+      "description": "One part under one key, as it stands: K-04 v1 outbox_parts (arch 01 line 65: 'Each part keeps Linq's message and option ids and an idempotency key (row, part, try)').",
+      "type": "object",
+      "properties": {
+        "outboxRowId": { "description": "outbox_parts.outbox_row_id.", "$ref": "#/$defs/id" },
+        "partNo": {
+          "description": "1 or 2: at most two sends, the words and then one poll or card (arch 07 line 367).",
+          "enum": [1, 2]
+        },
+        "tryNo": {
+          "description": "The key's try, from 1 (arch 01 line 65).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "idempotencyKey": { "$ref": "#/$defs/idempotencyKey" },
+        "attempts": {
+          "description": "Sends under this key (outbox_parts.attempts): a retry after a timeout or crash reuses the key (arch 01 line 65).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": { "$ref": "#/$defs/partKind" },
+        "state": { "$ref": "#/$defs/partState" },
+        "providerMessageId": {
+          "description": "The provider's message id once accepted (outbox_parts.linq_message_id; Resend's for email until K-12 names its column: K-05 v1 open gap 5).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "providerOptionIds": {
+          "description": "For a poll, the provider's option ids (outbox_parts.linq_option_ids); else null.",
+          "anyOf": [{ "type": "array", "items": { "$ref": "#/$defs/id" }, "minItems": 2 }, { "type": "null" }]
+        },
+        "sentAt": {
+          "description": "When the provider accepted it (outbox_parts.sent_at).",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "deliveredAt": {
+          "description": "When its delivery receipt came (outbox_parts.delivered_at; arch 02 line 127).",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "failedAt": {
+          "description": "When a failure was reported (outbox_parts.failed_at).",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "errorCode": {
+          "description": "The provider's error code, such as 4001 or 4006 (outbox_parts.error_code); null when none was reported.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        }
+      },
+      "required": [
+        "outboxRowId",
+        "partNo",
+        "tryNo",
+        "idempotencyKey",
+        "attempts",
+        "kind",
+        "state",
+        "providerMessageId",
+        "providerOptionIds",
+        "sentAt",
+        "deliveredAt",
+        "failedAt",
+        "errorCode"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "state": {
+          "description": "What each part state holds (K-05 v1 markPart).",
+          "allOf": [
+            {
+              "if": { "properties": { "state": { "const": "pending" } } },
+              "then": {
+                "properties": {
+                  "providerMessageId": { "type": "null" },
+                  "sentAt": { "type": "null" },
+                  "deliveredAt": { "type": "null" },
+                  "failedAt": { "type": "null" },
+                  "errorCode": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "state": { "const": "sent" } } },
+              "then": {
+                "properties": {
+                  "providerMessageId": { "$ref": "#/$defs/id" },
+                  "sentAt": { "$ref": "#/$defs/utc" },
+                  "deliveredAt": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "state": { "const": "delivered" } } },
+              "then": { "properties": { "deliveredAt": { "$ref": "#/$defs/utc" } } }
+            },
+            {
+              "if": { "properties": { "state": { "const": "failed" } } },
+              "then": {
+                "properties": {
+                  "failedAt": { "$ref": "#/$defs/utc" },
+                  "errorCode": { "type": "string" },
+                  "deliveredAt": { "type": "null" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "outboxClaim": {
+      "title": "OutboxClaim",
+      "description": "The claim on a row: this contract's outbox_claims table (README 'How a claim lapses'). One dispatcher holds a row until it is sent or finished; a claim not renewed by lapses_at lapses, and the row may be claimed again (K-04 v1 has no claim-time column: K-05 v1 open gap 1).",
+      "type": "object",
+      "properties": {
+        "claimer": {
+          "description": "The dispatcher instance (K-05 v1 claimOutbox claimer).",
+          "$ref": "#/$defs/id"
+        },
+        "claimedAt": { "description": "When this claim was taken.", "$ref": "#/$defs/utc" },
+        "lapsesAt": {
+          "description": "When it lapses unless renewed: claimed_at plus 60 s, renewed by 60 s at each part attempt (README default 2).",
+          "$ref": "#/$defs/utc"
+        },
+        "claimNo": {
+          "description": "1 for the first claim, raised by each re-claim (held, lapsed or reopened).",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["claimer", "claimedAt", "lapsesAt", "claimNo"],
+      "additionalProperties": false
+    },
+    "followUp": {
+      "title": "OutboxFollowUp",
+      "description": "A row written because of this one (arch 02 line 125): nextWay, the next way the person allows after the row failed for 15 minutes (S12-10: email); ownerGetsNumber, none left, so the owner gets the number to call (S12-10); safetyOtherWay, a safety line also sent at once every other way the person allows (RULES 4.12). K-04 v1 stores no link between the rows: the event log holds it until a K-04 or K-05 minor version adds one (open gap).",
+      "type": "object",
+      "properties": {
+        "why": { "enum": ["nextWay", "ownerGetsNumber", "safetyOtherWay"] },
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "recipientHandleId": { "$ref": "#/$defs/id" },
+        "channel": { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/channel" },
+        "at": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["why", "outboxRowId", "recipientHandleId", "channel", "at"],
+      "additionalProperties": false
+    },
+    "outboxLife": {
+      "title": "OutboxLife",
+      "description": "One outbox row's life: the row and its parts as they stand, the claim, every move in order, and the rows that followed it. The fixtures are these records (02-contracts K-07 Fixtures). The named rule lifeChain checks what one schema cannot: each subject's moves chain in time order and end in its state, keys follow (row, part, try), a new key comes only after a reported failure (and after a 4001 or 4006 only when no receipt came within 1 minute), the second send waits for the first's receipt or 10 s, and a row fails only after 15 minutes of tries.",
+      "type": "object",
+      "properties": {
+        "record": { "const": "outboxRow" },
+        "row": { "$ref": "#/$defs/outboxRow" },
+        "parts": {
+          "description": "Every part row under every key, in (part, try) order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/outboxPart" }
+        },
+        "claim": { "anyOf": [{ "$ref": "#/$defs/outboxClaim" }, { "type": "null" }] },
+        "moves": {
+          "description": "Every move, in time order.",
+          "type": "array",
+          "items": { "anyOf": [{ "$ref": "#/$defs/rowMove" }, { "$ref": "#/$defs/partMove" }] },
+          "minItems": 1
+        },
+        "followUps": { "type": "array", "items": { "$ref": "#/$defs/followUp" } }
+      },
+      "required": ["record", "row", "parts", "claim", "moves", "followUps"],
+      "additionalProperties": false
+    },
+
+    "effectKind": {
+      "title": "EffectKind",
+      "description": "What an effect row runs (02-contracts K-07 'Effect rows'; arch 01 line 77; arch 10 line 508: 'Stripe and calendar calls run from effect rows'): Stripe save a card, charge, refund, pay link, and dispute evidence on the owner's yes (K-14); Rosfield's monthly charge (K-14 platform billing; Q-22); calendar write, update or delete of one event keyed by booking id, visit and person (arch 05 line 267; K-16); Linq's contacts/add when the reach card saves a mobile (arch 11 line 572; MC C9; CQ-04's default: a third effect kind).",
+      "type": "string",
+      "enum": [
+        "stripe_save_card",
+        "stripe_charge",
+        "stripe_refund",
+        "stripe_pay_link",
+        "stripe_dispute_evidence",
+        "rosfield_monthly_charge",
+        "calendar_write",
+        "calendar_update",
+        "calendar_delete",
+        "linq_contact_add"
+      ]
+    },
+    "effectState": {
+      "title": "EffectState",
+      "description": "Where an effect row stands (02-contracts K-07 'Effect rows'; arch 10 lines 508, 542; arch 11 line 582): pending (written by the commit, or by a clock firing with no turn); running (claimed by the effects runner, a try in flight or a network error being retried on the same key); succeeded; declined (a card decline: never retried, RULES 3.11); outage (5 tries in 10 minutes failed: that service's outage row, S12-16 to S12-18; it waits and then runs once); cancelled (let go while its service was down: S12-17).",
+      "type": "string",
+      "enum": ["pending", "running", "succeeded", "declined", "outage", "cancelled"]
+    },
+    "effectActor": {
+      "title": "EffectActor",
+      "description": "What made an effect move: commitTurn or fireClock writes it (K-05 v1); claimEffects, recordEffectResult and serviceBack are K-05 v1.1's effect calls (claim effect rows, record an effect's result: 02-contracts K-05 v1.1); letGo is the outage path letting a booking go (S12-17).",
+      "type": "string",
+      "enum": ["commitTurn", "fireClock", "claimEffects", "recordEffectResult", "serviceBack", "letGo"]
+    },
+    "effectMove": {
+      "title": "EffectMove",
+      "description": "One move of an effect row. Only the moves listed here are allowed (02-contracts K-07 'Contract test').",
+      "type": "object",
+      "properties": {
+        "from": { "anyOf": [{ "$ref": "#/$defs/effectState" }, { "type": "null" }] },
+        "to": { "$ref": "#/$defs/effectState" },
+        "at": { "$ref": "#/$defs/utc" },
+        "by": { "$ref": "#/$defs/effectActor" },
+        "tryOutcome": {
+          "description": "For a move recording a try: ok, networkError (retried on the same key), declined (never retried); null otherwise.",
+          "anyOf": [{ "enum": ["ok", "networkError", "declined"] }, { "type": "null" }]
+        },
+        "note": { "$ref": "#/$defs/note" }
+      },
+      "required": ["from", "to", "at", "by", "tryOutcome", "note"],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "description": "Written in the turn's commit (arch 02 line 121; arch 10 line 508), or by a clock firing no handle owns, such as monthly billing (arch 10 line 540).",
+          "properties": {
+            "from": { "type": "null" },
+            "to": { "const": "pending" },
+            "by": { "enum": ["commitTurn", "fireClock"] },
+            "tryOutcome": { "type": "null" }
+          }
+        },
+        {
+          "description": "Claimed by the effects runner (K-05 v1.1 claim effect rows).",
+          "properties": {
+            "from": { "const": "pending" },
+            "to": { "const": "running" },
+            "by": { "const": "claimEffects" },
+            "tryOutcome": { "type": "null" }
+          }
+        },
+        {
+          "description": "A network error, retried on the same key (arch 10 line 542), or a lapsed claim taken again.",
+          "properties": {
+            "from": { "const": "running" },
+            "to": { "const": "running" },
+            "by": { "enum": ["recordEffectResult", "claimEffects"] },
+            "tryOutcome": { "enum": ["networkError", null] }
+          }
+        },
+        {
+          "description": "The provider did it (K-05 v1.1 record an effect's result).",
+          "properties": {
+            "from": { "const": "running" },
+            "to": { "const": "succeeded" },
+            "by": { "const": "recordEffectResult" },
+            "tryOutcome": { "const": "ok" }
+          }
+        },
+        {
+          "description": "A card decline: never retried; 'Try another card', or one pay link after the owner's OK (arch 10 line 542; RULES 3.11).",
+          "properties": {
+            "from": { "const": "running" },
+            "to": { "const": "declined" },
+            "by": { "const": "recordEffectResult" },
+            "tryOutcome": { "const": "declined" }
+          }
+        },
+        {
+          "description": "The 5th try in 10 minutes failed: that service's outage row (arch 10 line 542; S12-16).",
+          "properties": {
+            "from": { "const": "running" },
+            "to": { "const": "outage" },
+            "by": { "const": "recordEffectResult" },
+            "tryOutcome": { "const": "networkError" }
+          }
+        },
+        {
+          "description": "The service is back: it runs once (arch 11 line 582: 'Charges and refunds wait, then run once'; S12-16, S12-18).",
+          "properties": {
+            "from": { "const": "outage" },
+            "to": { "const": "running" },
+            "by": { "const": "serviceBack" },
+            "tryOutcome": { "type": "null" }
+          }
+        },
+        {
+          "description": "Let go while the service was down, with no yes (arch 11 line 582; S12-17).",
+          "properties": {
+            "from": { "const": "outage" },
+            "to": { "const": "cancelled" },
+            "by": { "const": "letGo" },
+            "tryOutcome": { "type": "null" }
+          }
+        }
+      ]
+    },
+    "effectRow": {
+      "title": "EffectRow",
+      "description": "One effect row as it stands: this contract's effects table (02-contracts K-07 'Effect rows'). Code runs it; the model never names it (arch 01 line 77).",
+      "type": "object",
+      "properties": {
+        "effectId": {
+          "description": "The effect id: reconciliation matches each Stripe charge and refund to its ledger line by it (arch 10 line 550).",
+          "$ref": "#/$defs/id"
+        },
+        "turnId": {
+          "description": "The turn whose commit wrote it (arch 10 line 508); null for one a clock firing with no turn wrote (jobId).",
+          "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/turnId" }, { "type": "null" }]
+        },
+        "jobId": {
+          "description": "The job that wrote it when no turn did, such as the minute sweep firing monthly billing (arch 10 line 540; K-04 event_log.job_id); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "businessId": {
+          "description": "The business it is for (arch 10 line 546); null for a Linq contact, which belongs to Rosie's one number.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": { "description": "The booking it is about, or null.", "$ref": "#/$defs/nullableId" },
+        "kind": { "$ref": "#/$defs/effectKind" },
+        "port": {
+          "description": "The port it runs through: stripe (K-14), calendar (K-16) or linq (K-11).",
+          "enum": ["stripe", "calendar", "linq"]
+        },
+        "calendarProvider": {
+          "description": "For a calendar effect, google or microsoft (MC 8 'Calendars'; K-16); null otherwise.",
+          "anyOf": [{ "enum": ["google", "microsoft"] }, { "type": "null" }]
+        },
+        "visitId": {
+          "description": "For a calendar effect, the visit (arch 05 line 267: one event per visit, keyed by booking id, visit and person); K-30 names the visit row.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "personId": {
+          "description": "For a calendar effect, the booked person whose calendar holds the event (arch 05 line 267); for a Stripe effect, the payer or the person refunded; null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "handleId": {
+          "description": "For linq_contact_add, the mobile's handle (K-04 handles; arch 11 line 572); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "amount": {
+          "description": "For a charge, refund, pay link or monthly charge, the amount in whole cents (CQ-09); null otherwise.",
+          "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/money" }, { "type": "null" }]
+        },
+        "portRequest": {
+          "description": "The request in the port's terms (02-contracts K-07: 'the request in the port's terms'). Its shape is the port contract's (K-14, K-16, K-11), open until each freezes; never a key or a card number (rule 7; arch 02 line 109).",
+          "type": "object"
+        },
+        "idempotencyKey": {
+          "description": "One idempotency key over all its tries (arch 10 line 542: 'retry network errors 5 times in 10 minutes on one idempotency key'). Unique.",
+          "type": "string",
+          "minLength": 1
+        },
+        "state": { "$ref": "#/$defs/effectState" },
+        "tries": {
+          "description": "Tries in the current run, at most 5 (arch 10 line 542; README default 3).",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "runs": {
+          "description": "Runs: 1, then 1 more each time it runs again after its service's outage (arch 11 line 582: 'then run once').",
+          "type": "integer",
+          "minimum": 1
+        },
+        "firstTryAt": {
+          "description": "When the current run's first try went, at its claim (pending to running, or outage to running): the 10 minutes count from it (arch 10 line 542); null before any run.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "providerObjectId": {
+          "description": "The provider's id of what it made or changed (a charge, refund, pay link, calendar event or contact); K-14, K-16 and K-11 name the forms.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "errorCode": {
+          "description": "The last error the provider or the network gave, or null.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "ledgerLineId": {
+          "description": "The ledger line it writes or matches (02-contracts K-07; arch 10 line 550); K-28 names the ledger. Null for a calendar or contact effect.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "traceId": { "description": "Its trace (arch 10 line 548; K-08).", "$ref": "#/$defs/id" }
+      },
+      "required": [
+        "effectId",
+        "turnId",
+        "jobId",
+        "businessId",
+        "bookingId",
+        "kind",
+        "port",
+        "calendarProvider",
+        "visitId",
+        "personId",
+        "handleId",
+        "amount",
+        "portRequest",
+        "idempotencyKey",
+        "state",
+        "tries",
+        "runs",
+        "firstTryAt",
+        "providerObjectId",
+        "errorCode",
+        "ledgerLineId",
+        "traceId"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "turnId": {
+          "description": "A turn or a job wrote it, never both or neither (K-04 event_log_turn_or_job).",
+          "if": { "properties": { "turnId": { "type": "null" } } },
+          "then": { "properties": { "jobId": { "$ref": "#/$defs/id" } } },
+          "else": { "properties": { "jobId": { "type": "null" } } }
+        },
+        "kind": {
+          "description": "Each kind's port and the fields it needs.",
+          "allOf": [
+            {
+              "if": {
+                "properties": { "kind": { "enum": ["calendar_write", "calendar_update", "calendar_delete"] } }
+              },
+              "then": {
+                "properties": {
+                  "port": { "const": "calendar" },
+                  "calendarProvider": { "enum": ["google", "microsoft"] },
+                  "bookingId": { "$ref": "#/$defs/id" },
+                  "visitId": { "$ref": "#/$defs/id" },
+                  "personId": { "$ref": "#/$defs/id" },
+                  "amount": { "type": "null" },
+                  "ledgerLineId": { "type": "null" }
+                }
+              },
+              "else": {
+                "properties": { "calendarProvider": { "type": "null" }, "visitId": { "type": "null" } }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "linq_contact_add" } } },
+              "then": {
+                "properties": {
+                  "port": { "const": "linq" },
+                  "handleId": { "$ref": "#/$defs/id" },
+                  "amount": { "type": "null" },
+                  "ledgerLineId": { "type": "null" }
+                }
+              },
+              "else": { "properties": { "handleId": { "type": "null" } } }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "stripe_save_card",
+                      "stripe_charge",
+                      "stripe_refund",
+                      "stripe_pay_link",
+                      "stripe_dispute_evidence",
+                      "rosfield_monthly_charge"
+                    ]
+                  }
+                }
+              },
+              "then": { "properties": { "port": { "const": "stripe" } } }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "enum": ["stripe_charge", "stripe_refund", "stripe_pay_link", "rosfield_monthly_charge"]
+                  }
+                }
+              },
+              "then": {
+                "properties": { "amount": { "$ref": "../common/formats.v1.schema.json#/$defs/money" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "effectLife": {
+      "title": "EffectLife",
+      "description": "One effect row's life: the row as it stands and every move in order, with the provider events linked to it. The named rule lifeChain checks the chain, at most 5 tries in a run within 10 minutes of its first, outage only after the 5th, and no try after a decline.",
+      "type": "object",
+      "properties": {
+        "record": { "const": "effect" },
+        "effect": { "$ref": "#/$defs/effectRow" },
+        "moves": { "type": "array", "items": { "$ref": "#/$defs/effectMove" }, "minItems": 1 },
+        "providerEventIds": {
+          "description": "The provider events linked to it (provider_events.effect_id).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" }
+        }
+      },
+      "required": ["record", "effect", "moves", "providerEventIds"],
+      "additionalProperties": false
+    },
+
+    "providerEvent": {
+      "title": "ProviderEvent",
+      "description": "A Stripe or calendar event, stored once by its event id and linked to its effect row (02-contracts K-07 'Provider events'; arch 02 line 109: 'Stripe and calendar events go to PostgreSQL'): this contract's provider_events table. The gateway verifies the signature first; a known event id is dropped (arch 02 line 109).",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "stripe, google_calendar or microsoft_calendar (MC 8 'Payments', 'Calendars').",
+          "enum": ["stripe", "google_calendar", "microsoft_calendar"]
+        },
+        "providerEventId": {
+          "description": "The provider's event id: with provider, the key it is stored once by.",
+          "$ref": "#/$defs/id"
+        },
+        "eventType": {
+          "description": "The provider's own name for the event; K-14 and K-16 name the list.",
+          "type": "string",
+          "minLength": 1
+        },
+        "occurredAt": {
+          "description": "When the provider says it happened, if it says.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "receivedAt": { "description": "When the gateway received it.", "$ref": "#/$defs/utc" },
+        "businessId": {
+          "description": "The business it concerns, when known.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "effectId": {
+          "description": "The effect row it reports on, or null (a calendar push about a person's own event, a dispute opened).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "payload": {
+          "description": "The event's fields as the port parses them (K-14, K-16); never a key or a card number.",
+          "type": "object"
+        },
+        "traceId": { "description": "The trace opened at receipt (arch 10 line 548).", "$ref": "#/$defs/id" }
+      },
+      "required": [
+        "provider",
+        "providerEventId",
+        "eventType",
+        "occurredAt",
+        "receivedAt",
+        "businessId",
+        "effectId",
+        "payload",
+        "traceId"
+      ],
+      "additionalProperties": false
+    },
+    "providerEventRecord": {
+      "title": "ProviderEventRecord",
+      "type": "object",
+      "properties": {
+        "record": { "const": "providerEvent" },
+        "event": { "$ref": "#/$defs/providerEvent" }
+      },
+      "required": ["record", "event"],
+      "additionalProperties": false
+    }
+  }
+}

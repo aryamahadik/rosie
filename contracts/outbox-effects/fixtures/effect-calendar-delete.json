@@ -1,0 +1,54 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-cal-riley-alex-nov14-delete",
+    "turnId": "turn-alex-calloff-1",
+    "jobId": null,
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-riley-nov14",
+    "kind": "calendar_delete",
+    "port": "calendar",
+    "calendarProvider": "google",
+    "visitId": "visit-alex-riley-nov14",
+    "personId": "person-riley",
+    "handleId": null,
+    "amount": null,
+    "portRequest": { "event": "gcal-event-demo-0001" },
+    "idempotencyKey": "eff-cal-riley-alex-nov14-delete",
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 1,
+    "firstTryAt": "2026-11-13T14:00:01Z",
+    "providerObjectId": "gcal-event-demo-0001",
+    "errorCode": null,
+    "ledgerLineId": null,
+    "traceId": "trace-alex-0090"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-13T13:59:57Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "Alex calls the visit off: a call-off deletes that visit's event from Riley's calendar (arch 05 line 267)."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-13T14:00:01Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "Try 1."
+    },
+    {
+      "from": "running",
+      "to": "succeeded",
+      "at": "2026-11-13T14:00:02Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "ok",
+      "note": "Deleted."
+    }
+  ],
+  "providerEventIds": []
+}

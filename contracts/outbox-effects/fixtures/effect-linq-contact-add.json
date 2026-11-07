@@ -1,0 +1,54 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-linq-contact-alex",
+    "turnId": "turn-alex-reach-1",
+    "jobId": null,
+    "businessId": null,
+    "bookingId": null,
+    "kind": "linq_contact_add",
+    "port": "linq",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-alex",
+    "handleId": "handle-alex",
+    "amount": null,
+    "portRequest": { "phone": "+15555550101" },
+    "idempotencyKey": "eff-linq-contact-alex",
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 1,
+    "firstTryAt": "2026-10-05T17:00:01Z",
+    "providerObjectId": "linq-contact-demo-alex",
+    "errorCode": null,
+    "ledgerLineId": null,
+    "traceId": "trace-alex-0001"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-10-05T17:00:00Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "The reach card saves Alex's mobile, so it is added as a Linq contact (arch 11 line 572; MC C9), as an effect row (CQ-04's default)."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-10-05T17:00:01Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "Try 1."
+    },
+    {
+      "from": "running",
+      "to": "succeeded",
+      "at": "2026-10-05T17:00:02Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "ok",
+      "note": "Added; K-04's phones.linq_contact_added_at records it."
+    }
+  ],
+  "providerEventIds": []
+}

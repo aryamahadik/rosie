@@ -1,0 +1,127 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-riley-alex-haircut",
+    "turnId": "turn-alex-book-3",
+    "commitSeq": 8,
+    "recipientHandleId": "handle-riley",
+    "recipientPersonId": "person-riley",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-haircut",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "delivered",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-riley-alex-haircut",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "New booking: Alex M. with you.\nSat Nov 7, 2:00pm",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "name", "value": "Alex M." },
+        { "slot": "visit.time", "value": "Sat Nov 7, 2:00pm" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0060"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-riley-alex-haircut",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-riley-alex-haircut/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0060",
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": "2026-11-05T15:00:25Z",
+      "failedAt": "2026-11-05T15:00:05Z",
+      "errorCode": "4001"
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-11-05T15:00:04Z",
+    "lapsesAt": "2026-11-05T15:01:04Z",
+    "claimNo": 1
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-05T15:00:00Z",
+      "by": "commitTurn",
+      "note": "A routine row telling Riley of Alex's haircut at Sat 2:00pm (A7-03's option)."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-05T15:00:03Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-05T15:00:04Z",
+      "by": "claimOutbox",
+      "note": "Claimed."
+    },
+    {
+      "subject": "part",
+      "key": "out-riley-alex-haircut/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-05T15:00:04Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "Try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-riley-alex-haircut/1/1",
+      "from": "pending",
+      "to": "failed",
+      "at": "2026-11-05T15:00:05Z",
+      "by": "markPart",
+      "errorCode": "4001",
+      "note": "Linq reports 4001, which may still deliver: no new key for 1 minute (arch 01 line 65)."
+    },
+    {
+      "subject": "part",
+      "key": "out-riley-alex-haircut/1/1",
+      "from": "failed",
+      "to": "delivered",
+      "at": "2026-11-05T15:00:25Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Its delivery receipt comes 20 s later, found by the message id: no new key is made."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "delivered",
+      "at": "2026-11-05T15:00:25Z",
+      "by": "markPart",
+      "note": "Every part delivered, with no acceptance recorded."
+    }
+  ],
+  "followUps": []
+}

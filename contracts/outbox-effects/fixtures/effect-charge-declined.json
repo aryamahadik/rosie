@@ -1,0 +1,54 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-alex-grooms-deposit-declined",
+    "turnId": "turn-alex-grooms-2",
+    "jobId": null,
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-grooms-package",
+    "kind": "stripe_charge",
+    "port": "stripe",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-alex",
+    "handleId": null,
+    "amount": { "cents": 4000, "currency": "USD" },
+    "portRequest": { "purpose": "deposit", "savedCard": "card-demo-alex" },
+    "idempotencyKey": "eff-alex-grooms-deposit-declined",
+    "state": "declined",
+    "tries": 1,
+    "runs": 1,
+    "firstTryAt": "2026-11-07T15:30:01Z",
+    "providerObjectId": null,
+    "errorCode": "card_declined",
+    "ledgerLineId": null,
+    "traceId": "trace-alex-0101"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T15:30:00Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "The $40 deposit for the Groom's package, in the turn's commit."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-07T15:30:01Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "Try 1."
+    },
+    {
+      "from": "running",
+      "to": "declined",
+      "at": "2026-11-07T15:30:02Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "declined",
+      "note": "The card is declined: never retried. 'Try another card', or one pay link after the owner's OK (arch 10 line 542; RULES 3.11). Another card is a new effect row with its own key."
+    }
+  ],
+  "providerEventIds": []
+}

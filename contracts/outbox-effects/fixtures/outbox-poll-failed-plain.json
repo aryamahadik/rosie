@@ -1,0 +1,260 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-a7-03-alex-again",
+    "turnId": "turn-alex-move-2",
+    "commitSeq": 9,
+    "recipientHandleId": "handle-alex",
+    "recipientPersonId": "person-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-haircut",
+    "openQuestionId": "oq-a7-03-alex-again",
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "quick_reply",
+    "copyOfRowId": null,
+    "state": "delivered",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-a7-03-alex-again",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        },
+        {
+          "kind": "poll",
+          "text": null,
+          "calendarFile": "none",
+          "options": [
+            { "id": "A7-03/1", "label": "Sat 12:00pm" },
+            { "id": "A7-03/2", "label": "Sat 2:00pm" },
+            { "id": "A7-03/3", "label": "Sat 3:30pm" }
+          ],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "pro.name", "value": "Riley" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0070"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-a7-03-alex-again",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-a7-03-alex-again/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0070",
+      "providerOptionIds": null,
+      "sentAt": "2026-11-07T17:00:03Z",
+      "deliveredAt": "2026-11-07T17:00:04Z",
+      "failedAt": null,
+      "errorCode": null
+    },
+    {
+      "outboxRowId": "out-a7-03-alex-again",
+      "partNo": 2,
+      "tryNo": 1,
+      "idempotencyKey": "out-a7-03-alex-again/2/1",
+      "attempts": 1,
+      "kind": "poll",
+      "state": "failed",
+      "providerMessageId": "linq-msg-demo-0071",
+      "providerOptionIds": ["linq-opt-demo-7", "linq-opt-demo-8", "linq-opt-demo-9"],
+      "sentAt": "2026-11-07T17:00:05Z",
+      "deliveredAt": null,
+      "failedAt": "2026-11-07T17:00:07Z",
+      "errorCode": "poll.failed"
+    },
+    {
+      "outboxRowId": "out-a7-03-alex-again",
+      "partNo": 2,
+      "tryNo": 2,
+      "idempotencyKey": "out-a7-03-alex-again/2/2",
+      "attempts": 1,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0072",
+      "providerOptionIds": null,
+      "sentAt": "2026-11-07T17:00:09Z",
+      "deliveredAt": "2026-11-07T17:00:10Z",
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-2",
+    "claimedAt": "2026-11-07T17:00:08Z",
+    "lapsesAt": "2026-11-07T17:01:09Z",
+    "claimNo": 2
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-07T17:00:00Z",
+      "by": "commitTurn",
+      "note": "A7-03 asked again: the words, then a poll."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-07T17:00:02Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-07T17:00:02Z",
+      "by": "claimOutbox",
+      "note": "Claimed by dispatcher-1."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T17:00:02Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The words, try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/2/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T17:00:02Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The poll, try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/1/1",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-11-07T17:00:03Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "The words accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/1/1",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T17:00:04Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "The words' receipt; the poll may go."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/2/1",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-11-07T17:00:05Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "The poll accepted."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sent",
+      "at": "2026-11-07T17:00:05Z",
+      "by": "markPart",
+      "note": "Both parts accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/2/1",
+      "from": "sent",
+      "to": "failed",
+      "at": "2026-11-07T17:00:07Z",
+      "by": "markPart",
+      "errorCode": "poll.failed",
+      "note": "Linq reports the poll failed after accepting it (K-06 poll-failed); a refused part goes again plain, options typed (arch 07 line 367)."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/2/2",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T17:00:07Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "The next try under a new key, as words: the options typed."
+    },
+    {
+      "subject": "row",
+      "from": "sent",
+      "to": "checked",
+      "at": "2026-11-07T17:00:07Z",
+      "by": "markPart",
+      "note": "The row is open again, so the next claim sends the plain try."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-07T17:00:08Z",
+      "by": "claimOutbox",
+      "note": "Claimed again, by dispatcher-2."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/2/2",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-11-07T17:00:09Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "The typed options accepted."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sent",
+      "at": "2026-11-07T17:00:09Z",
+      "by": "markPart",
+      "note": "Every part's latest try accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex-again/2/2",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T17:00:10Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Its receipt."
+    },
+    {
+      "subject": "row",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T17:00:10Z",
+      "by": "markPart",
+      "note": "Every part's latest try delivered."
+    }
+  ],
+  "followUps": []
+}

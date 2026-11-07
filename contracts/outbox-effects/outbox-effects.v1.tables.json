@@ -1,0 +1,603 @@
+{
+  "part": "outbox-effects",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "effects",
+      "description": "One effect row per Stripe, calendar or Linq contact call a commit (or a clock firing with no turn) causes: the call runs from this row, so a crash or retry never doubles or loses it (arch 10 line 508). One idempotency key over all its tries; 5 tries in 10 minutes, then that service's outage row; a card decline never retried (arch 10 line 542). Reconciliation matches Stripe charges and refunds to ledger lines by its id (arch 10 line 550). K-07's schema (effectRow) gives each column's meaning and the state moves.",
+      "source": "02-contracts K-07 'Effect rows' and its schema addition (migrated with K-05 v1.1); arch 01 line 77; arch 05 line 267; arch 10 lines 508, 542, 550; arch 11 lines 572, 582; CQ-04",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The effect id (CQ-09: an opaque string code makes); reconciliation matches by it.",
+          "source": "arch 10 line 550"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn whose commit wrote it (turns.id); null when a job wrote it.",
+          "source": "arch 10 line 508; arch 02 line 121"
+        },
+        {
+          "name": "job_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The job that wrote it when no turn did, such as the minute sweep firing monthly billing (K-04 event_log.job_id).",
+          "source": "arch 10 line 540; K-04 v1 event_log_turn_or_job"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business it is for (businesses.id); null for a Linq contact, which belongs to Rosie's one number.",
+          "source": "arch 10 line 546; MC 8 'Texting'"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking it is about (bookings.id), or null.",
+          "source": "arch 05 line 267"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "K-07 effectKind: stripe_save_card, stripe_charge, stripe_refund, stripe_pay_link, stripe_dispute_evidence, rosfield_monthly_charge, calendar_write, calendar_update, calendar_delete, linq_contact_add.",
+          "source": "02-contracts K-07; arch 01 line 77; arch 05 line 267; CQ-04"
+        },
+        {
+          "name": "port",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "stripe, calendar or linq: the port it runs through (K-14, K-16, K-11).",
+          "source": "02-contracts K-07; arch 10 line 508"
+        },
+        {
+          "name": "calendar_provider",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "google or microsoft for a calendar effect; null otherwise.",
+          "source": "MC 8 'Calendars'; 02-contracts K-16"
+        },
+        {
+          "name": "visit_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a calendar effect, the visit (one event per visit and person); K-30 names the visit row, so no foreign key yet.",
+          "source": "arch 05 line 267"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a calendar effect, the booked person whose calendar holds the event; for a Stripe effect, the payer or the person refunded (persons.id).",
+          "source": "arch 05 line 267; RULES 3.11"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For linq_contact_add, the mobile's handle (handles.id).",
+          "source": "arch 11 line 572; MC C9"
+        },
+        {
+          "name": "amount_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": "never",
+          "description": "For a charge, refund, pay link or monthly charge, the amount in whole cents.",
+          "source": "CQ-09 (money in integer cents with a currency code)"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The amount's currency code, three capital letters; set with amount_cents.",
+          "source": "CQ-09"
+        },
+        {
+          "name": "port_request",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "The request in the port's terms, as a JSON object; its shape is K-14's, K-16's or K-11's. Never a key or a card number.",
+          "source": "02-contracts K-07 ('the request in the port's terms'); BP rule 7; arch 02 line 109"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "One idempotency key over all its tries; unique.",
+          "source": "arch 10 line 542"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'pending'",
+          "audience": "never",
+          "description": "K-07 effectState: pending, running, succeeded, declined, outage or cancelled.",
+          "source": "02-contracts K-07; arch 10 line 542; arch 11 line 582; S12-16 to S12-18"
+        },
+        {
+          "name": "tries",
+          "type": "integer",
+          "null": false,
+          "default": "0",
+          "audience": "never",
+          "description": "Tries in the current run, 0 to 5.",
+          "source": "arch 10 line 542 (5 times in 10 minutes)"
+        },
+        {
+          "name": "runs",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "Runs: 1, then 1 more each time it runs again after its service's outage.",
+          "source": "arch 11 line 582 ('Charges and refunds wait, then run once')"
+        },
+        {
+          "name": "first_try_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the current run's first try went; the 10 minutes count from it.",
+          "source": "arch 10 line 542"
+        },
+        {
+          "name": "last_try_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the latest try went.",
+          "source": "arch 10 line 542"
+        },
+        {
+          "name": "claimed_by",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The effects runner instance holding it while running; null otherwise.",
+          "source": "02-contracts K-05 v1.1 (claim effect rows); README 'How a claim lapses'"
+        },
+        {
+          "name": "claim_lapses_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the runner's claim lapses unless renewed, so a runner that died never strands it.",
+          "source": "README 'How a claim lapses' (default 2)"
+        },
+        {
+          "name": "provider_object_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The provider's id of what it made or changed (a charge, refund, pay link, calendar event or contact).",
+          "source": "02-contracts K-07 ('the state, tries and provider ids')"
+        },
+        {
+          "name": "error_code",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The last error the provider or the network gave.",
+          "source": "arch 10 line 542"
+        },
+        {
+          "name": "ledger_line_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The ledger line it writes or matches; K-28 names the ledger, so no foreign key yet.",
+          "source": "02-contracts K-07; arch 10 line 550"
+        },
+        {
+          "name": "trace_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Its trace id.",
+          "source": "arch 10 line 548; BP 5.5"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When it was written; reconciliation reads the last 48 hours (arch 10 line 550).",
+          "source": "arch 10 line 550"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one; a claim and a result compare and set it.",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "effects_turn_fk",
+          "columns": ["turn_id"],
+          "references": { "table": "turns", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "effects_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "effects_booking_fk",
+          "columns": ["booking_id"],
+          "references": { "table": "bookings", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "effects_person_fk",
+          "columns": ["person_id"],
+          "references": { "table": "persons", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "effects_handle_fk",
+          "columns": ["handle_id"],
+          "references": { "table": "handles", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "effects_idempotency_key_key",
+          "columns": ["idempotency_key"],
+          "source": "arch 10 line 542 (one idempotency key)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "effects_turn_or_job",
+          "expression": "(turn_id is null) <> (job_id is null)",
+          "source": "arch 10 lines 508, 540; K-04 v1 event_log_turn_or_job"
+        },
+        {
+          "name": "effects_kind_known",
+          "expression": "kind in ('stripe_save_card', 'stripe_charge', 'stripe_refund', 'stripe_pay_link', 'stripe_dispute_evidence', 'rosfield_monthly_charge', 'calendar_write', 'calendar_update', 'calendar_delete', 'linq_contact_add')",
+          "source": "02-contracts K-07; CQ-04"
+        },
+        {
+          "name": "effects_port_matches_kind",
+          "expression": "(port = 'stripe' and (kind like 'stripe\\_%' or kind = 'rosfield_monthly_charge')) or (port = 'calendar' and kind like 'calendar\\_%') or (port = 'linq' and kind = 'linq_contact_add')",
+          "source": "02-contracts K-07"
+        },
+        {
+          "name": "effects_state_known",
+          "expression": "state in ('pending', 'running', 'succeeded', 'declined', 'outage', 'cancelled')",
+          "source": "02-contracts K-07; arch 10 line 542; arch 11 line 582"
+        },
+        {
+          "name": "effects_calendar_keyed",
+          "expression": "(port <> 'calendar' or (calendar_provider in ('google', 'microsoft') and booking_id is not null and visit_id is not null and person_id is not null)) and (port = 'calendar' or (calendar_provider is null and visit_id is null))",
+          "source": "arch 05 line 267 (keyed by booking id, visit and person); MC 8 'Calendars'"
+        },
+        {
+          "name": "effects_contact_has_handle",
+          "expression": "(kind = 'linq_contact_add') = (handle_id is not null)",
+          "source": "arch 11 line 572"
+        },
+        {
+          "name": "effects_money_kinds_have_amount",
+          "expression": "(kind not in ('stripe_charge', 'stripe_refund', 'stripe_pay_link', 'rosfield_monthly_charge') or amount_cents is not null) and (amount_cents is null) = (currency is null) and (currency is null or currency ~ '^[A-Z]{3}$')",
+          "source": "CQ-09; arch 10 line 550"
+        },
+        {
+          "name": "effects_tries_within_five",
+          "expression": "tries between 0 and 5 and runs >= 1",
+          "source": "arch 10 line 542"
+        },
+        {
+          "name": "effects_port_request_object",
+          "expression": "jsonb_typeof(port_request) = 'object'",
+          "source": "02-contracts K-07"
+        },
+        {
+          "name": "effects_running_is_claimed",
+          "expression": "(state = 'running') = (claimed_by is not null and claim_lapses_at is not null)",
+          "source": "README 'How a claim lapses'"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "effects_claimable_idx",
+          "columns": ["created_at"],
+          "where": "state in ('pending', 'running')",
+          "why": "The effects runner claims pending rows, and running rows whose claim lapsed, oldest first (K-05 v1.1 claim effect rows)."
+        },
+        {
+          "name": "effects_outage_idx",
+          "columns": ["port", "created_at"],
+          "where": "state = 'outage'",
+          "why": "When a service is back, its waiting effects run once, oldest first (arch 11 line 582)."
+        },
+        {
+          "name": "effects_calendar_event_idx",
+          "columns": ["booking_id", "visit_id", "person_id"],
+          "where": "port = 'calendar'",
+          "why": "A move or call-off finds the visit's event for that person (arch 05 line 267)."
+        },
+        {
+          "name": "effects_turn_idx",
+          "columns": ["turn_id"],
+          "why": "A turn's effects, for replay and the console (arch 10 line 508)."
+        },
+        {
+          "name": "effects_reconcile_idx",
+          "columns": ["created_at"],
+          "where": "port = 'stripe'",
+          "why": "Daily reconciliation over the last 48 hours (arch 10 line 550)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "provider_events",
+      "description": "Stripe and calendar events, stored once by their event id after the gateway verifies them, and linked to their effect rows (arch 02 line 109: 'Stripe and calendar events go to PostgreSQL'). A known event id is dropped (200).",
+      "source": "02-contracts K-07 'Provider events' and its schema addition; arch 02 line 109; arch 11 lines 578 to 582",
+      "columns": [
+        {
+          "name": "provider",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "stripe, google_calendar or microsoft_calendar.",
+          "source": "MC 8 'Payments', 'Calendars'"
+        },
+        {
+          "name": "provider_event_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The provider's event id: with provider, the key it is stored once by.",
+          "source": "arch 02 line 109"
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The provider's own name for the event (K-14, K-16 name the list).",
+          "source": "02-contracts K-14, K-16"
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the provider says it happened, if it says.",
+          "source": "02-contracts K-07"
+        },
+        {
+          "name": "received_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When the gateway received it.",
+          "source": "arch 02 line 109"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business it concerns (businesses.id), when known.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "effect_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The effect row it reports on (effects.id), or null.",
+          "source": "02-contracts K-07 ('linked to their effect rows')"
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "The event's fields as the port parses them; never a key or a card number.",
+          "source": "arch 02 line 109; BP rule 7"
+        },
+        {
+          "name": "trace_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The trace opened at receipt.",
+          "source": "arch 10 line 548"
+        },
+        {
+          "name": "handled_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the runtime acted on it (matched its effect, told the owner of a clash); null until then.",
+          "source": "arch 11 lines 578, 580; S12-33"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: handling it updates it once.",
+          "source": "arch 01 line 85; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["provider", "provider_event_id"],
+      "foreignKeys": [
+        {
+          "name": "provider_events_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "provider_events_effect_fk",
+          "columns": ["effect_id"],
+          "references": { "table": "effects", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "provider_events_provider_known",
+          "expression": "provider in ('stripe', 'google_calendar', 'microsoft_calendar')",
+          "source": "arch 02 line 109; MC 8"
+        },
+        {
+          "name": "provider_events_payload_object",
+          "expression": "jsonb_typeof(payload) = 'object'",
+          "source": "02-contracts K-07"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "provider_events_effect_idx",
+          "columns": ["effect_id"],
+          "why": "An effect's events, for its result and reconciliation (arch 10 line 550)."
+        },
+        {
+          "name": "provider_events_unhandled_idx",
+          "columns": ["received_at"],
+          "where": "handled_at is null",
+          "why": "Events not yet acted on, oldest first."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "outbox_claims",
+      "description": "The claim on an outbox row in state sending: who holds it and when it lapses, so a dispatcher that died never strands its recipient's later rows (K-04 v1 has no claim-time column; K-05 v1 open gap 1). One row per outbox row, written at its first claim and updated at each re-claim.",
+      "source": "02-contracts K-05 item 3 ('with a claim so no row is sent twice'); K-05 v1 open gap 1; arch 11 line 576; README 'How a claim lapses'",
+      "columns": [
+        {
+          "name": "outbox_row_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The claimed row (outbox_rows.id).",
+          "source": "K-04 v1 outbox_rows"
+        },
+        {
+          "name": "claimer",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The dispatcher instance holding it (K-05 v1 claimOutbox claimer).",
+          "source": "K-05 v1 claimOutbox.request"
+        },
+        {
+          "name": "claimed_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When this claim was taken.",
+          "source": "README 'How a claim lapses'"
+        },
+        {
+          "name": "lapses_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it lapses unless renewed (claimed_at plus 60 s, renewed by 60 s at each part attempt: README default 2).",
+          "source": "README 'How a claim lapses'; arch 01 line 61 (the 60 s turn lease it mirrors)"
+        },
+        {
+          "name": "claim_no",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "1 for the first claim, raised by each re-claim.",
+          "source": "README 'How a claim lapses'"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: a re-claim or a renewal compares and sets it.",
+          "source": "arch 01 line 85; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["outbox_row_id"],
+      "foreignKeys": [
+        {
+          "name": "outbox_claims_row_fk",
+          "columns": ["outbox_row_id"],
+          "references": { "table": "outbox_rows", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "outbox_claims_lapse_after_claim",
+          "expression": "lapses_at > claimed_at and claim_no >= 1",
+          "source": "README 'How a claim lapses'"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "outbox_claims_lapses_idx",
+          "columns": ["lapses_at"],
+          "why": "The claim walk finds sending rows whose claim lapsed."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Written and read only by the dispatcher on the runtime side, never by a Tool API call, as K-04's outbox_parts."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

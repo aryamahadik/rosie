@@ -1,0 +1,59 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-cal-riley-alex-nov14-move",
+    "turnId": "turn-alex-move-3",
+    "jobId": null,
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-riley-nov14",
+    "kind": "calendar_update",
+    "port": "calendar",
+    "calendarProvider": "google",
+    "visitId": "visit-alex-riley-nov14",
+    "personId": "person-riley",
+    "handleId": null,
+    "amount": null,
+    "portRequest": {
+      "event": "gcal-event-demo-0001",
+      "start": "2026-11-14T16:30:00Z",
+      "end": "2026-11-14T17:00:00Z",
+      "zone": "America/New_York"
+    },
+    "idempotencyKey": "eff-cal-riley-alex-nov14-move",
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 1,
+    "firstTryAt": "2026-11-08T14:00:02Z",
+    "providerObjectId": "gcal-event-demo-0001",
+    "errorCode": null,
+    "ledgerLineId": null,
+    "traceId": "trace-alex-0140"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-08T14:00:00Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "Alex moves the visit to 11:30am: a move updates that visit's event for Riley (arch 05 line 267; B8-37)."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-08T14:00:02Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "Try 1: the event found by booking, visit and person (effects_calendar_event_idx)."
+    },
+    {
+      "from": "running",
+      "to": "succeeded",
+      "at": "2026-11-08T14:00:03Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "ok",
+      "note": "The same event, updated."
+    }
+  ],
+  "providerEventIds": []
+}

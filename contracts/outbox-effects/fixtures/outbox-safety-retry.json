@@ -1,0 +1,210 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-alex-safety-emergency",
+    "turnId": "turn-alex-safety-1",
+    "commitSeq": 7,
+    "recipientHandleId": "handle-alex",
+    "recipientPersonId": "person-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-riley-nov14",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "safety",
+    "copyOfRowId": null,
+    "state": "delivered",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-alex-safety-emergency",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": ["safetyEmergency"],
+      "slotValues": [],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0050"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-alex-safety-emergency",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-alex-safety-emergency/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "failed",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": "2026-11-07T16:00:01Z",
+      "errorCode": "503"
+    },
+    {
+      "outboxRowId": "out-alex-safety-emergency",
+      "partNo": 1,
+      "tryNo": 2,
+      "idempotencyKey": "out-alex-safety-emergency/1/2",
+      "attempts": 1,
+      "kind": "words",
+      "state": "failed",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": "2026-11-07T16:00:12Z",
+      "errorCode": "503"
+    },
+    {
+      "outboxRowId": "out-alex-safety-emergency",
+      "partNo": 1,
+      "tryNo": 3,
+      "idempotencyKey": "out-alex-safety-emergency/1/3",
+      "attempts": 1,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0050",
+      "providerOptionIds": null,
+      "sentAt": "2026-11-07T16:00:22Z",
+      "deliveredAt": "2026-11-07T16:00:23Z",
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-11-07T16:00:00Z",
+    "lapsesAt": "2026-11-07T16:01:22Z",
+    "claimNo": 1
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-07T15:59:58Z",
+      "by": "commitTurn",
+      "note": "The safety read found an emergency in Alex's text: the outcome step's checked message goes first, at any hour, past any opt-out (arch 02 line 111)."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-07T15:59:59Z",
+      "by": "writePlan",
+      "note": "K-01's fixed line safetyEmergency, word for word (arch 07 line 361)."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-07T16:00:00Z",
+      "by": "claimOutbox",
+      "note": "Claimed; a safety line goes at any hour (RULES 4.3)."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-safety-emergency/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T16:00:00Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "Try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-safety-emergency/1/1",
+      "from": "pending",
+      "to": "failed",
+      "at": "2026-11-07T16:00:01Z",
+      "by": "markPart",
+      "errorCode": "503",
+      "note": "A failed safety line retries every 10 s for 15 minutes and goes at once every other way the person allows (arch 02 line 125; RULES 4.12)."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-safety-emergency/1/2",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T16:00:11Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Try 2, 10 s later."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-safety-emergency/1/2",
+      "from": "pending",
+      "to": "failed",
+      "at": "2026-11-07T16:00:12Z",
+      "by": "markPart",
+      "errorCode": "503",
+      "note": "Still failing."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-safety-emergency/1/3",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T16:00:22Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Try 3, 10 s later."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-safety-emergency/1/3",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-11-07T16:00:22Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Linq accepts it."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sent",
+      "at": "2026-11-07T16:00:22Z",
+      "by": "markPart",
+      "note": "Its only part is accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-safety-emergency/1/3",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T16:00:23Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "message.delivered."
+    },
+    {
+      "subject": "row",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-11-07T16:00:23Z",
+      "by": "markPart",
+      "note": "Delivered; the email copy sent at the first failure stays sent."
+    }
+  ],
+  "followUps": [
+    {
+      "why": "safetyOtherWay",
+      "outboxRowId": "out-alex-safety-emergency-email",
+      "recipientHandleId": "handle-alex-email",
+      "channel": "email",
+      "at": "2026-11-07T16:00:01Z"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-alex-bill-after-visit",
+    "turnId": "turn-alex-home-visit-done",
+    "jobId": null,
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-home-grooming",
+    "kind": "stripe_charge",
+    "port": "stripe",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-alex",
+    "handleId": null,
+    "amount": { "cents": 17900, "currency": "USD" },
+    "portRequest": { "purpose": "bill", "savedCard": "card-demo-alex" },
+    "idempotencyKey": "eff-alex-bill-after-visit",
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 2,
+    "firstTryAt": "2026-11-07T20:30:00Z",
+    "providerObjectId": "stripe-charge-demo-0002",
+    "errorCode": null,
+    "ledgerLineId": "ledger-alex-home-grooming-bill",
+    "traceId": "trace-alex-0120"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T19:00:00Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "The same bill as effect-gave-up-outage."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-07T19:00:01Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "Run 1, try 1."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-07T19:00:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 2."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-07T19:01:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 3."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-07T19:03:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 4."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-07T19:06:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 5."
+    },
+    {
+      "from": "running",
+      "to": "outage",
+      "at": "2026-11-07T19:09:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Stripe's outage row (S12-16)."
+    },
+    {
+      "from": "outage",
+      "to": "running",
+      "at": "2026-11-07T20:30:00Z",
+      "by": "serviceBack",
+      "tryOutcome": null,
+      "note": "Stripe is back: the waiting payment runs once, on the same key, so nothing is charged twice (arch 11 line 582; S12-16, S12-18)."
+    },
+    {
+      "from": "running",
+      "to": "succeeded",
+      "at": "2026-11-07T20:30:01Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "ok",
+      "note": "Charged once."
+    }
+  ],
+  "providerEventIds": []
+}
