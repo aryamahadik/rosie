@@ -1,0 +1,29 @@
+{
+  "call": "recordEffectResult",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-effects-lapsed.json"],
+    "now": "2026-11-07T15:08:11Z",
+    "note": "effects-runner-2's try, the run's second, on the same key: Google Calendar is still answering 503."
+  },
+  "request": {
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "expectVersion": 4,
+    "claimer": "effects-runner-2",
+    "outcome": "networkError",
+    "at": "2026-11-07T15:08:11Z",
+    "providerObjectId": null,
+    "errorCode": "503",
+    "ledgerLineId": null,
+    "nextTryAt": "2026-11-07T15:09:11Z"
+  },
+  "outcome": {
+    "result": "recorded",
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "version": 5,
+    "state": "running",
+    "tries": 2,
+    "runs": 1,
+    "claimLapsesAt": "2026-11-07T15:10:11Z"
+  }
+}

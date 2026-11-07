@@ -1,0 +1,29 @@
+{
+  "call": "recordEffectResult",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-effects.json"],
+    "now": "2026-11-07T15:06:34Z",
+    "note": "Google Calendar wrote the event on Riley's calendar on the first try (K-07 effect-calendar-write)."
+  },
+  "request": {
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "expectVersion": 2,
+    "claimer": "effects-runner-1",
+    "outcome": "ok",
+    "at": "2026-11-07T15:06:34Z",
+    "providerObjectId": "gcal-event-demo-0001",
+    "errorCode": null,
+    "ledgerLineId": null,
+    "nextTryAt": null
+  },
+  "outcome": {
+    "result": "recorded",
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "version": 3,
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 1,
+    "claimLapsesAt": null
+  }
+}

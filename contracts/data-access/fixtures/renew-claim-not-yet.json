@@ -1,0 +1,21 @@
+{
+  "call": "renewClaim",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-lapsed-reclaimed.json"],
+    "now": "2026-11-07T15:07:41Z",
+    "note": "dispatcher-2 tries to send try 2 at once; Linq's Retry-After holds it until 15:08:36."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "claimer": "dispatcher-2",
+    "claimNo": 2,
+    "idempotencyKey": "out-alex-booked-riley/1/2",
+    "at": "2026-11-07T15:07:41Z"
+  },
+  "outcome": {
+    "error": "notYet",
+    "outboxRowId": "out-alex-booked-riley",
+    "notBefore": "2026-11-07T15:08:36Z"
+  }
+}

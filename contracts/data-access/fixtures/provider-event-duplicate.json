@@ -1,0 +1,31 @@
+{
+  "call": "recordProviderEvent",
+  "given": {
+    "k04Seeds": ["seed-business-head.json"],
+    "after": ["provider-event-recorded.json"],
+    "now": "2026-11-12T21:15:40Z",
+    "note": "Google sends the same push again under the same event id; the gateway answers 200 and drops it."
+  },
+  "request": {
+    "provider": "google_calendar",
+    "providerEventId": "gcal-push-demo-0001",
+    "eventType": "calendar.changed",
+    "occurredAt": null,
+    "receivedAt": "2026-11-12T21:15:40Z",
+    "businessId": "biz-lees-barbershop",
+    "effectId": null,
+    "payload": {
+      "calendarOf": "person-riley",
+      "busy": [{ "start": "2026-11-14T15:30:00Z", "end": "2026-11-14T17:00:00Z" }]
+    },
+    "traceId": "trace-gcal-0002"
+  },
+  "outcome": {
+    "result": "recorded",
+    "provider": "google_calendar",
+    "providerEventId": "gcal-push-demo-0001",
+    "repeated": true,
+    "receivedAt": "2026-11-12T21:15:00Z",
+    "effectId": null
+  }
+}

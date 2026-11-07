@@ -1,0 +1,55 @@
+{
+  "call": "claimEffects",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["effect-result-network-error.json"],
+    "now": "2026-11-07T15:08:10Z",
+    "note": "effects-runner-1 died before its second try; its claim lapsed at 15:08:04. Another runner's sweep of the calendar port takes the running row again."
+  },
+  "request": {
+    "claimer": "effects-runner-2",
+    "now": "2026-11-07T15:08:10Z",
+    "limit": 10,
+    "ports": ["calendar"]
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "effect": {
+          "effectId": "eff-cal-riley-alex-nov14-write",
+          "turnId": "turn-alex-book-1",
+          "jobId": null,
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov14",
+          "kind": "calendar_write",
+          "port": "calendar",
+          "calendarProvider": "google",
+          "visitId": "visit-alex-riley-nov14",
+          "personId": "person-riley",
+          "handleId": null,
+          "amount": null,
+          "portRequest": {
+            "title": "Lee's Barbershop · Haircut · Alex",
+            "start": "2026-11-14T16:00:00Z",
+            "end": "2026-11-14T16:30:00Z",
+            "zone": "America/New_York"
+          },
+          "idempotencyKey": "eff-cal-riley-alex-nov14-write",
+          "state": "running",
+          "tries": 1,
+          "runs": 1,
+          "firstTryAt": "2026-11-07T15:06:33Z",
+          "providerObjectId": null,
+          "errorCode": "503",
+          "ledgerLineId": null,
+          "traceId": "trace-alex-0012"
+        },
+        "version": 4,
+        "claimedFrom": "running",
+        "claimedBy": "effects-runner-2",
+        "claimLapsesAt": "2026-11-07T15:09:10Z"
+      }
+    ]
+  }
+}

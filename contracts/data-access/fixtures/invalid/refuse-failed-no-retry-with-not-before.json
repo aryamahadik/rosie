@@ -1,0 +1,9 @@
+{
+  "outcome": "failed",
+  "idempotencyKey": "out-alex-booked-riley/1/1",
+  "errorCode": "429",
+  "retry": false,
+  "at": "2026-11-07T15:06:36Z",
+  "providerMessageId": null,
+  "nextTryNotBefore": "2026-11-07T15:08:36Z"
+}

@@ -1,0 +1,29 @@
+{
+  "call": "recordEffectResult",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["effect-try-3.json"],
+    "now": "2026-11-07T15:11:11Z",
+    "note": "Try 4 on the same key: 503 again."
+  },
+  "request": {
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "expectVersion": 6,
+    "claimer": "effects-runner-2",
+    "outcome": "networkError",
+    "at": "2026-11-07T15:11:11Z",
+    "providerObjectId": null,
+    "errorCode": "503",
+    "ledgerLineId": null,
+    "nextTryAt": "2026-11-07T15:14:11Z"
+  },
+  "outcome": {
+    "result": "recorded",
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "version": 7,
+    "state": "running",
+    "tries": 4,
+    "runs": 1,
+    "claimLapsesAt": "2026-11-07T15:15:11Z"
+  }
+}

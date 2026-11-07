@@ -1,0 +1,22 @@
+{
+  "call": "dispatcherGivesUp",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-lapsed-reclaimed.json"],
+    "now": "2026-11-07T15:21:40Z",
+    "note": "Linq stays down (S12-09): sends are still failing 15 minutes and 5 seconds after the first try went at 15:06:35. The tries between are left out of this chain; the call checks only the time since firstTryAt, so it ends the row failed and the next way the person allows follows in a later commit (S12-10)."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "expectVersion": 5,
+    "claimer": "dispatcher-2",
+    "claimNo": 2,
+    "at": "2026-11-07T15:21:40Z"
+  },
+  "outcome": {
+    "result": "failed",
+    "outboxRowId": "out-alex-booked-riley",
+    "version": 6,
+    "firstTryAt": "2026-11-07T15:06:35Z"
+  }
+}

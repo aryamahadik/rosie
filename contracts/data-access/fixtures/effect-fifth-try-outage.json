@@ -1,0 +1,29 @@
+{
+  "call": "recordEffectResult",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["effect-try-4.json"],
+    "now": "2026-11-07T15:14:11Z",
+    "note": "Try 5, within 10 minutes of the run's first try at 15:06:33: 503 again. The call, counting the run's tries, moves the row to the calendar service's outage row and lets the claim go."
+  },
+  "request": {
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "expectVersion": 7,
+    "claimer": "effects-runner-2",
+    "outcome": "networkError",
+    "at": "2026-11-07T15:14:11Z",
+    "providerObjectId": null,
+    "errorCode": "503",
+    "ledgerLineId": null,
+    "nextTryAt": null
+  },
+  "outcome": {
+    "result": "recorded",
+    "effectId": "eff-cal-riley-alex-nov14-write",
+    "version": 8,
+    "state": "outage",
+    "tries": 5,
+    "runs": 1,
+    "claimLapsesAt": null
+  }
+}

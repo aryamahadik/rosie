@@ -1,0 +1,73 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["write-plan-dee.json"],
+    "now": "2026-11-09T15:00:04Z",
+    "note": "A first claim in v1.1's form: the claim is written to outbox_claims and returned; no part has gone yet, so firstTryAt is null."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "recipientHandleId": "handle-dee",
+    "now": "2026-11-09T15:00:04Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-dee-booked-riley",
+        "version": 3,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-dee",
+        "recipientPersonId": "person-dee",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-dee-riley-nov14",
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "routine",
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-dee-riley-nov14", "version": 1 }],
+        "finalParts": {
+          "row": "out-dee-booked-riley",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 10:00am",
+              "calendarFile": "new",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            { "slot": "pro.name", "value": "Riley" },
+            { "slot": "biz.name", "value": "Lee's Barbershop" },
+            { "slot": "visit.time", "value": "Sat Nov 14, 10:00am" }
+          ],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-dee-booked-riley/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-dee-0010",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-09T15:00:04Z",
+          "lapsesAt": "2026-11-09T15:01:04Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked"
+      }
+    ],
+    "passedHeld": []
+  }
+}

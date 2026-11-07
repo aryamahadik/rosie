@@ -1,0 +1,22 @@
+{
+  "call": "markRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["claim-dee.json"],
+    "now": "2026-11-09T15:00:05Z",
+    "note": "Limit 8 at send: Dee's mobile has never texted Rosie, so it has no open chat (its phone row: chat_open false). The row waits with no clock and no held_until until Dee texts in, and its claim is let go (arch 06 line 313; RULES 4.1b; MC C9: nothing is sent first, not even an SMS)."
+  },
+  "request": {
+    "outboxRowId": "out-dee-booked-riley",
+    "expectVersion": 3,
+    "outcome": "waitingChat",
+    "heldUntil": null,
+    "at": "2026-11-09T15:00:05Z"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-dee-booked-riley",
+    "version": 4,
+    "outcome": "waitingChat"
+  }
+}

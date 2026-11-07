@@ -1,0 +1,30 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["renew-claim-first-send.json"],
+    "now": "2026-11-07T15:06:36Z",
+    "note": "Linq refuses the words part with a 429 and a Retry-After of 120 s: a reported failure, so the next try gets a new key (arch 01 line 65) and waits until 15:08:36 (arch 10 line 540). The row stays sending; its version rises because a part changed."
+  },
+  "request": {
+    "outcome": "failed",
+    "idempotencyKey": "out-alex-booked-riley/1/1",
+    "errorCode": "429",
+    "retry": true,
+    "at": "2026-11-07T15:06:36Z",
+    "providerMessageId": null,
+    "nextTryNotBefore": "2026-11-07T15:08:36Z"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-alex-booked-riley",
+    "partNo": 1,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": false,
+    "openQuestionId": null,
+    "nextKey": "out-alex-booked-riley/1/2",
+    "row": { "state": "sending", "version": 4 }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "effectId": "eff-cal-riley-alex-nov14-write",
+  "expectVersion": 2,
+  "claimer": "effects-runner-1",
+  "outcome": "ok",
+  "at": "2026-11-07T15:06:34Z",
+  "providerObjectId": "gcal-event-demo-0001",
+  "errorCode": "503",
+  "ledgerLineId": null,
+  "nextTryAt": null
+}

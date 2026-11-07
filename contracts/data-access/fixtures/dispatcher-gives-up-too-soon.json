@@ -1,0 +1,21 @@
+{
+  "call": "dispatcherGivesUp",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-lapsed-reclaimed.json"],
+    "now": "2026-11-07T15:10:00Z",
+    "note": "dispatcher-2 tries to end the row 3 minutes 25 seconds after the first try went; the 15 minutes count from the claim's firstTryAt, which the re-claim kept (arch 02 line 125)."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "expectVersion": 5,
+    "claimer": "dispatcher-2",
+    "claimNo": 2,
+    "at": "2026-11-07T15:10:00Z"
+  },
+  "outcome": {
+    "error": "tooSoon",
+    "outboxRowId": "out-alex-booked-riley",
+    "firstTryAt": "2026-11-07T15:06:35Z"
+  }
+}

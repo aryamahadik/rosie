@@ -1,0 +1,22 @@
+{
+  "call": "markRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["mark-waiting-chat.json"],
+    "now": "2026-11-09T15:00:06Z",
+    "note": "A second limit-8 outcome for the same row, at its current version: the row is waiting for the chat, not sending, so no limit-8 move starts from it (K-07 rowMove). Nothing changes."
+  },
+  "request": {
+    "outboxRowId": "out-dee-booked-riley",
+    "expectVersion": 4,
+    "outcome": "held",
+    "heldUntil": "2026-11-09T21:00:00Z",
+    "at": "2026-11-09T15:00:06Z"
+  },
+  "outcome": {
+    "error": "wrongState",
+    "table": "outbox_rows",
+    "rowId": "out-dee-booked-riley",
+    "state": "waiting_chat"
+  }
+}

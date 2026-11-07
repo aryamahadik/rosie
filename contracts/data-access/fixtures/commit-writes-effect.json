@@ -1,0 +1,150 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["reserve-10-min.json"],
+    "now": "2026-11-07T15:06:30Z",
+    "note": "commit-first's turn in its v1.1 form: Alex's exact yes, with the calendar write for Riley's calendar written pending in the same transaction (K-07 effect-calendar-write). Run instead of commit-first, not after it."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-book-1",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0012"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0012",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "businesses", "rowId": "biz-lees-barbershop", "version": 3 }],
+    "writes": {
+      "state": [
+        {
+          "op": "insert",
+          "table": "bookings",
+          "values": {
+            "id": "booking-alex-riley-nov14",
+            "business_id": "biz-lees-barbershop",
+            "flow": "A",
+            "stage": "booked",
+            "booker_person_id": "person-alex",
+            "served_person_id": "person-alex",
+            "payer_person_id": "person-alex"
+          }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-alex-booked-riley",
+          "recipientHandleId": "handle-alex",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov14",
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }]
+        },
+        {
+          "id": "out-sam-booked-riley",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov14",
+          "channel": "imessage",
+          "sendClass": "routine",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }]
+        }
+      ],
+      "reservations": {
+        "confirm": [{ "id": "rsv-alex-riley-nov14", "expectVersion": 1, "bookingId": "booking-alex-riley-nov14" }],
+        "release": []
+      },
+      "events": [
+        {
+          "id": "log-booking-alex-riley-nov14",
+          "kind": "booking.booked",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": "customer",
+          "tableName": "bookings",
+          "rowId": "booking-alex-riley-nov14",
+          "oldValues": null,
+          "newValues": { "stage": "booked" },
+          "sealed": null,
+          "why": { "step": "A6-14" },
+          "approvedBy": { "exactYes": "evt-alex-0012" },
+          "proofs": null
+        },
+        {
+          "id": "log-eff-cal-riley-alex-nov14-write",
+          "kind": "effect.created",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "effects",
+          "rowId": "eff-cal-riley-alex-nov14-write",
+          "oldValues": null,
+          "newValues": { "kind": "calendar_write", "state": "pending" },
+          "sealed": null,
+          "why": { "step": "A6-14" },
+          "approvedBy": { "exactYes": "evt-alex-0012" },
+          "proofs": null
+        }
+      ],
+      "effects": {
+        "write": [
+          {
+            "effectId": "eff-cal-riley-alex-nov14-write",
+            "businessId": "biz-lees-barbershop",
+            "bookingId": "booking-alex-riley-nov14",
+            "kind": "calendar_write",
+            "port": "calendar",
+            "calendarProvider": "google",
+            "visitId": "visit-alex-riley-nov14",
+            "personId": "person-riley",
+            "handleId": null,
+            "amount": null,
+            "portRequest": {
+              "title": "Lee's Barbershop · Haircut · Alex",
+              "start": "2026-11-14T16:00:00Z",
+              "end": "2026-11-14T16:30:00Z",
+              "zone": "America/New_York"
+            },
+            "idempotencyKey": "eff-cal-riley-alex-nov14-write",
+            "traceId": "trace-alex-0012"
+          }
+        ],
+        "letGo": []
+      }
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-book-1",
+    "committedAt": "2026-11-07T15:06:30Z",
+    "repeated": false,
+    "committed": {
+      "written": [
+        { "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 },
+        { "table": "reservations", "rowId": "rsv-alex-riley-nov14", "version": 2 },
+        { "table": "clock_rows", "rowId": "rsv-alex-riley-nov14/saved-time", "version": 2 },
+        { "table": "effects", "rowId": "eff-cal-riley-alex-nov14-write", "version": 1 }
+      ],
+      "outboxRows": [
+        { "id": "out-alex-booked-riley", "commitSeq": 1 },
+        { "id": "out-sam-booked-riley", "commitSeq": 2 }
+      ],
+      "promoted": []
+    }
+  }
+}

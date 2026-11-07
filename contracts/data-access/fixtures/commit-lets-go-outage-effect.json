@@ -1,0 +1,107 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["effect-fifth-try-outage.json"],
+    "now": "2026-11-07T15:30:00Z",
+    "note": "Instead of service-back: while Google Calendar is still down, Alex calls off the Nov 14 haircut. The commit cancels the booking, releases the time with Riley, and lets the waiting calendar write go, so it never runs when the service is back and no event is ever written for a visit that will not happen."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-cancel-1",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0013"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0013",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+    "writes": {
+      "state": [
+        {
+          "op": "update",
+          "table": "bookings",
+          "key": { "id": "booking-alex-riley-nov14" },
+          "expectVersion": 1,
+          "set": { "stage": "cancelled" }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-alex-cancelled-riley",
+          "recipientHandleId": "handle-alex",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov14",
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 2 }]
+        }
+      ],
+      "reservations": {
+        "confirm": [],
+        "release": [{ "id": "rsv-alex-riley-nov14", "expectVersion": 2, "why": "cancelled" }]
+      },
+      "events": [
+        {
+          "id": "log-booking-alex-riley-nov14-cancelled",
+          "kind": "booking.cancelled",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": "customer",
+          "tableName": "bookings",
+          "rowId": "booking-alex-riley-nov14",
+          "oldValues": { "stage": "booked" },
+          "newValues": { "stage": "cancelled" },
+          "sealed": null,
+          "why": { "choice": "cancel" },
+          "approvedBy": { "exactYes": "evt-alex-0013" },
+          "proofs": null
+        },
+        {
+          "id": "log-eff-cal-riley-alex-nov14-write-let-go",
+          "kind": "effect.result",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "effects",
+          "rowId": "eff-cal-riley-alex-nov14-write",
+          "oldValues": { "state": "outage" },
+          "newValues": { "state": "cancelled" },
+          "sealed": null,
+          "why": { "choice": "cancel", "outage": "calendar" },
+          "approvedBy": { "exactYes": "evt-alex-0013" },
+          "proofs": null
+        }
+      ],
+      "effects": {
+        "write": [],
+        "letGo": [{ "effectId": "eff-cal-riley-alex-nov14-write", "expectVersion": 8 }]
+      }
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-cancel-1",
+    "committedAt": "2026-11-07T15:30:00Z",
+    "repeated": false,
+    "committed": {
+      "written": [
+        { "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 2 },
+        { "table": "reservations", "rowId": "rsv-alex-riley-nov14", "version": 3 },
+        { "table": "effects", "rowId": "eff-cal-riley-alex-nov14-write", "version": 9 }
+      ],
+      "outboxRows": [{ "id": "out-alex-cancelled-riley", "commitSeq": 3 }],
+      "promoted": []
+    }
+  }
+}
