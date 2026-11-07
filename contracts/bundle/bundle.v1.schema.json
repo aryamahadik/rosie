@@ -1,0 +1,2944 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/bundle/bundle.v1.schema.json",
+  "title": "Bundle v1",
+  "description": "K-01, the step-graph bundle format, DRAFT (T-008; not frozen: T-010 adds the shared lists, sample bundles and refused fixtures, runs the consumer reviews and freezes it). A bundle is 'the step graph, prompts, model ids and policy one turn ran on, stored under one id' (arch 01 line 87; ops/plan/02-contracts.md K-01). Layout (Q-34 default): one manifest, one master graph per flow and one compiled overlay per trade, each stored as its own KV value under the bundle id (arch 10 line 536). The root of this schema is the whole bundle as one document, the form the compiler writes before it splits it into KV values and the form sample bundles take; $defs.manifest, $defs.flowGraph and $defs.tradeOverlay are the three kinds of KV value. Field names copied from the master keep the master's spelling (SPEC-master 4; overlay-core.js), so parity runs against the same functions (Q-35).",
+  "type": "object",
+  "properties": {
+    "manifest": {
+      "$ref": "#/$defs/manifest"
+    },
+    "flows": {
+      "description": "The master graph of each flow in the bundle, by flow letter (02-contracts K-01 'The master graph, per flow'; SPEC-master 1: flow A, the customer comes to the business; flow B, the business goes to the customer). A sample bundle may hold one flow (bundle v0: S1-01 and S1-02 in flow A, D-007).",
+      "type": "object",
+      "properties": {
+        "A": {
+          "$ref": "#/$defs/flowGraph"
+        },
+        "B": {
+          "$ref": "#/$defs/flowGraph"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "trades": {
+      "description": "One compiled overlay per trade, by trade id (Q-34 default; MC 1: 'The 243 trades', engine/work/prof/<id>.json). A sample bundle may hold one trade or none.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/tradeId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/tradeOverlay"
+      }
+    }
+  },
+  "required": ["manifest", "flows", "trades"],
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {
+      "title": "Sha256",
+      "description": "A SHA-256 digest as 64 lowercase hex characters (Q-36: fixture set v1 is a sha256 manifest; this contract hashes every input and value the same way).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "flowLetter": {
+      "title": "FlowLetter",
+      "description": "A flow: A, the customer comes to the business; B, the business goes to the customer (SPEC-master 1).",
+      "type": "string",
+      "enum": ["A", "B"]
+    },
+    "stepId": {
+      "title": "StepId",
+      "description": "A step id: S (shared), A or B, the section number 1 to 13, a dash and two or three digits (SPEC-master 4: 'S1-01, A4-07, B8-15'; B4-115 has three). A trade's own step puts x before the digits (SPEC-prof 3: 'A4-x01, B8-x03').",
+      "type": "string",
+      "pattern": "^[SAB](1[0-3]|[1-9])-x?[0-9]{2,3}$"
+    },
+    "lineId": {
+      "title": "LineId",
+      "description": "A line of engine/design/LINES.md that a step covers, such as 4.6 (SPEC-master 4, 'line').",
+      "type": "string",
+      "pattern": "^(1[0-3]|[1-9])\\.[0-9]{1,3}$"
+    },
+    "tradeId": {
+      "title": "TradeId",
+      "description": "A trade's id, the base name of its file engine/work/prof/<id>.json, such as plumber or property-manager (SPEC-prof 3, 'id'; MC 1).",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "lane": {
+      "title": "Lane",
+      "description": "Who acts or is told: owner (the owner or office manager), san (Rosie), staff, cust (the customer), agent (the customer's own AI), pay (Stripe), out (an outside service), other (anyone else) (SPEC-master 4 'who / to'; MC R1: san is Rosie and agent is the customer's own AI).",
+      "type": "string",
+      "enum": ["owner", "san", "staff", "cust", "agent", "pay", "out", "other"]
+    },
+    "via": {
+      "title": "Via",
+      "description": "How a step happens: chat (in the customer's AI chat), msg (texts), portal, page (a secure page), sync (system to system), auto (Rosie, automatic), visit (in person), call (phone), email (SPEC-master 4 'via').",
+      "type": "string",
+      "enum": ["chat", "msg", "portal", "page", "sync", "auto", "visit", "call", "email"]
+    },
+    "name": {
+      "title": "Name",
+      "description": "A switch, fact, slot group or booking value name: lowercase letters and digits (SPEC-master 5b: 'lowercase letters and digits'; lib.js parsePath, CORE.NAME).",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*$"
+    },
+    "price": {
+      "title": "PriceChoice",
+      "description": "The price choice of a money path: list (from the price list), photos (quoted from photos first), visit (quoted at the visit) (SPEC-master 5; the flow file's money.dims.price).",
+      "type": "string",
+      "enum": ["list", "photos", "visit"]
+    },
+    "before": {
+      "title": "BeforeChoice",
+      "description": "What is taken before the visit: none, card (a card saved), deposit, full. No hold (SPEC-master D66 amendments, #3: header.json 'ways' lists the four).",
+      "type": "string",
+      "enum": ["none", "card", "deposit", "full"]
+    },
+    "after": {
+      "title": "AfterChoice",
+      "description": "What is paid after: none, counter (flow A only), bill, card (the saved card charged at DONE), own (flow B only) (SPEC-master 5; the flow file's money.after).",
+      "type": "string",
+      "enum": ["none", "counter", "bill", "card", "own"]
+    },
+    "combo": {
+      "title": "MoneyCombo",
+      "description": "A money path written price|before|after, such as list|card|counter (SPEC-master 5; lib.js parsePath line 347). Whether it is one of its flow's paths (the flow's money.combos; lib.js validCombo) is a code check.",
+      "type": "string",
+      "pattern": "^(list|photos|visit)\\|(none|card|deposit|full)\\|(none|counter|bill|card|own)$"
+    },
+    "varyKey": {
+      "title": "VaryKey",
+      "description": "A vary key: one or more parts joined by +, each a money choice (price:, before:, after:), a booking value (booking:) or a plug-in switch (pf:), such as before:deposit+after:card or pf:sensitive (SPEC-master 5 item 1, 5b, 5e; overlay-core.js lines 27 to 34).",
+      "type": "string",
+      "pattern": "^(price|before|after|booking|pf):[a-z][a-z0-9]*(\\+(price|before|after|booking|pf):[a-z][a-z0-9]*)*$"
+    },
+    "stringList": {
+      "title": "StringList",
+      "description": "A list of plain strings (the master's own lists: more lines, needs and gives keys, labels).",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pair": {
+      "title": "Pair",
+      "description": "Two strings: a screen row (label, value), a rename pair or a swap pair (from, to) (SPEC-master 5f 'swap'; SPEC-prof 3 'rename'; a step's 'form').",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "table": {
+      "title": "Table",
+      "description": "A screen or chat list with a header row and rows of cells (SPEC-master 4, chat element 'list'; SPEC-prof 3 'Screens': a step's 'table').",
+      "type": "object",
+      "properties": {
+        "head": {
+          "description": "The header cells (a step's table.head; SPEC-prof 3 'Screens').",
+          "$ref": "#/$defs/stringList"
+        },
+        "rows": {
+          "description": "The rows, each a list of cells (a step's table.rows; SPEC-prof 3 'Screens').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stringList"
+          }
+        }
+      },
+      "required": ["head", "rows"],
+      "additionalProperties": false
+    },
+    "elements": {
+      "title": "MessageElements",
+      "description": "A message's chat elements (SPEC-master 4: 'Messages are chat elements (PLAIN-WORDS.md section 3): buttons, times, list, card, pay, code, photos, form, stars, stop'). The keys are the ones the master and the 243 trade files use (counted by T-008); the shape of the less used ones is kept as the master writes it.",
+      "type": "object",
+      "properties": {
+        "card": {
+          "description": "A card with a title and lines (SPEC-master 4 example: { \"card\": { \"title\": ..., \"lines\": [...] } }).",
+          "type": "object",
+          "properties": {
+            "title": {
+              "description": "The card's title (SPEC-master 4).",
+              "type": "string"
+            },
+            "lines": {
+              "description": "The card's lines (SPEC-master 4).",
+              "$ref": "#/$defs/stringList"
+            },
+            "button": {
+              "description": "The card's button label, such as 'Read and sign' (master-A.json S1-10 and S1-77 cards).",
+              "type": "string"
+            },
+            "link": {
+              "description": "The card's link, a sample address such as rosfield.com/v/s03 (master-A.json S1-10 and S1-77 cards). An illustration; live links are slots (K-03; MC C6).",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "buttons": {
+          "description": "The buttons, numbered like the split's branch labels so a tap jumps to that branch (SPEC-master 4: '\"1 Accept\" is button 1'). A label whose whole text is a guard keyword fails the lint (arch 12 line 592; Q-14).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/button"
+          }
+        },
+        "stop": {
+          "description": "The stop marker: true renders S13-02's full opt-out line on this message; \"first\" shows it only on the first text a number gets (SPEC-master 5j). Where the line goes now: Q-30's default (Rosie's first reply in a chat the person opened).",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "first"
+            }
+          ]
+        },
+        "as": {
+          "description": "The one named person on a shared lane this message is for, such as Kim (SPEC-master 4 'as'). An illustration, never a live value (MC C6).",
+          "type": "string"
+        },
+        "list": {
+          "$ref": "#/$defs/chatList"
+        },
+        "times": {
+          "description": "The times offered, one line each, such as 'Sat Oct 24 · 11:00am · Riley' (SPEC-master 4 'times'). Illustrations (MC C6).",
+          "$ref": "#/$defs/stringList"
+        },
+        "photos": {
+          "description": "Photo captions, such as 'Shop front' (SPEC-master 4 'photos').",
+          "$ref": "#/$defs/stringList"
+        },
+        "photoLink": {
+          "description": "A photo-link element some trade files use (engine/work/prof, counted by T-008), kept as written."
+        },
+        "form": {
+          "description": "The form's field names, such as 'Service', 'Price kind' (SPEC-master 4 'form').",
+          "$ref": "#/$defs/stringList"
+        },
+        "code": {
+          "description": "A code, such as a check-in code (SPEC-master 4 'code'). An illustration; the live code is a slot (MC C6).",
+          "type": "string"
+        },
+        "pay": {
+          "description": "A pay element (SPEC-master 4 'pay').",
+          "type": "object",
+          "properties": {
+            "amount": {
+              "description": "The amount, usually a slot such as {{due:$125}} (master-A.json pay elements; SPEC-master 5h).",
+              "type": "string"
+            },
+            "what": {
+              "description": "What it pays for (master-A.json pay elements).",
+              "type": "string"
+            },
+            "link": {
+              "description": "A sample pay link (master-A.json pay elements). An illustration; the live pay link is a slot (K-03; MC C6).",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "stars": {
+          "description": "true: a star rating (SPEC-master 4 'stars').",
+          "type": "boolean"
+        },
+        "lang": {
+          "description": "The message's language when it is not English, such as es (master-A.json, two messages).",
+          "type": "string"
+        },
+        "en": {
+          "description": "The English words of a message written in another language (master-A.json, two messages).",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "button": {
+      "title": "Button",
+      "description": "One button: its label, or a lettered pair such as [\"C\", \"Neither works\"] (SPEC-master 4 'buttons'; master-A.json A6-11; S13-12's lettered 'which?').",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/pair"
+        }
+      ]
+    },
+    "chatList": {
+      "title": "ChatList",
+      "description": "A chat list (SPEC-master 4 'list'): rows of cells, with or without a header row.",
+      "type": "object",
+      "properties": {
+        "head": {
+          "description": "The header cells, when it has them (master-A.json list elements).",
+          "$ref": "#/$defs/stringList"
+        },
+        "rows": {
+          "description": "The rows, each a list of cells (master-A.json list elements).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stringList"
+          }
+        },
+        "plain": {
+          "description": "true: shown as plain text lines (master-A.json list elements).",
+          "type": "boolean"
+        },
+        "pick": {
+          "description": "A pick marker some trade files use (engine/work/prof daycare.json, counted by T-008), kept as written."
+        },
+        "numbers": {
+          "description": "A numbering marker some trade files use (engine/work/prof towing.json, counted by T-008), kept as written."
+        }
+      },
+      "required": ["rows"],
+      "additionalProperties": false
+    },
+    "message": {
+      "title": "Message",
+      "description": "One message line. The master writes it [from, to, text, elements] (SPEC-master 4 'say'); the bundle writes it as an object, since a tuple schema (prefixItems) gives a wider generated type (ADR-005), and adds its plain-text form (02-contracts K-01; msgtext.js smsText(); C-064).",
+      "type": "object",
+      "properties": {
+        "from": {
+          "description": "Who sends it: the message's first item (SPEC-master 4).",
+          "$ref": "#/$defs/lane"
+        },
+        "to": {
+          "description": "Who gets it: the message's second item (SPEC-master 4).",
+          "$ref": "#/$defs/lane"
+        },
+        "text": {
+          "description": "The words, the message's third item, with slots such as {{svc.intext:Skin fade}} left in (SPEC-master 4, 5h). The sample names, dates, times, prices and places in it are illustrations that become slots (arch 12 line 592; MC C6).",
+          "type": "string"
+        },
+        "elements": {
+          "description": "The chat elements, the message's fourth item when it has one (SPEC-master 4).",
+          "$ref": "#/$defs/elements"
+        },
+        "plainText": {
+          "description": "The message as plain text, its elements turned into text (msgtext.js smsText(); C-064 element text forms; MC 1 'a message as plain SMS'). Slots stay in.",
+          "type": "string"
+        }
+      },
+      "required": ["from", "to", "text", "plainText"],
+      "additionalProperties": false
+    },
+    "messages": {
+      "title": "Messages",
+      "description": "A list of message lines (SPEC-master 4 'say').",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/message"
+      }
+    },
+    "gate": {
+      "title": "Gate",
+      "description": "A step's or branch's 'when': which paths light it (SPEC-master 5 item 2, 5d, 5e, 5i; overlay-core.js lines 14 to 25). Each list means any of its values; every key present must hold.",
+      "type": "object",
+      "properties": {
+        "price": {
+          "description": "Lit for these price choices (SPEC-master 5).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/price"
+          }
+        },
+        "before": {
+          "description": "Lit for these before choices (SPEC-master 5).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/before"
+          }
+        },
+        "after": {
+          "description": "Lit for these after choices (SPEC-master 5).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/after"
+          }
+        },
+        "booking": {
+          "description": "Lit for these booking values, any of them per group (SPEC-master 5e).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "pf": {
+          "description": "Lit when the trade lists any of these facts; a trade with no facts list sees it (SPEC-master 5d, 'pf' is the same as 'factOn').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "factOn": {
+          "description": "The same as 'pf' (SPEC-master 5d).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "factOff": {
+          "description": "Lit when the trade lists none of these facts (SPEC-master 5d).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "switchOn": {
+          "description": "Lit when any of these switches is on; a switch with no plug-in value is off (SPEC-master 5d).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "switchOff": {
+          "description": "Lit when none of these switches is on (SPEC-master 5d).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "rec": {
+          "description": "A record gate: lit when the booking holds any of these record values, such as credit, card, paid or keep (arch 03 line 161: 'a record gate when the booking holds the value'; the flow file's record; overlay-core.js line 437).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "recOff": {
+          "description": "Lit when the booking holds none of these record values (the flow file's record slot rows; overlay-core.js line 437).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/name"
+          }
+        },
+        "took": {
+          "description": "The stamp that this gate reads what the booking took, from the money step on: the flow letter (lib.js stampFlow line 900; overlay-core.js line 437).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "ev": {
+          "description": "The stamp that this gate reads the event groups (charge, contact): the flow letter (overlay-core.js lines 167, 326 and 437).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "wr": {
+          "description": "false: this gate's record values are read without what was written later (overlay-core.js lines 437 and 1765).",
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "bookingValues": {
+      "title": "BookingValues",
+      "description": "A booking's choices by group, each made once per booking and read later like money (SPEC-master 5e; overlay-core.js BOOKING lines 225 to 244 and EVENT_GROUPS lines 320 to 325). A group left out has its first value. Only live values: the record's live.off cuts reach notsafe, times noperson and line, and approval expert (master-A.json and master-B.json record.live.off; SPEC-master FIX7 amendments: notsafe dormant since D75).",
+      "type": "object",
+      "properties": {
+        "timing": {
+          "description": "settime (a set time) or sentnow (sent now) (overlay-core.js BOOKING.timing).",
+          "type": "string",
+          "enum": ["settime", "sentnow"]
+        },
+        "times": {
+          "description": "How the times read: window, setstart, stay or seat (overlay-core.js BOOKING.times; noperson and line cut by record.live.off).",
+          "type": "string",
+          "enum": ["window", "setstart", "stay", "seat"]
+        },
+        "reach": {
+          "description": "How the customer is reached: texts, callsonly, textsonly or email (overlay-core.js BOOKING.reach; notsafe cut by record.live.off and D75). Calls only is not offered at launch (MC C2).",
+          "type": "string",
+          "enum": ["texts", "callsonly", "textsonly", "email"]
+        },
+        "paidby": {
+          "description": "money (as its money choice says) or credit (paid by a credit) (overlay-core.js BOOKING.paidby).",
+          "type": "string",
+          "enum": ["money", "credit"]
+        },
+        "privacy": {
+          "description": "open or private (a private booking) (overlay-core.js BOOKING.privacy; arch 03 line 175).",
+          "type": "string",
+          "enum": ["open", "private"]
+        },
+        "taken": {
+          "description": "asked (as the service asks) or nothing (nothing taken) (overlay-core.js BOOKING.taken).",
+          "type": "string",
+          "enum": ["asked", "nothing"]
+        },
+        "approval": {
+          "description": "now (booked now) or ownerok (the owner's OK first) (overlay-core.js BOOKING.approval; expert cut by record.live.off).",
+          "type": "string",
+          "enum": ["now", "ownerok"]
+        },
+        "madeby": {
+          "description": "customer, or shop (the business booked it for its own customer) (overlay-core.js BOOKING.madeby).",
+          "type": "string",
+          "enum": ["customer", "shop"]
+        },
+        "charge": {
+          "description": "An event group: none, later (a charge after booking went through) or failed (overlay-core.js EVENT_GROUPS.charge).",
+          "type": "string",
+          "enum": ["none", "later", "failed"]
+        },
+        "contact": {
+          "description": "An event group: kept, switched (updates go to a new phone or email) or stopped (texts stopped by STOP) (overlay-core.js EVENT_GROUPS.contact).",
+          "type": "string",
+          "enum": ["kept", "switched", "stopped"]
+        },
+        "payer": {
+          "description": "A record group: self or other (someone else pays) (overlay-core.js EVENT_GROUPS.payer).",
+          "type": "string",
+          "enum": ["self", "other"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "sets": {
+      "title": "Sets",
+      "description": "A branch's 'sets': a booking value that changes mid-booking, read by its own steps and, once it rejoins, by every step after its split (SPEC-master 5e, the sets paragraph; master values such as {\"privacy\":\"private\"}, {\"payer\":\"other\"}, {\"svcAdd\":\"a-add\"}).",
+      "type": "object",
+      "properties": {
+        "timing": {
+          "$ref": "#/$defs/bookingValues/properties/timing"
+        },
+        "times": {
+          "$ref": "#/$defs/bookingValues/properties/times"
+        },
+        "reach": {
+          "$ref": "#/$defs/bookingValues/properties/reach"
+        },
+        "paidby": {
+          "$ref": "#/$defs/bookingValues/properties/paidby"
+        },
+        "privacy": {
+          "$ref": "#/$defs/bookingValues/properties/privacy"
+        },
+        "taken": {
+          "$ref": "#/$defs/bookingValues/properties/taken"
+        },
+        "approval": {
+          "$ref": "#/$defs/bookingValues/properties/approval"
+        },
+        "madeby": {
+          "$ref": "#/$defs/bookingValues/properties/madeby"
+        },
+        "charge": {
+          "$ref": "#/$defs/bookingValues/properties/charge"
+        },
+        "contact": {
+          "$ref": "#/$defs/bookingValues/properties/contact"
+        },
+        "payer": {
+          "$ref": "#/$defs/bookingValues/properties/payer"
+        },
+        "svcAdd": {
+          "description": "A service added to the booking, by its record service id, such as a-add (master-A.json, a branch's sets {\"svcAdd\":\"a-add\"}; the record's services).",
+          "$ref": "#/$defs/serviceId"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "path": {
+      "title": "Path",
+      "description": "The path model: which branches are lit and which words a step shows for one booking (02-contracts K-01 'The path model'; overlay-core.js lines 6 to 12: { price, before, after, booking, pf, facts }; lib.js parsePath line 338, whose text form is 'list|card|bill +switched booking=reach:callsonly,privacy:private pf=grief facts=packs'). Parity is checked against these functions with each trade's full switches and facts (Q-35).",
+      "type": "object",
+      "properties": {
+        "flow": {
+          "description": "The flow the path runs in (lib.js parsePath: 'the flow must be A or B').",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "price": {
+          "description": "The price choice (overlay-core.js line 7).",
+          "$ref": "#/$defs/price"
+        },
+        "before": {
+          "description": "The before choice (overlay-core.js line 7).",
+          "$ref": "#/$defs/before"
+        },
+        "after": {
+          "description": "The after choice (overlay-core.js line 7).",
+          "$ref": "#/$defs/after"
+        },
+        "booking": {
+          "description": "The booking values (overlay-core.js line 8: 'a group left out has its first value').",
+          "$ref": "#/$defs/bookingValues"
+        },
+        "switches": {
+          "description": "The plug-in switches, by name; missing means off (overlay-core.js line 10, 'pf'; SPEC-master 5b).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "facts": {
+          "description": "The plug-in facts the trade lists, or null when it lists none (then every fact-gated branch shows) (overlay-core.js lines 11 and 12; SPEC-master 5d).",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/name"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "services": {
+          "description": "The booking's services when it has more than one, by record service id (02-contracts K-01 path model 'services'; lib.js fixturePaths, the path's 'svc'; the record's services).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/serviceId"
+          }
+        },
+        "fixture": {
+          "description": "The record fixture the path rides, such as two-card, when it names one (lib.js parsePath line 348, '+<fixture id>'; the flow file's record.fixtures).",
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        }
+      },
+      "required": ["flow", "price", "before", "after"],
+      "additionalProperties": false
+    },
+    "wordsPatch": {
+      "title": "WordsPatch",
+      "description": "Other words for some paths: a vary entry (SPEC-master 5 item 1: 'A variant may change only does, more, say, rule, t, form and table (never the title, ids or keys)'; 5f: swap, addMore, addSay; overlay-core.js line 34). In one variant: swap first, then the fields it sets, then the adds (5f).",
+      "type": "object",
+      "properties": {
+        "does": {
+          "description": "What the step does, in one or two sentences (SPEC-master 4 'does').",
+          "type": "string"
+        },
+        "more": {
+          "description": "Detail lines, one rule per line; a variant that sets its own more replaces the whole base more (SPEC-master 4, 5k).",
+          "$ref": "#/$defs/stringList"
+        },
+        "say": {
+          "description": "The messages on these paths (SPEC-master 4 'say').",
+          "$ref": "#/$defs/messages"
+        },
+        "rule": {
+          "description": "A 'Rosie's rule: ... Why: ...' box (SPEC-master 4 'rule').",
+          "type": "string"
+        },
+        "t": {
+          "description": "When it happens, in the sample story, possibly relative to another step (SPEC-master 4 't', 5g). An illustration (MC C6).",
+          "type": "string"
+        },
+        "form": {
+          "description": "A screen as label and value pairs (SPEC-prof 3 'Screens').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pair"
+          }
+        },
+        "table": {
+          "description": "A screen table (SPEC-prof 3 'Screens').",
+          "$ref": "#/$defs/table"
+        },
+        "swap": {
+          "description": "Find-and-replace pairs on the words shown so far, whole words (SPEC-master 5f).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pair"
+          }
+        },
+        "addMore": {
+          "description": "Lines added after the more lines under it (SPEC-master 5f).",
+          "$ref": "#/$defs/stringList"
+        },
+        "addSay": {
+          "description": "Messages added after the messages under it (SPEC-master 5f).",
+          "$ref": "#/$defs/messages"
+        }
+      },
+      "additionalProperties": false
+    },
+    "vary": {
+      "title": "Vary",
+      "description": "A step's other words by path: vary key to words. The most specific choice key that fits wins; switch and booking keys are laid over it field by field, least specific first (SPEC-master 5 item 1, 5b, 5e; overlay-core.js lines 27 to 34).",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/varyKey"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/wordsPatch"
+      }
+    },
+    "clock": {
+      "title": "Clock",
+      "description": "When the step's question times out: its own Clock line, or step 9's default (arch 03 line 181; arch 12 line 592: 'only 13 of 210 decisions state a Clock line; the rest take step 9's default'; arch 02 line 127).",
+      "type": "object",
+      "properties": {
+        "from": {
+          "description": "clockLine: the step states one; step9Default: arch 02 line 127's default applies (7pm the day before the visit, 2 hours before a same-day visit, at least 1 hour after delivery; 8pm the day after delivery with no visit).",
+          "type": "string",
+          "enum": ["clockLine", "step9Default"]
+        },
+        "text": {
+          "description": "The Clock line's words, word for word, when from is clockLine (arch 12 line 592).",
+          "type": "string"
+        }
+      },
+      "required": ["from"],
+      "additionalProperties": false
+    },
+    "card": {
+      "title": "StepCard",
+      "description": "The step card the model is given for an open question or a hub: question, each branch's Means line, Never lines, safe default and Clock (arch 03 line 181: 'full step cards (question, Means, Never, safe default)'; arch 12 line 592; 02-contracts K-01). A question with no safe default and no clock fails the lint (arch 12 line 592).",
+      "type": "object",
+      "properties": {
+        "question": {
+          "description": "The question, the split's q (SPEC-master 4).",
+          "type": "string"
+        },
+        "means": {
+          "description": "One definition per branch (arch 12 line 592: '48 lack a Means line; the first sentence of the step it leads to stands in').",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "branch": {
+                "description": "The branch label, word for word (SPEC-master 4; SPEC-master 5d: 'never rename a branch label').",
+                "type": "string"
+              },
+              "text": {
+                "description": "The definition (arch 12 line 592).",
+                "type": "string"
+              },
+              "from": {
+                "description": "meansLine: the step's own \"Means '...'\" line; firstSentence: the first sentence of the step the branch leads to (arch 12 line 592).",
+                "type": "string",
+                "enum": ["meansLine", "firstSentence"]
+              }
+            },
+            "required": ["branch", "text", "from"],
+            "additionalProperties": false
+          }
+        },
+        "never": {
+          "description": "The step's Never lines, word for word (arch 03 line 181; the step's more lines that start 'Never').",
+          "$ref": "#/$defs/stringList"
+        },
+        "safeDefault": {
+          "description": "What the step does when nobody answers in time; a step without one changes nothing, charges nobody, moves nobody (arch 01 line 81; arch 03 line 181).",
+          "type": "string"
+        },
+        "clock": {
+          "$ref": "#/$defs/clock"
+        }
+      },
+      "required": ["question", "means", "never", "clock"],
+      "additionalProperties": false
+    },
+    "answerField": {
+      "title": "AnswerField",
+      "description": "A field a branch's answer carries, with its type, taken from the gives keys and record values (02-contracts K-01 'the fields its answer carries and their types'; ops/plan/02-contracts.md section 8 names each key's contract field). The model gives each with its source words and code re-parses it (arch 03 line 185).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The field's name: a gives key such as time_saved, or a record value (SPEC-master 4 'gives'; the flow file's record).",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.]*$"
+        },
+        "type": {
+          "description": "Its value type: text, integer or boolean; money, time, zone or id as the shared formats write them (contracts/common/formats.v1.schema.json, CQ-09); choice, one of the open question's option ids (arch 03 line 183).",
+          "type": "string",
+          "enum": ["text", "integer", "boolean", "money", "time", "zone", "id", "choice"]
+        }
+      },
+      "required": ["name", "type"],
+      "additionalProperties": false
+    },
+    "effect": {
+      "title": "Effect",
+      "description": "One write, message, charge, refund or clock a choice causes; code runs it and the model never names it (arch 01 line 77; 02-contracts K-01: 'record writes, messages and to whom, clocks, charges, refunds, calendar writes and flags').",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "What it does (02-contracts K-01, the branch's effects).",
+          "type": "string",
+          "enum": ["recordWrite", "message", "clock", "charge", "refund", "calendarWrite", "flag"]
+        },
+        "ref": {
+          "description": "What it acts on: the gives key or record field written, the step whose message goes, the Clock line armed, the record amount charged or refunded (02-contracts K-01; SPEC-master 4 'gives', 'tells'; the flow file's record).",
+          "type": "string"
+        },
+        "to": {
+          "description": "For a message: who gets it (SPEC-master 4 'tells').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lane"
+          }
+        },
+        "flag": {
+          "description": "For a flag: the record flag set, checked by the gate, the dispatcher, the charge job, clock firings and the crew day list (arch 03 line 175: deceased, stopped, private, paused).",
+          "type": "string",
+          "enum": ["deceased", "stopped", "private", "paused"]
+        }
+      },
+      "required": ["kind", "ref"],
+      "additionalProperties": false
+    },
+    "branch": {
+      "title": "Branch",
+      "description": "One branch of a split (SPEC-master 4, 'A split ... branches'), compiled: its steps by id, its tag and its end.",
+      "type": "object",
+      "properties": {
+        "label": {
+          "description": "The label, word for word; overlays turn a branch off by it (SPEC-master 4 'label'; 5d).",
+          "type": "string"
+        },
+        "tag": {
+          "description": "message: the model may choose it; lookup: code settles it; clock: a clock row settles it. Only message branches enter the choices (arch 03 line 161).",
+          "type": "string",
+          "enum": ["message", "lookup", "clock"]
+        },
+        "when": {
+          "description": "The paths that light it (SPEC-master 5 item 2, 5d, 5e).",
+          "$ref": "#/$defs/gate"
+        },
+        "sets": {
+          "$ref": "#/$defs/sets"
+        },
+        "steps": {
+          "description": "The branch's own steps, in order, by id; each is in the flow's steps (SPEC-master 4 'steps').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepId"
+          }
+        },
+        "end": {
+          "description": "merge: rejoins the path after the split; end: this path stops (SPEC-master 4 'end'). Left out where the master leaves it out.",
+          "type": "string",
+          "enum": ["merge", "end"]
+        },
+        "endText": {
+          "description": "The text an ending branch ends with (SPEC-master 4 'endText').",
+          "type": "string"
+        },
+        "flow": {
+          "description": "An ending branch that continues in the other flow: that flow (SPEC-master 4: '\"flow\": \"B\" on an ending branch').",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "rejoinAt": {
+          "description": "Where the walk goes after a merging branch: the step after its split, or null when the walk ends or leaves the flow (02-contracts K-01 'its end (rejoins, ends with its text, or continues in the other flow)'; arch 03 line 191).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/stepId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "answerFields": {
+          "description": "The fields its answer carries (02-contracts K-01).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/answerField"
+          }
+        },
+        "effects": {
+          "description": "Its effects, run by code once (arch 01 line 77; 02-contracts K-01).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        }
+      },
+      "required": ["label", "tag", "steps", "rejoinAt", "answerFields", "effects"],
+      "additionalProperties": false
+    },
+    "pluginSlot": {
+      "title": "PluginSlot",
+      "description": "The plug-in slot node (S1-11): one node that fills every pf key for a kind of work (SPEC-master 8, section 1: 'slot: { fills, reads, gives, examples }'; master-A.json S1-11).",
+      "type": "object",
+      "properties": {
+        "fills": {
+          "description": "What the slot fills, in plain words (SPEC-master 8).",
+          "type": "string"
+        },
+        "reads": {
+          "description": "The keys it reads, such as kinds (SPEC-master 8).",
+          "$ref": "#/$defs/stringList"
+        },
+        "gives": {
+          "description": "The pf keys it gives (SPEC-master 4: 'The slot is S1-xx in section 1 and gives every pf key').",
+          "$ref": "#/$defs/stringList"
+        },
+        "examples": {
+          "description": "Its examples, kept as the master writes them; never renamed (SPEC-master 5h, the last line)."
+        }
+      },
+      "required": ["fills", "reads", "gives"],
+      "additionalProperties": false
+    },
+    "step": {
+      "title": "Step",
+      "description": "One step of a flow, compiled (SPEC-master 4; 02-contracts K-01 'each step (id, section, who, to, via, title, needs, gives, tells) with its card'). Authoring fields are left out (MC R2: src, prop).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The step id (SPEC-master 4 'id').",
+          "$ref": "#/$defs/stepId"
+        },
+        "section": {
+          "description": "Its section, 1 to 13, in the order of engine/design/LINES.md (the flow file's 'sec'; SPEC-master 1).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 13
+        },
+        "lines": {
+          "description": "The LINES.md lines it covers (SPEC-master 4 'line').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lineId"
+          }
+        },
+        "kind": {
+          "description": "rule: a section 13 node, a rule every step follows, not a step in time (SPEC-master 4 'kind'). These are the always-on rules (arch 03 line 181).",
+          "type": "string",
+          "const": "rule"
+        },
+        "who": {
+          "description": "Who acts (SPEC-master 4 'who').",
+          "$ref": "#/$defs/lane"
+        },
+        "to": {
+          "description": "Who it is for, when someone is (SPEC-master 4 'to').",
+          "$ref": "#/$defs/lane"
+        },
+        "as": {
+          "description": "The one named person on a shared lane (SPEC-master 4 'as'). An illustration (MC C6).",
+          "type": "string"
+        },
+        "via": {
+          "description": "How it happens (SPEC-master 4 'via').",
+          "$ref": "#/$defs/via"
+        },
+        "t": {
+          "description": "When it happens in the sample story (SPEC-master 4 't', 5g). An illustration (MC C6).",
+          "type": "string"
+        },
+        "title": {
+          "description": "The title (SPEC-master 4 'title').",
+          "type": "string"
+        },
+        "does": {
+          "description": "What it does (SPEC-master 4 'does').",
+          "type": "string"
+        },
+        "more": {
+          "description": "Detail lines, one rule per line, holding the Means, Never and Silence lines and 'judgment rule N' pointers (SPEC-master 4 'more', 5k). Every 'judgment rule N' must resolve to rule 1 to 67 (MC R6).",
+          "$ref": "#/$defs/stringList"
+        },
+        "say": {
+          "description": "The messages it sends (SPEC-master 4 'say').",
+          "$ref": "#/$defs/messages"
+        },
+        "rule": {
+          "description": "A 'Rosie's rule: ... Why: ...' box (SPEC-master 4 'rule').",
+          "type": "string"
+        },
+        "form": {
+          "description": "A screen as label and value pairs (SPEC-prof 3 'Screens').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pair"
+          }
+        },
+        "table": {
+          "description": "A screen table (SPEC-prof 3 'Screens').",
+          "$ref": "#/$defs/table"
+        },
+        "needs": {
+          "description": "The keys it uses; it may only need what an earlier step gave on every path to it (SPEC-master 4 'needs'; BP 3.5: runtime data, not build edges).",
+          "$ref": "#/$defs/stringList"
+        },
+        "gives": {
+          "description": "The keys it gives (SPEC-master 4 'gives'; 02-contracts section 8 names each key's contract field).",
+          "$ref": "#/$defs/stringList"
+        },
+        "tells": {
+          "description": "Who gets a message in this step (SPEC-master 4 'tells').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lane"
+          }
+        },
+        "reads": {
+          "description": "The record homes it reads, such as stop or contact (the flow file's 'reads'; names of the routing tables' homes).",
+          "$ref": "#/$defs/stringList"
+        },
+        "when": {
+          "description": "The step's own gate: where it fails the step and its branches are skipped (SPEC-master 5d, 5i).",
+          "$ref": "#/$defs/gate"
+        },
+        "vary": {
+          "$ref": "#/$defs/vary"
+        },
+        "slot": {
+          "$ref": "#/$defs/pluginSlot"
+        },
+        "text": {
+          "description": "The step id the source part names in its 'text' field, kept as written (master-A.json and master-B.json; the source parts A36.json and B36.json, where a flow B step names its flow A twin).",
+          "$ref": "#/$defs/stepId"
+        },
+        "visit": {
+          "description": "The visit's day and time in the sample story, where the master states one on the step (the flow file's 'visit'). An illustration (MC C6).",
+          "type": "string"
+        },
+        "took": {
+          "description": "The stamp that the step reads what the booking took, from the money step on: the flow letter, or false where the master stops it (lib.js stampFlow line 898; overlay-core.js line 804).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/flowLetter"
+            },
+            {
+              "type": "boolean",
+              "const": false
+            }
+          ]
+        },
+        "ev": {
+          "description": "The stamp that the step reads the event groups: the flow letter (overlay-core.js lines 167 and 932).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "rec": {
+          "description": "The stamp that the step reads the record of this flow: the flow letter (the flow file's 'rec'; overlay-core.js line 1120).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "wr": {
+          "description": "false: the step reads the record without what was written later (overlay-core.js lines 804 and 1765).",
+          "type": "boolean",
+          "const": false
+        },
+        "timing": {
+          "description": "The stamp that the step's time slots follow the booking's timing: the flow letter (lib.js stampFlow line 918; SPEC-master 5h, the time-slot paragraph).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "amounts": {
+          "description": "The flow's amount table, stamped on a step with an amount slot (lib.js stampFlow line 909). Illustrations; live amounts come from the business's data (MC C6).",
+          "$ref": "#/$defs/amountTable"
+        },
+        "layerLines": {
+          "description": "The ids of the flow's layer lines stamped on this step (the flow file's 'layerAdd'; lib.js stampFlow line 906; overlay-core.js line 810). The lines themselves are in the flow's layerLines.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["private", "privatecall", "textsonly", "emailonly"]
+          }
+        },
+        "type": {
+          "description": "split: a decision with a question and branches (SPEC-master 4 'type'). Left out on a plain step.",
+          "type": "string",
+          "const": "split"
+        },
+        "q": {
+          "description": "A split's question (SPEC-master 4 'q').",
+          "type": "string"
+        },
+        "branches": {
+          "description": "A split's branches (SPEC-master 4 'branches').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/branch"
+          }
+        },
+        "card": {
+          "$ref": "#/$defs/card"
+        },
+        "fallbackText": {
+          "description": "The step's fallback text: its master line with slots filled, used when the composer's rewrite fails (arch 02 line 123; 02-contracts K-01). Jay's reviewed text replaces it once it exists (arch 02 line 123).",
+          "type": "string"
+        },
+        "pageTypes": {
+          "description": "The page types the step allows; the composer's plan picks one or none (arch 01 line 97; K-03).",
+          "$ref": "#/$defs/stringList"
+        },
+        "next": {
+          "description": "The next step on this step's own list (its section's main path, or its branch), in the flow file's order; null at the end of the list, where the enclosing branch's end or rejoinAt decides (SPEC-master 4: 'Steps in a section are the main path'; arch 03 line 191).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/stepId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["id", "section", "lines", "who", "via", "title", "does", "pageTypes", "next"],
+      "additionalProperties": false
+    },
+    "amountValues": {
+      "title": "AmountValues",
+      "description": "Example amounts for one money row, as the master writes them, such as \"$35\" or \"free\" (SPEC-master 5h, the amount slots; header flows.<flow>.amounts). Illustrations, never live values (MC C6).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The sample service name (SPEC-master 5h).",
+          "type": "string"
+        },
+        "price": {
+          "description": "{{price}} (SPEC-master 5h).",
+          "type": "string"
+        },
+        "fee": {
+          "description": "{{fee}} (SPEC-master 5h).",
+          "type": "string"
+        },
+        "deposit": {
+          "description": "{{deposit}} (SPEC-master 5h).",
+          "type": "string"
+        },
+        "rest": {
+          "description": "{{rest}} (SPEC-master 5h).",
+          "type": "string"
+        },
+        "paid": {
+          "description": "{{paid}} (SPEC-master 5h).",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "amountTable": {
+      "title": "AmountTable",
+      "description": "Amount rows by path pattern: '*', or price|before|after with * for any, the most specific row winning (SPEC-master 5h: 'rows like list|card|counter, list|*|*, *'; overlay-core.js line 1810).",
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^(\\*|(list|photos|visit|\\*)\\|(none|card|deposit|full|\\*)\\|(none|counter|bill|card|own|\\*))$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/amountValues"
+      }
+    },
+    "serviceId": {
+      "title": "ServiceId",
+      "description": "A record service id, such as a-add or b-plan (the flow file's record.services; a trade's money.<flow>.services).",
+      "type": "string",
+      "pattern": "^[ab]-[a-z0-9-]+$"
+    },
+    "service": {
+      "title": "Service",
+      "description": "A service the record's fixtures add to a booking (the flow file's record.services; a trade's money.<flow>.services, joined to the record's by overlay-core.js profRecord, line 1867).",
+      "type": "object",
+      "properties": {
+        "flow": {
+          "description": "The flow it is booked in (record.services).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "name": {
+          "description": "The sample service name (record.services). An illustration (MC C6).",
+          "type": "string"
+        },
+        "price": {
+          "$ref": "#/$defs/price"
+        },
+        "before": {
+          "$ref": "#/$defs/before"
+        },
+        "after": {
+          "$ref": "#/$defs/after"
+        },
+        "amounts": {
+          "$ref": "#/$defs/amountValues"
+        },
+        "paidby": {
+          "description": "credit when a pack credit pays it (record.services a-pack; overlay-core.js BOOKING.paidby).",
+          "$ref": "#/$defs/bookingValues/properties/paidby"
+        }
+      },
+      "required": ["flow", "price", "before", "after"],
+      "additionalProperties": false
+    },
+    "slotRow": {
+      "title": "SlotRow",
+      "description": "One row of a named record slot: the first row whose when fits gives the slot's text (the flow file's record.slots.<slot>.rows; overlay-core.js line 770).",
+      "type": "object",
+      "properties": {
+        "when": {
+          "description": "The paths and record values that pick this row (record.slots rows).",
+          "$ref": "#/$defs/gate"
+        },
+        "text": {
+          "description": "The slot's text on those paths (record.slots rows).",
+          "type": "string"
+        }
+      },
+      "required": ["text"],
+      "additionalProperties": false
+    },
+    "slotRows": {
+      "title": "SlotRows",
+      "description": "Rows by named slot, such as pay.price (the flow file's record.slots; a trade's slots.<flow>, laid before the master's rows by overlay-core.js profRecord).",
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z]+\\.[a-z]+$"
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/slotRow"
+        }
+      }
+    },
+    "namedSlot": {
+      "title": "NamedSlot",
+      "description": "One of the record's 16 named slots (the flow file's record.slots; K-03's slot vocabulary).",
+      "type": "object",
+      "properties": {
+        "home": {
+          "description": "The step that is the slot's home (record.slots.<slot>.home; RULES.md lines 6 and 7: a step's home wins).",
+          "$ref": "#/$defs/stepId"
+        },
+        "means": {
+          "description": "What the slot means, in plain words (record.slots.<slot>.means).",
+          "type": "string"
+        },
+        "rows": {
+          "description": "Its rows, first fit wins (record.slots.<slot>.rows).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slotRow"
+          }
+        }
+      },
+      "required": ["home", "means", "rows"],
+      "additionalProperties": false
+    },
+    "homes": {
+      "title": "Homes",
+      "description": "The homes: the one step that holds each kind of fact (the flow file's record.homes: money S13-55, contact S13-19, proof S13-45, stop S13-32, clock S13-35, who S13-31, safety S13-10, change S13-56, record S13-57, two A9-21; 02-contracts K-01 routing tables; arch 02 line 117: each fact once, from its home).",
+      "type": "object",
+      "properties": {
+        "money": {
+          "description": "record.homes.money (S13-55).",
+          "$ref": "#/$defs/stepId"
+        },
+        "contact": {
+          "description": "record.homes.contact (S13-19).",
+          "$ref": "#/$defs/stepId"
+        },
+        "proof": {
+          "description": "record.homes.proof (S13-45).",
+          "$ref": "#/$defs/stepId"
+        },
+        "stop": {
+          "description": "record.homes.stop (S13-32).",
+          "$ref": "#/$defs/stepId"
+        },
+        "clock": {
+          "description": "record.homes.clock (S13-35).",
+          "$ref": "#/$defs/stepId"
+        },
+        "who": {
+          "description": "record.homes.who (S13-31).",
+          "$ref": "#/$defs/stepId"
+        },
+        "safety": {
+          "description": "record.homes.safety (S13-10).",
+          "$ref": "#/$defs/stepId"
+        },
+        "change": {
+          "description": "record.homes.change (S13-56).",
+          "$ref": "#/$defs/stepId"
+        },
+        "record": {
+          "description": "record.homes.record (S13-57).",
+          "$ref": "#/$defs/stepId"
+        },
+        "two": {
+          "description": "record.homes.two (A9-21).",
+          "$ref": "#/$defs/stepId"
+        }
+      },
+      "required": ["money", "contact", "proof", "stop", "clock", "who", "safety", "change", "record", "two"],
+      "additionalProperties": false
+    },
+    "record": {
+      "title": "Record",
+      "description": "The booking record's one home, copied from the flow file's record (02-contracts K-01 'The record': money ways, the 16 named slots and their rows, ledger rules, one fee, the live switches and facts, the cut values, merged names and the 11 fixtures). Its _about note is authoring text and is left out (MC R2).",
+      "type": "object",
+      "properties": {
+        "from": {
+          "description": "The step in each flow from which the record is read (record.from: A7-01, B7-55).",
+          "type": "object",
+          "properties": {
+            "A": {
+              "$ref": "#/$defs/stepId"
+            },
+            "B": {
+              "$ref": "#/$defs/stepId"
+            }
+          },
+          "required": ["A", "B"],
+          "additionalProperties": false
+        },
+        "main": {
+          "description": "The main money path of each flow (record.main: list|card|counter, list|card|bill; lib.js parsePath line 357).",
+          "type": "object",
+          "properties": {
+            "A": {
+              "$ref": "#/$defs/combo"
+            },
+            "B": {
+              "$ref": "#/$defs/combo"
+            }
+          },
+          "required": ["A", "B"],
+          "additionalProperties": false
+        },
+        "ways": {
+          "description": "The money ways by before choice (and credit): what is paid now, whether a card is saved, which fee is kept and what goes back (record.ways).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "now": {
+                "description": "What is paid now: 0, deposit or paid (record.ways.<way>.now).",
+                "type": "string"
+              },
+              "card": {
+                "description": "Whether a card is saved, or asis (record.ways.<way>.card).",
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "const": "asis"
+                  }
+                ]
+              },
+              "fee": {
+                "description": "Which fee applies (record.ways.<way>.fee).",
+                "type": "string"
+              },
+              "back": {
+                "description": "What goes back on a refund (record.ways.<way>.back).",
+                "type": "string"
+              }
+            },
+            "required": ["now", "card", "fee", "back"],
+            "additionalProperties": false
+          }
+        },
+        "homes": {
+          "$ref": "#/$defs/homes"
+        },
+        "slots": {
+          "description": "The 16 named slots (record.slots; K-03: pay.asks, pay.price, pay.took, pay.left, pay.cancel, pay.late, pay.noshow, pay.back, pay.after, pay.staff, pay.failed, clock.pay, two.count, reach.way, reach.to, who.ok).",
+          "type": "object",
+          "properties": {
+            "pay.asks": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.price": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.took": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.left": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.cancel": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.late": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.noshow": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.back": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.after": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.staff": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "pay.failed": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "clock.pay": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "two.count": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "reach.way": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "reach.to": {
+              "$ref": "#/$defs/namedSlot"
+            },
+            "who.ok": {
+              "$ref": "#/$defs/namedSlot"
+            }
+          },
+          "required": [
+            "pay.asks",
+            "pay.price",
+            "pay.took",
+            "pay.left",
+            "pay.cancel",
+            "pay.late",
+            "pay.noshow",
+            "pay.back",
+            "pay.after",
+            "pay.staff",
+            "pay.failed",
+            "clock.pay",
+            "two.count",
+            "reach.way",
+            "reach.to",
+            "who.ok"
+          ],
+          "additionalProperties": false
+        },
+        "services": {
+          "description": "The services the fixtures add, by id (record.services).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/serviceId"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/service"
+          }
+        },
+        "fixtures": {
+          "description": "The record's 11 fixtures: a path variant a booking can ride, such as two-card or payer-other (record.fixtures; lib.js parsePath line 366).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "The fixture id (record.fixtures[].id).",
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              },
+              "label": {
+                "description": "What it is, in plain words (record.fixtures[].label).",
+                "type": "string"
+              },
+              "add": {
+                "description": "The services it adds, by id (record.fixtures[].add).",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/serviceId"
+                }
+              },
+              "on": {
+                "description": "Which money paths it rides, such as paid-or-card (record.fixtures[].on).",
+                "type": "string"
+              },
+              "facts": {
+                "description": "The facts it needs (record.fixtures[].facts).",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/name"
+                }
+              },
+              "booking": {
+                "description": "The booking and event values it sets (record.fixtures[].booking).",
+                "$ref": "#/$defs/bookingValues"
+              }
+            },
+            "required": ["id", "label"],
+            "additionalProperties": false
+          }
+        },
+        "lint": {
+          "description": "The record's own lint tables: phrases by home, pointer patterns, allowed exceptions by step and banned old phrases (record.lint: phrases, pointers, allow, banned). Kept as the master writes them; the compiler's lint reads them (C-065 to C-070).",
+          "type": "object",
+          "properties": {
+            "phrases": {
+              "description": "Regular expressions by home: money, contact, proof, stop (record.lint.phrases).",
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/stringList"
+              }
+            },
+            "pointers": {
+              "description": "Regular expressions for the pointer lines that name a home (record.lint.pointers).",
+              "$ref": "#/$defs/stringList"
+            },
+            "allow": {
+              "description": "Exceptions by step id: the lint rule allowed and why (record.lint.allow).",
+              "type": "object",
+              "propertyNames": {
+                "$ref": "#/$defs/stepId"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "rule": {
+                    "description": "The record lint rule or rules allowed, such as L1 or [L1, L2] (record.lint.allow.<step>.rule).",
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/$defs/stringList"
+                      }
+                    ]
+                  },
+                  "why": {
+                    "description": "Why (record.lint.allow.<step>.why).",
+                    "type": "string"
+                  }
+                },
+                "required": ["rule", "why"],
+                "additionalProperties": false
+              }
+            },
+            "banned": {
+              "description": "Old phrases of rules the redesign changed, which fail any step that holds one (record.lint.banned), kept as written."
+            }
+          },
+          "required": ["phrases", "pointers", "allow", "banned"],
+          "additionalProperties": false
+        },
+        "onefee": {
+          "description": "One fee per booking: the largest service fee (record.onefee; record.ledger_rules).",
+          "type": "boolean"
+        },
+        "live": {
+          "description": "What is live: the switches and facts in use, the booking values cut, and the names merged into others (record.live).",
+          "type": "object",
+          "properties": {
+            "switches": {
+              "description": "The live switches (record.live.switches).",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/name"
+              }
+            },
+            "facts": {
+              "description": "The live facts (record.live.facts).",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/name"
+              }
+            },
+            "off": {
+              "description": "Booking values cut, by group (record.live.off: reach notsafe, times noperson and line, approval expert).",
+              "type": "object",
+              "propertyNames": {
+                "$ref": "#/$defs/name"
+              },
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/name"
+                }
+              }
+            },
+            "merged": {
+              "description": "Names merged into others: facts to the fact that replaced them, switches to what replaced them, in words (record.live.merged).",
+              "type": "object",
+              "properties": {
+                "facts": {
+                  "description": "record.live.merged.facts.",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "switches": {
+                  "description": "record.live.merged.switches.",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": ["facts", "switches"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["switches", "facts", "off", "merged"],
+          "additionalProperties": false
+        },
+        "ledger_rules": {
+          "description": "The ledger rules, in words (record.ledger_rules).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "main",
+        "ways",
+        "homes",
+        "slots",
+        "services",
+        "fixtures",
+        "lint",
+        "onefee",
+        "live",
+        "ledger_rules"
+      ],
+      "additionalProperties": false
+    },
+    "masterMoney": {
+      "title": "MasterMoney",
+      "description": "A flow's money block: the choices, the after list, the valid paths, one example per path and the ways (the flow file's money; SPEC-master 5 and its D66 amendments: 28 paths per flow, free ones included).",
+      "type": "object",
+      "properties": {
+        "dims": {
+          "description": "Each money question's choices with their labels (money.dims: price, before, after).",
+          "type": "object",
+          "properties": {
+            "price": {
+              "$ref": "#/$defs/dimChoices"
+            },
+            "before": {
+              "$ref": "#/$defs/dimChoices"
+            },
+            "after": {
+              "$ref": "#/$defs/dimChoices"
+            }
+          },
+          "required": ["price", "before", "after"],
+          "additionalProperties": false
+        },
+        "after": {
+          "description": "The after choices this flow has (money.after: counter in A, own in B).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/after"
+          }
+        },
+        "combos": {
+          "description": "The flow's valid money paths (money.combos; lib.js validCombo).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/combo"
+          }
+        },
+        "examples": {
+          "description": "One plain line per path, the page's caption (money.examples). Illustrations (MC C6).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/combo"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "ways": {
+          "description": "The before choices in use and whether a rest is charged later (money.ways; SPEC-master D66 amendments: { \"before\": [\"none\", \"card\", \"deposit\", \"full\"], \"restLater\": false }).",
+          "type": "object",
+          "properties": {
+            "before": {
+              "description": "The before choices in use (money.ways.before; SPEC-master D66 #3).",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/before"
+              }
+            },
+            "restLater": {
+              "description": "Whether a rest is charged later on its own: false on the D66 master (money.ways.restLater; SPEC-master D66 #7).",
+              "type": "boolean"
+            }
+          },
+          "required": ["before", "restLater"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["dims", "after", "combos", "examples", "ways"],
+      "additionalProperties": false
+    },
+    "dimChoices": {
+      "title": "DimChoices",
+      "description": "One money question's choices: each value k and its label (the flow file's money.dims.<dim>).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "k": {
+            "description": "The choice's value (money.dims.<dim>[].k).",
+            "$ref": "#/$defs/name"
+          },
+          "label": {
+            "description": "Its label (money.dims.<dim>[].label).",
+            "type": "string"
+          }
+        },
+        "required": ["k", "label"],
+        "additionalProperties": false
+      }
+    },
+    "catalogEntry": {
+      "title": "CatalogEntry",
+      "description": "A switch or fact with its label and meaning (overlay-core.js SWITCHES and FACT_LIST; the flow file's header 'switches' and 'facts'; SPEC-master 5b, 5d).",
+      "type": "object",
+      "properties": {
+        "label": {
+          "description": "Its label (SPEC-master 5b: 'a label and what it means').",
+          "type": "string"
+        },
+        "means": {
+          "description": "What it means (SPEC-master 5b).",
+          "type": "string"
+        }
+      },
+      "required": ["label", "means"],
+      "additionalProperties": false
+    },
+    "layerLine": {
+      "title": "LayerLine",
+      "description": "A layer line added to Rosie's messages to the people named, when its booking values hold: private, privatecall, textsonly, emailonly (the flow file's layerLines; SPEC-master 5e, the layer lines paragraph, and the FIX7 amendments: contactchanged is gone).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The line's id (layerLines[].id).",
+          "type": "string",
+          "enum": ["private", "privatecall", "textsonly", "emailonly"]
+        },
+        "when": {
+          "description": "The booking values that turn it on (layerLines[].when).",
+          "$ref": "#/$defs/gate"
+        },
+        "to": {
+          "description": "Whose messages get it (layerLines[].to; lib.js stampFlow line 906: owner and staff when left out).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lane"
+          }
+        },
+        "line": {
+          "description": "The line, with <way> where the reach's words go (layerLines[].line).",
+          "type": "string"
+        },
+        "way": {
+          "description": "The words for <way>, by reach value (layerLines[].way).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "sections": {
+          "description": "The sections it applies in (layerLines[].sections).",
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 13
+          }
+        },
+        "more": {
+          "description": "true: it also goes on the step's more lines (layerLines[].more).",
+          "type": "boolean"
+        }
+      },
+      "required": ["id", "when", "line"],
+      "additionalProperties": false
+    },
+    "section": {
+      "title": "Section",
+      "description": "One of the 13 sections of a flow, with its main path (SPEC-master 1: 'the whole journey in the 13 sections of design/LINES.md, in order'; 4: 'Steps in a section are the main path, left to right').",
+      "type": "object",
+      "properties": {
+        "n": {
+          "description": "The section number (the flow file's 'sec').",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 13
+        },
+        "title": {
+          "description": "The section's title, such as '4. Booking' (the flow file's 'phase').",
+          "type": "string"
+        },
+        "steps": {
+          "description": "Its main-path steps in order, by id (SPEC-master 4).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepId"
+          }
+        }
+      },
+      "required": ["n", "title", "steps"],
+      "additionalProperties": false
+    },
+    "anytimeRow": {
+      "title": "AnytimeRow",
+      "description": "One row of the any-time table: a situation that can arise in any journey, with its handler step in this flow (arch 01 line 75; arch 03 lines 169 to 177).",
+      "type": "object",
+      "properties": {
+        "row": {
+          "description": "The row, one of the 21 arch 03 line 171 names: danger or crisis; threat; child, elder or unsafe at home; problem getting worse; death; STOP; wrong party or language; third party or privacy; contact change; payment problem; complaint or dispute; damage; owner command; cancel; move; running late; business can't make it; scope change or new request; question or unclear reply; platform or AI failure; due items.",
+          "type": "string",
+          "enum": [
+            "danger-or-crisis",
+            "threat",
+            "child-elder-or-unsafe-at-home",
+            "problem-getting-worse",
+            "death",
+            "stop",
+            "wrong-party-or-language",
+            "third-party-or-privacy",
+            "contact-change",
+            "payment-problem",
+            "complaint-or-dispute",
+            "damage",
+            "owner-command",
+            "cancel",
+            "move",
+            "running-late",
+            "business-cant-make-it",
+            "scope-change-or-new-request",
+            "question-or-unclear-reply",
+            "platform-or-ai-failure",
+            "due-items"
+          ]
+        },
+        "order": {
+          "description": "Its place in the order rows run within one turn, 1 first: danger, crisis, threat, child or elder, problem getting worse, death; STOP, wrong party; third party or privacy, contact change; payment, complaint, damage; owner command; the rest, safest first (arch 03 line 173; S13-23 rules 1 and 2).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 21
+        },
+        "safetyReadOnly": {
+          "description": "true for the three rows the safety read alone sets: danger or crisis, threat, and child, elder or unsafe at home (arch 03 line 173).",
+          "type": "boolean"
+        },
+        "handler": {
+          "description": "The row's handler step in this flow, derived from the master (Q-40 default, starting from BP M3b's steps: A3-22 to A3-26, A3-48 to A3-50, B3-17; A7-11, B7-15, A7-98, B7-88, S2-08; S12-09 to S12-12). null: no clear step; the row goes to Jay (Q-40).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/stepId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flags": {
+          "description": "The record flags the row's effects set (arch 03 line 175: deceased, stopped, private, paused).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect/properties/flag"
+          }
+        }
+      },
+      "required": ["row", "order", "safetyReadOnly", "handler", "flags"],
+      "additionalProperties": false
+    },
+    "judgmentRule": {
+      "title": "JudgmentRule",
+      "description": "One of the 67 numbered judgment rules (MC R6: 1 to 59 in steps S13-23 to S13-29, 60 to 65 in S13-53, 66 and 67 in S13-54; DECISIONS.md D2). A 'judgment rule N' outside 1 to 67, or that does not resolve, is refused (02-contracts K-01).",
+      "type": "object",
+      "properties": {
+        "number": {
+          "description": "The rule's number (MC R6).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 67
+        },
+        "text": {
+          "description": "The rule's text, word for word from its step (MC R6).",
+          "type": "string"
+        },
+        "step": {
+          "description": "The step it comes from: S13-23 to S13-29, S13-53 or S13-54 (MC R6).",
+          "type": "string",
+          "pattern": "^S13-(2[3-9]|5[34])$"
+        }
+      },
+      "required": ["number", "text", "step"],
+      "additionalProperties": false
+    },
+    "routingTables": {
+      "title": "RoutingTables",
+      "description": "The routing tables of one flow: hubs and doors, the any-time table, the always-on rules as the cached prefix, the homes and the judgment rules (02-contracts K-01 'Routing tables' and 'The judgment rules'; arch 03 lines 157 to 177).",
+      "type": "object",
+      "properties": {
+        "hubs": {
+          "description": "The hub step by the target booking's stage (arch 03 line 163: entry A3-51 (B3-40); booked A7-02 (B7-05); checked in A8-32 (B8-22); done A10-06 (B10-07); owner S11-12, settings S11-53; team S11-42). Journeys 4 to 6 and 9 have no hub.",
+          "type": "object",
+          "properties": {
+            "entry": {
+              "description": "arch 03 line 163, entry.",
+              "$ref": "#/$defs/stepId"
+            },
+            "booked": {
+              "description": "arch 03 line 163, booked.",
+              "$ref": "#/$defs/stepId"
+            },
+            "checkedIn": {
+              "description": "arch 03 line 163, checked in.",
+              "$ref": "#/$defs/stepId"
+            },
+            "done": {
+              "description": "arch 03 line 163, done.",
+              "$ref": "#/$defs/stepId"
+            },
+            "owner": {
+              "description": "arch 03 line 163, owner.",
+              "$ref": "#/$defs/stepId"
+            },
+            "settings": {
+              "description": "arch 03 line 163, settings.",
+              "$ref": "#/$defs/stepId"
+            },
+            "team": {
+              "description": "arch 03 line 163, team.",
+              "$ref": "#/$defs/stepId"
+            }
+          },
+          "required": ["entry", "booked", "checkedIn", "done", "owner", "settings", "team"],
+          "additionalProperties": false
+        },
+        "doors": {
+          "description": "The entry step for something new (arch 03 line 165: a new booking or a question about the business A3-51 (B3-40); a booking already made A3-43 (B3-35) after a code check; an owner command S11-12; a team change S11-42; an unclear owner text or HELP S11-21).",
+          "type": "object",
+          "properties": {
+            "newBooking": {
+              "description": "arch 03 line 165, a new booking or a question about the business.",
+              "$ref": "#/$defs/stepId"
+            },
+            "existingBooking": {
+              "description": "arch 03 line 165, a booking already made, after a code check.",
+              "$ref": "#/$defs/stepId"
+            },
+            "ownerCommand": {
+              "description": "arch 03 line 165, an owner command.",
+              "$ref": "#/$defs/stepId"
+            },
+            "teamChange": {
+              "description": "arch 03 line 165, a team change.",
+              "$ref": "#/$defs/stepId"
+            },
+            "unclearOwnerOrHelp": {
+              "description": "arch 03 line 165, an unclear owner text or HELP.",
+              "$ref": "#/$defs/stepId"
+            }
+          },
+          "required": ["newBooking", "existingBooking", "ownerCommand", "teamChange", "unclearOwnerOrHelp"],
+          "additionalProperties": false
+        },
+        "anytime": {
+          "description": "The 21 any-time rows, each once (arch 01 line 75; arch 03 line 171).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/anytimeRow"
+          },
+          "minItems": 21,
+          "maxItems": 21
+        },
+        "alwaysOn": {
+          "description": "The always-on rules, given to the model as the cached prefix (arch 03 line 181: 'the 50 rules as a cached prefix (80,000 characters, about 20,000 tokens)'; arch 10 line 536: prompt caching covers the rules).",
+          "type": "object",
+          "properties": {
+            "steps": {
+              "description": "The rule steps (kind rule, section 13), in order (arch 03 line 153: '717 steps + 50 rules').",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/stepId"
+              }
+            },
+            "prefixText": {
+              "description": "The prefix text the model is given, built from those steps (arch 03 line 181).",
+              "type": "string"
+            },
+            "prefixSha256": {
+              "description": "The sha256 of prefixText's UTF-8 bytes, so a cached prefix is matched to its bundle (arch 03 line 181; Q-36's hash).",
+              "$ref": "#/$defs/sha256"
+            }
+          },
+          "required": ["steps", "prefixText", "prefixSha256"],
+          "additionalProperties": false
+        },
+        "homes": {
+          "$ref": "#/$defs/homes"
+        },
+        "judgmentRules": {
+          "description": "The 67 judgment rules by number, each once (MC R6; contract test: rules 1 to 67 once each).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/judgmentRule"
+          },
+          "minItems": 67,
+          "maxItems": 67
+        }
+      },
+      "required": ["hubs", "doors", "anytime", "alwaysOn", "homes", "judgmentRules"],
+      "additionalProperties": false
+    },
+    "flowGraph": {
+      "title": "FlowGraph",
+      "description": "One KV value: the master graph of one flow, compiled from engine/work/master/master-<flow>.json with Master Corrections applied (02-contracts K-01 'The master graph, per flow'; MC 1, 3; arch 12 line 592). Stored under kvKey .../flow/<flow> (arch 10 line 536).",
+      "type": "object",
+      "properties": {
+        "contract": {
+          "description": "This contract and version (ADR-005; contracts/README.md convention 1).",
+          "type": "string",
+          "const": "bundle.v1"
+        },
+        "flow": {
+          "description": "The flow (SPEC-master 1).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "sections": {
+          "description": "The 13 sections in order, with their main paths (SPEC-master 1 and 4).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/section"
+          },
+          "minItems": 13,
+          "maxItems": 13
+        },
+        "steps": {
+          "description": "Every step of the flow, branch steps included, by id (SPEC-master 4: 'Branch steps get ids too').",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/stepId"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/step"
+          }
+        },
+        "tookAt": {
+          "description": "The money step from which what the booking took is read (the flow file's 'took': A5-04 in flow A; lib.js stampFlow line 893).",
+          "$ref": "#/$defs/stepId"
+        },
+        "money": {
+          "$ref": "#/$defs/masterMoney"
+        },
+        "amounts": {
+          "description": "The flow's example amount table (the flow file's 'amounts'; SPEC-master 5h). Illustrations (MC C6).",
+          "$ref": "#/$defs/amountTable"
+        },
+        "switches": {
+          "description": "Every switch a trade may turn on, by name: overlay-core.js SWITCHES with the flow file's header switches, such as verify, which stays off (SPEC-master 5b; MC C4).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/catalogEntry"
+          }
+        },
+        "facts": {
+          "description": "Every fact a trade may list, by name: overlay-core.js FACT_LIST with the flow file's header facts (SPEC-master 5d).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/catalogEntry"
+          }
+        },
+        "layerLines": {
+          "description": "The flow's layer lines (the flow file's layerLines).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/layerLine"
+          }
+        },
+        "record": {
+          "$ref": "#/$defs/record"
+        },
+        "routing": {
+          "$ref": "#/$defs/routingTables"
+        }
+      },
+      "required": [
+        "contract",
+        "flow",
+        "sections",
+        "steps",
+        "tookAt",
+        "money",
+        "amounts",
+        "switches",
+        "facts",
+        "layerLines",
+        "record",
+        "routing"
+      ],
+      "additionalProperties": false
+    },
+    "pluginText": {
+      "title": "PluginText",
+      "description": "The 11 free-text pf keys, each stored whole as one text block for the AI, its sub-keys guidance only (MC R3; Q-39 default; FRONTEND-SPEC.md line 565). The text is the trade file's value written as JSON text, unchanged (T-008 default).",
+      "type": "object",
+      "properties": {
+        "pf.license": {
+          "description": "plugin['pf.license'] (SPEC-prof 3). Text that says Rosie checks a paper is the business's own word (MC C7).",
+          "type": "string"
+        },
+        "pf.services": {
+          "description": "plugin['pf.services'] (SPEC-prof 3).",
+          "type": "string"
+        },
+        "pf.questions": {
+          "description": "plugin['pf.questions'] (SPEC-prof 3).",
+          "type": "string"
+        },
+        "pf.safety": {
+          "description": "plugin['pf.safety'] (SPEC-prof 3).",
+          "type": "string"
+        },
+        "pf.first_steps": {
+          "description": "plugin['pf.first_steps'] (SPEC-prof 3).",
+          "type": "string"
+        },
+        "pf.visit": {
+          "description": "plugin['pf.visit'] (SPEC-prof 3).",
+          "type": "string"
+        },
+        "pf.money": {
+          "description": "plugin['pf.money'] (SPEC-prof 3).",
+          "type": "string"
+        },
+        "pf.messages": {
+          "description": "plugin['pf.messages'] (SPEC-prof 3).",
+          "type": "string"
+        },
+        "pf.staff": {
+          "description": "plugin['pf.staff'] (SPEC-prof 3). Text that says Rosie checks a license is the business's own word (MC C7).",
+          "type": "string"
+        },
+        "pf.rules": {
+          "description": "plugin['pf.rules'] (SPEC-prof 3).",
+          "type": "string"
+        },
+        "pf.edges": {
+          "description": "plugin['pf.edges'] (SPEC-prof 3).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "pf.license",
+        "pf.services",
+        "pf.questions",
+        "pf.safety",
+        "pf.first_steps",
+        "pf.visit",
+        "pf.money",
+        "pf.messages",
+        "pf.staff",
+        "pf.rules",
+        "pf.edges"
+      ],
+      "additionalProperties": false
+    },
+    "tradeSettings": {
+      "title": "TradeSettings",
+      "description": "A trade's sign-up settings for one flow, typed (SPEC-prof 3 'Sign-up settings'; MC R3: code reads pf.settings by name; MC C5: a trade with none starts with arrive window and an empty free-cancel time, which the owner confirms at sign-up).",
+      "type": "object",
+      "properties": {
+        "arrive": {
+          "description": "window (the default), setstart, or { window: hours } (SPEC-prof 3; SPEC-master 5h {{arrive}}).",
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["window", "setstart"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "window": {
+                  "description": "The window's length in hours (SPEC-prof 3: { \"window\": 3 }).",
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": ["window"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "cutoff": {
+          "description": "The free-cancel time, such as '24 hours before' or '7am the day of', or null when empty (SPEC-prof 3; SPEC-master 5h {{cutoff}}; MC C5).",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["arrive", "cutoff"],
+      "additionalProperties": false
+    },
+    "tradeMoney": {
+      "title": "TradeMoney",
+      "description": "A trade's money for one flow: its main path, the paths it uses with an example each, its amounts, services, booking values and labels (SPEC-prof 3 'money'; the trade file's money.<flow>; overlay-core.js apply() lines 1808 to 1814).",
+      "type": "object",
+      "properties": {
+        "main": {
+          "description": "The main path (money.<flow>.main).",
+          "$ref": "#/$defs/combo"
+        },
+        "combos": {
+          "description": "The paths the trade really uses (money.<flow>.combos; SPEC-prof D66 amendment: only the master's 28).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/combo"
+          }
+        },
+        "examples": {
+          "description": "One plain line per path (money.<flow>.examples). Illustrations (MC C6).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/combo"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "amounts": {
+          "description": "The trade's own amount rows, which replace the master's example rows for this flow (money.<flow>.amounts; overlay-core.js line 1810). Illustrations (MC C6).",
+          "$ref": "#/$defs/amountTable"
+        },
+        "services": {
+          "description": "The trade's own services, joined to the record's (money.<flow>.services; overlay-core.js line 1802).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/serviceId"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/service"
+          }
+        },
+        "booking": {
+          "description": "The booking values the trade uses, by group; a group left out offers every value (money.<flow>.booking; SPEC-master 5e; SPEC-prof 3 'Booking choices').",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/name"
+            }
+          }
+        },
+        "labels": {
+          "description": "The trade's own labels for money choices, by question and value (money.<flow>.labels; overlay-core.js line 1808).",
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "enum": ["price", "before", "after"]
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": ["main", "combos", "examples"],
+      "additionalProperties": false
+    },
+    "overlayOp": {
+      "title": "OverlayOp",
+      "description": "One overlay op, in the trade file's order (SPEC-prof 3 'ops'; overlay-core.js apply() lines 1815 to 1856). Compiled: added steps are compiled steps; fields overlay-core ignores are left out; C8's void offs are dropped (MC C8: offs of S1-32, S2-22, S11-48, S11-57 citing D96 in 12 trades, and of S11-50, S13-11, S13-15, S2-11 in the trades it names); every other off stays.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "off: a master step, or one branch by its label, this trade never uses (SPEC-prof 3; overlay-core.js line 1848).",
+              "type": "string",
+              "const": "off"
+            },
+            "at": {
+              "description": "The master step (SPEC-prof 3 'at').",
+              "$ref": "#/$defs/stepId"
+            },
+            "label": {
+              "description": "The branch label, matched exactly (SPEC-prof 3; SPEC-master 5d).",
+              "type": "string"
+            },
+            "why": {
+              "description": "Why (SPEC-prof 3: 'say why'; overlay-core.js line 1849).",
+              "type": "string"
+            }
+          },
+          "required": ["op", "at", "why"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "words: the trade's own words for a master step, field by field (SPEC-prof 3; overlay-core.js line 1822).",
+              "type": "string",
+              "const": "words"
+            },
+            "at": {
+              "$ref": "#/$defs/stepId"
+            },
+            "does": {
+              "$ref": "#/$defs/wordsPatch/properties/does"
+            },
+            "more": {
+              "$ref": "#/$defs/wordsPatch/properties/more"
+            },
+            "say": {
+              "$ref": "#/$defs/wordsPatch/properties/say"
+            },
+            "rule": {
+              "$ref": "#/$defs/wordsPatch/properties/rule"
+            },
+            "t": {
+              "$ref": "#/$defs/wordsPatch/properties/t"
+            },
+            "form": {
+              "$ref": "#/$defs/wordsPatch/properties/form"
+            },
+            "table": {
+              "$ref": "#/$defs/wordsPatch/properties/table"
+            },
+            "title": {
+              "description": "A new title (SPEC-prof 3: a words op may set the title, since Oct 25).",
+              "type": "string"
+            },
+            "who": {
+              "description": "A new who (SPEC-prof 3).",
+              "$ref": "#/$defs/lane"
+            },
+            "to": {
+              "description": "A new to (SPEC-prof 3).",
+              "$ref": "#/$defs/lane"
+            },
+            "vary": {
+              "description": "The trade's words for some paths, merged field by field into the master's variant of the same key (SPEC-prof 3; overlay-core.js line 1825).",
+              "$ref": "#/$defs/vary"
+            }
+          },
+          "required": ["op", "at"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "more: extra detail lines, added to the base and every variant that sets more (SPEC-prof 3; overlay-core.js line 1827).",
+              "type": "string",
+              "const": "more"
+            },
+            "at": {
+              "$ref": "#/$defs/stepId"
+            },
+            "more": {
+              "description": "The lines added (SPEC-prof 3: { \"op\": \"more\", \"at\": \"A8-03\", \"more\": [\"...\"] }).",
+              "$ref": "#/$defs/stringList"
+            }
+          },
+          "required": ["op", "at", "more"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "after or before: the trade's own steps, inserted after or before a master step (SPEC-prof 3; overlay-core.js line 1831).",
+              "type": "string",
+              "enum": ["after", "before"]
+            },
+            "at": {
+              "$ref": "#/$defs/stepId"
+            },
+            "first": {
+              "description": "The first inserted main-path step; the rest follow by next, and the last one's next is the step that followed in the master (overlay-core.js line 1838).",
+              "$ref": "#/$defs/stepId"
+            },
+            "steps": {
+              "description": "Every step the op adds, branch steps included, compiled (SPEC-prof 3: 'Same step format as the master').",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/step"
+              },
+              "minItems": 1
+            }
+          },
+          "required": ["op", "at", "first", "steps"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "branch: a new branch on a master decision (SPEC-prof 3; overlay-core.js line 1841).",
+              "type": "string",
+              "const": "branch"
+            },
+            "at": {
+              "description": "The master split (overlay-core.js line 1842: it must be a decision).",
+              "$ref": "#/$defs/stepId"
+            },
+            "branch": {
+              "$ref": "#/$defs/branch"
+            },
+            "steps": {
+              "description": "The branch's steps, compiled (overlay-core.js line 1844).",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/step"
+              }
+            }
+          },
+          "required": ["op", "at", "branch", "steps"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "tradeFlow": {
+      "title": "TradeFlow",
+      "description": "What one trade changes in one flow (SPEC-prof 3; 02-contracts K-01 'One compiled overlay per trade').",
+      "type": "object",
+      "properties": {
+        "switches": {
+          "description": "The switches on in this flow, resolved from pf.switches (a per-flow value { A, B } split per flow), with no2 derived from the trade's choice at the $2 split S1-62 (SPEC-master 5j; SPEC-prof 3 'No $2'; MC R3). Every switch left out is off (SPEC-master 5b).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "settings": {
+          "$ref": "#/$defs/tradeSettings"
+        },
+        "money": {
+          "$ref": "#/$defs/tradeMoney"
+        },
+        "rename": {
+          "description": "The trade's rename pairs for this flow, in order, longer phrases first (SPEC-prof 3 'rename'; overlay-core.js line 1800). Their right sides are illustrations (MC C6).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pair"
+          }
+        },
+        "slotRows": {
+          "description": "The trade's own record slot rows for this flow, laid before the master's, slot by slot (the trade file's slots.<flow>; overlay-core.js profRecord line 1867). Empty when it has none.",
+          "$ref": "#/$defs/slotRows"
+        },
+        "ops": {
+          "description": "The trade's ops for this flow, in order (SPEC-prof 3 'ops').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/overlayOp"
+          }
+        }
+      },
+      "required": ["switches", "settings", "money", "rename", "slotRows", "ops"],
+      "additionalProperties": false
+    },
+    "tradeOverlay": {
+      "title": "TradeOverlay",
+      "description": "One KV value: one trade's compiled overlay (Q-34 default; 02-contracts K-01: facts, switches and settings as typed values with C5's fills, the 11 free-text pf blocks stored whole, money per flow, steps and branches turned off with C8's void list applied, words per path, added steps and branches, renames, and the trade's own slot rows; SPEC-prof 3 and 8; overlay-core.js apply(), lines 1794 to 1866). Authoring fields are left out (MC R2: notes, basis, keep, from, splitsKept, keep_why), as are the sample cast, names and story (MC C6). Stored under kvKey .../trade/<id> (arch 10 line 536).",
+      "type": "object",
+      "properties": {
+        "contract": {
+          "description": "This contract and version (ADR-005).",
+          "type": "string",
+          "const": "bundle.v1"
+        },
+        "trade": {
+          "description": "Who the trade is (SPEC-prof 3: id, name, style, pattern).",
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/tradeId"
+            },
+            "name": {
+              "description": "Its name, such as Barber (SPEC-prof 3 'name').",
+              "type": "string"
+            },
+            "style": {
+              "description": "Its style, such as Chair (SPEC-prof 3 'style').",
+              "type": "string"
+            },
+            "pattern": {
+              "description": "Its booking pattern (SPEC-prof 2 item 5 and 8).",
+              "type": "string",
+              "enum": [
+                "fix",
+                "urgent",
+                "project",
+                "service",
+                "dropoff",
+                "chair",
+                "clinic",
+                "class",
+                "event",
+                "consult",
+                "table"
+              ]
+            }
+          },
+          "required": ["id", "name", "style", "pattern"],
+          "additionalProperties": false
+        },
+        "facts": {
+          "description": "The facts the trade lists, or null when it lists none (SPEC-prof 3 'Plug-in facts'; MC R3). C5's fill applies: insurance lists video, forms, firststeps and documents.",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/name"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pluginText": {
+          "$ref": "#/$defs/pluginText"
+        },
+        "flows": {
+          "description": "What the trade changes in each flow; every trade writes both (SPEC-prof 1: 'Write BOTH flows in full').",
+          "type": "object",
+          "properties": {
+            "A": {
+              "$ref": "#/$defs/tradeFlow"
+            },
+            "B": {
+              "$ref": "#/$defs/tradeFlow"
+            }
+          },
+          "required": ["A", "B"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["contract", "trade", "facts", "pluginText", "flows"],
+      "additionalProperties": false
+    },
+    "kvKey": {
+      "title": "KvKey",
+      "description": "A KV key of one bundle value: bundle/<hash>/<build>/manifest, bundle/<hash>/<build>/flow/<A or B> or bundle/<hash>/<build>/trade/<trade id> (02-contracts K-01 'Storage: the KV keys per bundle id (manifest, flow graphs, trade overlays)'; T-008 default spelling). At most 512 bytes, Cloudflare KV's key size limit (developers.cloudflare.com/kv/platform/limits, read 2026-11-07).",
+      "type": "string",
+      "pattern": "^bundle/[0-9a-f]{64}/[1-9][0-9]*/(manifest|flow/[AB]|trade/[a-z0-9][a-z0-9-]*)$",
+      "maxLength": 512
+    },
+    "storedValue": {
+      "title": "StoredValue",
+      "description": "One KV value of the bundle besides the manifest: its key, what it holds, its size and its hash. The same bytes are also written under the same key to K-04's bundle copy in PostgreSQL, which the actor reads on a KV miss (arch 10 line 536; 02-contracts K-01 'Storage').",
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/kvKey"
+        },
+        "kind": {
+          "description": "flow: a flowGraph; trade: a tradeOverlay (02-contracts K-01 'Storage').",
+          "type": "string",
+          "enum": ["flow", "trade"]
+        },
+        "flow": {
+          "description": "For kind flow: which flow (02-contracts K-01).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "trade": {
+          "description": "For kind trade: which trade (02-contracts K-01).",
+          "$ref": "#/$defs/tradeId"
+        },
+        "bytes": {
+          "description": "The value's size in bytes, as stored (UTF-8 JSON). At most 25 MiB (26,214,400 bytes), Cloudflare KV's value size limit on the Free and Paid plans (developers.cloudflare.com/kv/platform/limits, read 2026-11-07; Q-34's spike, contracts/bundle/README.md).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 26214400
+        },
+        "sha256": {
+          "description": "The sha256 of the value's stored bytes (Q-36's hash; the bundle id's hash is built from these).",
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": ["key", "kind", "bytes", "sha256"],
+      "additionalProperties": false
+    },
+    "inputFile": {
+      "title": "InputFile",
+      "description": "One input of the build, with its hash (02-contracts K-01 'the hashes of every input (master-A.json, master-B.json, the 243 trade files, the Master Corrections version, engine/design/LINES.md, the overlays Jay approved, and fixture set v1's manifest, Q-36)').",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "masterFlow: master-A.json or master-B.json; trade: a trade file; masterCorrections: '3 Master Corrections.md'; lines: engine/design/LINES.md; approvedOverlay: an overlay Jay approved (arch 12 line 592: 'fixes go in an overlay Jay approves'); fixtureSetManifest: fixtures/v1/MANIFEST.sha256 (Q-36); referenceCode: overlay-core.js, lib.js or msgtext.js, the functions parity runs against (MC 1; Q-35).",
+          "type": "string",
+          "enum": [
+            "masterFlow",
+            "trade",
+            "masterCorrections",
+            "lines",
+            "approvedOverlay",
+            "fixtureSetManifest",
+            "referenceCode"
+          ]
+        },
+        "path": {
+          "description": "Its path: the master's own path for a master file, such as engine/work/master/master-A.json (MC 1, the path rule), or the repository path, such as fixtures/v1/MANIFEST.sha256 (Q-36).",
+          "type": "string",
+          "pattern": "."
+        },
+        "sha256": {
+          "description": "The sha256 of its bytes (Q-36).",
+          "$ref": "#/$defs/sha256"
+        },
+        "trade": {
+          "description": "For kind trade: the trade id (MC 1).",
+          "$ref": "#/$defs/tradeId"
+        },
+        "version": {
+          "description": "For kind masterCorrections or approvedOverlay: its version or approval date as written (02-contracts K-01 'the Master Corrections version').",
+          "type": "string"
+        }
+      },
+      "required": ["kind", "path", "sha256"],
+      "additionalProperties": false
+    },
+    "prompt": {
+      "title": "Prompt",
+      "description": "One prompt a turn runs on, shipped inside the bundle (arch 01 line 87; K-03: 'The prompt texts themselves are the AI engineer's (C-119) and ship inside the bundle').",
+      "type": "object",
+      "properties": {
+        "version": {
+          "description": "The prompt's own version, as its owner names it (C-119; 02-contracts K-01 'the prompts').",
+          "type": "string",
+          "pattern": "."
+        },
+        "sha256": {
+          "description": "The sha256 of text's UTF-8 bytes (Q-36's hash).",
+          "$ref": "#/$defs/sha256"
+        },
+        "text": {
+          "description": "The prompt text (arch 01 line 87).",
+          "type": "string"
+        }
+      },
+      "required": ["version", "sha256", "text"],
+      "additionalProperties": false
+    },
+    "modelRole": {
+      "title": "ModelRole",
+      "description": "Which of the bundle's two models: haiku or sonnet (arch 11 line 564; arch 02 line 119).",
+      "type": "string",
+      "enum": ["haiku", "sonnet"]
+    },
+    "readPair": {
+      "title": "ReadPair",
+      "description": "The two reads that must agree on a turn: the first and the checking read (arch 02 line 119: 'Haiku twice with the choices shuffled, or, on high stakes, Sonnet with Haiku checking').",
+      "type": "object",
+      "properties": {
+        "first": {
+          "description": "The model that reads first (arch 02 line 119; Q-26).",
+          "$ref": "#/$defs/modelRole"
+        },
+        "second": {
+          "description": "The model that checks (arch 02 line 119).",
+          "$ref": "#/$defs/modelRole"
+        }
+      },
+      "required": ["first", "second"],
+      "additionalProperties": false
+    },
+    "lintRule": {
+      "title": "LintRule",
+      "description": "A lint rule the compiler runs (arch 12 line 592: a question without a safe default or a clock, a choice without a definition, a lookup without the field it reads, a walk that can loop, a button whose whole text is a guard keyword; K-03's slot list: an unknown slot; MC R6: a judgment rule outside 1 to 67; the record's own lint tables). What the lookup and loop rules test: Q-39's default.",
+      "type": "string",
+      "enum": [
+        "no-safe-default-or-clock",
+        "choice-without-definition",
+        "lookup-without-field",
+        "loop",
+        "guard-keyword-button",
+        "unknown-slot",
+        "judgment-rule-out-of-range",
+        "record-lint"
+      ]
+    },
+    "lintFailure": {
+      "title": "LintFailure",
+      "description": "One step that fails a lint rule (arch 12 line 592: 'The lint fails a step when ...').",
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/$defs/lintRule"
+        },
+        "flow": {
+          "$ref": "#/$defs/flowLetter"
+        },
+        "step": {
+          "$ref": "#/$defs/stepId"
+        },
+        "trade": {
+          "description": "The trade whose overlay fails, or null for the master itself (02-contracts K-01; arch 03 line 155: trade settings change 10 to 20% of a flow).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/tradeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch": {
+          "description": "The branch label, when one branch fails (SPEC-master 4).",
+          "type": "string"
+        },
+        "message": {
+          "description": "What fails, in plain words (arch 12 line 592).",
+          "type": "string"
+        }
+      },
+      "required": ["rule", "flow", "step", "trade", "message"],
+      "additionalProperties": false
+    },
+    "journeyGate": {
+      "title": "JourneyGate",
+      "description": "Whether a journey may ship: 'A journey with a failing step does not ship; fixes go in an overlay Jay approves' (arch 12 line 592; Q-17).",
+      "type": "object",
+      "properties": {
+        "journey": {
+          "description": "The journey number, 1 to 12 (ops/plan/02-contracts.md sections 9 and 10: journeys 1 to 12).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "ships": {
+          "description": "true only when none of its steps fails the lint (arch 12 line 592; Q-17).",
+          "type": "boolean"
+        },
+        "failingSteps": {
+          "description": "Its failing steps, by id (arch 12 line 592).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepId"
+          }
+        }
+      },
+      "required": ["journey", "ships", "failingSteps"],
+      "additionalProperties": false
+    },
+    "manifest": {
+      "title": "Manifest",
+      "description": "One KV value: the bundle's manifest, read first at turn start once the actor has the active bundle id from K-04's bundle registry (arch 10 line 536; 02-contracts K-01 'The manifest'). Stored under kvKey .../manifest.",
+      "type": "object",
+      "properties": {
+        "contract": {
+          "description": "This contract and version (ADR-005).",
+          "type": "string",
+          "const": "bundle.v1"
+        },
+        "bundleId": {
+          "description": "The bundle id: a content hash plus a build number (CQ-09; arch 01 line 87; tour line 658: every published bundle stays readable for replay). The hash, as this contract spells it (T-008 default): the sha256, in lowercase hex, of the UTF-8 text made of one line '<sha256>  <key after bundle/<hash>/<build>/>' per stored value, sorted by that key part, each line ending in a newline, so equal content gives an equal hash. The build number counts publishes from 1 (C-072).",
+          "allOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/bundleId"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "hash": {
+                  "description": "The content hash as this contract spells it: 64 lowercase hex characters (CQ-09; T-008 default, above).",
+                  "$ref": "#/$defs/sha256"
+                },
+                "build": {
+                  "description": "The build number, counting publishes from 1 (CQ-09; C-072).",
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          ]
+        },
+        "builtAt": {
+          "description": "When it was built, in UTC (02-contracts K-01 'when it was built'; CQ-09).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "compiler": {
+          "description": "The compiler that built it (02-contracts K-01 'the compiler version'; C-058).",
+          "type": "object",
+          "properties": {
+            "version": {
+              "description": "The compiler's version (02-contracts K-01).",
+              "type": "string",
+              "pattern": "."
+            },
+            "commit": {
+              "description": "The git commit the compiler was built from, when known (02-contracts K-01 'the compiler version').",
+              "type": "string",
+              "pattern": "^[0-9a-f]{7,40}$"
+            }
+          },
+          "required": ["version"],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "description": "Every input with its hash (02-contracts K-01). That the list is complete (2 flows, 243 trades, Master Corrections, LINES.md, fixture set v1's manifest) is a contract-test check.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inputFile"
+          },
+          "minItems": 1
+        },
+        "prompts": {
+          "description": "The prompts one turn runs on: the safety read, decide, planner and composer (arch 01 line 87; 02-contracts K-01).",
+          "type": "object",
+          "properties": {
+            "safetyRead": {
+              "$ref": "#/$defs/prompt"
+            },
+            "decide": {
+              "$ref": "#/$defs/prompt"
+            },
+            "planner": {
+              "$ref": "#/$defs/prompt"
+            },
+            "composer": {
+              "$ref": "#/$defs/prompt"
+            }
+          },
+          "required": ["safetyRead", "decide", "planner", "composer"],
+          "additionalProperties": false
+        },
+        "models": {
+          "description": "The model ids one turn runs on (arch 01 line 87; arch 11 line 564: claude-haiku-5-5 and claude-sonnet-5-5).",
+          "type": "object",
+          "properties": {
+            "haiku": {
+              "description": "The Haiku model id (arch 11 line 564).",
+              "type": "string",
+              "pattern": "^claude-[a-z0-9-]+$"
+            },
+            "sonnet": {
+              "description": "The Sonnet model id (arch 11 line 564).",
+              "type": "string",
+              "pattern": "^claude-[a-z0-9-]+$"
+            }
+          },
+          "required": ["haiku", "sonnet"],
+          "additionalProperties": false
+        },
+        "policy": {
+          "description": "Routing by stakes: which models read on low and high stakes, and which one does the turn's one re-read (arch 01 line 79: stakes; arch 02 line 119; arch 10 line 520; Q-26 default: Sonnet first on high stakes).",
+          "type": "object",
+          "properties": {
+            "low": {
+              "description": "Low stakes: Haiku twice with the choices shuffled (arch 02 line 119).",
+              "$ref": "#/$defs/readPair"
+            },
+            "high": {
+              "description": "High stakes: Sonnet with Haiku checking (arch 02 line 119; Q-26).",
+              "$ref": "#/$defs/readPair"
+            },
+            "reread": {
+              "description": "The model of the one re-read per turn (arch 02 line 119: 'one Sonnet re-read per turn').",
+              "$ref": "#/$defs/modelRole"
+            }
+          },
+          "required": ["low", "high", "reread"],
+          "additionalProperties": false
+        },
+        "lint": {
+          "description": "The lint summary (02-contracts K-01 'the lint summary'; arch 12 line 592).",
+          "type": "object",
+          "properties": {
+            "rules": {
+              "description": "Each rule run, with its count of failing steps (arch 12 line 592).",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rule": {
+                    "$ref": "#/$defs/lintRule"
+                  },
+                  "failures": {
+                    "description": "How many steps fail it (arch 12 line 592).",
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": ["rule", "failures"],
+                "additionalProperties": false
+              }
+            },
+            "failures": {
+              "description": "Every failing step (arch 12 line 592).",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/lintFailure"
+              }
+            }
+          },
+          "required": ["rules", "failures"],
+          "additionalProperties": false
+        },
+        "journeys": {
+          "description": "Which journeys may ship (02-contracts K-01; arch 12 line 592; Q-17).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/journeyGate"
+          }
+        },
+        "storage": {
+          "description": "Where the bundle's values live (02-contracts K-01 'Storage'; arch 10 line 536). The active bundle id is not here: it sits in K-04's bundle registry, and the deploy publishes the bundle before it switches the active id (BP 5.4; C-020).",
+          "type": "object",
+          "properties": {
+            "manifestKey": {
+              "description": "This manifest's own KV key (02-contracts K-01 'Storage').",
+              "$ref": "#/$defs/kvKey"
+            },
+            "values": {
+              "description": "Every other value: one per flow and one per trade (Q-34 default; 02-contracts K-01 'Storage').",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/storedValue"
+              },
+              "minItems": 1
+            }
+          },
+          "required": ["manifestKey", "values"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract",
+        "bundleId",
+        "builtAt",
+        "compiler",
+        "inputs",
+        "prompts",
+        "models",
+        "policy",
+        "lint",
+        "journeys",
+        "storage"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
