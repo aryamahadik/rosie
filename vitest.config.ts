@@ -40,6 +40,10 @@ export default defineConfig({
             "fixtures/**/*.test.ts",
           ],
           exclude: ["**/node_modules/**", "**/*.worker.test.ts", "**/*.int.test.ts", PARITY_GLOB],
+          // A resource guard, not part of any test's claim (T-1073): CPU-heavy unit tests time out at Vitest's 5 s
+          // default when several builders run vitest at once on the build Mac.
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
         },
       },
       {
