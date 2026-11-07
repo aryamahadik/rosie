@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/scripts/test-sample/test-sample.v1.schema.json",
+  "title": "Test sample v1",
+  "description": "Not a contract: the sample the contract tools are proven on (T-006). A made-up price quote that uses the shared formats.",
+  "type": "object",
+  "properties": {
+    "quote": {
+      "description": "The quote's id (common formats: id).",
+      "$ref": "../../common/formats.v1.schema.json#/$defs/id"
+    },
+    "price": {
+      "description": "The quoted price (common formats: money).",
+      "$ref": "../../common/formats.v1.schema.json#/$defs/money"
+    },
+    "at": {
+      "description": "When the quote was given (common formats: time).",
+      "$ref": "../../common/formats.v1.schema.json#/$defs/time"
+    },
+    "kind": {
+      "description": "A closed list is an enum (02-contracts section 2 item 2).",
+      "enum": ["visit", "class"]
+    }
+  },
+  "required": ["quote", "price", "at", "kind"],
+  "additionalProperties": false
+}

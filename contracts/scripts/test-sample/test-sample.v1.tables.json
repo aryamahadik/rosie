@@ -1,0 +1,156 @@
+{
+  "part": "test-sample",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "sample_reservations",
+      "description": "Not a contract: a made-up table list that shows every field of tables.meta.schema.json (T-006).",
+      "source": "BP section 10, card T-041 (the example of a reservations table)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "null": false,
+          "default": "gen_random_uuid()",
+          "audience": "never",
+          "description": "The row's id.",
+          "source": "CQ-09 (other ids opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "uuid",
+          "null": false,
+          "audience": "never",
+          "description": "The business the row belongs to.",
+          "source": "architecture 10 line 546"
+        },
+        {
+          "name": "worker_id",
+          "type": "uuid",
+          "null": false,
+          "audience": "never",
+          "description": "The worker reserved.",
+          "source": "BP section 10, card T-041"
+        },
+        {
+          "name": "person_id",
+          "type": "uuid",
+          "null": false,
+          "audience": "never",
+          "description": "The person the reservation is for.",
+          "source": "BP section 10, card T-041"
+        },
+        {
+          "name": "during",
+          "type": "tstzrange",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "When the reservation holds.",
+          "source": "BP section 10, card T-041"
+        },
+        {
+          "name": "seats",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": ["staff", "owner"],
+          "description": "Seats taken.",
+          "source": "BP section 10, card T-041"
+        },
+        {
+          "name": "capacity",
+          "type": "integer",
+          "null": false,
+          "audience": ["owner"],
+          "description": "Seats the class holds.",
+          "source": "BP section 10, card T-041"
+        },
+        {
+          "name": "price_cents",
+          "type": "bigint",
+          "null": false,
+          "audience": ["customer", "owner"],
+          "writtenOnceAtBooking": true,
+          "description": "The price the booking was made with.",
+          "source": "RULES 3.7; CQ-09 (integer cents)"
+        },
+        {
+          "name": "note",
+          "type": "bytea",
+          "null": true,
+          "audience": "secure-page-only",
+          "sealedBy": "person_id",
+          "description": "A note sealed under the person's key.",
+          "source": "architecture 01 line 93"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "Raised by every update.",
+          "source": "architecture 01 line 85"
+        },
+        {
+          "name": "effective_from",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When this row took effect.",
+          "source": "architecture 09 line 488"
+        },
+        {
+          "name": "effective_to",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the next row replaced it.",
+          "source": "architecture 09 line 488"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "sample_reservations_business_fk",
+          "columns": ["business_id"],
+          "references": { "table": "businesses", "columns": ["id"] },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [{ "name": "sample_reservations_person_during_key", "columns": ["person_id", "during"] }],
+      "exclude": [
+        {
+          "name": "sample_reservations_no_overlap",
+          "using": "gist",
+          "elements": [
+            { "column": "worker_id", "operator": "=" },
+            { "column": "during", "operator": "&&" }
+          ],
+          "where": "effective_to is null",
+          "source": "BP section 10, card T-041 (two overlapping reservations for one worker are refused)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "sample_reservations_seats_within_capacity",
+          "expression": "seats <= capacity",
+          "source": "BP section 10, card T-041 (class seats never exceed capacity)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sample_reservations_business_idx",
+          "columns": ["business_id"],
+          "why": "Row-level security reads by business."
+        }
+      ],
+      "rowLevelSecurity": { "scope": "business", "column": "business_id" },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": true,
+      "effectiveColumns": ["effective_from", "effective_to"]
+    }
+  ]
+}

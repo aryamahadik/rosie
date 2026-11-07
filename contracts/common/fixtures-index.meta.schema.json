@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/common/fixtures-index.meta.schema.json",
+  "title": "Fixtures index",
+  "description": "The shape of every contracts/<name>/fixtures/index.json (02-contracts section 2 item 5): each sample payload, the version it was written for, whether its schema must accept or refuse it, what it shows and its source. `npm run contracts:check` checks each listed file; the frozen-contract guard (infra/ci/contract-freeze-guard.mjs) reads `file` and `version` to know which fixtures a frozen version owns.",
+  "type": "object",
+  "properties": {
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    }
+  },
+  "required": ["fixtures"],
+  "additionalProperties": false,
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "description": "The fixture's path inside fixtures/, for example money.ok.json or invalid/money.decimal.json. Unique in the index.",
+          "type": "string",
+          "pattern": "^(?!index[.]json$)(?!.*[.][.])[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*[.]json$"
+        },
+        "version": {
+          "description": "The contract version the fixture was written for: v1, v1.1, v2 (BP 6.4). A minor version adds fixtures and never edits an old one (item 5).",
+          "type": "string",
+          "pattern": "^v[0-9]+([.][0-9]+)?$"
+        },
+        "schema": {
+          "description": "The schema file in this contract's folder that checks it. Left out: <name>.<version>.schema.json, where <name> is the contract's folder.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+[.]v[0-9]+([.][0-9]+)?[.]schema[.]json$"
+        },
+        "def": {
+          "description": "The definition under the schema's $defs that checks it, for example money or book.request (item 2). Left out: the schema's root.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "table": {
+          "description": "Database parts only (item 3): the table a seed row belongs to. Such a row is checked by the part's contract test against a migrated database (item 12), not by contracts:check; it takes no schema or def.",
+          "type": "string",
+          "pattern": "^[a-z_][a-z0-9_]*$"
+        },
+        "expect": {
+          "description": "accept: the schema (or table) must take it. refuse: it must be refused, and `shows` says by which rule.",
+          "enum": ["accept", "refuse"]
+        },
+        "shows": {
+          "description": "What the fixture shows, in plain words.",
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "description": "The source line it comes from: a step id, an architecture line, a RULES section, an FS row or a decision (item 4).",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["file", "version", "expect", "shows", "source"],
+      "additionalProperties": false,
+      "not": {
+        "anyOf": [
+          {
+            "required": ["table", "schema"]
+          },
+          {
+            "required": ["table", "def"]
+          }
+        ]
+      }
+    }
+  }
+}

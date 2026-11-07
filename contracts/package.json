@@ -3,5 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "description": "Contracts (JSON Schema with fixtures, per version) and the TypeScript types generated from them.",
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "types": "node scripts/gen-types.mjs",
+    "check": "node scripts/check-fixtures.mjs && node --test \"scripts/*.test.mjs\""
+  }
 }
