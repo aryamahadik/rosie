@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/inbound-event/inbound-event.v1.1.schema.json",
+  "title": "InboundEventV1dot1",
+  "description": "K-06, the inbound event, v1.1 (T-1069), a minor version: the shape is v1's exactly (inbound-event.v1.schema.json, referred to here, frozen and unchanged), so every v1 event is a v1.1 event. v1.1 adds only the named rule scrubbedV1dot1 (inbound-event.rules.mjs), which reads the body and an email's subject the wider way: a 13 to 19 digit window that passes the Luhn check anywhere in a longer digit run, any run of spaces or dashes between groups, and digits of any script read as ASCII digits before matching (arch 02 line 109; arch 10 line 516; master S12-30, S13-05; T-242's security review). The tags and the counts in scrubbed are v1's. Owner: the architect.",
+  "$ref": "inbound-event.v1.schema.json"
+}
