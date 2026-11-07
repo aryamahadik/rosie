@@ -1,0 +1,411 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 4096,
+  "system": "You read one turn of texts to a booking assistant and map each part of it to one verb. Use only the choices listed, by their ids; for choose, give the choice's question as listed. Quote each part's exact words, and give each field's value with the exact words it comes from. For each part, call exactly one tool: the one whose verb fits that part. Make all the calls in one response, in the order the parts appear in the text, and give the text's language (two letters) in every call. Write each field's value as text with its type.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<who>Sam Lee, owner of biz-lees-barbershop, owner of biz-lee-home-services; language en</who>\n<open_questions>\n</open_questions>\n<choices>\nc-01 (hub; choose, question S11-12): BLOCK. Rosie asks which business, then reads the time back and says who's booked then. Fields: block_when (text).\nc-02 (hub; choose, question S11-12): PAUSE. Sam pauses one business, or both.\nc-03 (hub; choose, question S11-12): AWAY, or no answer all day. Requests, quotes and fees wait on Sam.\nc-04 (hub; choose, question S11-12): A change to the settings. Sam changes prices, rules, money settings or a part refund by text or call. Fields: service (text), price (money).\nc-05 (hub; choose, question S11-12): HELP, or something unclear. Nothing changes on a text Rosie can't act on for sure.\nc-06 (hub; choose, question S11-12): UPDATE. Sam texts UPDATE with a short note for everyone booked that day, or at a running event or stay.\nc-07 (anytime danger-or-crisis; enter): Danger or crisis. Every message and every call is checked before any answer, every time, by meaning.\n</choices>\n<facts>\npf.services: Tile floor (Lee Tile): free measure visit, then a quote\n</facts>\n<recent_messages>\n</recent_messages>\n<turn>block thursday afternoon and also tile is $12 a foot from now on</turn>"
+    }
+  ],
+  "tools": [
+    {
+      "name": "choose",
+      "description": "choose(question, option, fields with their source words): the part answers an offered question or hub case (arch 03 line 183). Model-facing.",
+      "strict": true,
+      "input_schema": {
+        "title": "Choose",
+        "description": "choose(question, option, fields with their source words): the part answers an offered question or hub case (arch 03 line 183). Model-facing.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, the same in every call of this turn (CQ-07 default).",
+            "$ref": "#/$defs/language"
+          },
+          "quote": { "$ref": "#/$defs/quote" },
+          "question": {
+            "description": "The question the option answers, exactly as the chosen choice's question gives it (arch 03 line 183).",
+            "type": "string"
+          },
+          "choice": {
+            "description": "The chosen option's choice id, one of the turn's choices of kind option, hub or whichBooking (arch 03 line 183; arch 06 line 333: 'Code hands it the choices'). Checked in code, never an enum (README 'Named rules').",
+            "type": "string"
+          },
+          "fields": {
+            "description": "The fields its answer carries, each with its words (arch 03 line 183).",
+            "type": "array",
+            "items": { "$ref": "#/$defs/field" }
+          }
+        },
+        "required": ["language", "quote", "question", "choice", "fields"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "field": {
+            "description": "One field, its value written as text with its type.",
+            "type": "object",
+            "properties": {
+              "name": { "description": "The field's name, as the choice lists it.", "type": "string" },
+              "type": {
+                "description": "The value's type.",
+                "type": "string",
+                "enum": ["text", "integer", "boolean", "money", "time"]
+              },
+              "value": {
+                "description": "text as is; integer as digits; boolean as true or false; money as whole cents and the currency code (1200 USD); time as the UTC instant and the IANA zone (2026-11-12T19:00:00Z America/New_York).",
+                "type": "string"
+              },
+              "words": {
+                "description": "The exact words the value comes from.",
+                "$ref": "#/$defs/nonEmptyText"
+              }
+            },
+            "required": ["name", "type", "value", "words"],
+            "additionalProperties": false
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      }
+    },
+    {
+      "name": "enter",
+      "description": "enter(door or any-time row, fields): the part starts something new or raises an any-time row (arch 03 line 183); also an entry step meaning search added (arch 03 line 189). Model-facing.",
+      "strict": true,
+      "input_schema": {
+        "title": "Enter",
+        "description": "enter(door or any-time row, fields): the part starts something new or raises an any-time row (arch 03 line 183); also an entry step meaning search added (arch 03 line 189). Model-facing.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, the same in every call of this turn (CQ-07 default).",
+            "$ref": "#/$defs/language"
+          },
+          "quote": { "$ref": "#/$defs/quote" },
+          "choice": {
+            "description": "The door's, any-time row's or entry step's choice id, one of the turn's choices of kind door, anytime or searchEntry (arch 03 lines 183 and 189). Checked in code (README 'Named rules').",
+            "type": "string"
+          },
+          "fields": {
+            "description": "The fields its answer carries, each with its words (arch 03 line 183).",
+            "type": "array",
+            "items": { "$ref": "#/$defs/field" }
+          }
+        },
+        "required": ["language", "quote", "choice", "fields"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "field": {
+            "description": "One field, its value written as text with its type.",
+            "type": "object",
+            "properties": {
+              "name": { "description": "The field's name, as the choice lists it.", "type": "string" },
+              "type": {
+                "description": "The value's type.",
+                "type": "string",
+                "enum": ["text", "integer", "boolean", "money", "time"]
+              },
+              "value": {
+                "description": "text as is; integer as digits; boolean as true or false; money as whole cents and the currency code (1200 USD); time as the UTC instant and the IANA zone (2026-11-12T19:00:00Z America/New_York).",
+                "type": "string"
+              },
+              "words": {
+                "description": "The exact words the value comes from.",
+                "$ref": "#/$defs/nonEmptyText"
+              }
+            },
+            "required": ["name", "type", "value", "words"],
+            "additionalProperties": false
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      }
+    },
+    {
+      "name": "ask",
+      "description": "ask(questions, what is unclear): the part could answer more than one question, or a bare reply or reaction is not a choice, so Rosie asks which (arch 03 lines 183 and 187; S13-12; A7-17). Model-facing.",
+      "strict": true,
+      "input_schema": {
+        "title": "Ask",
+        "description": "ask(questions, what is unclear): the part could answer more than one question, or a bare reply or reaction is not a choice, so Rosie asks which (arch 03 lines 183 and 187; S13-12; A7-17). Model-facing.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, the same in every call of this turn (CQ-07 default).",
+            "$ref": "#/$defs/language"
+          },
+          "quote": { "$ref": "#/$defs/quote" },
+          "questions": {
+            "description": "The questions it could answer, by the choices' question values (arch 03 line 183).",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "unclear": {
+            "description": "What is unclear, in plain words (arch 03 line 183).",
+            "type": "string"
+          }
+        },
+        "required": ["language", "quote", "questions", "unclear"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      }
+    },
+    {
+      "name": "none_fits",
+      "description": "none_fits(why): no choice fits the part; meaning search runs (arch 03 lines 183 and 189). Model-facing.",
+      "strict": true,
+      "input_schema": {
+        "title": "NoneFits",
+        "description": "none_fits(why): no choice fits the part; meaning search runs (arch 03 lines 183 and 189). Model-facing.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, the same in every call of this turn (CQ-07 default).",
+            "$ref": "#/$defs/language"
+          },
+          "quote": { "$ref": "#/$defs/quote" },
+          "why": { "description": "Why nothing fits (arch 03 line 183).", "type": "string" }
+        },
+        "required": ["language", "quote", "why"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      }
+    },
+    {
+      "name": "pass_on",
+      "description": "pass_on(words): the part is words for the business, passed on as they are (arch 03 line 183). Model-facing.",
+      "strict": true,
+      "input_schema": {
+        "title": "PassOn",
+        "description": "pass_on(words): the part is words for the business, passed on as they are (arch 03 line 183). Model-facing.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, the same in every call of this turn (CQ-07 default).",
+            "$ref": "#/$defs/language"
+          },
+          "quote": { "$ref": "#/$defs/quote" },
+          "words": {
+            "description": "The words to pass on (arch 03 line 183).",
+            "$ref": "#/$defs/nonEmptyText"
+          }
+        },
+        "required": ["language", "quote", "words"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      }
+    },
+    {
+      "name": "hand_off",
+      "description": "hand_off(reason): the part goes to a person (arch 03 line 183), routed by about: a report about the owner or staff to Rosie's team that day, any other hand-off to the owner in text hours, then Rosie's team (arch 06 line 329). Model-facing.",
+      "strict": true,
+      "input_schema": {
+        "title": "HandOff",
+        "description": "hand_off(reason): the part goes to a person (arch 03 line 183), routed by about: a report about the owner or staff to Rosie's team that day, any other hand-off to the owner in text hours, then Rosie's team (arch 06 line 329). Model-facing.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, the same in every call of this turn (CQ-07 default).",
+            "$ref": "#/$defs/language"
+          },
+          "quote": { "$ref": "#/$defs/quote" },
+          "reason": { "description": "Why it goes to a person (arch 03 line 183).", "type": "string" },
+          "about": { "$ref": "#/$defs/handOffAbout" }
+        },
+        "required": ["language", "quote", "reason", "about"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "handOffAbout": {
+            "title": "HandOffAbout",
+            "description": "Whom a hand-off is about, so the hand-off code (C-104) routes it without reading the reason: ownerOrStaff, a report about the owner or staff, which goes to Rosie's team that day, never the person named (arch 06 line 329: 'a report about the owner or staff: Rosie's team that day, never the person named'; S13-29 rule 58: 'A report that the owner or staff harmed someone goes to Rosie's team that day, never only to the one named'; S13-27 rule 36's note: 'If it's about the owner or staff, or is sent to Rosie itself, only Rosie's team gets it'); other, any other hand-off, which goes to the owner in text hours, then Rosie's team after 2 days unanswered (arch 06 line 329; S11-19). A closed enum of scalars, inside the structured-outputs subset (02-contracts section 2 item 7). Model-facing.",
+            "type": "string",
+            "enum": ["ownerOrStaff", "other"]
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      }
+    },
+    {
+      "name": "redact",
+      "description": "redact(words): words that must not stay in the message log or reach a message, such as a field kept to the secure page (arch 03 line 183; RULES 4.5). Model-facing.",
+      "strict": true,
+      "input_schema": {
+        "title": "Redact",
+        "description": "redact(words): words that must not stay in the message log or reach a message, such as a field kept to the secure page (arch 03 line 183; RULES 4.5). Model-facing.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, the same in every call of this turn (CQ-07 default).",
+            "$ref": "#/$defs/language"
+          },
+          "quote": { "$ref": "#/$defs/quote" },
+          "words": {
+            "description": "The words to redact, found in the text (arch 03 line 183).",
+            "$ref": "#/$defs/nonEmptyText"
+          }
+        },
+        "required": ["language", "quote", "words"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      }
+    },
+    {
+      "name": "no_op",
+      "description": "no_op: the part needs nothing done, such as a thank-you (arch 03 line 183). Model-facing.",
+      "strict": true,
+      "input_schema": {
+        "title": "NoOp",
+        "description": "no_op: the part needs nothing done, such as a thank-you (arch 03 line 183). Model-facing.",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, the same in every call of this turn (CQ-07 default).",
+            "$ref": "#/$defs/language"
+          },
+          "quote": { "$ref": "#/$defs/quote" }
+        },
+        "required": ["language", "quote"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      }
+    }
+  ],
+  "tool_choice": { "type": "auto" },
+  "output_config": { "effort": "low" }
+}

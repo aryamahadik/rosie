@@ -1,0 +1,33 @@
+{
+  "model": "claude-haiku-5-5",
+  "id": "msg_011CgorZS3W4FsckeogxVKiX",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "CAQStwkKEAgTGAI4AUIIdGhpbmtpbmcSDMLR440WZbqQjl4q6RoMjJOMdfm1nhQy6wL7IjBXoBsPgIcOaDARl9Bxk9m3EIiQxv9V8rMFDS2Mamrgu87nBp3kEkvFFs40D8xb4G8q1AiwoBoB2U9UNyiaKv0wAkwTqBPPKXdnPp12SgbkvN9MFteeqglMh8yLajcTEpZwXPC5wr32Abs0m8J+o5z8XIKrnQwZ5c7IEHyzQvxERnrn+mjK3FVKS3jb6QonTRdTn12a4jQn6hWgLIwnsprMX+9UwWHoGA+fNAq45edma3lgxN5yYLYB4pFERYiAA0e8whYoGGt9z6lFwqqhWZ84WYG5CjzKOLVO5AsqjJxzVOczs3PfRkEGPOzkyYJklR9VhgJQ78V+cHgBlRhpJLPKPqpCX0zIciXjpOtMxZr2RaJAOxuqR5TiSa9yCeGIMII7IeghenpKqSK6fpeh5k3j24s2viGrrYMa7JeT6yfRyGFd5lX4vVpwvf/nrHcm22vJrbTgTZ2kT1mz1ZWKIVzituvDAUoHqVD1RSaMKsQq+DoayIaljmFE8BEyPAIA7oUPkMIAyzk9n0jC3BrESi/hNgPfjwWfF6bTZqs1xUnx8jbAOQEZNTsgb8JPYE+OZEgXZ2TTUMh86Ycanvvr89WbPGNoMFBF2MR5OrqQMi9TwM5WFldF940JnFHXn++yXL+8EwBu7QfOn6pG2D4ZI0Z12CcAbtwYajtE2iqcMDA/r62A8EbCYo07H0GjfAMsc0IBAJwCnTiCyIGx6fax1TnT2jEsSPpG/Xu0VB4r9m5dmAS82fwYhdB6J8g8e+Bn6OPtd3S7RZLFSRiiiPb41OQ/rCDJESEtckhgihFTutRXORMdlZpEGaFB58OeZD3ETrTb6Rrq4xSDw9nEDqLbRKw5v/dzEKB10RUi3mF0q0aRTJtyMpeYp5Ny34QwXt8+vfAdGrcookcA2oIoI8BJ7gbawVtvHOpQeVE//R8Cw4ecMUNsDY2AQEuWWZz0qXK53HMBOU33vAhzPqppxORJZKC77E6m5Fuz50DmS3oVZHkpspChfXkZiYqOVs5jC2mjIJc4IzQS+9vjioBXvtVxWpfOxbsWrhGtJ7hbASRrkbN9b/FxZuYwMVvPeJVnXchezYZX8o515kwqTtkQbq8BpiUnVhBUrSJx23kmIC+eAGS+qupjE8Mh/icF/vQJP56VzoKh9952T6QZDuoTPBoxcIo8QVl9pgkKovbJG1+qBdqtCTvyBpuRiDSH1j+PVbXIQHHWl8GCUrsbo/+f17Mu6qkaDvsUg7AQVu3xbwWfoI/x5rv71cifjiHcj2jfqPBPzMs8EQg/h5vv3kK/LTcCEuX/FxeDZxN3W6wRg9DW9hwtomcNdAoRiYX6RbNbrf4rRee8Wgaqfxu6+y5gcwJDqUF6p0XK8ljWouvCTD9Y/fNWW/WiIkUqeqCa1P4tkMBxprllTKACgnef5U9ukP4rLtqs/9UQJPcUo+LUJ7WDHx6jUn2ant9DOAERQjyu3u9qpHHIm7cOtbVxedrLw96dw2gaAgBzuEbzLzapgnpxLYHnMHOHhwyjK10O8IBcSBg+4qhn9xSsQLoaGAE="
+    },
+    {
+      "type": "text",
+      "text": "{\"question\":\"S11-12\",\"choice\":\"c-01\",\"fields\":[{\"name\":\"block_when\",\"value\":\"thursday afternoon\",\"words\":\"block thursday afternoon\"}]}"
+    }
+  ],
+  "container": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 2762,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": { "ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 0 },
+    "output_tokens": 273,
+    "output_tokens_details": { "thinking_tokens": 214 },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "diagnostics": null
+}

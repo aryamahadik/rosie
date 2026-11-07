@@ -119,18 +119,18 @@ The probe picks the "strongest" from calls 1 to 3 (`chooseStrongest()`): first t
 
 ## Live results
 
-**Pending the lead's one run** (NQ-R2):
+**Round 1 done** (the lead, once, from the code folder, at the user's instruction in an interactive session: NQ-R2, DL-081, DL-087; it ended 16:07Z by results.jsonl's time): 6 of the 12 calls. No key in results.jsonl or samples/ (searched for the key prefix and an api-key header: 0 files).
 
-1. Run `node --env-file=.dev.vars ai/spikes/decide-wire/probe.mjs --live` from the code folder (or the worktree), with `CI` unset.
-2. Fill this table from `results.jsonl`.
-3. Search `results.jsonl` and `samples/` for the key prefix and an api-key header; expect 0 files.
+| Candidate    | claude-haiku-5-5 (two-requests)                                       | claude-sonnet-5-5 (two-requests) | Haiku (s1-02) | Refusal or error text                                                                                                                       | Valid on the wire | Mapped valid against decideRead | Same as the fixture | Tokens in/out                |
+| ------------ | --------------------------------------------------------------------- | -------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------- | ------------------- | ---------------------------- |
+| (a) tools    | refused (400)                                                         | not sent (refused on Haiku)      | not sent      | "The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools." | n/a               | n/a                             | n/a                 | none                         |
+| (a') flat    | refused (400)                                                         | not sent (refused on Haiku)      | not sent      | the same text as (a)                                                                                                                        | n/a               | n/a                             | n/a                 | none                         |
+| (b) envelope | refused (400, after 13.3 s)                                           | not sent (refused on Haiku)      | not sent      | "Schema is too complex."                                                                                                                    | n/a               | n/a                             | n/a                 | none                         |
+| (c) two-step | accepted (200, end_turn): stage 1 and stage 2 for each of the 2 parts | pending (round 2)                | not sent      | none                                                                                                                                        | yes (all 3 calls) | yes                             | yes                 | 1834/238; 2762/273; 2768/390 |
 
-| Candidate    | claude-haiku-5-5 (two-requests) | claude-sonnet-5-5 (two-requests) | Haiku (s1-02) | Refusal or error text | Valid on the wire | Mapped valid against decideRead | Same as the fixture | Tokens in/out |
-| ------------ | ------------------------------- | -------------------------------- | ------------- | --------------------- | ----------------- | ------------------------------- | ------------------- | ------------- |
-| (a) tools    | pending                         | pending                          | pending       |                       |                   |                                 |                     |               |
-| (a') flat    | pending                         | pending                          | pending       |                       |                   |                                 |                     |               |
-| (b) envelope | pending                         | pending                          | pending       |                       |                   |                                 |                     |               |
-| (c) two-step | pending                         | not sent                         | not sent      |                       |                   |                                 |                     |               |
+Round 2 (the plan's Sonnet calls) did not run as planned: no one-call candidate was accepted, so the probe sent nothing to Sonnet. Because only (c) works on Haiku, the Sonnet check of (c) is added as round 2 (the lead's follow-up in this task).
+
+What it shows: every one-call form is refused, including the flat envelope with no union and no optional property (3.3 KB), which the documentation's advice suggested; the strict-tool forms hit a different limit ("compiled grammar is too large"). Splitting decide into two calls (the documentation's last advice, "split into multiple requests") is the only form accepted, its outputs are valid on the wire, and the mapped read is valid against K-02 v1's decideRead and equal to the fixture.
 
 ## Recommendation for CQ-25 (provisional until the live table is filled)
 
