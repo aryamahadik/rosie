@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-alex-0202",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "An emergency",
+        "tense": "now",
+        "evidence": "my lips are swelling after the beard color and I can't breathe well",
+        "atRisk": "the writer",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [
+    {
+      "words": "lips are swelling",
+      "list": "plugin"
+    }
+  ],
+  "outcomes": [
+    "An emergency"
+  ],
+  "liftedToUnsure": false
+}

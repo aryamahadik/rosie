@@ -1,0 +1,27 @@
+{
+  "eventId": "evt-alex-0206",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "Unsafe at home",
+        "tense": "could restart",
+        "evidence": "my ex lives with me and gets angry if he sees I'm going out",
+        "atRisk": "the writer",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [],
+  "outcomes": [
+    "Unsafe at home"
+  ],
+  "liftedToUnsure": false
+}

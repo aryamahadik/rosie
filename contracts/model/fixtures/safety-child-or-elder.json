@@ -1,0 +1,27 @@
+{
+  "eventId": "evt-alex-0205",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "Harm to a child or older adult",
+        "tense": "now",
+        "evidence": "my mom's carer leaves her alone without food for days",
+        "atRisk": "the writer's mother",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [],
+  "outcomes": [
+    "Harm to a child or older adult"
+  ],
+  "liftedToUnsure": false
+}

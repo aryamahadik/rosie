@@ -1,0 +1,79 @@
+{
+  "turnId": "turn-s1-02-sam-kinds",
+  "bundleId": {
+    "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+    "build": 1
+  },
+  "stakes": "low",
+  "routing": {
+    "first": "haiku",
+    "second": "haiku"
+  },
+  "reads": [
+    {
+      "model": "haiku",
+      "role": "first",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "Barbershop, plumbing, electrical",
+            "question": "oq-s1-02",
+            "choice": "c-01",
+            "fields": [
+              {
+                "name": "kinds",
+                "value": "Barbershop, plumbing, electrical",
+                "words": "Barbershop, plumbing, electrical"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "model": "haiku",
+      "role": "check",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "Barbershop, plumbing, electrical",
+            "question": "oq-s1-02",
+            "choice": "c-01",
+            "fields": [
+              {
+                "name": "kinds",
+                "value": "Barbershop, plumbing, electrical",
+                "words": "Barbershop, plumbing, electrical"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "agreed": true,
+  "reread": false,
+  "language": "en",
+  "parts": [
+    {
+      "part": {
+        "verb": "choose",
+        "quote": "Barbershop, plumbing, electrical",
+        "question": "oq-s1-02",
+        "choice": "c-01",
+        "fields": [
+          {
+            "name": "kinds",
+            "value": "Barbershop, plumbing, electrical",
+            "words": "Barbershop, plumbing, electrical"
+          }
+        ]
+      },
+      "outcome": "go"
+    }
+  ]
+}

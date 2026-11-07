@@ -1,0 +1,52 @@
+{
+  "turnId": "turn-alex-thanks",
+  "bundleId": {
+    "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82",
+    "build": 1
+  },
+  "stakes": "low",
+  "routing": {
+    "first": "haiku",
+    "second": "haiku"
+  },
+  "reads": [
+    {
+      "model": "haiku",
+      "role": "first",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "no_op",
+            "quote": "thanks!"
+          }
+        ]
+      }
+    },
+    {
+      "model": "haiku",
+      "role": "check",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "no_op",
+            "quote": "thanks!"
+          }
+        ]
+      }
+    }
+  ],
+  "agreed": true,
+  "reread": false,
+  "language": "en",
+  "parts": [
+    {
+      "part": {
+        "verb": "no_op",
+        "quote": "thanks!"
+      },
+      "outcome": "go"
+    }
+  ]
+}

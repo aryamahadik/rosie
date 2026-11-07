@@ -1,0 +1,117 @@
+# model (K-02): the model's contract
+
+**Status: v1, frozen** (`frozen.json`: `{"frozen": ["v1"]}`). Written and frozen by T-011. The freeze takes effect when T-011 merges, and the merge waits for every review below (build prompt 6.2, 6.5).
+
+## Freeze record
+
+Frozen v1, 2026-11-07, reviews required: AI engineer, action-layer engineer, integrations engineer, runtime engineer, QA and eval engineer.
+
+Each reviewer checks its own side (02-contracts section 1): the AI engineer the context bundle, the three model-facing schemas, the reads and the re-read (C-113 to C-117, C-121, C-123); the action-layer engineer the choices, stakes and facts it builds and the decide result the gate takes, with the named rules (C-075, C-079, C-080, C-083, C-087, C-104, C-110); the integrations engineer that nothing in v1 blocks photo reading's fields reaching Google Places in v1.1 (C-218, through K-15); the runtime engineer the safety result on arrival, its timeout marker and the danger words (C-047, C-174); QA and eval the fixtures and the shape gold labels use (C-139, C-140). The lead records the freeze in `ops/DECISIONS.md` and on the board (build prompt 5.7).
+
+**Owner:** the architect. **Schema:** `model.v1.schema.json` (JSON Schema 2020-12, `$id` `https://rosie.invalid/contracts/model/model.v1.schema.json`). **Named rules:** `model.rules.mjs`. **Checked by:** `npm run contracts:check` (the fixtures, the named rules and the structured-outputs subset lint). **Contract test:** `tests/contract/model.v1.test.ts` (QA, T-081). A change after the freeze is a new minor version file, `model.v1.1.schema.json`, with new fixtures (build prompt 6.4); photo reading is v1.1 (F14, T-070). The frozen-contract guard fails any edit to v1's schema, its fixtures or their index entries.
+
+## What it defines
+
+There is no root payload: each payload is one definition under `$defs`, and each fixture names its `def`.
+
+| Payload                                                                                                                                                                                                                                                                                                  | Where in the schema                                                                                                                   | Model-facing | Source                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------- |
+| What decide is given, the context bundle: the turn's texts after the edge scrub (poll votes and tapbacks included), who wrote, the languages, the open questions, at most 60 choices with their stakes, the cards, the facts, the cached prefix by hash, the last 6 messages, meaning search's additions | `$defs/context` (`text`, `person`, `openQuestion`, `choice`, `target`, `stakesReason`, `stepCard`, `fact`, `recentMessage`)           | no (input)   | arch 03 lines 159 to 167 and 181; arch 01 lines 67 to 79; arch 02 line 117 |
+| What one decide read returns: the text's language and one verb per part, each with its exact quote; fields with their words                                                                                                                                                                              | `$defs/decideRead` (`decidePart`: `choose`, `enter`, `ask`, `noneFits`, `passOn`, `handOff`, `redact`, `noOp`; `field`, `fieldValue`) | **yes**      | arch 03 lines 183 and 185                                                  |
+| What decide returns to the gate: the reads (model, role, output), whether they agreed, whether the re-read ran, the language, each part with its outcome (go, or one question with nothing changed)                                                                                                      | `$defs/decideResult` (`read`, `resultPart`)                                                                                           | no           | arch 02 line 119; arch 06 lines 285 to 289; Q-26; Q-41                     |
+| A context with its decide result, as the gate reads them; the two named rules run on it                                                                                                                                                                                                                  | `$defs/contextAndDecide`                                                                                                              | no           | arch 03 line 185; arch 06 line 333                                         |
+| What one safety read returns for one raw text: labels from the 8 outcomes of A3-22 and B3-17 or Unsure, each with tense, evidence words, who is at risk and who wrote it                                                                                                                                 | `$defs/safetyRead` (`safetyLabel`, `safetyOutcome`, `tense`)                                                                          | **yes**      | arch 03 line 183; arch 02 line 111; arch 06 lines 283, 315 to 329          |
+| The safety read's output as the actor hands it on: the tries, the read or the timeout marker, the danger words code matched, the outcomes that hold after a danger word lifts No to Unsure; for texts, pages and outside AIs                                                                             | `$defs/safetyResult`                                                                                                                  | no           | arch 02 lines 111 and 129; arch 06 line 283                                |
+| What the planner returns: one of five verbs, answer from stored facts, ask one question, pass a question on, hand to a person, log a gap case                                                                                                                                                            | `$defs/plannerOutput` (`plannerAnswer`, `plannerAsk`, `plannerPassOn`, `plannerHandOff`, `plannerLogGap`)                             | **yes**      | arch 06 line 291; arch 03 line 189                                         |
+| The meaning-search hand-over: the 3 closest entry steps join the choices as kind `searchEntry`, and the context says which (`meaningSearch`); the turn's one re-read then runs (`decideResult.reread`)                                                                                                   | `choice.kind`, `context.meaningSearch`                                                                                                | no           | arch 03 line 189; Q-42                                                     |
+
+Every field's `description` names its source (02-contracts section 2 item 4). K-01's definitions are reused by relative `$ref` where the meaning is the same (contracts/README.md convention 2): `stepId`, `flowLetter`, `card`, `answerField`, `anytimeRow.row`, `modelRole`, `readPair`, `sha256`; and the shared formats' `id`, `turnId`, `bundleId`, `money` and `time`. Line numbers "arch NN line N" are those of `scratch/text/architecture.txt`, as `ops/plan/02-contracts.md` cites them.
+
+### Verbs and what code checks (arch 03 lines 183 to 187)
+
+- `choose(question, choice, fields)` takes a choice of kind `option`, `hub` or `whichBooking`; `question` is the choice's own `question` (the open question's id, the hub's step, or the booking a which-booking choice stands for). `enter(choice, fields)` takes `door`, `anytime` or `searchEntry`. Each field carries its value and the exact words it comes from; code re-parses every value from its words (limit 6, arch 06 line 309).
+- A bare "2", "ok" or reaction counts only when it clearly answers the one open question (S13-24 rule 8): `decide-bare-2.json`. A poll vote answers its own poll: `decide-poll-vote.json`, where the vote's text `words` are the option's words as sent. A tapback is never a yes; where a pick is needed the reads agree on `ask`: `decide-tapback-asks-which.json`.
+- Two reads must agree on every choice and every field value. On a disagreement, an unmapped part or a value that fails its words, the one Sonnet re-read runs; still unclear, the part ends in one question and nothing changes for it (`outcome: "oneQuestion"`); parts both reads agree on go ahead (arch 02 line 119; Q-41's default: the re-read runs before the question): `decide-reads-disagree.json`.
+
+## Model-facing schemas: the structured-outputs subset (J-02 open)
+
+`decideRead`, `safetyRead` and `plannerOutput` are what the model answers in, so each is written inside the JSON Schema subset the model API's structured outputs accept (02-contracts section 2 item 7). `contracts/scripts/structured-subset-lint.mjs` checks them on every `npm run contracts:check`, following Anthropic's structured-outputs documentation as T-360 read it on 2026-11-07:
+
+1. **External `$ref` is refused**, so the AI gateway sends each schema **bundled**: every `$ref` resolved and its target copied into the schema's own `$defs` (`bundleSchema()` in the lint is that bundling). This contract file keeps its relative `$ref`s; the lint checks the bundled form, and its test shows the bundled forms accept and refuse every K-02 fixture exactly as the contract does.
+2. **Per-request limits** across all structured schemas and strict tools in one request: 24 optional properties, 16 parameters with a union type (`anyOf`, or a type array), 20 strict tools; a schema too complex to compile is a 400. One request carries one of these schemas. Every property here is required: decide read 0 optional and 2 unions, safety read 0 and 0, planner 0 and 1.
+3. **Schemas stay static** (compiled grammars are cached for 24 hours): never an enum of a turn's option ids. A choice id is a plain string in the output and is checked in code (`optionOffered`, below).
+4. **Left out:** recursive schemas, number limits, string-length limits, array limits other than `minItems` 0 or 1, complex enum values, and any `additionalProperties` other than false. "Non-empty" is the pattern `\S` (`nonEmptyText`). **Allowed:** local `$ref` and `$defs`, `anyOf`, `allOf` (not with `$ref`), `const`, enums of scalars, `required`, simple `pattern`, and the formats date-time, time, date, duration, email, hostname, uri, ipv4, ipv6, uuid (none used here).
+5. **For the AI gateway (C-121):** a refusal is HTTP 200 with `stop_reason` `"refusal"`, and its output may not match the schema; `stop_reason` `"max_tokens"` means the output may be incomplete. Both are a failed read, never a verdict: the gateway's retry and outage rules apply (arch 06 line 293), and for the safety read the 4 s timeout marker (arch 02 line 111).
+
+The context and the stage results are not model output: they may use any 2020-12 keyword, so the context holds the frontier to at most 60 choices and the decide result to 2 or 3 reads. **J-02 stays open:** the live structured-output check on claude-haiku-5-5 and claude-sonnet-5-5 runs as smoke-size calls only (DL-027, Q-20) once the lead schedules it; until then the subset is the documented one, linted.
+
+## Named rules (what the schema refuses, and what the rules refuse)
+
+Two refusals state a rule across two documents, the context and the decide result, that one JSON Schema cannot express. `model.rules.mjs` states each by name; a fixture of `$defs/contextAndDecide` names its rule in `fixtures/index.json` (`"rule"`), must pass the schema first, and is then refused by that rule alone (`contracts/scripts/check-fixtures.mjs`).
+
+| Refused fixture                   | Refused by                     | What                                                                                                                                                                                          |
+| --------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `refuse-unknown-verb.json`        | the schema (`decideRead`)      | a verb that is none of the eight                                                                                                                                                              |
+| `refuse-value-without-words.json` | the schema (`decideRead`)      | a field whose words are empty                                                                                                                                                                 |
+| `refuse-planner-books.json`       | the schema (`plannerOutput`)   | a planner verb that is none of the five                                                                                                                                                       |
+| `refuse-over-60-choices.json`     | the schema (`context`)         | 61 choices                                                                                                                                                                                    |
+| `refuse-option-not-offered.json`  | the named rule `optionOffered` | a chosen or entered choice the context does not offer; also a verb that does not fit the choice's kind, a wrong question, a field the choice does not carry, an ask about no offered question |
+| `refuse-quote-not-in-text.json`   | the named rule `quoteInText`   | a quote not found exactly in the turn's texts; also a field's words, or pass_on's or redact's words, not found there                                                                          |
+
+At runtime the same rules are the gate's (C-080 refuses a choice not offered, arch 06 line 333) and code's quote check (arch 03 line 185: "code confirms the quote and re-parses every value from its words"); the rules file states them in the contract and does not implement them. The frozen-contract guard covers the schema, fixtures and index of v1, but not `model.rules.mjs` (it guards `.json` files whose name carries a version): a later version adds rules under new names and never changes these two.
+
+## Stakes (arch 01 line 79)
+
+"High when the target question, or the first read's pick, can charge, refund, book, move or cancel. Otherwise low." Each choice carries `stakes` and, when high, `stakesFrom`, its reasons; the schema refuses a high choice without a reason and a low one with any. K-01 v1 has no stakes field (its open gap), so the frontier builder (C-075) derives it from the bundle:
+
+- **high** when the choice's walk (its branch, then the steps it walks to before it stops at the first step that asks someone, waits or ends the journey: arch 03 line 191) holds an effect (K-01 `effect.kind`) of `charge`, `refund` or `calendarWrite`; or a `recordWrite` of the gives key `booked` (given in section 6) or of a section 5 money key (`money_before`, `card_saved`, `deposit_paid`, `paid_full`: `A-keys.md`, `B-keys.md`); or the choice is the any-time row `cancel` or `move`;
+- every option of an open question is high when any one of its options is high (`question`: "the target question ... can");
+- a choice the builder cannot walk is high (`unknown`), the safer route: Sonnet reads first, and any difference asks one question (arch 06 line 287);
+- otherwise low. The turn's stakes (`decideResult.stakes`) is high when the target question, or the first read's pick, is high.
+
+This is a default, not a source: no source lists which record writes book, move or cancel (open gaps).
+
+## Producers and consumers (02-contracts K-02)
+
+- **Producers:** AI engineer: C-113 safety read, C-114 context bundle, C-115 decide (two reads), C-116 Sonnet re-read, C-117 planner (C-120 photo reading is v1.1); action-layer engineer: C-075 frontier builder (the choices, stakes and facts), C-079 meaning-search fallback.
+- **Consumers:** action-layer engineer: C-080 policy gate and limits 1 to 6, C-083 limit 3 exact yes, C-087 one commit per turn, C-104 safety and hand-offs, C-110 Agent API (free text read first); integrations engineer: C-218 Google Places (v1.1, through K-15); runtime engineer: C-047 safety read on arrival, C-174 AI provider down or slow; AI engineer: C-123 recorded-model double (T-004: it replays outputs of this shape); QA: C-139 gold-set generator and C-140 eval harness (gold labels use this shape).
+- **Contract test** (QA, its own task, T-081): `tests/contract/model.v1.test.ts`: the fixtures against the schema; the recorded-model double returns only valid outputs; the gate accepts every valid decide output and refuses the refused ones, the two named rules included. What the schema and the rules leave to code and the test: each value re-parses from its words; dates resolve from the send time in the visit's zone (limit 6); a fact appears once; the planner's `facts` name facts of the context; the 30-day and 6-message window of recent messages; at most one question in a planner ask (C-092).
+
+## Fixtures (`fixtures/`, listed in `fixtures/index.json`)
+
+Accepted: `context-s1-02.json` with `decide-s1-02-choose.json` (Sam names the kinds of work); `context-two-requests.json` with `decide-two-requests.json` (arch 04: "block thursday afternoon and also tile is $12 a foot from now on", two choices, both pending); `decide-bare-2.json`, `decide-poll-vote.json`, `decide-tapback-asks-which.json`, `decide-no-op-thanks.json`, `decide-none-fits.json`, `decide-ask.json`, `decide-pass-on.json`, `decide-hand-off.json`, `decide-redact.json`, `decide-reads-disagree.json`; `safety-no.json`, `safety-emergency-now.json`, `safety-crisis-words.json`, `safety-threat.json`, `safety-child-or-elder.json`, `safety-unsafe-at-home.json`, `safety-business-own-line.json`, `safety-over-gas-leak.json`, `safety-unknown-tense.json`, `safety-timeout-danger-word.json`; `planner-answer.json`, `planner-log-gap.json`. Refused, in `fixtures/invalid/`: the six above. Each refused fixture is refused for the one reason it shows: the contracts tools' test fixes that one fault and sees it accepted.
+
+Names and values come only from the master's sample cast and businesses (Sam Lee, Alex, Riley, Avery, Lee's Barbershop, Lee Home Services, Lee Tile; dates in October 2026 as the master writes them) and fixture set v1's demo shops (`fixtures/v1/test-kit/shops/barber.json`: the $35 haircut, the $20 fee, its danger words and what never goes in a text; `plumber.json` and `flooring.json`), never a real person (rule 9). Phone numbers are in the fictional 555-01xx range. The bundle ids and the prefix hash are those of K-01's sample bundles. The steps' words (S1-02's card, the S11-12 hub's cases, A7-17's options) are the master's own.
+
+## Defaults used (T-011)
+
+1. **Stakes** as above, with `stakesFrom` naming the source of each high.
+2. **The meaning-search entry steps and the which-booking choice are choice kinds** (`searchEntry`, `whichBooking`) beside arch 01 line 67's four; `enter` takes an entry step, and `choose` takes a which-booking choice, whose `question` is the booking it stands for (arch 03 lines 167 and 189).
+3. **A definition for an any-time row, a door or an entry step** is the first sentence of its handler or entry step, the stand-in K-01 uses for a branch with no Means line (arch 12 line 592); K-01 v1 holds no definition for them.
+4. **An any-time row with no handler step** (K-01's `handler: null`, Q-40) is not offered as a choice until Q-40 names its step.
+5. **The text's language** is reported by each decide read (`decideRead.language`) and kept when the two agree (`decideResult.language`, null otherwise): CQ-07's default. The context gives the stored languages and the business's.
+6. **A hub case is chosen, not entered:** `choose` with the hub's step as its question, since arch 03 line 183 gives `enter` only doors and any-time rows.
+7. **The planner reads the same context** as decide, after meaning search; v1 gives it no verb that changes anything (below).
+8. **Safety labels name the master's outcome labels word for word** ("Needs the business's own line"), with Unsure beside them, and code's danger-word lift is recorded (`liftedToUnsure`, `outcomes`) rather than left to the reader.
+
+## Keywords beyond ADR-005's list
+
+`dependentSchemas` with `if`/`then`/`else` (a choice fills only the fields its kind uses; high stakes has its reasons; a poll vote has its poll and a tapback its reaction; a re-read is the third read; a timeout has no read), `maxItems` and `minItems` above 1 in the context and the decide result. None of them is in a model-facing schema. The consistency checks sit in `dependentSchemas` rather than `allOf`, so json-schema-to-typescript keeps the types (T-010's finding); the generated types are wider than the schema there.
+
+## Open gaps
+
+- **Q-26** (who decides first on high stakes): Sonnet first, Haiku checking, per its default; `decideResult.routing` records the pair, so the head-to-head result changes data, not the contract.
+- **Q-41** (the re-read before the one question; how reply time is measured): the re-read runs first, then one question, never a commit on a difference.
+- **Q-42** (the meaning match's model or index): `meaningSearch.index` names it as a free string until the spike (T-631) picks one.
+- **Q-40** (the any-time handler steps): default 4.
+- **CQ-07** (which stage reports a text's language): default 5.
+- **J-02** (the live structured-output check on claude-haiku-5-5 and claude-sonnet-5-5, 02-contracts section 2 item 7): open; smoke-size calls only (DL-027, Q-20) once the lead schedules it.
+- **New (stakes):** no source lists which record writes book, move or cancel; default 1 stands until the CTO names them, or K-01 gains a stakes field in a minor version.
+- **New (tapbacks):** the reaction names come from the Linq port (K-11, F6); v1 keeps `tapback.reaction` a free string, and a tapback text's `words` are its reaction's name.
+- **New (who is at risk, who wrote it):** arch 03 line 183 names the two but no closed list; v1 keeps both as plain words. A list, once a source gives one, is a new field in a minor version.
+- **New (the planner's protecting change):** arch 06 line 291 lets the planner make "a change that only protects (S13-57)", but its five verbs hold none. v1 gives it none: a protecting change (a stop, stricter contact, a death report) reaches the gate through decide's `enter` on its any-time row and commits at once (arch 06 line 329).
+- **New (the rules file):** the frozen-contract guard does not cover `model.rules.mjs`. Extending the guard to a frozen contract's rules file is a release-engineer task (C-008).
+
+## Change log
+
+- v1, 2026-11-07 (T-011): first version, frozen: the context bundle, the decide read and result, the safety read and result, the planner output, the context with its decide result; the named rules `optionOffered` and `quoteInText`; the fixtures and their index; the freeze record and `frozen.json`.

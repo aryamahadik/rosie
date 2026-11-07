@@ -1,0 +1,273 @@
+{
+  "turnId": "turn-two-requests-sam",
+  "bundleId": {
+    "hash": "22d734f465f32f953c926384a825e36d37ccb577b3fbe134debfd96a0667e72a",
+    "build": 1
+  },
+  "flow": "B",
+  "texts": [
+    {
+      "eventId": "evt-sam-0102",
+      "kind": "text",
+      "words": "block thursday afternoon and also tile is $12 a foot from now on",
+      "sentAt": {
+        "utc": "2026-10-26T15:30:00Z",
+        "zone": "America/New_York"
+      },
+      "attachments": [],
+      "poll": null,
+      "tapback": null
+    }
+  ],
+  "writer": {
+    "handle": "+15555550100",
+    "people": [
+      {
+        "personId": "person-sam",
+        "name": "Sam Lee",
+        "roles": [
+          {
+            "role": "owner",
+            "businessId": "biz-lees-barbershop"
+          },
+          {
+            "role": "owner",
+            "businessId": "biz-lee-home-services"
+          }
+        ],
+        "language": "en"
+      }
+    ]
+  },
+  "businessLanguage": "en",
+  "openQuestions": [],
+  "choices": [
+    {
+      "question": "S11-12",
+      "branch": "BLOCK",
+      "anytimeRow": null,
+      "door": null,
+      "hub": "owner",
+      "fields": [
+        {
+          "name": "block_when",
+          "type": "text"
+        }
+      ],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-01",
+      "kind": "hub",
+      "label": "BLOCK",
+      "definition": "Rosie asks which business, then reads the time back and says who's booked then.",
+      "step": "S11-12",
+      "target": {
+        "businessId": "biz-lee-home-services",
+        "businessName": "Lee Home Services",
+        "bookingId": null,
+        "visitAt": null
+      }
+    },
+    {
+      "question": "S11-12",
+      "branch": "PAUSE",
+      "anytimeRow": null,
+      "door": null,
+      "hub": "owner",
+      "fields": [],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-02",
+      "kind": "hub",
+      "label": "PAUSE",
+      "definition": "Sam pauses one business, or both.",
+      "step": "S11-12",
+      "target": {
+        "businessId": "biz-lee-home-services",
+        "businessName": "Lee Home Services",
+        "bookingId": null,
+        "visitAt": null
+      }
+    },
+    {
+      "question": "S11-12",
+      "branch": "AWAY, or no answer all day",
+      "anytimeRow": null,
+      "door": null,
+      "hub": "owner",
+      "fields": [],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-03",
+      "kind": "hub",
+      "label": "AWAY, or no answer all day",
+      "definition": "Requests, quotes and fees wait on Sam.",
+      "step": "S11-12",
+      "target": {
+        "businessId": "biz-lee-home-services",
+        "businessName": "Lee Home Services",
+        "bookingId": null,
+        "visitAt": null
+      }
+    },
+    {
+      "question": "S11-12",
+      "branch": "A change to the settings",
+      "anytimeRow": null,
+      "door": null,
+      "hub": "owner",
+      "fields": [
+        {
+          "name": "service",
+          "type": "text"
+        },
+        {
+          "name": "price",
+          "type": "money"
+        }
+      ],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-04",
+      "kind": "hub",
+      "label": "A change to the settings",
+      "definition": "Sam changes prices, rules, money settings or a part refund by text or call.",
+      "step": "S11-12",
+      "target": {
+        "businessId": "biz-lee-home-services",
+        "businessName": "Lee Home Services",
+        "bookingId": null,
+        "visitAt": null
+      }
+    },
+    {
+      "question": "S11-12",
+      "branch": "HELP, or something unclear",
+      "anytimeRow": null,
+      "door": null,
+      "hub": "owner",
+      "fields": [],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-05",
+      "kind": "hub",
+      "label": "HELP, or something unclear",
+      "definition": "Nothing changes on a text Rosie can't act on for sure.",
+      "step": "S11-12",
+      "target": {
+        "businessId": "biz-lee-home-services",
+        "businessName": "Lee Home Services",
+        "bookingId": null,
+        "visitAt": null
+      }
+    },
+    {
+      "question": "S11-12",
+      "branch": "UPDATE",
+      "anytimeRow": null,
+      "door": null,
+      "hub": "owner",
+      "fields": [],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-06",
+      "kind": "hub",
+      "label": "UPDATE",
+      "definition": "Sam texts UPDATE with a short note for everyone booked that day, or at a running event or stay.",
+      "step": "S11-12",
+      "target": {
+        "businessId": "biz-lee-home-services",
+        "businessName": "Lee Home Services",
+        "bookingId": null,
+        "visitAt": null
+      }
+    },
+    {
+      "question": null,
+      "branch": null,
+      "anytimeRow": "danger-or-crisis",
+      "door": null,
+      "hub": null,
+      "fields": [],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-07",
+      "kind": "anytime",
+      "label": "Danger or crisis",
+      "definition": "Every message and every call is checked before any answer, every time, by meaning.",
+      "step": "B3-17",
+      "target": {
+        "businessId": "biz-lee-home-services",
+        "businessName": "Lee Home Services",
+        "bookingId": null,
+        "visitAt": null
+      }
+    }
+  ],
+  "cards": [
+    {
+      "step": "S11-12",
+      "card": {
+        "question": "What does Sam text?",
+        "means": [
+          {
+            "branch": "BLOCK",
+            "text": "Rosie asks which business, then reads the time back and says who's booked then.",
+            "from": "firstSentence"
+          },
+          {
+            "branch": "PAUSE",
+            "text": "Sam pauses one business, or both.",
+            "from": "firstSentence"
+          },
+          {
+            "branch": "AWAY, or no answer all day",
+            "text": "Requests, quotes and fees wait on Sam.",
+            "from": "firstSentence"
+          },
+          {
+            "branch": "A change to the settings",
+            "text": "Sam changes prices, rules, money settings or a part refund by text or call.",
+            "from": "firstSentence"
+          },
+          {
+            "branch": "HELP, or something unclear",
+            "text": "Nothing changes on a text Rosie can't act on for sure.",
+            "from": "firstSentence"
+          },
+          {
+            "branch": "UPDATE",
+            "text": "Sam texts UPDATE with a short note for everyone booked that day, or at a running event or stay.",
+            "from": "firstSentence"
+          }
+        ],
+        "never": [
+          "Never: change anything before the read-back gets a yes."
+        ],
+        "safeDefault": "nothing changes until it's clear what Sam meant.",
+        "clock": {
+          "from": "step9Default"
+        }
+      }
+    }
+  ],
+  "facts": [
+    {
+      "name": "pf.services",
+      "value": "Tile floor (Lee Tile): free measure visit, then a quote",
+      "home": "money",
+      "table": "services",
+      "rowId": "svc-lee-tile",
+      "version": 3,
+      "forSteps": [
+        "S11-12"
+      ]
+    }
+  ],
+  "alwaysOn": {
+    "flow": "B",
+    "prefixSha256": "18d7f9c761c1f58436d2e3e9148b64386221b1d0affa33a8c7b0226c06b6ebea"
+  },
+  "recentMessages": [],
+  "meaningSearch": null
+}

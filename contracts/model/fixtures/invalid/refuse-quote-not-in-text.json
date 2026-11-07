@@ -1,0 +1,312 @@
+{
+  "context": {
+    "turnId": "turn-s1-02-sam-kinds",
+    "bundleId": {
+      "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "build": 1
+    },
+    "flow": "A",
+    "texts": [
+      {
+        "eventId": "evt-sam-0001",
+        "kind": "text",
+        "words": "Barbershop, plumbing, electrical",
+        "sentAt": {
+          "utc": "2026-10-19T14:05:00Z",
+          "zone": "America/New_York"
+        },
+        "attachments": [],
+        "poll": null,
+        "tapback": null
+      }
+    ],
+    "writer": {
+      "handle": "+15555550100",
+      "people": [
+        {
+          "personId": "person-sam",
+          "name": "Sam Lee",
+          "roles": [
+            {
+              "role": "owner",
+              "businessId": "biz-lees-barbershop"
+            },
+            {
+              "role": "owner",
+              "businessId": "biz-lee-home-services"
+            }
+          ],
+          "language": "en"
+        }
+      ]
+    },
+    "businessLanguage": "en",
+    "openQuestions": [
+      {
+        "openQuestionId": "oq-s1-02",
+        "step": "S1-02",
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "sentAt": {
+          "utc": "2026-10-19T14:02:00Z",
+          "zone": "America/New_York"
+        },
+        "pollId": null,
+        "askCount": 1
+      }
+    ],
+    "choices": [
+      {
+        "question": "oq-s1-02",
+        "branch": "All on the list",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "fields": [
+          {
+            "name": "kinds",
+            "type": "text"
+          }
+        ],
+        "stakes": "low",
+        "stakesFrom": [],
+        "choiceId": "c-01",
+        "kind": "option",
+        "label": "All on the list",
+        "definition": "A plug-in holds what one kind of work needs.",
+        "step": "S1-02",
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        }
+      },
+      {
+        "question": "oq-s1-02",
+        "branch": "One isn't on the list yet",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "fields": [
+          {
+            "name": "kinds",
+            "type": "text"
+          }
+        ],
+        "stakes": "low",
+        "stakesFrom": [],
+        "choiceId": "c-02",
+        "kind": "option",
+        "label": "One isn't on the list yet",
+        "definition": "a service with a visit that Rosie has no plug-in for.",
+        "step": "S1-02",
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        }
+      },
+      {
+        "question": "oq-s1-02",
+        "branch": "Not a service we book",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "fields": [
+          {
+            "name": "kinds",
+            "type": "text"
+          }
+        ],
+        "stakes": "low",
+        "stakesFrom": [],
+        "choiceId": "c-03",
+        "kind": "option",
+        "label": "Not a service we book",
+        "definition": "goods with no visit, delivery only, renting a thing alone, or work the law bars.",
+        "step": "S1-02",
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        }
+      },
+      {
+        "question": null,
+        "branch": null,
+        "anytimeRow": null,
+        "door": "unclearOwnerOrHelp",
+        "hub": null,
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": [],
+        "choiceId": "c-04",
+        "kind": "door",
+        "label": "An unclear owner text or HELP",
+        "definition": "Nothing changes on a text Rosie can't act on for sure.",
+        "step": "S11-21",
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        }
+      },
+      {
+        "question": null,
+        "branch": null,
+        "anytimeRow": "danger-or-crisis",
+        "door": null,
+        "hub": null,
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": [],
+        "choiceId": "c-05",
+        "kind": "anytime",
+        "label": "Danger or crisis",
+        "definition": "Every message and every call is checked before any answer, every time, by meaning.",
+        "step": "A3-22",
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        }
+      }
+    ],
+    "cards": [
+      {
+        "step": "S1-02",
+        "card": {
+          "question": "Is each one on Rosie's list?",
+          "means": [
+            {
+              "branch": "All on the list",
+              "text": "A plug-in holds what one kind of work needs.",
+              "from": "firstSentence"
+            },
+            {
+              "branch": "One isn't on the list yet",
+              "text": "a service with a visit that Rosie has no plug-in for.",
+              "from": "meansLine"
+            },
+            {
+              "branch": "Not a service we book",
+              "text": "goods with no visit, delivery only, renting a thing alone, or work the law bars.",
+              "from": "meansLine"
+            }
+          ],
+          "never": [
+            "Never: set up any of those."
+          ],
+          "safeDefault": "draft it as new work, offline until Rosie's team reviews it.",
+          "clock": {
+            "from": "step9Default"
+          }
+        }
+      }
+    ],
+    "facts": [],
+    "alwaysOn": {
+      "flow": "A",
+      "prefixSha256": "18d7f9c761c1f58436d2e3e9148b64386221b1d0affa33a8c7b0226c06b6ebea"
+    },
+    "recentMessages": [
+      {
+        "from": "rosie",
+        "sentAt": {
+          "utc": "2026-10-19T14:02:00Z",
+          "zone": "America/New_York"
+        },
+        "words": "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them."
+      }
+    ],
+    "meaningSearch": null
+  },
+  "decide": {
+    "turnId": "turn-s1-02-sam-kinds",
+    "bundleId": {
+      "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "build": 1
+    },
+    "stakes": "low",
+    "routing": {
+      "first": "haiku",
+      "second": "haiku"
+    },
+    "reads": [
+      {
+        "model": "haiku",
+        "role": "first",
+        "output": {
+          "language": "en",
+          "parts": [
+            {
+              "verb": "choose",
+              "quote": "Barbershop and plumbing",
+              "question": "oq-s1-02",
+              "choice": "c-01",
+              "fields": [
+                {
+                  "name": "kinds",
+                  "value": "Barbershop, plumbing, electrical",
+                  "words": "Barbershop, plumbing, electrical"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "model": "haiku",
+        "role": "check",
+        "output": {
+          "language": "en",
+          "parts": [
+            {
+              "verb": "choose",
+              "quote": "Barbershop and plumbing",
+              "question": "oq-s1-02",
+              "choice": "c-01",
+              "fields": [
+                {
+                  "name": "kinds",
+                  "value": "Barbershop, plumbing, electrical",
+                  "words": "Barbershop, plumbing, electrical"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "agreed": true,
+    "reread": false,
+    "language": "en",
+    "parts": [
+      {
+        "part": {
+          "verb": "choose",
+          "quote": "Barbershop and plumbing",
+          "question": "oq-s1-02",
+          "choice": "c-01",
+          "fields": [
+            {
+              "name": "kinds",
+              "value": "Barbershop, plumbing, electrical",
+              "words": "Barbershop, plumbing, electrical"
+            }
+          ]
+        },
+        "outcome": "go"
+      }
+    ]
+  }
+}

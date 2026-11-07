@@ -1,0 +1,61 @@
+{
+  "turnId": "turn-a7-17-alex-2",
+  "bundleId": {
+    "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82",
+    "build": 1
+  },
+  "stakes": "high",
+  "routing": {
+    "first": "sonnet",
+    "second": "haiku"
+  },
+  "reads": [
+    {
+      "model": "sonnet",
+      "role": "first",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "2",
+            "question": "oq-a7-17",
+            "choice": "c-02",
+            "fields": []
+          }
+        ]
+      }
+    },
+    {
+      "model": "haiku",
+      "role": "check",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "choose",
+            "quote": "2",
+            "question": "oq-a7-17",
+            "choice": "c-02",
+            "fields": []
+          }
+        ]
+      }
+    }
+  ],
+  "agreed": true,
+  "reread": false,
+  "language": "en",
+  "parts": [
+    {
+      "part": {
+        "verb": "choose",
+        "quote": "2",
+        "question": "oq-a7-17",
+        "choice": "c-02",
+        "fields": []
+      },
+      "outcome": "go"
+    }
+  ]
+}

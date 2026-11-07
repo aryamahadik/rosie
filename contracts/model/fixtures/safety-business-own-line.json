@@ -1,0 +1,27 @@
+{
+  "eventId": "evt-alex-0207",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "Needs the business's own line",
+        "tense": "now",
+        "evidence": "is the beard color okay if I'm allergic to hair dye?",
+        "atRisk": "the writer",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [],
+  "outcomes": [
+    "Needs the business's own line"
+  ],
+  "liftedToUnsure": false
+}

@@ -38,6 +38,11 @@
           "type": "string",
           "pattern": "^[A-Za-z0-9_.-]+$"
         },
+        "rule": {
+          "description": "A named rule that holds across the parts of one fixture where JSON Schema cannot state it, such as a choice that must be one the paired context offers (T-011). The contract's rules file, contracts/<name>/<name>.rules.mjs, exports it in `rules`; it takes the fixture and returns its problems. The fixture must pass its schema first, so a refused fixture is refused by the rule alone; an accepted one must pass the rule too.",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9]*$"
+        },
         "table": {
           "description": "Database parts only (item 3): the table a seed row belongs to. Such a row is checked by the part's contract test against a migrated database (item 12), not by contracts:check; it takes no schema or def.",
           "type": "string",
@@ -67,6 +72,9 @@
           },
           {
             "required": ["table", "def"]
+          },
+          {
+            "required": ["table", "rule"]
           }
         ]
       }

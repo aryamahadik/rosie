@@ -1,0 +1,26 @@
+{
+  "eventId": "evt-alex-0210",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "timeout"
+    },
+    {
+      "model": "sonnet",
+      "result": "timeout"
+    }
+  ],
+  "read": null,
+  "timedOut": true,
+  "dangerWords": [
+    {
+      "words": "cut won't stop bleeding",
+      "list": "plugin"
+    }
+  ],
+  "outcomes": [
+    "Unsure"
+  ],
+  "liftedToUnsure": true
+}

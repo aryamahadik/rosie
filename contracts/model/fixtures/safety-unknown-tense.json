@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-alex-0209",
+  "source": "text",
+  "tries": [
+    {
+      "model": "haiku",
+      "result": "verdict"
+    }
+  ],
+  "read": {
+    "labels": [
+      {
+        "outcome": "An emergency",
+        "tense": "unknown",
+        "evidence": "there was a fire in the back room",
+        "atRisk": "unknown",
+        "writer": "the person at the handle"
+      }
+    ]
+  },
+  "timedOut": false,
+  "dangerWords": [
+    {
+      "words": "fire",
+      "list": "general"
+    }
+  ],
+  "outcomes": [
+    "An emergency"
+  ],
+  "liftedToUnsure": false
+}

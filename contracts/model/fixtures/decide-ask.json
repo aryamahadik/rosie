@@ -1,0 +1,67 @@
+{
+  "turnId": "turn-sam-1-two-requests",
+  "bundleId": {
+    "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82",
+    "build": 1
+  },
+  "stakes": "high",
+  "routing": {
+    "first": "sonnet",
+    "second": "haiku"
+  },
+  "reads": [
+    {
+      "model": "sonnet",
+      "role": "first",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "ask",
+            "quote": "1",
+            "questions": [
+              "oq-a6-02",
+              "oq-b6-04"
+            ],
+            "unclear": "'1' could accept the request at Lee's Barbershop or the one at Lee Home Services."
+          }
+        ]
+      }
+    },
+    {
+      "model": "haiku",
+      "role": "check",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "ask",
+            "quote": "1",
+            "questions": [
+              "oq-a6-02",
+              "oq-b6-04"
+            ],
+            "unclear": "'1' could accept the request at Lee's Barbershop or the one at Lee Home Services."
+          }
+        ]
+      }
+    }
+  ],
+  "agreed": true,
+  "reread": false,
+  "language": "en",
+  "parts": [
+    {
+      "part": {
+        "verb": "ask",
+        "quote": "1",
+        "questions": [
+          "oq-a6-02",
+          "oq-b6-04"
+        ],
+        "unclear": "'1' could accept the request at Lee's Barbershop or the one at Lee Home Services."
+      },
+      "outcome": "go"
+    }
+  ]
+}

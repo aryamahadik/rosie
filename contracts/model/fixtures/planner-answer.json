@@ -1,0 +1,10 @@
+{
+  "language": "en",
+  "action": {
+    "verb": "answer",
+    "text": "Lee's Barbershop's fee for a missed visit is $20.",
+    "facts": [
+      "pay.noshow"
+    ]
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "fixtures": [
+    {
+      "file": "context-s1-02.json",
+      "version": "v1",
+      "def": "context",
+      "expect": "accept",
+      "shows": "What decide is given when Sam, signing up, names the kinds of work: S1-02's open question with its three options and card, a door and an any-time row, Sam's roles and language, the always-on prefix by hash, Rosie's opener as the last message.",
+      "source": "02-contracts K-02 Fixtures; arch 03 line 181; S1-02 (contracts/bundle/fixtures/bundle-v0-skeleton.json)"
+    },
+    {
+      "file": "decide-s1-02-choose.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Two Haiku reads agree on choose(S1-02's open question, 'All on the list', kinds with its words): low stakes, no re-read, the part goes ahead.",
+      "source": "02-contracts K-02 Fixtures; arch 03 line 183; arch 02 line 119; S1-02"
+    },
+    {
+      "file": "context-two-requests.json",
+      "version": "v1",
+      "def": "context",
+      "expect": "accept",
+      "shows": "Sam's 'block thursday afternoon and also tile is $12 a foot from now on' with the owner hub S11-12's cases as choices, its card, and the Lee Tile service fact with its home, row and version.",
+      "source": "arch 04 'Two requests, one turn, nothing changed yet'; arch 03 line 163 (owner hub S11-12); arch 02 line 117"
+    },
+    {
+      "file": "decide-two-requests.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Two parts, two choices: BLOCK with 'thursday afternoon', and a settings change with the service and $12 as money with its words; both go to the gate, which saves both as pending.",
+      "source": "arch 04; arch 03 lines 183 and 185; S11-12, S11-13, S11-20"
+    },
+    {
+      "file": "decide-bare-2.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Alex's bare '2' answers the one open question (A7-17's '2 Another time'); high stakes, so Sonnet reads first and Haiku checks.",
+      "source": "S13-24 rule 8; arch 03 line 187; A7-17; arch 06 line 287; Q-26"
+    },
+    {
+      "file": "decide-poll-vote.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Sam's poll vote 'Block around it' answers its own poll (S11-13's read-back); the question can move bookings, so the turn is high stakes.",
+      "source": "arch 03 line 187 ('a poll vote answers its own poll'); arch 04; S11-13; arch 01 line 79"
+    },
+    {
+      "file": "decide-tapback-asks-which.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "A tapback on A7-17's question is never a yes: the reads agree on ask, so Rosie asks which.",
+      "source": "A7-17 ('A bare ok or a reaction isn't a choice: Rosie asks which one'); arch 03 line 187"
+    },
+    {
+      "file": "decide-no-op-thanks.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "A thank-you needs nothing done: no_op.",
+      "source": "arch 03 line 183"
+    },
+    {
+      "file": "decide-none-fits.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Nothing offered is about gift cards: none_fits with why, so meaning search runs next.",
+      "source": "arch 03 lines 183 and 189; S1-02 ('Gift cards are never set up either')"
+    },
+    {
+      "file": "decide-ask.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Sam's '1' could accept either open request (A6-02 at Lee's Barbershop, B6-04 at Lee Home Services): ask names both questions and what is unclear, for one lettered 'which?'.",
+      "source": "arch 03 lines 183 and 187; S13-12; A6-02; B6-04"
+    },
+    {
+      "file": "decide-pass-on.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Words for the business are passed on as they are: pass_on with the words.",
+      "source": "arch 03 line 183"
+    },
+    {
+      "file": "decide-hand-off.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Alex asks for Sam: hand_off with the reason.",
+      "source": "arch 03 line 183; arch 06 line 329; A3-51 ('Asks for a person')"
+    },
+    {
+      "file": "decide-redact.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "A skin-test answer never goes in a text or through the AI at a barbershop: redact with the words.",
+      "source": "arch 03 line 183; fixture set v1 test-kit/shops/barber.json messages_never; RULES 4.5"
+    },
+    {
+      "file": "decide-reads-disagree.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Sonnet picks the stand-in and Haiku another time: the reads disagree, the one Sonnet re-read runs and is still unclear, so the part ends in one question and nothing changes.",
+      "source": "arch 02 line 119; arch 06 lines 287 and 289; Q-41; A7-17"
+    },
+    {
+      "file": "safety-no.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "A plain booking text reads No.",
+      "source": "A3-22 ('Means No'); arch 02 line 111"
+    },
+    {
+      "file": "safety-emergency-now.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "A dye reaction happening now, matched by the barbershop's own danger words: An emergency, now.",
+      "source": "A3-22 ('Means An emergency'); fixture set v1 test-kit/shops/barber.json safety_stop; arch 06 line 283"
+    },
+    {
+      "file": "safety-crisis-words.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "Self-harm words: Crisis words, now.",
+      "source": "A3-22 ('Means Crisis words'); arch 02 line 111; arch 06 line 323"
+    },
+    {
+      "file": "safety-threat.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "The writer threatens a barber: A threat to staff or others, with who is at risk.",
+      "source": "A3-22 ('Means A threat to staff or others'); arch 06 line 325"
+    },
+    {
+      "file": "safety-child-or-elder.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "An older adult left without care: Harm to a child or older adult.",
+      "source": "A3-22 ('Means Harm to a child or older adult'); arch 06 line 319"
+    },
+    {
+      "file": "safety-unsafe-at-home.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "At risk from someone at home, not in danger this minute: Unsafe at home, could restart.",
+      "source": "A3-22 ('Means Unsafe at home'); arch 06 line 321"
+    },
+    {
+      "file": "safety-business-own-line.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "A dye-allergy question only the barbershop's own people may answer: Needs the business's own line.",
+      "source": "A3-22 ('Means Needs the business's own line'); fixture set v1 test-kit/shops/barber.json messages_never"
+    },
+    {
+      "file": "safety-over-gas-leak.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "'the gas leak was fixed in March' matches a danger word but its tense is over, so it stays No and is not lifted.",
+      "source": "arch 06 line 283"
+    },
+    {
+      "file": "safety-unknown-tense.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "A fire with no time given: An emergency with tense unknown, which reads as danger.",
+      "source": "arch 06 line 329; S13-24 rule 10"
+    },
+    {
+      "file": "safety-timeout-danger-word.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "No verdict in 4 s from Haiku or Sonnet, and the barbershop's danger words match: the timeout marker, no read, and Unsure.",
+      "source": "arch 02 line 111; arch 06 line 283; fixture set v1 test-kit/shops/barber.json safety_stop"
+    },
+    {
+      "file": "planner-answer.json",
+      "version": "v1",
+      "def": "plannerOutput",
+      "expect": "accept",
+      "shows": "The planner answers from a stored fact, the shop's $20 missed-visit fee (pay.noshow).",
+      "source": "arch 06 line 291; fixture set v1 test-kit/shops/barber.json (Haircut, $20 fee); record.slots pay.noshow"
+    },
+    {
+      "file": "planner-log-gap.json",
+      "version": "v1",
+      "def": "plannerOutput",
+      "expect": "accept",
+      "shows": "Nothing stored answers it: the planner logs a gap case.",
+      "source": "arch 06 line 291; arch 01 line 95; arch 03 line 189"
+    },
+    {
+      "file": "invalid/refuse-unknown-verb.json",
+      "version": "v1",
+      "def": "decideRead",
+      "expect": "refuse",
+      "shows": "A read with the verb book, which is none of the eight: the model-facing schema refuses it.",
+      "source": "arch 03 line 183; arch 06 line 335 ('It picks choices; code runs each choice's effects once')"
+    },
+    {
+      "file": "invalid/refuse-option-not-offered.json",
+      "version": "v1",
+      "def": "contextAndDecide",
+      "rule": "optionOffered",
+      "expect": "refuse",
+      "shows": "Both reads choose c-99, which the context's choices do not hold; the pair is valid JSON Schema, and the named rule optionOffered refuses it.",
+      "source": "arch 06 line 333 ('Code hands it the choices'); arch 01 line 69; T-360 finding 3 (option ids are checked in code)"
+    },
+    {
+      "file": "invalid/refuse-quote-not-in-text.json",
+      "version": "v1",
+      "def": "contextAndDecide",
+      "rule": "quoteInText",
+      "expect": "refuse",
+      "shows": "The quote 'Barbershop and plumbing' is not in Sam's text 'Barbershop, plumbing, electrical'; the pair is valid JSON Schema, and the named rule quoteInText refuses it.",
+      "source": "arch 03 line 185 ('each part is quoted exactly, and code confirms the quote')"
+    },
+    {
+      "file": "invalid/refuse-value-without-words.json",
+      "version": "v1",
+      "def": "decideRead",
+      "expect": "refuse",
+      "shows": "A field with a value but empty words: the model-facing schema refuses it.",
+      "source": "arch 03 lines 183 and 185; arch 06 line 309 (limit 6)"
+    },
+    {
+      "file": "invalid/refuse-planner-books.json",
+      "version": "v1",
+      "def": "plannerOutput",
+      "expect": "refuse",
+      "shows": "A planner output that books: book is none of the five verbs, so the model-facing schema refuses it.",
+      "source": "arch 06 line 291 ('It never books, charges, refunds, cancels, moves ...')"
+    },
+    {
+      "file": "invalid/refuse-over-60-choices.json",
+      "version": "v1",
+      "def": "context",
+      "expect": "refuse",
+      "shows": "A context with 61 choices: the frontier is never more than 60.",
+      "source": "arch 01 line 69; arch 03 line 167"
+    }
+  ]
+}
