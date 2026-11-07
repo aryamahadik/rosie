@@ -1,0 +1,18 @@
+{
+  "call": "capabilityCheck",
+  "given": {
+    "now": "2026-10-21T12:29:59Z",
+    "note": "Before a message to Tomás, with no text of his to answer, code asks what his number supports: no iMessage now, RCS. The answer is cached for 10 minutes, so polls and calendar files are off and a link card is allowed."
+  },
+  "request": {
+    "phone": "+15555550105"
+  },
+  "outcome": {
+    "result": "checked",
+    "phone": "+15555550105",
+    "imessage": false,
+    "service": "rcs",
+    "checkedAt": "2026-10-21T12:29:59Z",
+    "cacheSeconds": 600
+  }
+}

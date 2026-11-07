@@ -1,0 +1,33 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-23T14:06:12Z",
+    "note": "Alex has two open questions; the reply answers the move question, so it threads under that question's message (linq-msg-demo-0001)."
+  },
+  "request": {
+    "idempotencyKey": "out-alex-moved-sat-2pm/1/1",
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "kind": "words",
+    "text": "Done. Your haircut with Riley at Lee's Barbershop is now Sat 2:00pm.",
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": {
+      "messageId": "linq-msg-demo-0001"
+    },
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "linq-msg-demo-0004",
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "acceptedAt": "2026-10-23T14:06:12Z"
+  }
+}

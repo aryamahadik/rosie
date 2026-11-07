@@ -1,0 +1,37 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-23T14:05:03Z",
+    "note": "send-text.json with Linq's text decorations making 'Lee's Barbershop' bold: bold is untested, so v1 has no field for it until its test passes (MC 8)."
+  },
+  "request": {
+    "idempotencyKey": "out-a7-03-alex/1/1",
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "kind": "words",
+    "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+    "textDecorations": [
+      {
+        "style": "bold",
+        "range": [42, 58]
+      }
+    ],
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "linq-msg-demo-0001",
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "acceptedAt": "2026-10-23T14:05:03Z"
+  }
+}

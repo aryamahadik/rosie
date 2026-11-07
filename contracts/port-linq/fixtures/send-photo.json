@@ -1,0 +1,34 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-10-19T14:20:00Z",
+    "note": "A photo to Sam, as tested on Nov 5 (MC 8). No K-03 v1 step sends one yet; the port carries it for a later K-03 minor version. The file id is K-13's placeholder until F8."
+  },
+  "request": {
+    "idempotencyKey": "out-sam-photo-demo/1/1",
+    "to": "+15555550100",
+    "chatId": "linq-chat-demo-sam",
+    "service": "imessage",
+    "kind": "photo",
+    "text": null,
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": {
+      "fileId": "file-demo-lees-price-list",
+      "mediaType": "image/jpeg"
+    },
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "linq-msg-demo-0020",
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-sam",
+    "service": "imessage",
+    "acceptedAt": "2026-10-19T14:20:01Z"
+  }
+}

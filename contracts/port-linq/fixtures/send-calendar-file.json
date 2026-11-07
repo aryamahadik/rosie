@@ -1,0 +1,35 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-11-07T15:06:35Z",
+    "note": "Alex's confirmation with Riley at Lee's Barbershop: the words carry a new calendar file built from the booking (K-07 out-alex-booked-riley, part 1)."
+  },
+  "request": {
+    "idempotencyKey": "out-alex-booked-riley/1/1",
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "kind": "words",
+    "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am",
+    "calendarFile": {
+      "action": "new",
+      "fileName": "lees-barbershop-haircut.ics",
+      "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Rosfield//Rosie//EN\r\nMETHOD:PUBLISH\r\nBEGIN:VEVENT\r\nUID:booking-alex-riley-nov14\r\nSEQUENCE:0\r\nDTSTAMP:20261107T150635Z\r\nDTSTART:20261114T160000Z\r\nDTEND:20261114T163000Z\r\nSUMMARY:Haircut with Riley at Lee's Barbershop\r\nSTATUS:CONFIRMED\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+    },
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "linq-msg-demo-0012",
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "acceptedAt": "2026-11-07T15:06:36Z"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "chat_id": "linq-chat-demo-alex",
+  "created_at": "2026-10-23T14:05:05Z",
+  "message_id": "linq-msg-demo-0002",
+  "poll": {
+    "options": [
+      { "option_id": "linq-opt-demo-1", "text": "Sat 12:00pm", "can_be_edited": false, "voters": [] },
+      { "option_id": "linq-opt-demo-2", "text": "Sat 2:00pm", "can_be_edited": false, "voters": [] },
+      { "option_id": "linq-opt-demo-3", "text": "Sat 3:30pm", "can_be_edited": false, "voters": [] }
+    ],
+    "total_voters": 0
+  },
+  "reactions": [],
+  "updated_at": "2026-10-23T14:05:05Z"
+}

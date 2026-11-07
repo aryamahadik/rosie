@@ -1,0 +1,9 @@
+{
+  "message": {
+    "parts": [
+      { "type": "text", "value": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am" },
+      { "type": "media", "attachment_id": "linq-att-demo-0002" }
+    ],
+    "idempotency_key": "out-alex-booked-riley/1/1"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "success": false,
+  "error": {
+    "status": 429,
+    "code": 1007,
+    "message": "Rate limit exceeded",
+    "doc_url": "https://docs.linqapp.com/error/codes/1xxx/1007/",
+    "retry_after": 65
+  },
+  "trace_id": "linq-trace-demo-0015"
+}

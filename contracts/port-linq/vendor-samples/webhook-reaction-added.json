@@ -1,0 +1,23 @@
+{
+  "api_version": "v3",
+  "webhook_version": "2026-02-03",
+  "event_type": "reaction.added",
+  "event_id": "evt-alex-0013",
+  "created_at": "2026-10-23T14:08:05Z",
+  "trace_id": "linq-trace-demo-0007",
+  "partner_id": "partner-demo",
+  "data": {
+    "chat_id": "linq-chat-demo-alex",
+    "message_id": "linq-msg-demo-in-alex-0012",
+    "part_index": 0,
+    "reaction_id": "linq-reaction-demo-0001",
+    "reaction_type": "like",
+    "custom_emoji": null,
+    "is_from_me": true,
+    "from": "+15555550199",
+    "from_handle": { "handle": "+15555550199", "is_me": true, "service": "iMessage" },
+    "service": "iMessage",
+    "reacted_at": "2026-10-23T14:08:04Z",
+    "sticker": null
+  }
+}

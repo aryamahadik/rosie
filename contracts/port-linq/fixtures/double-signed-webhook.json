@@ -1,0 +1,49 @@
+{
+  "call": "doubleWebhook",
+  "given": {
+    "now": "2026-10-20T13:00:01Z",
+    "note": "On staging's test-phone page, Maya's test phone asks about Saturday's class as a threaded reply; the Linq double signs a webhook in Linq's form, and verifyWebhook on it gives back K-06 test-phone-page.json.",
+    "signing": "valid"
+  },
+  "request": {
+    "event": {
+      "eventId": "evt-double-0104-0001",
+      "provider": "linq",
+      "handle": {
+        "kind": "phone",
+        "address": "+15555550104"
+      },
+      "service": "imessage",
+      "kind": "text",
+      "messageId": "linq-msg-double-in-0104-0001",
+      "chatId": "linq-chat-double-0104",
+      "sentAt": "2026-10-20T13:00:00Z",
+      "receivedAt": "2026-10-20T13:00:01Z",
+      "body": "Is there a spot in Saturday's class?",
+      "scrubbed": {
+        "cards": 0,
+        "ssns": 0
+      },
+      "attachments": [],
+      "threadedReplyTo": "linq-msg-double-0104-0000",
+      "poll": null,
+      "reaction": null,
+      "edit": null,
+      "status": null,
+      "fromRosie": false,
+      "email": null,
+      "traceId": "trace-double-0104-0001"
+    }
+  },
+  "outcome": {
+    "result": "signed",
+    "webhook": {
+      "webhookId": "evt-double-0104-0001",
+      "timestamp": "1792501201",
+      "signature": "v1,signed-at-test-time",
+      "raw": "{\"api_version\":\"v3\",\"webhook_version\":\"2026-02-03\",\"event_type\":\"message.received\",\"event_id\":\"evt-double-0104-0001\",\"created_at\":\"2026-10-20T13:00:01Z\",\"trace_id\":\"linq-trace-double-0001\",\"partner_id\":\"partner-double\",\"data\":{\"chat\":{\"id\":\"linq-chat-double-0104\",\"is_group\":false},\"id\":\"linq-msg-double-in-0104-0001\",\"direction\":\"inbound\",\"sender_handle\":{\"handle\":\"+15555550104\",\"is_me\":false,\"service\":\"iMessage\"},\"parts\":[{\"type\":\"text\",\"value\":\"Is there a spot in Saturday's class?\"}],\"reply_to\":{\"message_id\":\"linq-msg-double-0104-0000\",\"part_index\":0},\"sent_at\":\"2026-10-20T13:00:00Z\",\"service\":\"iMessage\"}}",
+      "receivedAt": "2026-10-20T13:00:01Z",
+      "traceId": "trace-double-0104-0001"
+    }
+  }
+}

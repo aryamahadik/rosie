@@ -1,0 +1,10 @@
+{
+  "success": false,
+  "error": {
+    "status": 500,
+    "code": 4006,
+    "message": "Message send timed out",
+    "doc_url": "https://docs.linqapp.com/error/codes/4xxx/4006/"
+  },
+  "trace_id": "linq-trace-demo-0014"
+}

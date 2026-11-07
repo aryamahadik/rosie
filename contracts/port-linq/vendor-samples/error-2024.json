@@ -1,0 +1,10 @@
+{
+  "success": false,
+  "error": {
+    "status": 403,
+    "code": 2024,
+    "message": "Recipient asked you to stop messaging them",
+    "doc_url": "https://docs.linqapp.com/error/codes/2xxx/2024/"
+  },
+  "trace_id": "linq-trace-demo-0013"
+}

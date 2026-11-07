@@ -1,0 +1,31 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-11-07T15:10:02Z",
+    "note": "The secure page link for Alex's haircut at Lee's Barbershop as a link card, the whole message, after the words that explain it. The link host is a config value (Q-51); example.com stands in."
+  },
+  "request": {
+    "idempotencyKey": "out-alex-secure-link/2/1",
+    "to": "+15555550101",
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "kind": "linkCard",
+    "text": null,
+    "calendarFile": null,
+    "options": [],
+    "link": "https://rosie.example.com/b/booking-alex-haircut",
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "linq-msg-demo-0003",
+    "providerOptionIds": null,
+    "chatId": "linq-chat-demo-alex",
+    "service": "imessage",
+    "acceptedAt": "2026-11-07T15:10:02Z"
+  }
+}

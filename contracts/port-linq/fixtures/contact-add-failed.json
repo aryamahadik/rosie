@@ -1,0 +1,17 @@
+{
+  "call": "contactAdd",
+  "given": {
+    "now": "2026-11-07T16:00:01Z",
+    "note": "A walk-in's mobile is saved, but Linq refuses the contact (the line's plan holds a fixed number of contacts: arch 11 line 572). Not retryable: no chat link or QR is shown, and the person uses the booking page, email or their own AI (Q-03)."
+  },
+  "request": {
+    "phone": "+15555550107"
+  },
+  "outcome": {
+    "result": "failed",
+    "phone": "+15555550107",
+    "retryable": false,
+    "code": null,
+    "reason": "Linq refused the contact: the line's contact list is full"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "call": "sendPart",
+  "given": {
+    "now": "2026-11-07T19:00:05Z",
+    "note": "Avery's new-booking text meets Linq's rate limit (30 messages a minute per person): 429 with code 1007 and a Retry-After of 65 s, which the claim keeps as nextTryNotBefore (K-07 outbox-retry-after-reclaimed)."
+  },
+  "request": {
+    "idempotencyKey": "out-avery-new-booking-alex/1/1",
+    "to": "+15555550103",
+    "chatId": "linq-chat-demo-avery",
+    "service": "imessage",
+    "kind": "words",
+    "text": "New booking: Alex M. at Sat Nov 21, 11:00am.",
+    "calendarFile": null,
+    "options": [],
+    "link": null,
+    "photo": null,
+    "tapback": null,
+    "threadedReplyTo": null,
+    "typing": null,
+    "overrideOptout": false
+  },
+  "outcome": {
+    "result": "failed",
+    "kind": "rateLimited",
+    "httpStatus": 429,
+    "code": "1007",
+    "reason": "Rate limit exceeded",
+    "retryAfterSeconds": 65,
+    "providerMessageId": null
+  }
+}

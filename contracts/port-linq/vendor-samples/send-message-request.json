@@ -1,0 +1,10 @@
+{
+  "message": {
+    "parts": [
+      { "type": "text", "value": "Done. Your haircut with Riley at Lee's Barbershop is now Sat 2:00pm." }
+    ],
+    "reply_to": { "message_id": "linq-msg-demo-0001", "part_index": 0 },
+    "idempotency_key": "out-alex-moved-sat-2pm/1/1"
+  },
+  "override_optout": false
+}

@@ -1,0 +1,6 @@
+{
+  "message": {
+    "parts": [{ "type": "link", "value": "https://rosie.example.com/b/booking-alex-haircut" }],
+    "idempotency_key": "out-alex-secure-link/2/1"
+  }
+}

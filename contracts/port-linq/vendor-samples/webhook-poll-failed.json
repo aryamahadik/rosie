@@ -1,0 +1,26 @@
+{
+  "api_version": "v3",
+  "webhook_version": "2026-02-03",
+  "event_type": "poll.failed",
+  "event_id": "evt-linq-poll-failed-0001",
+  "created_at": "2026-10-23T14:05:07Z",
+  "trace_id": "linq-trace-demo-0011",
+  "partner_id": "partner-demo",
+  "data": {
+    "message_id": "linq-msg-demo-0002",
+    "direction": "outbound",
+    "chat": { "id": "linq-chat-demo-alex", "is_group": false },
+    "sender_handle": null,
+    "poll": {
+      "options": [
+        { "option_id": "linq-opt-demo-1", "text": "Sat 12:00pm" },
+        { "option_id": "linq-opt-demo-2", "text": "Sat 2:00pm" },
+        { "option_id": "linq-opt-demo-3", "text": "Sat 3:30pm" }
+      ],
+      "total_voters": 0
+    },
+    "service": "iMessage",
+    "error": { "code": 4001, "message": "Message send failed" },
+    "failed_at": "2026-10-23T14:05:06Z"
+  }
+}

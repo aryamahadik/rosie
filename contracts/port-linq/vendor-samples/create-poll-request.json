@@ -1,0 +1,6 @@
+{
+  "poll": {
+    "options": [{ "text": "Sat 12:00pm" }, { "text": "Sat 2:00pm" }, { "text": "Sat 3:30pm" }],
+    "idempotency_key": "out-a7-03-alex/2/1"
+  }
+}
