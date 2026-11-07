@@ -1,0 +1,82 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "effects",
+      "values": {
+        "id": "effect-bill-movers-2026-10-pay-link",
+        "turn_id": null,
+        "job_id": "job-monthly-billing-2026-11-02",
+        "business_id": "biz-movers",
+        "booking_id": null,
+        "kind": "stripe_pay_link",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-sam",
+        "handle_id": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "port_request": {
+          "monthlyBillId": "bill-movers-2026-10"
+        },
+        "idempotency_key": "rosfield-bill-movers-2026-10-pay-link",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-02T16:00:01Z",
+        "last_try_at": "2026-11-02T16:00:01Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-pay-link-demo-movers-2026-10",
+        "error_code": null,
+        "ledger_line_id": null,
+        "trace_id": "trace-bill-movers-2026-10-pay-link",
+        "created_at": "2026-11-02T16:00:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "monthly_bills",
+      "values": {
+        "id": "bill-movers-2026-10",
+        "business_id": "biz-movers",
+        "month": "2026-10-01",
+        "bill_date": "2026-11-02",
+        "charge_on": "2026-11-04",
+        "sent_at": "2026-11-02T16:00:00Z",
+        "total_cents": 200,
+        "currency": "USD",
+        "bill_card_id": null,
+        "state": "pay_link",
+        "charge_effect_id": null,
+        "charged_at": null,
+        "declined_at": null,
+        "pay_link_effect_id": "effect-bill-movers-2026-10-pay-link",
+        "pay_link_sent_at": "2026-11-02T16:00:05Z",
+        "pay_by": "2026-11-16",
+        "paid_at": null,
+        "paused_at": null,
+        "version": 2
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "monthly_bills",
+    "set": {
+      "state": "paused",
+      "paused_at": "2026-11-10T05:00:00Z",
+      "version": 3
+    },
+    "where": {
+      "id": "bill-movers-2026-10"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["monthly_bills_paused_after_pay_by"]
+    }
+  }
+}

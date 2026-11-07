@@ -1,0 +1,49 @@
+{
+  "after": ["seed-monthly-bill.json"],
+  "rows": [
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-beard-trim",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "done",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 4
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "monthly_bill_lines",
+    "values": {
+      "id": "billline-lees-barbershop-2026-10-alex-beard-trim",
+      "bill_id": "bill-lees-barbershop-2026-10",
+      "business_id": "biz-lees-barbershop",
+      "kind": "rosfield_2",
+      "fee_id": "fee-rosfield2-alex-beard-trim",
+      "booking_id": "booking-alex-beard-trim",
+      "counts_for_person_id": "person-avery",
+      "plan_charge_cents": null,
+      "amount_cents": 300,
+      "currency": "USD",
+      "questioned_at": null,
+      "questioned_by_person_id": null,
+      "question": null,
+      "answered_at": null,
+      "answered_by_person_id": null,
+      "outcome": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["monthly_bill_lines_two_dollars"]
+    }
+  }
+}

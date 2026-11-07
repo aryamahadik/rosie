@@ -1,0 +1,134 @@
+{
+  "after": ["seed-bill-card.json", "../../core/fixtures/seed-booking-head.json", "../../core/fixtures/seed-phone-stopped.json"],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-owen",
+        "name": "Owen H.",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-owen-plan-oct31",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "done",
+        "booker_person_id": "person-owen",
+        "served_person_id": "person-owen",
+        "payer_person_id": "person-owen",
+        "private": false,
+        "deceased": false,
+        "version": 4
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-ben-trim",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "done",
+        "booker_person_id": "person-ben",
+        "served_person_id": "person-ben",
+        "payer_person_id": "person-ben",
+        "private": false,
+        "deceased": false,
+        "version": 4
+      }
+    },
+    {
+      "table": "monthly_bills",
+      "values": {
+        "id": "bill-lees-barbershop-2026-10",
+        "business_id": "biz-lees-barbershop",
+        "month": "2026-10-01",
+        "bill_date": "2026-11-02",
+        "charge_on": "2026-11-04",
+        "sent_at": "2026-11-02T16:00:00Z",
+        "total_cents": 600,
+        "currency": "USD",
+        "bill_card_id": "billcard-lees-barbershop-1",
+        "state": "sent",
+        "charge_effect_id": null,
+        "charged_at": null,
+        "declined_at": null,
+        "pay_link_effect_id": null,
+        "pay_link_sent_at": null,
+        "pay_by": null,
+        "paid_at": null,
+        "paused_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "monthly_bill_lines",
+      "values": {
+        "id": "billline-lees-barbershop-2026-10-alex",
+        "bill_id": "bill-lees-barbershop-2026-10",
+        "business_id": "biz-lees-barbershop",
+        "kind": "rosfield_2",
+        "fee_id": "fee-rosfield2-alex-haircut",
+        "booking_id": "booking-alex-haircut",
+        "counts_for_person_id": "person-riley",
+        "plan_charge_cents": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "questioned_at": null,
+        "questioned_by_person_id": null,
+        "question": null,
+        "answered_at": null,
+        "answered_by_person_id": null,
+        "outcome": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "monthly_bill_lines",
+      "values": {
+        "id": "billline-lees-barbershop-2026-10-owen",
+        "bill_id": "bill-lees-barbershop-2026-10",
+        "business_id": "biz-lees-barbershop",
+        "kind": "rosfield_2",
+        "fee_id": "fee-rosfield2-owen-plan-oct31",
+        "booking_id": "booking-owen-plan-oct31",
+        "counts_for_person_id": "person-riley",
+        "plan_charge_cents": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "questioned_at": null,
+        "questioned_by_person_id": null,
+        "question": null,
+        "answered_at": null,
+        "answered_by_person_id": null,
+        "outcome": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "monthly_bill_lines",
+      "values": {
+        "id": "billline-lees-barbershop-2026-10-ben",
+        "bill_id": "bill-lees-barbershop-2026-10",
+        "business_id": "biz-lees-barbershop",
+        "kind": "rosfield_2",
+        "fee_id": "fee-rosfield2-ben-trim",
+        "booking_id": "booking-ben-trim",
+        "counts_for_person_id": "person-avery",
+        "plan_charge_cents": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "questioned_at": "2026-11-03T14:30:00Z",
+        "questioned_by_person_id": "person-sam",
+        "question": "Ben never came in, so there was no visit.",
+        "answered_at": null,
+        "answered_by_person_id": null,
+        "outcome": null,
+        "version": 2
+      }
+    }
+  ]
+}

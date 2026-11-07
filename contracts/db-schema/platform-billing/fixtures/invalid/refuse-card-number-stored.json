@@ -1,0 +1,26 @@
+{
+  "after": ["seed-bill-card.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-movers"
+    },
+    "action": "insert",
+    "table": "bill_cards",
+    "values": {
+      "id": "billcard-movers-1",
+      "business_id": "biz-movers",
+      "saved_by_person_id": "person-sam",
+      "stripe_customer_id": "stripe-customer-demo-sam-lee",
+      "stripe_payment_method_id": "0000 1111 2222 3333",
+      "saved_at": "2026-10-21T15:00:00Z",
+      "removed_at": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["bill_cards_no_card_number"]
+    }
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "after": ["../../business-setup/fixtures/seed-company-two-kinds.json"],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-jordan",
+        "name": "Jordan",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-alex-drain",
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "stage": "done",
+        "booker_person_id": "person-alex",
+        "served_person_id": "person-alex",
+        "payer_person_id": "person-alex",
+        "private": false,
+        "deceased": false,
+        "version": 6
+      }
+    },
+    {
+      "table": "bill_cards",
+      "values": {
+        "id": "billcard-lee-home-services-1",
+        "business_id": "biz-lee-home-services",
+        "saved_by_person_id": "person-sam",
+        "stripe_customer_id": "stripe-customer-demo-sam-lee",
+        "stripe_payment_method_id": "stripe-card-demo-sam-lee-2",
+        "saved_at": "2026-10-19T19:05:00Z",
+        "removed_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "effect-bill-lee-home-services-2026-10-charge",
+        "turn_id": null,
+        "job_id": "job-monthly-billing-charge-2026-11-04",
+        "business_id": "biz-lee-home-services",
+        "booking_id": null,
+        "kind": "rosfield_monthly_charge",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-sam",
+        "handle_id": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "port_request": {
+          "monthlyBillId": "bill-lee-home-services-2026-10"
+        },
+        "idempotency_key": "rosfield-bill-lee-home-services-2026-10-charge",
+        "state": "declined",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-04T16:00:00Z",
+        "last_try_at": "2026-11-04T16:00:00Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": null,
+        "error_code": "card_declined",
+        "ledger_line_id": null,
+        "trace_id": "trace-bill-lee-home-services-2026-10-charge",
+        "created_at": "2026-11-04T16:00:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "effects",
+      "values": {
+        "id": "effect-bill-lee-home-services-2026-10-pay-link",
+        "turn_id": null,
+        "job_id": "job-monthly-billing-charge-2026-11-04",
+        "business_id": "biz-lee-home-services",
+        "booking_id": null,
+        "kind": "stripe_pay_link",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-sam",
+        "handle_id": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "port_request": {
+          "monthlyBillId": "bill-lee-home-services-2026-10"
+        },
+        "idempotency_key": "rosfield-bill-lee-home-services-2026-10-pay-link",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-04T16:00:03Z",
+        "last_try_at": "2026-11-04T16:00:03Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-pay-link-demo-lee-home-services-2026-10",
+        "error_code": null,
+        "ledger_line_id": null,
+        "trace_id": "trace-bill-lee-home-services-2026-10-pay-link",
+        "created_at": "2026-11-04T16:00:02Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "monthly_bills",
+      "values": {
+        "id": "bill-lee-home-services-2026-10",
+        "business_id": "biz-lee-home-services",
+        "month": "2026-10-01",
+        "bill_date": "2026-11-02",
+        "charge_on": "2026-11-04",
+        "sent_at": "2026-11-02T16:00:00Z",
+        "total_cents": 200,
+        "currency": "USD",
+        "bill_card_id": "billcard-lee-home-services-1",
+        "state": "paused",
+        "charge_effect_id": "effect-bill-lee-home-services-2026-10-charge",
+        "charged_at": null,
+        "declined_at": "2026-11-04T16:00:01Z",
+        "pay_link_effect_id": "effect-bill-lee-home-services-2026-10-pay-link",
+        "pay_link_sent_at": "2026-11-04T16:00:05Z",
+        "pay_by": "2026-11-18",
+        "paid_at": null,
+        "paused_at": "2026-11-19T05:00:00Z",
+        "version": 4
+      }
+    },
+    {
+      "table": "monthly_bill_lines",
+      "values": {
+        "id": "billline-lee-home-services-2026-10-alex",
+        "bill_id": "bill-lee-home-services-2026-10",
+        "business_id": "biz-lee-home-services",
+        "kind": "rosfield_2",
+        "fee_id": "fee-rosfield2-alex-drain",
+        "booking_id": "booking-alex-drain",
+        "counts_for_person_id": "person-jordan",
+        "plan_charge_cents": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "questioned_at": null,
+        "questioned_by_person_id": null,
+        "question": null,
+        "answered_at": null,
+        "answered_by_person_id": null,
+        "outcome": null,
+        "version": 1
+      }
+    }
+  ]
+}
