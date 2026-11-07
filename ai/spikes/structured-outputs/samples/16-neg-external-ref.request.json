@@ -1,0 +1,142 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 4096,
+  "system": "You read one turn of texts to a booking assistant and map each part of it to one verb. Use only the choices listed. Quote each part's exact words.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<who>The owner of Flooring installer (demo shop), writing from the owner's phone.</who>\n<choices>\ndoor-block-time (door): Owner command: block time off the calendar.\ndoor-price-change (door): Owner command: change a service's price.\nany-stop (anytime_row): The sender asks Rosie to stop texting.\nq-1 (open question: 'Which day works for your floor consult?'): options opt-tue (Tuesday), opt-wed (Wednesday).\n</choices>\n<turn>block thursday afternoon and also tile is $12 a foot</turn>"
+    }
+  ],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://rosie.invalid/ai/spikes/structured-outputs/schemas/decide.candidate.schema.json",
+        "title": "DecideReadCandidate",
+        "description": "SPIKE CANDIDATE for T-360, not the contract: what one decide read returns, derived from ops/plan/02-contracts.md K-02 ('What decide returns') and architecture 03 'The model's contract' (verbs). Which models read, whether the reads agreed and whether the re-read ran are filled by code around the reads, so they are not in the model-facing shape. K-02 v1 (T-011, the architect) is the contract.",
+        "type": "object",
+        "properties": {
+          "parts": {
+            "description": "One entry per part of the turn's text (architecture 03: 'Verbs, one per part of the text').",
+            "type": "array",
+            "items": { "$ref": "#/$defs/part" }
+          }
+        },
+        "required": ["parts"],
+        "additionalProperties": false,
+        "$defs": {
+          "part": {
+            "type": "object",
+            "properties": {
+              "quote": {
+                "description": "The part's exact words from the turn; code confirms the quote (architecture 03 'Checks').",
+                "type": "string"
+              },
+              "action": {
+                "description": "The one verb for this part (architecture 03 'Verbs').",
+                "anyOf": [
+                  { "$ref": "#/$defs/choose" },
+                  { "$ref": "#/$defs/enter" },
+                  { "$ref": "#/$defs/ask" },
+                  { "$ref": "#/$defs/noneFits" },
+                  { "$ref": "#/$defs/passOn" },
+                  { "$ref": "#/$defs/handOff" },
+                  { "$ref": "#/$defs/redact" },
+                  { "$ref": "#/$defs/noOp" }
+                ]
+              }
+            },
+            "required": ["quote", "action"],
+            "additionalProperties": false
+          },
+          "field": {
+            "description": "A field with the words it came from; code re-parses every value from its words (architecture 03 'Checks'; principle 4).",
+            "type": "object",
+            "properties": { "name": { "type": "string" }, "words": { "type": "string" } },
+            "required": ["name", "words"],
+            "additionalProperties": false
+          },
+          "choose": {
+            "description": "choose(question, option, fields with their source words) (architecture 03).",
+            "type": "object",
+            "properties": {
+              "verb": { "type": "string", "const": "choose" },
+              "question_id": { "$ref": "../../../../contracts/common/formats.v1.schema.json#/$defs/id" },
+              "option_id": { "$ref": "../../../../contracts/common/formats.v1.schema.json#/$defs/id" },
+              "fields": { "type": "array", "items": { "$ref": "#/$defs/field" } }
+            },
+            "required": ["verb", "question_id", "option_id", "fields"],
+            "additionalProperties": false
+          },
+          "enter": {
+            "description": "enter(door or any-time row, fields) (architecture 03).",
+            "type": "object",
+            "properties": {
+              "verb": { "type": "string", "const": "enter" },
+              "target_kind": { "type": "string", "enum": ["door", "anytime_row"] },
+              "target_id": { "$ref": "../../../../contracts/common/formats.v1.schema.json#/$defs/id" },
+              "fields": { "type": "array", "items": { "$ref": "#/$defs/field" } }
+            },
+            "required": ["verb", "target_kind", "target_id", "fields"],
+            "additionalProperties": false
+          },
+          "ask": {
+            "description": "ask(questions, what is unclear) (architecture 03).",
+            "type": "object",
+            "properties": {
+              "verb": { "type": "string", "const": "ask" },
+              "question_ids": {
+                "type": "array",
+                "items": { "$ref": "../../../../contracts/common/formats.v1.schema.json#/$defs/id" }
+              },
+              "unclear": { "type": "string" }
+            },
+            "required": ["verb", "question_ids", "unclear"],
+            "additionalProperties": false
+          },
+          "noneFits": {
+            "description": "none_fits(why) (architecture 03).",
+            "type": "object",
+            "properties": { "verb": { "type": "string", "const": "none_fits" }, "why": { "type": "string" } },
+            "required": ["verb", "why"],
+            "additionalProperties": false
+          },
+          "passOn": {
+            "description": "pass_on(words) (architecture 03).",
+            "type": "object",
+            "properties": { "verb": { "type": "string", "const": "pass_on" }, "words": { "type": "string" } },
+            "required": ["verb", "words"],
+            "additionalProperties": false
+          },
+          "handOff": {
+            "description": "hand_off(reason) (architecture 03).",
+            "type": "object",
+            "properties": {
+              "verb": { "type": "string", "const": "hand_off" },
+              "reason": { "type": "string" }
+            },
+            "required": ["verb", "reason"],
+            "additionalProperties": false
+          },
+          "redact": {
+            "description": "redact(words) (architecture 03).",
+            "type": "object",
+            "properties": { "verb": { "type": "string", "const": "redact" }, "words": { "type": "string" } },
+            "required": ["verb", "words"],
+            "additionalProperties": false
+          },
+          "noOp": {
+            "description": "no_op (architecture 03).",
+            "type": "object",
+            "properties": { "verb": { "type": "string", "const": "no_op" } },
+            "required": ["verb"],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}

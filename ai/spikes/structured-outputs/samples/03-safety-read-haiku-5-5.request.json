@@ -1,0 +1,73 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 4096,
+  "system": "You read one raw text for safety before anything else happens. Label it with every outcome that applies, each with its tense, the words that support it, who is at risk and who wrote it.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<text>the gas leak was fixed in March, can we book the floor consult for next week?</text>"
+    }
+  ],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "title": "SafetyReadCandidate",
+        "description": "SPIKE CANDIDATE for T-360, not the contract: what the safety read returns for one raw text, derived from ops/plan/02-contracts.md K-02 ('The safety read's output') and architecture 06 (outcomes table and tense note). The timeout marker (no verdict in 4 s) is set by code, not by the model, so it is not in the model-facing shape. K-02 v1 (T-011, the architect) is the contract.",
+        "type": "object",
+        "properties": {
+          "labels": {
+            "description": "Several labels per text are allowed (architecture 06: 'Outcomes: 8, several per text, tense'). An empty list is not a verdict; code checks that at least one label came back.",
+            "type": "array",
+            "items": { "$ref": "#/$defs/label" }
+          }
+        },
+        "required": ["labels"],
+        "additionalProperties": false,
+        "$defs": {
+          "label": {
+            "type": "object",
+            "properties": {
+              "outcome": {
+                "description": "One of the 8 outcomes of A3-22 and B3-17, or unsure (architecture 06 'Safety outcomes and what they hold').",
+                "type": "string",
+                "enum": [
+                  "no",
+                  "safety_steps_then_go_on",
+                  "harm_to_child_or_older_adult",
+                  "needs_business_own_line",
+                  "unsafe_at_home",
+                  "emergency",
+                  "crisis_words",
+                  "threat_to_staff_or_others",
+                  "unsure"
+                ]
+              },
+              "tense": {
+                "description": "Each label carries a tense (architecture 06 note): now, could restart, over, joke or unknown.",
+                "type": "string",
+                "enum": ["now", "could_restart", "over", "joke", "unknown"]
+              },
+              "evidence_words": {
+                "description": "The words in the text that support the label (architecture 03 'Verbs': evidence words).",
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "at_risk": {
+                "description": "Who is at risk, in the text's own terms (architecture 03 'Verbs').",
+                "type": "string"
+              },
+              "writer": {
+                "description": "Who wrote it, relative to the person at risk (architecture 03 'Verbs').",
+                "type": "string"
+              }
+            },
+            "required": ["outcome", "tense", "evidence_words", "at_risk", "writer"],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}
