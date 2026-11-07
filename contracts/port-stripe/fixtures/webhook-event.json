@@ -26,7 +26,8 @@
       "payload": {
         "paymentId": "stripe-payment-demo-0001",
         "chargeId": "stripe-charge-demo-0001",
-        "amount": { "cents": 4000, "currency": "USD" }
+        "amount": { "cents": 4000, "currency": "USD" },
+        "paymentMethodId": "stripe-card-demo-alex"
       }
     }
   }

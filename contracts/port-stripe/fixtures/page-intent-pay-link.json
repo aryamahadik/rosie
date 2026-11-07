@@ -1,0 +1,19 @@
+{
+  "call": "pageIntent",
+  "given": {
+    "now": "2026-11-06T16:18:00Z",
+    "note": "A6-32: Alex opens his one pay link, rosfield.com/p/f4, 78 minutes after it went (charge-failed-pay-link.json). The pay page's server reads the payment by the effect row's providerObjectId on Lee's Barbershop's account, from Rosie's own record and not from the link: it still needs a card, so the answer carries the client secret for the page's Stripe form and the $25 it takes. The deadline, 17:00Z, is the clock row's; Alex pays at 16:20Z (double-signed-webhook.json)."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "paymentId": "stripe-payment-demo-0007"
+  },
+  "outcome": {
+    "result": "intent",
+    "paymentId": "stripe-payment-demo-0007",
+    "state": "needsCard",
+    "clientSecret": "demo-client-secret-payment-0007",
+    "amount": { "cents": 2500, "currency": "USD" },
+    "card": null
+  }
+}

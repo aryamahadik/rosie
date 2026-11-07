@@ -1,0 +1,33 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-11-03T13:00:01Z",
+    "note": "A9-14 'Declined or replaced card': Alex's bank issued him a new card, and the card network updated his saved card at Lee's Barbershop in place, under the same id, now ending 5556 (payment_method.automatically_updated). The port reports it as cardReplaced with only the new brand and last four, so the saved card is marked replaced, and a charge on it at Riley's next DONE goes to Alex as one pay link instead (A9-12; S11-26: 'nothing goes on the new card without asking the customer first').",
+    "signing": "valid"
+  },
+  "request": {
+    "endpoint": "businesses",
+    "signatureHeader": "t=1793710801,v1=COMPUTED-AT-TEST-TIME",
+    "raw": "{\"id\":\"stripe-evt-demo-0103\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"account\":\"stripe-acct-demo-lees-barbershop\",\"created\":1793710800,\"livemode\":false,\"type\":\"payment_method.automatically_updated\",\"data\":{\"object\":{\"id\":\"stripe-card-demo-alex\",\"object\":\"payment_method\",\"card\":{\"brand\":\"visa\",\"last4\":\"5556\"},\"customer\":\"stripe-customer-demo-alex\",\"type\":\"card\"}}}",
+    "receivedAt": "2026-11-03T13:00:01Z",
+    "traceId": "trace-stripe-0103"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "stripe-evt-demo-0103",
+      "kind": "cardReplaced",
+      "stripeType": "payment_method.automatically_updated",
+      "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+      "testMode": true,
+      "occurredAt": "2026-11-03T13:00:00Z",
+      "effectId": null,
+      "payload": {
+        "paymentMethodId": "stripe-card-demo-alex",
+        "customerId": "stripe-customer-demo-alex",
+        "card": { "brand": "visa", "last4": "5556" }
+      }
+    }
+  }
+}

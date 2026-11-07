@@ -1,0 +1,18 @@
+{
+  "call": "pageIntent",
+  "given": {
+    "now": "2026-10-20T14:06:20Z",
+    "note": "A5-07: once Alex's card is saved (webhook-card-saved.json), the secure page reads the card save again by the effect row's providerObjectId. It succeeded, so no client secret goes out any more, and the page shows the card saved as A5-07's form does, 'Card •••• 4242', with nothing taken."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "setupId": "stripe-setup-demo-alex-1"
+  },
+  "outcome": {
+    "result": "intent",
+    "setupId": "stripe-setup-demo-alex-1",
+    "state": "succeeded",
+    "clientSecret": null,
+    "card": { "brand": "visa", "last4": "4242" }
+  }
+}

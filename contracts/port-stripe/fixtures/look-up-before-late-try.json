@@ -1,0 +1,30 @@
+{
+  "call": "listMoney",
+  "given": {
+    "now": "2026-10-28T20:00:01Z",
+    "note": "S11-26 and S12-16: Sam OK'd Ben T.'s $20 no-show fee for the Tue 1:00pm haircut with Riley he missed (S11-22), and its effect row was written at 2:10pm Tue Oct 27. As it was charged, Stripe went down: try 1 reached Stripe, which made the charge, but its answer never came, and tries 2 to 5 got none, so the effect took Stripe's outage row (K-07 v1 retry rule 8). Stripe came back at 4:00pm Wed Oct 28, 25 hours 50 minutes after the row was written, when Stripe may have let its key go. So before the effect runs once more (arch 11 line 582: 'Charges and refunds wait, then run once'), the effects runner looks its effect id up on the account from when the row was written to now. It finds the charge try 1 made and records it as the effect's result, with no second try (S12-16: 'Nothing is charged twice')."
+  },
+  "request": {
+    "account": { "kind": "business", "accountId": "stripe-acct-demo-lees-barbershop" },
+    "from": "2026-10-27T18:10:00Z",
+    "to": "2026-10-28T20:00:01Z",
+    "effectId": "eff-ben-no-show-fee"
+  },
+  "outcome": {
+    "result": "listed",
+    "from": "2026-10-27T18:10:00Z",
+    "to": "2026-10-28T20:00:01Z",
+    "items": [
+      {
+        "kind": "charge",
+        "stripeId": "stripe-charge-demo-0040",
+        "paymentId": "stripe-payment-demo-0040",
+        "refundOf": null,
+        "effectId": "eff-ben-no-show-fee",
+        "amount": { "cents": 2000, "currency": "USD" },
+        "state": "succeeded",
+        "createdAt": "2026-10-27T18:10:02Z"
+      }
+    ]
+  }
+}

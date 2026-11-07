@@ -161,6 +161,30 @@
       "source": "S13-55 in master-A.json ('A saved card is removed once nothing needs it. A booking that's declined or never made removes it at once'); A6-32 ('Any card saved for it is removed')"
     },
     {
+      "file": "page-intent-pay-link.json",
+      "version": "v1",
+      "def": "pageIntent.exchange",
+      "expect": "accept",
+      "shows": "A6-32: Alex opens his pay link 78 minutes after it went; the pay page's server reads the payment by the effect row's providerObjectId and gets the client secret for the page's Stripe form, the $25 it takes and needsCard; the deadline stays the clock row's",
+      "source": "T-023 round 2, frontend review of 89c3af8 gap 1 (a page opened later has no source for the client secret); A6-32 in master-A.json (link rosfield.com/p/f4; 'After an OK, the link is due by {{clock.pay}}'); 01-inventory C-200; README spike row 19 (a PaymentIntent read with the secret key carries its client_secret and status)"
+    },
+    {
+      "file": "page-intent-card-saved.json",
+      "version": "v1",
+      "def": "pageIntent.exchange",
+      "expect": "accept",
+      "shows": "A5-07: the secure page reads Alex's card save after it succeeded: no client secret goes out any more, and the page shows the card saved, 'Card •••• 4242'",
+      "source": "T-023 round 2, frontend review gap 1; A5-07 in master-A.json ('Card •••• 4242'; nothing taken); 01-inventory C-199; README spike row 19 (SetupIntent statuses; Stripe: the client secret 'should not be stored, logged, or exposed to anyone other than the customer')"
+    },
+    {
+      "file": "saved-card-bill-card.json",
+      "version": "v1",
+      "def": "savedCard.exchange",
+      "expect": "accept",
+      "shows": "FS row M04: the monthly bill shows Sam's bill card, read live by K-33 v1 bill_cards' two ids on Rosfield's own account: 'Card •••• 4242'",
+      "source": "T-023 round 2, frontend review gap 2 (M04's card display: K-33 README 'Stripe's, read through K-14', with no K-14 call); FS row M04 ('Card for Rosfield's monthly bill', shown on the monthly bill); K-33 v1 fixtures/seed-bill-card.json and seed-monthly-bill.json; README spike row 20"
+    },
+    {
       "file": "list-48-hours.json",
       "version": "v1",
       "def": "listMoney.exchange",
@@ -183,6 +207,14 @@
       "expect": "accept",
       "shows": "S12-26: Dee W.'s $20 fee charged twice under one effect id; the second charge has no ledger line and no agreed booking behind it, so reconciliation refunds it at once",
       "source": "02-contracts K-14 Fixtures ('list-double-charge.json ... reconciliation refunds it at once and both are told: S12-26; arch 10 line 550'); S12-26 in master-A.json; README spike row 7 (a key Stripe has let go makes a new request)"
+    },
+    {
+      "file": "look-up-before-late-try.json",
+      "version": "v1",
+      "def": "listMoney.exchange",
+      "expect": "accept",
+      "shows": "S12-16: Ben T.'s $20 no-show fee runs again 25 hours 50 minutes after its effect row was written, after Stripe's outage; first the effects runner looks its effect id up from when the row was written, finds the charge try 1 made and takes it as the result, so nothing is charged twice",
+      "source": "T-023 round 2 lead note 5 and README open gap 4 (Stripe keeps a key 24 hours and replays a saved 500); BP section 0 (no charge without a bound yes); S12-16 in master-A.json ('Nothing is charged twice: each payment waits, and runs once it's back'); arch 11 line 582; K-07 v1 retry rule 8; S11-22 and S11-26 (Ben T.'s missed Tue 1:00pm haircut, $20 fee); README spike rows 7, 9, 10"
     },
     {
       "file": "double-plant-charge-without-effect-id.json",
@@ -223,6 +255,14 @@
       "expect": "accept",
       "shows": "Alex's saved card as it may be shown: only its brand and last four (cardDetails from payment_method.attached), with no effect id",
       "source": "A5-07's form ('Card •••• 4242'); K-33 v1 README open gap ('The card's display (brand and last four on the owner's pages, FS M04): Stripe's, read through K-14'); RULES 4.5; README 'Webhook events'"
+    },
+    {
+      "file": "webhook-card-replaced.json",
+      "version": "v1",
+      "def": "verifyWebhook.exchange",
+      "expect": "accept",
+      "shows": "A9-14: the card network replaced Alex's saved card in place (payment_method.automatically_updated), so the port reports cardReplaced with only the new brand and last four; the saved card is marked replaced and nothing goes on it without asking",
+      "source": "T-023 round 2, action-layer review of 89c3af8 gap 2; A9-14 in master-A.json ('The card is declined, or it was replaced. Nothing goes on a new card without asking, so the customer gets one pay link'); A9-12 ('declined, expired or replaced'); S11-26 ('A replaced card: nothing goes on the new card without asking the customer first'); README spike row 21; the last four 5556 of Stripe's published Visa debit test card (README spike row 16's document T)"
     },
     {
       "file": "webhook-bill-card-saved.json",
@@ -269,8 +309,8 @@
       "version": "v1",
       "def": "doubleWebhook.exchange",
       "expect": "accept",
-      "shows": "The Stripe double signs paymentSucceeded for Alex's $25 pay link, paid in time on staging's pay page; verifyWebhook gives the same event back",
-      "source": "02-contracts K-14 Defines ('The double: fakes charges, declines, refunds, pay links, onboarding and webhook events'); BP 9.4; A6-32 ('Paid in time')"
+      "shows": "The Stripe double signs paymentSucceeded for Alex's $25 pay link, paid in time on staging's pay page with the card that is then saved for it; verifyWebhook gives the same event back",
+      "source": "02-contracts K-14 Defines ('The double: fakes charges, declines, refunds, pay links, onboarding and webhook events'); BP 9.4; A6-32 ('Paid in time: it's booked ... and that card is the one saved for it'); T-023 round 2, action-layer review gap 1; README spike row 19 (setup_future_usage)"
     },
     {
       "file": "span-charge.json",
@@ -351,6 +391,14 @@
       "expect": "refuse",
       "shows": "The charge's span with the card's last four added to what it got: refused by the span's closed list, though K-08 alone would take the four digits as a label (without last4 it is span-charge.json)",
       "source": "K-08 v1 ('never the raw number or words'); RULES 4.5; lead note for T-023 ('No card number, CVC or full card data ever enters the contract, a fixture or a log')"
+    },
+    {
+      "file": "invalid/refuse-page-secret-after-saved.json",
+      "version": "v1",
+      "def": "pageIntent.exchange",
+      "expect": "refuse",
+      "shows": "A page read of Alex's card save that succeeded, still handing out its client secret: refused, since the secret goes out only while the page's form has something to do (with clientSecret null it is page-intent-card-saved.json)",
+      "source": "T-023 round 2, frontend review gap 1 and security review note N4 (keep the secret out of everything but the page that needs it); README spike row 19 (Stripe: 'It should not be stored, logged, or exposed to anyone other than the customer')"
     }
   ]
 }
