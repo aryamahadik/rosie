@@ -48,7 +48,7 @@ describe("wrangler.jsonc BUNDLES KV binding (T-277)", () => {
 
   it("leaves env.staging without its own copy and adds no other storage binding", () => {
     assert.equal(config.env.staging.kv_namespaces, undefined);
-    for (const k of ["r2_buckets", "hyperdrive", "d1_databases"]) {
+    for (const k of ["hyperdrive", "d1_databases"]) {
       assert.equal(config[k], undefined);
     }
   });
@@ -58,6 +58,59 @@ describe("wrangler.jsonc BUNDLES KV binding (T-277)", () => {
     assert.equal(config.route, undefined);
     assert.deepEqual(config.secrets, { required: [] });
     assert.ok(!/(sk_|token)/i.test(JSON.stringify(config.kv_namespaces)));
+  });
+});
+
+// R2 (T-1059): r2_buckets may be absent; when present it is exactly one top-level binding named FILES with a
+// bucket_name, and env.staging has no copy of its own (T-441 adds the binding).
+function checkR2(cfg) {
+  assert.equal(cfg.env.staging.r2_buckets, undefined);
+  if (cfg.r2_buckets === undefined) return;
+  assert.ok(Array.isArray(cfg.r2_buckets));
+  assert.equal(cfg.r2_buckets.length, 1);
+  const [bucket] = cfg.r2_buckets;
+  assert.equal(bucket.binding, "FILES");
+  assert.equal(typeof bucket.bucket_name, "string");
+  assert.notEqual(bucket.bucket_name.trim(), "");
+}
+
+describe("wrangler.jsonc R2 FILES binding (T-1059)", () => {
+  it("allows no r2_buckets, or exactly one FILES binding with a bucket_name and no env.staging copy", () => {
+    checkR2(config);
+  });
+
+  it("accepts an in-memory copy with a top-level FILES binding", () => {
+    const copy = structuredClone(config);
+    copy.r2_buckets = [{ binding: "FILES", bucket_name: "rosie-files" }];
+    checkR2(copy);
+  });
+
+  it("rejects an in-memory copy with a second R2 binding", () => {
+    const copy = structuredClone(config);
+    copy.r2_buckets = [
+      { binding: "FILES", bucket_name: "rosie-files" },
+      { binding: "OTHER", bucket_name: "rosie-other" },
+    ];
+    assert.throws(() => checkR2(copy));
+  });
+
+  it("rejects an in-memory copy with a binding not named FILES", () => {
+    const copy = structuredClone(config);
+    copy.r2_buckets = [{ binding: "UPLOADS", bucket_name: "rosie-files" }];
+    assert.throws(() => checkR2(copy));
+  });
+
+  it("rejects an in-memory copy with a FILES binding that has no bucket_name", () => {
+    const copy = structuredClone(config);
+    copy.r2_buckets = [{ binding: "FILES" }];
+    assert.throws(() => checkR2(copy));
+  });
+
+  it("rejects an in-memory copy with an env.staging r2_buckets", () => {
+    const copy = structuredClone(config);
+    copy.r2_buckets = [{ binding: "FILES", bucket_name: "rosie-files" }];
+    copy.env.staging.r2_buckets = [{ binding: "FILES", bucket_name: "rosie-files-staging" }];
+    assert.throws(() => checkR2(copy));
   });
 });
 
