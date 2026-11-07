@@ -32,6 +32,7 @@
     "test:integration": "vitest run --project integration",
     "test:scenario": "vitest run --project scenario",
     "test:e2e": "vitest run --project e2e",
+    "test:scripts": "node --test \"infra/scripts/*.test.mjs\"",
     "test:count": "node infra/scripts/test-count.mjs",
     "guard:tests": "node infra/ci/test-guard.mjs",
     "guard:migrations": "node infra/ci/migration-guard.mjs",
