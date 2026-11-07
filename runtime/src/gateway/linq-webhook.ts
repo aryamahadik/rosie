@@ -1,12 +1,16 @@
 // The Linq webhook entry (T-241; C-044; arch 02 step 1 "Receive", line 109).
 //
 // Answers: a bad or stale signature 401, with nothing written or handed on; a signed event type Rosie does not use 200,
-// handed on to no one; a known event id 200 and dropped; a failing hand-off (or a verifier that cannot answer) 503, so
-// Linq retries for 30 minutes; otherwise 200. The trace id opens at receipt, one K-08 `receive` span ends every answer,
+// handed on to no one; a known event id 200 and dropped; a failing scrub-seal-write (a key store that gives no key, a
+// seal or a write that fails, an event it cannot route, a verify result it does not know, or a verifier that cannot
+// answer) 503, so Linq retries for 30 minutes, with nothing stored; otherwise 200. After the verify the event is
+// scrubbed, then (texts, photos, reactions, votes, edits) sealed and written to the handle's actor, or (receipts) handed
+// scrubbed to the dispatcher's door (hand-off.ts). The trace id opens at receipt, one K-08 `receive` span ends every answer,
 // and the answer carries x-trace-id. Never logged: a body, a phone number, the webhook secret.
 
 import { isLabel, logSink, openTrace, type BundleId, type TraceContext } from "../trace";
-import type { GatewayDeps, VerifyWebhookResult } from "./types";
+import { HandoffError, prepareHandoff } from "./hand-off";
+import type { GatewayDeps, StoreAnswer, VerifyWebhookResult } from "./types";
 
 /** Bundle v0's id (K-01 bundle-v0-skeleton), the stand-in until a bundle registry can be read (K-08 README default 1). */
 export const DEFAULT_BUNDLE_ID: BundleId = {
@@ -143,29 +147,45 @@ export async function handleLinqWebhook(
       outcome = "dropped";
       decided = { signatureValid: true, ignoredType: true, answered: 200 };
       got = { eventType: verified.eventType };
+    } else if (isNotEvent(verified.result)) {
+      // A K-11 minor version that adds a result is not handed on as an event: fail closed, never 200.
+      fail(503, "unavailable", "unknownVerifyResult");
     } else if (typeof verified.event.eventId !== "string" || verified.event.eventId === "") {
       fail(503, "unavailable", "badVerifyAnswer");
     } else {
       const { event, partKey } = verified;
       eventId = event.eventId;
       got = { kind: event.kind, service: event.service };
-      let stored: "written" | "duplicate" | undefined;
+      let stored: StoreAnswer | undefined;
+      let stage = "prepare";
+      let code = "handoffFailed";
       try {
-        stored = await deps.actor.accept({ event, partKey, traceId: context.traceId, bundleId });
+        // Scrub, then seal (actor kinds), then write: the door never gets an unscrubbed or an unsealed body.
+        const prepared = await prepareHandoff(
+          { event, partKey, traceId: context.traceId, bundleId },
+          deps.keys,
+        );
+        stage = "handoff";
+        stored =
+          prepared.door === "actor"
+            ? await deps.actor.accept(prepared.handoff)
+            : await deps.receipts.accept(prepared.handoff);
       } catch (error) {
-        logFailure(context.traceId, "handoff", error);
+        logFailure(context.traceId, stage, error);
+        if (stage === "prepare") code = error instanceof HandoffError ? error.code : "sealFailed";
       }
-      if (stored === undefined) {
-        decided = { signatureValid: true, answered: 503 };
-        fail(503, "unavailable", "handoffFailed");
-      } else if (stored === "duplicate") {
+      // 200 only for a positive answer of the door: anything else, an unknown word included, is 503.
+      if (stored === "duplicate") {
         answer = { status: 200 };
         outcome = "dropped";
         decided = { signatureValid: true, knownEventId: true, answered: 200 };
-      } else {
+      } else if (stored === "written") {
         answer = { status: 200 };
         outcome = "ok";
         decided = { signatureValid: true, knownEventId: false, answered: 200 };
+      } else {
+        decided = { signatureValid: true, answered: 503 };
+        fail(503, "unavailable", code);
       }
     }
   }
@@ -184,6 +204,11 @@ export async function handleLinqWebhook(
     logFailure(context.traceId, "span", error);
   }
   return respond(answer, context.traceId);
+}
+
+/** The positive check: the verify result is an event, by its own word. The type holds three results; a later one reads as not an event. */
+function isNotEvent(result: string): boolean {
+  return result !== "event";
 }
 
 /** Keeps only the facts that are labels: a kind or service the port gave that is not one would make the span refused. */

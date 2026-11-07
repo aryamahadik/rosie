@@ -4,14 +4,16 @@
 // - Sealing the event and writing it to the handle's actor is T-243's; the scrub is T-242's (runtime/src/scrub).
 
 import type { BundleId } from "../trace";
+import type { HandleRef, SealedBox, SealingKeyStore } from "./seal";
 
-/** K-06 v1's inbound event, as far as the gateway reads it; the rest rides through untouched, sealed by the actor (T-243). */
+/** K-06 v1's inbound event, as far as the gateway reads it; the rest rides through untouched (the gateway seals the words, T-243). */
 export interface InboundEvent {
   eventId: string;
   provider: string;
   kind: string;
   service: string;
   traceId: string;
+  handle: HandleRef;
   readonly [field: string]: unknown;
 }
 
@@ -40,7 +42,7 @@ export interface LinqPort {
   verifyWebhook(request: VerifyWebhookRequest): Promise<VerifyWebhookResult>;
 }
 
-/** What the gateway hands the actor: the event with `partKey` beside it (K-11 README: K-06 does not change). */
+/** What the gateway hands a receipt's door: the scrubbed event with `partKey` beside it (K-11 README: K-06 does not change). */
 export interface ActorHandoff {
   event: InboundEvent;
   partKey: string | null;
@@ -49,20 +51,61 @@ export interface ActorHandoff {
 }
 
 /**
- * The actor's door (T-243 fills it). `written`: the event is stored. `duplicate`: its event id is already known and
- * nothing was written. A throw or a rejected promise means the write failed: the gateway answers 503.
+ * K-06's event as the actor stores it: the scrubbed event with its words (`body`, and an email's `email.subject`)
+ * taken out and sealed into `sealed` (null when the event has no words). Every other field is K-06's, in the clear:
+ * the actor orders, dedupes and routes on them.
+ */
+export interface SealedEvent {
+  eventId: string;
+  provider: string;
+  kind: string;
+  service: string;
+  traceId: string;
+  handle: HandleRef;
+  /** `scrubbed`'s counts are in the event's own field of that name; the words are only here, sealed. */
+  sealed: SealedBox | null;
+  readonly [field: string]: unknown;
+}
+
+/** What the gateway hands the handle's actor: a sealed event with `partKey` beside it. Never a plain body. */
+export interface SealedHandoff {
+  event: SealedEvent;
+  partKey: string | null;
+  traceId: string;
+  bundleId: BundleId;
+  /** The name of the handle's Durable Object (`actorNameOf(event.handle)`): every event of a handle names the same one. */
+  actorName: string;
+}
+
+/** The answer of a door that stores: `written`, or `duplicate` (its event id is already known; nothing was written). */
+export type StoreAnswer = "written" | "duplicate";
+
+/**
+ * The actor's door (T-243 fills it; the inbox behind it is T-244's). A throw or a rejected promise means the write
+ * failed: the gateway answers 503.
  *
  * The seen-event-id check lives behind this door, in the handle actor's own storage, in the same step as the write:
  * two retries of one event that arrive together cannot both pass a check that sits apart from the write, and the
  * actor is the one place that already owns the handle's rows. No wrangler binding is added here (NQ-RT-5).
  */
 export interface ActorStub {
-  accept(handoff: ActorHandoff): Promise<"written" | "duplicate">;
+  accept(handoff: SealedHandoff): Promise<StoreAnswer>;
+}
+
+/**
+ * The door for delivery receipts (`delivered`, `sent`, `failed`): they go to the outbox dispatcher and to clock arming
+ * (K-06 README routing), never to the handle's actor, and carry no words.
+ */
+export interface ReceiptSink {
+  accept(handoff: ActorHandoff): Promise<StoreAnswer>;
 }
 
 export interface GatewayDeps {
   linq: LinqPort;
   actor: ActorStub;
+  receipts: ReceiptSink;
+  /** The handle's sealing key (NQ-RT-1); a fake in tests until D-017. */
+  keys: SealingKeyStore;
   /** The active bundle id read at receipt (K-08 v1 README default 1). */
   bundleId: () => BundleId | Promise<BundleId>;
   /** Epoch milliseconds; Date.now in the Worker. */

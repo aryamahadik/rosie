@@ -12,11 +12,15 @@ import verifyOk from "../../../contracts/port-linq/fixtures/verify-ok.json";
 import staleTimestamp from "../../../contracts/port-linq/fixtures/verify-stale-timestamp.json";
 import duplicateEvent from "../../../contracts/inbound-event/fixtures/duplicate-event.json";
 import { handleLinqWebhook } from "./linq-webhook";
+import { fakeKeyStore } from "./test-support";
+import type { SealingKeyStore } from "./seal";
 import type {
   ActorHandoff,
   ActorStub,
   GatewayDeps,
   LinqPort,
+  ReceiptSink,
+  SealedHandoff,
   VerifyWebhookRequest,
   VerifyWebhookResult,
 } from "./types";
@@ -76,10 +80,10 @@ function portDouble(fixtures: readonly Fixture[]): LinqPort & { requests: Verify
 }
 
 /** The actor stub: writes an event once and calls a known event id a duplicate, as T-243's actor will. */
-function actorStub(): ActorStub & { written: ActorHandoff[]; calls: ActorHandoff[] } {
+function actorStub(): ActorStub & { written: SealedHandoff[]; calls: SealedHandoff[] } {
   const seen = new Set<string>();
-  const written: ActorHandoff[] = [];
-  const calls: ActorHandoff[] = [];
+  const written: SealedHandoff[] = [];
+  const calls: SealedHandoff[] = [];
   return {
     written,
     calls,
@@ -93,10 +97,32 @@ function actorStub(): ActorStub & { written: ActorHandoff[]; calls: ActorHandoff
   };
 }
 
-function depsOf(linq: LinqPort, actor: ActorStub): GatewayDeps {
+/** The receipts' door: stores each receipt once, as the dispatcher's will. */
+function receiptsStub(): ReceiptSink & { written: ActorHandoff[] } {
+  const seen = new Set<string>();
+  const written: ActorHandoff[] = [];
+  return {
+    written,
+    accept(handoff) {
+      if (seen.has(handoff.event.eventId)) return Promise.resolve("duplicate");
+      seen.add(handoff.event.eventId);
+      written.push(handoff);
+      return Promise.resolve("written");
+    },
+  };
+}
+
+function depsOf(
+  linq: LinqPort,
+  actor: ActorStub,
+  receipts: ReceiptSink = receiptsStub(),
+  keys: SealingKeyStore = fakeKeyStore(),
+): GatewayDeps {
   return {
     linq,
     actor,
+    receipts,
+    keys,
     bundleId: () => ({ hash: "a".repeat(64), build: 1 }),
     now: () => NOW,
   };
@@ -176,21 +202,23 @@ describe("POST /webhooks/linq", () => {
     });
   });
 
-  it("hands partKey on beside the event, which stays K-06's (verify-delivered-after-4006)", async () => {
+  it("hands a receipt's partKey on beside the event, to the dispatcher's door and not the actor (verify-delivered-after-4006)", async () => {
     captureLogLines();
     const actor = actorStub();
+    const receipts = receiptsStub();
 
     const response = await handleLinqWebhook(
       webhookOf(deliveredAfter4006),
-      depsOf(portDouble(ALL), actor),
+      depsOf(portDouble(ALL), actor, receipts),
       WHERE,
     );
 
     expect(response.status).toBe(200);
-    expect(actor.written).toHaveLength(1);
-    expect(actor.written[0]?.partKey).toBe("out-sam-booked-riley/1/1");
-    expect(actor.written[0]?.event).not.toHaveProperty("partKey");
-    expect(actor.written[0]?.event.kind).toBe("delivered");
+    expect(actor.calls).toHaveLength(0);
+    expect(receipts.written).toHaveLength(1);
+    expect(receipts.written[0]?.partKey).toBe("out-sam-booked-riley/1/1");
+    expect(receipts.written[0]?.event).not.toHaveProperty("partKey");
+    expect(receipts.written[0]?.event.kind).toBe("delivered");
   });
 
   it("accepts the double's signed webhook (double-signed-webhook)", async () => {
