@@ -25,6 +25,11 @@
   // runs, the Vitest Workers pool and dry runs; no real namespace exists yet (a later staging task creates it and
   // env.staging's copy, T-566).
   "kv_namespaces": [{ "binding": "BUNDLES", "id": "00000000000000000000000000000000" }],
+  // The clock sweep's one-minute cron (C-021). Used by local runs and the Vitest Workers pool only; env.staging's
+  // copy comes in T-566, so staging stays free of cron until then.
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
   // No R2, Queues or Hyperdrive bindings yet: they come with the tasks that need them.
   // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
   "vars": {
