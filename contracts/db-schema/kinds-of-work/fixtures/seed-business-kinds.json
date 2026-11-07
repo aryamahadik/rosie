@@ -1,0 +1,163 @@
+{
+  "after": [
+    "seed-kinds-sample.json",
+    "../../business-setup/fixtures/seed-company-two-kinds.json"
+  ],
+  "rows": [
+    {
+      "table": "picked_kinds",
+      "values": {
+        "id": "pick-sam-barbershop",
+        "owner_person_id": "person-sam",
+        "position": 1,
+        "words": "Barbershop",
+        "outcome": "listed",
+        "kind_id": "barber",
+        "company_id": "company-lees-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "picked_at": "2026-10-19T18:05:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "picked_kinds",
+      "values": {
+        "id": "pick-sam-plumbing",
+        "owner_person_id": "person-sam",
+        "position": 2,
+        "words": "plumbing",
+        "outcome": "listed",
+        "kind_id": "plumber",
+        "company_id": "company-lee-home-services",
+        "business_id": "biz-lee-home-services",
+        "picked_at": "2026-10-19T18:05:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "picked_kinds",
+      "values": {
+        "id": "pick-sam-electrical",
+        "owner_person_id": "person-sam",
+        "position": 3,
+        "words": "electrical",
+        "outcome": "listed",
+        "kind_id": "electrician",
+        "company_id": "company-lee-home-services",
+        "business_id": "biz-lee-home-services",
+        "picked_at": "2026-10-19T18:05:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.license",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"need\":\"always: barbering is licensed where the state's rules require it\",\"who\":\"both: the shop holds a barbershop license, and each barber holds their own barber license\",\"ask\":\"the shop's license number; each barber's number in their invite reply (or the owner sends it)\",\"check\":\"none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie\",\"blocks\":\"nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked\",\"away\":\"house calls and event work only where the state's rules allow barbering away from a licensed shop; some states allow it only for some services, or only for barbers with more years, a background check or insurance (switches from the state form)\",\"mobile\":\"a mobile barbering company gives the license the state's form names for work away from a shop, where one exists\",\"renewals\":\"optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)\",\"insurance\":\"liability insurance where the state's form asks for it, and proof of it when a venue asks\",\"booth\":\"a booth renter is their own business: their own barber license, a renter's license where the state issues one, their own prices, rules, calendar and Stripe\",\"skinCare\":\"skin care (an esthetician's work: facials, brows, waxing) is its own kind of work, with its own license where the state asks\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.services",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"shape\":\"set services with a chosen barber, booked in 15-minute steps; quick services fill the short gaps they fit\",\"examples\":\"the example businesses' own prices (Lee's Barbershop and Lee Mobile Barbers), not a standard\",\"list\":[{\"name\":\"Haircut\",\"price\":\"$35\",\"kind\":\"one price\",\"length\":\"30 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"},{\"name\":\"Skin fade\",\"price\":\"$40\",\"kind\":\"one price\",\"length\":\"45 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"},{\"name\":\"Beard trim\",\"price\":\"$20\",\"kind\":\"one price\",\"length\":\"15 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\",\"note\":\"a quick service: fills 15-minute gaps, bookable up to 30 minutes ahead\"},{\"name\":\"Line-up\",\"price\":\"$15\",\"kind\":\"one price\",\"length\":\"15 min\",\"where\":\"at the shop\",\"before\":\"nothing\",\"after\":\"at the chair\",\"note\":\"a quick service, like the beard trim\"},{\"name\":\"Kids cut (12 and under)\",\"price\":\"$25\",\"kind\":\"one price\",\"length\":\"30 min\",\"where\":\"at the shop\",\"before\":\"a card saved\",\"after\":\"at the chair\",\"note\":\"a parent or guardian books it and stays\"},{\"name\":\"Signature cut and hot towel shave\",\"price\":\"$55\",\"kind\":\"one price\",\"length\":\"60 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"},{\"name\":\"Groom's package (cut, shave, facial)\",\"price\":\"$140\",\"kind\":\"one price\",\"length\":\"2½ hours, one whole block\",\"where\":\"at the shop\",\"before\":\"a $40 deposit when booked\",\"after\":\"the $100 rest at the chair\"},{\"name\":\"Beard color (gray blending)\",\"price\":\"$25\",\"kind\":\"one price\",\"length\":\"20 min\",\"where\":\"at the shop only\",\"before\":\"a card saved\",\"after\":\"at the chair\",\"note\":\"a skin test at least 48 hours before; only barbers who do color\"},{\"name\":\"Skin test for beard color\",\"price\":\"free\",\"kind\":\"a first step\",\"length\":\"5 min\",\"where\":\"at the shop\",\"before\":\"nothing\",\"after\":\"nothing more\",\"note\":\"at least 48 hours before the color, often added after a cut\"},{\"name\":\"Home grooming visit (cut, beard trim, hot towel)\",\"price\":\"$179\",\"kind\":\"one price\",\"length\":\"60 min\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill, with a tip line\"},{\"name\":\"Travel fee (inside each home visit's price)\",\"price\":\"$89\",\"kind\":\"one price\",\"length\":\"part of each home visit's price\",\"where\":\"at the customer's place\",\"before\":\"nothing taken\",\"after\":\"counts toward the visit\"},{\"name\":\"Groom's cut at home\",\"price\":\"$150\",\"kind\":\"one price\",\"length\":\"45 min\",\"where\":\"at the customer's place\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\"},{\"name\":\"Wedding party grooming\",\"price\":\"quoted from the party's details (the example: 4 people, $640)\",\"kind\":\"quoted from the details first\",\"length\":\"about 35 minutes a person\",\"where\":\"at the customer's home or the venue\",\"before\":\"a 25% deposit when booked\",\"after\":\"the rest on the bill\",\"note\":\"a signed contract; Sam OKs quotes over $500\"},{\"name\":\"Office visit (cuts for up to 3 at a workplace)\",\"price\":\"$199\",\"kind\":\"one price\",\"length\":\"90 min\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Hair design (lines and patterns)\",\"price\":\"set at the visit; only the $89 travel fee is promised\",\"kind\":\"quoted at the visit\",\"length\":\"set at the visit\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Event hours (a barber on site at an event)\",\"price\":\"$120 an hour, 1-hour minimum ($140 with Andre)\",\"kind\":\"per hour\",\"length\":\"the hours booked\",\"where\":\"at the customer's place\",\"before\":\"added to the booking, and paid at the visit\",\"after\":\"on the bill\"}],\"capacity\":\"one barber per booking; a group or a wedding party is one booking with several people and one code; a group of 3 or more at the shop ties up 2 chairs\",\"skills\":\"cuts and fades, beard work, straight-razor shaves, kids cuts, beard color, house calls and events; color services offer only barbers who do color\",\"walkIns\":\"a line for the next free barber; booked customers go first, and walk-ins fill gaps of 30 minutes or more; some chairs or hours can be walk-in only\",\"away\":\"away from the shop: cuts, beard trims, hot towels and hair designs; no razor shaves or color unless the state's rules and Sam allow them\",\"fix\":\"a free fix-up within 7 days of a cut (the example shop's promise)\",\"online\":\"no: barbering is done in person\",\"nobodyHome\":\"never: the customer must be there\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.questions",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"beforeTimes\":[\"new or returning\",\"the service, and which barber (or the first free)\",\"anyone else in the group, and how many (a group of 3 or more at the shop asks Sam first)\",\"for a kids cut: the child's age\",\"for a house call or event: the kind of place, and the town or ZIP\",\"for a wedding party: how many people, what each wants, the date and the start time\"],\"afterTime\":[\"what's on top (a guard number) and the style\",\"the beard: line it up, trim it down, or none\",\"for a house call or event: parking, and a chair near an outlet with good light\"],\"securePage\":[\"18 or older (a parent books for a child)\",\"for beard color: ever reacted to hair dye\",\"a reference photo of the style\",\"any skin or scalp problem now, like a rash or a cut\"],\"whoMayBook\":\"an adult; a parent or guardian for anyone under 18, and a parent stays for a kids cut\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.safety",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"stop\":[{\"words\":\"a dye reaction happening now: face, lips or throat swelling, trouble breathing\",\"say\":\"Call 911 now. Rinse the dye off with plenty of water.\",\"booking\":\"no booking\"},{\"words\":\"a deep cut that won't stop bleeding\",\"say\":\"Press a clean cloth on it and call 911.\",\"booking\":\"no booking\"}],\"goOn\":[{\"words\":\"a rash, an open sore, an infection or lice on the scalp or face\",\"what\":\"no razor or color on it; the barber checks before starting; the visit goes on with what's safe, or moves with no fee\"},{\"words\":\"an itchy or red scalp or beard after a home dye, with no swelling\",\"what\":\"rinse with cool water and use no more dye; the barber checks the skin before any color, and a color waits for a skin test\"}],\"always\":\"the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.first_steps",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"steps\":[{\"name\":\"Skin test for beard color (a small test for a reaction to hair dye)\",\"when\":\"at least 48 hours before beard or hair color, the time the dye's label sets\",\"who\":\"new color clients, and anyone whose last test has run out\",\"goodFor\":\"3 months (the example shop's rule), or until the dye changes\",\"result\":\"the barber checks the spot before mixing any color; redness or itching calls the color off, with no fee\"}],\"reaction\":\"a past reaction to hair dye: the booking waits for Sam's OK, and the skin test comes first\",\"prep\":\"for the reminder: bring a photo of the style if you have one; for a house call, a chair near an outlet and good light\",\"away\":\"none for house calls or events: color stays at the shop\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.visit",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"checkIn\":\"at the shop: the check-in code at the chair or the front desk; a walk-in gets a code when he's next; at a home or venue: the code from whoever will be there (the groom or the venue contact when a mobile is given for them)\",\"beforeWork\":\"the barber goes over the reference photo, the guard numbers and the beard first, and checks the skin before a razor or color\",\"changes\":\"anything added at the chair (a beard trim, a line-up) is priced and OK'd before it's done; booked customers go first, and a walk-in starts only if it fits before the next booking\",\"done\":\"the check-in code, or DONE from the barber; guard numbers, the style and any skin-test date go in the barber's notes for next time\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.money",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"before\":\"at the shop: a card saved for the $20 fee, and paid at the chair (the Groom's package takes a $40 deposit when booked); a home or office visit: a card saved for the $89 fee; a groom's cut at home is paid in full when booked; a wedding party: a 25% deposit when booked\",\"caps\":\"deposit cap: from the state form\",\"cancel\":\"free to cancel until 24 hours before (the owner's setting; many barbershops pick 2 hours for a cut)\",\"fees\":\"late cancel or no-show: $20 at the shop ($40 for the Groom's package); $89 for a home or office visit; a wedding party: the deposit may be kept, never more. Sam confirms each fee, never more than what was paid now or agreed; no card and no deposit, no fee\",\"repeat\":\"after 2 no-shows or late cancels with no card, the shop can ask that customer for a card to book (the owner's setting)\",\"refunds\":\"a full refund if the shop changes the plan, or a skin test rules color out\",\"tips\":\"on: at the chair (the reader or cash), or a tip line on the bill Rosie texts; tips go to the barber\",\"tax\":\"a tax line for products sold, where the state's rules require it\",\"fee2\":\"Rosfield's $2 applies\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.messages",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"never\":\"dye-reaction, skin-test and skin or scalp answers never go in a text or through the AI: only the secure page and the customer's record; the customer never hears why a barber is out\",\"photos\":\"a reference photo only on the secure page; the barber sees it by private link\",\"languages\":\"English and Spanish\",\"minors\":\"a minor's booking texts go to the parent or guardian\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.staff",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"licenses\":\"each barber's license per state; skin care where the state licenses it\",\"skills\":\"cuts, fades, beard work, razor shaves, kids cuts, beard color, house calls and events; only barbers who do color are offered for beard color\",\"supervision\":\"apprentices and students work only under a licensed barber, where the state's rules allow\",\"oks\":\"Sam OKs a group of 3 or more at the shop, a booking after a past dye reaction, and any wedding party quote over $500\",\"standIn\":\"a barber out: another barber who does that service, at the same time and price; the stand-in gets the cut notes\",\"away\":\"only barbers cleared for work away from the shop are offered for house calls and events\",\"booth\":\"a booth renter's bookings are their own, never sent to the shop's owner\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.rules",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"showLicense\":\"each barber's license and the shop's posted where the state's rules require it; the license number in texts where the state asks\",\"away\":\"barbering away from the shop only where the state allows it, and only for the services it allows (a switch from the state form)\",\"booth\":\"booth rental only where the state allows it; a renter's license or a written agreement where the state's rules require one\",\"receipt\":\"what a receipt must show, where the state's rules require it\",\"minors\":\"a parent's written OK for color on a minor, where the state's rules require it\",\"records\":\"skin-test dates and cut notes kept with the customer's record: 7 years, or longer where the state asks\",\"contracts\":\"a signed contract for wedding party work (the owner's setting), and where the state's rules require one above an amount\"}",
+        "version": 1
+      }
+    },
+    {
+      "table": "picked_kind_texts",
+      "values": {
+        "picked_kind_id": "pick-sam-barbershop",
+        "pf_key": "pf.edges",
+        "business_id": "biz-lees-barbershop",
+        "block": "{\"lateArrival\":\"10 minutes' grace; 10 to 20 minutes late, a shorter cut in the time left or a later time; after 20 minutes it's a no-show, and the chair goes to walk-ins\",\"walkInLong\":\"a walk-in runs long: the next booked customer hears the new start at once, and may move with no fee\",\"standIn\":\"a barber out sick: another barber who does that service, at the same time and price, or new times with no fee\",\"skinTest\":\"a skin test not done in time: later times that keep the 48 hours, or the cut without color\",\"repeatNoShow\":\"after 2 no-shows or late cancels with no card, a card is needed to book (the owner's setting)\",\"group\":\"a group of 3 or more: one booking, chairs side by side, Sam's OK first, one check-in code\",\"weddingDay\":\"a wedding day can't move: a stand-in with the skill, or a full refund\",\"fix\":\"a free fix-up within 7 days of a cut (the example shop's promise)\",\"other\":\"all other edge cases the generic way\"}",
+        "version": 1
+      }
+    }
+  ]
+}

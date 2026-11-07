@@ -1,0 +1,806 @@
+{
+  "part": "kinds-of-work",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "kinds",
+      "description": "The kinds of work Rosie books: the 243 trade files of fixture set v1, one row each, seeded from the compiled bundle's trade overlays (K-01 tradeOverlay: id, name, style, pattern and facts, with MC C5's fill), and each new kind of work drafted for one owner (S1-03), which gets its row when it is drafted so the business's kinds can name it at once. The kind matcher (C-130) reads the trade-file rows as data (Q-42: no model or index is chosen here). Per-flow money paths, switches and settings are kind_flows'.",
+      "source": "02-contracts section 7 row K-24 ('The 243 kinds (id, name, booking type, money combos per flow, facts, switches, settings) seeded from the trade files'); FS row B09; FS section 3; SPEC-prof 3; MC R3, C5; S1-02; S1-03; Q-42",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind's id. A trade-file kind: its profession file's id, the file name without .json, such as barber or plumber (K-01 tradeId). A drafted kind: new- and an id code makes, such as new-pack-hikes, so it never meets a trade file's id. K-23's company_kinds.kind_id holds the same ids.",
+          "source": "SPEC-prof 3 ('id'); K-01 v1 tradeId; FS row B09; S1-03; K-23 v1 company_kinds.kind_id"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "Its name, such as Barber or Plumber (the trade file's name); a drafted kind's name in the owner's words, such as Pack hikes. The kind matcher matches an owner's words against it (S1-02).",
+          "source": "SPEC-prof 3 ('name'); K-01 v1 tradeOverlay.trade.name; S1-02 ('Rosie matches Sam's words to the closest kinds of work'); S1-03"
+        },
+        {
+          "name": "style",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "Its booking type as the trade file words it, such as Chair, Home visit or Drop-off (the demo shops' booking_type). Null only for a drafted kind, which has its pattern alone.",
+          "source": "SPEC-prof 3 ('style'); K-01 v1 tradeOverlay.trade.style; fixtures/v1/test-kit/shops (booking_type)"
+        },
+        {
+          "name": "pattern",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Its booking pattern, one of the 11 of FS section 3: what the customer picks and how the time is held. A drafted kind takes the closest one (S1-03).",
+          "source": "FS section 3 ('Eleven patterns appear in the profession files (field pattern)'); SPEC-prof 2 item 5; K-01 v1 tradeOverlay.trade.pattern; S1-03 ('It matches the work to the closest booking pattern')"
+        },
+        {
+          "name": "facts",
+          "type": "text[]",
+          "null": true,
+          "audience": "never",
+          "description": "A trade-file kind's plug-in facts (pf.facts), the defaults a business's kind starts from at S1-04: insurance carries MC C5's list (video, forms, firststeps, documents). Null: no facts list, so every fact-gated branch shows (SPEC-master 5d); a drafted kind is always null here, since its facts are its draft's (new_work_draft_blocks). The business's own facts are K-23's company_kinds.pf_facts.",
+          "source": "MC R3 (code reads pf.facts by name); MC C5; SPEC-master 5d; K-01 v1 tradeOverlay.facts; K-23 v1 company_kinds.pf_facts"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "trade_file: seeded from a trade file of fixture set v1; new_work: drafted from one owner's own words and checklist (S1-03), offline until Rosie's team reviews it.",
+          "source": "02-contracts row K-24 ('seeded from the trade files'; 'new work drafted for review (S1-03)'); S1-02 branch 'One isn't on the list yet'; S1-03"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "checks": [
+        {
+          "name": "kinds_id_form",
+          "expression": "id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'",
+          "source": "K-23 v1 company_kinds_kind_id_form; fixtures/master/engine/work/prof (the 243 file names)"
+        },
+        {
+          "name": "kinds_new_work_id",
+          "expression": "(source = 'new_work') = (id like 'new-%')",
+          "source": "S1-03 (a drafted kind has no profession file); no trade file of fixture set v1 starts with new-"
+        },
+        {
+          "name": "kinds_source_known",
+          "expression": "source in ('trade_file', 'new_work')",
+          "source": "02-contracts row K-24; S1-03"
+        },
+        {
+          "name": "kinds_pattern_known",
+          "expression": "pattern in ('fix', 'urgent', 'project', 'service', 'dropoff', 'chair', 'clinic', 'class', 'event', 'consult', 'table')",
+          "source": "FS section 3; SPEC-prof 2 item 5; K-01 v1 tradeOverlay.trade.pattern"
+        },
+        {
+          "name": "kinds_name_given",
+          "expression": "length(btrim(name)) > 0",
+          "source": "SPEC-prof 3 ('name')"
+        },
+        {
+          "name": "kinds_trade_file_has_style",
+          "expression": "source = 'new_work' or style is not null",
+          "source": "SPEC-prof 3 (id, name, style, pattern); K-01 v1 tradeOverlay.trade (style required)"
+        },
+        {
+          "name": "kinds_drafted_facts_on_draft",
+          "expression": "source = 'trade_file' or facts is null",
+          "source": "S1-03 ('Each answer sets a switch or a fact'); 02-contracts row K-24"
+        },
+        {
+          "name": "kinds_facts_form",
+          "expression": "facts is null or array_to_string(facts, ',') ~ '^([a-z0-9]+(,[a-z0-9]+)*)?$'",
+          "source": "SPEC-master 5b ('lowercase letters and digits'), 5d; K-23 v1 company_kinds_names_form"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "The catalog every business picks from and the kind matcher reads (S1-02; C-130): no business's data. The Tool API roles may only read it; the seed job and the runtime side write it (README rule 2)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "kind_flows",
+      "description": "A trade-file kind's defaults in one flow (A: the customer comes to the business; B: the business goes to the customer), as the compiled bundle has them (K-01 tradeFlow): the main money path and the paths it really uses, the plug-in switches on, and the sign-up settings (arrive, cutoff) with MC C5's start values. Every trade file writes both flows (SPEC-prof 1), so each trade-file kind has two rows; a drafted kind has none until it is reviewed. A business's own values are K-23's (company_kinds switches per flow; flow_defaults for arrive and cutoff), which start from these at sign-up.",
+      "source": "02-contracts row K-24 ('money combos per flow, facts, switches, settings'); SPEC-prof 1 and 3 ('money', 'Plug-in switches', 'Sign-up settings'); MC R3, C5; K-01 v1 tradeFlow, tradeMoney, tradeSettings; FS section 5 (A# / B#, arrive A / B, cutoff)",
+      "columns": [
+        {
+          "name": "kind_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind (kinds.id).",
+          "source": "SPEC-prof 3 ('id')"
+        },
+        {
+          "name": "flow",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "A or B, as K-04's bookings.flow.",
+          "source": "SPEC-prof 1 ('Write BOTH flows in full'); K-04 v1 bookings_flow_known"
+        },
+        {
+          "name": "main_combo",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The main money path in this flow, written price|before|after, such as list|card|counter (money.<flow>.main).",
+          "source": "SPEC-prof 3 ('money': 'the main path per flow'); K-01 v1 tradeMoney.main; SPEC-master 5"
+        },
+        {
+          "name": "combos",
+          "type": "text[]",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The money paths the trade really uses in this flow (money.<flow>.combos), of the master's 28: only these are shown when the owner picks money for a service.",
+          "source": "SPEC-prof 3 ('the combinations this profession really uses'); SPEC-prof D66 amendment ('only its 28 paths'); FS line 564; K-01 v1 tradeMoney.combos"
+        },
+        {
+          "name": "switches_on",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "The plug-in switches on in this flow, resolved from pf.switches (a per-flow value split per flow) as K-01's tradeFlow.switches has them; every switch not named is off.",
+          "source": "MC R3; SPEC-master 5b ('Every switch is off unless turned on'; per flow { \"A\": true, \"B\": false }); K-01 v1 tradeFlow.switches"
+        },
+        {
+          "name": "arrive",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The default arrival setting: setstart (a set start time) or window (an arrival window). MC C5: a trade with no pf.settings, or none for this flow, starts at window.",
+          "source": "SPEC-prof 3 ('arrive: window (the default), setstart or { window: 3 }'); FS line 294; MC C5; K-01 v1 tradeSettings.arrive"
+        },
+        {
+          "name": "arrive_window_hours",
+          "type": "integer",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The window's length in hours when the file gives one ({ window: 2 } in dog-walker.json's flow B); null: the master's window.",
+          "source": "SPEC-prof 3 ('{ \"window\": 3 }'); SPEC-master 5h; K-01 v1 tradeSettings.arrive"
+        },
+        {
+          "name": "cutoff",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The default free-cancel time as the trade file words it, free text such as 24 hours before, 6pm the day before or 7am the day of. Null: empty (MC C5), so the owner sets it at sign-up (FS row H06). K-23's flow_defaults holds the business's own, typed.",
+          "source": "SPEC-prof 3 ('cutoff: \"24 hours before\", \"2 days before\", \"7am the day of\", \"6pm the day before\"'); FS line 294 ('free text (S1-21, A7-01)'); MC C5; K-01 v1 tradeSettings.cutoff; K-23 v1 flow_defaults"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["kind_id", "flow"],
+      "foreignKeys": [
+        {
+          "name": "kind_flows_kind_fk",
+          "columns": ["kind_id"],
+          "references": {
+            "table": "kinds",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "kind_flows_flow_known",
+          "expression": "flow in ('A', 'B')",
+          "source": "SPEC-prof 1; K-04 v1 bookings_flow_known"
+        },
+        {
+          "name": "kind_flows_combos_form",
+          "expression": "array_to_string(combos, ',') ~ '^(list|photos|visit)\\|(none|card|deposit|full)\\|(none|counter|bill|card|own)(,(list|photos|visit)\\|(none|card|deposit|full)\\|(none|counter|bill|card|own))*$'",
+          "source": "SPEC-master 5 (price|before|after); K-01 v1 combo; SPEC-prof 3 ('at least the main one')"
+        },
+        {
+          "name": "kind_flows_main_listed",
+          "expression": "main_combo = any(combos)",
+          "source": "SPEC-prof 3 ('the main path per flow and the combinations this profession really uses (at least the main one)')"
+        },
+        {
+          "name": "kind_flows_after_by_flow",
+          "expression": "(flow = 'A' and array_to_string(combos, ',') !~ '\\|own') or (flow = 'B' and array_to_string(combos, ',') !~ '\\|counter')",
+          "source": "K-01 v1 after ('counter (flow A only)', 'own (flow B only)'); SPEC-master 5"
+        },
+        {
+          "name": "kind_flows_switches_form",
+          "expression": "array_to_string(switches_on, ',') ~ '^([a-z0-9]+(,[a-z0-9]+)*)?$'",
+          "source": "SPEC-master 5b ('lowercase letters and digits')"
+        },
+        {
+          "name": "kind_flows_arrive_known",
+          "expression": "arrive in ('setstart', 'window')",
+          "source": "SPEC-prof 3; FS line 294; K-23 v1 flow_defaults_arrive_known"
+        },
+        {
+          "name": "kind_flows_window_hours",
+          "expression": "arrive_window_hours is null or (arrive = 'window' and arrive_window_hours >= 1)",
+          "source": "SPEC-prof 3 ('{ \"window\": 3 }'); K-01 v1 tradeSettings.arrive (minimum 1)"
+        },
+        {
+          "name": "kind_flows_cutoff_given",
+          "expression": "cutoff is null or length(btrim(cutoff)) > 0",
+          "source": "MC C5 (an empty cutoff is null)"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Part of the catalog every business picks from (S1-02, S1-13, S1-21): no business's data. The Tool API roles may only read it (README rule 2)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "picked_kinds",
+      "description": "The kinds of work an owner picked (S1-02 gives kinds): each kind named, in the order named, with the owner's own words for it and what it became: a listed kind, a new kind drafted for review (S1-03), or work Rosie does not book (S1-74), kept so Rosie's team can see it. S1-02 comes before S1-04 gives companies and S1-09 gives the business, so company_id and business_id are null until then; once set, the pick is that company's kind (K-23 company_kinds) and holds its plug-in text blocks (picked_kind_texts). S11-58 (NEW) adds a pick to a live business the same way.",
+      "source": "S1-02 (gives kinds); S1-03; S1-74; S1-04; S11-58; FS row B09; 02-contracts section 8 ('kinds | S1-02 | K-24: the business's kinds of work')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pick's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "owner_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The owner who named it (persons.id).",
+          "source": "S1-02 ('Sam types the kinds of work in any words'); S11-58"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["owner"],
+          "description": "Its place in the order the owner named the kinds, from 1: the first named is set up first, unless the owner picks another.",
+          "source": "S1-02 ('The first kind named is set up first. Sam can pick another.')"
+        },
+        {
+          "name": "words",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The owner's own words for this kind, as typed, such as Barbershop or plumbing.",
+          "source": "S1-02 ('Sam types the kinds of work in any words'; 'Barbershop, plumbing, electrical'); FS section 6.1 screen 3"
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "listed: matched to a kind on Rosie's list and picked; new_work: not on the list yet, so drafted as new work (S1-03); not_booked: not a service Rosie books, so nothing is set up and Rosie's team sees it within 1 business day (S1-74).",
+          "source": "S1-02 (its three branches: 'All on the list', 'One isn't on the list yet', 'Not a service we book'); S1-03; S1-74"
+        },
+        {
+          "name": "kind_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The kind it became (kinds.id): a trade-file kind when listed, the drafted kind when new_work. Null when not booked.",
+          "source": "S1-02; S1-03; S1-74 ('Rosie says so and sets nothing up')"
+        },
+        {
+          "name": "company_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The company this kind belongs to (companies.id), set at S1-04 (or at S11-58's 'same company?'); then (company_id, kind_id) is a row of K-23's company_kinds. Null until then, and for work not booked.",
+          "source": "S1-04 (gives companies: 'the company of each kind'); S11-58 ('is it the same company?'); K-23 v1 company_kinds"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business it is for (businesses.id), copied from its company and held to it by a foreign key, or the business a NEW was texted for (S11-58), so row-level security can scope the row. Null while there is none.",
+          "source": "arch 10 line 546; S1-04; S1-09; S11-58; K-23 v1 company_kinds.business_id"
+        },
+        {
+          "name": "picked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the owner named it.",
+          "source": "S1-02; S11-58"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "picked_kinds_owner_fk",
+          "columns": ["owner_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "picked_kinds_kind_fk",
+          "columns": ["kind_id"],
+          "references": {
+            "table": "kinds",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "picked_kinds_company_kind_fk",
+          "columns": ["company_id", "kind_id"],
+          "references": {
+            "table": "company_kinds",
+            "columns": ["company_id", "kind_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "picked_kinds_company_business_fk",
+          "columns": ["company_id", "business_id"],
+          "references": {
+            "table": "companies",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "picked_kinds_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "picked_kinds_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "arch 10 line 546 (a pick's text blocks and draft carry its business, for row-level security)"
+        },
+        {
+          "name": "picked_kinds_one_per_company_kind",
+          "columns": ["company_id", "kind_id"],
+          "where": "company_id is not null",
+          "source": "S1-04; K-23 v1 company_kinds primary key (one row per company and kind), so each business kind has one set of text blocks"
+        }
+      ],
+      "checks": [
+        {
+          "name": "picked_kinds_outcome_known",
+          "expression": "outcome in ('listed', 'new_work', 'not_booked')",
+          "source": "S1-02 (its three branches)"
+        },
+        {
+          "name": "picked_kinds_kind_unless_not_booked",
+          "expression": "(outcome = 'not_booked') = (kind_id is null)",
+          "source": "S1-74 ('Rosie says so and sets nothing up'); S1-02; S1-03"
+        },
+        {
+          "name": "picked_kinds_outcome_matches_kind",
+          "expression": "kind_id is null or (outcome = 'new_work') = (kind_id like 'new-%')",
+          "source": "S1-02 ('One isn't on the list yet'); S1-03; kinds_new_work_id"
+        },
+        {
+          "name": "picked_kinds_not_booked_unplaced",
+          "expression": "outcome <> 'not_booked' or company_id is null",
+          "source": "S1-74 ('sets nothing up')"
+        },
+        {
+          "name": "picked_kinds_position_positive",
+          "expression": "position >= 1",
+          "source": "S1-02"
+        },
+        {
+          "name": "picked_kinds_words_given",
+          "expression": "length(btrim(words)) > 0",
+          "source": "S1-02"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "picked_kinds_owner_idx",
+          "columns": ["owner_person_id", "picked_at"],
+          "why": "An owner's kinds during sign-up, before any company or business exists (S1-02, S1-11, S1-04), in the order named."
+        },
+        {
+          "name": "picked_kinds_business_idx",
+          "columns": ["business_id"],
+          "why": "A business's kinds of work with their text blocks (the planner's context; S11-58)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "picked_kind_texts",
+      "description": "Each business kind's plug-in text blocks (S1-11 gives pf.license to pf.edges): the 11 free-text pf keys, one row each, stored whole as the AI reads them, sub-keys guidance only. For a listed kind each block is its trade file's value as JSON text, unchanged (K-01 pluginText); for a drafted kind, the draft's. This is FS business.extras ({\"<profession id>\": {\"pf.license\": ...}}), held per pick. The typed keys (pf.facts, pf.switches, pf.settings) never come here: K-23's company_kinds and flow_defaults hold a business's own, and kinds and kind_flows the trade's.",
+      "source": "S1-11 (slot gives pf.license, pf.services, pf.questions, pf.safety, pf.first_steps, pf.visit, pf.money, pf.messages, pf.staff, pf.rules, pf.edges); MC R3; Q-39 default; FS line 746 (Business.extras); FS line 565; 02-contracts section 8 (pf.* keys: 'K-24: each kind's plug-in text blocks, stored whole'); K-01 v1 pluginText; T-143 keymap (pluginText/<key>)",
+      "columns": [
+        {
+          "name": "picked_kind_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business kind (picked_kinds.id) the block belongs to.",
+          "source": "S1-11 (slot reads kinds); FS line 746 ('for each kind of work the business has')"
+        },
+        {
+          "name": "pf_key",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Which of the 11 free-text pf keys it is, such as pf.services.",
+          "source": "S1-11 (slot gives); SPEC-prof 3 ('plugin'); MC R3; compiler/src/load/trade.ts PF_TEXT_KEYS"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The pick's business, copied from it and held to it by a foreign key, so row-level security can scope the row. Null while the pick has none.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "block",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The block, whole, as JSON text: for a listed kind, the trade file's value unchanged (K-01 pluginText: JSON.stringify of the value as parsed). The AI reads it and the owner's settings pages show it; no code and no screen reads a sub-key by name (FS line 748), and its words reach a customer only through the composer's checked messages.",
+          "source": "MC R3 ('stored whole as a text block for the AI'); FS lines 748, 565; K-01 v1 pluginText; compiler/src/load/trade.ts (pluginText)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["picked_kind_id", "pf_key"],
+      "foreignKeys": [
+        {
+          "name": "picked_kind_texts_pick_fk",
+          "columns": ["picked_kind_id"],
+          "references": {
+            "table": "picked_kinds",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "picked_kind_texts_pick_business_fk",
+          "columns": ["picked_kind_id", "business_id"],
+          "references": {
+            "table": "picked_kinds",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "picked_kind_texts_key_known",
+          "expression": "pf_key in ('pf.license', 'pf.services', 'pf.questions', 'pf.safety', 'pf.first_steps', 'pf.visit', 'pf.money', 'pf.messages', 'pf.staff', 'pf.rules', 'pf.edges')",
+          "source": "S1-11 (slot gives the 11); MC R3 (pf.facts, pf.switches, pf.settings are read by name, as typed values); Q-39 default"
+        },
+        {
+          "name": "picked_kind_texts_block_is_json",
+          "expression": "block is json",
+          "source": "K-01 v1 pluginText ('the trade file's value written as JSON text, unchanged'); compiler/src/load/trade.ts"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "picked_kind_texts_business_idx",
+          "columns": ["business_id"],
+          "why": "A business's plug-in text blocks for the planner's context (C-114)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "new_work_drafts",
+      "description": "A plug-in drafted for new work (S1-03): a kind of work not on Rosie's list, drafted from the owner's own words and price list through a fixed checklist of 15 blocks, offline until a person on Rosie's team reviews it within 1 business day. One per pick whose outcome is new_work; the drafted kind is that pick's kind (kinds, source new_work, with its closest booking pattern). The review itself is K-37's review_items row of kind new_work whose subject is this row; its decision is written back here as the state.",
+      "source": "S1-03; S1-02 branch 'One isn't on the list yet' (safe default: 'draft it as new work, offline until Rosie's team reviews it'); S11-58; 02-contracts row K-24 ('new work drafted for review (S1-03)'); K-37 v1 review_items (kind new_work, subject_table, subject_row_id)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The draft's id: an opaque string code makes and never parses (CQ-09). K-37's review item names it as subject_table new_work_drafts, subject_row_id this id.",
+          "source": "CQ-09; K-37 v1 review_items.subject_table, subject_row_id"
+        },
+        {
+          "name": "picked_kind_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pick it drafts (picked_kinds.id, outcome new_work): its owner, words, kind and business are the pick's.",
+          "source": "S1-02; S1-03"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The pick's business, copied from it and held to it by a foreign key, so row-level security can scope the row. Null while the pick has none.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'drafting'",
+          "audience": ["owner"],
+          "description": "drafting: the owner is still answering the checklist; in_review: sent to Rosie's team (K-37's review item is open); approved: the team checked it and every service against the official rules for that work, so it can go live; kept_offline: the team did not approve it, so it stays offline, saved. Until approved it is offline.",
+          "source": "S1-03 ('The plug-in is a draft, offline until it's reviewed. Sam hears the result within 1 business day'; 'A person checks every service against the official rules for that work'); S1-02 safe default; S11-58 ('offline until Rosie's team reviews it')"
+        },
+        {
+          "name": "drafted_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the draft was started.",
+          "source": "S1-03"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "new_work_drafts_pick_fk",
+          "columns": ["picked_kind_id"],
+          "references": {
+            "table": "picked_kinds",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "new_work_drafts_pick_business_fk",
+          "columns": ["picked_kind_id", "business_id"],
+          "references": {
+            "table": "picked_kinds",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "new_work_drafts_one_per_pick",
+          "columns": ["picked_kind_id"],
+          "source": "S1-03 (one draft for each kind not on the list)"
+        },
+        {
+          "name": "new_work_drafts_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "arch 10 line 546 (a draft's blocks carry its business, for row-level security)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "new_work_drafts_state_known",
+          "expression": "state in ('drafting', 'in_review', 'approved', 'kept_offline')",
+          "source": "S1-03; S1-02 safe default; S11-58"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "new_work_drafts_business_idx",
+          "columns": ["business_id"],
+          "where": "business_id is not null",
+          "why": "A business's drafts and whether a kind is still offline (S1-35 go-live, S11-58)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "new_work_draft_blocks",
+      "description": "The owner's answer to one block of S1-03's checklist of 15 (1 Danger and safety words to 15 Free estimates, who collects), with the facts and switches it set, as the screen names them. Each block starts from its safe default; a block with no row is still at it, so its protective facts (contracts, crews and forms) stay on. A clear no skips the block and sets nothing; only that turns a protective fact off. Which facts the draft ends with, and the business's own copy, is code's and K-23's (company_kinds), from these rows.",
+      "source": "S1-03 (its form: the 15 blocks; 'Each starts from its safe default, and a no skips that block'; 'Each answer sets a switch or a fact'; 'The screen names every fact each block sets'; 'Protective facts start on: contracts, crews and forms'; 'Only the business's clear no turns a protective fact off. Silence or a skipped block keeps it on'); FS rows T13, V15, K07 (S1-03 blocks 12 and 15)",
+      "columns": [
+        {
+          "name": "draft_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The draft (new_work_drafts.id).",
+          "source": "S1-03"
+        },
+        {
+          "name": "block",
+          "type": "integer",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The block's number on S1-03's checklist, 1 to 15.",
+          "source": "S1-03 ('The checklist has 15 blocks, shown on the screen')"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The draft's business, copied from it and held to it by a foreign key, so row-level security can scope the row. Null while the draft has none.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "answered: the owner's words answer the block; no: the owner's clear no, which skips the block.",
+          "source": "S1-03 ('a no skips that block'; 'Only the business's clear no turns a protective fact off')"
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The owner's own words, as given; for a no, the no itself.",
+          "source": "S1-03 ('Rosie drafts a plug-in from the owner's own words'; 'Never: make up a rule. Only the owner's own words, the checklist and the official rules count')"
+        },
+        {
+          "name": "facts_on",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": ["owner"],
+          "description": "The facts this answer sets on, as the screen names them. Empty for a no.",
+          "source": "S1-03 ('Each answer sets a switch or a fact'; 'The screen names every fact each block sets'); SPEC-master 5d"
+        },
+        {
+          "name": "switches_on",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": ["owner"],
+          "description": "The switches this answer sets on, in both flows, such as sensitive. Empty for a no.",
+          "source": "S1-03 ('Each answer sets a switch or a fact, like sensitive work'); SPEC-master 5b"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the owner answered it.",
+          "source": "S1-03"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["draft_id", "block"],
+      "foreignKeys": [
+        {
+          "name": "new_work_draft_blocks_draft_fk",
+          "columns": ["draft_id"],
+          "references": {
+            "table": "new_work_drafts",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "new_work_draft_blocks_draft_business_fk",
+          "columns": ["draft_id", "business_id"],
+          "references": {
+            "table": "new_work_drafts",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "new_work_draft_blocks_block_range",
+          "expression": "block between 1 and 15",
+          "source": "S1-03 ('The checklist has 15 blocks')"
+        },
+        {
+          "name": "new_work_draft_blocks_outcome_known",
+          "expression": "outcome in ('answered', 'no')",
+          "source": "S1-03"
+        },
+        {
+          "name": "new_work_draft_blocks_no_sets_nothing",
+          "expression": "outcome <> 'no' or (cardinality(facts_on) = 0 and cardinality(switches_on) = 0)",
+          "source": "S1-03 ('a no skips that block')"
+        },
+        {
+          "name": "new_work_draft_blocks_answer_given",
+          "expression": "length(btrim(answer)) > 0",
+          "source": "S1-03 (only the owner's own words count)"
+        },
+        {
+          "name": "new_work_draft_blocks_names_form",
+          "expression": "array_to_string(facts_on || switches_on, ',') ~ '^([a-z0-9]+(,[a-z0-9]+)*)?$'",
+          "source": "SPEC-master 5b ('lowercase letters and digits'), 5d"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

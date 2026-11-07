@@ -1,0 +1,28 @@
+{
+  "after": ["seed-business-kinds.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "insert",
+    "table": "picked_kinds",
+    "values": {
+      "id": "pick-sam-barbershop-home-services",
+      "owner_person_id": "person-sam",
+      "position": 4,
+      "words": "Barbershop",
+      "outcome": "listed",
+      "kind_id": "barber",
+      "company_id": "company-lee-home-services",
+      "business_id": "biz-lee-home-services",
+      "picked_at": "2026-10-19T18:06:00Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23503",
+      "constraintOneOf": ["picked_kinds_company_kind_fk"]
+    }
+  }
+}
