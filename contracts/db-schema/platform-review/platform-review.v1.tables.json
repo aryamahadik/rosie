@@ -1,0 +1,994 @@
+{
+  "part": "platform-review",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "parked_turns",
+      "description": "Rosie's team's record of a parked turn: a turn that crashed a third time before its commit is parked for Rosie's team, freeing the inbox for later texts; the person hears once that nothing changed and that Rosie's team will reply within 1 business day (arch 11 line 576, DD). The turn itself, with state parked, parked_at and tries 3, is K-04's turns row; this row holds what the team needs: why it crashed, when the person was told, when the reply is due, and the reply. Shown in the team console (C-194).",
+      "source": "arch 11 line 576; C-180; C-194; Q-18; NQ-RT-3 (the turns row is written once, as committed or parked); 02-contracts section 7 row K-37 ('Parked turns')",
+      "columns": [
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The parked turn (turns.id), whose core row has state parked. One record per parked turn.",
+          "source": "arch 11 line 576; K-04 v1 turns (state parked, parked_at, tries)"
+        },
+        {
+          "name": "error_summary",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The third crash's error as the runtime caught it, for the team: the error's own text, never a private value from the turn's texts, which stay sealed (traces never carry personal data: K-04 v1 handles.address; arch 10 line 516).",
+          "source": "arch 11 line 576 ('A third crash before the commit parks the turn for Rosie's team'); C-180; arch 10 line 516"
+        },
+        {
+          "name": "person_told_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the person was told, once, that nothing changed and that Rosie's team will reply within 1 business day. Set once; null until the line has gone. Whether it goes to a stopped number is limit 8's (RULES 7.2), not this row's.",
+          "source": "arch 11 line 576 ('the person hears once that nothing changed and that Rosie's team will reply within 1 business day (DD)')"
+        },
+        {
+          "name": "reply_due_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the team's reply is due: 1 business day after the turn was parked, as code computes it (README open gaps: the business-day calendar).",
+          "source": "arch 11 line 576 ('within 1 business day (DD)'); Q-18"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'open'",
+          "audience": "never",
+          "description": "open: waiting for the team's reply; replied: a person on Rosie's team has replied to the person.",
+          "source": "arch 11 line 576 ('Rosie's team will reply'); C-194"
+        },
+        {
+          "name": "replied_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the team replied; set with state replied.",
+          "source": "arch 11 line 576"
+        },
+        {
+          "name": "replied_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person on Rosie's team who replied (persons.id; until launch Jay or the CTO, Q-18). Set with state replied.",
+          "source": "Q-18; C-194; arch 09 line 457 (who)"
+        },
+        {
+          "name": "resolution",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "What the team did, in plain words and without private values (RULES 4.5): for example re-ran the turn from its sealed texts, or handled the request by hand. Set with state replied.",
+          "source": "arch 11 line 576; C-194; RULES 4.5"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["turn_id"],
+      "foreignKeys": [
+        {
+          "name": "parked_turns_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "parked_turns_replied_by_fk",
+          "columns": ["replied_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "parked_turns_state_known",
+          "expression": "state in ('open', 'replied')",
+          "source": "arch 11 line 576; C-194"
+        },
+        {
+          "name": "parked_turns_replied_has_time",
+          "expression": "(state = 'replied') = (replied_at is not null)",
+          "source": "arch 11 line 576"
+        },
+        {
+          "name": "parked_turns_replied_has_who",
+          "expression": "state <> 'replied' or (replied_by_person_id is not null and resolution is not null)",
+          "source": "arch 09 line 457 (who); C-194"
+        },
+        {
+          "name": "parked_turns_error_given",
+          "expression": "length(btrim(error_summary)) > 0",
+          "source": "arch 11 line 576"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "parked_turns_open_due_idx",
+          "columns": ["reply_due_at"],
+          "where": "state = 'open'",
+          "why": "The team console's parked turns, the reply due soonest first (C-194; arch 11 line 576)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Rosie's team's own record, read and written across every business by the runtime and the team console (Q-18; C-194); a turn belongs to a handle, not a business (K-04 v1 turns). No business sees it: the Tool API roles have no grant on it (README rule 2)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "dead_letters",
+      "description": "The dead-letter queue in the team console: a queued job other than a send that failed its 5 tries. Queues carry retries only: sends follow step 8 and never land here; other jobs get 5 tries, then the dead-letter queue (arch 10 line 540, DD). Effects take their service's outage row instead (arch 10 line 542). One row per job that ran out of tries; the team replays it or closes it.",
+      "source": "arch 10 line 540 ('other jobs get 5 tries, then a dead-letter queue in the team console (DD)'); arch 02 diagram line 105 ('Team console: paging · gap cases · dead letters'); C-035; C-056; C-194; 02-contracts section 7 row K-37",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The dead letter's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "queue",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The queue the job came from (a Cloudflare Queues queue name, C-056). Queue names are the runtime engineer's; the fixtures' are examples.",
+          "source": "arch 10 line 540 ('Queues carry retries only'); C-056"
+        },
+        {
+          "name": "job_kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "What kind of job it was, such as the daily reconciliation (arch 10 line 550) or a calendar poll (arch 11 line 578). Free text in v1: no source closes the list of job kinds (README open gaps).",
+          "source": "arch 10 line 540 ('other jobs'); arch 10 line 550; arch 11 line 578"
+        },
+        {
+          "name": "job_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The job's id, the same id the event log's job_id carries for the job's writes (K-04 v1 event_log.job_id; 02-contracts K-08 'the turn id, or a job id').",
+          "source": "K-04 v1 event_log.job_id; 02-contracts K-08"
+        },
+        {
+          "name": "message_body",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "The job's queue message as it was enqueued, so the team can replay it unchanged. Jobs carry ids and references, never a private value (README rule 4).",
+          "source": "arch 10 line 540; C-056; RULES 4.10"
+        },
+        {
+          "name": "tries",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "How many times the job ran: at least 5, since a job lands here only after its 5 tries.",
+          "source": "arch 10 line 540 ('5 tries, then a dead-letter queue')"
+        },
+        {
+          "name": "first_tried_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the job first ran.",
+          "source": "arch 10 line 540"
+        },
+        {
+          "name": "last_tried_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When its last try ran.",
+          "source": "arch 10 line 540"
+        },
+        {
+          "name": "last_error",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The last try's error as the runtime caught it, without private values (arch 10 line 516).",
+          "source": "arch 10 line 540; arch 10 line 516"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business the job was for (businesses.id); null for a job across businesses, such as the daily reconciliation or a sweep (arch 10 line 540: 'rows no handle owns').",
+          "source": "arch 10 lines 540, 546, 550"
+        },
+        {
+          "name": "trace_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The job's trace id, so the team can follow it (one trace id from webhook to delivery receipt).",
+          "source": "arch 10 line 548; CQ-06"
+        },
+        {
+          "name": "dead_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When it landed in the dead-letter queue.",
+          "source": "arch 10 line 540"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'open'",
+          "audience": "never",
+          "description": "open: waiting in the team console; replayed: the team sent it back to its queue unchanged; closed: the team closed it without a replay (README open gaps: the sources name the queue, not what the team does with it).",
+          "source": "arch 10 line 540 ('a dead-letter queue in the team console (DD)'); C-194"
+        },
+        {
+          "name": "resolved_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the team replayed or closed it.",
+          "source": "C-194"
+        },
+        {
+          "name": "resolved_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person on Rosie's team who replayed or closed it (persons.id; Q-18).",
+          "source": "Q-18; C-194; arch 09 line 457 (who)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "dead_letters_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "dead_letters_resolved_by_fk",
+          "columns": ["resolved_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "dead_letters_after_five_tries",
+          "expression": "tries >= 5",
+          "source": "arch 10 line 540 ('other jobs get 5 tries, then a dead-letter queue')"
+        },
+        {
+          "name": "dead_letters_tries_in_order",
+          "expression": "first_tried_at <= last_tried_at and last_tried_at <= dead_at",
+          "source": "arch 10 line 540"
+        },
+        {
+          "name": "dead_letters_state_known",
+          "expression": "state in ('open', 'replayed', 'closed')",
+          "source": "arch 10 line 540; C-194"
+        },
+        {
+          "name": "dead_letters_resolved_has_time",
+          "expression": "(state = 'open') = (resolved_at is null)",
+          "source": "C-194"
+        },
+        {
+          "name": "dead_letters_resolved_has_who",
+          "expression": "state = 'open' or resolved_by_person_id is not null",
+          "source": "arch 09 line 457 (who); C-194"
+        },
+        {
+          "name": "dead_letters_error_given",
+          "expression": "length(btrim(last_error)) > 0",
+          "source": "arch 10 line 540"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "dead_letters_open_idx",
+          "columns": ["dead_at"],
+          "where": "state = 'open'",
+          "why": "The team console's dead-letter queue, oldest first (arch 10 line 540; C-194)."
+        },
+        {
+          "name": "dead_letters_job_idx",
+          "columns": ["job_id"],
+          "why": "A job's dead letters, and its writes in the event log by the same job id (K-04 v1 event_log.job_id)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Jobs run across businesses (arch 10 line 540: the minute sweep, rows no handle owns), and the dead-letter queue is Rosie's team's, in the team console (C-194; Q-18). No business sees it: the Tool API roles have no grant on it (README rule 2)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "gap_cases",
+      "description": "A gap case: a turn that no choice fit, logged with its state and frontier for the weekly review (arch 01 line 95). Nothing fits: meaning search adds the 3 closest entry steps and the turn's one re-read runs; still nothing: the Sonnet planner; a reply to its question that fits nothing goes to a person. Each such turn is a gap case; the team reviews them weekly, and each miss becomes a test and a fix (arch 03 line 189; HANDOFF 10).",
+      "source": "arch 01 line 95; arch 03 line 189; arch 06 line 291 (log a gap case); K-02 v1 plannerLogGap, choice; C-194; 02-contracts section 7 row K-37 ('gap cases with their state and frontier')",
+      "columns": [
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The turn that nothing fit (turns.id). One gap case per turn: 'Each such turn is a gap case' (arch 03 line 189).",
+          "source": "arch 01 line 95 ('A turn that no choice fit'); arch 03 line 189"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business whose step graph meaning search ran over (businesses.id); null when the turn was about no one business yet.",
+          "source": "arch 03 line 189 ('meaning search over this business's step graph')"
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "What happened to the turn: one of the planner's five verbs as K-02 v1's plannerOutput names them (answer, ask, pass_on, hand_off, log_gap: arch 06 line 291), or to_person, when a reply to the planner's question fit nothing and went to a person (arch 03 line 189; S13-29 rule 54).",
+          "source": "arch 03 line 189; arch 06 line 291; K-02 v1 plannerOutput; S13-29 rule 54"
+        },
+        {
+          "name": "summary_sealed",
+          "type": "bytea",
+          "null": true,
+          "audience": "never",
+          "sealedBy": "sealed_for_person_id",
+          "description": "What the person wanted that nothing fit, in plain words: K-02 v1 plannerLogGap.summary for log_gap. Sealed under the key of sealed_for_person_id, since it may carry the person's private details (RULES 4.5: when unsure, treat it as private); unreadable once that key is deleted. Null when the planner gave no summary.",
+          "source": "K-02 v1 plannerLogGap.summary; arch 09 line 492; arch 01 line 93; RULES 4.5, 4.10"
+        },
+        {
+          "name": "sealed_for_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person whose key seals summary_sealed (persons.id): the person who wrote the turn. One person per row, as K-04's event_log.",
+          "source": "arch 09 line 492; K-04 v1 event_log.sealed_for_person_id"
+        },
+        {
+          "name": "open_question_ids",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "Its state, part one: the open questions sent to this handle when the turn ran (open_questions.id; K-02 v1 context openQuestions), so the review sees what was being asked. Empty when none was open.",
+          "source": "arch 01 line 95 ('logged with its state'); arch 09 line 455 ('Open questions are the memory of every conversation'); K-02 v1 context.openQuestions"
+        },
+        {
+          "name": "versions_read",
+          "type": "jsonb",
+          "null": false,
+          "default": "'[]'",
+          "audience": "never",
+          "description": "Its state, part two: the rows the turn read, as a JSON array of {\"table\", \"rowId\", \"version\"}, the same references as K-04's open_questions.versions_read, so the review can re-read the rows as they were from the event log. References only, never the values.",
+          "source": "arch 01 line 95; K-04 v1 open_questions.versions_read; K-02 v1 fact (table, rowId, version)"
+        },
+        {
+          "name": "frontier",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "The frontier as offered on the turn's last read: a JSON array of K-02 v1 choice objects, including the entry steps meaning search added (kind searchEntry). Labels and definitions come from the bundle; targets name the business, booking and visit time (K-02 v1 target).",
+          "source": "arch 01 line 95 ('logged with its state and frontier'); arch 03 line 189; K-02 v1 context.choices, choice, meaningSearch"
+        },
+        {
+          "name": "logged_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When the gap case was logged.",
+          "source": "arch 01 line 95 ('logged')"
+        },
+        {
+          "name": "review_state",
+          "type": "text",
+          "null": false,
+          "default": "'open'",
+          "audience": "never",
+          "description": "open: waiting for the weekly review; reviewed: the team has reviewed it.",
+          "source": "arch 03 line 189 ('the team reviews them weekly'); arch 01 line 95 ('for the weekly review')"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the team reviewed it; set with review_state reviewed.",
+          "source": "arch 03 line 189"
+        },
+        {
+          "name": "reviewed_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person on Rosie's team who reviewed it (persons.id; Q-18). Set with review_state reviewed.",
+          "source": "Q-18; C-194; arch 09 line 457 (who)"
+        },
+        {
+          "name": "test_ref",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The test the miss became: the gold-set item's id (K-10), an opaque string with no foreign key, since the gold set lives outside the database. Null when the review found no miss.",
+          "source": "arch 03 line 189 ('each miss becomes a test and a fix'); HANDOFF 10; 02-contracts K-10"
+        },
+        {
+          "name": "fix_ref",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The fix the miss became: the task or bundle that carries it, as an opaque string. Null when the review found no miss.",
+          "source": "arch 03 line 189 ('each miss becomes a test and a fix'); HANDOFF 10"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["turn_id"],
+      "foreignKeys": [
+        {
+          "name": "gap_cases_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "gap_cases_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "gap_cases_sealed_for_fk",
+          "columns": ["sealed_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "gap_cases_reviewed_by_fk",
+          "columns": ["reviewed_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "gap_cases_outcome_known",
+          "expression": "outcome in ('answer', 'ask', 'pass_on', 'hand_off', 'log_gap', 'to_person')",
+          "source": "arch 06 line 291 (five verbs only); K-02 v1 plannerOutput; arch 03 line 189 (a reply that fits nothing goes to a person)"
+        },
+        {
+          "name": "gap_cases_sealed_has_person",
+          "expression": "summary_sealed is null or sealed_for_person_id is not null",
+          "source": "arch 09 line 492"
+        },
+        {
+          "name": "gap_cases_frontier_is_list",
+          "expression": "jsonb_typeof(frontier) = 'array' and jsonb_array_length(frontier) >= 1",
+          "source": "arch 01 line 95; K-02 v1 context.choices (minItems 1)"
+        },
+        {
+          "name": "gap_cases_versions_read_is_list",
+          "expression": "jsonb_typeof(versions_read) = 'array'",
+          "source": "K-04 v1 open_questions.versions_read"
+        },
+        {
+          "name": "gap_cases_review_state_known",
+          "expression": "review_state in ('open', 'reviewed')",
+          "source": "arch 03 line 189"
+        },
+        {
+          "name": "gap_cases_reviewed_has_time",
+          "expression": "(review_state = 'reviewed') = (reviewed_at is not null)",
+          "source": "arch 03 line 189"
+        },
+        {
+          "name": "gap_cases_reviewed_has_who",
+          "expression": "review_state <> 'reviewed' or reviewed_by_person_id is not null",
+          "source": "arch 09 line 457 (who); C-194"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "gap_cases_open_idx",
+          "columns": ["logged_at"],
+          "where": "review_state = 'open'",
+          "why": "The week's gap cases still to review, in the team console (arch 03 line 189; C-194)."
+        },
+        {
+          "name": "gap_cases_business_idx",
+          "columns": ["business_id", "logged_at"],
+          "where": "business_id is not null",
+          "why": "One business's gap cases, since meaning search ran over that business's step graph (arch 03 line 189)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Rosie's team's weekly review across every business (arch 03 line 189; C-194; Q-18); a turn belongs to a handle, not a business (K-04 v1 turns). No business sees it: the Tool API roles have no grant on it (README rule 2)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "review_items",
+      "description": "The team review queue: each thing the sources send to a person on Rosie's team, never to the AI alone, with when it is due. Within 1 business day: a new kind of work drafted from the owner's words (S1-03), control of a business (S1-75), a listing that does not match or is already on Rosie (S1-76), an owner of record's claim (S11-52), bookings over a phone or address limit (S12-28). The same day: harm to a child, an older adult or someone in care (A3-49), a report that the owner or staff harmed someone, and a deadline the law sets that Rosie missed (S11-70). The thing reviewed lives in its own part (a business, a new-work draft, a harm report); this row is the queue entry that points at it.",
+      "source": "S1-03; S1-75; S1-76; S11-52; A3-49; S12-28; S11-70; Q-18; C-194; 02-contracts section 7 row K-37 ('the team review queue (1 business day: S1-03, S1-75, S1-76, S11-52, A3-49, S12-28; S11-70)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The review item's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "new_work (S1-03: the plug-in draft and each service against the official rules for that work), control (S1-75: Rosie's team checks control when no code came back from the listing's own phone or email), listing_match (S1-76: a listing that does not match, or a business already on Rosie), owner_claim (S11-52: an owner of record claims a business set up by someone who is not one; the team checks the papers), booking_cap (S12-28: one phone or address over the plug-in's daily cap), harm_report (A3-49; S11-70: harm told of, or a report that the owner or staff harmed someone), missed_deadline (S11-70: a deadline the law sets that was missed).",
+          "source": "S1-03; S1-75; S1-76; S11-52; S12-28; A3-49; S11-70"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business it is about (businesses.id); null when it is about no one business.",
+          "source": "S1-75 ('That company stays offline until then'); S1-76; S11-52; S12-28; arch 10 line 546"
+        },
+        {
+          "name": "subject_table",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The table of the row under review, named as K-04's event_log.table_name names a row, for example businesses for control and listing checks. Null while the row's part is not frozen (README open gaps: K-24's new-work draft, K-34's harm report). Set with subject_row_id.",
+          "source": "K-04 v1 event_log.table_name, row_id; K-02 v1 fact (table, rowId)"
+        },
+        {
+          "name": "subject_row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The primary key of the row under review, as text; no foreign key, since it may be in any part. Set with subject_table.",
+          "source": "K-04 v1 event_log.row_id"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that raised it (turns.id), or null when a job or a page raised it.",
+          "source": "02-contracts K-08 ('the turn id, or a job id'); K-04 v1 turns"
+        },
+        {
+          "name": "raised_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who asked for the review (persons.id): the owner setting up (S1-03, S1-75, S1-76) or the owner of record claiming (S11-52). Null when Rosie raised it: a harm report she was told of (A3-49), the cap flag (S12-28), a missed deadline (S11-70). A harm report never names its reporter here: the report and who made it are kept with the report itself (README open gaps, K-34).",
+          "source": "S1-03; S1-75; S1-76; S11-52; A3-49 ('Nothing they said reaches the family or the booker'); S12-28; S11-70"
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "What the team must check, in plain words, without private values: those stay in the row under review, sealed where its part seals them (RULES 4.5, 4.10). For example S12-28's flag: 'One phone tried to book more visits today than the plug-in allows. Nothing was booked.'",
+          "source": "S1-03; S1-75; S1-76; S11-52; A3-49; S12-28; S11-70; RULES 4.5"
+        },
+        {
+          "name": "opened_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When it entered the queue.",
+          "source": "C-194"
+        },
+        {
+          "name": "due_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the team's answer is due, as code computes it from the kind: within 1 business day for new_work, control, listing_match, owner_claim and booking_cap (S1-03, S1-75, S1-76, S11-52, S12-28); the same day for harm_report and missed_deadline (A3-49 'a person on Rosie's team follows up today'; S11-70 'the same day'). README open gaps: the business-day calendar.",
+          "source": "S1-03; S1-75; S1-76; S11-52; S12-28 ('within 1 business day'); A3-49 ('today'); S11-70 ('the same day')"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'open'",
+          "audience": "never",
+          "description": "open: waiting for the team; waiting: waiting on someone else until wait_until (S11-52: the account owner is told and has 3 business days to send their own papers); done: the team decided.",
+          "source": "S11-52 ('has 3 business days to send their own papers'; 'Rosie's team decides on both'); C-194"
+        },
+        {
+          "name": "wait_until",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "While waiting, when the wait ends: for an owner claim, 3 business days after the account owner was told (S11-52). Null otherwise.",
+          "source": "S11-52"
+        },
+        {
+          "name": "decided_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the team decided; set with state done.",
+          "source": "S11-52 ('Rosie's team decides'); S1-03 ('Sam hears the result within 1 business day')"
+        },
+        {
+          "name": "decided_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person on Rosie's team who decided (persons.id; until launch Jay or the CTO, Q-18). Set with state done.",
+          "source": "Q-18; C-194; arch 09 line 457 (who)"
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The team's decision in plain words, without private values: for example control proven or not, the claim granted or refused, the services checked. Set with state done; what it changes is written to the row under review in its own part.",
+          "source": "S1-03; S1-75; S1-76; S11-52; S12-28; S11-70; RULES 4.5"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "review_items_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "review_items_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "review_items_raised_by_fk",
+          "columns": ["raised_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "review_items_decided_by_fk",
+          "columns": ["decided_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "review_items_kind_known",
+          "expression": "kind in ('new_work', 'control', 'listing_match', 'owner_claim', 'booking_cap', 'harm_report', 'missed_deadline')",
+          "source": "S1-03; S1-75; S1-76; S11-52; S12-28; A3-49; S11-70; 02-contracts section 7 row K-37"
+        },
+        {
+          "name": "review_items_state_known",
+          "expression": "state in ('open', 'waiting', 'done')",
+          "source": "S11-52; C-194"
+        },
+        {
+          "name": "review_items_waiting_has_until",
+          "expression": "(state = 'waiting') = (wait_until is not null)",
+          "source": "S11-52 (3 business days to send their own papers)"
+        },
+        {
+          "name": "review_items_done_has_time",
+          "expression": "(state = 'done') = (decided_at is not null)",
+          "source": "S11-52 ('Rosie's team decides')"
+        },
+        {
+          "name": "review_items_done_has_who",
+          "expression": "state <> 'done' or (decided_by_person_id is not null and outcome is not null)",
+          "source": "arch 09 line 457 (who); C-194"
+        },
+        {
+          "name": "review_items_subject_pair",
+          "expression": "(subject_table is null) = (subject_row_id is null)",
+          "source": "K-04 v1 event_log.table_name, row_id"
+        },
+        {
+          "name": "review_items_due_after_opened",
+          "expression": "due_at > opened_at",
+          "source": "S1-03; A3-49; S11-70"
+        },
+        {
+          "name": "review_items_summary_given",
+          "expression": "length(btrim(summary)) > 0",
+          "source": "C-194"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "review_items_queue_idx",
+          "columns": ["due_at"],
+          "where": "state <> 'done'",
+          "why": "The team console's review queue, the answer due soonest first (C-194; Q-18)."
+        },
+        {
+          "name": "review_items_subject_idx",
+          "columns": ["subject_table", "subject_row_id"],
+          "where": "subject_table is not null",
+          "why": "A row's reviews, for example whether a business still waits on its control check (S1-75)."
+        },
+        {
+          "name": "review_items_business_idx",
+          "columns": ["business_id", "opened_at"],
+          "where": "business_id is not null",
+          "why": "One business's reviews, for the team (S1-76, S11-52, S12-28)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Rosie's team's queue across every business (Q-18; C-194). Some items must never reach the business they are about (S11-70: a report that the owner or staff harmed someone comes here, never only to the one named; S12-28: patterns across businesses are seen only by Rosie's team), so the Tool API roles have no grant on it (README rule 2)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "live_turn_labels",
+      "description": "The human-labelled live turns after launch: 300 live turns sampled each month and labelled by people, then added to the gold set (arch 08 line 449; C-145). One row per sampled turn: the month whose sample it is, and its label once a person gives it. The sample waits in the team console (QUESTIONS.md M6-M8.7).",
+      "source": "arch 08 line 449 ('plus 300 human-labeled live turns a month'); C-145; QUESTIONS.md M6-M8.7; 02-contracts section 7 row K-37",
+      "columns": [
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sampled live turn (turns.id). A turn is sampled once.",
+          "source": "arch 08 line 449; C-145"
+        },
+        {
+          "name": "sample_month",
+          "type": "date",
+          "null": false,
+          "audience": "never",
+          "description": "The month whose sample it is, as its first day (300 a month).",
+          "source": "arch 08 line 449 ('300 human-labeled live turns a month')"
+        },
+        {
+          "name": "sampled_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When the turn was sampled.",
+          "source": "C-145"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'waiting'",
+          "audience": "never",
+          "description": "waiting: in the team console for a person to label; labelled: a person gave its label.",
+          "source": "QUESTIONS.md M6-M8.7 ('The sample waits in the team console'); C-145"
+        },
+        {
+          "name": "label_sealed",
+          "type": "bytea",
+          "null": true,
+          "audience": "never",
+          "sealedBy": "sealed_for_person_id",
+          "description": "The gold label a person gave: the right choices and every field value (arch 08 line 447: 'the chosen choices and every field value equal the gold label'), in K-10's label shape. Field values can be private, so it is sealed under the key of sealed_for_person_id and unreadable once that key is deleted. Null while waiting.",
+          "source": "arch 08 lines 447, 449; 02-contracts K-10; arch 09 line 492; arch 01 line 93; RULES 4.10"
+        },
+        {
+          "name": "sealed_for_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person whose key seals label_sealed (persons.id): the person who wrote the turn. One person per row, as K-04's event_log.",
+          "source": "arch 09 line 492; K-04 v1 event_log.sealed_for_person_id"
+        },
+        {
+          "name": "labelled_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was labelled; set with state labelled.",
+          "source": "arch 08 line 449"
+        },
+        {
+          "name": "labelled_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person who labelled it (persons.id; Jay and the CTO until Jay names other labellers: QUESTIONS.md M6-M8.7). Set with state labelled.",
+          "source": "QUESTIONS.md M6-M8.7; Q-18; arch 08 line 449 ('human-labeled')"
+        },
+        {
+          "name": "gold_item_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The gold-set item it became (K-10's item id), an opaque string with no foreign key, since the gold set lives outside the database. Null until it is added.",
+          "source": "C-145 ('added to the gold set'); 02-contracts K-10"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["turn_id"],
+      "foreignKeys": [
+        {
+          "name": "live_turn_labels_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "live_turn_labels_sealed_for_fk",
+          "columns": ["sealed_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "live_turn_labels_labelled_by_fk",
+          "columns": ["labelled_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "live_turn_labels_month_start",
+          "expression": "sample_month = date_trunc('month', sample_month)::date",
+          "source": "arch 08 line 449 ('a month')"
+        },
+        {
+          "name": "live_turn_labels_state_known",
+          "expression": "state in ('waiting', 'labelled')",
+          "source": "QUESTIONS.md M6-M8.7; C-145"
+        },
+        {
+          "name": "live_turn_labels_labelled_has_label",
+          "expression": "(state = 'labelled') = (label_sealed is not null and labelled_at is not null and labelled_by_person_id is not null)",
+          "source": "arch 08 line 449 ('human-labeled'); arch 09 line 457 (who)"
+        },
+        {
+          "name": "live_turn_labels_sealed_has_person",
+          "expression": "label_sealed is null or sealed_for_person_id is not null",
+          "source": "arch 09 line 492"
+        },
+        {
+          "name": "live_turn_labels_gold_after_label",
+          "expression": "gold_item_id is null or state = 'labelled'",
+          "source": "C-145 (labelled, then added to the gold set)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "live_turn_labels_month_state_idx",
+          "columns": ["sample_month", "state"],
+          "why": "A month's sample and how many still wait for a label (arch 08 line 449: 300 a month; QUESTIONS.md M6-M8.7)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "The sample is drawn across every business and labelled by Rosie's team or the labellers Jay names (arch 08 line 449; QUESTIONS.md M6-M8.7). No business sees it: the Tool API roles have no grant on it (README rule 2)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

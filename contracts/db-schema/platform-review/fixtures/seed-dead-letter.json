@@ -1,0 +1,51 @@
+{
+  "after": ["../../core/fixtures/seed-business-head.json"],
+  "rows": [
+    {
+      "table": "dead_letters",
+      "values": {
+        "id": "dl-reconcile-2026-11-03",
+        "queue": "jobs",
+        "job_kind": "reconciliation",
+        "job_id": "job-reconcile-2026-11-03T03:00Z",
+        "message_body": {
+          "job": "reconciliation",
+          "from": "2026-11-01T03:00:00Z",
+          "to": "2026-11-03T03:00:00Z"
+        },
+        "tries": 5,
+        "first_tried_at": "2026-11-03T03:00:00Z",
+        "last_tried_at": "2026-11-03T03:08:00Z",
+        "last_error": "Stripe request timed out",
+        "business_id": null,
+        "trace_id": "trace-reconcile-2026-11-03",
+        "dead_at": "2026-11-03T03:08:05Z",
+        "state": "open",
+        "version": 1
+      }
+    },
+    {
+      "table": "dead_letters",
+      "values": {
+        "id": "dl-calendar-poll-riley-2026-10-23",
+        "queue": "jobs",
+        "job_kind": "calendar_poll",
+        "job_id": "job-calendar-poll-riley-2026-10-23T14:30Z",
+        "message_body": {
+          "job": "calendar_poll",
+          "businessId": "biz-lees-barbershop",
+          "personId": "person-riley"
+        },
+        "tries": 5,
+        "first_tried_at": "2026-10-23T14:30:00Z",
+        "last_tried_at": "2026-10-23T14:38:00Z",
+        "last_error": "Calendar provider answered 503",
+        "business_id": "biz-lees-barbershop",
+        "trace_id": "trace-calendar-poll-0042",
+        "dead_at": "2026-10-23T14:38:05Z",
+        "state": "open",
+        "version": 1
+      }
+    }
+  ]
+}

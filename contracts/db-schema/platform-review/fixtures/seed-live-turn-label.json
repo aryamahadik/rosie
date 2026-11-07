@@ -1,0 +1,15 @@
+{
+  "after": ["../../core/fixtures/seed-turn.json"],
+  "rows": [
+    {
+      "table": "live_turn_labels",
+      "values": {
+        "turn_id": "turn-alex-move-1",
+        "sample_month": "2026-10-01",
+        "sampled_at": "2026-11-01T13:00:00Z",
+        "state": "waiting",
+        "version": 1
+      }
+    }
+  ]
+}

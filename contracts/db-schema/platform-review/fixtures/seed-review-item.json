@@ -1,0 +1,90 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "review_items",
+      "values": {
+        "id": "review-new-work-barbershop",
+        "kind": "new_work",
+        "business_id": "biz-lees-barbershop",
+        "subject_table": null,
+        "subject_row_id": null,
+        "turn_id": null,
+        "raised_by_person_id": "person-sam",
+        "summary": "A new kind of work drafted from Sam's own words and price list: review the plug-in and check every service against the official rules for that work. It stays a draft, offline, until reviewed.",
+        "opened_at": "2026-10-19T18:20:00Z",
+        "due_at": "2026-10-20T18:20:00Z",
+        "state": "open",
+        "version": 1
+      }
+    },
+    {
+      "table": "review_items",
+      "values": {
+        "id": "review-control-movers",
+        "kind": "control",
+        "business_id": "biz-movers",
+        "subject_table": "businesses",
+        "subject_row_id": "biz-movers",
+        "turn_id": null,
+        "raised_by_person_id": "person-sam",
+        "summary": "Control of Movers: no code came back from the listing's own phone or email. Check it; the company stays offline until then.",
+        "opened_at": "2026-10-19T19:30:00Z",
+        "due_at": "2026-10-20T19:30:00Z",
+        "state": "open",
+        "version": 1
+      }
+    },
+    {
+      "table": "review_items",
+      "values": {
+        "id": "review-booking-cap-barbershop",
+        "kind": "booking_cap",
+        "business_id": "biz-lees-barbershop",
+        "subject_table": null,
+        "subject_row_id": null,
+        "turn_id": null,
+        "raised_by_person_id": null,
+        "summary": "Flag: one phone tried to book more visits today than the plug-in allows. Nothing was booked.",
+        "opened_at": "2026-10-24T16:10:00Z",
+        "due_at": "2026-10-26T16:10:00Z",
+        "state": "open",
+        "version": 1
+      }
+    },
+    {
+      "table": "review_items",
+      "values": {
+        "id": "review-harm-report-barbershop",
+        "kind": "harm_report",
+        "business_id": "biz-lees-barbershop",
+        "subject_table": null,
+        "subject_row_id": null,
+        "turn_id": null,
+        "raised_by_person_id": null,
+        "summary": "Harm to a child, an older adult or someone in care was told of, not urgent now; a hotline from the safety list was given. Follow up today.",
+        "opened_at": "2026-10-22T13:00:00Z",
+        "due_at": "2026-10-23T04:00:00Z",
+        "state": "open",
+        "version": 1
+      }
+    },
+    {
+      "table": "review_items",
+      "values": {
+        "id": "review-missed-deadline-barbershop",
+        "kind": "missed_deadline",
+        "business_id": "biz-lees-barbershop",
+        "subject_table": null,
+        "subject_row_id": null,
+        "turn_id": null,
+        "raised_by_person_id": null,
+        "summary": "A refund for a cancelled membership, with a deadline the law sets, was due yesterday. Call Sam today; nobody is charged.",
+        "opened_at": "2026-11-03T14:00:00Z",
+        "due_at": "2026-11-04T05:00:00Z",
+        "state": "open",
+        "version": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "after": ["../../core/fixtures/seed-business-head.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "dead_letters",
+    "values": {
+      "id": "dl-calendar-poll-riley-early",
+      "queue": "jobs",
+      "job_kind": "calendar_poll",
+      "job_id": "job-calendar-poll-riley-2026-10-23T15:00Z",
+      "message_body": {
+        "job": "calendar_poll",
+        "businessId": "biz-lees-barbershop",
+        "personId": "person-riley"
+      },
+      "tries": 3,
+      "first_tried_at": "2026-10-23T15:00:00Z",
+      "last_tried_at": "2026-10-23T15:04:00Z",
+      "last_error": "Calendar provider answered 503",
+      "business_id": "biz-lees-barbershop",
+      "trace_id": "trace-calendar-poll-0043",
+      "dead_at": "2026-10-23T15:04:05Z",
+      "state": "open"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["dead_letters_after_five_tries"]
+    }
+  }
+}

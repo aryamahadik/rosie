@@ -1,0 +1,60 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-parked-turn.json",
+      "version": "v1",
+      "table": "parked_turns",
+      "expect": "accept",
+      "shows": "Riley's DONE text crashed three times before its commit, so its core turns row is parked (tries 3) and Rosie's team has a parked-turn record: the third crash's error, Riley told once at once that nothing changed, the reply due 1 business day later (Saturday to Monday), still open",
+      "source": "arch 11 line 576; C-180; C-194; NQ-RT-3 (the turns row written once, as parked); K-04 v1 turns; SPEC-master 6 (Riley; the main visit Sat Oct 24, 11:00am)"
+    },
+    {
+      "file": "seed-dead-letter.json",
+      "version": "v1",
+      "table": "dead_letters",
+      "expect": "accept",
+      "shows": "Two jobs that failed their 5 tries and wait in the team console's dead-letter queue: the daily reconciliation at 03:00 UTC, across every business (no business), and a calendar poll for Riley at Lee's Barbershop; each with its queue, job id, message as enqueued (ids only), last error and trace id",
+      "source": "arch 10 line 540 ('other jobs get 5 tries, then a dead-letter queue in the team console (DD)'); arch 10 line 550 (reconciliation daily at 03:00 UTC); arch 11 line 578 (the 30-minute poll); C-056; C-194; SPEC-master 6 (Riley, Lee's Barbershop)"
+    },
+    {
+      "file": "seed-gap-case.json",
+      "version": "v1",
+      "table": "gap_cases",
+      "expect": "accept",
+      "shows": "Alex's \"do you sell gift cards?\" turn at Lee's Barbershop, which no choice fit (K-02's decide-none-fits), logged as a gap case by the planner's log_gap: its summary sealed under Alex's key, its state (no open question; the business head read at version 3) and its frontier (one K-02 choice, copied from K-02's context-s1-02), open for the weekly review",
+      "source": "arch 01 line 95; arch 03 line 189; arch 06 line 291; K-02 v1 plannerLogGap and choice; contracts/model/fixtures/decide-none-fits.json and context-s1-02.json; arch 09 line 492; SPEC-master 6 (Alex M., Lee's Barbershop)"
+    },
+    {
+      "file": "seed-review-item.json",
+      "version": "v1",
+      "table": "review_items",
+      "expect": "accept",
+      "shows": "The team review queue: Sam's new kind of work drafted for review (S1-03) and Movers' control check (S1-75, the business row under review, offline until then), each due in 1 business day; Lee's Barbershop's booking-cap flag (S12-28, Saturday to Monday); a harm report followed up the same day (A3-49); a missed legal deadline for a membership refund, Sam called the same day (S11-70). No private value in any summary",
+      "source": "S1-03; S1-75; S12-28 (the flag's words); A3-49; S11-70; Q-18; C-194; fixtures/v1/test-kit/shops movers.json; SPEC-master 6 (Sam, Lee's Barbershop)"
+    },
+    {
+      "file": "seed-live-turn-label.json",
+      "version": "v1",
+      "table": "live_turn_labels",
+      "expect": "accept",
+      "shows": "Alex's committed turn (\"1\" at A7-02) sampled for October's 300 live turns, waiting in the team console for a person's label (beyond 02-contracts' list, so every table has a seed row)",
+      "source": "arch 08 line 449; C-145; QUESTIONS.md M6-M8.7; K-04 v1 seed-turn"
+    },
+    {
+      "file": "invalid/refuse-review-item-tool-api-read.json",
+      "version": "v1",
+      "table": "review_items",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop cannot read the team review queue, not even the barbershop's own booking-cap flag: the Tool API roles have no grant on review_items (SQLSTATE 42501); the same read on the runtime side returns the row",
+      "source": "S11-70 (a report that the owner or staff harmed someone comes here, never only to the one named); S12-28 (patterns across businesses are seen only by Rosie's team); Q-18; arch 10 line 546"
+    },
+    {
+      "file": "invalid/refuse-dead-letter-early.json",
+      "version": "v1",
+      "table": "dead_letters",
+      "expect": "refuse",
+      "shows": "A job after only 3 tries is refused as a dead letter (CHECK dead_letters_after_five_tries, SQLSTATE 23514); the same row with tries 5 passes",
+      "source": "arch 10 line 540 ('other jobs get 5 tries, then a dead-letter queue')"
+    }
+  ]
+}

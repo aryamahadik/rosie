@@ -1,0 +1,18 @@
+{
+  "after": ["seed-review-item.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "select",
+    "table": "review_items",
+    "where": {
+      "id": "review-booking-cap-barbershop"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}
