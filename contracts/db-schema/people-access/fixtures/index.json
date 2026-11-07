@@ -119,6 +119,38 @@
       "expect": "refuse",
       "shows": "A session holding the raw token instead of its sha256 is refused (CHECK sessions_token_hash_form, SQLSTATE 23514); the same session with the token's sha256 passes",
       "source": "BP rule 7 (never a key or token); S11-52"
+    },
+    {
+      "file": "invalid/refuse-proof-code-hash-read.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's sign-in code row with every column is refused (no SELECT on code_hash, SQLSTATE 42501): no Tool API call reads a code hash back; the same read on the runtime side passes, and the Tool API's read of every other column passes",
+      "source": "README rule 5; BP rule 7; RULES 6.2; S11-52"
+    },
+    {
+      "file": "invalid/refuse-proof-code-pause-lifted.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee Home Services lifting the pause on Jordan's code after five wrong codes is refused (no UPDATE on proof_codes, SQLSTATE 42501): a try is counted and a code used only through check_proof_code; the same update on the runtime side passes",
+      "source": "README rule 5; RULES 6.2 ('Five wrong codes pause it 15 minutes'); S11-52"
+    },
+    {
+      "file": "invalid/refuse-session-token-read.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's live session with every column is refused (no SELECT on token_sha256, SQLSTATE 42501): a token is found only through session_for_token, which never returns a hash; the same read on the runtime side passes",
+      "source": "README rule 5; BP rule 7; S11-52"
+    },
+    {
+      "file": "invalid/refuse-own-chat-change-business-read.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Alex's change from his own chat, which has no business, gets no row (row-level security): the Tool API may write a person's own change with no business but no business scope reads one; the same read on the runtime side returns it",
+      "source": "README rule 4; K-04 v1 rule 4; D75; D102; FS line 756; RULES 9.3"
     }
   ]
 }
