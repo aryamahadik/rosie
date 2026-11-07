@@ -4,12 +4,12 @@ For the runtime engineer (T-244 handle actor, T-254 clocks, T-256 retries). Run 
 
 ## Answers
 
-| #   | Question                                                  | Answer                                                                                               | The test that shows it                                                       |
-| --- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| 1   | A Durable Object with its own storage per test?           | Yes, with `afterEach(reset)`. The plugin does not isolate storage by itself.                         | `storage.worker.test.ts` (isolation), `no-auto-isolation.worker.test.ts`     |
-| 2   | Fire an alarm on demand (a 10-minute alarm, no waiting)?  | Yes: `runDurableObjectAlarm(stub)` runs `alarm()` now and clears it.                                 | `alarm.worker.test.ts`, first test (set for 10 minutes, fires in about 1 ms) |
-| 3   | Deliver a queue message to a consumer?                    | Yes, by calling the consumer's `queue()` with `createMessageBatch()` and reading `getQueueResult()`. | `queue.worker.test.ts`                                                       |
-| 4   | Run a cron handler?                                       | Yes, by calling `scheduled()` with `createScheduledController()` and `waitOnExecutionContext()`.     | `cron.worker.test.ts`                                                        |
+| #   | Question                                                 | Answer                                                                                               | The test that shows it                                                       |
+| --- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| 1   | A Durable Object with its own storage per test?          | Yes, with `afterEach(reset)`. The plugin does not isolate storage by itself.                         | `storage.worker.test.ts` (isolation), `no-auto-isolation.worker.test.ts`     |
+| 2   | Fire an alarm on demand (a 10-minute alarm, no waiting)? | Yes: `runDurableObjectAlarm(stub)` runs `alarm()` now and clears it.                                 | `alarm.worker.test.ts`, first test (set for 10 minutes, fires in about 1 ms) |
+| 3   | Deliver a queue message to a consumer?                   | Yes, by calling the consumer's `queue()` with `createMessageBatch()` and reading `getQueueResult()`. | `queue.worker.test.ts`                                                       |
+| 4   | Run a cron handler?                                      | Yes, by calling `scheduled()` with `createScheduledController()` and `waitOnExecutionContext()`.     | `cron.worker.test.ts`                                                        |
 
 The 17 spike tests pass under `npm run test:workers` and `npm test` on the config as it stands (22 tests in the workers project with the 5 health tests).
 
