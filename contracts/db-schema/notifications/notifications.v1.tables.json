@@ -1,0 +1,843 @@
+{
+  "part": "notifications",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "hand_offs",
+      "description": "An alert that hands something to a person (S13-29 rules 53 to 57: 'a person' means the owner, or whoever they named): who was told, why, about which booking or safety read, and the deadline after which Rosie's team steps in. Who is told (arch 06 line 329): crisis words, the owner and Rosie's team at once; an emergency or a threat, the owner, then after 5 minutes with no reply or console tap whoever they named and Rosie's team; any other hand-off, the owner in text hours, then after 2 days unanswered Rosie's team (S11-19). The alert itself is a core outbox row; the page to the team is a team_pages row that points here. Harm to a child or older adult, and a report about the owner or staff, never go to the owner: they are K-34 harm reports and page the team directly.",
+      "source": "arch 06 line 329; S13-29 rules 53, 54, 57; S11-19 ('Still no answer after 2 days, or word that Sam can't act or may have died: Rosie's team checks first'); S13-10; A3-25; A3-48; 02-contracts section 7 row K-36 ('owner alerts and hand-offs (S11-19)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The hand-off's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose owner is told (businesses.id). Row-level security scopes by it.",
+          "source": "arch 06 line 329 ('the owner'); arch 10 line 546"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Which row of arch 06 line 329's 'Who is told' it follows: crisis_words (the owner and Rosie's team at once); emergency or threat (the owner; after 5 minutes with no reply or console tap, whoever they named and Rosie's team, paged every 5 minutes until acknowledged); other (any other hand-off: the owner in text hours; unanswered for 2 days, Rosie's team).",
+          "source": "arch 06 line 329; S13-29 rule 57; S11-19"
+        },
+        {
+          "name": "safety_outcome_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For crisis_words, emergency and threat, the safety read that raised it (safety_outcomes.id, K-34 v1); null for other. The person's words stay sealed there: the owner hears 'Urgent: a customer may need help', never the words.",
+          "source": "arch 06 line 329; A3-25; K-34 v1 safety_outcomes"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn whose one commit handed it off (turns.id); null when a clock or a job handed it off.",
+          "source": "arch 02 line 121 (one commit per turn)"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking it is about (bookings.id), or null.",
+          "source": "S13-29 rules 53, 54; S13-10 ('Crisis words after booking')"
+        },
+        {
+          "name": "about_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person it is about (persons.id), such as the customer whose text was read, when known.",
+          "source": "S13-29 rule 53; FS line 743"
+        },
+        {
+          "name": "told_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who was told (persons.id): the owner, or whoever the owner named to stand for them (S13-29 rule 57).",
+          "source": "S13-29 rule 57 ('\"A person\" means the owner, or whoever they named'); arch 06 line 329"
+        },
+        {
+          "name": "told_as",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "owner, or named (whoever the owner named). Who the owner names is K-22's (not yet frozen); this row copies the person told.",
+          "source": "S13-29 rule 57"
+        },
+        {
+          "name": "alert_outbox_row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The alert sent to the person told (outbox_rows.id), written in the same commit; send class safety for crisis_words, emergency and threat, routine (held for text hours) for other. Null when no outbox row is linked, such as a hand-off seen only on the owner console; code links the row (README rule 5).",
+          "source": "arch 01 line 65; RULES 4.3; arch 06 line 329 ('the owner in text hours')"
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "What is handed off, in plain words with no private value: for a safety read only what the owner may hear ('Urgent: a customer may need help'), never the person's words, which stay sealed in K-34.",
+          "source": "A3-25; S13-10 ('never the words'); RULES 4.5; K-37 v1 README rule 4 (no private value in a plain column)"
+        },
+        {
+          "name": "handed_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it was handed off (the commit that wrote it).",
+          "source": "arch 06 line 329 ('at once')"
+        },
+        {
+          "name": "escalate_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When Rosie's team (and, for an emergency or a threat, whoever the owner named) is paged if nobody has answered: at handed_at for crisis_words (at once); 5 minutes after handed_at for emergency and threat; for other, 2 days after the owner is told in text hours, so never sooner than 2 days after handed_at. Code computes it.",
+          "source": "arch 06 line 329 ('after 5 minutes with no reply or console tap'; 'unanswered for 2 days, Rosie's team'); S11-19"
+        },
+        {
+          "name": "escalation_clock_row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The core clock row that pages Rosie's team at escalate_at (clock_rows.id); null for crisis_words, which pages at once. Cancelled when an answer comes first.",
+          "source": "arch 01 line 83; arch 10 line 540 (every clock is a PostgreSQL row); K-04 v1 clock_rows"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the person told answered, by a reply or a console tap; null while unanswered.",
+          "source": "arch 06 line 329 ('no reply or console tap')"
+        },
+        {
+          "name": "answered_via",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "reply (a text or email reply) or console_tap (a tap on the owner console).",
+          "source": "arch 06 line 329 ('no reply or console tap')"
+        },
+        {
+          "name": "answered_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who answered (persons.id).",
+          "source": "arch 06 line 329; S13-29 rule 57"
+        },
+        {
+          "name": "escalated_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it went to Rosie's team: the team_pages row that points here was opened. Null while it has not.",
+          "source": "arch 06 line 329; S11-19; S13-29 rule 57 ('If they can't be reached in time ... Rosie's team steps in')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "hand_offs_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "hand_offs_safety_outcome_fk",
+          "columns": ["safety_outcome_id"],
+          "references": {
+            "table": "safety_outcomes",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "hand_offs_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "hand_offs_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "hand_offs_about_person_fk",
+          "columns": ["about_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "hand_offs_told_person_fk",
+          "columns": ["told_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "hand_offs_alert_outbox_fk",
+          "columns": ["alert_outbox_row_id"],
+          "references": {
+            "table": "outbox_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "hand_offs_clock_fk",
+          "columns": ["escalation_clock_row_id"],
+          "references": {
+            "table": "clock_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "hand_offs_answered_by_fk",
+          "columns": ["answered_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "hand_offs_clock_key",
+          "columns": ["escalation_clock_row_id"],
+          "source": "arch 01 line 83 (one clock row per clock)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "hand_offs_kind_known",
+          "expression": "kind in ('crisis_words', 'emergency', 'threat', 'other')",
+          "source": "arch 06 line 329"
+        },
+        {
+          "name": "hand_offs_told_as_known",
+          "expression": "told_as in ('owner', 'named')",
+          "source": "S13-29 rule 57"
+        },
+        {
+          "name": "hand_offs_safety_kind_has_outcome",
+          "expression": "(kind = 'other') = (safety_outcome_id is null)",
+          "source": "arch 06 line 329 (crisis words, an emergency and a threat are safety outcomes); K-34 v1 safety_outcomes"
+        },
+        {
+          "name": "hand_offs_crisis_words_at_once",
+          "expression": "kind <> 'crisis_words' or escalate_at = handed_at",
+          "source": "arch 06 line 329 ('crisis words, Rosie's team and the owner at once')"
+        },
+        {
+          "name": "hand_offs_emergency_threat_five_minutes",
+          "expression": "kind not in ('emergency', 'threat') or escalate_at = handed_at + interval '5 minutes'",
+          "source": "arch 06 line 329 ('after 5 minutes with no reply or console tap')"
+        },
+        {
+          "name": "hand_offs_other_two_days",
+          "expression": "kind <> 'other' or escalate_at >= handed_at + interval '2 days'",
+          "source": "arch 06 line 329 ('the owner in text hours; unanswered for 2 days, Rosie's team'); S11-19"
+        },
+        {
+          "name": "hand_offs_clock_unless_at_once",
+          "expression": "(kind = 'crisis_words') = (escalation_clock_row_id is null)",
+          "source": "arch 06 line 329; arch 01 line 83"
+        },
+        {
+          "name": "hand_offs_answered_via_known",
+          "expression": "answered_via is null or answered_via in ('reply', 'console_tap')",
+          "source": "arch 06 line 329 ('no reply or console tap')"
+        },
+        {
+          "name": "hand_offs_answered_together",
+          "expression": "(answered_at is null) = (answered_via is null) and (answered_at is null) = (answered_by_person_id is null)",
+          "source": "arch 06 line 329"
+        },
+        {
+          "name": "hand_offs_answered_after_handed",
+          "expression": "answered_at is null or answered_at >= handed_at",
+          "source": "arch 06 line 329"
+        },
+        {
+          "name": "hand_offs_escalated_when_due",
+          "expression": "escalated_at is null or escalated_at >= escalate_at",
+          "source": "arch 06 line 329; S11-19"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "hand_offs_waiting_idx",
+          "columns": ["escalate_at"],
+          "where": "answered_at is null and escalated_at is null",
+          "why": "Hand-offs nobody has answered yet, due to go to Rosie's team (arch 06 line 329; S11-19)."
+        },
+        {
+          "name": "hand_offs_business_handed_idx",
+          "columns": ["business_id", "handed_at"],
+          "why": "A business's hand-offs, newest first, for the owner console and the owner's answer (arch 06 line 329)."
+        },
+        {
+          "name": "hand_offs_safety_outcome_idx",
+          "columns": ["safety_outcome_id"],
+          "where": "safety_outcome_id is not null",
+          "why": "The hand-off a safety read raised (K-34 v1 safety_outcomes)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "team_pages",
+      "description": "A page to Rosie's team and its acknowledgement: what it is about (a hand-off nobody answered in time, crisis words, word that the owner can't act, a harm report, a review item, a missed safety check, a reply that went out as 'I've passed this on', a hard-invariant breach), when it was opened, how many times it was paged, whether it repeats every 5 minutes until acknowledged, and who acknowledged it, how and when. For an emergency or a threat, whoever the owner named is paged with the team. Rosie's team's rows: the Tool API role may add them and never read, change or delete them (README rule 2).",
+      "source": "arch 06 line 329 ('paged every 5 minutes until acknowledged (DD)'); arch 02 diagram line 105 ('Team console · paging · gap cases · dead letters'); arch 03 line 123 ('the team is paged'); arch 08 line 447 ('A hard-invariant breach in production pages Rosie's team at once'); S11-19; S13-10; B8-86; A3-49; Q-18; 02-contracts section 7 row K-36 ('pages to Rosie's team with their acknowledgement')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The page's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Why the team is paged: hand_off (a hand_offs row: crisis words at once, an emergency or a threat after 5 minutes, any other hand-off after 2 days); owner_cannot_act (word that the owner can't act or may have died: S11-19, S13-29 rule 57); harm_report (a K-34 harm report, that day); review_item (a K-37 review item); safety_timer_missed (a K-34 safety timer missed, which the team keeps trying until SAFE); passed_on (a reply that went out as 'I've passed this on. Rosie's team will reply within 1 business day.'); hard_invariant_breach (in production, at once).",
+          "source": "arch 06 line 329; S11-19; S13-29 rule 57; A3-49; S13-10 ('Nobody reached: Rosie's team keeps trying them'); B8-86; arch 03 line 123; arch 08 line 447"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business it is about (businesses.id), or null for one about no single business, such as a hard-invariant breach. Not a row-level security scope: no business reads these rows (README rule 2).",
+          "source": "arch 06 line 329; arch 08 line 447"
+        },
+        {
+          "name": "hand_off_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For hand_off, the hand-off it escalates (hand_offs.id); a hand-off escalates once.",
+          "source": "arch 06 line 329; S11-19"
+        },
+        {
+          "name": "harm_report_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For harm_report, the report (harm_reports.id, K-34 v1), which Rosie's team follows up that day.",
+          "source": "A3-49; S13-10; arch 06 line 329; K-34 v1 harm_reports"
+        },
+        {
+          "name": "review_item_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For review_item, the item in the team review queue (review_items.id, K-37 v1).",
+          "source": "K-37 v1 review_items; S11-70; Q-18"
+        },
+        {
+          "name": "safety_timer_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For safety_timer_missed, the missed check-out timer (safety_timers.id, K-34 v1): a missed check stays open until the pro replies SAFE, and the team keeps trying the pro, the contact and the owner.",
+          "source": "S13-10 ('Then Rosie's team keeps trying them all'); B8-86; K-34 v1 safety_timers"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn the page is about or whose commit opened it (turns.id): for passed_on, the turn whose reply went out as 'I've passed this on'; otherwise null when a clock, a job or the release monitor opened it.",
+          "source": "arch 03 line 123; arch 02 line 121"
+        },
+        {
+          "name": "named_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Whoever the owner named, paged with the team for an emergency or a threat (persons.id); null when the owner named nobody, or for any other reason. Who the owner names is K-22's (not yet frozen); this row copies the person paged.",
+          "source": "arch 06 line 329 ('whoever they named and Rosie's team, paged every 5 minutes'); S13-29 rule 57; S13-10 ('So are the owner and whoever they named')"
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "What the team needs to know, in plain words with no private value: ids and kinds, never a person's words. The words stay sealed in the row it points at.",
+          "source": "RULES 4.5; arch 09 line 492; K-37 v1 README rule 4 (no private value in a plain column)"
+        },
+        {
+          "name": "opened_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the page was opened and first sent.",
+          "source": "arch 06 line 329; arch 08 line 447 ('at once')"
+        },
+        {
+          "name": "last_paged_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it was last paged; opened_at for the first page.",
+          "source": "arch 06 line 329 ('paged every 5 minutes until acknowledged')"
+        },
+        {
+          "name": "times_paged",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "How many times it has been paged, the first included. Each page reaches every member on team_page_recipients (removed_at null) and the named person, through core outbox rows.",
+          "source": "arch 06 line 329"
+        },
+        {
+          "name": "repeat_minutes",
+          "type": "integer",
+          "null": true,
+          "audience": "never",
+          "description": "5 when the page repeats every 5 minutes until acknowledged (arch 06 line 329's emergency and threat row, a DD); null when it is paged once and waits in the team console. Which other reasons repeat is not in the sources (README open gaps).",
+          "source": "arch 06 line 329 ('paged every 5 minutes until acknowledged (DD)')"
+        },
+        {
+          "name": "next_page_clock_row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The core clock row that sends the next page (clock_rows.id), while a repeating page is open. A clock row fires once, so each page arms a new row and this column moves to it; acknowledging cancels it.",
+          "source": "arch 01 line 83; arch 10 line 540; K-04 v1 clock_rows; 02-contracts K-05 item 5 (fired once)"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'open'",
+          "audience": "never",
+          "description": "open (not yet acknowledged; a repeating page keeps paging) or acknowledged.",
+          "source": "arch 06 line 329 ('until acknowledged')"
+        },
+        {
+          "name": "acknowledged_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When a person paged acknowledged it; paging stops.",
+          "source": "arch 06 line 329 ('until acknowledged')"
+        },
+        {
+          "name": "acknowledged_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who acknowledged it (persons.id): a person on Rosie's team (Jay and the CTO until launch, Q-18), or whoever the owner named.",
+          "source": "arch 06 line 329; Q-18; S13-29 rule 57"
+        },
+        {
+          "name": "acknowledged_via",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "reply (a reply to the page) or console_tap (a tap in the team console).",
+          "source": "arch 06 line 329 ('reply or console tap'); arch 02 diagram line 105 (team console · paging)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "team_pages_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_pages_hand_off_fk",
+          "columns": ["hand_off_id"],
+          "references": {
+            "table": "hand_offs",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_pages_harm_report_fk",
+          "columns": ["harm_report_id"],
+          "references": {
+            "table": "harm_reports",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_pages_review_item_fk",
+          "columns": ["review_item_id"],
+          "references": {
+            "table": "review_items",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_pages_safety_timer_fk",
+          "columns": ["safety_timer_id"],
+          "references": {
+            "table": "safety_timers",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_pages_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_pages_named_person_fk",
+          "columns": ["named_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_pages_clock_fk",
+          "columns": ["next_page_clock_row_id"],
+          "references": {
+            "table": "clock_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_pages_acknowledged_by_fk",
+          "columns": ["acknowledged_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "team_pages_one_per_hand_off",
+          "columns": ["hand_off_id"],
+          "where": "hand_off_id is not null",
+          "source": "arch 06 line 329 (a hand-off goes to Rosie's team once, then is paged until acknowledged)"
+        },
+        {
+          "name": "team_pages_clock_key",
+          "columns": ["next_page_clock_row_id"],
+          "source": "arch 01 line 83 (one clock row per clock)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "team_pages_reason_known",
+          "expression": "reason in ('hand_off', 'owner_cannot_act', 'harm_report', 'review_item', 'safety_timer_missed', 'passed_on', 'hard_invariant_breach')",
+          "source": "arch 06 line 329; S11-19; A3-49; S13-10; B8-86; arch 03 line 123; arch 08 line 447; K-37 v1 review_items"
+        },
+        {
+          "name": "team_pages_hand_off_pointer",
+          "expression": "(reason = 'hand_off') = (hand_off_id is not null)",
+          "source": "arch 06 line 329"
+        },
+        {
+          "name": "team_pages_harm_report_pointer",
+          "expression": "(reason = 'harm_report') = (harm_report_id is not null)",
+          "source": "A3-49; K-34 v1 harm_reports"
+        },
+        {
+          "name": "team_pages_review_item_pointer",
+          "expression": "(reason = 'review_item') = (review_item_id is not null)",
+          "source": "K-37 v1 review_items"
+        },
+        {
+          "name": "team_pages_safety_timer_pointer",
+          "expression": "(reason = 'safety_timer_missed') = (safety_timer_id is not null)",
+          "source": "S13-10; B8-86; K-34 v1 safety_timers"
+        },
+        {
+          "name": "team_pages_passed_on_has_turn",
+          "expression": "reason <> 'passed_on' or turn_id is not null",
+          "source": "arch 03 line 123"
+        },
+        {
+          "name": "team_pages_owner_cannot_act_has_business",
+          "expression": "reason <> 'owner_cannot_act' or business_id is not null",
+          "source": "S11-19; S13-29 rule 57"
+        },
+        {
+          "name": "team_pages_named_only_for_hand_off",
+          "expression": "named_person_id is null or reason = 'hand_off'",
+          "source": "arch 06 line 329 (an emergency or a threat: whoever they named and Rosie's team)"
+        },
+        {
+          "name": "team_pages_repeat_every_five",
+          "expression": "repeat_minutes is null or repeat_minutes = 5",
+          "source": "arch 06 line 329 ('paged every 5 minutes until acknowledged (DD)')"
+        },
+        {
+          "name": "team_pages_times_paged",
+          "expression": "times_paged >= 1 and (times_paged = 1 or repeat_minutes is not null)",
+          "source": "arch 06 line 329"
+        },
+        {
+          "name": "team_pages_last_paged_in_order",
+          "expression": "last_paged_at >= opened_at and (times_paged = 1 or last_paged_at > opened_at)",
+          "source": "arch 06 line 329"
+        },
+        {
+          "name": "team_pages_state_known",
+          "expression": "state in ('open', 'acknowledged')",
+          "source": "arch 06 line 329 ('until acknowledged')"
+        },
+        {
+          "name": "team_pages_acknowledged_via_known",
+          "expression": "acknowledged_via is null or acknowledged_via in ('reply', 'console_tap')",
+          "source": "arch 06 line 329 ('reply or console tap'); arch 02 diagram line 105"
+        },
+        {
+          "name": "team_pages_acknowledged_together",
+          "expression": "(state = 'acknowledged') = (acknowledged_at is not null) and (acknowledged_at is null) = (acknowledged_by_person_id is null) and (acknowledged_at is null) = (acknowledged_via is null)",
+          "source": "arch 06 line 329"
+        },
+        {
+          "name": "team_pages_acknowledged_after_paged",
+          "expression": "acknowledged_at is null or acknowledged_at >= last_paged_at",
+          "source": "arch 06 line 329 ('paged ... until acknowledged': no page after the acknowledgement)"
+        },
+        {
+          "name": "team_pages_open_repeat_has_clock",
+          "expression": "state <> 'open' or repeat_minutes is null or next_page_clock_row_id is not null",
+          "source": "arch 06 line 329; arch 01 line 83"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "team_pages_open_idx",
+          "columns": ["opened_at"],
+          "where": "state = 'open'",
+          "why": "The team console's open pages, oldest first (arch 02 diagram line 105; arch 06 line 329)."
+        },
+        {
+          "name": "team_pages_harm_report_idx",
+          "columns": ["harm_report_id"],
+          "where": "harm_report_id is not null",
+          "why": "The page a harm report raised (A3-49)."
+        },
+        {
+          "name": "team_pages_review_item_idx",
+          "columns": ["review_item_id"],
+          "where": "review_item_id is not null",
+          "why": "The page a review item raised (K-37 v1 review_items)."
+        },
+        {
+          "name": "team_pages_safety_timer_idx",
+          "columns": ["safety_timer_id"],
+          "where": "safety_timer_id is not null",
+          "why": "The page a missed safety check raised (S13-10; B8-86)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Rosie's team's rows, never a business's: a page may point at a harm report that names the owner or staff, who must never hear of it (S13-10; arch 06 line 329), or at a review item the business must not see (K-37 v1 README rule 2). The Tool API role may insert only (README rule 2); the team's side reads, repeats and acknowledges unscoped."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "team_page_recipients",
+      "description": "The members of Rosie's team who get every page, and how each is reached: in their own open chat with Rosie, else by email, since Rosie never writes first (C9). Until launch the members are Jay and the CTO (Q-18); on staging, only roster test phones and the test console (BP 9.4). A member leaves the list by removed_at, never by a delete. Rosie's team's rows: the Tool API role has no grant on them (README rule 2).",
+      "source": "QUESTIONS.md M3-M3b.5 (default: 'The architect adds a recipient list to K-36. Each member gets pages in their own open chat with Rosie, else by email. Until launch the members are Jay and the CTO (Q-18). On staging, only roster test phones and the test console (BP 9.4)'); Q-18; MC C9; arch 06 line 329",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The recipient row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The member of Rosie's team (persons.id). K-04 has no team role, so a member is a person row named here (K-37 v1 README open gaps).",
+          "source": "Q-18; QUESTIONS.md M3-M3b.5; K-37 v1 README ('Rosie's team as people')"
+        },
+        {
+          "name": "chat_handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The member's mobile (handles.id, kind phone), whose own chat with Rosie carries pages while it is open; whether it is open is read from core phones at send time.",
+          "source": "QUESTIONS.md M3-M3b.5 ('in their own open chat with Rosie'); MC C9; K-04 v1 phones"
+        },
+        {
+          "name": "email_handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The member's email address (handles.id, kind email), used when there is no open chat.",
+          "source": "QUESTIONS.md M3-M3b.5 ('else by email')"
+        },
+        {
+          "name": "added_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the member joined the list.",
+          "source": "Q-18"
+        },
+        {
+          "name": "removed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the member left the list; null while they get pages.",
+          "source": "Q-18 ('until launch'); QUESTIONS.md M3-M3b.5"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "team_page_recipients_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_page_recipients_chat_handle_fk",
+          "columns": ["chat_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "team_page_recipients_email_handle_fk",
+          "columns": ["email_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "team_page_recipients_one_live_per_person",
+          "columns": ["person_id"],
+          "where": "removed_at is null",
+          "source": "QUESTIONS.md M3-M3b.5 (each member gets each page once)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "team_page_recipients_reachable",
+          "expression": "chat_handle_id is not null or email_handle_id is not null",
+          "source": "QUESTIONS.md M3-M3b.5 ('in their own open chat with Rosie, else by email')"
+        },
+        {
+          "name": "team_page_recipients_removed_after_added",
+          "expression": "removed_at is null or removed_at >= added_at",
+          "source": "Q-18"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Rosie's team's own list, not a business's (Q-18). The Tool API role has no grant on it (README rule 2); the team's side and the paging job read it unscoped."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

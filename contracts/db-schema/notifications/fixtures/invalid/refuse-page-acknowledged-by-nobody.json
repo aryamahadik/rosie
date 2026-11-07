@@ -1,0 +1,21 @@
+{
+  "after": ["seed-page-open.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "action": "update",
+    "table": "team_pages",
+    "set": {
+      "state": "acknowledged",
+      "acknowledged_at": "2026-10-26T21:52:30Z",
+      "version": 3
+    },
+    "where": {
+      "id": "page-alex-0204"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["team_pages_acknowledged_together"]
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "after": ["seed-page-open.json"],
+  "rows": [
+    {
+      "table": "clock_rows",
+      "values": {
+        "id": "clock-handoff-alex-0204-late",
+        "kind": "job",
+        "handle_id": null,
+        "business_id": "biz-lees-barbershop",
+        "due_at": "2026-10-26T21:50:03Z",
+        "due_zone": "America/New_York",
+        "state": "armed",
+        "armed_at": "2026-10-26T21:40:03Z",
+        "fires": {
+          "job": "hand-off-escalation",
+          "handOff": "handoff-alex-0204-late"
+        },
+        "created_by_turn_id": "turn-alex-0204",
+        "version": 1
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "hand_offs",
+    "values": {
+      "id": "handoff-alex-0204-late",
+      "business_id": "biz-lees-barbershop",
+      "kind": "threat",
+      "safety_outcome_id": "safety-alex-0204",
+      "turn_id": "turn-alex-0204",
+      "about_person_id": "person-alex",
+      "told_person_id": "person-sam",
+      "told_as": "owner",
+      "summary": "Urgent: a message to Lee's Barbershop threatened harm to someone on your team. Nothing was booked. Visits with this person are paused until you decide. Details on the secure page.",
+      "handed_at": "2026-10-26T21:40:03Z",
+      "escalate_at": "2026-10-26T21:50:03Z",
+      "escalation_clock_row_id": "clock-handoff-alex-0204-late"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["hand_offs_emergency_threat_five_minutes"]
+    }
+  }
+}
