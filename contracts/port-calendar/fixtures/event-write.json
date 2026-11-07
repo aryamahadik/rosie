@@ -12,6 +12,7 @@
       "visitId": "visit-alex-riley-nov14",
       "personId": "person-riley"
     },
+    "idempotencyKey": "eff-cal-riley-alex-nov14-write",
     "start": "2026-11-14T16:00:00Z",
     "end": "2026-11-14T16:30:00Z",
     "zone": "America/New_York",

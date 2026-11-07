@@ -253,8 +253,8 @@
       "version": "v1",
       "def": "calendarWrite.exchange",
       "expect": "accept",
-      "shows": "Alex's visit goes from Riley to Sam and back to Riley: the new write has the same key as Riley's first one, whose event was deleted, so it makes a new event, written and not alreadyWritten",
-      "source": "arch 05 line 267 ('a call-off or a change of person deletes it'); K-07 v1 rule 8 (one idempotency key over all tries); action-layer engineer's note on T-025 at 45b0c7b (changing a visit's person back reuses the event key)"
+      "shows": "Alex's visit goes from Riley to Sam and back to Riley: the new write has the same event key as Riley's first one, whose event was deleted, but its own idempotency key in the request, so it makes a new event, written and not alreadyWritten",
+      "source": "arch 05 line 267 ('a call-off or a change of person deletes it'); K-07 v1 rule 8 (one idempotency key over all tries); action-layer engineer's note on T-025 at 45b0c7b (changing a visit's person back reuses the event key) and FAIL on 8c6c587 (the key on the call)"
     },
     {
       "file": "event-sensitive-no-case.json",
@@ -265,11 +265,27 @@
       "source": "RULES 4.6; S13-22; arch 05 line 267; arch 06 line 341 ('It answers in the language of the text'); K-03 v1 initials form (A.M.); fixture set v1 test-kit/shops/therapist.json (sensitive; weekly sessions with Maya); action-layer engineer's FAIL 2 on T-025 at 45b0c7b"
     },
     {
+      "file": "event-sensitive-arabic.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "accept",
+      "shows": "Lee Associates has the sensitive switch on and Alex gave the name in Arabic script, an alphabet with no capital letters: Alex's session goes on Maya's calendar as 'Visit' and the Arabic initials only",
+      "source": "RULES 4.6; S13-22; arch 05 line 267; arch 06 line 341 ('It answers in the language of the text'); K-03 v1 initials form (A.M.); fixture set v1 test-kit/shops/therapist.json (sensitive; weekly sessions with Maya); security reviewer's FAIL on T-025 at 8c6c587 (keep the letters of alphabetic scripts such as Hebrew and Arabic)"
+    },
+    {
+      "file": "event-sensitive-no-initials.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "accept",
+      "shows": "Lee Associates has the sensitive switch on and a client gave the name only in Chinese characters, which give no initial: the session still goes on Maya's calendar, as 'Visit' alone, with initials null",
+      "source": "RULES 4.6; S13-22 ('the calendar entries Rosie writes back show times and initials'); arch 05 line 267; D41's form (the master's initials(), overlay-core.js line 1356: no initial for a word with no Latin letter); README default 18; security reviewer's FAIL on T-025 at 8c6c587"
+    },
+    {
       "file": "effect-row-calendar-write.json",
       "version": "v1",
       "def": "calendarEffect.row",
       "expect": "accept",
-      "shows": "K-07 v1's effect row for Alex's calendar write, with this port's calendarWrite request as its portRequest",
+      "shows": "K-07 v1's effect row for Alex's calendar write, with this port's calendarWrite request as its portRequest, carrying the row's own idempotency key",
       "source": "K-07 v1 effectRow ('the request in the port's terms ... whose shape K-14, K-16 and K-11 give') and effect-calendar-write; lead note for T-025 ('Calendar effects run as K-07 v1 effect rows')"
     },
     {
@@ -353,12 +369,28 @@
       "source": "RULES 4.6 ('show only the display name, times and initials'); arch 05 line 267 ('only Visit and initials'); S13-22"
     },
     {
+      "file": "invalid/refuse-initials-chinese-name.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "refuse",
+      "shows": "event-sensitive-no-initials.json with 张.伟. as the initials of the client named 张伟: refused, since a letter of Han, Hangul, Hiragana, Katakana or Yi is a whole syllable or word and never an initial, so these initials would spell the whole name (with null for them it is event-sensitive-no-initials.json)",
+      "source": "S13-22 ('the calendar entries Rosie writes back show times and initials'); RULES 4.6 ('only the display name, times and initials'); RULES 4.5 ('When unsure, treat it as private'); arch 05 line 267 ('only Visit and initials'); security reviewer's FAIL on T-025 at 8c6c587"
+    },
+    {
       "file": "invalid/refuse-updated-without-event-id.json",
       "version": "v1",
       "def": "calendarUpdate.exchange",
       "expect": "refuse",
       "shows": "event-move-no-id.json answered updated with no event id: refused, since an event found by its key and updated is always named, so the effect's providerObjectId is known (with the id it is event-move-no-id.json)",
       "source": "K-07 v1 effectRow providerObjectId ('The provider's id of what it made or changed'); arch 05 line 267"
+    },
+    {
+      "file": "invalid/refuse-write-without-idempotency-key.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "refuse",
+      "shows": "event-write-again.json with no idempotencyKey in the request: refused, since every calendar request carries its effect's one idempotency key, from which the adapter makes the provider's repeat guard; without it a retry and a new write of the same event key look the same (with the key it is event-write-again.json)",
+      "source": "K-07 v1 rule 8 and effectRow idempotencyKey ('One idempotency key over all its tries'); arch 10 line 542 ('retry network errors 5 times in 10 minutes on one idempotency key'); K-11 v1 sendPart.request idempotencyKey (the precedent); action-layer engineer's FAIL on T-025 at 8c6c587"
     },
     {
       "file": "invalid/refuse-title-in-span.json",

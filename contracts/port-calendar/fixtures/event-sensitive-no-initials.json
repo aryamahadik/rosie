@@ -1,0 +1,29 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-11-02T15:00:05Z",
+    "note": "Lee Associates has the sensitive switch on. A client gave the name only in Chinese characters, 张伟, the security reviewer's example of a common two-character name (a placeholder, no real person). Each Chinese character is a whole syllable and here a whole name part, so initials of them would spell the name; no part has a letter that can be an initial, as D41's form gives none for a word with no Latin letter. The client's first session with Maya on Sat Nov 7 at 1:00pm still goes on Maya's Outlook calendar, as 'Visit' alone, with initials null (RULES 4.6; S13-22; arch 05 line 267; README default 18). The session's date, length and ids are an illustration."
+  },
+  "request": {
+    "calendarLinkId": "callink-maya-microsoft",
+    "provider": "microsoft",
+    "eventKey": {
+      "bookingId": "booking-wei-maya-nov07",
+      "visitId": "visit-wei-maya-nov07",
+      "personId": "person-maya"
+    },
+    "idempotencyKey": "eff-cal-maya-wei-nov07-write",
+    "start": "2026-11-07T18:00:00Z",
+    "end": "2026-11-07T19:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": true,
+      "initials": null
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "graph-event-demo-0006",
+    "alreadyWritten": false
+  }
+}

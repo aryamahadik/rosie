@@ -13,6 +13,7 @@
       "personId": "person-riley"
     },
     "providerEventId": "gcal-event-demo-0001",
+    "idempotencyKey": "eff-cal-riley-alex-nov14-move",
     "start": "2026-11-14T16:30:00Z",
     "end": "2026-11-14T17:00:00Z",
     "zone": "America/New_York",

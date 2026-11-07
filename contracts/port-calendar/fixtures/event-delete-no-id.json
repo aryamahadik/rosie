@@ -12,7 +12,8 @@
       "visitId": "visit-ben-sam-dec05",
       "personId": "person-sam"
     },
-    "providerEventId": null
+    "providerEventId": null,
+    "idempotencyKey": "eff-cal-sam-ben-dec05-delete"
   },
   "outcome": {
     "result": "deleted",

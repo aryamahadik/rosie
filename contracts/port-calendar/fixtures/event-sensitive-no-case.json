@@ -12,6 +12,7 @@
       "visitId": "visit-alex-maya-oct31",
       "personId": "person-maya"
     },
+    "idempotencyKey": "eff-cal-maya-alex-oct31-write",
     "start": "2026-10-31T15:00:00Z",
     "end": "2026-10-31T16:00:00Z",
     "zone": "America/New_York",

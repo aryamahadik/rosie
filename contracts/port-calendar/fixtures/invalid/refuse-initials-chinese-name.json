@@ -1,0 +1,29 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-11-02T15:00:05Z",
+    "note": "event-sensitive-no-initials.json with one fault: the sensitive event carries 张.伟., one Chinese character and a dot per name part, for the client named 张伟. Refused: a Chinese character is a whole syllable or word, so these initials spell the whole name onto Maya's calendar; a letter of Han, Hangul, Hiragana, Katakana or Yi is never an initial, and a name that gives none is written as 'Visit' alone (RULES 4.6: 'only the display name, times and initials'; S13-22; arch 05 line 267; RULES 4.5: 'When unsure, treat it as private')."
+  },
+  "request": {
+    "calendarLinkId": "callink-maya-microsoft",
+    "provider": "microsoft",
+    "eventKey": {
+      "bookingId": "booking-wei-maya-nov07",
+      "visitId": "visit-wei-maya-nov07",
+      "personId": "person-maya"
+    },
+    "idempotencyKey": "eff-cal-maya-wei-nov07-write",
+    "start": "2026-11-07T18:00:00Z",
+    "end": "2026-11-07T19:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": true,
+      "initials": "张.伟."
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "graph-event-demo-0006",
+    "alreadyWritten": false
+  }
+}
