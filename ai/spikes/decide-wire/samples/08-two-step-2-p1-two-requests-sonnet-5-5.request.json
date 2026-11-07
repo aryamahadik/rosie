@@ -1,0 +1,121 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 4096,
+  "system": "You read one turn of texts to a booking assistant and map each part of it to one verb. Use only the choices listed, by their ids; for choose, give the choice's question as listed. Quote each part's exact words, and give each field's value with the exact words it comes from. The part and its verb are already chosen; give only what that verb needs for that part.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<who>Sam Lee, owner of biz-lees-barbershop, owner of biz-lee-home-services; language en</who>\n<open_questions>\n</open_questions>\n<choices>\nc-01 (hub; choose, question S11-12): BLOCK. Rosie asks which business, then reads the time back and says who's booked then. Fields: block_when (text).\nc-02 (hub; choose, question S11-12): PAUSE. Sam pauses one business, or both.\nc-03 (hub; choose, question S11-12): AWAY, or no answer all day. Requests, quotes and fees wait on Sam.\nc-04 (hub; choose, question S11-12): A change to the settings. Sam changes prices, rules, money settings or a part refund by text or call. Fields: service (text), price (money).\nc-05 (hub; choose, question S11-12): HELP, or something unclear. Nothing changes on a text Rosie can't act on for sure.\nc-06 (hub; choose, question S11-12): UPDATE. Sam texts UPDATE with a short note for everyone booked that day, or at a running event or stay.\nc-07 (anytime danger-or-crisis; enter): Danger or crisis. Every message and every call is checked before any answer, every time, by meaning.\n</choices>\n<facts>\npf.services: Tile floor (Lee Tile): free measure visit, then a quote\n</facts>\n<recent_messages>\n</recent_messages>\n<turn>block thursday afternoon and also tile is $12 a foot from now on</turn>\n<part>verb choose; quote: block thursday afternoon</part>"
+    }
+  ],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "title": "Choose",
+        "description": "choose(question, option, fields with their source words): the part answers an offered question or hub case (arch 03 line 183). Model-facing.",
+        "type": "object",
+        "properties": {
+          "question": {
+            "description": "The question the option answers, exactly as the chosen choice's question gives it (arch 03 line 183).",
+            "type": "string"
+          },
+          "choice": {
+            "description": "The chosen option's choice id, one of the turn's choices of kind option, hub or whichBooking (arch 03 line 183; arch 06 line 333: 'Code hands it the choices'). Checked in code, never an enum (README 'Named rules').",
+            "type": "string"
+          },
+          "fields": {
+            "description": "The fields its answer carries, each with its words (arch 03 line 183).",
+            "type": "array",
+            "items": { "$ref": "#/$defs/field" }
+          }
+        },
+        "required": ["question", "choice", "fields"],
+        "additionalProperties": false,
+        "$defs": {
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "field": {
+            "title": "Field",
+            "description": "One field of a choose or enter, with its source words (arch 03 line 183: 'fields with their source words'). A value without words is refused (refuse-value-without-words). Model-facing.",
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The field's name, one the chosen choice lists in its fields (contracts/bundle answerField.name; arch 03 line 183).",
+                "type": "string"
+              },
+              "value": { "$ref": "#/$defs/fieldValue" },
+              "words": {
+                "description": "The exact words of the text the value comes from; code re-parses the value from them (arch 03 line 185; arch 06 line 309, limit 6).",
+                "$ref": "#/$defs/nonEmptyText"
+              }
+            },
+            "required": ["name", "value", "words"],
+            "additionalProperties": false
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "fieldValue": {
+            "title": "FieldValue",
+            "description": "The value the model read for a field, in the type the choice's field names (contracts/bundle answerField.type): a string for text, zone, id or choice; an integer; a boolean; money or a time as the shared formats write them (CQ-09). Code re-parses it from its words (arch 03 line 185; arch 06 line 309, limit 6). Model-facing.",
+            "anyOf": [
+              { "type": "string" },
+              { "type": "integer" },
+              { "type": "boolean" },
+              { "$ref": "#/$defs/money" },
+              { "$ref": "#/$defs/time" }
+            ]
+          },
+          "money": {
+            "title": "Money",
+            "description": "An amount of money: whole cents with its currency code, never a decimal (CQ-09). Whether an amount may be zero or negative is each field's rule, checked in code.",
+            "type": "object",
+            "properties": {
+              "cents": {
+                "description": "The amount in the currency's cents, as an integer (CQ-09).",
+                "type": "integer"
+              },
+              "currency": { "$ref": "#/$defs/currency" }
+            },
+            "required": ["cents", "currency"],
+            "additionalProperties": false
+          },
+          "time": {
+            "title": "Time",
+            "description": "A time: the instant in UTC together with the IANA zone it is shown and reasoned in (CQ-09: 'every time in UTC with its IANA zone'; S13-03).",
+            "type": "object",
+            "properties": { "utc": { "$ref": "#/$defs/utc" }, "zone": { "$ref": "#/$defs/zone" } },
+            "required": ["utc", "zone"],
+            "additionalProperties": false
+          },
+          "currency": {
+            "title": "Currency",
+            "description": "A currency code: three capital letters, as ISO 4217 writes them, for example USD (CQ-09: 'money in integer cents with a currency code').",
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "utc": {
+            "title": "Utc",
+            "description": "An instant in UTC, written as an RFC 3339 date-time ending in Z, for example 2026-11-07T15:30:00Z (CQ-09: 'every time in UTC'). Whether the date exists is a code check.",
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?Z$"
+          },
+          "zone": {
+            "title": "Zone",
+            "description": "An IANA time zone name, for example America/New_York (CQ-09; S13-03: a visit's time is read in the visit's zone). Whether the zone exists in the IANA database is a code check.",
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$"
+          }
+        }
+      }
+    }
+  }
+}

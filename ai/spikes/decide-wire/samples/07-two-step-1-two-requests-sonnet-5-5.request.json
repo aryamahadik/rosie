@@ -1,0 +1,57 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 4096,
+  "system": "You read one turn of texts to a booking assistant. Split it into parts and give each part's exact words and the one verb that fits it, in the text's order, with the text's language. Do not give fields yet. The verbs:\n- choose: choose(question, option, fields with their source words): the part answers an offered question or hub case (arch 03 line 183). Model-facing.\n- enter: enter(door or any-time row, fields): the part starts something new or raises an any-time row (arch 03 line 183); also an entry step meaning search added (arch 03 line 189). Model-facing.\n- ask: ask(questions, what is unclear): the part could answer more than one question, or a bare reply or reaction is not a choice, so Rosie asks which (arch 03 lines 183 and 187; S13-12; A7-17). Model-facing.\n- none_fits: none_fits(why): no choice fits the part; meaning search runs (arch 03 lines 183 and 189). Model-facing.\n- pass_on: pass_on(words): the part is words for the business, passed on as they are (arch 03 line 183). Model-facing.\n- hand_off: hand_off(reason): the part goes to a person (arch 03 line 183), routed by about: a report about the owner or staff to Rosie's team that day, any other hand-off to the owner in text hours, then Rosie's team (arch 06 line 329). Model-facing.\n- redact: redact(words): words that must not stay in the message log or reach a message, such as a field kept to the secure page (arch 03 line 183; RULES 4.5). Model-facing.\n- no_op: no_op: the part needs nothing done, such as a thank-you (arch 03 line 183). Model-facing.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<who>Sam Lee, owner of biz-lees-barbershop, owner of biz-lee-home-services; language en</who>\n<open_questions>\n</open_questions>\n<choices>\nc-01 (hub; choose, question S11-12): BLOCK. Rosie asks which business, then reads the time back and says who's booked then. Fields: block_when (text).\nc-02 (hub; choose, question S11-12): PAUSE. Sam pauses one business, or both.\nc-03 (hub; choose, question S11-12): AWAY, or no answer all day. Requests, quotes and fees wait on Sam.\nc-04 (hub; choose, question S11-12): A change to the settings. Sam changes prices, rules, money settings or a part refund by text or call. Fields: service (text), price (money).\nc-05 (hub; choose, question S11-12): HELP, or something unclear. Nothing changes on a text Rosie can't act on for sure.\nc-06 (hub; choose, question S11-12): UPDATE. Sam texts UPDATE with a short note for everyone booked that day, or at a running event or stay.\nc-07 (anytime danger-or-crisis; enter): Danger or crisis. Every message and every call is checked before any answer, every time, by meaning.\n</choices>\n<facts>\npf.services: Tile floor (Lee Tile): free measure visit, then a quote\n</facts>\n<recent_messages>\n</recent_messages>\n<turn>block thursday afternoon and also tile is $12 a foot from now on</turn>"
+    }
+  ],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "language": { "description": "The text's language (CQ-07 default).", "$ref": "#/$defs/language" },
+          "parts": {
+            "description": "One entry per part of the text, in the text's order.",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "quote": { "description": "The part's exact words.", "$ref": "#/$defs/nonEmptyText" },
+                "verb": {
+                  "description": "The part's verb (arch 03 line 183).",
+                  "type": "string",
+                  "enum": ["choose", "enter", "ask", "none_fits", "pass_on", "hand_off", "redact", "no_op"]
+                }
+              },
+              "required": ["quote", "verb"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["language", "parts"],
+        "additionalProperties": false,
+        "$defs": {
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    }
+  }
+}

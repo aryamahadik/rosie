@@ -1,0 +1,33 @@
+{
+  "model": "claude-haiku-5-5",
+  "id": "msg_011CgorZiWTZfQLaveDqjdoN",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "",
+      "signature": "CAQSigsKEAgTGAI4AUIIdGhpbmtpbmcSDMktnRsiLcozDkHjxRoMGcuf+hHK2Be3Kht1IjDdBUJlbXRCqE4EBssF6KMC7a3pDVbY+Z/QxaKBvs3o9C383vsNpV8Advgy4t//K/4qpwrST1I410fuCmqVl+plhOPm2SVFODMQBALmLXVyD+OlwqYXR1B/TlcerOa4LHeF9x6pIFa6hIbDE98Ro9aQmKRJNrB2DrWaQiEPDFq024itErdHcNyPiPEwEp1EKY5DeV1cgZcoYfNjb989JsZaZCfZ0gEOLx2KknpWUBvvjDakKiKX/R6tcbgAdAd3bNNt0TvhkLYQpAMWS2BUahWdC3dYSsx68RONLkHFZHlzfuuWzHnM/vkYUWENZ0Ve7HXuFAwVovRl1crbXUcwYogBCiBHvfa8WdO4Nr0VxVrywkMqSEwPNZHO6co4UbKxJ1MrDibBzhmRCds+yA0/AeXI4Tw0wPL2ls60zwrU7bSe3PBYGj3nf8FaP5GOStY7r56I1vcQibyM/cFnuJ1yOJPQ+3SDM+3BhdEv4w6KPaUjBe/4/cDmQN8Xk1kz1xDwxUJeh63dVR+XtYpDuhoeqnxSCE42oxmrZ/x2/VObAxI0i04LTz9FJ8kxhbcyFe+izLj/4dF5PVllUEgPufuncD47765qBqd9PPlzteaMgTgXnhZfwgKNcyVhrcDCechNBoLzOfY+mBruxEtyvl8hCIz8K5lAQhWEoFJeTYF5cye4g/SbjnBqApN118g0FNYmIN6jHk0ydgNT86TU/fWZUgmZ4zlr+E2DNaUCwldpiiAgO6oiNSb+RtU4qhhGeMvNsX355mZW1SULyuY+jbuGSDigXupnZ17h4Ebchcf8OtEIXnsAX6LJR/yfA3qCL+dqyhKlSej0WC3BR9Agw0OwfcWNU6BRpPsQ2T8ONulyCxcKI62JwLymyDZN9SPpnAC9ZjOlQXJPIxmdiA/FmRekGbzJ6oDkwSUVxnUpYeE7EKktscqPJS8uPSTx5vVoHYAssVQoUPl/g+mm18iloi02zB0sdM80RJ2FkSmmSZvvnxoZqcdODwFYSLfJyraPDWnQOi1X55+tDB7xZGQXo2TOnGCiiyqRfeN1W24ZVHk1gdCh4/fKuZ22uEcTvlXKIpBiQyzlGMdFWpni2f8lKrj2Y9tOoU4n7SqrgUbbmGwckTLcZ5VE9Ve2iuwqf1lvMo46952q2h6LhDY2y1uLmmjRkmrwVBedDr6pBEvzobvPyfVXBQUkCky6+cSpr7AiCwKW7tkOLREWjfXWPayFGUQyD+GL3zqfWnLBBebXPO/aCNbQmGr38VryqJNVsEf3D+VCgTTWyHYcX5PZbcF+3xM8KCeTJW2VzsrhgtmlaC0U6RBcIaZmexk3csyHgOblzjYihRAxlDm2aUnX9nkRHpbiwWybTvQRg0GfOo9+D5+cOKn9+nzxyCFNWPXabPYi0N/uxk7eusmdl++nZs15vTBbg0/d1AR/BcA6SCwGdij404Ghia0VMqGkDI5hjCgVqO4cSmO3c12KkQds7JN7ZHXaYO03/UNFCzAsc4aFwNH96DMwTd0sGNJ/UMB4LK8eOkmq86UbDFiv59/n9cMjw1k/NMCz3WQYZdl9CoFzeRsNk41XHZ67oIQFeZ5BsSqK5LkMx22OLVyBg7ywGQx4Lbdje6TDaHiT+dWY04fEemQMaXxU/S9rAXvN5NYujVG7ADGylWW4TTf/Sz0JuoEPe4YEV0w3wohYfctKSkvoRB+qhVAYABAtIrjkk+Ryd77nvd2TncTQ5Nh22woftCFAbboXVWYy0DiVFeWhiJ7y4FN9Op1t4XfXcMCOl4vnPQoJL48qAu9IE6DGi1lmgg2dcL4T8WZeNhCUcoJoLv7MxxgB"
+    },
+    {
+      "type": "text",
+      "text": "{\"question\":\"S11-12\",\"choice\":\"c-04\",\"fields\":[{\"name\":\"service\",\"value\":\"tile\",\"words\":\"tile is $12 a foot\"},{\"name\":\"price\",\"value\":{\"cents\":1200,\"currency\":\"USD\"},\"words\":\"$12 a foot\"}]}"
+    }
+  ],
+  "container": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 2768,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": { "ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 0 },
+    "output_tokens": 390,
+    "output_tokens_details": { "thinking_tokens": 299 },
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard"
+  },
+  "diagnostics": null
+}
