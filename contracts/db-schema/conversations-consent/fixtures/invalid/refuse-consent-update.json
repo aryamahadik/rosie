@@ -1,0 +1,19 @@
+{
+  "after": ["seed-consent-fee-ok.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "consents",
+    "set": {
+      "revoked": true
+    },
+    "where": {
+      "id": "consent-sam-fee-ok-barbershop"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

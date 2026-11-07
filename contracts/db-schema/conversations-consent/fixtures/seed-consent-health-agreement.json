@@ -1,0 +1,42 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "businesses",
+      "values": {
+        "id": "biz-lee-nutrition-clinic",
+        "name": "Lee Nutrition Clinic",
+        "display_name": "Lee Nutrition Clinic",
+        "status": "saved",
+        "time_zone": "America/New_York",
+        "text_hours_start": "08:00",
+        "text_hours_end": "20:00",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-sam-nutrition",
+        "person_id": "person-sam",
+        "business_id": "biz-lee-nutrition-clinic",
+        "role": "owner",
+        "version": 1
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-sam-health-agreement",
+        "person_id": "person-sam",
+        "business_id": "biz-lee-nutrition-clinic",
+        "kind": "health_agreement",
+        "revoked": false,
+        "exact_words": "Health privacy agreement / Signed once, on the secure page / Covers every booking and intake form / Not signed: that work stays offline, saved",
+        "words_sha256": "5c1ff01fcaef292b82cf063cf1baeaa3dce1a8f617d83b8a93ce154e85e717c9",
+        "at": "2026-10-20T15:10:00Z",
+        "channel": "page"
+      }
+    }
+  ]
+}

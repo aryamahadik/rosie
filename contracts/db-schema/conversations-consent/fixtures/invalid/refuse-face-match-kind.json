@@ -1,0 +1,27 @@
+{
+  "after": ["../../core/fixtures/seed-phone-chat-open.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "consents",
+    "values": {
+      "id": "consent-sam-face-match",
+      "person_id": "person-sam",
+      "business_id": "biz-lees-barbershop",
+      "kind": "face_match",
+      "revoked": false,
+      "exact_words": "Your selfie is matched to your license photo, only to prove it's you / Face data is deleted within 30 days",
+      "words_sha256": "89e6adf6bd323d91ba8d3db1cb672b38e57d118c9c226711124458bea8105769",
+      "at": "2026-10-19T14:10:00Z",
+      "channel": "page"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["consents_kind_known"]
+    }
+  }
+}

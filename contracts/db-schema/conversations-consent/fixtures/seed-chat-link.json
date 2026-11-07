@@ -1,0 +1,135 @@
+{
+  "after": ["../../core/fixtures/seed-phone-chat-open.json", "../../core/fixtures/seed-phone-stopped.json"],
+  "rows": [
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-ben-haircut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "stage": "booked",
+        "booker_person_id": "person-ben",
+        "served_person_id": "person-ben",
+        "payer_person_id": "person-ben",
+        "version": 2
+      }
+    },
+    {
+      "table": "chat_links",
+      "values": {
+        "id": "chatlink-ben-haircut",
+        "short_code": "4K7Q",
+        "purpose": "booking",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-ben-haircut",
+        "person_id": "person-ben",
+        "phone_number": "+15555550106",
+        "ready_text": "Hey, send me further updates about my booking. Ref 4K7Q",
+        "given_via": ["booking_page", "confirmation_email"],
+        "issued_at": "2026-10-05T17:00:00Z",
+        "used_at": "2026-10-05T17:00:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-ben-texts-yes",
+        "person_id": "person-ben",
+        "business_id": "biz-lees-barbershop",
+        "kind": "texts",
+        "revoked": false,
+        "handle_id": "handle-ben",
+        "booking_id": "booking-ben-haircut",
+        "exact_words": "Hey, send me further updates about my booking. Ref 4K7Q",
+        "words_sha256": "6787b8ed87e3d9d839bbfe158d1aaeaafd1b945cac4ae704933e78649be5208d",
+        "at": "2026-10-05T17:00:00Z",
+        "channel": "text",
+        "chat_link_id": "chatlink-ben-haircut"
+      }
+    },
+    {
+      "table": "chat_links",
+      "values": {
+        "id": "chatlink-avery-invite",
+        "short_code": "R2V9",
+        "purpose": "staff_invite",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-avery",
+        "phone_number": "+15555550103",
+        "ready_text": "YES. Ref R2V9",
+        "given_via": ["owner"],
+        "issued_at": "2026-10-19T14:40:00Z",
+        "used_at": "2026-10-19T15:02:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-avery-texts-yes",
+        "person_id": "person-avery",
+        "business_id": "biz-lees-barbershop",
+        "kind": "texts",
+        "revoked": false,
+        "handle_id": "handle-avery",
+        "exact_words": "YES. Ref R2V9",
+        "words_sha256": "ace83bd6140b3faec7a22cd38ffc050a3eaf3bc3ccd91a20c6ad127893053b39",
+        "at": "2026-10-19T15:02:00Z",
+        "channel": "text",
+        "chat_link_id": "chatlink-avery-invite"
+      }
+    },
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-pat",
+        "name": "Pat",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-pat",
+        "kind": "phone",
+        "address": "+15555550107"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-pat",
+        "handle_id": "handle-pat"
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550107",
+        "handle_id": "handle-pat",
+        "chat_open": false,
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-19T14:39:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "chat_links",
+      "values": {
+        "id": "chatlink-pat-invite",
+        "short_code": "P5J3",
+        "purpose": "staff_invite",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-pat",
+        "phone_number": "+15555550107",
+        "ready_text": "YES. Ref P5J3",
+        "given_via": ["owner"],
+        "issued_at": "2026-10-19T14:40:00Z",
+        "owner_retold_at": "2026-10-21T14:40:00Z",
+        "version": 2
+      }
+    }
+  ]
+}
