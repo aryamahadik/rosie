@@ -4,12 +4,27 @@ import { DEFAULT_BUNDLE_ID } from "./linq-webhook";
 import type { GatewayDeps } from "./types";
 
 export { DEFAULT_BUNDLE_ID, handleLinqWebhook, type WebhookEnvironment } from "./linq-webhook";
+export { durableObjectActor, type ActorNamespace, type HandleActorRpc } from "./actor-door";
+export { ACTOR_KINDS, HandoffError, RECEIPT_KINDS, prepareHandoff, type Prepared } from "./hand-off";
+export {
+  actorNameOf,
+  openWords,
+  sealWords,
+  type HandleRef,
+  type SealedBox,
+  type SealedWords,
+  type SealingKeyStore,
+} from "./seal";
 export type {
   ActorHandoff,
   ActorStub,
   GatewayDeps,
   InboundEvent,
   LinqPort,
+  ReceiptSink,
+  SealedEvent,
+  SealedHandoff,
+  StoreAnswer,
   VerifyWebhookRequest,
   VerifyWebhookResult,
 } from "./types";
@@ -27,6 +42,8 @@ export function unconfiguredGateway(): GatewayDeps {
   return {
     linq: { verifyWebhook: () => notYet("Linq adapter") },
     actor: { accept: () => notYet("handle actor") },
+    receipts: { accept: () => notYet("dispatcher") },
+    keys: { getOrCreateKey: () => notYet("sealing key store") },
     bundleId: () => DEFAULT_BUNDLE_ID,
   };
 }
