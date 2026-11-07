@@ -139,7 +139,7 @@ What it shows: every one-call form is refused, including the flat envelope with 
 
 ## Recommendation for CQ-25
 
-**Choose (c), the two-step form, for claude-haiku-5-5 and claude-sonnet-5-5.** Decide reaches the model as stage 1 (one structured output: the language and each part's quote and verb) and then one structured output per part that is not `no_op` (the verb's own K-02 schema less `verb` and `quote`), mapped by code into K-02 v1's `decideRead` unchanged. No K-02 change is proposed. The Sonnet cell of (c) is pending the lead's round 2 (`--live --round two-step-sonnet`); until it is filled, the choice is settled for Haiku and open for Sonnet. If Sonnet refuses a stage, the architect and the lead decide whether the Sonnet re-read uses another form; this spike does not guess.
+**Choose (c), the two-step form, for claude-haiku-5-5 and claude-sonnet-5-5.** Decide reaches the model as stage 1 (one structured output: the language and each part's quote and verb) and then one structured output per part that is not `no_op` (the verb's own K-02 schema less `verb` and `quote`), mapped by code into K-02 v1's `decideRead` unchanged. No K-02 change is proposed. Round 2 (calls 7 to 9) measured (c) on claude-sonnet-5-5: accepted, valid on the wire, mapped valid and equal to the fixture, so the choice holds for both models, the Sonnet re-read included.
 
 ### The decision rule applied
 
