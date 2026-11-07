@@ -1,0 +1,45 @@
+{
+  "id": "S1-37",
+  "section": 1,
+  "lines": [
+    "1.16"
+  ],
+  "who": "owner",
+  "to": "san",
+  "via": "msg",
+  "title": "Sam texts MORE; picks up where he left off",
+  "does": "Whenever Sam texts MORE, Rosie picks up where Sam left off. Nothing Sam already sent is asked again. On this branch, the steps below run when Sam texts MORE.",
+  "say": [
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "MORE",
+      "plainText": "MORE"
+    },
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Welcome back! Lee's Barbershop is live. Next up: Lee Home Services, about 5 minutes.",
+      "elements": {
+        "buttons": [
+          "Start"
+        ]
+      },
+      "plainText": "Welcome back! Lee's Barbershop is live. Next up: Lee Home Services, about 5 minutes.\nReply 1 Start."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "1",
+      "plainText": "1"
+    }
+  ],
+  "tells": [
+    "owner"
+  ],
+  "t": "Tue Oct 20, 10:30am",
+  "fallbackText": "Welcome back! Lee's Barbershop is live. Next up: Lee Home Services, about 5 minutes.",
+  "pageTypes": [],
+  "next": null,
+  "lint": []
+}

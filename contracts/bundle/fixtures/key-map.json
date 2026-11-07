@@ -1,0 +1,188 @@
+{
+  "keys": [
+    {
+      "key": "id",
+      "as": "typed",
+      "to": "trade/id",
+      "why": "SPEC-prof 3; MC R3 (top keys read by name)"
+    },
+    {
+      "key": "name",
+      "as": "typed",
+      "to": "trade/name",
+      "why": "SPEC-prof 3"
+    },
+    {
+      "key": "style",
+      "as": "typed",
+      "to": "trade/style",
+      "why": "SPEC-prof 3"
+    },
+    {
+      "key": "pattern",
+      "as": "typed",
+      "to": "trade/pattern",
+      "why": "SPEC-prof 2 items 5 and 8"
+    },
+    {
+      "key": "pf.facts",
+      "as": "typed",
+      "to": "facts",
+      "why": "MC R3: code reads pf.facts by name; MC C5's fills"
+    },
+    {
+      "key": "pf.switches",
+      "as": "typed",
+      "to": "flows/<flow>/switches",
+      "why": "MC R3; SPEC-master 5b (a per-flow value split per flow); no2 from S1-62 (SPEC-master 5j)"
+    },
+    {
+      "key": "pf.settings",
+      "as": "typed",
+      "to": "flows/<flow>/settings",
+      "why": "MC R3; MC C5 (none: arrive window and an empty cutoff)"
+    },
+    {
+      "key": "money",
+      "as": "typed",
+      "to": "flows/<flow>/money",
+      "why": "MC R3: money.<flow> read by name; SPEC-prof 3"
+    },
+    {
+      "key": "pf.license",
+      "as": "textBlock",
+      "to": "pluginText/pf.license",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.services",
+      "as": "textBlock",
+      "to": "pluginText/pf.services",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.questions",
+      "as": "textBlock",
+      "to": "pluginText/pf.questions",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.safety",
+      "as": "textBlock",
+      "to": "pluginText/pf.safety",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.first_steps",
+      "as": "textBlock",
+      "to": "pluginText/pf.first_steps",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.visit",
+      "as": "textBlock",
+      "to": "pluginText/pf.visit",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.money",
+      "as": "textBlock",
+      "to": "pluginText/pf.money",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.messages",
+      "as": "textBlock",
+      "to": "pluginText/pf.messages",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.staff",
+      "as": "textBlock",
+      "to": "pluginText/pf.staff",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.rules",
+      "as": "textBlock",
+      "to": "pluginText/pf.rules",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "pf.edges",
+      "as": "textBlock",
+      "to": "pluginText/pf.edges",
+      "why": "MC R3: free text stored whole as a text block for the AI; Q-39 default (sub-keys guidance only); FRONTEND-SPEC.md line 565"
+    },
+    {
+      "key": "rename",
+      "as": "ops",
+      "to": "flows/<flow>/rename",
+      "why": "SPEC-prof 3 'rename'; overlay-core.js line 1800"
+    },
+    {
+      "key": "slots",
+      "as": "ops",
+      "to": "flows/<flow>/slotRows",
+      "why": "overlay-core.js profRecord line 1867"
+    },
+    {
+      "key": "A",
+      "as": "ops",
+      "to": "flows/A/ops",
+      "why": "SPEC-prof 3 'ops'; MC C8 (void offs dropped)"
+    },
+    {
+      "key": "B",
+      "as": "ops",
+      "to": "flows/B/ops",
+      "why": "SPEC-prof 3 'ops'; MC C8 (void offs dropped)"
+    },
+    {
+      "key": "notes",
+      "as": "leftOut",
+      "why": "MC R2: authoring fields"
+    },
+    {
+      "key": "basis",
+      "as": "leftOut",
+      "why": "MC R2: authoring fields"
+    },
+    {
+      "key": "keep",
+      "as": "leftOut",
+      "why": "MC R2: authoring fields"
+    },
+    {
+      "key": "from",
+      "as": "leftOut",
+      "why": "MC R2: authoring fields"
+    },
+    {
+      "key": "splitsKept",
+      "as": "leftOut",
+      "why": "MC R2: authoring fields"
+    },
+    {
+      "key": "keep_why",
+      "as": "leftOut",
+      "why": "MC R2: authoring fields"
+    },
+    {
+      "key": "cast",
+      "as": "leftOut",
+      "why": "MC C6: the sample cast, names and story are illustrations"
+    },
+    {
+      "key": "names",
+      "as": "leftOut",
+      "why": "MC C6: the sample cast, names and story are illustrations"
+    },
+    {
+      "key": "story",
+      "as": "leftOut",
+      "why": "MC C6: the sample cast, names and story are illustrations"
+    }
+  ],
+  "subKeys": "guidance"
+}

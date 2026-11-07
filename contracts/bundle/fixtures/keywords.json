@@ -1,0 +1,26 @@
+{
+  "start": "START",
+  "help": "HELP",
+  "optOut": [
+    "STOP",
+    "STOPALL",
+    "CANCEL",
+    "END",
+    "QUIT",
+    "UNSUBSCRIBE",
+    "REVOKE",
+    "OPTOUT",
+    "OPT OUT",
+    "CANCELAR",
+    "PARA",
+    "PARAR",
+    "ALTO",
+    "BASTA",
+    "DETENER",
+    "FIN"
+  ],
+  "flagsVisit": [
+    "CANCEL",
+    "CANCELAR"
+  ]
+}

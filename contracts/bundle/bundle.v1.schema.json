@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/bundle/bundle.v1.schema.json",
   "title": "Bundle v1",
-  "description": "K-01, the step-graph bundle format, DRAFT (T-008; not frozen: T-010 adds the shared lists, sample bundles and refused fixtures, runs the consumer reviews and freezes it). A bundle is 'the step graph, prompts, model ids and policy one turn ran on, stored under one id' (arch 01 line 87; ops/plan/02-contracts.md K-01). Layout (Q-34 default): one manifest, one master graph per flow and one compiled overlay per trade, each stored as its own KV value under the bundle id (arch 10 line 536). The root of this schema is the whole bundle as one document, the form the compiler writes before it splits it into KV values and the form sample bundles take; $defs.manifest, $defs.flowGraph and $defs.tradeOverlay are the three kinds of KV value. Field names copied from the master keep the master's spelling (SPEC-master 4; overlay-core.js), so parity runs against the same functions (Q-35).",
+  "description": "K-01, the step-graph bundle format, v1 (drafted by T-008, frozen by T-010; contracts/bundle/README.md holds the freeze record). A bundle is 'the step graph, prompts, model ids and policy one turn ran on, stored under one id' (arch 01 line 87; ops/plan/02-contracts.md K-01). Layout (Q-34 default): one manifest, one master graph per flow and one compiled overlay per trade, each stored as its own KV value under the bundle id (arch 10 line 536). The root of this schema is the whole bundle as one document, the form the compiler writes before it splits it into KV values and the form sample bundles take; $defs.manifest, $defs.flowGraph and $defs.tradeOverlay are the three kinds of KV value. Field names copied from the master keep the master's spelling (SPEC-master 4; overlay-core.js), so parity runs against the same functions (Q-35).",
   "type": "object",
   "properties": {
     "manifest": {
@@ -273,6 +273,95 @@
           "$ref": "#/$defs/pair"
         }
       ]
+    },
+    "guardKeyword": {
+      "title": "GuardKeyword",
+      "description": "A guard keyword: START, HELP or one of msgtext.js's 16 opt-out words (arch 02 line 115: 'Code alone acts on a text that is only START, HELP or one of msgtext.js's 16 opt-out words'; msgtext.js OPTOUT, line 29).",
+      "type": "string",
+      "enum": [
+        "START",
+        "HELP",
+        "STOP",
+        "STOPALL",
+        "CANCEL",
+        "END",
+        "QUIT",
+        "UNSUBSCRIBE",
+        "REVOKE",
+        "OPTOUT",
+        "OPT OUT",
+        "CANCELAR",
+        "PARA",
+        "PARAR",
+        "ALTO",
+        "BASTA",
+        "DETENER",
+        "FIN"
+      ]
+    },
+    "keywordText": {
+      "title": "KeywordText",
+      "description": "A text that is only a guard keyword, trimmed, in any case (arch 02 line 115; msgtext.js line 95 compares String(label).trim().toUpperCase() with the list). The words: START, HELP, STOP, STOPALL, CANCEL, END, QUIT, UNSUBSCRIBE, REVOKE, OPTOUT, OPT OUT, CANCELAR, PARA, PARAR, ALTO, BASTA, DETENER, FIN.",
+      "type": "string",
+      "pattern": "^\\s*([Ss][Tt][Aa][Rr][Tt]|[Hh][Ee][Ll][Pp]|[Ss][Tt][Oo][Pp]|[Ss][Tt][Oo][Pp][Aa][Ll][Ll]|[Cc][Aa][Nn][Cc][Ee][Ll]|[Ee][Nn][Dd]|[Qq][Uu][Ii][Tt]|[Uu][Nn][Ss][Uu][Bb][Ss][Cc][Rr][Ii][Bb][Ee]|[Rr][Ee][Vv][Oo][Kk][Ee]|[Oo][Pp][Tt][Oo][Uu][Tt]|[Oo][Pp][Tt] [Oo][Uu][Tt]|[Cc][Aa][Nn][Cc][Ee][Ll][Aa][Rr]|[Pp][Aa][Rr][Aa]|[Pp][Aa][Rr][Aa][Rr]|[Aa][Ll][Tt][Oo]|[Bb][Aa][Ss][Tt][Aa]|[Dd][Ee][Tt][Ee][Nn][Ee][Rr]|[Ff][Ii][Nn])\\s*$"
+    },
+    "keywordButton": {
+      "title": "KeywordButton",
+      "description": "A button whose whole label is a guard keyword, such as S1-37's 'Start', which the guard would read as START (arch 12 line 592; Q-14). A lettered pair's key is one letter or digit, so only its label can match (msgtext.js line 91).",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/keywordText"
+        },
+        {
+          "type": "array",
+          "contains": {
+            "$ref": "#/$defs/keywordText"
+          }
+        }
+      ]
+    },
+    "messagesWithKeywordButton": {
+      "title": "MessagesWithKeywordButton",
+      "description": "Messages of which at least one carries a guard-keyword button (arch 12 line 592: 'a button's whole text is a guard keyword'). Used only by the step's lint checks.",
+      "type": "array",
+      "contains": {
+        "description": "A message that carries a guard-keyword button (arch 12 line 592; SPEC-master 4 'buttons').",
+        "type": "object",
+        "required": ["elements"],
+        "properties": {
+          "elements": {
+            "description": "Its chat elements (SPEC-master 4).",
+            "type": "object",
+            "required": ["buttons"],
+            "properties": {
+              "buttons": {
+                "description": "Its buttons, one of which is a guard keyword (arch 12 line 592; msgtext.js line 95).",
+                "type": "array",
+                "contains": {
+                  "$ref": "#/$defs/keywordButton"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "messagesWithUnknownSlot": {
+      "title": "MessagesWithUnknownSlot",
+      "description": "Messages of which at least one names a slot outside the bundle's slot list (02-contracts K-01, refused fixture 'refuse-unknown-slot'; overlay-core.js slotProblems line 1508: 'no slot ...'). The list: overlay-core.js SLOTS (line 1285: alex.staff, name.staff, svc.intext, arrive, window, cutoff, day, keep, price, fee, deposit, rest, hold, paid), the ledger amounts (overlay-core.js LEDGER_AMOUNTS line 597 and AMOUNT_RE line 983: paidnow, due, back, later, backlate, name) and the record's 16 named slots (master-A.json and master-B.json record.slots). Used only by the step's lint checks.",
+      "type": "array",
+      "contains": {
+        "description": "A message whose words name an unknown slot (02-contracts K-01; overlay-core.js line 1508).",
+        "type": "object",
+        "required": ["text"],
+        "properties": {
+          "text": {
+            "description": "Its words, holding '{{' and a name outside the slot list (overlay-core.js SLOT_RE line 1284).",
+            "type": "string",
+            "pattern": "\\{\\{\\s*(?!(alex\\.staff|name\\.staff|svc\\.intext|arrive|window|cutoff|day|keep|price|fee|deposit|rest|hold|paidnow|paid|due|backlate|back|later|name|pay\\.asks|pay\\.price|pay\\.took|pay\\.left|pay\\.cancel|pay\\.late|pay\\.noshow|pay\\.back|pay\\.after|pay\\.staff|pay\\.failed|clock\\.pay|two\\.count|reach\\.way|reach\\.to|who\\.ok)\\s*[:|}])"
+          }
+        }
+      }
     },
     "chatList": {
       "title": "ChatList",
@@ -700,7 +789,7 @@
     },
     "card": {
       "title": "StepCard",
-      "description": "The step card the model is given for an open question or a hub: question, each branch's Means line, Never lines, safe default and Clock (arch 03 line 181: 'full step cards (question, Means, Never, safe default)'; arch 12 line 592; 02-contracts K-01). A question with no safe default and no clock fails the lint (arch 12 line 592).",
+      "description": "The step card the model is given for an open question or a hub: question, each branch's Means line, Never lines, safe default and Clock (arch 03 line 181: 'full step cards (question, Means, Never, safe default)'; arch 12 line 592; 02-contracts K-01). A card with neither a safe default nor a clock, or with a branch that has no definition, fails the lint: its step's lint lists the rule (arch 12 line 592).",
       "type": "object",
       "properties": {
         "question": {
@@ -719,17 +808,34 @@
                 "type": "string"
               },
               "text": {
-                "description": "The definition (arch 12 line 592).",
-                "type": "string"
+                "description": "The definition (arch 12 line 592). Left out when from is none.",
+                "type": "string",
+                "pattern": "."
               },
               "from": {
-                "description": "meansLine: the step's own \"Means '...'\" line; firstSentence: the first sentence of the step the branch leads to (arch 12 line 592).",
+                "description": "meansLine: the step's own \"Means '...'\" line; firstSentence: the first sentence of the step the branch leads to (arch 12 line 592: '48 lack a Means line; the first sentence of the step it leads to stands in'); none: neither exists, so the choice has no definition and its step fails the lint rule choice-without-definition (arch 12 line 592).",
                 "type": "string",
-                "enum": ["meansLine", "firstSentence"]
+                "enum": ["meansLine", "firstSentence", "none"]
               }
             },
-            "required": ["branch", "text", "from"],
-            "additionalProperties": false
+            "required": ["branch", "from"],
+            "additionalProperties": false,
+            "if": {
+              "properties": {
+                "from": {
+                  "description": "none: no definition (arch 12 line 592).",
+                  "const": "none"
+                }
+              }
+            },
+            "then": {
+              "not": {
+                "required": ["text"]
+              }
+            },
+            "else": {
+              "required": ["text"]
+            }
           }
         },
         "never": {
@@ -741,10 +847,11 @@
           "type": "string"
         },
         "clock": {
+          "description": "The question's Clock: its own Clock line, or step 9's default (arch 12 line 592: 'only 13 of 210 decisions state a Clock line; the rest take step 9's default'). Left out, with no safeDefault either, the step fails the lint rule no-safe-default-or-clock.",
           "$ref": "#/$defs/clock"
         }
       },
-      "required": ["question", "means", "never", "clock"],
+      "required": ["question", "means", "never"],
       "additionalProperties": false
     },
     "answerField": {
@@ -838,7 +945,7 @@
           "$ref": "#/$defs/flowLetter"
         },
         "rejoinAt": {
-          "description": "Where the walk goes after a merging branch: the step after its split, or null when the walk ends or leaves the flow (02-contracts K-01 'its end (rejoins, ends with its text, or continues in the other flow)'; arch 03 line 191).",
+          "description": "Where the walk goes after a merging branch: the step after its split, or null when the walk ends or leaves the flow, or when the split is the last step of its own list, where the enclosing branch's rejoinAt decides, as for next (02-contracts K-01 'its end (rejoins, ends with its text, or continues in the other flow)'; arch 03 line 191).",
           "anyOf": [
             {
               "$ref": "#/$defs/stepId"
@@ -861,6 +968,24 @@
           "items": {
             "$ref": "#/$defs/effect"
           }
+        },
+        "reads": {
+          "description": "For a lookup branch: the field code reads to settle it (arch 03 line 161: 'code settles lookups'; arch 12 line 592: 'a lookup lacks the field it reads'). Q-39's default: the lint fails a lookup whose needs key or record field has no source on some path. A lookup branch without reads fails the lint rule lookup-without-field.",
+          "type": "object",
+          "properties": {
+            "from": {
+              "description": "needs: a key an earlier step gives (SPEC-master 4 'needs'); record: a record value (master-A.json and master-B.json record; arch 03 line 161: 'a record gate when the booking holds the value'); path: a value of the path model, a money or booking choice, a switch or a fact (overlay-core.js lines 6 to 12; SPEC-master 5, 5d, 5e).",
+              "type": "string",
+              "enum": ["needs", "record", "path"]
+            },
+            "key": {
+              "description": "The key, such as card_saved, credit or before (SPEC-master 4 'needs' and 5's keys; master-A.json and master-B.json record; overlay-core.js line 7).",
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.]*$"
+            }
+          },
+          "required": ["from", "key"],
+          "additionalProperties": false
         }
       },
       "required": ["label", "tag", "steps", "rejoinAt", "answerFields", "effects"],
@@ -892,7 +1017,7 @@
     },
     "step": {
       "title": "Step",
-      "description": "One step of a flow, compiled (SPEC-master 4; 02-contracts K-01 'each step (id, section, who, to, via, title, needs, gives, tells) with its card'). Authoring fields are left out (MC R2: src, prop).",
+      "description": "One step of a flow, compiled (SPEC-master 4; 02-contracts K-01 'each step (id, section, who, to, via, title, needs, gives, tells) with its card'). Authoring fields are left out (MC R2: src, prop). A step that fails a lint rule says so in lint, and the schema refuses a step that shows a failure its lint does not list (arch 12 line 592; T-010).",
       "type": "object",
       "properties": {
         "id": {
@@ -1084,10 +1209,482 @@
               "type": "null"
             }
           ]
+        },
+        "judgmentRules": {
+          "description": "The judgment rules the step's lines, card and branches point to ('judgment rule N' pointers, SPEC-master 5k), by number, each resolving to rule N of the flow's judgmentRules (MC R6). A number outside 1 to 67 is refused (02-contracts K-01, refuse-judgment-rule-out-of-range).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/judgmentRuleNumber"
+          },
+          "uniqueItems": true
+        },
+        "walk": {
+          "description": "The steps the lint's loop rule followed from this step, in order, through relative t references and flow-switch ends, up to a fixed time or an end (Q-39 default: 'a cycle through relative t references or flow-switch ends'; SPEC-master 5g: a relative time must 'never loop'; arch 03 line 191: 'The compiler rejects loops'). A step that comes back makes the walk a loop, and the step fails the lint rule loop. Left out when the step has no relative time and no flow switch.",
+          "type": "array",
+          "items": {
+            "description": "One step on the walk (Q-39; SPEC-master 5g).",
+            "$ref": "#/$defs/stepId"
+          }
+        },
+        "lint": {
+          "description": "The lint rules this step fails, each once; empty when it passes (arch 12 line 592: 'The lint fails a step when ...'). A journey with a failing step does not ship (arch 12 line 592; Q-17), and the manifest's lint summary counts these. The schema refuses a step whose own fields show a failure of no-safe-default-or-clock, choice-without-definition, lookup-without-field, loop, guard-keyword-button, unknown-slot or judgment-rule-out-of-range that this list does not name; the other failures (a lookup source missing on some path, a loop across steps, the record's own lint) are the compiler's to find (C-065 to C-070).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lintRule"
+          },
+          "uniqueItems": true
         }
       },
-      "required": ["id", "section", "lines", "who", "via", "title", "does", "pageTypes", "next"],
-      "additionalProperties": false
+      "required": ["id", "section", "lines", "who", "via", "title", "does", "pageTypes", "next", "lint"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "say": {
+          "description": "With messages: a guard-keyword button needs guard-keyword-button in lint (arch 12 line 592; Q-14), and an unknown slot needs unknown-slot (02-contracts K-01).",
+          "if": {
+            "type": "object",
+            "required": ["say"],
+            "properties": {
+              "say": {
+                "$ref": "#/$defs/messagesWithKeywordButton"
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names guard-keyword-button (arch 12 line 592; Q-14).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule guard-keyword-button (arch 12 line 592; Q-14).",
+                  "const": "guard-keyword-button"
+                }
+              }
+            },
+            "if": {
+              "type": "object",
+              "required": ["say"],
+              "properties": {
+                "say": {
+                  "$ref": "#/$defs/messagesWithUnknownSlot"
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                    "const": "unknown-slot"
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "type": "object",
+              "required": ["say"],
+              "properties": {
+                "say": {
+                  "$ref": "#/$defs/messagesWithUnknownSlot"
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                    "const": "unknown-slot"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "vary": {
+          "description": "With variants: the same two checks on each variant's say and addSay (SPEC-master 5f; arch 12 line 592; 02-contracts K-01).",
+          "if": {
+            "type": "object",
+            "required": ["vary"],
+            "properties": {
+              "vary": {
+                "description": "Some variant of the step shows a guard-keyword button (arch 12 line 592) (SPEC-master 5 item 1, 5f: say and addSay).",
+                "type": "object",
+                "not": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "description": "A variant whose say or addSay shows a guard-keyword button (arch 12 line 592) (SPEC-master 5f).",
+                    "not": {
+                      "type": "object",
+                      "anyOf": [
+                        {
+                          "required": ["say"],
+                          "properties": {
+                            "say": {
+                              "$ref": "#/$defs/messagesWithKeywordButton"
+                            }
+                          }
+                        },
+                        {
+                          "required": ["addSay"],
+                          "properties": {
+                            "addSay": {
+                              "$ref": "#/$defs/messagesWithKeywordButton"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names guard-keyword-button (arch 12 line 592; Q-14).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule guard-keyword-button (arch 12 line 592; Q-14).",
+                  "const": "guard-keyword-button"
+                }
+              }
+            },
+            "if": {
+              "type": "object",
+              "required": ["vary"],
+              "properties": {
+                "vary": {
+                  "description": "Some variant of the step shows an unknown slot (02-contracts K-01) (SPEC-master 5 item 1, 5f: say and addSay).",
+                  "type": "object",
+                  "not": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "description": "A variant whose say or addSay shows an unknown slot (02-contracts K-01) (SPEC-master 5f).",
+                      "not": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": ["say"],
+                            "properties": {
+                              "say": {
+                                "$ref": "#/$defs/messagesWithUnknownSlot"
+                              }
+                            }
+                          },
+                          {
+                            "required": ["addSay"],
+                            "properties": {
+                              "addSay": {
+                                "$ref": "#/$defs/messagesWithUnknownSlot"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                    "const": "unknown-slot"
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "type": "object",
+              "required": ["vary"],
+              "properties": {
+                "vary": {
+                  "description": "Some variant of the step shows an unknown slot (02-contracts K-01) (SPEC-master 5 item 1, 5f: say and addSay).",
+                  "type": "object",
+                  "not": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "description": "A variant whose say or addSay shows an unknown slot (02-contracts K-01) (SPEC-master 5f).",
+                      "not": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": ["say"],
+                            "properties": {
+                              "say": {
+                                "$ref": "#/$defs/messagesWithUnknownSlot"
+                              }
+                            }
+                          },
+                          {
+                            "required": ["addSay"],
+                            "properties": {
+                              "addSay": {
+                                "$ref": "#/$defs/messagesWithUnknownSlot"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                    "const": "unknown-slot"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "card": {
+          "description": "With a card: no safe default and no clock needs no-safe-default-or-clock in lint; a branch with no definition needs choice-without-definition (arch 12 line 592).",
+          "if": {
+            "type": "object",
+            "required": ["card"],
+            "properties": {
+              "card": {
+                "description": "A card with neither a safe default nor a clock (arch 12 line 592; arch 03 line 181).",
+                "type": "object",
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": ["safeDefault"]
+                    },
+                    {
+                      "required": ["clock"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names no-safe-default-or-clock (arch 12 line 592).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule no-safe-default-or-clock (arch 12 line 592).",
+                  "const": "no-safe-default-or-clock"
+                }
+              }
+            },
+            "if": {
+              "type": "object",
+              "required": ["card"],
+              "properties": {
+                "card": {
+                  "description": "A card with a branch that has no definition (arch 12 line 592).",
+                  "type": "object",
+                  "required": ["means"],
+                  "properties": {
+                    "means": {
+                      "description": "Its definitions, one per branch (arch 12 line 592).",
+                      "type": "array",
+                      "contains": {
+                        "description": "A branch with no definition (arch 12 line 592).",
+                        "type": "object",
+                        "required": ["from"],
+                        "properties": {
+                          "from": {
+                            "description": "none: no Means line and no first sentence (arch 12 line 592).",
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names choice-without-definition (arch 12 line 592).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule choice-without-definition (arch 12 line 592).",
+                    "const": "choice-without-definition"
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "type": "object",
+              "required": ["card"],
+              "properties": {
+                "card": {
+                  "description": "A card with a branch that has no definition (arch 12 line 592).",
+                  "type": "object",
+                  "required": ["means"],
+                  "properties": {
+                    "means": {
+                      "description": "Its definitions, one per branch (arch 12 line 592).",
+                      "type": "array",
+                      "contains": {
+                        "description": "A branch with no definition (arch 12 line 592).",
+                        "type": "object",
+                        "required": ["from"],
+                        "properties": {
+                          "from": {
+                            "description": "none: no Means line and no first sentence (arch 12 line 592).",
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names choice-without-definition (arch 12 line 592).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule choice-without-definition (arch 12 line 592).",
+                    "const": "choice-without-definition"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "branches": {
+          "description": "With branches: a lookup that does not name its field needs lookup-without-field in lint (arch 12 line 592; Q-39).",
+          "if": {
+            "type": "object",
+            "required": ["branches"],
+            "properties": {
+              "branches": {
+                "description": "The split's branches (SPEC-master 4).",
+                "type": "array",
+                "contains": {
+                  "description": "A lookup branch that does not name the field it reads (arch 12 line 592; Q-39).",
+                  "type": "object",
+                  "required": ["tag"],
+                  "properties": {
+                    "tag": {
+                      "description": "lookup: code settles it (arch 03 line 161).",
+                      "const": "lookup"
+                    }
+                  },
+                  "not": {
+                    "required": ["reads"]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names lookup-without-field (arch 12 line 592; Q-39).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule lookup-without-field (arch 12 line 592; Q-39).",
+                  "const": "lookup-without-field"
+                }
+              }
+            }
+          }
+        },
+        "walk": {
+          "description": "With a walk: a walk that comes back to a step needs loop in lint (arch 12 line 592; Q-39; arch 03 line 191).",
+          "if": {
+            "type": "object",
+            "required": ["walk"],
+            "properties": {
+              "walk": {
+                "description": "A walk that comes back to a step (Q-39; SPEC-master 5g; arch 03 line 191).",
+                "type": "array",
+                "not": {
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names loop (arch 12 line 592; Q-39; arch 03 line 191).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule loop (arch 12 line 592; Q-39; arch 03 line 191).",
+                  "const": "loop"
+                }
+              }
+            }
+          }
+        },
+        "more": {
+          "description": "With more lines: a 'judgment rule N' outside 1 to 67 needs judgment-rule-out-of-range in lint (MC R6).",
+          "if": {
+            "type": "object",
+            "required": ["more"],
+            "properties": {
+              "more": {
+                "description": "The step's more lines (SPEC-master 4, 5k).",
+                "type": "array",
+                "contains": {
+                  "description": "A 'judgment rule N' pointer with N outside 1 to 67 (MC R6; SPEC-master 5k).",
+                  "type": "string",
+                  "pattern": "[Jj]udgment rules? (0|6[89]|[7-9][0-9]|[1-9][0-9]{2,})([^0-9]|$)"
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names judgment-rule-out-of-range (MC R6).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule judgment-rule-out-of-range (MC R6).",
+                  "const": "judgment-rule-out-of-range"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "amountValues": {
       "title": "AmountValues",
@@ -1126,6 +1723,7 @@
       "description": "Amount rows by path pattern: '*', or price|before|after with * for any, the most specific row winning (SPEC-master 5h: 'rows like list|card|counter, list|*|*, *'; overlay-core.js line 1810).",
       "type": "object",
       "propertyNames": {
+        "description": "A path pattern: '*', or price|before|after with * for any (SPEC-master 5h; overlay-core.js line 1810).",
         "type": "string",
         "pattern": "^(\\*|(list|photos|visit|\\*)\\|(none|card|deposit|full|\\*)\\|(none|counter|bill|card|own|\\*))$"
       },
@@ -1194,6 +1792,7 @@
       "description": "Rows by named slot, such as pay.price (master-A.json and master-B.json record.slots; a trade's slots.<flow>, laid before the master's rows by overlay-core.js profRecord).",
       "type": "object",
       "propertyNames": {
+        "description": "A named slot such as pay.price (master-A.json and master-B.json record.slots; overlay-core.js RECORD_SLOT_RE line 745).",
         "type": "string",
         "pattern": "^[a-z]+\\.[a-z]+$"
       },
@@ -1354,7 +1953,7 @@
           "$ref": "#/$defs/homes"
         },
         "slots": {
-          "description": "The 16 named slots (record.slots; K-03: pay.asks, pay.price, pay.took, pay.left, pay.cancel, pay.late, pay.noshow, pay.back, pay.after, pay.staff, pay.failed, clock.pay, two.count, reach.way, reach.to, who.ok).",
+          "description": "The 16 named slots (master-A.json and master-B.json record.slots; K-03: pay.asks, pay.price, pay.took, pay.left, pay.cancel, pay.late, pay.noshow, pay.back, pay.after, pay.staff, pay.failed, clock.pay, two.count, reach.way, reach.to, who.ok).",
           "type": "object",
           "properties": {
             "pay.asks": {
@@ -1892,6 +2491,49 @@
       "required": ["number", "text", "step"],
       "additionalProperties": false
     },
+    "judgmentRuleNumber": {
+      "title": "JudgmentRuleNumber",
+      "description": "A judgment rule's number, 1 to 67: 'Judgment rule N' is rule N of the 67 numbered rules, 1 to 59 in S13-23 to S13-29, 60 to 65 in S13-53 and 66 to 67 in S13-54 (MC R6; DECISIONS.md D2, checked Nov 5 2026). A number outside 1 to 67 is refused (02-contracts K-01).",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 67
+    },
+    "judgmentRules": {
+      "title": "JudgmentRules",
+      "description": "The 67 numbered judgment rules, a field of the bundle, by number, each with its text and the step it comes from (MC R6; 02-contracts K-01 'The judgment rules'). That each number 1 to 67 is there once is a contract-test check (02-contracts K-01 'Contract test').",
+      "type": "object",
+      "properties": {
+        "rules": {
+          "description": "The rules in number order, 1 to 67 (MC R6; DECISIONS.md D2).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/judgmentRule"
+          },
+          "minItems": 67,
+          "maxItems": 67
+        }
+      },
+      "required": ["rules"],
+      "additionalProperties": false
+    },
+    "anytimeTable": {
+      "title": "AnytimeTable",
+      "description": "The any-time table of one flow: the 21 rows, each once, in the order they run within one turn (arch 01 line 75; arch 03 lines 169 to 177; handlers per Q-40's default).",
+      "type": "object",
+      "properties": {
+        "rows": {
+          "description": "The 21 rows (arch 03 line 171), each once; that each row name is there once is a contract-test check.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/anytimeRow"
+          },
+          "minItems": 21,
+          "maxItems": 21
+        }
+      },
+      "required": ["rows"],
+      "additionalProperties": false
+    },
     "routingTables": {
       "title": "RoutingTables",
       "description": "The routing tables of one flow: hubs and doors, the any-time table, the always-on rules as the cached prefix, the homes and the judgment rules (02-contracts K-01 'Routing tables' and 'The judgment rules'; arch 03 lines 157 to 177).",
@@ -1962,13 +2604,7 @@
           "additionalProperties": false
         },
         "anytime": {
-          "description": "The 21 any-time rows, each once (arch 01 line 75; arch 03 line 171).",
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/anytimeRow"
-          },
-          "minItems": 21,
-          "maxItems": 21
+          "$ref": "#/$defs/anytimeTable"
         },
         "alwaysOn": {
           "description": "The always-on rules, given to the model as the cached prefix (arch 03 line 181: 'the 50 rules as a cached prefix (80,000 characters, about 20,000 tokens)'; arch 10 line 536: prompt caching covers the rules).",
@@ -1997,13 +2633,7 @@
           "$ref": "#/$defs/homes"
         },
         "judgmentRules": {
-          "description": "The 67 judgment rules by number, each once (MC R6; contract test: rules 1 to 67 once each).",
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/judgmentRule"
-          },
-          "minItems": 67,
-          "maxItems": 67
+          "$ref": "#/$defs/judgmentRules"
         }
       },
       "required": ["hubs", "doors", "anytime", "alwaysOn", "homes", "judgmentRules"],
@@ -2268,6 +2898,7 @@
           "description": "The trade's own labels for money choices, by question and value (money.<flow>.labels; overlay-core.js line 1808).",
           "type": "object",
           "propertyNames": {
+            "description": "A money question: price, before or after (engine/work/prof/<id>.json money.<flow>.labels; overlay-core.js line 1808).",
             "type": "string",
             "enum": ["price", "before", "after"]
           },
@@ -2644,6 +3275,339 @@
       "required": ["kind", "path", "sha256"],
       "additionalProperties": false
     },
+    "keywords": {
+      "title": "Keywords",
+      "description": "The guard's keyword list, which the guard (C-051), the lint (C-065 to C-070) and the message checks (C-092) all read (02-contracts K-01 'Shared lists'; arch 02 line 115). A text that is only one of these words, trimmed and in any case, is acted on by code alone.",
+      "type": "object",
+      "properties": {
+        "start": {
+          "description": "START: turns texts back on (arch 02 line 115; RULES 7.5).",
+          "type": "string",
+          "const": "START"
+        },
+        "help": {
+          "description": "HELP: gets the business's name and number and how to stop (arch 02 line 115; S13-32; RULES 7.6).",
+          "type": "string",
+          "const": "HELP"
+        },
+        "optOut": {
+          "description": "msgtext.js's 16 opt-out words, as written there (msgtext.js OPTOUT, line 29; arch 02 line 115): STOP, STOPALL, CANCEL, END, QUIT, UNSUBSCRIBE, REVOKE, OPTOUT, OPT OUT, CANCELAR, PARA, PARAR, ALTO, BASTA, DETENER, FIN.",
+          "type": "array",
+          "items": {
+            "description": "One opt-out word (msgtext.js OPTOUT, line 29).",
+            "type": "string",
+            "enum": [
+              "STOP",
+              "STOPALL",
+              "CANCEL",
+              "END",
+              "QUIT",
+              "UNSUBSCRIBE",
+              "REVOKE",
+              "OPTOUT",
+              "OPT OUT",
+              "CANCELAR",
+              "PARA",
+              "PARAR",
+              "ALTO",
+              "BASTA",
+              "DETENER",
+              "FIN"
+            ]
+          },
+          "minItems": 16,
+          "maxItems": 16,
+          "uniqueItems": true
+        },
+        "flagsVisit": {
+          "description": "The opt-out words that also flag the visit: CANCEL and CANCELAR (arch 02 line 115: 'CANCEL or CANCELAR also flags the visit'; RULES 7.4; S13-28 rule 46).",
+          "type": "array",
+          "items": {
+            "description": "One word that also flags the visit (arch 02 line 115).",
+            "type": "string",
+            "enum": ["CANCEL", "CANCELAR"]
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": ["start", "help", "optOut", "flagsVisit"],
+      "additionalProperties": false
+    },
+    "fixedLine": {
+      "title": "FixedLine",
+      "description": "One fixed line: added by code, word for word as its source writes it, outside the composer's Shape and Length counts (arch 07 line 361; BP rule 3; C-089 fixed-line inserter).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The line's name, such as optOutLine or stopLaterReply (02-contracts K-01 'Shared lists': the fixed lines).",
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9]*$"
+        },
+        "text": {
+          "description": "The words, exactly as the source writes them; <business> is the one placeholder, filled with the business's name (arch 07 line 361). null while the words wait for Jay (Q-01: the stop replies' drafted words go to Jay on a tier 3 card before any release).",
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "."
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lang": {
+          "description": "The line's language, as a two-letter code such as en (arch 07 line 361: 'in section 06's language'; arch 06: safety lines in each checked language).",
+          "type": "string",
+          "pattern": "^[a-z]{2}$"
+        },
+        "status": {
+          "description": "asWritten: the source's own words, used as they are; pendingJay: no final words yet, so text is null and the line waits for Jay (Q-01 default).",
+          "type": "string",
+          "enum": ["asWritten", "pendingJay"]
+        },
+        "use": {
+          "description": "Where code adds it, in plain words (arch 07 line 361; the source named in source).",
+          "type": "string"
+        },
+        "source": {
+          "description": "Where the words come from: a RULES section, a step id, an architecture line or a question row (02-contracts section 2 item 4).",
+          "type": "string",
+          "pattern": "."
+        }
+      },
+      "required": ["id", "text", "lang", "status", "source"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "status": {
+            "description": "asWritten: the source's own words (arch 07 line 361).",
+            "const": "asWritten"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "text": {
+            "description": "A line used as written has its words (arch 07 line 361; BP rule 3).",
+            "type": "string"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "text": {
+            "description": "A line that waits for Jay has none yet (Q-01).",
+            "type": "null"
+          }
+        }
+      }
+    },
+    "fixedLines": {
+      "title": "FixedLines",
+      "description": "The fixed lines word for word (02-contracts K-01 'Shared lists'; arch 07 line 361; BP rule 3): the guard's START, HELP and STOP replies in C1's every-business meaning (words per Q-01), the safety lines, step 7's last line (arch 02 line 123), the outage line (arch 11 lines 564 and 566), the opener and the opt-out line. That every id is there once is a contract-test check.",
+      "type": "object",
+      "properties": {
+        "lines": {
+          "description": "The lines (arch 07 line 361).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fixedLine"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["lines"],
+      "additionalProperties": false
+    },
+    "keyMapEntry": {
+      "title": "KeyMapEntry",
+      "description": "How one top key of a trade file reaches the compiled overlay (arch 12 line 592: 'map the 2,344 plug-in keys, or mark them guidance only'; MC R3: trade files are read by top key only; Q-39 default).",
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "The trade file's top key, such as pf.facts, pf.services or money (SPEC-prof 3; MC R3).",
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_.]*$"
+        },
+        "as": {
+          "description": "typed: code reads it by name into a typed field (MC R3: pf.facts, pf.switches, pf.settings, money.<flow>); textBlock: stored whole as one text block for the AI, its sub-keys guidance only (MC R3; Q-39 default; FRONTEND-SPEC.md line 565); ops: compiled into the overlay's ops, renames or slot rows (SPEC-prof 3); leftOut: authoring fields (MC R2) or the sample cast and story (MC C6).",
+          "type": "string",
+          "enum": ["typed", "textBlock", "ops", "leftOut"]
+        },
+        "to": {
+          "description": "Where it lands in a tradeOverlay, as a path such as pluginText/pf.license or flows/<flow>/settings; left out for leftOut (SPEC-prof 3; this schema's $defs/tradeOverlay).",
+          "type": "string",
+          "pattern": "."
+        },
+        "why": {
+          "description": "Its source (MC R2, R3, C6; SPEC-prof 3; Q-39).",
+          "type": "string",
+          "pattern": "."
+        }
+      },
+      "required": ["key", "as", "why"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "as": {
+            "description": "leftOut: authoring fields or the sample cast and story (MC R2, C6).",
+            "const": "leftOut"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": ["to"]
+        }
+      },
+      "else": {
+        "required": ["to"]
+      }
+    },
+    "keyMap": {
+      "title": "KeyMap",
+      "description": "The plug-in key map: each trade-file top key and where it goes (02-contracts K-01 'Shared lists'; arch 12 line 592; Q-39 default: the 11 free-text pf keys are mapped as whole text blocks, their sub-keys guidance only; MC R3).",
+      "type": "object",
+      "properties": {
+        "keys": {
+          "description": "One entry per top key (MC R3: 'Read trade files by top key only').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/keyMapEntry"
+          },
+          "minItems": 1
+        },
+        "subKeys": {
+          "description": "guidance: no sub-key under a textBlock key is read by code; it is guidance in the text the AI is given (Q-39 default; MC R3: 'sub-keys differ from file to file').",
+          "type": "string",
+          "const": "guidance"
+        }
+      },
+      "required": ["keys", "subKeys"],
+      "additionalProperties": false
+    },
+    "outOfScopeTarget": {
+      "title": "OutOfScopeTarget",
+      "description": "One thing an out-of-scope marker makes unreachable (01-inventory.md group 11; C-149 unreachability tests).",
+      "type": "object",
+      "properties": {
+        "at": {
+          "description": "The step (01-inventory.md group 11 rows name each step).",
+          "$ref": "#/$defs/stepId"
+        },
+        "unreachable": {
+          "description": "step: the whole step; branch: one branch of it, by label; line: one line of it, word for word; firstText: any text Rosie would send first on that step or branch, to someone who has not texted Rosie (MC C9: 'Rosie never writes first, by iMessage or SMS').",
+          "type": "string",
+          "enum": ["step", "branch", "line", "firstText"]
+        },
+        "branch": {
+          "description": "The branch label, word for word (SPEC-master 5d: overlays match labels exactly).",
+          "type": "string",
+          "pattern": "."
+        },
+        "line": {
+          "description": "The line, word for word as the master writes it: a say text or a more line (master-A.json and master-B.json; 01-inventory.md group 11).",
+          "type": "string",
+          "pattern": "."
+        }
+      },
+      "required": ["at", "unreachable"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "unreachable": {
+            "description": "branch: one branch, named by label (01-inventory.md group 11).",
+            "const": "branch"
+          }
+        }
+      },
+      "then": {
+        "required": ["branch"]
+      },
+      "else": {
+        "if": {
+          "properties": {
+            "unreachable": {
+              "description": "line: one line, word for word (01-inventory.md group 11).",
+              "const": "line"
+            }
+          }
+        },
+        "then": {
+          "required": ["line"]
+        }
+      }
+    },
+    "outOfScopeMarker": {
+      "title": "OutOfScopeMarker",
+      "description": "An out-of-scope marker: one 01-inventory.md group 11 row, C-222 to C-254, with what it makes unreachable, so C-149's unreachability tests check each one (02-contracts K-01 'Shared lists' and 'Contract test').",
+      "type": "object",
+      "properties": {
+        "component": {
+          "description": "The group 11 component id, C-222 to C-254 (01-inventory.md group 11).",
+          "type": "string",
+          "pattern": "^C-(22[2-9]|2[34][0-9]|25[0-4])$"
+        },
+        "title": {
+          "description": "What is out, in the inventory's words (01-inventory.md group 11).",
+          "type": "string",
+          "pattern": "."
+        },
+        "targets": {
+          "description": "What it makes unreachable (01-inventory.md group 11).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/outOfScopeTarget"
+          },
+          "minItems": 1
+        },
+        "why": {
+          "description": "Its source: a Master Corrections item, a decision or a question row (01-inventory.md group 11).",
+          "type": "string",
+          "pattern": "."
+        }
+      },
+      "required": ["component", "title", "targets", "why"],
+      "additionalProperties": false
+    },
+    "outOfScope": {
+      "title": "OutOfScope",
+      "description": "The out-of-scope markers each unreachability test checks (02-contracts K-01 'Shared lists'; 01-inventory.md group 11, C-222 to C-254). That every group 11 id has a marker is a contract-test check.",
+      "type": "object",
+      "properties": {
+        "markers": {
+          "description": "The markers (01-inventory.md group 11).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/outOfScopeMarker"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["markers"],
+      "additionalProperties": false
+    },
+    "sharedLists": {
+      "title": "SharedLists",
+      "description": "The shared lists, so the guard, the lint and the message checks read one list (02-contracts K-01 'Shared lists'): the keywords, the fixed lines, the plug-in key map and the out-of-scope markers. They ride in the manifest, which a turn reads first (arch 10 line 536).",
+      "type": "object",
+      "properties": {
+        "keywords": {
+          "$ref": "#/$defs/keywords"
+        },
+        "fixedLines": {
+          "$ref": "#/$defs/fixedLines"
+        },
+        "keyMap": {
+          "$ref": "#/$defs/keyMap"
+        },
+        "outOfScope": {
+          "$ref": "#/$defs/outOfScope"
+        }
+      },
+      "required": ["keywords", "fixedLines", "keyMap", "outOfScope"],
+      "additionalProperties": false
+    },
     "prompt": {
       "title": "Prompt",
       "description": "One prompt a turn runs on, shipped inside the bundle (arch 01 line 87; K-03: 'The prompt texts themselves are the AI engineer's (C-119) and ship inside the bundle').",
@@ -2691,7 +3655,7 @@
     },
     "lintRule": {
       "title": "LintRule",
-      "description": "A lint rule the compiler runs (arch 12 line 592: a question without a safe default or a clock, a choice without a definition, a lookup without the field it reads, a walk that can loop, a button whose whole text is a guard keyword; K-03's slot list: an unknown slot; MC R6: a judgment rule outside 1 to 67; the record's own lint tables). What the lookup and loop rules test: Q-39's default.",
+      "description": "A lint rule the compiler runs (C-065 to C-070): no-safe-default-or-clock, choice-without-definition, lookup-without-field, loop and guard-keyword-button are arch 12 line 592's five ('The lint fails a step when a question lacks a safe default or a clock, ... when a choice lacks a definition, when a lookup lacks the field it reads, when a walk can loop, or when a button's whole text is a guard keyword'); unknown-slot is a slot outside the bundle's slot list (02-contracts K-01); judgment-rule-out-of-range is a 'judgment rule N' outside 1 to 67 (MC R6); record-lint is the record's own lint tables (master-A.json and master-B.json record.lint). What the lookup and loop rules test: Q-39's default.",
       "type": "string",
       "enum": [
         "no-safe-default-or-clock",
@@ -2753,7 +3717,7 @@
           "maximum": 12
         },
         "ships": {
-          "description": "true only when none of its steps fails the lint (arch 12 line 592; Q-17).",
+          "description": "true only when none of its steps fails the lint; a journey that ships lists no failing step (arch 12 line 592: 'A journey with a failing step does not ship'; Q-17).",
           "type": "boolean"
         },
         "failingSteps": {
@@ -2765,6 +3729,59 @@
         }
       },
       "required": ["journey", "ships", "failingSteps"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "ships": {
+            "description": "A journey that ships (arch 12 line 592; Q-17).",
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "failingSteps": {
+            "description": "It has no failing step (arch 12 line 592: 'A journey with a failing step does not ship').",
+            "type": "array",
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    "lintReport": {
+      "title": "LintReport",
+      "description": "The lint summary: each rule run with its count of failing steps, and every failing step (02-contracts K-01 'the lint summary'; arch 12 line 592).",
+      "type": "object",
+      "properties": {
+        "rules": {
+          "description": "Each rule run, with its count of failing steps (arch 12 line 592).",
+          "type": "array",
+          "items": {
+            "description": "One lint rule run and its count of failing steps (arch 12 line 592; 02-contracts K-01 'the lint summary').",
+            "type": "object",
+            "properties": {
+              "rule": {
+                "$ref": "#/$defs/lintRule"
+              },
+              "failures": {
+                "description": "How many steps fail it (arch 12 line 592).",
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": ["rule", "failures"],
+            "additionalProperties": false
+          }
+        },
+        "failures": {
+          "description": "Every failing step (arch 12 line 592).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lintFailure"
+          }
+        }
+      },
+      "required": ["rules", "failures"],
       "additionalProperties": false
     },
     "manifest": {
@@ -2888,39 +3905,7 @@
           "additionalProperties": false
         },
         "lint": {
-          "description": "The lint summary (02-contracts K-01 'the lint summary'; arch 12 line 592).",
-          "type": "object",
-          "properties": {
-            "rules": {
-              "description": "Each rule run, with its count of failing steps (arch 12 line 592).",
-              "type": "array",
-              "items": {
-                "description": "One lint rule run and its count of failing steps (arch 12 line 592; 02-contracts K-01 'the lint summary').",
-                "type": "object",
-                "properties": {
-                  "rule": {
-                    "$ref": "#/$defs/lintRule"
-                  },
-                  "failures": {
-                    "description": "How many steps fail it (arch 12 line 592).",
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                },
-                "required": ["rule", "failures"],
-                "additionalProperties": false
-              }
-            },
-            "failures": {
-              "description": "Every failing step (arch 12 line 592).",
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/lintFailure"
-              }
-            }
-          },
-          "required": ["rules", "failures"],
-          "additionalProperties": false
+          "$ref": "#/$defs/lintReport"
         },
         "journeys": {
           "description": "Which journeys may ship (02-contracts K-01; arch 12 line 592; Q-17).",
@@ -2948,6 +3933,13 @@
           },
           "required": ["manifestKey", "values"],
           "additionalProperties": false
+        },
+        "lists": {
+          "$ref": "#/$defs/sharedLists"
+        },
+        "partial": {
+          "description": "true: the bundle holds only some steps, as bundle v0 (S1-01 and S1-02, D-007) and the sample bundles do; its routing tables still name the master's step ids, and a step it does not hold is not reachable. Left out: it holds every step of each flow it carries (02-contracts K-01 'Fixtures').",
+          "type": "boolean"
         }
       },
       "required": [
@@ -2961,7 +3953,8 @@
         "policy",
         "lint",
         "journeys",
-        "storage"
+        "storage",
+        "lists"
       ],
       "additionalProperties": false
     }

@@ -1,0 +1,1541 @@
+{
+  "contract": "bundle.v1",
+  "trade": {
+    "id": "barber",
+    "name": "Barber",
+    "style": "Chair",
+    "pattern": "chair"
+  },
+  "facts": [
+    "children",
+    "documents",
+    "extrawork",
+    "groups",
+    "photos"
+  ],
+  "pluginText": {
+    "pf.license": "{\"need\":\"always: barbering is licensed where the state's rules require it\",\"who\":\"both: the shop holds a barbershop license, and each barber holds their own barber license\",\"ask\":\"the shop's license number; each barber's number in their invite reply (or the owner sends it)\",\"check\":\"none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie\",\"blocks\":\"nothing waits on a license (D96): the business and each person go live once set up and the owner says yes; a job the owner says needs a license they don't have isn't booked\",\"away\":\"house calls and event work only where the state's rules allow barbering away from a licensed shop; some states allow it only for some services, or only for barbers with more years, a background check or insurance (switches from the state form)\",\"mobile\":\"a mobile barbering company gives the license the state's form names for work away from a shop, where one exists\",\"renewals\":\"optional reminders the owner sets; a license the owner says has lapsed pauses that person's new bookings for that work (the owner's word, never a check)\",\"insurance\":\"liability insurance where the state's form asks for it, and proof of it when a venue asks\",\"booth\":\"a booth renter is their own business: their own barber license, a renter's license where the state issues one, their own prices, rules, calendar and Stripe\",\"skinCare\":\"skin care (an esthetician's work: facials, brows, waxing) is its own kind of work, with its own license where the state asks\"}",
+    "pf.services": "{\"shape\":\"set services with a chosen barber, booked in 15-minute steps; quick services fill the short gaps they fit\",\"examples\":\"the example businesses' own prices (Lee's Barbershop and Lee Mobile Barbers), not a standard\",\"list\":[{\"name\":\"Haircut\",\"price\":\"$35\",\"kind\":\"one price\",\"length\":\"30 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"},{\"name\":\"Skin fade\",\"price\":\"$40\",\"kind\":\"one price\",\"length\":\"45 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"},{\"name\":\"Beard trim\",\"price\":\"$20\",\"kind\":\"one price\",\"length\":\"15 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\",\"note\":\"a quick service: fills 15-minute gaps, bookable up to 30 minutes ahead\"},{\"name\":\"Line-up\",\"price\":\"$15\",\"kind\":\"one price\",\"length\":\"15 min\",\"where\":\"at the shop\",\"before\":\"nothing\",\"after\":\"at the chair\",\"note\":\"a quick service, like the beard trim\"},{\"name\":\"Kids cut (12 and under)\",\"price\":\"$25\",\"kind\":\"one price\",\"length\":\"30 min\",\"where\":\"at the shop\",\"before\":\"a card saved\",\"after\":\"at the chair\",\"note\":\"a parent or guardian books it and stays\"},{\"name\":\"Signature cut and hot towel shave\",\"price\":\"$55\",\"kind\":\"one price\",\"length\":\"60 min\",\"where\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"at the chair\"},{\"name\":\"Groom's package (cut, shave, facial)\",\"price\":\"$140\",\"kind\":\"one price\",\"length\":\"2½ hours, one whole block\",\"where\":\"at the shop\",\"before\":\"a $40 deposit when booked\",\"after\":\"the $100 rest at the chair\"},{\"name\":\"Beard color (gray blending)\",\"price\":\"$25\",\"kind\":\"one price\",\"length\":\"20 min\",\"where\":\"at the shop only\",\"before\":\"a card saved\",\"after\":\"at the chair\",\"note\":\"a skin test at least 48 hours before; only barbers who do color\"},{\"name\":\"Skin test for beard color\",\"price\":\"free\",\"kind\":\"a first step\",\"length\":\"5 min\",\"where\":\"at the shop\",\"before\":\"nothing\",\"after\":\"nothing more\",\"note\":\"at least 48 hours before the color, often added after a cut\"},{\"name\":\"Home grooming visit (cut, beard trim, hot towel)\",\"price\":\"$179\",\"kind\":\"one price\",\"length\":\"60 min\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill, with a tip line\"},{\"name\":\"Travel fee (inside each home visit's price)\",\"price\":\"$89\",\"kind\":\"one price\",\"length\":\"part of each home visit's price\",\"where\":\"at the customer's place\",\"before\":\"nothing taken\",\"after\":\"counts toward the visit\"},{\"name\":\"Groom's cut at home\",\"price\":\"$150\",\"kind\":\"one price\",\"length\":\"45 min\",\"where\":\"at the customer's place\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\"},{\"name\":\"Wedding party grooming\",\"price\":\"quoted from the party's details (the example: 4 people, $640)\",\"kind\":\"quoted from the details first\",\"length\":\"about 35 minutes a person\",\"where\":\"at the customer's home or the venue\",\"before\":\"a 25% deposit when booked\",\"after\":\"the rest on the bill\",\"note\":\"a signed contract; Sam OKs quotes over $500\"},{\"name\":\"Office visit (cuts for up to 3 at a workplace)\",\"price\":\"$199\",\"kind\":\"one price\",\"length\":\"90 min\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Hair design (lines and patterns)\",\"price\":\"set at the visit; only the $89 travel fee is promised\",\"kind\":\"quoted at the visit\",\"length\":\"set at the visit\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Event hours (a barber on site at an event)\",\"price\":\"$120 an hour, 1-hour minimum ($140 with Andre)\",\"kind\":\"per hour\",\"length\":\"the hours booked\",\"where\":\"at the customer's place\",\"before\":\"added to the booking, and paid at the visit\",\"after\":\"on the bill\"}],\"capacity\":\"one barber per booking; a group or a wedding party is one booking with several people and one code; a group of 3 or more at the shop ties up 2 chairs\",\"skills\":\"cuts and fades, beard work, straight-razor shaves, kids cuts, beard color, house calls and events; color services offer only barbers who do color\",\"walkIns\":\"a line for the next free barber; booked customers go first, and walk-ins fill gaps of 30 minutes or more; some chairs or hours can be walk-in only\",\"away\":\"away from the shop: cuts, beard trims, hot towels and hair designs; no razor shaves or color unless the state's rules and Sam allow them\",\"fix\":\"a free fix-up within 7 days of a cut (the example shop's promise)\",\"online\":\"no: barbering is done in person\",\"nobodyHome\":\"never: the customer must be there\"}",
+    "pf.questions": "{\"beforeTimes\":[\"new or returning\",\"the service, and which barber (or the first free)\",\"anyone else in the group, and how many (a group of 3 or more at the shop asks Sam first)\",\"for a kids cut: the child's age\",\"for a house call or event: the kind of place, and the town or ZIP\",\"for a wedding party: how many people, what each wants, the date and the start time\"],\"afterTime\":[\"what's on top (a guard number) and the style\",\"the beard: line it up, trim it down, or none\",\"for a house call or event: parking, and a chair near an outlet with good light\"],\"securePage\":[\"18 or older (a parent books for a child)\",\"for beard color: ever reacted to hair dye\",\"a reference photo of the style\",\"any skin or scalp problem now, like a rash or a cut\"],\"whoMayBook\":\"an adult; a parent or guardian for anyone under 18, and a parent stays for a kids cut\"}",
+    "pf.safety": "{\"stop\":[{\"words\":\"a dye reaction happening now: face, lips or throat swelling, trouble breathing\",\"say\":\"Call 911 now. Rinse the dye off with plenty of water.\",\"booking\":\"no booking\"},{\"words\":\"a deep cut that won't stop bleeding\",\"say\":\"Press a clean cloth on it and call 911.\",\"booking\":\"no booking\"}],\"goOn\":[{\"words\":\"a rash, an open sore, an infection or lice on the scalp or face\",\"what\":\"no razor or color on it; the barber checks before starting; the visit goes on with what's safe, or moves with no fee\"},{\"words\":\"an itchy or red scalp or beard after a home dye, with no swelling\",\"what\":\"rinse with cool water and use no more dye; the barber checks the skin before any color, and a color waits for a skin test\"}],\"always\":\"the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking\"}",
+    "pf.first_steps": "{\"steps\":[{\"name\":\"Skin test for beard color (a small test for a reaction to hair dye)\",\"when\":\"at least 48 hours before beard or hair color, the time the dye's label sets\",\"who\":\"new color clients, and anyone whose last test has run out\",\"goodFor\":\"3 months (the example shop's rule), or until the dye changes\",\"result\":\"the barber checks the spot before mixing any color; redness or itching calls the color off, with no fee\"}],\"reaction\":\"a past reaction to hair dye: the booking waits for Sam's OK, and the skin test comes first\",\"prep\":\"for the reminder: bring a photo of the style if you have one; for a house call, a chair near an outlet and good light\",\"away\":\"none for house calls or events: color stays at the shop\"}",
+    "pf.visit": "{\"checkIn\":\"at the shop: the check-in code at the chair or the front desk; a walk-in gets a code when he's next; at a home or venue: the code from whoever will be there (the groom or the venue contact when a mobile is given for them)\",\"beforeWork\":\"the barber goes over the reference photo, the guard numbers and the beard first, and checks the skin before a razor or color\",\"changes\":\"anything added at the chair (a beard trim, a line-up) is priced and OK'd before it's done; booked customers go first, and a walk-in starts only if it fits before the next booking\",\"done\":\"the check-in code, or DONE from the barber; guard numbers, the style and any skin-test date go in the barber's notes for next time\"}",
+    "pf.money": "{\"before\":\"at the shop: a card saved for the $20 fee, and paid at the chair (the Groom's package takes a $40 deposit when booked); a home or office visit: a card saved for the $89 fee; a groom's cut at home is paid in full when booked; a wedding party: a 25% deposit when booked\",\"caps\":\"deposit cap: from the state form\",\"cancel\":\"free to cancel until 24 hours before (the owner's setting; many barbershops pick 2 hours for a cut)\",\"fees\":\"late cancel or no-show: $20 at the shop ($40 for the Groom's package); $89 for a home or office visit; a wedding party: the deposit may be kept, never more. Sam confirms each fee, never more than what was paid now or agreed; no card and no deposit, no fee\",\"repeat\":\"after 2 no-shows or late cancels with no card, the shop can ask that customer for a card to book (the owner's setting)\",\"refunds\":\"a full refund if the shop changes the plan, or a skin test rules color out\",\"tips\":\"on: at the chair (the reader or cash), or a tip line on the bill Rosie texts; tips go to the barber\",\"tax\":\"a tax line for products sold, where the state's rules require it\",\"fee2\":\"Rosfield's $2 applies\"}",
+    "pf.messages": "{\"never\":\"dye-reaction, skin-test and skin or scalp answers never go in a text or through the AI: only the secure page and the customer's record; the customer never hears why a barber is out\",\"photos\":\"a reference photo only on the secure page; the barber sees it by private link\",\"languages\":\"English and Spanish\",\"minors\":\"a minor's booking texts go to the parent or guardian\"}",
+    "pf.staff": "{\"licenses\":\"each barber's license per state; skin care where the state licenses it\",\"skills\":\"cuts, fades, beard work, razor shaves, kids cuts, beard color, house calls and events; only barbers who do color are offered for beard color\",\"supervision\":\"apprentices and students work only under a licensed barber, where the state's rules allow\",\"oks\":\"Sam OKs a group of 3 or more at the shop, a booking after a past dye reaction, and any wedding party quote over $500\",\"standIn\":\"a barber out: another barber who does that service, at the same time and price; the stand-in gets the cut notes\",\"away\":\"only barbers cleared for work away from the shop are offered for house calls and events\",\"booth\":\"a booth renter's bookings are their own, never sent to the shop's owner\"}",
+    "pf.rules": "{\"showLicense\":\"each barber's license and the shop's posted where the state's rules require it; the license number in texts where the state asks\",\"away\":\"barbering away from the shop only where the state allows it, and only for the services it allows (a switch from the state form)\",\"booth\":\"booth rental only where the state allows it; a renter's license or a written agreement where the state's rules require one\",\"receipt\":\"what a receipt must show, where the state's rules require it\",\"minors\":\"a parent's written OK for color on a minor, where the state's rules require it\",\"records\":\"skin-test dates and cut notes kept with the customer's record: 7 years, or longer where the state asks\",\"contracts\":\"a signed contract for wedding party work (the owner's setting), and where the state's rules require one above an amount\"}",
+    "pf.edges": "{\"lateArrival\":\"10 minutes' grace; 10 to 20 minutes late, a shorter cut in the time left or a later time; after 20 minutes it's a no-show, and the chair goes to walk-ins\",\"walkInLong\":\"a walk-in runs long: the next booked customer hears the new start at once, and may move with no fee\",\"standIn\":\"a barber out sick: another barber who does that service, at the same time and price, or new times with no fee\",\"skinTest\":\"a skin test not done in time: later times that keep the 48 hours, or the cut without color\",\"repeatNoShow\":\"after 2 no-shows or late cancels with no card, a card is needed to book (the owner's setting)\",\"group\":\"a group of 3 or more: one booking, chairs side by side, Sam's OK first, one check-in code\",\"weddingDay\":\"a wedding day can't move: a stand-in with the skill, or a full refund\",\"fix\":\"a free fix-up within 7 days of a cut (the example shop's promise)\",\"other\":\"all other edge cases the generic way\"}"
+  },
+  "flows": {
+    "A": {
+      "switches": {},
+      "settings": {
+        "arrive": "setstart",
+        "cutoff": "24 hours before"
+      },
+      "money": {
+        "main": "list|card|counter",
+        "combos": [
+          "list|card|counter",
+          "list|none|counter",
+          "list|deposit|counter"
+        ],
+        "examples": {
+          "list|card|counter": "The main story: a $35 haircut with Riley. A card is saved for the shop's $20 fee. Alex pays at the chair, tip included.",
+          "list|none|counter": "A $35 haircut. Nothing is taken: a YES books it. Alex pays at the chair.",
+          "list|deposit|counter": "The $140 Groom's package (2½ hours). Sam takes a $40 deposit now, and the $100 rest is paid at the chair."
+        },
+        "amounts": {
+          "list|*|*": {
+            "price": "$35",
+            "name": "Haircut"
+          },
+          "list|card|*": {
+            "fee": "$20",
+            "name": "Haircut"
+          },
+          "list|deposit|*": {
+            "price": "$140",
+            "deposit": "$40",
+            "rest": "$100",
+            "fee": "$40",
+            "name": "Groom's package"
+          }
+        },
+        "services": {
+          "a-beard": {
+            "flow": "A",
+            "name": "Beard trim",
+            "price": "list",
+            "before": "card",
+            "after": "counter",
+            "amounts": {
+              "price": "$20",
+              "fee": "$20"
+            }
+          }
+        }
+      },
+      "rename": [
+        [
+          "patch test",
+          "skin test"
+        ],
+        [
+          "patch test",
+          "skin test"
+        ],
+        [
+          "A water heater job",
+          "A groom at work"
+        ],
+        [
+          "Color correction",
+          "Beard color"
+        ],
+        [
+          "Color and cut",
+          "Beard color"
+        ],
+        [
+          "color correction",
+          "beard color"
+        ],
+        [
+          "1-year labor warranty: if there's a problem with the work, reply here.",
+          "Free fix-up for 7 days: if there's a problem with the cut, reply here."
+        ],
+        [
+          "1-year labor warranty",
+          "free fix-up for 7 days"
+        ],
+        [
+          "Sam named you their emergency contact.",
+          "Sam named you their safety contact."
+        ],
+        [
+          "Panel upgrade",
+          "Beard trim"
+        ],
+        [
+          "Why: many barbers, salons and groomers are licensed to their shop.",
+          "Why: many barbers and groomers are licensed to their shop."
+        ],
+        [
+          "barber, color and house calls",
+          "barber, beard color and house calls"
+        ],
+        [
+          "Every shop service, color and house calls",
+          "Every shop service, beard color and house calls"
+        ],
+        [
+          "Plumbing JP031552",
+          "Barber BR031552"
+        ],
+        [
+          "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+          "Some work takes urgent jobs sent now, like a lockout or a tow."
+        ],
+        [
+          "Plumbing takes jobs sent now. The shop takes none.",
+          "Neither company's barber work is sent now."
+        ],
+        [
+          "A plumber's example: water near outlets gets 'shut off the main valve'.",
+          "A barber's example: an itchy scalp after a box dye gets 'rinse it with cool water'."
+        ],
+        [
+          "Sam adds massage to Lee's Barbershop.",
+          "Sam adds skin care to Lee's Barbershop."
+        ],
+        [
+          "NEW massage",
+          "NEW skin care"
+        ],
+        [
+          "Massage for Lee's Barbershop: is it the same company?",
+          "Skin care for Lee's Barbershop: is it the same company?"
+        ],
+        [
+          "A booked window stays right when the clocks change",
+          "A booked time stays right when the clocks change"
+        ],
+        [
+          "1 color quote",
+          "1 wedding party quote"
+        ],
+        [
+          "A barbershop's plug-in adds no danger words of its own.",
+          "The barber plug-in adds two: a dye reaction happening now, and a cut that won't stop bleeding."
+        ],
+        [
+          "A barbershop has none, so nothing is sent here.",
+          "Alex's haircut needs none, so nothing is sent here."
+        ],
+        [
+          "A haircut could mean a salon or a barbershop.",
+          "A facial could mean a barbershop or a skin care studio."
+        ],
+        [
+          "Color always stays with Riley.",
+          "Beard color always stays with Riley."
+        ],
+        [
+          "a color and cut",
+          "a cut and beard color"
+        ],
+        [
+          "color and cut",
+          "cut and beard color"
+        ],
+        [
+          "Any warranty the plug-in sets comes first, like a year on a repair.",
+          "The plug-in's free fix-up comes first: within 7 days of the cut."
+        ],
+        [
+          "After the job",
+          "After the visit"
+        ],
+        [
+          "Drain clearing",
+          "Home grooming visit"
+        ],
+        [
+          "the visit fee",
+          "the travel fee"
+        ],
+        [
+          "Lee Plumbing",
+          "Lee Mobile Barbers"
+        ],
+        [
+          "Lee Electric",
+          "Lee Skin Care"
+        ],
+        [
+          "plumbing and electrical",
+          "mobile barbering and skin care"
+        ],
+        [
+          "Plumbing",
+          "Mobile barbering"
+        ],
+        [
+          "plumbing",
+          "mobile barbering"
+        ],
+        [
+          "Electrical",
+          "Skin care"
+        ],
+        [
+          "electrical",
+          "skin care"
+        ],
+        [
+          "plumber",
+          "barber"
+        ],
+        [
+          "MP045210",
+          "MB045210"
+        ],
+        [
+          "EC22871",
+          "ES22871"
+        ],
+        [
+          "JE30417",
+          "ES30417"
+        ],
+        [
+          "Lee Home Services",
+          "Lee Mobile Barbers"
+        ],
+        [
+          "Jordan Price",
+          "Andre Ruiz"
+        ],
+        [
+          "Jordan",
+          "Andre"
+        ],
+        [
+          "Casey Moore",
+          "Malik Brooks"
+        ],
+        [
+          "Casey",
+          "Malik"
+        ],
+        [
+          "1200 Main St",
+          "500 Lake St"
+        ],
+        [
+          "water heater",
+          "wedding party"
+        ],
+        [
+          "heater",
+          "barber"
+        ],
+        [
+          "Visit fee",
+          "Travel fee"
+        ],
+        [
+          "visit fee",
+          "travel fee"
+        ],
+        [
+          "valve",
+          "clipper"
+        ],
+        [
+          "shutoff",
+          "trim"
+        ],
+        [
+          "sink",
+          "chair"
+        ],
+        [
+          "flush",
+          "trim"
+        ],
+        [
+          "salon",
+          "barbershop"
+        ],
+        [
+          "water heaters",
+          "wedding parties"
+        ]
+      ],
+      "slotRows": {},
+      "ops": [
+        {
+          "op": "words",
+          "at": "S1-12",
+          "more": [
+            "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+            "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+            "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+            "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+            "Wedding party grooming is never one list price. Each party is different, so it's priced from photos of the looks."
+          ],
+          "say": [
+            {
+              "from": "san",
+              "to": "owner",
+              "text": "Now your mobile barbering services and prices. Send a photo of your price list, or fill in the form.",
+              "elements": {
+                "card": {
+                  "title": "Mobile barbering prices",
+                  "lines": [
+                    "One row per service"
+                  ],
+                  "button": "Fill in the form",
+                  "link": "rosfield.com/f/s01"
+                },
+                "form": [
+                  "Service",
+                  "Price kind",
+                  "Price",
+                  "Time it takes"
+                ]
+              },
+              "plainText": "Now your mobile barbering services and prices. Send a photo of your price list, or fill in the form.\nMobile barbering prices\nOne row per service\nFill in the form: rosfield.com/f/s01\nOn the secure page: Service, Price kind, Price, Time it takes."
+            },
+            {
+              "from": "owner",
+              "to": "san",
+              "text": "",
+              "elements": {
+                "photos": [
+                  "Mobile barbering price list"
+                ]
+              },
+              "plainText": "[photo: Mobile barbering price list]"
+            },
+            {
+              "from": "san",
+              "to": "owner",
+              "text": "Here's what I read.",
+              "elements": {
+                "list": {
+                  "head": [
+                    "Service",
+                    "Price"
+                  ],
+                  "rows": [
+                    [
+                      "Travel fee",
+                      "$89, part of each home visit's price"
+                    ],
+                    [
+                      "Home grooming visit (cut, beard trim, hot towel)",
+                      "$179"
+                    ],
+                    [
+                      "Groom's cut at home",
+                      "$150"
+                    ],
+                    [
+                      "Hair design",
+                      "Priced at the visit"
+                    ],
+                    [
+                      "Wedding party grooming",
+                      "Priced from the customer's photos"
+                    ],
+                    [
+                      "Office visit (cuts for up to 3)",
+                      "$199"
+                    ],
+                    [
+                      "Extra time",
+                      "$120 an hour, 1-hour minimum"
+                    ]
+                  ]
+                },
+                "buttons": [
+                  "That's right",
+                  "Change something"
+                ]
+              },
+              "plainText": "Here's what I read.\nA) Travel fee · $89, part of each home visit's price\nB) Home grooming visit (cut, beard trim, hot towel) · $179\nC) Groom's cut at home · $150\nD) Hair design · Priced at the visit\nE) Wedding party grooming · Priced from the customer's photos\nF) Office visit (cuts for up to 3) · $199\nG) Extra time · $120 an hour, 1-hour minimum\nReply 1 That's right, 2 Change something."
+            },
+            {
+              "from": "owner",
+              "to": "san",
+              "text": "1",
+              "plainText": "1"
+            }
+          ]
+        },
+        {
+          "op": "words",
+          "at": "S1-12",
+          "more": [
+            "Beard color needs a free skin test at least 48 hours before.",
+            "The long services show how much time they take, so the chair is saved for all of it."
+          ],
+          "say": [
+            {
+              "from": "san",
+              "to": "owner",
+              "text": "Send a photo of the shop's price board.",
+              "plainText": "Send a photo of the shop's price board."
+            },
+            {
+              "from": "owner",
+              "to": "san",
+              "text": "",
+              "elements": {
+                "photos": [
+                  "Price board"
+                ]
+              },
+              "plainText": "[photo: Price board]"
+            },
+            {
+              "from": "san",
+              "to": "owner",
+              "text": "Here's what I read.",
+              "elements": {
+                "list": {
+                  "head": [
+                    "Service",
+                    "Price"
+                  ],
+                  "rows": [
+                    [
+                      "Haircut",
+                      "$35 · 30 min"
+                    ],
+                    [
+                      "Skin fade",
+                      "$40"
+                    ],
+                    [
+                      "Beard trim",
+                      "$20"
+                    ],
+                    [
+                      "Kids cut (12 and under)",
+                      "$25"
+                    ],
+                    [
+                      "Signature cut and hot towel shave",
+                      "$55 · 60 min"
+                    ],
+                    [
+                      "Groom's package (cut, shave, facial)",
+                      "$140 · 2½ hours"
+                    ],
+                    [
+                      "Beard color (gray blending)",
+                      "$25 · 20 min"
+                    ],
+                    [
+                      "Skin test for beard color",
+                      "Free · 5 min"
+                    ]
+                  ]
+                },
+                "buttons": [
+                  "That's right",
+                  "Change something"
+                ]
+              },
+              "plainText": "Here's what I read.\nA) Haircut · $35 · 30 min\nB) Skin fade · $40\nC) Beard trim · $20\nD) Kids cut (12 and under) · $25\nE) Signature cut and hot towel shave · $55 · 60 min\nF) Groom's package (cut, shave, facial) · $140 · 2½ hours\nG) Beard color (gray blending) · $25 · 20 min\nH) Skin test for beard color · Free · 5 min\nReply 1 That's right, 2 Change something."
+            },
+            {
+              "from": "owner",
+              "to": "san",
+              "text": "1",
+              "plainText": "1"
+            }
+          ]
+        },
+        {
+          "op": "more",
+          "at": "A3-20",
+          "more": [
+            "Some chairs or hours can be walk-in only, like one chair on Saturday mornings. Those times never show for booking.",
+            "A walk-in starts only if it fits before that barber's next booking."
+          ]
+        },
+        {
+          "op": "more",
+          "at": "A4-14",
+          "more": [
+            "Quick services, like a line-up or a beard trim, show in the short gaps they fit, up to 30 minutes ahead."
+          ]
+        },
+        {
+          "op": "branch",
+          "at": "A7-02",
+          "branch": {
+            "label": "Asks to add beard color",
+            "tag": "message",
+            "steps": [
+              "A7-x01"
+            ],
+            "end": "merge",
+            "rejoinAt": "A8-01",
+            "answerFields": [],
+            "effects": [
+              {
+                "kind": "message",
+                "ref": "A7-x01",
+                "to": [
+                  "cust"
+                ]
+              }
+            ]
+          },
+          "steps": [
+            {
+              "id": "A7-x01",
+              "section": 7,
+              "lines": [
+                "7.14",
+                "4.14"
+              ],
+              "who": "san",
+              "to": "cust",
+              "via": "msg",
+              "t": "Thu Oct 22, 3:00pm",
+              "title": "Offers a skin test before beard color",
+              "does": "Alex asks to add beard color to Saturday's cut. Color needs a skin test 48 hours before, so it can't be done this time. Riley can do the free test after the cut.",
+              "more": [
+                "The plug-in sets the gap: the time the dye's label sets, 48 hours here.",
+                "A past reaction to hair dye goes on the secure page, never in a text.",
+                "No reply by 8pm: nothing is added, and the cut stays as booked.",
+                "With the test done, beard color can be booked for any day 48 hours later."
+              ],
+              "say": [
+                {
+                  "from": "cust",
+                  "to": "san",
+                  "text": "Can Riley also color my beard Saturday? I'm getting some gray.",
+                  "plainText": "Can Riley also color my beard Saturday? I'm getting some gray."
+                },
+                {
+                  "from": "san",
+                  "to": "cust",
+                  "text": "Beard color needs a skin test 48 hours before, so it can't be done this Saturday. Riley can do a free 5-minute test after your cut, for color next time. Your cut stays as booked.",
+                  "elements": {
+                    "buttons": [
+                      "Add the test",
+                      "No thanks"
+                    ]
+                  },
+                  "plainText": "Beard color needs a skin test 48 hours before, so it can't be done this Saturday. Riley can do a free 5-minute test after your cut, for color next time. Your cut stays as booked.\nReply 1 Add the test, 2 No thanks."
+                }
+              ],
+              "needs": [
+                "pf.first_steps"
+              ],
+              "tells": [
+                "cust"
+              ],
+              "fallbackText": "Beard color needs a skin test 48 hours before, so it can't be done this Saturday. Riley can do a free 5-minute test after your cut, for color next time. Your cut stays as booked.",
+              "pageTypes": [],
+              "next": null,
+              "lint": []
+            }
+          ]
+        },
+        {
+          "op": "off",
+          "at": "S1-60",
+          "label": "2 No license: registration only",
+          "why": "Barbering is licensed: the company and each barber."
+        },
+        {
+          "op": "off",
+          "at": "S1-62",
+          "label": "2 No $2, so no monthly bill",
+          "why": "Barber work pays the $2."
+        }
+      ]
+    },
+    "B": {
+      "switches": {},
+      "settings": {
+        "arrive": "setstart",
+        "cutoff": "24 hours before"
+      },
+      "money": {
+        "main": "list|card|bill",
+        "combos": [
+          "list|card|bill",
+          "list|full|none",
+          "photos|deposit|bill"
+        ],
+        "examples": {
+          "list|card|bill": "The main story: a $179 home grooming visit (cut, beard trim, hot towel). A card is saved for the $89 fee. Rosie texts the bill, with a tip line, after the visit.",
+          "list|full|none": "A $150 groom's cut at home, paid in full when booking.",
+          "photos|deposit|bill": "Grooming for a wedding party of 4 at Alex's home, quoted at $640 from photos and OK'd by Sam. A $160 deposit now, the $480 rest on the bill."
+        },
+        "amounts": {
+          "list|*|*": {
+            "price": "$179",
+            "fee": "$89",
+            "name": "Home grooming visit"
+          },
+          "list|full|*": {
+            "price": "$150",
+            "paid": "$150",
+            "fee": "$89",
+            "name": "Groom's cut at home"
+          },
+          "photos|deposit|*": {
+            "price": "$640",
+            "deposit": "$160",
+            "rest": "$480",
+            "fee": "$160",
+            "name": "Wedding party grooming (4 people)"
+          }
+        }
+      },
+      "rename": [
+        [
+          "patch test",
+          "skin test"
+        ],
+        [
+          "patch test",
+          "skin test"
+        ],
+        [
+          "A water heater job",
+          "A groom at work"
+        ],
+        [
+          "It's a leak under the sink, today,",
+          "It's a shave, today,"
+        ],
+        [
+          "drain clearings",
+          "grooming visits"
+        ],
+        [
+          "I found water damage under the sink this morning.",
+          "I found a nick on my neck this morning."
+        ],
+        [
+          "corroded shutoff valves",
+          "clipper nicks"
+        ],
+        [
+          "cracks the cabinet floor",
+          "nicks the scalp"
+        ],
+        [
+          "Hi, it's about a leaking pipe under my sink. A text back is fine.",
+          "Hi, my scalp itches after a dye. A text back is fine."
+        ],
+        [
+          "My sink won't drain",
+          "I need a beard trim"
+        ],
+        [
+          "Yes, it won't drain",
+          "Just a trim"
+        ],
+        [
+          "The $179 drain needs none.",
+          "The $179 visit needs none."
+        ],
+        [
+          "like new pipes put in one day and finished another",
+          "like a color done in two steps"
+        ],
+        [
+          "Adding a faucet check? Say so.",
+          "Adding a beard trim? Say so."
+        ],
+        [
+          "tapping a neighbor's water line without asking",
+          "using a neighbor's chair without asking"
+        ],
+        [
+          "Andre found the leak.",
+          "Andre found more to do."
+        ],
+        [
+          "Shutoff valve and wall pipe",
+          "Beard color and skin test"
+        ],
+        [
+          "Shutoff valve",
+          "Beard color"
+        ],
+        [
+          "shutoff valve",
+          "beard color"
+        ],
+        [
+          "valve 165 supply line 80",
+          "beard color 165 beard trim 80"
+        ],
+        [
+          "Alex M. · water heater",
+          "Alex M. · wedding party"
+        ],
+        [
+          "1-year labor warranty: if there's a problem with the work, reply here.",
+          "Free fix-up for 7 days: if there's a problem with the cut, reply here."
+        ],
+        [
+          "1-year labor warranty",
+          "free fix-up for 7 days"
+        ],
+        [
+          "Sam named you their emergency contact.",
+          "Sam named you their safety contact."
+        ],
+        [
+          "Panel upgrade",
+          "Beard trim"
+        ],
+        [
+          "Why: many barbers, salons and groomers are licensed to their shop.",
+          "Why: many barbers and groomers are licensed to their shop."
+        ],
+        [
+          "barber, color and house calls",
+          "barber, beard color and house calls"
+        ],
+        [
+          "Plumbing JP031552",
+          "Barber BR031552"
+        ],
+        [
+          "Some work takes urgent jobs sent now, like a burst pipe or a lockout.",
+          "Some work takes urgent jobs sent now, like a lockout or a tow."
+        ],
+        [
+          "Plumbing takes jobs sent now. The shop takes none.",
+          "Neither company's barber work is sent now."
+        ],
+        [
+          "A plumber's example: water near outlets gets 'shut off the main valve'.",
+          "A barber's example: an itchy scalp after a box dye gets 'rinse it with cool water'."
+        ],
+        [
+          "Morgan P. would like to talk about the water heater quote before booking.",
+          "Morgan P. would like to talk about the wedding party quote before booking."
+        ],
+        [
+          "Drain clearing plans",
+          "Home grooming plans"
+        ],
+        [
+          "Drain clearings",
+          "Home grooming visits"
+        ],
+        [
+          "Sam adds heating and cooling to Lee Home Services.",
+          "Sam adds nail care to Lee Mobile Barbers."
+        ],
+        [
+          "NEW heating and cooling",
+          "NEW nail care"
+        ],
+        [
+          "Heating and cooling for Lee Home Services: is it the same company?",
+          "Nail care for Lee Mobile Barbers: is it the same company?"
+        ],
+        [
+          "Nora can ask to be next for that window.",
+          "Nora can ask to be next for that time."
+        ],
+        [
+          "A booked window stays right when the clocks change",
+          "A booked time stays right when the clocks change"
+        ],
+        [
+          "My kitchen drain is clogged. Can a plumber come Thursday morning?",
+          "Can a barber come to my home Thursday morning, for a cut and beard trim?"
+        ],
+        [
+          "Hello, do you speak Spanish? Water is coming out of the water heater.",
+          "Hello, do you speak Spanish? My scalp itches after a dye."
+        ],
+        [
+          "Hola, ¿habla español? Sale agua del calentador.",
+          "Hola, ¿habla español? Me pica el cuero cabelludo después de un tinte."
+        ],
+        [
+          "Primero: ¿hay alguien herido? ¿Huele a gas?",
+          "Primero: ¿se le hincha la cara, los labios o la garganta?"
+        ],
+        [
+          "First: is anyone hurt? Do you smell gas?",
+          "First: are your face, lips or throat swelling?"
+        ],
+        [
+          "No. No huele a gas.",
+          "No. Solo me pica."
+        ],
+        [
+          "No. It doesn't smell like gas.",
+          "No. It just itches."
+        ],
+        [
+          "Cierre la llave del agua fría, arriba del calentador. Si huele a gas, salga y llame al 911.",
+          "Enjuáguese el cuero cabelludo con agua fría y no use más tinte. Si se le hincha la cara, llame al 911."
+        ],
+        [
+          "Shut the cold-water valve, above the heater. If you smell gas, get out and call 911.",
+          "Rinse your scalp with cool water and skip more dye. If your face swells, call 911."
+        ],
+        [
+          "Then the booking goes on, marked urgent.",
+          "Then the booking goes on, with a note for the barber."
+        ],
+        [
+          "Rosa is told to shut the cold-water valve, and to leave and call 911 if there's a gas smell.",
+          "Rosa is told to rinse her scalp with cool water, and to call 911 if her face swells."
+        ],
+        [
+          "For plumbing, a gas smell, hissing or a carbon monoxide alarm stops the booking.",
+          "For barber work, a dye reaction happening now stops the booking, like a swelling face or throat."
+        ],
+        [
+          "This sounds like an emergency. If you smell gas, leave the house now. Then call 911 and the gas company.",
+          "This sounds like an emergency. Call 911 now. Rinse the dye off with plenty of water."
+        ],
+        [
+          "Safety stop: a customer's AI said they smell gas.",
+          "Safety stop: a customer's AI said their face is swelling after a dye."
+        ],
+        [
+          "A gas smell at the home",
+          "A dye reaction happening now"
+        ],
+        [
+          "Told to leave, then call 911 and the gas company",
+          "Told to call 911 now and rinse the dye off"
+        ],
+        [
+          "My gas water heater got wet in a flood. Is it safe to turn back on?",
+          "I have a rash on my neck. Is it safe to shave over it?"
+        ],
+        [
+          "Can a plumber clear a yard drain this Thursday? What does it cost?",
+          "Can a barber come to her home this Thursday? What does it cost?"
+        ],
+        [
+          "BOOK Tessa drain Thu 12-2 Casey",
+          "BOOK Tessa grooming Thu 12pm Malik"
+        ],
+        [
+          "like a roof leak",
+          "like a tattoo"
+        ],
+        [
+          "Lee Home Services does plumbing and electrical work, not roofing.",
+          "Lee Mobile Barbers does barbering and skin care, not tattoos."
+        ],
+        [
+          "You can look for a roofer near you.",
+          "You can look for a tattoo studio near you."
+        ],
+        [
+          "The plug-in says a water heater is priced from photos",
+          "The plug-in says a wedding party is priced from photos"
+        ],
+        [
+          "Add photos of your water heater, and a plumber will price the job.",
+          "Add a photo of each look your party wants, and a barber will price it."
+        ],
+        [
+          "Your water heater price is with Lee Home Services.",
+          "Your wedding party price is with Lee Mobile Barbers."
+        ],
+        [
+          "couldn't price your water heater this time",
+          "couldn't price your wedding party this time"
+        ],
+        [
+          "It's overflowing. Can someone come tonight?",
+          "My interview is tomorrow at 9. Can someone come tonight?"
+        ],
+        [
+          "Say Alex asks for a water heater flush every year. Lee Home Services offers that as a plan, so the AI shows its terms.",
+          "Say Alex asks for a home grooming visit every 4 weeks. Lee Mobile Barbers offers that as a plan, so the AI shows its terms."
+        ],
+        [
+          "Can you flush my water heater every year, too?",
+          "Can Andre come every 4 weeks, too?"
+        ],
+        [
+          "Yes. Lee Home Services has a yearly flush plan, $150 a visit. Each visit is booked and paid like a single one. Want it every 12 months?",
+          "Yes. Lee Mobile Barbers has a 4-week plan, $179 a visit. Each visit is booked and paid like a single one. Want a visit every 4 weeks?"
+        ],
+        [
+          "Yes, every year",
+          "Yes, every 4 weeks"
+        ],
+        [
+          "Say a building manager books the same job for 4 units at one address.",
+          "Say a groom books cuts for himself and 3 groomsmen at one home."
+        ],
+        [
+          "Each unit's notes go to the plumber, one line each.",
+          "Each person's notes go to the barber, one line each."
+        ],
+        [
+          "Say Alex also asks about a dripping faucet. Both jobs go in one booking, with one arrival window and one code.",
+          "Say Alex also asks for a hair design. Both go in one booking, with one start time and one code."
+        ],
+        [
+          "Can Jordan also look at a dripping faucet?",
+          "Can Andre also cut a design on the side?"
+        ],
+        [
+          "Yes. The faucet is a leak repair, quoted at the visit. Both fit in the same arrival window.",
+          "Yes. A hair design is priced at the visit. Both fit in the same visit."
+        ],
+        [
+          "Plumbing books a 2-hour window.",
+          "Barber work books a set start time."
+        ],
+        [
+          "he's the one who replaces water heaters",
+          "he's the one who grooms wedding parties"
+        ],
+        [
+          "Is the sink still full of water?",
+          "Short on the sides, or just a trim?"
+        ],
+        [
+          "Written estimate and terms",
+          "Contract and terms"
+        ],
+        [
+          "Your water heater contract",
+          "Your wedding party contract"
+        ],
+        [
+          "the water heater contract",
+          "the wedding party contract"
+        ],
+        [
+          "priced a water heater replacement for Alex M.",
+          "priced a wedding party for Alex M."
+        ],
+        [
+          "if the next job allows",
+          "if the next booking allows"
+        ],
+        [
+          "Yearly water heater flush plan",
+          "Home grooming plan"
+        ],
+        [
+          "Every 12 months",
+          "Every 4 weeks"
+        ],
+        [
+          "Please clear the cabinet under the sink.",
+          "Please set out a chair near an outlet, in good light."
+        ],
+        [
+          "Can I run the dishwasher before you come?",
+          "Should I wash my hair before you come?"
+        ],
+        [
+          "Jordan says no. Please wait until the job is done.",
+          "Andre says no need. He'll wet it himself before the cut."
+        ],
+        [
+          "like a move-out day",
+          "like a wedding day"
+        ],
+        [
+          "Morgan has a repeat plan: a drain cleaning at two rentals every 3 months.",
+          "Morgan has a repeat plan: a home grooming visit for her father every 2 weeks."
+        ],
+        [
+          "Can I skip next week's drain cleaning?",
+          "Can I skip next week's visit for my dad?"
+        ],
+        [
+          "your plan charges $358 to your saved card for October's two visits.",
+          "your plan charges $358 to your saved card for October's two visits for your father."
+        ],
+        [
+          "Rental 1 · Tue Oct 20 · $179",
+          "Visit 1 · Tue Oct 6 · $179"
+        ],
+        [
+          "Rental 2 · Wed Oct 21 · $179",
+          "Visit 2 · Tue Oct 20 · $179"
+        ],
+        [
+          "Yard drain",
+          "Home grooming visit"
+        ],
+        [
+          "yard drain",
+          "home grooming visit"
+        ],
+        [
+          "Before any work, Jordan photographs what the work will touch and notes what's already wrong.",
+          "Before any work, Andre photographs the set-up spot and notes what's already wrong."
+        ],
+        [
+          "BEFORE old water stain on the cabinet floor",
+          "BEFORE dry skin on the neck. Floor covered with a sheet"
+        ],
+        [
+          "Under the sink, before",
+          "Hair and beard, before"
+        ],
+        [
+          "Cabinet floor, before",
+          "Floor sheet, before"
+        ],
+        [
+          "EXTRA 160 replace both shutoff valves, corroded",
+          "EXTRA 25 kids cut for Alex's son"
+        ],
+        [
+          "Extra for Alex M.: replace both shutoff valves, $160. Sent to Alex.",
+          "Extra for Alex M.: a kids cut for his son, $25. Sent to Alex."
+        ],
+        [
+          "Jordan found more work.",
+          "Andre can add more work."
+        ],
+        [
+          "Replace both shutoff valves · $160",
+          "Kids cut for your son · $25"
+        ],
+        [
+          "No problem. The $160 valve quote is good for 7 days.",
+          "No problem. The $25 kids cut price is good for 7 days."
+        ],
+        [
+          "Copy: at 8:52am on Jordan's phone, you said yes to replacing both shutoff valves for $160.",
+          "Copy: at 8:35am on Andre's phone, you said yes to a kids cut for your son, for $25."
+        ],
+        [
+          "DAMAGE cracked the cabinet floor",
+          "DAMAGE chipped a floor tile"
+        ],
+        [
+          "Cracked cabinet floor",
+          "Chipped floor tile"
+        ],
+        [
+          "Jordan cracked the cabinet floor at Alex M.'s. The before photo shows no crack.",
+          "Andre chipped a floor tile at Alex M.'s. The before photo shows no chip."
+        ],
+        [
+          "NOTE grease clog 12 ft in. Old pipes: bring the camera next time.",
+          "NOTE #2 on the sides, scissors on top, beard lined up low."
+        ],
+        [
+          "the shutoff valves",
+          "the kids cut"
+        ],
+        [
+          "$800 for stage 2 of your repipe.",
+          "$800 for day 2 of your event."
+        ],
+        [
+          "stage 2 of your repipe",
+          "day 2 of your event"
+        ],
+        [
+          "Replace both shutoff valves",
+          "Kids cut for your son"
+        ],
+        [
+          "Jordan left a mess under the sink.",
+          "Andre left hair on the floor."
+        ],
+        [
+          "Can Jordan look at my bathroom sink next week?",
+          "Can Andre come for a cut next week?"
+        ],
+        [
+          "Here are Jordan's next times for a bathroom drain.",
+          "Here are Andre's next times for a home grooming visit."
+        ],
+        [
+          "after the job",
+          "after the visit"
+        ],
+        [
+          "After the job",
+          "After the visit"
+        ],
+        [
+          "7am on the visit day",
+          "6pm the day before"
+        ],
+        [
+          "plumbing visit",
+          "house call"
+        ],
+        [
+          "Kitchen drain clearing",
+          "Home grooming visit"
+        ],
+        [
+          "Kitchen drain",
+          "Home grooming visit"
+        ],
+        [
+          "kitchen drain",
+          "home grooming visit"
+        ],
+        [
+          "Drain clearing",
+          "Home grooming visit"
+        ],
+        [
+          "drain clearing",
+          "home grooming visit"
+        ],
+        [
+          "Water heater replacement",
+          "Wedding party grooming"
+        ],
+        [
+          "water heater replacement",
+          "wedding party grooming"
+        ],
+        [
+          "Water heater flush",
+          "Groom's cut at home"
+        ],
+        [
+          "water heater flush",
+          "groom's cut at home"
+        ],
+        [
+          "Leak repair",
+          "Hair design"
+        ],
+        [
+          "leak repair",
+          "hair design"
+        ],
+        [
+          "Sewer camera inspection",
+          "Office visit"
+        ],
+        [
+          "sewer camera inspection",
+          "office visit"
+        ],
+        [
+          "camera inspection",
+          "office visit"
+        ],
+        [
+          "credited to the repair",
+          "part of each home visit's price"
+        ],
+        [
+          "Service call",
+          "Travel fee"
+        ],
+        [
+          "service call",
+          "travel fee"
+        ],
+        [
+          "the visit fee",
+          "the travel fee"
+        ],
+        [
+          "Lee Plumbing",
+          "Lee Mobile Barbers"
+        ],
+        [
+          "Lee Electric",
+          "Lee Skin Care"
+        ],
+        [
+          "plumbing and electrical",
+          "mobile barbering and skin care"
+        ],
+        [
+          "Plumbing",
+          "Mobile barbering"
+        ],
+        [
+          "plumbing",
+          "mobile barbering"
+        ],
+        [
+          "Electrical",
+          "Skin care"
+        ],
+        [
+          "electrical",
+          "skin care"
+        ],
+        [
+          "plumber",
+          "barber"
+        ],
+        [
+          "MP045210",
+          "MB045210"
+        ],
+        [
+          "EC22871",
+          "ES22871"
+        ],
+        [
+          "JE30417",
+          "ES30417"
+        ],
+        [
+          "Lee Home Services LLC",
+          "Lee Mobile Barbers LLC"
+        ],
+        [
+          "Lee Home Services",
+          "Lee Mobile Barbers"
+        ],
+        [
+          "leehomeservices.com",
+          "leemobilebarbers.com"
+        ],
+        [
+          "Jordan Price",
+          "Andre Ruiz"
+        ],
+        [
+          "Jordan",
+          "Andre"
+        ],
+        [
+          "Casey Moore",
+          "Malik Brooks"
+        ],
+        [
+          "Casey",
+          "Malik"
+        ],
+        [
+          "1200 Main St",
+          "500 Lake St"
+        ],
+        [
+          "42 Oak St",
+          "27 Cedar Ct"
+        ],
+        [
+          "Thu Oct 22, 7:00am",
+          "Wed Oct 21, 6:00pm"
+        ],
+        [
+          "until 7am Thu",
+          "until 6pm Wed"
+        ],
+        [
+          "before 7am Thu",
+          "before 6pm Wed"
+        ],
+        [
+          "(7am Thu)",
+          "(6pm Wed)"
+        ],
+        [
+          "7am Thu",
+          "6pm Wed"
+        ],
+        [
+          "· arriving 8–10am",
+          "· starts at 8:00am"
+        ],
+        [
+          "arriving 8–10am",
+          "at 8:00am"
+        ],
+        [
+          "8–10am",
+          "8:00am"
+        ],
+        [
+          "· arriving 12–2pm",
+          "· starts at 12:00pm"
+        ],
+        [
+          "arriving 12–2pm",
+          "at 12:00pm"
+        ],
+        [
+          "12–2pm",
+          "12:00pm"
+        ],
+        [
+          "· arriving 10am–12pm",
+          "· starts at 10:00am"
+        ],
+        [
+          "arriving 10am–12pm",
+          "at 10:00am"
+        ],
+        [
+          "10am–12pm",
+          "10:00am"
+        ],
+        [
+          "travel fee fee",
+          "travel fee"
+        ],
+        [
+          "Travel fee fee",
+          "Travel fee"
+        ],
+        [
+          "water heater",
+          "wedding party"
+        ],
+        [
+          "heater",
+          "barber"
+        ],
+        [
+          "Visit fee",
+          "Travel fee"
+        ],
+        [
+          "visit fee",
+          "travel fee"
+        ],
+        [
+          "valve",
+          "clipper"
+        ],
+        [
+          "shutoff",
+          "trim"
+        ],
+        [
+          "sink",
+          "chair"
+        ],
+        [
+          "flush",
+          "trim"
+        ],
+        [
+          "salon",
+          "barbershop"
+        ],
+        [
+          "Supply line",
+          "Beard trim"
+        ],
+        [
+          "supply line",
+          "beard trim"
+        ],
+        [
+          "water heaters",
+          "wedding parties"
+        ]
+      ],
+      "slotRows": {},
+      "ops": [
+        {
+          "op": "words",
+          "at": "S1-12",
+          "more": [
+            "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+            "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+            "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+            "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+            "Wedding party grooming is never one list price. Each party is different, so it's priced from photos of the looks."
+          ],
+          "say": [
+            {
+              "from": "san",
+              "to": "owner",
+              "text": "Now your mobile barbering services and prices. Send a photo of your price list, or fill in the form.",
+              "elements": {
+                "card": {
+                  "title": "Mobile barbering prices",
+                  "lines": [
+                    "One row per service"
+                  ],
+                  "button": "Fill in the form",
+                  "link": "rosfield.com/f/s01"
+                },
+                "form": [
+                  "Service",
+                  "Price kind",
+                  "Price",
+                  "Time it takes"
+                ]
+              },
+              "plainText": "Now your mobile barbering services and prices. Send a photo of your price list, or fill in the form.\nMobile barbering prices\nOne row per service\nFill in the form: rosfield.com/f/s01\nOn the secure page: Service, Price kind, Price, Time it takes."
+            },
+            {
+              "from": "owner",
+              "to": "san",
+              "text": "",
+              "elements": {
+                "photos": [
+                  "Mobile barbering price list"
+                ]
+              },
+              "plainText": "[photo: Mobile barbering price list]"
+            },
+            {
+              "from": "san",
+              "to": "owner",
+              "text": "Here's what I read.",
+              "elements": {
+                "list": {
+                  "head": [
+                    "Service",
+                    "Price"
+                  ],
+                  "rows": [
+                    [
+                      "Travel fee",
+                      "$89, part of each home visit's price"
+                    ],
+                    [
+                      "Home grooming visit (cut, beard trim, hot towel)",
+                      "$179"
+                    ],
+                    [
+                      "Groom's cut at home",
+                      "$150"
+                    ],
+                    [
+                      "Hair design",
+                      "Priced at the visit"
+                    ],
+                    [
+                      "Wedding party grooming",
+                      "Priced from the customer's photos"
+                    ],
+                    [
+                      "Office visit (cuts for up to 3)",
+                      "$199"
+                    ],
+                    [
+                      "Extra time",
+                      "$120 an hour, 1-hour minimum"
+                    ]
+                  ]
+                },
+                "buttons": [
+                  "That's right",
+                  "Change something"
+                ]
+              },
+              "plainText": "Here's what I read.\nA) Travel fee · $89, part of each home visit's price\nB) Home grooming visit (cut, beard trim, hot towel) · $179\nC) Groom's cut at home · $150\nD) Hair design · Priced at the visit\nE) Wedding party grooming · Priced from the customer's photos\nF) Office visit (cuts for up to 3) · $199\nG) Extra time · $120 an hour, 1-hour minimum\nReply 1 That's right, 2 Change something."
+            },
+            {
+              "from": "owner",
+              "to": "san",
+              "text": "1",
+              "plainText": "1"
+            }
+          ]
+        },
+        {
+          "op": "more",
+          "at": "B4-01",
+          "more": [
+            "Away from the shop, it's cuts, beard trims, hot towels and hair designs. Razor shaves and color stay at the shop.",
+            "Barbering away from a shop is offered only where the state's rules allow it, and only by barbers cleared for it."
+          ]
+        },
+        {
+          "op": "more",
+          "at": "B4-27",
+          "more": [
+            "At a venue, the code goes to whoever is getting ready there, like the groom."
+          ]
+        },
+        {
+          "op": "words",
+          "at": "B4-04",
+          "does": "A plug-in holds what one kind of work needs. The steps around it stay the same. Here, Rosie uses the barber plug-in's booking parts.",
+          "more": [
+            "Its questions: the service, who's in the group, and the style and beard.",
+            "Its danger words: a dye reaction happening now, or a cut that won't stop bleeding.",
+            "Its first steps: none away from the shop, since color stays at the shop.",
+            "Who can stand in for whom, and how the visit is checked in: the code at the door.",
+            "No plug-in yet? Safe defaults: name, mobile and address, an adult books, and the general danger check."
+          ]
+        },
+        {
+          "op": "off",
+          "at": "S1-60",
+          "label": "2 No license: registration only",
+          "why": "Barbering is licensed: the company and each barber."
+        },
+        {
+          "op": "off",
+          "at": "S1-62",
+          "label": "2 No $2, so no monthly bill",
+          "why": "Barber work pays the $2."
+        }
+      ]
+    }
+  }
+}

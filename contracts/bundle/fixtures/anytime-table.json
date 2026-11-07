@@ -1,0 +1,159 @@
+{
+  "rows": [
+    {
+      "row": "danger-or-crisis",
+      "order": 1,
+      "safetyReadOnly": true,
+      "handler": "A3-22",
+      "flags": []
+    },
+    {
+      "row": "threat",
+      "order": 2,
+      "safetyReadOnly": true,
+      "handler": "A3-48",
+      "flags": [
+        "paused"
+      ]
+    },
+    {
+      "row": "child-elder-or-unsafe-at-home",
+      "order": 3,
+      "safetyReadOnly": true,
+      "handler": "A3-22",
+      "flags": [
+        "private"
+      ]
+    },
+    {
+      "row": "problem-getting-worse",
+      "order": 4,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "death",
+      "order": 5,
+      "safetyReadOnly": false,
+      "handler": "A7-81",
+      "flags": [
+        "deceased"
+      ]
+    },
+    {
+      "row": "stop",
+      "order": 6,
+      "safetyReadOnly": false,
+      "handler": "A7-11",
+      "flags": [
+        "stopped"
+      ]
+    },
+    {
+      "row": "wrong-party-or-language",
+      "order": 7,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "third-party-or-privacy",
+      "order": 8,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "contact-change",
+      "order": 9,
+      "safetyReadOnly": false,
+      "handler": "A7-98",
+      "flags": []
+    },
+    {
+      "row": "payment-problem",
+      "order": 10,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "complaint-or-dispute",
+      "order": 11,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "damage",
+      "order": 12,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "owner-command",
+      "order": 13,
+      "safetyReadOnly": false,
+      "handler": "S11-12",
+      "flags": []
+    },
+    {
+      "row": "cancel",
+      "order": 14,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "move",
+      "order": 15,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "running-late",
+      "order": 16,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "business-cant-make-it",
+      "order": 17,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "scope-change-or-new-request",
+      "order": 18,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "question-or-unclear-reply",
+      "order": 19,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    },
+    {
+      "row": "platform-or-ai-failure",
+      "order": 20,
+      "safetyReadOnly": false,
+      "handler": "S12-11",
+      "flags": []
+    },
+    {
+      "row": "due-items",
+      "order": 21,
+      "safetyReadOnly": false,
+      "handler": null,
+      "flags": []
+    }
+  ]
+}
