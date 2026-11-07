@@ -1,0 +1,43 @@
+{
+  "call": "sendState",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json", "seed-thread-messages.json", "seed-flag.json"],
+    "after": ["claim-in-order.json"],
+    "now": "2026-11-07T15:06:35Z",
+    "note": "Limit 8's read for Alex's confirmation, claimed and about to go: not stopped, his chat open with Linq's chat id, a customer in the barbershop's zone and hours (no visit zone is stored before K-30), the staging override on for his test number (BP 9.4: honoured on staging only), and the booking it read still at version 1."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley"
+  },
+  "outcome": {
+    "result": "sendState",
+    "outboxRowId": "out-alex-booked-riley",
+    "rowState": "sending",
+    "rowVersion": 3,
+    "readAt": "2026-11-07T15:06:35Z",
+    "recipient": { "handleId": "handle-alex", "kind": "phone", "address": "+15555550101", "personId": "person-alex" },
+    "phone": {
+      "number": "+15555550101",
+      "stopped": false,
+      "stopAt": null,
+      "chatOpen": true,
+      "chatWay": "imessage",
+      "linqContactAddedAt": "2026-10-12T16:20:00Z",
+      "pollVotedAt": "2026-10-23T14:06:10Z",
+      "optoutLineDeliveredAt": "2026-10-12T16:20:00Z",
+      "version": 3
+    },
+    "chat": { "threadId": "thread-alex-chat", "linqChatId": "linq-chat-demo-alex", "version": 2 },
+    "textsConsent": null,
+    "audience": "customer",
+    "zone": "America/New_York",
+    "visitZone": null,
+    "businessZone": "America/New_York",
+    "textHours": { "start": "08:00", "end": "20:00" },
+    "textHoursOverride": true,
+    "currentVersions": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+    "booking": { "id": "booking-alex-riley-nov14", "stage": "booked", "version": 1 },
+    "openQuestion": null,
+    "closed": { "booking": false, "question": false }
+  }
+}

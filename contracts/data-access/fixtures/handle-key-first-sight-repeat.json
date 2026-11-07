@@ -1,0 +1,22 @@
+{
+  "call": "handleSealingKey",
+  "given": {
+    "k04Seeds": ["seed-sealing-key.json"],
+    "after": ["handle-key-first-sight.json"],
+    "now": "2026-11-08T14:00:01Z",
+    "note": "The same number's second text a second later (or Linq's retry of the first webhook) carries fresh ids from the gateway; the call finds the handle, the person and the key the first call wrote and writes nothing, so one handle gets one key."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550108" },
+    "newHandleId": "handle-gw-0108-b",
+    "newPersonId": "person-gw-0108-b",
+    "wrappingKeyName": "SEALING_WRAP_KEY"
+  },
+  "outcome": {
+    "result": "key",
+    "handleId": "handle-gw-0108",
+    "personId": "person-gw-0108",
+    "created": { "handle": false, "person": false, "key": false },
+    "key": { "wrappingKeyName": "SEALING_WRAP_KEY", "createdAt": "2026-11-08T14:00:00Z", "version": 1 }
+  }
+}

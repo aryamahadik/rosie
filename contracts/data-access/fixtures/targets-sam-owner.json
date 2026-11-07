@@ -1,0 +1,30 @@
+{
+  "call": "handleTargets",
+  "given": {
+    "k04Seeds": ["seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-19T14:10:00Z",
+    "note": "Sam texts an owner command. He owns three businesses and has no open question and no booking of his own, so his targets are his roles: the owner's door (S11-12), which business it is about being the frontier's to settle."
+  },
+  "request": {
+    "handleId": "handle-sam"
+  },
+  "outcome": {
+    "result": "targets",
+    "handleId": "handle-sam",
+    "readAt": "2026-10-19T14:10:00Z",
+    "persons": [
+      {
+        "personId": "person-sam",
+        "roles": [
+          { "roleId": "role-sam-barber", "businessId": "biz-lees-barbershop", "role": "owner", "version": 1 },
+          { "roleId": "role-sam-movers", "businessId": "biz-movers", "role": "owner", "version": 1 },
+          { "roleId": "role-sam-yoga", "businessId": "biz-yoga-studio", "role": "owner", "version": 1 }
+        ]
+      }
+    ],
+    "openQuestions": [],
+    "bookings": [],
+    "phone": { "stopped": false, "chatOpen": true, "version": 2 }
+  }
+}

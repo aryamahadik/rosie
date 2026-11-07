@@ -1,0 +1,85 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-in-order.json"],
+    "now": "2026-11-07T15:06:36Z",
+    "note": "A second after the dispatcher claimed his confirmation, and before any part went, Alex calls off the Nov 14 haircut: the commit cancels the booking (version 1 to 2), releases the time with Riley and writes the one reply in the same turn."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-cancel-2",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0015"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0015",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+    "writes": {
+      "state": [
+        {
+          "op": "update",
+          "table": "bookings",
+          "key": { "id": "booking-alex-riley-nov14" },
+          "expectVersion": 1,
+          "set": { "stage": "cancelled" }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-alex-cancelled-nov14",
+          "recipientHandleId": "handle-alex",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov14",
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 2 }]
+        }
+      ],
+      "reservations": {
+        "confirm": [],
+        "release": [{ "id": "rsv-alex-riley-nov14", "expectVersion": 2, "why": "cancelled" }]
+      },
+      "events": [
+        {
+          "id": "log-booking-alex-riley-nov14-cancel-2",
+          "kind": "booking.stage_changed",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": "customer",
+          "tableName": "bookings",
+          "rowId": "booking-alex-riley-nov14",
+          "oldValues": { "stage": "booked" },
+          "newValues": { "stage": "cancelled" },
+          "sealed": null,
+          "why": { "choice": "cancel" },
+          "approvedBy": { "exactYes": "evt-alex-0015" },
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-cancel-2",
+    "committedAt": "2026-11-07T15:06:36Z",
+    "repeated": false,
+    "committed": {
+      "written": [
+        { "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 2 },
+        { "table": "reservations", "rowId": "rsv-alex-riley-nov14", "version": 3 }
+      ],
+      "outboxRows": [{ "id": "out-alex-cancelled-nov14", "commitSeq": 3 }],
+      "promoted": []
+    }
+  }
+}

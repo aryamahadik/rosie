@@ -1,0 +1,20 @@
+{
+  "call": "readTurnState",
+  "given": {
+    "k04Seeds": ["seed-booking-head.json"],
+    "after": [],
+    "now": "2026-10-23T14:06:12Z",
+    "note": "A read under the barbershop's scope that names Alex's yoga workshop, the yoga studio's booking: row-level security hides it (K-04 v1 rule 4), so the read is refused with notFound and returns nothing. A turn about both businesses reads each in its own call."
+  },
+  "request": {
+    "handleId": "handle-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingIds": ["booking-alex-workshop"],
+    "facts": []
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "bookings",
+    "rowId": "booking-alex-workshop"
+  }
+}

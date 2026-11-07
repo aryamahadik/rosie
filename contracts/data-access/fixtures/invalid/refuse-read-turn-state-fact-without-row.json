@@ -1,0 +1,6 @@
+{
+  "handleId": "handle-alex",
+  "businessId": "biz-lees-barbershop",
+  "bookingIds": ["booking-alex-haircut"],
+  "facts": [{ "key": "biz.name", "table": "businesses", "column": "name" }]
+}

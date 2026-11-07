@@ -743,6 +743,278 @@
       "expect": "refuse",
       "shows": "An 'all set' sent by email: it goes once texts work, as a text",
       "source": "arch 02 line 125 ('once texts work, one short \"all set\"'); S12-10 ('Nothing already emailed is sent again in full')"
+    },
+    {
+      "file": "handle-key-existing.json",
+      "version": "v1.2",
+      "def": "handleSealingKey.exchange",
+      "expect": "accept",
+      "shows": "A text from Alex's mobile: his handle, person and key exist, so the gateway gets his key and nothing is written; the response names the key's row, never its bytes",
+      "source": "QUESTIONS.md NQ-RT-1 default; arch 02 line 109; arch 01 line 93; K-04 v1 sealing_keys, seed-sealing-key; NQ-DB-1 default; T-182 (db/repo/sealing.ts)"
+    },
+    {
+      "file": "handle-key-person-no-key.json",
+      "version": "v1.2",
+      "def": "handleSealingKey.exchange",
+      "expect": "accept",
+      "shows": "A text from Sam's mobile: his handle and person exist but he has no key yet, so his key is made now, wrapped under the named secret",
+      "source": "QUESTIONS.md NQ-RT-1 default; K-04 v1 sealing_keys (one key per person); NQ-DB-1 default; T-182 ('The data key is made on first seal')"
+    },
+    {
+      "file": "handle-key-first-sight.json",
+      "version": "v1.2",
+      "def": "handleSealingKey.exchange",
+      "expect": "accept",
+      "shows": "S1-01: a number never seen before: one transaction writes the handle, a person with no name yet and their link, and that person's key",
+      "source": "QUESTIONS.md NQ-RT-1 default ('created on first sight of the handle and linked to the person once known'); K-06 v1 handle ('a new number has no row yet'); K-04 v1 handles, persons (name 'null until known'), person_handles, sealing_keys"
+    },
+    {
+      "file": "handle-key-first-sight-repeat.json",
+      "version": "v1.2",
+      "def": "handleSealingKey.exchange",
+      "expect": "accept",
+      "shows": "The same number again a second later finds what the first call wrote and writes nothing: one handle gets one key, whatever new ids the gateway proposes",
+      "source": "T-220 (50 parallel get-or-create calls for one handle create exactly one key); arch 02 line 109 (Linq retries a webhook); K-04 v1 handles_address_key"
+    },
+    {
+      "file": "handle-key-erased.json",
+      "version": "v1.2",
+      "def": "handleSealingKey.exchange",
+      "expect": "accept",
+      "shows": "Ben T. texts after his key was erased: no person on the handle holds a key, so the call is refused with keyErased and writes nothing",
+      "source": "RULES 4.10 (45-day delete); arch 09 line 492; K-04 v1 sealing_keys_erased_or_held, seed-sealing-key (Ben erased 2026-11-02)"
+    },
+    {
+      "file": "targets-alex.json",
+      "version": "v1.2",
+      "def": "handleTargets.exchange",
+      "expect": "accept",
+      "shows": "The guard's targets for Alex across every business: his two customer roles, A7-03's open question with its options, and his bookings at the barbershop and the yoga studio, with versions",
+      "source": "QUESTIONS.md NQ-RT-2 default ('a handle's targets'); arch 02 line 115; arch 03 line 159; K-04 v1 person_roles, open_questions, bookings_booker_idx, bookings_served_idx"
+    },
+    {
+      "file": "targets-sam-owner.json",
+      "version": "v1.2",
+      "def": "handleTargets.exchange",
+      "expect": "accept",
+      "shows": "Sam owns three businesses and has no question or booking of his own: his targets are his roles, the owner's door",
+      "source": "arch 02 line 115; arch 03 line 165 (S11-12, an owner command); K-04 v1 seed-person-roles"
+    },
+    {
+      "file": "targets-first-text.json",
+      "version": "v1.2",
+      "def": "handleTargets.exchange",
+      "expect": "accept",
+      "shows": "A new owner's first text: one person with no role, no question, no booking and no phone row yet, so nothing is a target and the doors are offered",
+      "source": "arch 02 line 115 ('No target: the doors'); arch 03 line 165; T-556 (JOIN reaches the doors with no target)"
+    },
+    {
+      "file": "read-turn-state-alex.json",
+      "version": "v1.2",
+      "def": "readTurnState.exchange",
+      "expect": "accept",
+      "shows": "The frontier's read of Alex's state under the barbershop's scope: his person and role, his phone, A7-03's open question, the haircut's head at v7 with its flags, no pause, no consent row, and two facts each from its one home row with that row's version",
+      "source": "QUESTIONS.md M2-action-adapters.1 default ('read turn state', primary and uncached, under the business scope); arch 02 line 117; arch 03 lines 159, 163, 175; arch 10 lines 504, 538, 546"
+    },
+    {
+      "file": "read-turn-state-ben-stopped.json",
+      "version": "v1.2",
+      "def": "readTurnState.exchange",
+      "expect": "accept",
+      "shows": "Ben T.'s state at the barbershop after his STOP and a pause on his phone: the record flags (stopped, paused, neither private nor deceased) and his texts yes there; his STOP row has no business, so the business scope does not read it",
+      "source": "arch 03 line 175 (record flags); RULES 7.2, 7.3; K-29 v1 consents and rule 4; K-04 v1 pauses, seed-pause, seed-phone-stopped; QUESTIONS.md M2-action-adapters.1"
+    },
+    {
+      "file": "read-turn-state-first-text.json",
+      "version": "v1.2",
+      "def": "readTurnState.exchange",
+      "expect": "accept",
+      "shows": "S1-01's frontier before there is a business: read on the runtime side, only rows with no business: the person made at first sight and nothing else",
+      "source": "K-05 v1 Scope (writes with no business go on the runtime side); K-04 v1 rule 4; S1-01"
+    },
+    {
+      "file": "read-turn-state-other-business.json",
+      "version": "v1.2",
+      "def": "readTurnState.exchange",
+      "expect": "accept",
+      "shows": "A read under the barbershop's scope that names the yoga studio's booking is refused with notFound: row-level security hides another business's row",
+      "source": "arch 10 line 546 (row-level security per business on every Tool API call); K-04 v1 rule 4; T-219 (a read under business A never returns business B's rows)"
+    },
+    {
+      "file": "read-turn-state-unknown-fact.json",
+      "version": "v1.2",
+      "def": "readTurnState.exchange",
+      "expect": "accept",
+      "shows": "A fact whose column no frozen table list gives for its table is refused with unknownFact, and nothing is read",
+      "source": "arch 02 line 117 (each fact from its one home); 02-contracts section 2 item 3 (the table lists); K-23 v1 business_setup.website"
+    },
+    {
+      "file": "claim-in-order-with-port.json",
+      "version": "v1.2",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "claim-in-order in its v1.2 form: each claimed row carries its claim and its port, linq for the imessage rows",
+      "source": "K-07 v1 outboxRow.port ('in K-05's names'); T-259 (limit 8 refuses exactly a send by an SMS port); DL-012; DL-031"
+    },
+    {
+      "file": "renew-claim-reads-phone.json",
+      "version": "v1.2",
+      "def": "renewClaim.exchange",
+      "expect": "accept",
+      "shows": "renew-claim-first-send in its v1.2 form: the renewal also reads the recipient's phone flags in its own transaction, so the stopped flag acted on before the send is the renewal's",
+      "source": "T-259 (the window from the stopped flag's last read to Linq's acceptance); arch 03 line 175; RULES 7.2; K-07 v1 'How a claim lapses'"
+    },
+    {
+      "file": "commit-alex-stop.json",
+      "version": "v1.2",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Alex's STOP commits while his confirmation is claimed and unsent: the phone stopped with its chat closed, the STOP row for every business and the stop reply, in one commit",
+      "source": "RULES 7.2, 7.5; arch 03 line 175; K-29 v1 README ('The core phones.stopped flag and stop_at are written in the same commit as the STOP row'); K-09 draft recordStopOrStart, default 6"
+    },
+    {
+      "file": "renew-claim-stopped.json",
+      "version": "v1.2",
+      "def": "renewClaim.exchange",
+      "expect": "accept",
+      "shows": "The renewal after Alex's STOP reads the phone stopped, so the dispatcher sends nothing and drops the row",
+      "source": "arch 06 line 313 ('Stopped: dropped'); arch 03 line 175; T-259"
+    },
+    {
+      "file": "send-state-customer.json",
+      "version": "v1.2",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read for Alex's confirmation: not stopped, chat open with Linq's chat id and a Linq contact, a customer in the business's zone (no visit zone before K-30) and H04 hours, the staging override on for his test number, the booking it read unchanged",
+      "source": "QUESTIONS.md NQ-RT-2 default ('a recipient's send state'); arch 06 line 313; RULES 4.3; CQ-05; BP 9.4; QUESTIONS.md M3-M3b.4; K-04 v1 phones, threads, businesses, release_flags, seed-flag"
+    },
+    {
+      "file": "send-state-owner.json",
+      "version": "v1.2",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read for Sam's routine notice: the owner's audience, whose text hours start at 8am",
+      "source": "RULES 4.3 ('the owner and team from 8am'); arch 06 line 313; K-04 v1 person_roles, businesses text hours (H04)"
+    },
+    {
+      "file": "send-state-no-chat.json",
+      "version": "v1.2",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read for Dee W.'s notice: her mobile has no open chat and is not a Linq contact, so the row waits for her to text in",
+      "source": "RULES 4.1b; MC C9; arch 06 line 313; K-07 v1 waiting_chat; K-04 v1 phones.chat_open, linq_contact_added_at"
+    },
+    {
+      "file": "send-state-stopped.json",
+      "version": "v1.2",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read after Alex's STOP: the phone stopped, its chat closed, and the newest texts row covering him the STOP for every business",
+      "source": "arch 06 line 313; RULES 7.2; K-29 v1 consents_handle_kind_at_idx ('limit 8's texts check read a contact's newest texts row'); T-562 (a row for a phone stopped before the claim is dropped)"
+    },
+    {
+      "file": "commit-alex-cancels-while-sending.json",
+      "version": "v1.2",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Alex calls the Nov 14 haircut off while its confirmation is claimed and unsent: the booking cancelled (v2), the time with Riley released, the reply written",
+      "source": "02-contracts K-05 item 1; arch 06 line 313; K-04 v1 bookings.stage"
+    },
+    {
+      "file": "send-state-booking-cancelled.json",
+      "version": "v1.2",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read after the cancel: the booking the row read is now v2 and cancelled, so the row is stale and its booking closed, and it is withdrawn rather than composed again",
+      "source": "arch 06 line 313 ('Stale: composed again from today's record (S13-57), or withdrawn if its booking or question has closed'); K-07 v1 rowState withdrawn"
+    },
+    {
+      "file": "mark-failed-4006.json",
+      "version": "v1.2",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "Linq answers the confirmation's part with 4006 and no message id: the part fails with no next try yet, waiting a minute for a receipt",
+      "source": "arch 01 line 65 ('After a 4001 or 4006, which may still deliver: a new key only if no delivery receipt comes within 1 minute'); K-11 v1 mayStillDeliver, error-4006.json; K-07 v1 rule 2"
+    },
+    {
+      "file": "mark-delivered-by-key.json",
+      "version": "v1.2",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "The receipt for the 4006 part arrives within the minute: found by the part's key, since no part holds its message id, the part goes failed to delivered, keeps the message id, and the row is delivered",
+      "source": "K-11 v1 README line 50 ('A late receipt after 4001 or 4006'), verify-delivered-after-4006.json; K-07 v1 partMove failed to delivered; T-257 open point; DL-103 (5)"
+    },
+    {
+      "file": "claim-effects-logged.json",
+      "version": "v1.2",
+      "def": "claimEffects.exchange",
+      "expect": "accept",
+      "shows": "claim-effects in its v1.2 form: the claim of the pending calendar write appends its effect.claimed entry in the same transaction and returns it",
+      "source": "QUESTIONS.md CQ-43; K-08 v1.1 effect.claimed, event-effect-claimed-pending.json; arch 09 lines 457, 492; K-05 v1.1 open gap 15"
+    },
+    {
+      "file": "claim-effects-lapsed-logged.json",
+      "version": "v1.2",
+      "def": "claimEffects.exchange",
+      "expect": "accept",
+      "shows": "claim-effects-lapsed in its v1.2 form: a lapsed running row taken again by another runner, its entry naming the state it stays in and both claims",
+      "source": "QUESTIONS.md CQ-43; K-08 v1.1 effect.claimed, event-effect-claimed-lapsed.json, default 20"
+    },
+    {
+      "file": "service-back-logged.json",
+      "version": "v1.2",
+      "def": "serviceBack.exchange",
+      "expect": "accept",
+      "shows": "service-back in its v1.2 form: the outage row claimed for one more run, its entry recording tries back to 0 and runs up by one",
+      "source": "QUESTIONS.md CQ-43; K-08 v1.1 effect.claimed, event-effect-claimed-outage.json; arch 11 line 582"
+    },
+    {
+      "file": "invalid/refuse-handle-key-with-key-value.json",
+      "version": "v1.2",
+      "def": "handleSealingKey.request",
+      "expect": "refuse",
+      "shows": "A key request that carries the wrapping secret's value: a key is named, never shown, so the request takes only the secret's name",
+      "source": "BP rule 7; contracts/README.md convention 9; K-04 v1 sealing_keys.wrapping_key_name ('a name, never a value')"
+    },
+    {
+      "file": "invalid/refuse-claimed-row-sms-port.json",
+      "version": "v1.2",
+      "def": "claimedRow",
+      "expect": "refuse",
+      "shows": "A claimed row on Linq's SMS service that names an SMS port: there is no SMS port, so an sms channel row goes by linq, text only",
+      "source": "DL-012; DL-031; K-07 v1 port, refuse-sms-channel.json; T-259"
+    },
+    {
+      "file": "invalid/refuse-mark-delivered-key-only.json",
+      "version": "v1.2",
+      "def": "markPart.request",
+      "expect": "refuse",
+      "shows": "A delivery receipt with the part's key and no message id: a receipt always carries the provider's message id, and the key is only a second way to find the part",
+      "source": "K-06 v1 status.messageId; K-11 v1 README line 50"
+    },
+    {
+      "file": "invalid/refuse-claim-event-not-claim-kind.json",
+      "version": "v1.2",
+      "def": "claimedEffect",
+      "expect": "refuse",
+      "shows": "A claimed effect whose entry is an effect.result: the entry a claim appends is the claim's own kind",
+      "source": "K-08 v1.1 effect.claimed; QUESTIONS.md CQ-43"
+    },
+    {
+      "file": "invalid/refuse-send-state-caller-versions.json",
+      "version": "v1.2",
+      "def": "sendState.request",
+      "expect": "refuse",
+      "shows": "A send-state request that hands in the versions to compare: the call reads the row's own versions read, never a copy from the caller",
+      "source": "arch 06 line 313 ('versions unchanged'); K-04 v1 outbox_rows.versions_read; NQ-RT-2 default"
+    },
+    {
+      "file": "invalid/refuse-read-turn-state-fact-without-row.json",
+      "version": "v1.2",
+      "def": "readTurnState.request",
+      "expect": "refuse",
+      "shows": "A fact named with no home row: each fact is read once from its one home row, with that row's version",
+      "source": "arch 02 line 117 ('each fact once, from its one home'); S13-30; K-02 v1 fact rowId"
     }
   ]
 }

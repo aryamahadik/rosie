@@ -1,0 +1,21 @@
+{
+  "call": "handleTargets",
+  "given": {
+    "k04Seeds": ["seed-sealing-key.json"],
+    "after": ["handle-key-first-sight.json"],
+    "now": "2026-11-08T14:00:04Z",
+    "note": "S1-01: the new owner's first text, sealed under the key made at first sight. The handle's one person has no role, no open question and no booking, and the number has no phone row until this turn commits: no target, so the doors (arch 03 line 165)."
+  },
+  "request": {
+    "handleId": "handle-gw-0108"
+  },
+  "outcome": {
+    "result": "targets",
+    "handleId": "handle-gw-0108",
+    "readAt": "2026-11-08T14:00:04Z",
+    "persons": [{ "personId": "person-gw-0108", "roles": [] }],
+    "openQuestions": [],
+    "bookings": [],
+    "phone": null
+  }
+}

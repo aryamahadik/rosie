@@ -1,0 +1,21 @@
+{
+  "call": "readTurnState",
+  "given": {
+    "k04Seeds": ["seed-booking-head.json"],
+    "after": [],
+    "now": "2026-10-23T14:06:12Z",
+    "note": "A fact whose home names a column no frozen part lists for that table: the business's website lives in K-23's business_setup (FS row B05), not in K-04's businesses. The call builds reads only from names a frozen table list gives, so it refuses the read and reads nothing."
+  },
+  "request": {
+    "handleId": "handle-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingIds": [],
+    "facts": [{ "key": "biz.website", "table": "businesses", "rowId": "biz-lees-barbershop", "column": "website" }]
+  },
+  "outcome": {
+    "error": "unknownFact",
+    "key": "biz.website",
+    "table": "businesses",
+    "column": "website"
+  }
+}

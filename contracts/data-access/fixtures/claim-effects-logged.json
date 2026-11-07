@@ -1,0 +1,76 @@
+{
+  "call": "claimEffects",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-writes-effect.json"],
+    "now": "2026-11-07T15:06:33Z",
+    "note": "claim-effects's exchange in its v1.2 form, run instead of it: the claim of the pending calendar write also appends its K-08 v1.1 effect.claimed entry in the same transaction, with the effect's turn, trace and bundle, and returns it (CQ-43)."
+  },
+  "request": {
+    "claimer": "effects-runner-1",
+    "now": "2026-11-07T15:06:33Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "effect": {
+          "effectId": "eff-cal-riley-alex-nov14-write",
+          "turnId": "turn-alex-book-1",
+          "jobId": null,
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov14",
+          "kind": "calendar_write",
+          "port": "calendar",
+          "calendarProvider": "google",
+          "visitId": "visit-alex-riley-nov14",
+          "personId": "person-riley",
+          "handleId": null,
+          "amount": null,
+          "portRequest": {
+            "title": "Lee's Barbershop · Haircut · Alex",
+            "start": "2026-11-14T16:00:00Z",
+            "end": "2026-11-14T16:30:00Z",
+            "zone": "America/New_York"
+          },
+          "idempotencyKey": "eff-cal-riley-alex-nov14-write",
+          "state": "running",
+          "tries": 0,
+          "runs": 1,
+          "firstTryAt": "2026-11-07T15:06:33Z",
+          "providerObjectId": null,
+          "errorCode": null,
+          "ledgerLineId": null,
+          "traceId": "trace-alex-0012"
+        },
+        "version": 2,
+        "claimedFrom": "pending",
+        "claimedBy": "effects-runner-1",
+        "claimLapsesAt": "2026-11-07T15:07:33Z",
+        "event": {
+          "id": "eff-cal-riley-alex-nov14-write/claimed/2",
+          "kind": "effect.claimed",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "job",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "effects",
+          "rowId": "eff-cal-riley-alex-nov14-write",
+          "oldValues": { "state": "pending", "first_try_at": null, "claimed_by": null, "claim_lapses_at": null },
+          "newValues": {
+            "state": "running",
+            "first_try_at": "2026-11-07T15:06:33Z",
+            "claimed_by": "effects-runner-1",
+            "claim_lapses_at": "2026-11-07T15:07:33Z"
+          },
+          "sealed": null,
+          "why": { "claimedFrom": "pending" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      }
+    ]
+  }
+}
