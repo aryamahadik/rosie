@@ -9,7 +9,12 @@ const url = process.env.DATABASE_URL ?? "postgres://rosie:rosie@127.0.0.1:54329/
 const schema = `spike_${process.pid}`;
 const ms = (t) => Math.round(Number(process.hrtime.bigint() - t) / 1e6);
 
-const sql = postgres(url, { max: 1, onnotice: () => {} });
+const sql = postgres(url, {
+  max: 1,
+  onnotice: () => {
+    // notices (for example 'relation already exists, skipping') are not timings: ignore them
+  },
+});
 const out = { schema };
 
 // 1. migration run in an empty schema
