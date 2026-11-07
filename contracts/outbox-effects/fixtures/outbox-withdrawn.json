@@ -1,0 +1,109 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-riley-alex-reminder",
+    "turnId": "turn-alex-book-1",
+    "commitSeq": 11,
+    "recipientHandleId": "handle-riley",
+    "recipientPersonId": "person-riley",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-riley-nov14",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "withdrawn",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-riley-alex-reminder",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Tomorrow: Alex M. at Sat Nov 14, 11:00am.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "name", "value": "Alex M." },
+        { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0090"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-riley-alex-reminder",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-riley-alex-reminder/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "pending",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-11-13T14:00:01Z",
+    "lapsesAt": "2026-11-13T14:01:01Z",
+    "claimNo": 1,
+    "firstTryAt": null,
+    "nextTryNotBefore": null
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-13T13:59:57Z",
+      "by": "commitTurn",
+      "note": "A routine row telling Riley of the next day's visit."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-13T14:00:00Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-13T14:00:01Z",
+      "by": "claimOutbox",
+      "note": "Claimed."
+    },
+    {
+      "subject": "part",
+      "key": "out-riley-alex-reminder/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-13T14:00:01Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "Try 1."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "withdrawn",
+      "at": "2026-11-13T14:00:02Z",
+      "by": "markRow",
+      "note": "Limit 8 at send: Alex called the visit off a moment before, so the versions changed and the booking has closed: withdrawn, never sent (arch 06 line 313; K-05 v1 markRow withdrawn)."
+    }
+  ],
+  "followUps": []
+}

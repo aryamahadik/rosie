@@ -1,0 +1,54 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-alex-grooms-deposit-refund",
+    "turnId": "turn-alex-grooms-cancel-1",
+    "jobId": null,
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-grooms-package",
+    "kind": "stripe_refund",
+    "port": "stripe",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-alex",
+    "handleId": null,
+    "amount": { "cents": 4000, "currency": "USD" },
+    "portRequest": { "refundOf": "stripe-charge-demo-0001" },
+    "idempotencyKey": "eff-alex-grooms-deposit-refund",
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 1,
+    "firstTryAt": "2026-11-08T16:00:01Z",
+    "providerObjectId": "stripe-refund-demo-0001",
+    "errorCode": null,
+    "ledgerLineId": "ledger-alex-grooms-deposit-refund",
+    "traceId": "trace-alex-0110"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-08T16:00:00Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "Alex calls the Groom's package off before the 24-hour cutoff (barber.json), so the $40 deposit is refunded: an effect row in the cancel's commit."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-08T16:00:01Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "Try 1."
+    },
+    {
+      "from": "running",
+      "to": "succeeded",
+      "at": "2026-11-08T16:00:02Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "ok",
+      "note": "Stripe refunds the charge; reconciliation matches the refund to its ledger line by the effect id (arch 10 line 550)."
+    }
+  ],
+  "providerEventIds": []
+}

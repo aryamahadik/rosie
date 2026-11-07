@@ -1,0 +1,86 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-alex-bill-after-visit",
+    "turnId": "turn-alex-home-visit-done",
+    "jobId": null,
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-home-grooming",
+    "kind": "stripe_charge",
+    "port": "stripe",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-alex",
+    "handleId": null,
+    "amount": { "cents": 17900, "currency": "USD" },
+    "portRequest": { "purpose": "bill", "savedCard": "card-demo-alex" },
+    "idempotencyKey": "eff-alex-bill-after-visit",
+    "state": "outage",
+    "tries": 5,
+    "runs": 1,
+    "firstTryAt": "2026-11-07T19:00:01Z",
+    "providerObjectId": null,
+    "errorCode": "network",
+    "ledgerLineId": null,
+    "traceId": "trace-alex-0120"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T19:00:00Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "After Alex's $179 home grooming visit, the bill is charged to the saved card (barber.json, flow B)."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-07T19:00:01Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "Try 1 goes on the one key."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-07T19:00:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "A network error: try 2 on the same key (arch 10 line 542)."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-07T19:01:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 3."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-07T19:03:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 4."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-07T19:06:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 5."
+    },
+    {
+      "from": "running",
+      "to": "outage",
+      "at": "2026-11-07T19:09:11Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "The 5th try in 10 minutes failed: Stripe's outage row. The payment waits and runs once Stripe is back (arch 10 line 542; S12-16, S12-18)."
+    }
+  ],
+  "providerEventIds": []
+}

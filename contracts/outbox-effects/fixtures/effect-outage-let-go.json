@@ -1,0 +1,94 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-alex-save-card-haircut",
+    "turnId": "turn-alex-book-4",
+    "jobId": null,
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-haircut-dec",
+    "kind": "stripe_save_card",
+    "port": "stripe",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-alex",
+    "handleId": null,
+    "amount": null,
+    "portRequest": { "purpose": "fee card", "fee": { "cents": 2000, "currency": "USD" } },
+    "idempotencyKey": "eff-alex-save-card-haircut",
+    "state": "cancelled",
+    "tries": 5,
+    "runs": 1,
+    "firstTryAt": "2026-11-09T15:00:01Z",
+    "providerObjectId": null,
+    "errorCode": "network",
+    "ledgerLineId": null,
+    "traceId": "trace-alex-0130"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-09T15:00:00Z",
+      "by": "commitTurn",
+      "tryOutcome": null,
+      "note": "Alex saves a time for a $35 haircut; a card is saved for the shop's $20 fee (barber.json, flow A)."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-09T15:00:01Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "Try 1."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-09T15:00:31Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 2."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-09T15:01:31Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 3."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-09T15:03:31Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 4."
+    },
+    {
+      "from": "running",
+      "to": "running",
+      "at": "2026-11-09T15:05:31Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Try 5."
+    },
+    {
+      "from": "running",
+      "to": "outage",
+      "at": "2026-11-09T15:08:31Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "networkError",
+      "note": "Stripe's outage row: the card can't be saved yet; the time stays saved up to 2 of Sam's text hours while Sam picks (S12-17)."
+    },
+    {
+      "from": "outage",
+      "to": "cancelled",
+      "at": "2026-11-09T17:08:31Z",
+      "by": "letGo",
+      "tryOutcome": null,
+      "note": "Still down with no yes from Sam: the time is let go and Alex is told; the card is never saved (arch 11 line 582; S12-17)."
+    }
+  ],
+  "providerEventIds": []
+}

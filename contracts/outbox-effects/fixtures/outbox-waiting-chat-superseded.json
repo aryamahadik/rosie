@@ -1,0 +1,119 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-dee-booked-riley",
+    "turnId": "turn-sam-adds-dee-1",
+    "commitSeq": 12,
+    "recipientHandleId": "handle-dee",
+    "recipientPersonId": "person-dee",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-dee-riley-nov14",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "superseded",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-dee-booked-riley",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 10:00am",
+          "calendarFile": "new",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "pro.name", "value": "Riley" },
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "visit.time", "value": "Sat Nov 14, 10:00am" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-dee-0010"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-dee-booked-riley",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-dee-booked-riley/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "pending",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": null,
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-09T15:00:00Z",
+      "by": "commitTurn",
+      "note": "Sam adds Dee W.'s $35 haircut with Riley (a booking the business adds); a routine row tells Dee."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-09T15:00:03Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-09T15:00:04Z",
+      "by": "claimOutbox",
+      "note": "Claimed in Dee's commit order."
+    },
+    {
+      "subject": "part",
+      "key": "out-dee-booked-riley/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-09T15:00:04Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The words part, try 1, written at the claim."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "waiting_chat",
+      "at": "2026-11-09T15:00:05Z",
+      "by": "markRow",
+      "note": "Limit 8 at send: Dee's mobile has never texted Rosie, so it has no open chat. The row waits, its claim let go, with no clock and no held_until, until Dee texts in (arch 06 line 313; RULES 4.1b). Nothing is sent, not even an SMS: Rosie never writes first, and Sam is given Dee's chat link to pass on (MC C9)."
+    },
+    {
+      "subject": "row",
+      "from": "waiting_chat",
+      "to": "superseded",
+      "at": "2026-11-10T14:00:02Z",
+      "by": "commitTurn",
+      "note": "Dee sends the ready text ('Hey, send me further updates about my booking' and the booking ref), so the chat opens. The commit of the turn that answers it writes one message giving the booking as it stands, out-dee-chat-open-answer, and this row gives way to it, never sent (arch 06 line 313; RULES 4.1b: 'Nothing sent before is sent again'). K-05 v1.1."
+    }
+  ],
+  "followUps": [
+    {
+      "why": "chatOpenAnswer",
+      "outboxRowId": "out-dee-chat-open-answer",
+      "recipientHandleId": "handle-dee",
+      "channel": "imessage",
+      "at": "2026-11-10T14:00:02Z"
+    }
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "fixtures": [
+    {
+      "file": "outbox-delivered.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Alex's booking confirmation with Riley, one words part carrying the calendar file: planned at the commit, checked by writePlan, claimed (sending), accepted (sent), delivered.",
+      "source": "02-contracts K-07 Fixtures; arch 02 lines 121 to 127; arch 01 line 65; K-05 claim-in-order (out-alex-booked-riley)"
+    },
+    {
+      "file": "outbox-held-text-hours.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "A routine row to Sam at 8:30pm: limit 8 holds it to 8am New York (held, held_until 13:00Z), the next claim takes it at 8am under its stored key, sent and delivered.",
+      "source": "02-contracts K-07 Fixtures; arch 06 line 313; arch 02 line 125; K-05 mark-held-for-text-hours"
+    },
+    {
+      "file": "outbox-dropped-stopped.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "A reminder to Ben T., whose phone is stopped: limit 8 drops it at send (dropped_stopped); nothing is sent, and its question takes step 9's never-delivered path.",
+      "source": "02-contracts K-07 Fixtures; arch 06 line 313; arch 02 line 127; K-04 seed-phone-stopped"
+    },
+    {
+      "file": "outbox-stale-recomposed.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Riley's new-booking row goes stale at send (the booking's version changed when Sam moved it to 11:30am), is composed again from today's record (stale to checked), claimed again under the stored key and delivered.",
+      "source": "02-contracts K-07 Fixtures; arch 06 line 313; S13-57; K-05 v1 markRow stale"
+    },
+    {
+      "file": "outbox-fallback-email.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Texting is down: Alex's confirmation fails three tries, each under a new key, and after 15 minutes of tries the row is failed and the next way, an email row, follows.",
+      "source": "02-contracts K-07 Fixtures; arch 02 line 125; S12-09, S12-10; arch 01 line 65"
+    },
+    {
+      "file": "outbox-safety-retry.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "A safety line (K-01 safetyEmergency) to Alex fails, retries every 10 s under new keys, and goes at once by email too (safetyOtherWay); the third try is delivered.",
+      "source": "02-contracts K-07 Fixtures; arch 02 lines 111, 125; RULES 4.3, 4.12; arch 07 line 361"
+    },
+    {
+      "file": "outbox-4006-new-key.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Sam's new-booking row: Linq reports 4006, no delivery receipt comes within 1 minute, so try 2 goes under a new key and is delivered.",
+      "source": "02-contracts K-07 Fixtures and retry rules; arch 01 line 65"
+    },
+    {
+      "file": "outbox-4001-delivered-anyway.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Linq reports 4001, then the delivery receipt comes 20 s later: the part moves failed to delivered and the row sending to delivered, with no new key.",
+      "source": "arch 01 line 65 ('which may still deliver'); 02-contracts K-07 retry rules"
+    },
+    {
+      "file": "outbox-two-sends.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The tour's A7-03 question: the words, then the poll after the words' delivery receipt; the row is sent when both parts are accepted and delivered when both receipts came (K-04 seed-outbox-row's ids).",
+      "source": "02-contracts K-07 Fixtures; arch 07 line 367; tour lines 423 to 427; K-04 seed-outbox-row"
+    },
+    {
+      "file": "outbox-email-copy.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Alex's email copy of A7-03: its own row on the email channel and port, reusing the text row's plan (copyOfRowId), one text with the options typed; Resend's delivered receipt.",
+      "source": "02-contracts K-07 'An email copy row'; arch 07 lines 371, 397; RULES 4.1; K-04 seed-outbox-row"
+    },
+    {
+      "file": "outbox-poll-failed-plain.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "A poll accepted and then reported failed: the next try goes plain (words, options typed) under a new key; the row moves sent to checked and is claimed again.",
+      "source": "arch 07 line 367 ('A refused part goes again plain'); arch 01 line 65; K-06 poll-failed"
+    },
+    {
+      "file": "outbox-claim-lapsed.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "dispatcher-1 dies holding Maya's row; its claim lapses after 60 s and dispatcher-2 claims it again (sending to sending, claim 2); the unsent part goes under its stored key.",
+      "source": "README 'How a claim lapses'; K-05 v1 open gap 1; arch 11 line 576"
+    },
+    {
+      "file": "outbox-withdrawn.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Riley's reminder found stale at send after Alex called the visit off: its booking has closed, so it is withdrawn, never sent.",
+      "source": "arch 06 line 313; K-05 v1 markRow withdrawn"
+    },
+    {
+      "file": "outbox-waiting-chat-superseded.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Sam adds Dee W.'s booking with Riley; Dee's mobile has no open chat, so limit 8 puts the row to waiting_chat (markRow; claim let go, no clock, no held_until, no SMS). When Dee sends the ready text, the commit of the turn that answers it writes one message giving the booking as it stands (chatOpenAnswer) and the row is superseded, never sent.",
+      "source": "arch 06 line 313; RULES 4.1b; MC C9; K-05 v1.1"
+    },
+    {
+      "file": "outbox-waiting-chat-withdrawn.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Dee W.'s booking with Avery: the row waits for Dee's chat to open (waiting_chat), then Sam calls the visit off before Dee texts in, and that turn's commit withdraws it (waiting_chat to withdrawn), never sent.",
+      "source": "arch 06 line 313; RULES 4.1b; K-05 v1.1"
+    },
+    {
+      "file": "outbox-retry-after-reclaimed.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Avery's new-booking row: try 1 refused with a Retry-After of 120 s, so try 2 waits under a new key and the claim holds nextTryNotBefore; the dispatcher dies, its claim lapses and dispatcher-2 claims the row again (claim 2), keeping nextTryNotBefore and the claim's firstTryAt, which the 15 minutes count from.",
+      "source": "arch 10 line 540 ('each try after any Retry-After'); arch 02 line 125; arch 01 line 65; arch 11 line 576"
+    },
+    {
+      "file": "effect-charge.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The $40 deposit on Alex's $140 Groom's package at Lee's Barbershop: written at the commit, claimed, charged once on its key, with its ledger line and Stripe event.",
+      "source": "02-contracts K-07 Fixtures; arch 10 lines 508, 542, 550; fixture set v1 barber.json"
+    },
+    {
+      "file": "effect-charge-declined.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The same deposit declined: never retried ('Try another card').",
+      "source": "02-contracts K-07 Fixtures; arch 10 line 542; RULES 3.11"
+    },
+    {
+      "file": "effect-refund.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Alex calls the Groom's package off before the 24-hour cutoff: the $40 deposit refunded once, matched to its ledger line by effect id.",
+      "source": "02-contracts K-07 Fixtures; arch 10 line 550; fixture set v1 barber.json"
+    },
+    {
+      "file": "effect-reconciliation-refund.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The daily reconciliation (a job, no turn) finds Dee W.'s $20 payment charged twice, the second with no agreed booking behind it: it writes a stripe_refund effect (reconciliationJob), which is claimed and succeeds on its one key.",
+      "source": "arch 10 line 550; S12-26; 02-contracts K-14 list-double-charge.json"
+    },
+    {
+      "file": "effect-gave-up-outage.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The $179 home grooming bill: 5 network errors in 10 minutes on one key, then Stripe's outage row (outage), waiting to run once.",
+      "source": "02-contracts K-07 Fixtures; arch 10 line 542; S12-16, S12-18; fixture set v1 barber.json (flow B)"
+    },
+    {
+      "file": "effect-outage-runs-once.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The same bill: Stripe back, it runs once (run 2) on the same key and succeeds.",
+      "source": "arch 11 line 582 ('Charges and refunds wait, then run once'); S12-16, S12-18"
+    },
+    {
+      "file": "effect-outage-let-go.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Saving Alex's card for the $20 fee hits Stripe's outage; still down after 2 of Sam's text hours with no yes, the time is let go and the effect cancelled.",
+      "source": "arch 11 line 582; S12-17; fixture set v1 barber.json"
+    },
+    {
+      "file": "effect-calendar-write.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "One event on Riley's Google calendar for Alex's Nov 14 visit, keyed by booking, visit and person, titled with the display name, service and first name.",
+      "source": "02-contracts K-07 Fixtures; arch 05 line 267; RULES 4.7; MC 8 'Calendars'"
+    },
+    {
+      "file": "effect-calendar-move.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The visit moved to 11:30am: the same event updated.",
+      "source": "02-contracts K-07 Fixtures; arch 05 line 267; B8-37"
+    },
+    {
+      "file": "effect-calendar-delete.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The visit called off: the event deleted from Riley's calendar.",
+      "source": "02-contracts K-07 Fixtures; arch 05 line 267"
+    },
+    {
+      "file": "effect-linq-contact-add.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "The reach card saves Alex's mobile: Linq's contacts/add as an effect row on Rosie's one number, no business.",
+      "source": "02-contracts K-07 Fixtures; CQ-04; arch 11 line 572; MC C9"
+    },
+    {
+      "file": "provider-event-stripe.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "Stripe's event for the deposit charge, stored once by its event id and linked to effect eff-alex-grooms-deposit.",
+      "source": "02-contracts K-07 'Provider events'; arch 02 line 109"
+    },
+    {
+      "file": "provider-event-calendar.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "accept",
+      "shows": "A Google calendar push about Riley's own calendar, stored once by its event id, linked to no effect (a personal event over a visit goes to Sam: S12-33).",
+      "source": "02-contracts K-07 'Provider events'; arch 02 line 109; arch 11 line 578; S12-33"
+    },
+    {
+      "file": "invalid/refuse-sms-channel.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "Alex's confirmation sent through an SMS port: refused, since there is no SMS provider (port is linq or email). The same row on Linq's sms channel, port linq, passes.",
+      "source": "02-contracts K-07 Fixtures; DL-012; DL-031; MC C9"
+    },
+    {
+      "file": "invalid/refuse-sms-row-with-poll.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "A7-03 on Linq's sms channel with a poll: refused, since a reply on SMS goes back in that chat as text only. The same row on imessage passes.",
+      "source": "DL-031 (CQ-11's default)"
+    },
+    {
+      "file": "invalid/refuse-part-without-key.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "A part with no idempotency key: refused.",
+      "source": "02-contracts K-07 Fixtures; arch 01 line 65"
+    },
+    {
+      "file": "invalid/refuse-row-move-not-allowed.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "A delivered row claimed again (delivered to sending): no such move, so it is refused.",
+      "source": "02-contracts K-07 Contract test ('every state move ... is allowed and no other')"
+    },
+    {
+      "file": "invalid/refuse-4006-new-key-too-soon.json",
+      "version": "v1",
+      "rule": "lifeChain",
+      "expect": "refuse",
+      "shows": "After a 4006, try 2 under a new key only 20 s later: refused by the named rule, since a new key waits 1 minute for a delivery receipt.",
+      "source": "arch 01 line 65"
+    },
+    {
+      "file": "invalid/refuse-effect-without-key.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "The deposit charge with no idempotency key: refused.",
+      "source": "02-contracts K-07 Fixtures; arch 10 line 542"
+    },
+    {
+      "file": "invalid/refuse-decline-retried.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "A declined card tried again (declined to running): no such move, so it is refused.",
+      "source": "arch 10 line 542; RULES 3.11"
+    },
+    {
+      "file": "invalid/refuse-waiting-with-claim.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "Dee W.'s row waiting for the chat to open but keeping its claim: refused, since a waiting row keeps no claim. The same row with its claim let go (null) passes.",
+      "source": "arch 06 line 313 ('wait, with no clock')"
+    },
+    {
+      "file": "invalid/refuse-waiting-by-wrong-actor.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "Dee W.'s row put to waiting_chat by markPart: no such move, since only limit 8 at send (markRow) does it. The same move by markRow passes.",
+      "source": "arch 06 line 313; 02-contracts K-07 Contract test ('every state move ... is allowed and no other')"
+    }
+  ]
+}

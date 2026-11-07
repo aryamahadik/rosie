@@ -1,0 +1,54 @@
+{
+  "record": "effect",
+  "effect": {
+    "effectId": "eff-reconcile-dee-second-charge-refund",
+    "turnId": null,
+    "jobId": "job-reconcile-2026-11-09",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": null,
+    "kind": "stripe_refund",
+    "port": "stripe",
+    "calendarProvider": null,
+    "visitId": null,
+    "personId": "person-dee",
+    "handleId": null,
+    "amount": { "cents": 2000, "currency": "USD" },
+    "portRequest": { "refundOf": "stripe-charge-demo-0021" },
+    "idempotencyKey": "eff-reconcile-dee-second-charge-refund",
+    "state": "succeeded",
+    "tries": 1,
+    "runs": 1,
+    "firstTryAt": "2026-11-09T03:00:06Z",
+    "providerObjectId": "stripe-refund-demo-0021",
+    "errorCode": null,
+    "ledgerLineId": "ledger-dee-second-charge-refund",
+    "traceId": "trace-reconcile-0001"
+  },
+  "moves": [
+    {
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-09T03:00:05Z",
+      "by": "reconciliationJob",
+      "tryOutcome": null,
+      "note": "The daily reconciliation at 03:00 UTC, over the last 48 hours, finds Dee W.'s $20 payment at Lee's Barbershop charged twice: the second charge has no ledger line, so its line is written, and with no agreed booking behind it, it is refunded at once and Dee and Sam are told (arch 10 line 550; S12-26). The job, with no turn, writes this effect row (K-05 v1.1)."
+    },
+    {
+      "from": "pending",
+      "to": "running",
+      "at": "2026-11-09T03:00:06Z",
+      "by": "claimEffects",
+      "tryOutcome": null,
+      "note": "The effects runner claims it; try 1 goes on its one key."
+    },
+    {
+      "from": "running",
+      "to": "succeeded",
+      "at": "2026-11-09T03:00:07Z",
+      "by": "recordEffectResult",
+      "tryOutcome": "ok",
+      "note": "Stripe refunds the second charge; reconciliation matches the refund to its ledger line by the effect id (arch 10 line 550)."
+    }
+  ],
+  "providerEventIds": []
+}

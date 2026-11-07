@@ -1,0 +1,198 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-alex-confirm-texts-down",
+    "turnId": "turn-alex-book-2",
+    "commitSeq": 6,
+    "recipientHandleId": "handle-alex",
+    "recipientPersonId": "person-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-riley-nov14",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "quick_reply",
+    "copyOfRowId": null,
+    "state": "failed",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-alex-confirm-texts-down",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am",
+          "calendarFile": "new",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "pro.name", "value": "Riley" },
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0040"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-alex-confirm-texts-down",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-alex-confirm-texts-down/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "failed",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": "2026-11-07T15:10:01Z",
+      "errorCode": "503"
+    },
+    {
+      "outboxRowId": "out-alex-confirm-texts-down",
+      "partNo": 1,
+      "tryNo": 2,
+      "idempotencyKey": "out-alex-confirm-texts-down/1/2",
+      "attempts": 1,
+      "kind": "words",
+      "state": "failed",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": "2026-11-07T15:16:01Z",
+      "errorCode": "503"
+    },
+    {
+      "outboxRowId": "out-alex-confirm-texts-down",
+      "partNo": 1,
+      "tryNo": 3,
+      "idempotencyKey": "out-alex-confirm-texts-down/1/3",
+      "attempts": 1,
+      "kind": "words",
+      "state": "failed",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": "2026-11-07T15:22:01Z",
+      "errorCode": "503"
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-11-07T15:10:00Z",
+    "lapsesAt": "2026-11-07T15:23:00Z",
+    "claimNo": 1,
+    "firstTryAt": "2026-11-07T15:10:00Z",
+    "nextTryNotBefore": null
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-07T15:09:56Z",
+      "by": "commitTurn",
+      "note": "Alex's confirmation, committed while Rosie's texting company has an outage (S12-09)."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-07T15:09:59Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-07T15:10:00Z",
+      "by": "claimOutbox",
+      "note": "Claimed."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-confirm-texts-down/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T15:10:00Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "Try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-confirm-texts-down/1/1",
+      "from": "pending",
+      "to": "failed",
+      "at": "2026-11-07T15:10:01Z",
+      "by": "markPart",
+      "errorCode": "503",
+      "note": "A reported failure: the next try gets a new key (arch 01 line 65)."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-confirm-texts-down/1/2",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T15:10:01Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Try 2, written with the failure; it goes after the provider's Retry-After (arch 10 line 540)."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-confirm-texts-down/1/2",
+      "from": "pending",
+      "to": "failed",
+      "at": "2026-11-07T15:16:01Z",
+      "by": "markPart",
+      "errorCode": "503",
+      "note": "Still failing."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-confirm-texts-down/1/3",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-07T15:16:01Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Try 3."
+    },
+    {
+      "subject": "part",
+      "key": "out-alex-confirm-texts-down/1/3",
+      "from": "pending",
+      "to": "failed",
+      "at": "2026-11-07T15:22:01Z",
+      "by": "markPart",
+      "errorCode": "503",
+      "note": "Still failing."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "failed",
+      "at": "2026-11-07T15:25:00Z",
+      "by": "dispatcherGivesUp",
+      "note": "Sends still failing after 15 minutes of tries: the next way the person allows (arch 02 line 125; S12-09 'No: the outage lasts')."
+    }
+  ],
+  "followUps": [
+    {
+      "why": "nextWay",
+      "outboxRowId": "out-alex-confirm-by-email",
+      "recipientHandleId": "handle-alex-email",
+      "channel": "email",
+      "at": "2026-11-07T15:25:00Z"
+    }
+  ]
+}

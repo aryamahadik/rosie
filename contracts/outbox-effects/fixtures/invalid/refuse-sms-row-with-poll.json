@@ -1,0 +1,193 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-a7-03-alex",
+    "turnId": "turn-alex-move-1",
+    "commitSeq": 1,
+    "recipientHandleId": "handle-alex",
+    "recipientPersonId": "person-alex",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-alex-haircut",
+    "openQuestionId": "oq-a7-03-alex",
+    "channel": "sms",
+    "port": "linq",
+    "sendClass": "quick_reply",
+    "copyOfRowId": null,
+    "state": "delivered",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-a7-03-alex",
+      "channel": "sms",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        },
+        {
+          "kind": "poll",
+          "text": null,
+          "calendarFile": "none",
+          "options": [
+            { "id": "A7-03/1", "label": "Sat 12:00pm" },
+            { "id": "A7-03/2", "label": "Sat 2:00pm" },
+            { "id": "A7-03/3", "label": "Sat 3:30pm" }
+          ],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "pro.name", "value": "Riley" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-alex-0007"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-a7-03-alex",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-a7-03-alex/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0001",
+      "providerOptionIds": null,
+      "sentAt": "2026-10-23T14:05:03Z",
+      "deliveredAt": "2026-10-23T14:05:04Z",
+      "failedAt": null,
+      "errorCode": null
+    },
+    {
+      "outboxRowId": "out-a7-03-alex",
+      "partNo": 2,
+      "tryNo": 1,
+      "idempotencyKey": "out-a7-03-alex/2/1",
+      "attempts": 1,
+      "kind": "poll",
+      "state": "delivered",
+      "providerMessageId": "linq-msg-demo-0002",
+      "providerOptionIds": ["linq-opt-demo-1", "linq-opt-demo-2", "linq-opt-demo-3"],
+      "sentAt": "2026-10-23T14:05:05Z",
+      "deliveredAt": "2026-10-23T14:05:06Z",
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-10-23T14:05:02Z",
+    "lapsesAt": "2026-10-23T14:06:05Z",
+    "claimNo": 1,
+    "firstTryAt": "2026-10-23T14:05:02Z",
+    "nextTryNotBefore": null
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-10-23T14:05:00Z",
+      "by": "commitTurn",
+      "note": "The tour's A7-03: Alex asks to move the haircut; one row asks which time (tour lines 423 to 427; K-04 seed-outbox-row)."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-10-23T14:05:02Z",
+      "by": "writePlan",
+      "note": "Two sends: the words with the question, then the poll (arch 07 line 367)."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-10-23T14:05:02Z",
+      "by": "claimOutbox",
+      "note": "Claimed."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-10-23T14:05:02Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The words, try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex/2/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-10-23T14:05:02Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The poll, try 1."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex/1/1",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-10-23T14:05:03Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Linq accepts the words; the row stays sending until the poll is accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex/1/1",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-10-23T14:05:04Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "The words' delivery receipt: the poll may go now (Linq documents no order between them, so the second waits for the first's receipt, at most 10 s: arch 07 line 367). The question's clock arms here (arch 02 line 127)."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex/2/1",
+      "from": "pending",
+      "to": "sent",
+      "at": "2026-10-23T14:05:05Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "Linq accepts the poll with its option ids."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "sent",
+      "at": "2026-10-23T14:05:05Z",
+      "by": "markPart",
+      "note": "Both parts accepted."
+    },
+    {
+      "subject": "part",
+      "key": "out-a7-03-alex/2/1",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-10-23T14:05:06Z",
+      "by": "markPart",
+      "errorCode": null,
+      "note": "The poll's receipt."
+    },
+    {
+      "subject": "row",
+      "from": "sent",
+      "to": "delivered",
+      "at": "2026-10-23T14:05:06Z",
+      "by": "markPart",
+      "note": "Every part delivered (K-04 seed-outbox-row's state)."
+    }
+  ],
+  "followUps": []
+}

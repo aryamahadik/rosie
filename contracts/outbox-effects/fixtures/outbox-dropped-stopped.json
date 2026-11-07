@@ -1,0 +1,110 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-ben-reminder",
+    "turnId": "turn-ben-reminder-1",
+    "commitSeq": 4,
+    "recipientHandleId": "handle-ben",
+    "recipientPersonId": "person-ben",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-ben-skin-fade",
+    "openQuestionId": "oq-ben-reminder",
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "dropped_stopped",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-ben-reminder",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Reminder: your visit at Lee's Barbershop with Avery is Sat Nov 7, 2:00pm.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "pro.name", "value": "Avery" },
+        { "slot": "visit.time", "value": "Sat Nov 7, 2:00pm" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-ben-0031"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-ben-reminder",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-ben-reminder/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "pending",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": {
+    "claimer": "dispatcher-1",
+    "claimedAt": "2026-11-06T19:00:04Z",
+    "lapsesAt": "2026-11-06T19:01:04Z",
+    "claimNo": 1,
+    "firstTryAt": null,
+    "nextTryNotBefore": null
+  },
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-06T19:00:00Z",
+      "by": "commitTurn",
+      "note": "The day before Ben T.'s Saturday visit, a reminder row to Ben (S12-09's booking: Lee's Barbershop, Sat Nov 7, 2:00pm, Avery)."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-06T19:00:03Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-06T19:00:04Z",
+      "by": "claimOutbox",
+      "note": "Claimed in Ben's commit order."
+    },
+    {
+      "subject": "part",
+      "key": "out-ben-reminder/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-06T19:00:04Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The words part, try 1, written at the claim."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "dropped_stopped",
+      "at": "2026-11-06T19:00:05Z",
+      "by": "markRow",
+      "note": "Limit 8 at send: Ben's phone is stopped (K-04 seed-phone-stopped), so the row is dropped; its question takes step 9's never-delivered path, so no clock runs (arch 06 line 313; arch 02 line 127). Nothing was sent."
+    }
+  ],
+  "followUps": []
+}

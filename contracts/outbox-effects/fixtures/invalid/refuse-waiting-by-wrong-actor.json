@@ -1,0 +1,103 @@
+{
+  "record": "outboxRow",
+  "row": {
+    "id": "out-dee-booked-riley",
+    "turnId": "turn-sam-adds-dee-1",
+    "commitSeq": 12,
+    "recipientHandleId": "handle-dee",
+    "recipientPersonId": "person-dee",
+    "businessId": "biz-lees-barbershop",
+    "bookingId": "booking-dee-riley-nov14",
+    "openQuestionId": null,
+    "channel": "imessage",
+    "port": "linq",
+    "sendClass": "routine",
+    "copyOfRowId": null,
+    "state": "waiting_chat",
+    "heldUntil": null,
+    "finalParts": {
+      "row": "out-dee-booked-riley",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 10:00am",
+          "calendarFile": "new",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "pro.name", "value": "Riley" },
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "visit.time", "value": "Sat Nov 14, 10:00am" }
+      ],
+      "threadReplyTo": null
+    },
+    "traceId": "trace-dee-0010"
+  },
+  "parts": [
+    {
+      "outboxRowId": "out-dee-booked-riley",
+      "partNo": 1,
+      "tryNo": 1,
+      "idempotencyKey": "out-dee-booked-riley/1/1",
+      "attempts": 1,
+      "kind": "words",
+      "state": "pending",
+      "providerMessageId": null,
+      "providerOptionIds": null,
+      "sentAt": null,
+      "deliveredAt": null,
+      "failedAt": null,
+      "errorCode": null
+    }
+  ],
+  "claim": null,
+  "moves": [
+    {
+      "subject": "row",
+      "from": null,
+      "to": "planned",
+      "at": "2026-11-09T15:00:00Z",
+      "by": "commitTurn",
+      "note": "Sam adds Dee W.'s $35 haircut with Riley (a booking the business adds); a routine row tells Dee."
+    },
+    {
+      "subject": "row",
+      "from": "planned",
+      "to": "checked",
+      "at": "2026-11-09T15:00:03Z",
+      "by": "writePlan",
+      "note": "Plan and final parts after the checks."
+    },
+    {
+      "subject": "row",
+      "from": "checked",
+      "to": "sending",
+      "at": "2026-11-09T15:00:04Z",
+      "by": "claimOutbox",
+      "note": "Claimed in Dee's commit order."
+    },
+    {
+      "subject": "part",
+      "key": "out-dee-booked-riley/1/1",
+      "from": null,
+      "to": "pending",
+      "at": "2026-11-09T15:00:04Z",
+      "by": "claimOutbox",
+      "errorCode": null,
+      "note": "The words part, try 1, written at the claim."
+    },
+    {
+      "subject": "row",
+      "from": "sending",
+      "to": "waiting_chat",
+      "at": "2026-11-09T15:00:05Z",
+      "by": "markPart",
+      "note": "The row put to waiting_chat by markPart. Refused: only limit 8 at send (markRow) puts a row to wait for the chat to open (arch 06 line 313)."
+    }
+  ],
+  "followUps": []
+}
