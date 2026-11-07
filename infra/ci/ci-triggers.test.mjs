@@ -1,4 +1,5 @@
-// T-1058: ci.yml runs once per push (pull_request, plus push to main only), and keeps every step.
+// T-1058: ci.yml runs once per push (pull_request, plus push to main only), and keeps every step. T-1067 adds
+// two steps (the parity inputs check and the parity run); infra/ci/parity-placement.test.mjs proves them.
 // No YAML dependency: this reads only the few lines it needs from the workflow file.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -82,6 +83,8 @@ test("no job or step is removed", () => {
     "Lint",
     "Type check",
     "Tests (unit, workers, contract)",
+    "Parity inputs changed (overlay, load, graph, master fixtures, Vitest config, manifest, lockfile)",
+    "Overlay parity (only when its inputs changed)",
     "CI script tests (the guards and the PreToolUse hook)",
     "Test guard (no fewer tests, no new skip, todo or only)",
     "Migration guard (migrations only expand)",

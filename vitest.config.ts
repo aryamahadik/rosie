@@ -1,5 +1,6 @@
 // Vitest projects (factory spec 2, ADR-003). `npm test` runs unit, workers and contract; each project also has its
-// own script (`npm run test:<project>`). A project with no test files passes.
+// own script (`npm run test:<project>`). A project with no test files passes. The parity project is outside
+// `npm test` (T-1067).
 import { cloudflareTest } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
 
@@ -15,6 +16,10 @@ const workspaces = [
   "evals",
   "tests",
 ];
+
+// The overlay parity shards (T-135, 243 trades through both flows): their own project, outside `npm test`, run by
+// `npm run test:parity` when the parity's inputs change (T-1067; ci.yml and merge-check.yml hold the path list).
+const PARITY_GLOB = "compiler/src/**/parity.shard-*.test.ts";
 
 // The local database of infra/docker-compose.yml, used when DATABASE_URL and CI are both unset.
 const LOCAL_DATABASE_URL = "postgres://rosie:rosie@127.0.0.1:54329/rosie";
@@ -34,7 +39,15 @@ export default defineConfig({
             "db/seeds/**/*.test.ts",
             "fixtures/**/*.test.ts",
           ],
-          exclude: ["**/node_modules/**", "**/*.worker.test.ts", "**/*.int.test.ts"],
+          exclude: ["**/node_modules/**", "**/*.worker.test.ts", "**/*.int.test.ts", PARITY_GLOB],
+        },
+      },
+      {
+        // Not in `npm test`: `npm run test:parity`. Same exclusions as unit, so no other file lands here.
+        test: {
+          name: "parity",
+          include: [PARITY_GLOB],
+          exclude: ["**/node_modules/**"],
         },
       },
       {
