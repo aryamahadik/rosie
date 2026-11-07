@@ -36,7 +36,12 @@
     "producers": [{ "queue": "rosie-retry", "binding": "RETRY_QUEUE" }],
     "consumers": [{ "queue": "rosie-retry", "max_retries": 5, "dead_letter_queue": "rosie-retry-dlq" }],
   },
-  // No R2 or Hyperdrive bindings yet: they come with the tasks that need them.
+  // The private files bucket (FILES; the R2 adapter, T-438, reads and writes ID files through it; Master
+  // Corrections C10). The bucket is rosie-staging-files, the only one that exists (infra/scripts/create-r2-bucket.sh
+  // makes it with no public access: no r2.dev URL, no custom domain). For local runs, the Vitest Workers pool and
+  // dry runs, which simulate it without touching the real bucket. No env.staging copy until T-566.
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "rosie-staging-files" }],
+  // No Hyperdrive binding yet: it comes with the task that needs it.
   // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
   "vars": {
     "ENVIRONMENT": "production",
